@@ -1,32 +1,39 @@
-# Prerequisites
-*.d
+# Daemon renderer gitignore
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+#Temp folders
+Build/
+Logs/
 
-# Precompiled Headers
-*.gch
-*.pch
+#logs
+*.bsc
+*.htm
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+# Binaries
 *.exe
-*.out
-*.app
+*.iobj
+*.ipdb
+*.pdb
+*.ilk
+*.dmp
+
+# Visual Studio Files
+*.suo
+*.csproj.user
+*.vbproj.user
+*.user
+*.vcxproj.filters
+*.vcxproj.user
+*.sln.DotSettings.user
+ipch
+*sdf
+\.vs/
+
+#assets
+*.obj
+*.fbx
+*.png
+*.gif
+*.jpg
+*.mp3
+*.wav
+*.ogg

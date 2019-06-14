@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping|Win32">
+      <Configuration>Shipping</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping|x64">
+      <Configuration>Shipping</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{91B56EA1-6D82-4200-A859-EF487BB0B39A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>PGOptimize</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>PGOptimize</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath)</IncludePath>
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\Source\Include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\Source\Include</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\Source\Include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <ProgramDatabaseFile />
+    </Link>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_RELEASE</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\Source\Include</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <Link>
+      <ProgramDatabaseFile>
+      </ProgramDatabaseFile>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>
+      </PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <StringPooling>true</StringPooling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ProgramDataBaseFileName />
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\Source\Include</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\Source\Include</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
+    <ClInclude Include="Source\Include\Config.hpp" />
+    <ClInclude Include="Source\Include\Containers\Array.hpp" />
+    <ClInclude Include="Source\Include\Containers\Bitset.hpp" />
+    <ClInclude Include="Source\Include\Containers\Deque.hpp" />
+    <ClInclude Include="Source\Include\Containers\ForwardList.hpp" />
+    <ClInclude Include="Source\Include\Containers\List.hpp" />
+    <ClInclude Include="Source\Include\Containers\Map.hpp" />
+    <ClInclude Include="Source\Include\Containers\Pair.hpp" />
+    <ClInclude Include="Source\Include\Containers\Queue.hpp" />
+    <ClInclude Include="Source\Include\Containers\Set.hpp" />
+    <ClInclude Include="Source\Include\Containers\SmartPtr.hpp" />
+    <ClInclude Include="Source\Include\Containers\Stack.hpp" />
+    <ClInclude Include="Source\Include\Containers\String.hpp" />
+    <ClInclude Include="Source\Include\Containers\Tuple.hpp" />
+    <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
+    <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
+    <ClInclude Include="Source\Include\Containers\Vector.hpp" />
+    <ClInclude Include="source\include\FundamentalTypes.hpp" />
+    <ClInclude Include="Source\Include\Meta\Meta.hpp" />
+    <ClInclude Include="Source\Include\Meta\MinimumType.hpp" />
+    <ClInclude Include="source\include\resource\ResourceLoadingDescriptor.hpp" />
+    <ClInclude Include="Source\Include\Resource\Enums\EGCCollectionMode.hpp" />
+    <ClInclude Include="Source\Include\Resource\Enums\EResourceGCStrategy.hpp" />
+    <ClInclude Include="Source\Include\Resource\Enums\EResourceLoadingFailureCode.hpp" />
+    <ClInclude Include="Source\Include\Resource\Enums\EResourceLoadingMode.hpp" />
+    <ClInclude Include="Source\Include\Resource\Enums\EResourceStatus.hpp" />
+    <ClInclude Include="Source\Include\Resource\ResourceProcessingFailure.hpp" />
+    <ClInclude Include="source\include\resource\Handle.hpp" />
+    <ClInclude Include="source\include\resource\IResource.hpp" />
+    <ClInclude Include="source\include\resource\ResourceIdentifier.hpp" />
+    <ClInclude Include="source\include\resource\ResourceManager.hpp" />
+    <ClInclude Include="source\include\resource\ResourceManifest.hpp" />
+    <ClInclude Include="Source\Include\Threading\BaseSynchronizedAccess.hpp" />
+    <ClInclude Include="Source\Include\Threading\EAccessMode.hpp" />
+    <ClInclude Include="Source\Include\Threading\EWorkerFlag.hpp" />
+    <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
+    <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
+    <ClInclude Include="Source\Include\Threading\ThreadPool.hpp" />
+    <ClInclude Include="Source\Include\Threading\Worker.hpp" />
+    <ClInclude Include="Source\Include\Threading\TsLockQueue.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
+    <None Include=".vscode\ipch\4071d4c5e77a9eb1\mmap_address.bin" />
+    <None Include=".vscode\ipch\4c2ba5647491bbb7\mmap_address.bin" />
+    <None Include=".vscode\ipch\65a0accd8a051220\mmap_address.bin" />
+    <None Include=".vscode\ipch\692980f561d745ba\mmap_address.bin" />
+    <None Include=".vscode\ipch\6e88d65252f37c42\mmap_address.bin" />
+    <None Include=".vscode\ipch\791877508d46f326\mmap_address.bin" />
+    <None Include=".vscode\ipch\7965698fafeaa865\mmap_address.bin" />
+    <None Include=".vscode\ipch\7ba7f4bd34b60b56\mmap_address.bin" />
+    <None Include=".vscode\ipch\8339eef03436c344\mmap_address.bin" />
+    <None Include=".vscode\ipch\877d88a9f4b512f1\mmap_address.bin" />
+    <None Include=".vscode\ipch\886f9239b4c86ff6\mmap_address.bin" />
+    <None Include=".vscode\ipch\b2a036dfd0ce33c7\mmap_address.bin" />
+    <None Include=".vscode\ipch\b31ddc60b45f72dd\mmap_address.bin" />
+    <None Include=".vscode\ipch\be30e155d42a8433\mmap_address.bin" />
+    <None Include=".vscode\ipch\d792cd70e494eded\mmap_address.bin" />
+    <None Include=".vscode\ipch\e53b10bdc85bdc49\mmap_address.bin" />
+    <None Include=".vscode\ipch\e571e583f658dfef\mmap_address.bin" />
+    <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
+    <None Include="cpp.hint" />
+    <None Include="Source\Include\Bitwise\Bitmask.inl" />
+    <None Include="Source\Include\Threading\BaseSynchronizedAccess.inl" />
+    <None Include="Source\Include\Threading\Synchronized.inl" />
+    <None Include="Source\Include\Threading\SynchronizedAccess.inl" />
+    <None Include="Source\Include\Threading\TsLockQueue.inl" />
+    <None Include="Source\Include\Threading\Worker.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Src\Main.cpp" />
+    <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
+    <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
+    <ClCompile Include="Source\Src\Threading\Worker.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
