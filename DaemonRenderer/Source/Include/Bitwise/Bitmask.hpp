@@ -28,7 +28,7 @@
 #include <type_traits>
 
 #include "Config.hpp"
-#include "FundamentalTypes.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 #include "Meta/Meta.hpp"
 #include "Meta/MinimumType.hpp"

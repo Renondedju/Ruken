@@ -27,7 +27,7 @@
 #include <thread>
 
 #include "Config.hpp"
-#include "FundamentalTypes.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 #include "Threading/EWorkerFlag.hpp"
 #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS

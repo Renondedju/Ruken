@@ -25,7 +25,7 @@
 #pragma once
 
 #include "Config.hpp"
-#include "FundamentalTypes.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 #include "Containers/String.hpp"
 #include "Resource/Enums/EResourceLoadingFailureCode.hpp"

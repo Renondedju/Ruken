@@ -47,6 +47,8 @@ using DAEchar32	= char32_t;
 
 //Integers
 
+using DAEint	= int;
+
 using DAEint8	= int8_t;
 using DAEint16	= int16_t;
 using DAEint32	= int32_t;
