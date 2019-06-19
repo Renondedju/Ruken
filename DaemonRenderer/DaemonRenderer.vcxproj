@@ -240,7 +240,9 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
-    <ClInclude Include="source\include\FundamentalTypes.hpp" />
+    <ClInclude Include="Source\Include\Types\ArithmeticOperators.hpp" />
+    <ClInclude Include="Source\Include\Types\Division.hpp" />
+    <ClInclude Include="Source\Include\Types\FundamentalTypes.hpp" />
     <ClInclude Include="Source\Include\Meta\Meta.hpp" />
     <ClInclude Include="Source\Include\Meta\MinimumType.hpp" />
     <ClInclude Include="source\include\resource\ResourceLoadingDescriptor.hpp" />
@@ -263,6 +265,14 @@
     <ClInclude Include="Source\Include\Threading\ThreadPool.hpp" />
     <ClInclude Include="Source\Include\Threading\Worker.hpp" />
     <ClInclude Include="Source\Include\Threading\TsLockQueue.hpp" />
+    <ClInclude Include="Source\Include\Types\Addition.hpp" />
+    <ClInclude Include="Source\Include\Types\Increment.hpp" />
+    <ClInclude Include="Source\Include\Types\Modulo.hpp" />
+    <ClInclude Include="Source\Include\Types\Multiplication.hpp" />
+    <ClInclude Include="Source\Include\Types\NamedType.hpp" />
+    <ClInclude Include="Source\Include\Types\Subtraction.hpp" />
+    <ClInclude Include="Source\Include\Types\UnaryMinus.hpp" />
+    <ClInclude Include="Source\Include\Types\UnaryPlus.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
