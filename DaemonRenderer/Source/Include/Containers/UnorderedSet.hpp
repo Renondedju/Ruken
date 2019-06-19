@@ -30,10 +30,22 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename Key, typename Hash = std::hash<Key>, typename Pred = std::equal_to<Key>>
-using UnorderedSet = std::unordered_set<Key, Hash, Pred>;
+#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
 
-template<typename K, typename V>
-using UnorderedMultiset = std::unordered_multiset<K, V>;
+template<typename TKey, typename THash = std::hash<TKey>, typename TPredicate = std::equal_to<TKey>>
+using UnorderedSet = std::pmr::unordered_set<TKey, THash, TPredicate>;
+
+template<typename TK, typename TV>
+using UnorderedMultiset = std::pmr::unordered_multiset<TK, TV>;
+
+#else
+
+template<typename TKey, typename THash = std::hash<TKey>, typename TPredicate = std::equal_to<TKey>>
+using UnorderedSet = std::unordered_set<TKey, THash, TPredicate>;
+
+template<typename TK, typename TV>
+using UnorderedMultiset = std::unordered_multiset<TK, TV>;
+
+#endif
 
 END_DAEMON_NAMESPACE

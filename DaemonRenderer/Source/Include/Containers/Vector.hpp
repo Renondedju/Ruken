@@ -30,7 +30,16 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+
+template<typename T>
+using Vector = std::pmr::vector<T>;
+
+#else
+
 template<typename T>
 using Vector = std::vector<T>;
+
+#endif
 
 END_DAEMON_NAMESPACE

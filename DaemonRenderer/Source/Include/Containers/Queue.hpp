@@ -31,10 +31,10 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename T, typename C = Deque<T>>
-using Queue = std::queue<T, C>;
+template<typename T, typename TC = Deque<T>>
+using Queue = std::queue<T, TC>;
 
-template<typename T, typename C = Deque<T>>
-using PriorityQueue = std::priority_queue<T, C>;
+template<typename T, typename TC = Deque<T>>
+using PriorityQueue = std::priority_queue<T, TC>;
 
 END_DAEMON_NAMESPACE

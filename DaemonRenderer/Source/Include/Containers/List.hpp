@@ -30,7 +30,16 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+
+template<typename T>
+using List = std::pmr::list<T>
+
+#else
+
 template<typename T>
 using List = std::list<T>;
+
+#endif
 
 END_DAEMON_NAMESPACE

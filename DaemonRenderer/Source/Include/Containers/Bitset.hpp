@@ -30,7 +30,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template <size_t Size>
-using Bitset = std::bitset<Size>;
+template <size_t TSize>
+using Bitset = std::bitset<TSize>;
 
 END_DAEMON_NAMESPACE

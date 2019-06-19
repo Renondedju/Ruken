@@ -31,7 +31,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename T, typename C = Deque<T>>
-using Stack = std::stack<T, C>;
+template<typename T, typename TC = Deque<T>>
+using Stack = std::stack<T, TC>;
 
 END_DAEMON_NAMESPACE

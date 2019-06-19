@@ -129,3 +129,8 @@
 #else
 	#define DAEMON_THREADING_DISABLE_THREAD_LABELS
 #endif
+
+// ------------------------------
+//	   Standard containers
+
+//#define DAEMON_CONTAINERS_USE_PMR_ALLOCATORS

@@ -30,8 +30,8 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename T, class Del = std::default_delete<T>>
-using UniquePtr = std::unique_ptr<T, Del>;
+template<typename T, class TDel = std::default_delete<T>>
+using UniquePtr = std::unique_ptr<T, TDel>;
 
 template <typename T>
 using SharedPtr = std::shared_ptr<T>;

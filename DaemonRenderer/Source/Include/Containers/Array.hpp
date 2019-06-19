@@ -30,7 +30,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template <typename T, size_t Size>
-using Array = std::array<T, Size>;
+template <typename T, size_t TSize>
+using Array = std::array<T, TSize>;
 
 END_DAEMON_NAMESPACE

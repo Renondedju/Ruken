@@ -30,7 +30,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template <typename T, typename U>
-using Pair = std::pair<T, U>;
+template <typename T, typename TU>
+using Pair = std::pair<T, TU>;
 
 END_DAEMON_NAMESPACE

@@ -30,10 +30,22 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename K, typename V, typename Hasher = std::hash<K>>
-using UnorderedMap = std::unordered_map<K, V, Hasher>;
+#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
 
-template<typename K, typename V>
-using UnorderedMultimap = std::unordered_multimap<K, V>;
+template<typename TK, typename TV, typename THasher = std::hash<TK>>
+using UnorderedMap = std::pmr::unordered_map<TK, TV, THasher>;
+
+template<typename TK, typename TV>
+using UnorderedMultimap = std::pmr::unordered_multimap<TK, TV>;
+
+#else
+
+template<typename TK, typename TV, typename THasher = std::hash<TK>>
+using UnorderedMap = std::unordered_map<TK, TV, THasher>;
+
+template<typename TK, typename TV>
+using UnorderedMultimap = std::unordered_multimap<TK, TV>;
+
+#endif
 
 END_DAEMON_NAMESPACE

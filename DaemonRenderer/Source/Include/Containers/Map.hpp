@@ -30,7 +30,16 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename K, typename V>
-using Map = std::map<K, V>;
+#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+
+template<typename TK, typename TV>
+using Map = std::pmr::map<TK, TV>;
+
+#else
+
+template<typename TK, typename TV>
+using Map = std::map<TK, TV>;
+
+#endif
 
 END_DAEMON_NAMESPACE
