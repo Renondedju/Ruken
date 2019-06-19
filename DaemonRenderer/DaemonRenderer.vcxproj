@@ -93,29 +93,32 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
-    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
@@ -282,12 +285,13 @@
     <None Include=".vscode\ipch\e571e583f658dfef\mmap_address.bin" />
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
-    <None Include="Source\Include\Bitwise\Bitmask.inl" />
-    <None Include="Source\Include\Threading\BaseSynchronizedAccess.inl" />
-    <None Include="Source\Include\Threading\Synchronized.inl" />
-    <None Include="Source\Include\Threading\SynchronizedAccess.inl" />
-    <None Include="Source\Include\Threading\TsLockQueue.inl" />
-    <None Include="Source\Include\Threading\Worker.inl" />
+    <None Include="Source\Src\Bitwise\Bitmask.inl" />
+    <None Include="Source\Src\Threading\BaseSynchronizedAccess.inl" />
+    <None Include="Source\Src\Threading\Synchronized.inl" />
+    <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
+    <None Include="Source\Src\Threading\TsLockQueue.inl" />
+    <None Include="Source\Src\Threading\Worker.inl" />
+    <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\Main.cpp" />
