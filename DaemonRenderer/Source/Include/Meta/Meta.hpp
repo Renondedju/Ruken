@@ -26,11 +26,11 @@
 
 // Meta-programing header
 
-#define GLUE(a, b) __GLUE(a, b)
-#define __GLUE(a, b) a ## b
+#define DAEMON_GLUE(a, b) __DAEMON_GLUE(a, b)
+#define __DAEMON_GLUE(a, b) a ## b
 
-#define STRING(a) __STRING(a)
-#define __STRING(a) # a
+#define DAEMON_STRING(a) __DAEMON_STRING(a)
+#define __DAEMON_STRING(a) # a
 
 #define DAEMON_GET_ARG_COUNT(...)  DAEMON_INTERNAL_EXPAND_ARGS_PRIVATE(DAEMON_INTERNAL_ARGS_AUGMENTER(__VA_ARGS__))
 
