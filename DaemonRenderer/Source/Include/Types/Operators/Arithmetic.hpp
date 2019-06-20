@@ -26,15 +26,15 @@
 
 #include "Config.hpp"
 
-#include "Types/Modulo.hpp"
-#include "Types/Addition.hpp"
-#include "Types/Division.hpp"
-#include "Types/Increment.hpp"
-#include "Types/Decrement.hpp"
-#include "Types/UnaryPlus.hpp"
-#include "Types/UnaryMinus.hpp"
-#include "Types/Subtraction.hpp"
-#include "Types/Multiplication.hpp"
+#include "Types/Operators/Arithmetic/Modulo.hpp"
+#include "Types/Operators/Arithmetic/Addition.hpp"
+#include "Types/Operators/Arithmetic/Division.hpp"
+#include "Types/Operators/Arithmetic/Increment.hpp"
+#include "Types/Operators/Arithmetic/Decrement.hpp"
+#include "Types/Operators/Arithmetic/UnaryPlus.hpp"
+#include "Types/Operators/Arithmetic/UnaryMinus.hpp"
+#include "Types/Operators/Arithmetic/Subtraction.hpp"
+#include "Types/Operators/Arithmetic/Multiplication.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -44,15 +44,15 @@ BEGIN_DAEMON_NAMESPACE
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct ArithmeticOperators : Modulo			<TStrongTypedef>,
-							 Addition		<TStrongTypedef>,
-							 Division		<TStrongTypedef>,
-							 Increment		<TStrongTypedef>,
-							 Decrement		<TStrongTypedef>,
-							 UnaryPlus		<TStrongTypedef>,
-							 UnaryMinus		<TStrongTypedef>,
-							 Subtraction	<TStrongTypedef>,
-							 Multiplication	<TStrongTypedef>
+struct Arithmetic:	Modulo			<TStrongTypedef>,
+					Addition		<TStrongTypedef>,
+					Division		<TStrongTypedef>,
+					Increment		<TStrongTypedef>,
+					Decrement		<TStrongTypedef>,
+					UnaryPlus		<TStrongTypedef>,
+					UnaryMinus		<TStrongTypedef>,
+					Subtraction		<TStrongTypedef>,
+					Multiplication	<TStrongTypedef>
 {};
 	
 
