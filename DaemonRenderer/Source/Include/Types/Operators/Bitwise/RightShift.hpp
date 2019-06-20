@@ -40,7 +40,7 @@ BEGIN_DAEMON_NAMESPACE
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct LeftShift
+struct RightShift
 {
 	/**
 	 * \brief Bitwise right shift assignment operator

@@ -41,11 +41,12 @@ BEGIN_DAEMON_NAMESPACE
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct Bitwise:	Or		 <TStrongTypedef>,
-				And		 <TStrongTypedef>,
-				Not		 <TStrongTypedef>,
-				Xor		 <TStrongTypedef>,
-				LeftShift<TStrongTypedef>
+struct Bitwise:	Or		  <TStrongTypedef>,
+				And		  <TStrongTypedef>,
+				Not		  <TStrongTypedef>,
+				Xor		  <TStrongTypedef>,
+				LeftShift <TStrongTypedef>,
+				RightShift<TStrongTypedef>
 {};
 	
 
