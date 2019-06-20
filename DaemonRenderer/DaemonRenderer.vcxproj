@@ -289,6 +289,10 @@
     <ClInclude Include="Source\Include\Types\Operators\Comparison\LessEqual.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Comparison\NotEqual.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Comparison\Spaceship.hpp" />
+    <ClInclude Include="Source\Include\Types\Operators\Logical.hpp" />
+    <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalAnd.hpp" />
+    <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalNot.hpp" />
+    <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalOr.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
