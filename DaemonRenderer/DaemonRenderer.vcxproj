@@ -240,6 +240,8 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
+    <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
+    <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Operators.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Decrement.hpp" />
@@ -294,6 +296,7 @@
     <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalAnd.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalNot.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalOr.hpp" />
+    <ClInclude Include="Source\Include\Types\Unique.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
