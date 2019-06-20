@@ -240,6 +240,7 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
+    <ClInclude Include="Source\Include\Types\Operators\Operators.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Decrement.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Division.hpp" />
