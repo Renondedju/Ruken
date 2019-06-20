@@ -1,11 +1,141 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_PREPROCESSOR_DIRECTIVES/@EntryValue">LeaveAsIs</s:String>
+	<s:String x:Key="/Default/CodeEditing/GenerateMemberBody/DocumentationGenerationKind/@EntryValue">Copy</s:String>
+	<s:String x:Key="/Default/CodeEditing/GenerateMemberBody/MethodImplementationKind/@EntryValue">ReturnDefaultValue</s:String>
+	<s:Boolean x:Key="/Default/CodeEditing/Intellisense/CodeCompletion/IntelliSenseCompletingCharacters/CSharpCompletingCharacters/UpgradedFromVSSettings/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeInspection/CppClangTidy/Checks/@EntryValue">*,-modernize-*,-bugprone-*</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/AnalysisEnabled/@EntryValue">SOLUTION</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CheckNamespace/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyBugproneUnusedReturnValue/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyClangDiagnosticInvalidTokenPaste/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyClangDiagnosticNonportableIncludePath/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyClangDiagnosticUnknownAttributes/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyCppcoreguidelinesMacroUsage/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyCppcoreguidelinesProTypeMemberInit/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyCppcoreguidelinesProTypeStaticCastDowncast/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyHicppMemberInit/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyHicppUseAuto/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyHicppUseEqualsDefault/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeMakeShared/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeMakeUnique/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeRedundantVoidArg/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeUseAuto/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeUseNullptr/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeUseOverride/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyModernizeUseUsing/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyReadabilityInconsistentDeclarationParameterName/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyReadabilityRedundantMemberInit/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppClangTidyReadabilitySimplifyBooleanExpr/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppDefaultCaseNotHandledInSwitchStatement/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppExpressionWithoutSideEffects/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppIncompleteSwitchStatement/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppLocalVariableMayBeConst/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppNonExplicitConvertingConstructor/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppRedundantAccessSpecifier/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppRedundantBaseClassAccessSpecifier/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppRedundantMemberInitializer/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppRedundantVirtualSpecifierOnOverrideFunction/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppUseAuto/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SuggestVarOrType_005FSimpleTypes/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedMember_002ELocal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeCleanup/RecentlyUsedProfile/@EntryValue">Built-in: Full Cleanup</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_BINARY_EXPRESSIONS_CHAIN/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_TERNARY/@EntryValue">ALIGN_ALL</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/ANONYMOUS_METHOD_DECLARATION_BRACES/@EntryValue">END_OF_LINE</s:String>
+	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/BLANK_LINES_AROUND_FUNCTION_DECLARATION/@EntryValue">1</s:Int64>
+	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/BLANK_LINES_AROUND_SINGLE_LINE_FUNCTION_DEFINITION/@EntryValue">1</s:Int64>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/EMPTY_BLOCK_STYLE/@EntryValue">TOGETHER</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/FUNCTION_DECLARATION_RETURN_TYPE_STYLE/@EntryValue">ON_SINGLE_LINE</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/FUNCTION_DEFINITION_RETURN_TYPE_STYLE/@EntryValue">ON_SINGLE_LINE</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_ACCESS_SPECIFIERS_FROM_CLASS/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_CASE_FROM_SWITCH/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_PREPROCESSOR_DIRECTIVES/@EntryValue">Normal</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_STYLE/@EntryValue">Tab</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_COMMENTS/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_DECLARATION_NAMES/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_EQ/@EntryValue">True</s:Boolean>
+	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/KEEP_BLANK_LINES_IN_CODE/@EntryValue">1</s:Int64>
+	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/KEEP_BLANK_LINES_IN_DECLARATIONS/@EntryValue">1</s:Int64>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/LINE_BREAK_AFTER_COLON_IN_MEMBER_INITIALIZER_LISTS/@EntryValue">LINE_BREAK</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/LINE_BREAK_AFTER_COMMA_IN_MEMBER_INITIALIZER_LISTS/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/LINKAGE_SPECIFICATION_BRACES/@EntryValue">NEXT_LINE</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/LINKAGE_SPECIFICATION_INDENTATION/@EntryValue">All</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/MEMBER_INITIALIZER_LIST_STYLE/@EntryValue">ON_SINGLE_LINE</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/OUTDENT_COMMAS/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/OUTDENT_DOTS/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SIMPLE_BLOCK_STYLE/@EntryValue">LINE_BREAK</s:String>
-	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=315DEC306848EE488C6AC3867E32B5C5/AbsolutePath/@EntryValue">D:\Basile\Documents\Projects\Cpp\DaemonRenderer\DaemonRenderer.DotSettings</s:String>
-	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=315DEC306848EE488C6AC3867E32B5C5/RelativePath/@EntryValue">..\DaemonRenderer.DotSettings</s:String>
-	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=315DEC306848EE488C6AC3867E32B5C5/@KeyIndexDefined">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File315DEC306848EE488C6AC3867E32B5C5/@KeyIndexDefined">True</s:Boolean>
-	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File315DEC306848EE488C6AC3867E32B5C5/RelativePriority/@EntryValue">1</s:Double>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SIMPLE_CASE_STATEMENT_STYLE/@EntryValue">LINE_BREAK</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SIMPLE_EMBEDDED_STATEMENT_STYLE/@EntryValue">LINE_BREAK</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SPACE_AFTER_PTR_IN_DATA_MEMBERS/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SPACE_AFTER_REF_IN_DATA_MEMBERS/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SPACE_BEFORE_PTR_IN_DATA_MEMBERS/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/SPACE_BEFORE_REF_IN_DATA_MEMBERS/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/TOPLEVEL_FUNCTION_DECLARATION_RETURN_TYPE_STYLE/@EntryValue">ON_SINGLE_LINE</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/TOPLEVEL_FUNCTION_DEFINITION_RETURN_TYPE_STYLE/@EntryValue">ON_SINGLE_LINE</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/USE_INDENT_FROM_VS/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_AFTER_INVOCATION_LPAR/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_ARGUMENTS_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_BRACED_INIT_LIST_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_CTOR_INITIALIZER_STYLE/@EntryValue">CHOP_ALWAYS</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_ENUMERATION_STYLE/@EntryValue">CHOP_ALWAYS</s:String>
+	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_LIMIT/@EntryValue">100</s:Int64>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CppFormatting/WRAP_PARAMETERS_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CppCVQualsPlacement/PutBeforeTypename/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CppCVQualsPlacement/PutConstBeforeVolatile/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CppIncludeDirective/UseRelativePaths/@EntryValue">Never</s:String>
+	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForBuiltInTypes/@EntryValue">UseExplicitType</s:String>
+	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForOtherTypes/@EntryValue">UseExplicitType</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/Generate/=CppDefinitions/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/Generate/=CppDefinitions/Options/=GenerateInlineDefinitions/@EntryIndexedValue">False</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=API/@EntryIndexedValue">API</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=EBO/@EntryIndexedValue">EBO</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=GC/@EntryIndexedValue">GC</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=GL/@EntryIndexedValue">GL</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=GPU/@EntryIndexedValue">GPU</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=HDR/@EntryIndexedValue">HDR</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=MRAO/@EntryIndexedValue">MRAO</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=RGB/@EntryIndexedValue">RGB</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=RGBA/@EntryIndexedValue">RGBA</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=RHI/@EntryIndexedValue">RHI</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=TRS/@EntryIndexedValue">TRS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=UBO/@EntryIndexedValue">UBO</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=UI/@EntryIndexedValue">UI</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=UV/@EntryIndexedValue">UV</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=VBO/@EntryIndexedValue">VBO</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=VK/@EntryIndexedValue">VK</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Class_0020and_0020struct_0020fields/@EntryIndexedValue">&lt;NamingElement Priority="10"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="class field" /&gt;&lt;type Name="struct field" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="m_" Suffix="" Style="aa_bb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Class_0020and_0020struct_0020methods/@EntryIndexedValue">&lt;NamingElement Priority="9"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="member function" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Classes_0020and_0020structs/@EntryIndexedValue">&lt;NamingElement Priority="1"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="__interface" /&gt;&lt;type Name="class" /&gt;&lt;type Name="struct" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Enum_0020members/@EntryIndexedValue">&lt;NamingElement Priority="13"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="scoped enumerator" /&gt;&lt;type Name="unscoped enumerator" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Enums/@EntryIndexedValue">&lt;NamingElement Priority="2"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="enum" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="E" Suffix="" Style="AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Global_0020constants/@EntryIndexedValue">&lt;NamingElement Priority="15"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="True" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="global variable" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Global_0020functions/@EntryIndexedValue">&lt;NamingElement Priority="8"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="global function" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Global_0020variables/@EntryIndexedValue">&lt;NamingElement Priority="7"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="global variable" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="g_" Suffix="" Style="aa_bb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Other_0020constants/@EntryIndexedValue">&lt;NamingElement Priority="14"&gt;&lt;Descriptor Static="True" Constexpr="Indeterminate" Const="True" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="class field" /&gt;&lt;type Name="local variable" /&gt;&lt;type Name="struct field" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Parameters/@EntryIndexedValue">&lt;NamingElement Priority="5"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="function parameter" /&gt;&lt;type Name="lambda parameter" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="in_" Suffix="" Style="aa_bb"&gt;&lt;ExtraRule Prefix="out_" Suffix="" Style="aa_bb" /&gt;&lt;/Policy&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Template_0020parameters/@EntryIndexedValue">&lt;NamingElement Priority="4"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="non-type template parameter" /&gt;&lt;type Name="type template parameter" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="T" Suffix="" Style="AaBb_AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Typedefs/@EntryIndexedValue">&lt;NamingElement Priority="17"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="type alias" /&gt;&lt;type Name="typedef" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Union_0020members/@EntryIndexedValue">&lt;NamingElement Priority="12"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="union member" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Rules/=Unions/@EntryIndexedValue">&lt;NamingElement Priority="3"&gt;&lt;Descriptor Static="Indeterminate" Constexpr="Indeterminate" Const="Indeterminate" Volatile="Indeterminate" Accessibility="NOT_APPLICABLE"&gt;&lt;type Name="union" /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/NamingElement&gt;</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpAutoNaming/IsNotificationDisabled/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Parameters/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="in_" Suffix="" Style="aaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateInstanceFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="m_" Suffix="" Style="aaBb" /&gt;</s:String>
+	
+	
+	
+	
+	
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EFeature_002EServices_002ECpp_002ECodeStyle_002ESettingsUpgrade_002EFunctionReturnStyleSettingsUpgrader/@EntryIndexedValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;FIXME)(\W|$)(.*)</s:String></wpf:ResourceDictionary>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4386F01B791C56499C7EA059B55FFB54/TodoIconStyle/@EntryValue">Error</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/Color/@EntryValue">WindowText</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/MatchComments/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/Name/@EntryValue">Fixme</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;FIXME)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4A001757F197724D844B172C183EB018/TodoIconStyle/@EntryValue">Warning</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Callstacks/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=compositing/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=convolute/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Perlin/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=renderdoc/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=shaders/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=SSAO/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
