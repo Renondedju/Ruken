@@ -25,7 +25,7 @@
 #include <iostream>
 
 #include "Config.hpp"
-#include "FundamentalTypes.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 USING_DAEMON_NAMESPACE
 
