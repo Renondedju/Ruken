@@ -185,6 +185,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
       <ProgramDatabaseFile />
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -199,6 +200,7 @@
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
       <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -240,6 +242,13 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
+    <ClInclude Include="Source\Include\Functional\Function.hpp" />
+    <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
+    <ClInclude Include="Source\Include\Functional\Method.hpp" />
+    <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
+    <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
+    <ClInclude Include="Source\Include\Threading\ThreadSafeQueue.hpp" />
     <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
     <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Operators.hpp" />
@@ -268,7 +277,6 @@
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadPool.hpp" />
     <ClInclude Include="Source\Include\Threading\Worker.hpp" />
-    <ClInclude Include="Source\Include\Threading\TsLockQueue.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Addition.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Increment.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Modulo.hpp" />
@@ -320,10 +328,12 @@
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
+    <None Include="Source\Src\Functional\Function.inl" />
+    <None Include="Source\Src\Functional\Method.inl" />
     <None Include="Source\Src\Threading\BaseSynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
     <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
-    <None Include="Source\Src\Threading\TsLockQueue.inl" />
+    <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
     <None Include="Source\Src\Threading\Worker.inl" />
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
@@ -331,6 +341,7 @@
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
+    <ClCompile Include="Source\Src\Threading\ThreadPool.cpp" />
     <ClCompile Include="Source\Src\Threading\Worker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

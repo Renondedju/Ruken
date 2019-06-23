@@ -22,49 +22,16 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Threading/ThreadPool.hpp"
 
-#include "Config.hpp"
+#include <thread>
+#include <algorithm>
 
-#include "Types/Unique.hpp"
-#include "Threading/Worker.hpp"
-#include "Containers/Vector.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
-
-class ThreadPool : Unique
+ThreadPool::ThreadPool():
+	m_workers {std::thread::hardware_concurrency() - 1}
 {
-	private:
+	m_workers[]
 
-		#pragma region Members
-
-		Vector<Worker> m_workers;
-
-		#pragma endregion 
-
-	public:
-
-		#pragma region Constructors
-
-		ThreadPool();
-		ThreadPool(ThreadPool const& in_copy)		= default;
-		ThreadPool(ThreadPool&& in_move) noexcept	= default;
-		~ThreadPool()								= default;
-
-		#pragma endregion
-
-		#pragma region Methods
-
-		DAEsize
-
-		#pragma endregion
-
-		#pragma region Operators
-
-		ThreadPool& operator=(ThreadPool const& in_copy)		= default;
-		ThreadPool& operator=(ThreadPool&& in_move) noexcept	= default;
-
-		#pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+}

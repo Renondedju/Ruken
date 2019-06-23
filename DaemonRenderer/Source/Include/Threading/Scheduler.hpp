@@ -25,44 +25,56 @@
 #pragma once
 
 #include "Config.hpp"
+#include "Containers/Array.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "Threading/EWorkerFlag.hpp"
+#include "Threading/ThreadSafeQueue.hpp"
 
-#include "Types/Unique.hpp"
-#include "Threading/Worker.hpp"
-#include "Containers/Vector.hpp"
+#include <functional>
 
 BEGIN_DAEMON_NAMESPACE
 
-class ThreadPool : Unique
+/**
+ * \brief This class is responsible for the repartition of different tasks between workers
+ */
+class Scheduler
 {
+	using Job = std::function<DAEvoid()>;
+
 	private:
 
-		#pragma region Members
+		#pragma region Memebers
 
-		Vector<Worker> m_workers;
+		Array<ThreadSafeQueue<Job>, internal::g_worker_flag_max + 1> m_job_queue;
 
-		#pragma endregion 
+		#pragma endregion
 
 	public:
 
 		#pragma region Constructors
 
-		ThreadPool();
-		ThreadPool(ThreadPool const& in_copy)		= default;
-		ThreadPool(ThreadPool&& in_move) noexcept	= default;
-		~ThreadPool()								= default;
+		Scheduler()								= default;
+		Scheduler(Scheduler const& in_copy)		= default;
+		Scheduler(Scheduler&& in_move) noexcept = default;
+		~Scheduler()							= default;
 
 		#pragma endregion
 
 		#pragma region Methods
 
-		DAEsize
+		/**
+		 * \brief Schedules a task on one of the available threads
+		 * \param in_task Task to schedule, any return value will be discarded
+		 * \param in_flag Worker flag, this is used determine which worker will execute the task. Use EWorkerFlag::Any if this does not matter
+		 */
+		DAEvoid ScheduleTask(Job in_task, EWorkerFlag in_flag) noexcept;
 
-		#pragma endregion
+		#pragma endregion 
 
 		#pragma region Operators
 
-		ThreadPool& operator=(ThreadPool const& in_copy)		= default;
-		ThreadPool& operator=(ThreadPool&& in_move) noexcept	= default;
+		Scheduler& operator=(Scheduler const& in_copy)		= default;
+		Scheduler& operator=(Scheduler&& in_move) noexcept	= default;
 
 		#pragma endregion
 };

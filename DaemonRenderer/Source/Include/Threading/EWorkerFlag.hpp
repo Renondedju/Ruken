@@ -44,4 +44,14 @@ DAEMON_BITMASK(EWorkerFlag,
 	Rendering
 );
 
+namespace internal
+{
+	/**
+	 * \brief This variable is used by the scheduler, please update it if you modify the EWorkerFlag enum
+	 * 
+	 * If you have any better and cleaner alternatives to this, please let me know !
+	 */
+	constexpr DAEsize g_worker_flag_max = static_cast<DAEsize>(EWorkerFlag::Rendering);
+}
+
 END_DAEMON_NAMESPACE

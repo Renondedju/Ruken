@@ -27,16 +27,16 @@
 #include <thread>
 
 #include "Config.hpp"
+
+#include "Types/NonCopyable.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #include "Threading/EWorkerFlag.hpp"
-#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
-	#include "Containers/String.hpp"
-#endif
+#include "Containers/String.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class Worker
+class Worker : NonCopyable
 {
 	private:
 
@@ -69,15 +69,6 @@ class Worker
 		#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
 
 		/**
-		 * \brief Returns the job flags of this worker.
-		 * \brief This value is purely indicative of what should be executed by this worker and can be bypassed (but this isn't recommended).
-		 * 
-		 * \return Job flags
-		 */
-		[[nodiscard]]
-		Bitmask<EWorkerFlag> Flags() const noexcept;
-
-		/**
 		 * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
 		 * \return Worker's label
 		 */
@@ -94,6 +85,15 @@ class Worker
 		String Label() const noexcept;
 
 		#endif
+
+		/**
+		 * \brief Returns the job flags of this worker.
+		 * \brief This value is purely indicative of what should be executed by this worker and can be bypassed (but this isn't recommended).
+		 * 
+		 * \return Job flags
+		 */
+		[[nodiscard]]
+		Bitmask<EWorkerFlag> Flags() const noexcept;
 
 		/**
 		 * \brief Checks if the worker is busy or not 

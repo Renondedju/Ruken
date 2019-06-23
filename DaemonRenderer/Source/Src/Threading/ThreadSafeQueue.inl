@@ -22,49 +22,27 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
-#include "Config.hpp"
-
-#include "Types/Unique.hpp"
-#include "Threading/Worker.hpp"
-#include "Containers/Vector.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-class ThreadPool : Unique
+template <typename TType>
+DAEbool ThreadSafeQueue<TType>::Empty() const noexcept
 {
-	private:
+	QueueReadAccess access(m_queue);
 
-		#pragma region Members
+	return access->empty();
+}
 
-		Vector<Worker> m_workers;
+template <typename TType>
+DAEvoid ThreadSafeQueue<TType>::Enqueue(TType&& in_item) noexcept
+{
+	QueueWriteAccess access(m_queue);
 
-		#pragma endregion 
+	access->emplace_back(std::forward<TType>(in_item));
+}
 
-	public:
-
-		#pragma region Constructors
-
-		ThreadPool();
-		ThreadPool(ThreadPool const& in_copy)		= default;
-		ThreadPool(ThreadPool&& in_move) noexcept	= default;
-		~ThreadPool()								= default;
-
-		#pragma endregion
-
-		#pragma region Methods
-
-		DAEsize
-
-		#pragma endregion
-
-		#pragma region Operators
-
-		ThreadPool& operator=(ThreadPool const& in_copy)		= default;
-		ThreadPool& operator=(ThreadPool&& in_move) noexcept	= default;
-
-		#pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+template <typename TType>
+DAEvoid ThreadSafeQueue<TType>::Dequeue(TType& out_item) noexcept
+{
+	QueueWriteAccess access(m_queue);
+	
+	out_item = std::move(access->front());
+	access->pop_front();
+}

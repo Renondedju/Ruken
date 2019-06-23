@@ -25,80 +25,73 @@
 #pragma once
 
 #include "Config.hpp"
-#include "Types/FundamentalTypes.hpp"
+
 #include "Containers/Queue.hpp"
 #include "Threading/Synchronized.hpp"
-
-#include <atomic>
-#include <mutex>
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-template <typename TData_Type>
-class TsLockQueue
+/**
+ * \brief Thread safe queue encapsulation
+ * \tparam TType Type contained into the queue
+ */
+template <typename TType>
+class ThreadSafeQueue
 {
 	private:
 
-		std::condition_variable			m_empty_notification;
-		std::condition_variable			m_push_notification;
-		std::atomic_bool				m_unlock_all;
-		Synchronized<Queue<TData_Type>>	m_queue;
+		#pragma region Members
+
+		Synchronized<Queue<TType>> m_queue;
+
+		using QueueReadAccess  = decltype(m_queue)::ReadAccess;
+		using QueueWriteAccess = decltype(m_queue)::WriteAccess;
+
+		#pragma endregion
 
 	public:
 
 		#pragma region Constructors
 
-		TsLockQueue();
-		TsLockQueue(TsLockQueue const& in_copy)		= default;
-		TsLockQueue(TsLockQueue&& in_move) noexcept = default;
-		~TsLockQueue();
+		ThreadSafeQueue()									= default;
+		ThreadSafeQueue(ThreadSafeQueue const& in_copy)		= default;
+		ThreadSafeQueue(ThreadSafeQueue&& in_move) noexcept = default;
+		~ThreadSafeQueue()									= default;
 
 		#pragma endregion
 
 		#pragma region Methods
 
 		/**
-		 * \brief Pushes a new object into the queue
-		 * \tparam TData Type of the data
-		 * \param in_data data to push
-		 */
-		template <typename... TData, typename = std::enable_if_t<std::is_constructible_v<TData_Type, TData...>>>
-		DAEvoid Push(TData&... in_data);
-
-		/**
-		 * \brief Pops an object from the queue, if there is none, this method will lock the thread until a new object is added to the queue.
-		 * \return Object
-		 */
-		[[nodiscard]]
-		TData_Type Pop();
-		
-		/**
-		 * \brief Releases all the locked threads from the pop() method
-		 */
-		DAEvoid Release();
-
-		/**
 		 * \brief Checks if the queue is empty
-		 * \return True if the queue is currently empty, false otherwise
+		 * \return True if the queue is empty, false otherwise
 		 */
-		[[nodiscard]]
-		DAEbool Empty() noexcept;
+		DAEbool Empty() const noexcept;
 
 		/**
-		 * \brief Blocks the current thread until the queue gets emptied.
+		 * \brief Enqueue an item
+		 * \param in_item Item to enqueue
 		 */
-		DAEvoid WaitUntilEmpty();
+		DAEvoid Enqueue(TType&& in_item) noexcept;
+
+		/**
+		 * \brief Tries to dequeue an item
+		 * \warning If the queue is empty, the result of this function and the content of out_item are undefined
+		 * \param out_item Dequeued item
+		 */
+		DAEvoid Dequeue(TType& out_item) noexcept;
 
 		#pragma endregion
 
 		#pragma region Operators
 
-		TsLockQueue& operator=(TsLockQueue const& in_copy)		= default;
-		TsLockQueue& operator=(TsLockQueue&& in_move) noexcept	= default;
+		ThreadSafeQueue& operator=(ThreadSafeQueue const& in_copy)		= default;
+		ThreadSafeQueue& operator=(ThreadSafeQueue&& in_move) noexcept	= default;
 
 		#pragma endregion
 };
 
-#include "Threading/TsLockQueue.inl"
+#include "Threading/ThreadSafeQueue.inl"
 
 END_DAEMON_NAMESPACE

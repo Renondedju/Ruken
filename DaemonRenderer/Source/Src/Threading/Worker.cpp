@@ -41,15 +41,12 @@ String const& Worker::Label() const noexcept
 	return m_label;
 }
 
-DAEbool Worker::Available() const noexcept
-{
-	return m_thread.joinable();
-}
-
 #else // Label disabled code
 
-Worker::Worker(DAEchar const*) noexcept:
-	m_thread {}
+Worker::Worker(Bitmask<EWorkerFlag> in_flags,
+			   DAEchar const*) noexcept:
+	m_thread {},
+	m_flags	 {in_flags}
 {}
 
 String Worker::Label() const noexcept
@@ -68,6 +65,11 @@ Worker::~Worker() noexcept
 Bitmask<EWorkerFlag> Worker::Flags() const noexcept
 {
 	return m_flags;
+}
+
+DAEbool Worker::Available() const noexcept
+{
+	return m_thread.joinable();
 }
 
 DAEvoid Worker::WaitForAvailability() noexcept
