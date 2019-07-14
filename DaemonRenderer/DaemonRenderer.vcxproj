@@ -307,6 +307,7 @@
     <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalNot.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalOr.hpp" />
     <ClInclude Include="Source\Include\Types\Unique.hpp" />
+    <ClInclude Include="Source\Include\Utility\Todo.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
