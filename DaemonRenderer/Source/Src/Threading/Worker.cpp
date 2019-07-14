@@ -44,6 +44,11 @@ String const& Worker::Label() const noexcept
 	return m_label;
 }
 
+String& Worker::Label() noexcept
+{
+	return m_label;
+}
+
 #else // Label disabled code
 
 Worker::Worker(DAEchar const*) noexcept:
@@ -76,6 +81,12 @@ DAEvoid Worker::WaitForAvailability() noexcept
 {
 	if (m_thread.joinable())
 		m_thread.join();
+}
+
+DAEvoid Worker::Detach() noexcept
+{
+	if (!m_thread.joinable())
+		m_thread.detach();
 }
 
 std::thread& Worker::Thread() noexcept

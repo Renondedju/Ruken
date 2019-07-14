@@ -25,25 +25,41 @@
 #pragma once
 
 #include "Config.hpp"
-#include "Containers/Array.hpp"
+
+#include "Containers/Vector.hpp"
+#include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
-#include "Threading/ThreadSafeQueue.hpp"
+#include "Threading/Worker.hpp"
+#include "Threading/ThreadSafeLockQueue.hpp"
 
 #include <functional>
+#include <atomic>
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief This class is responsible for the repartition of different tasks between workers
  */
-class Scheduler
+class Scheduler : Unique
 {
-	using Job = std::function<DAEvoid()>;
+	public: using Job = std::function<DAEvoid()>;
 
 	private:
 
 		#pragma region Memebers
 
+		Vector<Worker>			 m_workers;
+		std::atomic_bool		 m_running;
+		ThreadSafeLockQueue<Job> m_job_queue;
+
+		#pragma endregion
+
+		#pragma region Methods
+
+		/**
+		 * \brief Job given to every worker used my the scheduler
+		 */
+		DAEvoid WorkersJob() noexcept;
 
 		#pragma endregion
 
@@ -51,10 +67,15 @@ class Scheduler
 
 		#pragma region Constructors
 
-		Scheduler()								= default;
-		Scheduler(Scheduler const& in_copy)		= default;
-		Scheduler(Scheduler&& in_move) noexcept = default;
-		~Scheduler()							= default;
+		/**
+		 * \brief Scheduler constructor
+		 * \param in_workers_count Number of managed workers
+		 */
+		Scheduler(DAEuint16 in_workers_count = 0u);
+
+		Scheduler(Scheduler const& in_copy)		= delete;
+		Scheduler(Scheduler&& in_move) noexcept = delete;
+		~Scheduler();
 
 		#pragma endregion
 
@@ -63,15 +84,27 @@ class Scheduler
 		/**
 		 * \brief Schedules a task on one of the available threads
 		 * \param in_task Task to schedule, any return value will be discarded
+		 * \note If Shutdown() has been called, this method has no effect
 		 */
-		DAEvoid ScheduleTask(Job in_task) noexcept;
+		DAEvoid ScheduleTask(Job&& in_task) noexcept;
+
+		/**
+		 * \brief Waits until all the queued tasks are completed
+		 */
+		DAEvoid WaitForQueuedTasks() noexcept;
+
+		/**
+		 * \brief Waits for all current active tasks to be done and drops any queued jobs. This also detaches any workers.
+		 * \note This method can only be called once
+		 */
+		DAEvoid Shutdown() noexcept;
 
 		#pragma endregion 
 
 		#pragma region Operators
 
-		Scheduler& operator=(Scheduler const& in_copy)		= default;
-		Scheduler& operator=(Scheduler&& in_move) noexcept	= default;
+		Scheduler& operator=(Scheduler const& in_copy)		= delete;
+		Scheduler& operator=(Scheduler&& in_move) noexcept	= delete;
 
 		#pragma endregion
 };

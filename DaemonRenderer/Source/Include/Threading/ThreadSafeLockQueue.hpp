@@ -78,6 +78,11 @@ class ThreadSafeLockQueue
 		DAEvoid Release();
 
 		/**
+		 * \brief Clears the queue
+		 */
+		DAEvoid Clear() noexcept;
+
+		/**
 		 * \brief Blocks the current thread until the queue gets emptied.
 		 */
 		DAEvoid WaitUntilEmpty();

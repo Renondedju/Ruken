@@ -345,6 +345,7 @@
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
+    <ClCompile Include="Source\Src\Threading\Scheduler.cpp" />
     <ClCompile Include="Source\Src\Threading\Worker.cpp" />
     <ClCompile Include="Source\Src\Utility\Benchmark.cpp" />
   </ItemGroup>

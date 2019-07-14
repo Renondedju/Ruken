@@ -22,12 +22,20 @@
  *  SOFTWARE.
  */
 
-
-template <typename TExecutable>
-DAEvoid Worker::Execute(TExecutable in_job) noexcept
+template <typename TExecutable, typename ...TArgs>
+DAEvoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
 {
-	if (m_thread.joinable())
-		m_thread.join();
+	// This avoids an std::terminate throw
+	WaitForAvailability();
 
-	m_thread = std::thread {in_job};
+	m_thread = std::thread {in_job, in_args...};
+}
+
+template <typename TExecutable, typename ...TArgs>
+DAEvoid Worker::ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept
+{
+	// This avoids an std::terminate throw
+	WaitForAvailability();
+
+	m_thread = std::thread{in_job, in_args..., this};
 }

@@ -64,9 +64,10 @@ class Synchronized
 
 	public:
         
-        using ReadAccess   = SynchronizedAccess<TType, EAccessMode::Read  >;
-        using WriteAccess  = SynchronizedAccess<TType, EAccessMode::Write >;
-        using UnsafeAccess = SynchronizedAccess<TType, EAccessMode::Unsafe>;
+        using ReadAccess     = SynchronizedAccess<TType, EAccessMode::Read  >;
+        using WriteAccess    = SynchronizedAccess<TType, EAccessMode::Write >;
+        using UnsafeAccess   = SynchronizedAccess<TType, EAccessMode::Unsafe>;
+		using UnderlyingType = TType;
 
 	private:
 

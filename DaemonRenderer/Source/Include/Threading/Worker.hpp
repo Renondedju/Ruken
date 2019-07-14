@@ -40,7 +40,7 @@ class Worker : NonCopyable
 
 		#pragma region Variables
 
-		std::thread			 m_thread;
+		std::thread m_thread;
 
 		#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
 			String m_label;
@@ -71,6 +71,9 @@ class Worker : NonCopyable
 		 */
 		[[nodiscard]]
 		String const& Label() const noexcept;
+		
+		[[nodiscard]]
+		String&		  Label() noexcept;
 
 		#else
 
@@ -94,15 +97,33 @@ class Worker : NonCopyable
 		 * \brief Waits for the last task to execute, and starts the execution of this new job 
 		 * \tparam TExecutable Type of the job
 		 * \param in_job job to execute when done with the previous one
+		 * \param in_args Args of the job to execute
 		 */
-		template <typename TExecutable>
-		DAEvoid Execute(TExecutable in_job) noexcept;
+		template <typename TExecutable, typename ...TArgs>
+		DAEvoid Execute(TExecutable in_job, TArgs... in_args) noexcept;
+
+		/**
+		 * \brief Waits for the last task to execute, and starts the execution of this new job 
+		 * \tparam TExecutable Type of the job
+		 * \param in_job job to execute when done with the previous one
+		 * \param in_args Args of the job to execute
+		 */
+		template <typename TExecutable, typename ...TArgs>
+		DAEvoid ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept;
 
 		/**
 		 * \brief Locks the current thread until the current job has been done.
 		 * \brief If there was no job currently executed, this method has no effect.
 		 */
 		DAEvoid WaitForAvailability() noexcept;
+
+		/**
+		 * \brief Separates the thread of execution from the worker object, allowing execution to continue independently.
+		 * 
+		 * \note Any allocated resources will be freed once the thread exits.
+		 * \note If the worker was available, this method has no effect
+		 */
+		DAEvoid Detach() noexcept;
 
 		/**
 		 * \brief Returns the current underlying thread

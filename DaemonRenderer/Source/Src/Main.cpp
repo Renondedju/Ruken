@@ -23,10 +23,11 @@
  */
 
 #include <iostream>
-#include <thread>
 #include <chrono>
 
 #include "Config.hpp"
+
+#include "Threading/Scheduler.hpp"
 #include "Utility/Benchmark.hpp"
 
 using namespace std::chrono_literals;
@@ -35,15 +36,18 @@ USING_DAEMON_NAMESPACE
 
 int main()
 {
-	LOOPED_BENCHMARK("Enqueing", 100)
+	Scheduler scheduler;
+
+	LOOPED_BENCHMARK("Task addition", 100)
 	{
-		std::this_thread::sleep_for(50ms);
+		scheduler.ScheduleTask([] {
+			std::cout << "lol" << std::endl;
+			std::this_thread::sleep_for(2s);
+		});
 	}
 
-	BENCHMARK("Wait and release")
-	{
-		std::this_thread::sleep_for(2s);
-	}
+	scheduler.WaitForQueuedTasks();
+	scheduler.Shutdown();
 
 	system("pause");
 

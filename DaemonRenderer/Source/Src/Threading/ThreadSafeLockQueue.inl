@@ -97,6 +97,15 @@ DAEbool ThreadSafeLockQueue<TType>::Empty() noexcept
 }
 
 template<typename TType>
+DAEvoid ThreadSafeLockQueue<TType>::Clear() noexcept
+{
+	QueueWriteAccess access(m_queue);
+	decltype(m_queue)::UnderlyingType().swap(access.Get());
+
+	m_empty_notification.notify_all();
+}
+
+template<typename TType>
 DAEvoid ThreadSafeLockQueue<TType>::WaitUntilEmpty()
 {
 	if (Empty())
