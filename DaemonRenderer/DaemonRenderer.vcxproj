@@ -277,7 +277,6 @@
     <ClInclude Include="Source\Include\Threading\EAccessMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
-    <ClInclude Include="Source\Include\Threading\ThreadPool.hpp" />
     <ClInclude Include="Source\Include\Threading\Worker.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Addition.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Increment.hpp" />
@@ -346,7 +345,6 @@
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
-    <ClCompile Include="Source\Src\Threading\ThreadPool.cpp" />
     <ClCompile Include="Source\Src\Threading\Worker.cpp" />
     <ClCompile Include="Source\Src\Utility\Benchmark.cpp" />
   </ItemGroup>
