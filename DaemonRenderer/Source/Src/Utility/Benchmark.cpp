@@ -22,30 +22,31 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-#include <thread>
-#include <chrono>
-
-#include "Config.hpp"
 #include "Utility/Benchmark.hpp"
 
-using namespace std::chrono_literals;
+#include <iostream>
 
 USING_DAEMON_NAMESPACE
 
-int main()
+Benchmark::Benchmark(const DAEchar* in_label, DAEuint64 const in_execution_count) noexcept:
+	m_label {in_label},
+	m_execution_count {in_execution_count},
+	m_time  {std::chrono::steady_clock::now()}
+{}
+
+Benchmark::~Benchmark()
 {
-	LOOPED_BENCHMARK("Enqueing", 100)
+	if (m_execution_count == 1)
 	{
-		std::this_thread::sleep_for(50ms);
+		std::cout << "Benchmark labeled '" << m_label << "' took: "
+			<< std::chrono::duration<DAEdouble, std::milli>(std::chrono::steady_clock::now() - m_time).count()
+			<< "ms" << std::endl;
 	}
-
-	BENCHMARK("Wait and release")
+	else
 	{
-		std::this_thread::sleep_for(2s);
+		std::cout << "Benchmark labeled '" << m_label << "' took: "
+			<< std::chrono::duration<DAEdouble, std::milli>(std::chrono::steady_clock::now() - m_time).count()
+			<< "ms for " << m_execution_count << " executions (~ " <<  std::chrono::duration<DAEdouble, std::milli>(std::chrono::steady_clock::now() - m_time).count() / m_execution_count
+			<< "ms/execution)" << std::endl;
 	}
-
-	system("pause");
-
-	return EXIT_SUCCESS;
 }
