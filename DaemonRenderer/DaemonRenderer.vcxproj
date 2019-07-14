@@ -225,6 +225,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
+    <ClInclude Include="Source\Include\Bitwise\Endian.hpp" />
     <ClInclude Include="Source\Include\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\Array.hpp" />
     <ClInclude Include="Source\Include\Containers\Bitset.hpp" />
