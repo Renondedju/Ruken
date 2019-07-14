@@ -26,6 +26,9 @@
 
 #define	DAEMON_COPYRIGHT_STR "Copyright (c) 2019 Basile Combet, Philippe Yi"
 #define DAEMON_LICENCE_STR   "MIT License"
+#define DAEMON_PROJECT_NAME  "Daemon Renderer"
+#define DAEMON_URL           "https://github.com/Renondedju/Daemon"
+
 
 // ------------------------------
 //	        Global Settings
