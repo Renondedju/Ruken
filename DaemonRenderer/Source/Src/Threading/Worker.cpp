@@ -29,11 +29,14 @@ USING_DAEMON_NAMESPACE
 // Label enabled code
 #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
 
-Worker::Worker(Bitmask<EWorkerFlag> in_flags,
-			   DAEchar const*		in_label) noexcept:
+Worker::Worker(DAEchar const* in_label) noexcept:
 	m_thread {},
-	m_flags	 {in_flags},
 	m_label  {in_label}
+{}
+
+Worker::Worker() noexcept:
+	m_thread {},
+	m_label  {"Unlabeled"}
 {}
 
 String const& Worker::Label() const noexcept
@@ -43,10 +46,12 @@ String const& Worker::Label() const noexcept
 
 #else // Label disabled code
 
-Worker::Worker(Bitmask<EWorkerFlag> in_flags,
-			   DAEchar const*) noexcept:
-	m_thread {},
-	m_flags	 {in_flags}
+Worker::Worker(DAEchar const*) noexcept:
+	m_thread {}
+{}
+
+Worker::Worker() noexcept:
+	m_thread {}
 {}
 
 String Worker::Label() const noexcept
@@ -60,11 +65,6 @@ Worker::~Worker() noexcept
 {
 	if (m_thread.joinable())
 		m_thread.join();
-}
-
-Bitmask<EWorkerFlag> Worker::Flags() const noexcept
-{
-	return m_flags;
 }
 
 DAEbool Worker::Available() const noexcept

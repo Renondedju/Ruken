@@ -27,7 +27,6 @@
 #include "Config.hpp"
 #include "Containers/Array.hpp"
 #include "Types/FundamentalTypes.hpp"
-#include "Threading/EWorkerFlag.hpp"
 #include "Threading/ThreadSafeQueue.hpp"
 
 #include <functional>
@@ -45,7 +44,6 @@ class Scheduler
 
 		#pragma region Memebers
 
-		Array<ThreadSafeQueue<Job>, internal::g_worker_flag_max + 1> m_job_queue;
 
 		#pragma endregion
 
@@ -65,9 +63,8 @@ class Scheduler
 		/**
 		 * \brief Schedules a task on one of the available threads
 		 * \param in_task Task to schedule, any return value will be discarded
-		 * \param in_flag Worker flag, this is used determine which worker will execute the task. Use EWorkerFlag::Any if this does not matter
 		 */
-		DAEvoid ScheduleTask(Job in_task, EWorkerFlag in_flag) noexcept;
+		DAEvoid ScheduleTask(Job in_task) noexcept;
 
 		#pragma endregion 
 

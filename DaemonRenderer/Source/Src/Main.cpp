@@ -26,11 +26,45 @@
 
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
+#include "Threading/Worker.hpp"
+#include "Threading/ThreadSafeLockQueue.hpp"
 
 USING_DAEMON_NAMESPACE
 
 int main()
 {
+	// Creating workers
+	Worker worker1("Worker1");
+	Worker worker2("Worker2");
+	Worker worker3("Worker3");
+	Worker worker4("Worker4");
+
+	// Creating the queue
+	ThreadSafeLockQueue<String> queue;
+
+	auto const job = [&queue] {
+		String text;
+		DAEbool const result = queue.Dequeue(text);
+
+		if (result)
+			std::cout << text << std::endl;
+		else
+			std::cout << "Released" << std::endl;
+	};
+
+	queue.Enqueue("Test1");
+	queue.Enqueue("Test2");
+	queue.Enqueue("Test3");
+
+	//Starting workers
+	worker1.Execute(job);
+	worker2.Execute(job);
+	worker3.Execute(job);
+	worker4.Execute(job);
+
+	queue.WaitUntilEmpty();
+	queue.Release();
+
 	system("pause");
 
 	return EXIT_SUCCESS;

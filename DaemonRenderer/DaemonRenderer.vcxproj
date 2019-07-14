@@ -248,6 +248,7 @@
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
+    <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeQueue.hpp" />
     <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
     <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
@@ -272,7 +273,6 @@
     <ClInclude Include="source\include\resource\ResourceManifest.hpp" />
     <ClInclude Include="Source\Include\Threading\BaseSynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\EAccessMode.hpp" />
-    <ClInclude Include="Source\Include\Threading\EWorkerFlag.hpp" />
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadPool.hpp" />
@@ -333,6 +333,7 @@
     <None Include="Source\Src\Threading\BaseSynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
     <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
+    <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
     <None Include="Source\Src\Threading\Worker.inl" />
     <None Include="Source\Src\Types\NamedType.inl" />

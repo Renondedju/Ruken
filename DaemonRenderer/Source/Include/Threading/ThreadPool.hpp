@@ -55,7 +55,6 @@ class ThreadPool : Unique
 
 		#pragma region Methods
 
-		DAEsize
 
 		#pragma endregion
 

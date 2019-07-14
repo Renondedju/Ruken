@@ -32,6 +32,6 @@ USING_DAEMON_NAMESPACE
 ThreadPool::ThreadPool():
 	m_workers {std::thread::hardware_concurrency() - 1}
 {
-	m_workers[]
+	//m_workers[]
 
 }

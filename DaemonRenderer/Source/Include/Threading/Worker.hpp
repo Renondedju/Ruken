@@ -30,8 +30,6 @@
 
 #include "Types/NonCopyable.hpp"
 #include "Types/FundamentalTypes.hpp"
-
-#include "Threading/EWorkerFlag.hpp"
 #include "Containers/String.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -43,7 +41,6 @@ class Worker : NonCopyable
 		#pragma region Variables
 
 		std::thread			 m_thread;
-		Bitmask<EWorkerFlag> m_flags;
 
 		#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
 			String m_label;
@@ -55,9 +52,9 @@ class Worker : NonCopyable
 
 		#pragma region Constructors
 
-		Worker(Bitmask<EWorkerFlag> in_flags = {EWorkerFlag::Any}, DAEchar const* in_label = "Unlabeled") noexcept;
+		Worker(DAEchar const* in_label) noexcept;
+		Worker()						noexcept;
 
-		Worker()						noexcept = delete;
 		Worker(Worker const& in_copy)	noexcept = delete;
 		Worker(Worker&&		 in_move)	noexcept = default;
 		~Worker()						noexcept;
@@ -85,15 +82,6 @@ class Worker : NonCopyable
 		String Label() const noexcept;
 
 		#endif
-
-		/**
-		 * \brief Returns the job flags of this worker.
-		 * \brief This value is purely indicative of what should be executed by this worker and can be bypassed (but this isn't recommended).
-		 * 
-		 * \return Job flags
-		 */
-		[[nodiscard]]
-		Bitmask<EWorkerFlag> Flags() const noexcept;
 
 		/**
 		 * \brief Checks if the worker is busy or not 
