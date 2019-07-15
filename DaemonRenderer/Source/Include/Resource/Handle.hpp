@@ -111,6 +111,13 @@ class Handle
         ResourceManifest::ReferenceCountType ReferenceCount() const noexcept;
 
         /**
+		 * \brief Waits until the resource becomes available
+		 * \note If the underlying resource manager hasn't been set, this method won't have any effects
+		 * \return True if the resource is valid, false otherwise.
+		 */
+		DAEbool WaitForValidity(DAEfloat in_timeout) const noexcept;
+
+        /**
          * \brief Returns the garbage collection strategy (get/set)
          * \return GC strategy
          */

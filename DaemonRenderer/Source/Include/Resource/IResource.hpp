@@ -82,7 +82,7 @@ class IResource
          * 
          * \param in_manager Resource manager instance. This is useful to request dependencies or resolve assets name/path.
          */
-        virtual DAEvoid Unload(class ResourceManager& in_manager) = 0;
+        virtual DAEvoid Unload(class ResourceManager& in_manager) noexcept = 0;
 
 		#pragma endregion
 

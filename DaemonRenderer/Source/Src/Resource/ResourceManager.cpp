@@ -26,7 +26,17 @@
 
 USING_DAEMON_NAMESPACE
 
-ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_unique_identifier) noexcept
+DAEvoid ResourceManager::InvalidateResource(ResourceManifest* in_manifest) noexcept
+{
+	if (!in_manifest || in_manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
+		return;
+
+	// Clearing the data
+	in_manifest->data.load(std::memory_order_acquire)->Unload(*this);
+	in_manifest->status.store(EResourceStatus::Invalid, std::memory_order_release);
+}
+
+ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_unique_identifier, DAEbool const in_auto_create_manifest) noexcept
 {
 	ManifestsWriteAccess access(m_manifests);
 
@@ -34,21 +44,68 @@ ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_
 	if (access->find(in_unique_identifier) != access->end())
 		return access.Get()[in_unique_identifier];
 
+	ResourceManifest* manifest = nullptr;
+
 	// Creating a new invalid manifest.
-	ResourceManifest* manifest = new ResourceManifest();
-	access.Get()[in_unique_identifier] = manifest;
+	if (in_auto_create_manifest)
+	{
+		manifest = new ResourceManifest();
+		access.Get()[in_unique_identifier] = manifest;
+	}
 
 	return manifest;
 }
 
-ResourceManager::ResourceManager() noexcept:
-	m_manifests			{},
-	m_collection_mode	{EGCCollectionMode::Automatic}
+DAEvoid ResourceManager::Cleanup() noexcept
+{
+	ManifestsWriteAccess access(m_manifests);
+
+	// The resources will be unloaded one by one, even if the resource manager gets deleted in the process
+	for (auto& [identifier, manifest] : access.Get())
+	{
+		m_scheduler_reference.ScheduleTask([&] {
+			InvalidateResource(manifest);
+
+			delete manifest;
+		});
+	}
+
+	access->clear();
+}
+
+ResourceManager::ResourceManager(Scheduler& in_scheduler) noexcept:
+	m_manifests				{},
+	m_collection_mode		{EGCCollectionMode::Automatic},
+	m_scheduler_reference	{in_scheduler}
 {}
 
 ResourceManager::~ResourceManager() noexcept
 {
 	// If the resource manager is destroyed, we need to make sure
 	// that all resources are correctly deleted from memory to avoid leaks
-	//FlushResources();
+	Cleanup();
 }
+
+DAEvoid ResourceManager::SetGarbageCollectionMode(EGCCollectionMode const in_collection_mode) noexcept
+{
+	m_collection_mode = in_collection_mode;
+}
+
+DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier, EResourceLoadingMode const in_loading_mode) noexcept
+{
+	ResourceManifest* manifest = RequestManifest(in_identifier);
+
+	if (!manifest || manifest->status != EResourceStatus::Loaded || manifest->gc_strategy != EResourceGCStrategy::Manual)
+		return false;
+
+	if (in_loading_mode == EResourceLoadingMode::Synchronous)
+		manifest->data.load(std::memory_order_acquire)->Unload(*this);
+	else
+		m_scheduler_reference.ScheduleTask([&manifest, this] {
+			manifest->data.load(std::memory_order_acquire)->Unload(*this);
+	});
+
+	return true;
+}
+
+

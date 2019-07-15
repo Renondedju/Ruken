@@ -31,6 +31,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/UnorderedMap.hpp"
 
+#include "Threading/Scheduler.hpp"
 #include "Threading/Synchronized.hpp"
 #include "Threading/SynchronizedAccess.hpp"
 
@@ -55,6 +56,8 @@ class ResourceManager
 		// Integrated garbage collection mode of the resource manager. 
 		EGCCollectionMode m_collection_mode;
 
+		Scheduler& m_scheduler_reference;
+
 		#pragma endregion
 
 		using ManifestsType        = decltype(m_manifests)::UnderlyingType;
@@ -65,18 +68,18 @@ class ResourceManager
 
 		/**
 		 * \brief Invalidates a resource and tags it's corresponding resource manager for garbage collection.
-		 * 
 		 * \param in_manifest Manifest of the resource to delete
 		 */
-		static DAEvoid InvalidateResource(struct ResourceManifest* in_manifest) noexcept;
+		DAEvoid InvalidateResource(struct ResourceManifest* in_manifest) noexcept;
 
 		/**
 		 * \brief Finds or creates a resource manifest by name.
 		 * \param in_unique_identifier Unique identifier of the resource.
+		 * \param in_auto_create_manifest If set to true, this method will automatically create a manifest and assign it to the passed identifier if none has been found.
 		 * \return The requested manifest.
 		 */
 		[[nodiscard]]
-		struct ResourceManifest* RequestManifest(ResourceIdentifier const& in_unique_identifier) noexcept;
+		struct ResourceManifest* RequestManifest(ResourceIdentifier const& in_unique_identifier, DAEbool in_auto_create_manifest = true) noexcept;
 
 		/**
 		 * \brief Triggers a garbage collection
@@ -102,14 +105,14 @@ class ResourceManager
 		 * \param in_descriptor Parameters to pass to the resource loader
 		 * \param in_loading_mode Loading mode of the resource (async/sync)
 		 */
-		template <typename TResource_Type, typename TDesc_Type = TResource_Type>
+		template <typename TResource_Type>
 		DAEvoid LoadResource(ResourceIdentifier const& in_unique_identifier, ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor, EResourceLoadingMode in_loading_mode) noexcept;
 
 		/**
-		 * \brief Frees all the currently loaded resources in the manager
-		 * \note Has to be called on the main thread
+		 * \brief Unloads all the currently loaded resources in the manager
+		 * \warning This method also invalidates every handle, be careful
 		 */
-		DAEvoid FlushResources() noexcept;
+		DAEvoid Cleanup() noexcept;
 
 		#pragma endregion
 
@@ -118,7 +121,7 @@ class ResourceManager
 		#pragma region Constructors
 
 		// Copy and move constructors/operators are not supported yet
-		ResourceManager () noexcept;
+		ResourceManager (Scheduler& in_scheduler) noexcept;
 		ResourceManager (ResourceManager const& in_copy) = delete;
 		ResourceManager (ResourceManager&& in_move)		 = delete;
 		~ResourceManager() noexcept;
@@ -175,12 +178,12 @@ class ResourceManager
 		 * Alternative overload using the resource handle instead
 		 * 
 		 * \tparam TResource_Type Type of the resource to reload
-		 * \param in_unique_identifier Unique identifier of the resource
+		 * \param in_handle Unique identifier of the resource
 		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
 		 * \return Handle to the resource
 		 */
 		template <typename TResource_Type>
-		Handle<TResource_Type> ReloadResource(Handle<TResource_Type> const& in_unique_identifier, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
+		Handle<TResource_Type> ReloadResource(Handle<TResource_Type> const& in_handle, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
 
 		/**
 		 * \brief Requests a resource from the resource manager.
@@ -191,7 +194,7 @@ class ResourceManager
 		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
 		 * \return Handle to the resource
 		 */
-		template <typename TResource_Type, typename TDesc_Type = TResource_Type>
+		template <typename TResource_Type>
 		Handle<TResource_Type> RequestResource(ResourceIdentifier const& in_unique_identifier, class ResourceLoadingDescriptor const& in_descriptor, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
 		
 		/**
@@ -212,9 +215,10 @@ class ResourceManager
 		 * \note The resource has to have a manual garbage collection mode in order to work
 		 * 
 		 * \param in_identifier Identifier of the resource to delete
+		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
 		 * \return true if the resource has been successfully removed, false otherwise
 		 */
-		DAEbool DeleteResource(ResourceIdentifier const& in_identifier) noexcept;
+		DAEbool UnloadResource(ResourceIdentifier const& in_identifier, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
 
 		#pragma endregion
 

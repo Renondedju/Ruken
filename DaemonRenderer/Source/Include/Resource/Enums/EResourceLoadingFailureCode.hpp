@@ -34,8 +34,8 @@ BEGIN_DAEMON_NAMESPACE
  * 
  * Other					=> Other failure type than listed bellow. 
  * Unknown					=> Unknown failure.
- * OutOfMemory				=> The device does not have enougth memory. Retries can be considered. 
- *							   Fireing this code will cause the garbage collector to imediatly try to free up some memory.
+ * OutOfMemory				=> The device does not have enough memory. Retries can be considered. 
+ *							   Sending this code will cause the garbage collector to immediately try to free up some memory.
  * NoSuchResource			=> The resource has not been found, this might be caused by an invalid path
  * CorruptedResource		=> The resource is corrupted or invalid. The resource had unexpected data patterns.
  * UnauthorizedAccess		=> The resource exists, but we don't have the rights to access it. Retries can be considered.
