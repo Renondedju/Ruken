@@ -333,6 +333,7 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
+    <None Include="Source\Src\Resource\Handle.inl" />
     <None Include="Source\Src\Resource\ResourceManager.inl" />
     <None Include="Source\Src\Threading\BaseSynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />

@@ -30,3 +30,8 @@ String ResourceIdentifier::ToString() const noexcept
 {
 	return name;	
 }
+
+DAEbool ResourceIdentifier::operator==(ResourceIdentifier const& in_other) const noexcept
+{
+	return name == in_other.name;
+}

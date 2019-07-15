@@ -26,6 +26,7 @@
 
 #include "Config.hpp"
 #include "Containers/String.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -45,10 +46,10 @@ struct ResourceIdentifier
 
     #pragma region Constructors
 
-	ResourceIdentifier()                                  noexcept = default;
-	ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept = default;
-	ResourceIdentifier(ResourceIdentifier&& in_move)      noexcept = default;
-	~ResourceIdentifier()										   = default;
+	ResourceIdentifier()							noexcept	= default;
+	ResourceIdentifier(ResourceIdentifier const& in_copy)		= default;
+	ResourceIdentifier(ResourceIdentifier&& in_move)			= default;
+	~ResourceIdentifier()										= default;
 
 	#pragma endregion
 
@@ -64,8 +65,10 @@ struct ResourceIdentifier
 
     #pragma region Operators
 
-	ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) noexcept = default;
-	ResourceIdentifier& operator=(ResourceIdentifier&& in_move)      noexcept = default;
+	ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) = default;
+	ResourceIdentifier& operator=(ResourceIdentifier&& in_move)		 = default;
+
+	DAEbool operator==(ResourceIdentifier const& in_other) const noexcept;
 
 	#pragma endregion
 };
@@ -74,7 +77,7 @@ END_DAEMON_NAMESPACE
 
 namespace std
 {
-    // Hash support for DAEMON_NAMESPACE::ResourceIdentifier
+    // Hash support for ResourceIdentifier
     template<>
     struct hash<DAEMON_NAMESPACE::ResourceIdentifier> 
     {

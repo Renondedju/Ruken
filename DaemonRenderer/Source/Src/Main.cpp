@@ -44,7 +44,7 @@ struct TestResource final : IResource
 		std::cout << "Reloading Resource" << std::endl;
 	}
 
-	DAEvoid Unload(ResourceManager& in_manager) override
+	DAEvoid Unload(ResourceManager& in_manager) noexcept override
 	{
 		std::cout << "Unloading Resource" << std::endl;
 	}
