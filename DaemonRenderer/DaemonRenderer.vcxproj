@@ -333,6 +333,7 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
+    <None Include="Source\Src\Resource\ResourceManager.inl" />
     <None Include="Source\Src\Threading\BaseSynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
     <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
@@ -344,7 +345,9 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
+    <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
+    <ClCompile Include="Source\Src\Resource\ResourceManifest.cpp" />
     <ClCompile Include="Source\Src\Threading\Scheduler.cpp" />
     <ClCompile Include="Source\Src\Threading\Worker.cpp" />
     <ClCompile Include="Source\Src\Utility\Benchmark.cpp" />

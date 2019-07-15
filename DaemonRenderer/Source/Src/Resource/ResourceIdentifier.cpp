@@ -22,19 +22,11 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-
-#include "Config.hpp"
-
-#include "Resource/ResourceManager.hpp"
+#include "Resource/ResourceIdentifier.hpp"
 
 USING_DAEMON_NAMESPACE
 
-int main()
+String ResourceIdentifier::ToString() const noexcept
 {
-	ResourceManager resource_manager;
-
-	system("pause");
-
-	return EXIT_SUCCESS;
+	return name;	
 }

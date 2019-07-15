@@ -52,7 +52,7 @@ struct ResourceProcessingFailure
 	 * If set to true, the error message will still be displayed but the resource will be considered as valid.
 	 * This can be useful if a resource by default has been loaded instead.
 	 */
-	DAEbool valid;
+	DAEbool resource_validity;
 
 	/**
 	 * \brief Error code.

@@ -28,7 +28,7 @@ USING_DAEMON_NAMESPACE
 
 ResourceProcessingFailure::ResourceProcessingFailure(EResourceProcessingFailureCode const in_code, DAEbool const in_validity, DAEchar const* in_description) noexcept:
 	description {in_description},
-	valid		{in_validity},
+	resource_validity		{in_validity},
 	code		{in_code}
 {}
 

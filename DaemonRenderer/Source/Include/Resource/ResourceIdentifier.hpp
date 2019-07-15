@@ -24,7 +24,6 @@
 
 #pragma once
 
-
 #include "Config.hpp"
 #include "Containers/String.hpp"
 
@@ -52,6 +51,16 @@ struct ResourceIdentifier
 	~ResourceIdentifier()										   = default;
 
 	#pragma endregion
+
+	#pragma region Methods
+
+    /**
+	 * \brief Converts the ResourceIdentifier to a string representation
+	 * \return String representation
+	 */
+	String ToString() const noexcept;
+
+	#pragma endregion 
 
     #pragma region Operators
 

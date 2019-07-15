@@ -24,17 +24,21 @@
 
 #pragma once
 
-#include "Config.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include <iostream>
 
+#include "Config.hpp"
+
+#include "Types/FundamentalTypes.hpp"
 #include "Containers/UnorderedMap.hpp"
 
 #include "Threading/Synchronized.hpp"
+#include "Threading/SynchronizedAccess.hpp"
 
 #include "Resource/Handle.hpp"
 #include "Resource/ResourceIdentifier.hpp"
 #include "Resource/Enums/EGCCollectionMode.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"
+#include "Resource/ResourceProcessingFailure.hpp"
 #include "Resource/Enums/EResourceLoadingMode.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -53,6 +57,10 @@ class ResourceManager
 
 		#pragma endregion
 
+		using ManifestsType        = decltype(m_manifests)::UnderlyingType;
+		using ManifestsReadAccess  = decltype(m_manifests)::ReadAccess;
+		using ManifestsWriteAccess = decltype(m_manifests)::WriteAccess;
+
 		#pragma region Methods
 
 		/**
@@ -64,11 +72,11 @@ class ResourceManager
 
 		/**
 		 * \brief Finds or creates a resource manifest by name.
-		 * \param in_name Name of the manifest to request.
+		 * \param in_unique_identifier Unique identifier of the resource.
 		 * \return The requested manifest.
 		 */
 		[[nodiscard]]
-		struct ResourceManifest* RequestManifest(DAEchar const* in_name) noexcept;
+		struct ResourceManifest* RequestManifest(ResourceIdentifier const& in_unique_identifier) noexcept;
 
 		/**
 		 * \brief Triggers a garbage collection
@@ -217,5 +225,7 @@ class ResourceManager
 
 		#pragma endregion
 };
+
+#include "Resource/ResourceManager.inl"
 
 END_DAEMON_NAMESPACE

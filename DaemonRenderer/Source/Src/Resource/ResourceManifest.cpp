@@ -22,19 +22,13 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-
-#include "Config.hpp"
-
-#include "Resource/ResourceManager.hpp"
+#include "Resource/ResourceManifest.hpp"
 
 USING_DAEMON_NAMESPACE
 
-int main()
-{
-	ResourceManager resource_manager;
-
-	system("pause");
-
-	return EXIT_SUCCESS;
-}
+ResourceManifest::ResourceManifest() noexcept:
+	data			{nullptr},
+	reference_count {0},
+	gc_strategy		{EResourceGCStrategy::ReferenceCount},
+	status			{EResourceStatus::Invalid}
+{}

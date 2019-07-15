@@ -26,6 +26,21 @@
 
 USING_DAEMON_NAMESPACE
 
+ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_unique_identifier) noexcept
+{
+	ManifestsWriteAccess access(m_manifests);
+
+	// If there is no such manifest in the map: adding a new one
+	if (access->find(in_unique_identifier) != access->end())
+		return access.Get()[in_unique_identifier];
+
+	// Creating a new invalid manifest.
+	ResourceManifest* manifest = new ResourceManifest();
+	access.Get()[in_unique_identifier] = manifest;
+
+	return manifest;
+}
+
 ResourceManager::ResourceManager() noexcept:
 	m_manifests			{},
 	m_collection_mode	{EGCCollectionMode::Automatic}
