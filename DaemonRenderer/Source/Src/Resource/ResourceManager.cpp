@@ -23,17 +23,90 @@
  */
 
 #include "Resource/ResourceManager.hpp"
+#include "Resource/ResourceLoadingDescriptor.hpp"
 
 USING_DAEMON_NAMESPACE
+
+DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor) noexcept
+{
+	in_manifest->status.store(EResourceStatus::Processed, std::memory_order_release);
+
+	++m_current_operation_count;
+	
+	try
+	{
+		in_manifest->data.load(std::memory_order_acquire)->Load(*this, in_descriptor);
+		in_manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
+
+		--m_current_operation_count;
+
+		// Successfully loaded the resource
+	}
+
+	// Something happened
+	catch (ResourceLoadingFailure const& failure)
+	{
+		in_manifest->status.store(failure.resource_validity ? EResourceStatus::Loaded : EResourceStatus::Invalid, std::memory_order_release);
+
+		std::cout << "Failed to load. Code : " <<  EnumToString(failure.code) << " : " << failure.description << std::endl;
+
+		--m_current_operation_count;
+
+		// If some resource tells us that there is not enough memory,
+		// we are going to try to free up some in case of a retry (because we are nice ! :D)
+		if (failure.code == EResourceProcessingFailureCode::OutOfMemory)
+			TriggerReferenceGC();
+	}
+}
+
+DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest) noexcept
+{
+	in_manifest->status.store(EResourceStatus::Processed, std::memory_order_release);
+
+	++m_current_operation_count;
+
+	try
+	{
+		in_manifest->data.load(std::memory_order_acquire)->Reload(*this);
+		in_manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
+
+		--m_current_operation_count;
+		
+		// Successfully reloaded the resource
+	}
+
+	// Something happened
+	catch (ResourceLoadingFailure const& failure)
+	{
+		in_manifest->status.store(failure.resource_validity ? EResourceStatus::Loaded : EResourceStatus::Invalid, std::memory_order_release);
+
+		std::cout << "Failed to reload. Code : " <<  EnumToString(failure.code) << " : " << failure.description << std::endl;
+
+		--m_current_operation_count;
+
+		// If some resource tells us that there is not enough memory,
+		// we are going to try to free up some in case of a retry (because we are nice ! :D)
+		if (failure.code == EResourceProcessingFailureCode::OutOfMemory)
+			TriggerReferenceGC();
+	}
+}
+
+DAEvoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest) noexcept
+{
+	++m_current_operation_count;
+
+	in_manifest->data.load(std::memory_order_acquire)->Unload(*this);
+	in_manifest->status.store(EResourceStatus::Invalid, std::memory_order_release);
+
+	--m_current_operation_count;
+}
 
 DAEvoid ResourceManager::InvalidateResource(ResourceManifest* in_manifest) noexcept
 {
 	if (!in_manifest || in_manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
 		return;
 
-	// Clearing the data
-	in_manifest->data.load(std::memory_order_acquire)->Unload(*this);
-	in_manifest->status.store(EResourceStatus::Invalid, std::memory_order_release);
+	UnloadingRoutine(in_manifest);
 }
 
 ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_unique_identifier, DAEbool const in_auto_create_manifest) noexcept
@@ -63,7 +136,7 @@ DAEvoid ResourceManager::Cleanup() noexcept
 	// The resources will be unloaded one by one, even if the resource manager gets deleted in the process
 	for (auto& [identifier, manifest] : access.Get())
 	{
-		m_scheduler_reference.ScheduleTask([&] {
+		m_scheduler_reference.ScheduleTask([manifest, this] {
 			InvalidateResource(manifest);
 
 			delete manifest;
@@ -74,9 +147,10 @@ DAEvoid ResourceManager::Cleanup() noexcept
 }
 
 ResourceManager::ResourceManager(Scheduler& in_scheduler) noexcept:
-	m_manifests				{},
-	m_collection_mode		{EGCCollectionMode::Automatic},
-	m_scheduler_reference	{in_scheduler}
+	m_manifests				  {},
+	m_collection_mode		  {EGCCollectionMode::Automatic},
+	m_scheduler_reference	  {in_scheduler},
+	m_current_operation_count {0}
 {}
 
 ResourceManager::~ResourceManager() noexcept
@@ -84,6 +158,23 @@ ResourceManager::~ResourceManager() noexcept
 	// If the resource manager is destroyed, we need to make sure
 	// that all resources are correctly deleted from memory to avoid leaks
 	Cleanup();
+}
+
+DAEvoid ResourceManager::TriggerSceneGC() noexcept
+{
+	// Clearing every invalid value in the scene garbage collection since we know that every handle is more likely to be unused now.
+	// (to avoid segmentation faults)
+	GarbageCollection([] (ResourceManifest const& in_manifest) {
+		return in_manifest.gc_strategy.load(std::memory_order_acquire) == EResourceGCStrategy::SceneDeletion;
+	}, true);
+}
+
+DAEvoid ResourceManager::TriggerReferenceGC() noexcept
+{
+	GarbageCollection([] (ResourceManifest const& in_manifest) {
+		return in_manifest.gc_strategy    .load(std::memory_order_acquire) == EResourceGCStrategy::ReferenceCount &&
+			   in_manifest.reference_count.load(std::memory_order_acquire) == 0;
+	});	
 }
 
 DAEvoid ResourceManager::SetGarbageCollectionMode(EGCCollectionMode const in_collection_mode) noexcept
@@ -99,11 +190,13 @@ DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier,
 		return false;
 
 	if (in_loading_mode == EResourceLoadingMode::Synchronous)
-		manifest->data.load(std::memory_order_acquire)->Unload(*this);
+		UnloadingRoutine(manifest);
 	else
+	{
 		m_scheduler_reference.ScheduleTask([&manifest, this] {
-			manifest->data.load(std::memory_order_acquire)->Unload(*this);
-	});
+			UnloadingRoutine(manifest);
+		});
+	}
 
 	return true;
 }

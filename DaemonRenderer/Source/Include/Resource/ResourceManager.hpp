@@ -25,6 +25,7 @@
 #pragma once
 
 #include <iostream>
+#include <atomic>
 
 #include "Config.hpp"
 
@@ -58,6 +59,9 @@ class ResourceManager
 
 		Scheduler& m_scheduler_reference;
 
+		// The actual number of resource being processed
+		std::atomic<DAEuint64> m_current_operation_count;
+
 		#pragma endregion
 
 		using ManifestsType        = decltype(m_manifests)::UnderlyingType;
@@ -65,6 +69,10 @@ class ResourceManager
 		using ManifestsWriteAccess = decltype(m_manifests)::WriteAccess;
 
 		#pragma region Methods
+
+		DAEvoid LoadingRoutine  (struct ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor) noexcept;
+		DAEvoid ReloadingRoutine(struct ResourceManifest* in_manifest) noexcept;
+		DAEvoid UnloadingRoutine(struct ResourceManifest* in_manifest) noexcept;
 
 		/**
 		 * \brief Invalidates a resource and tags it's corresponding resource manager for garbage collection.

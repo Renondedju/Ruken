@@ -42,6 +42,8 @@ struct TestResource final : IResource
 	DAEvoid Reload(ResourceManager& in_manager) override
 	{
 		std::cout << "Reloading Resource" << std::endl;
+		
+		throw ResourceLoadingFailure(EResourceProcessingFailureCode::Unknown, false, "Test error");
 	}
 
 	DAEvoid Unload(ResourceManager& in_manager) noexcept override
@@ -52,13 +54,20 @@ struct TestResource final : IResource
 
 int main()
 {
-	Scheduler		scheduler;
-	ResourceManager resource_manager(scheduler);
+	Scheduler scheduler;
+	
+	{
+		ResourceManager resource_manager(scheduler);
 
-	Handle<TestResource> const resource = resource_manager.RequestResource<TestResource>({"Test resource"}, {}, EResourceLoadingMode::Asynchronous);
+		ResourceIdentifier   const identifier {"Test resource"};
+		Handle<TestResource> const resource = resource_manager.RequestResource<TestResource>(identifier, {}, EResourceLoadingMode::Asynchronous);
 
-	while(!resource.Available())
-		std::this_thread::yield();
+		if (resource.WaitForValidity(10.0f))
+			resource_manager.ReloadResource<TestResource>(resource);
+
+		resource.WaitForValidity(10.0f);
+		std::cout << resource.Available() << std::endl;
+	}
 
 	system("pause");
 

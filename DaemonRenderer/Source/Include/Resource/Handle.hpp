@@ -49,6 +49,8 @@ class Handle
 {
 	static_assert(std::is_base_of_v<IResource, TResource_Type>, "Handles can only be used on classes that implements the IResource interface");
 
+	friend class ResourceManager;
+
     private:
 
         #pragma region Variables
