@@ -22,12 +22,14 @@
  *  SOFTWARE.
  */
 
+#include <iostream>
+
 #include "Resource/ResourceManager.hpp"
 #include "Resource/ResourceLoadingDescriptor.hpp"
 
 USING_DAEMON_NAMESPACE
 
-DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor) noexcept
+DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor)
 {
 	in_manifest->status.store(EResourceStatus::Processed, std::memory_order_release);
 
@@ -44,23 +46,34 @@ DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceL
 	}
 
 	// Something happened
-	catch (ResourceLoadingFailure const& failure)
+	catch (ResourceProcessingFailure const& failure)
 	{
 		in_manifest->status.store(failure.resource_validity ? EResourceStatus::Loaded : EResourceStatus::Invalid, std::memory_order_release);
 
-		std::cout << "Failed to load. Code : " <<  EnumToString(failure.code) << " : " << failure.description << std::endl;
+		DAEMON_DEBUG_RELEASE
+		{
+			std::cout << static_cast<String>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<String>(failure) << std::endl;
+		}
 
 		--m_current_operation_count;
 
 		// If some resource tells us that there is not enough memory,
 		// we are going to try to free up some in case of a retry (because we are nice ! :D)
-		if (failure.code == EResourceProcessingFailureCode::OutOfMemory)
+		if (failure.code == EResourceProcessingFailureCode::OutOfMemory && m_collection_mode == EGCCollectionMode::Automatic)
 			TriggerReferenceGC();
+	}
+	catch(...)
+	{
+		--m_current_operation_count;
+		throw;
 	}
 }
 
-DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest) noexcept
+DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
 {
+	if (!in_manifest || in_manifest->status.load(std::memory_order_acquire) != EResourceStatus::Loaded)
+		return;
+
 	in_manifest->status.store(EResourceStatus::Processed, std::memory_order_release);
 
 	++m_current_operation_count;
@@ -76,12 +89,14 @@ DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest) noexcep
 	}
 
 	// Something happened
-	catch (ResourceLoadingFailure const& failure)
+	catch (ResourceProcessingFailure const& failure)
 	{
 		in_manifest->status.store(failure.resource_validity ? EResourceStatus::Loaded : EResourceStatus::Invalid, std::memory_order_release);
 
-		std::cout << "Failed to reload. Code : " <<  EnumToString(failure.code) << " : " << failure.description << std::endl;
-
+		DAEMON_DEBUG_RELEASE
+		{
+			std::cout << static_cast<String>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<String>(failure) << std::endl;
+		}
 		--m_current_operation_count;
 
 		// If some resource tells us that there is not enough memory,
@@ -89,14 +104,25 @@ DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest) noexcep
 		if (failure.code == EResourceProcessingFailureCode::OutOfMemory)
 			TriggerReferenceGC();
 	}
+	catch(...)
+	{
+		--m_current_operation_count;
+		throw;
+	}
 }
 
-DAEvoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest) noexcept
+DAEvoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest)
 {
-	++m_current_operation_count;
+	if (!in_manifest)
+		return;
 
-	in_manifest->data.load(std::memory_order_acquire)->Unload(*this);
-	in_manifest->status.store(EResourceStatus::Invalid, std::memory_order_release);
+	++m_current_operation_count;
+	
+	if (in_manifest->status.load(std::memory_order_acquire) == EResourceStatus::Loaded)
+	{
+		in_manifest->data.load(std::memory_order_acquire)->Unload(*this);
+		in_manifest->status.store(EResourceStatus::Invalid, std::memory_order_release);
+	}
 
 	--m_current_operation_count;
 }
@@ -122,7 +148,7 @@ ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_
 	// Creating a new invalid manifest.
 	if (in_auto_create_manifest)
 	{
-		manifest = new ResourceManifest();
+		manifest = new ResourceManifest(in_unique_identifier, nullptr, EResourceGCStrategy::ReferenceCount);
 		access.Get()[in_unique_identifier] = manifest;
 	}
 
@@ -131,6 +157,10 @@ ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_
 
 DAEvoid ResourceManager::Cleanup() noexcept
 {
+	// Waiting for any pending operations to be done to avoid concurrent accesses
+	while (m_current_operation_count.load(std::memory_order_acquire) > 0)
+		std::this_thread::yield();
+
 	ManifestsWriteAccess access(m_manifests);
 
 	// The resources will be unloaded one by one, even if the resource manager gets deleted in the process
@@ -182,14 +212,14 @@ DAEvoid ResourceManager::SetGarbageCollectionMode(EGCCollectionMode const in_col
 	m_collection_mode = in_collection_mode;
 }
 
-DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier, EResourceLoadingMode const in_loading_mode) noexcept
+DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier, ESynchronizationMode const in_loading_mode) noexcept
 {
 	ResourceManifest* manifest = RequestManifest(in_identifier);
 
 	if (!manifest || manifest->status != EResourceStatus::Loaded || manifest->gc_strategy != EResourceGCStrategy::Manual)
 		return false;
 
-	if (in_loading_mode == EResourceLoadingMode::Synchronous)
+	if (in_loading_mode == ESynchronizationMode::Synchronous)
 		UnloadingRoutine(manifest);
 	else
 	{
@@ -199,6 +229,11 @@ DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier,
 	}
 
 	return true;
+}
+
+DAEuint64 ResourceManager::GetCurrentOperationCount() const noexcept
+{
+	return m_current_operation_count.load(std::memory_order_acquire);
 }
 
 

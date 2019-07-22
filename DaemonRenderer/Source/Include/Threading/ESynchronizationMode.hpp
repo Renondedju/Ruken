@@ -37,7 +37,7 @@ BEGIN_DAEMON_NAMESPACE
  * Asynchronous => Creates a task to load the resource without locking the current thread.
  *                 Make sure to check if the resource is available before using it in this case.
  */
-enum class EResourceLoadingMode : DAEuint8
+enum class ESynchronizationMode : DAEuint8
 {
     Synchronous,
     Asynchronous

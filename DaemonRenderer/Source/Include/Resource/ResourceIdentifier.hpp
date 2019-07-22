@@ -46,27 +46,23 @@ struct ResourceIdentifier
 
     #pragma region Constructors
 
-	ResourceIdentifier()							noexcept	= default;
-	ResourceIdentifier(ResourceIdentifier const& in_copy)		= default;
-	ResourceIdentifier(ResourceIdentifier&& in_move)			= default;
-	~ResourceIdentifier()										= default;
+	ResourceIdentifier(String const& in_name)			  noexcept;
+	ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept;
+	ResourceIdentifier(ResourceIdentifier&&		 in_move) noexcept;
+	~ResourceIdentifier() = default;
 
 	#pragma endregion
 
-	#pragma region Methods
-
-    /**
-	 * \brief Converts the ResourceIdentifier to a string representation
-	 * \return String representation
-	 */
-	String ToString() const noexcept;
-
-	#pragma endregion 
-
     #pragma region Operators
 
-	ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) = default;
-	ResourceIdentifier& operator=(ResourceIdentifier&& in_move)		 = default;
+	/**
+	* \brief Converts the ResourceIdentifier to a string representation
+	* \return String representation
+	*/
+    explicit operator String() const noexcept;
+
+	ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) noexcept;
+	ResourceIdentifier& operator=(ResourceIdentifier&&		in_move) noexcept;
 
 	DAEbool operator==(ResourceIdentifier const& in_other) const noexcept;
 

@@ -24,10 +24,12 @@
 
 #pragma once
 
+#include <exception>
+
 #include "Config.hpp"
-#include "Types/FundamentalTypes.hpp"
 
 #include "Containers/String.hpp"
+#include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceLoadingFailureCode.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -37,7 +39,7 @@ BEGIN_DAEMON_NAMESPACE
  * 
  * This exception and all the derived exceptions are handled by the resource manager.
  */
-struct ResourceProcessingFailure
+struct ResourceProcessingFailure final : std::exception
 {
 	#pragma region Variables
 
@@ -64,7 +66,7 @@ struct ResourceProcessingFailure
 
 	#pragma region Constructors
 
-	ResourceProcessingFailure (EResourceProcessingFailureCode in_code, DAEbool in_validity = false, DAEchar const* in_description = "") noexcept;
+	explicit ResourceProcessingFailure (EResourceProcessingFailureCode in_code, DAEbool in_validity = false, DAEchar const* in_description = "") noexcept;
 
 	ResourceProcessingFailure ()										 noexcept = delete;
 	ResourceProcessingFailure (ResourceProcessingFailure const& in_copy) noexcept = default;
@@ -73,23 +75,24 @@ struct ResourceProcessingFailure
 
 	#pragma endregion
 
+	#pragma region Methods
+	
+	char const* what() const override;
+
+	#pragma endregion 
+
     #pragma region Operators
 
 	/**
 	 * \brief String representation
 	 */
 	[[nodiscard]]
-	virtual explicit operator String() const noexcept;
+	explicit operator String() const noexcept;
 
 	ResourceProcessingFailure& operator=(ResourceProcessingFailure const& in_copy) noexcept = default;
 	ResourceProcessingFailure& operator=(ResourceProcessingFailure&&	  in_move) noexcept = default;
 
 	#pragma endregion
 };
-
-// Type aliases, those are just for code quality
-typedef ResourceProcessingFailure ResourceLoadingFailure;
-typedef ResourceProcessingFailure ResourceReloadingFailure;
-typedef ResourceProcessingFailure ResourceUnloadingFailure;
 
 END_DAEMON_NAMESPACE

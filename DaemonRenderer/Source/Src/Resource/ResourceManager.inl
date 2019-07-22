@@ -44,7 +44,7 @@ DAEvoid ResourceManager::GarbageCollection(TUnary_Predicate in_predicate, DAEboo
 			m_scheduler_reference.ScheduleTask([manifest = iterator->second, in_clear_invalid_resources, this] {
 				InvalidateResource(manifest);
 
-				if (in_clear_invalid_resources  && manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
+				if (in_clear_invalid_resources && manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
 					delete manifest;
 			});
 		}
@@ -58,7 +58,7 @@ DAEvoid ResourceManager::GarbageCollection(TUnary_Predicate in_predicate, DAEboo
 }
 
 template <typename TResource_Type>
-DAEvoid ResourceManager::LoadResource(ResourceIdentifier const& in_unique_identifier, ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor, EResourceLoadingMode const in_loading_mode) noexcept
+DAEvoid ResourceManager::LoadResource(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
 {
 	if (!in_manifest)
 		return;
@@ -77,7 +77,7 @@ DAEvoid ResourceManager::LoadResource(ResourceIdentifier const& in_unique_identi
 		in_manifest->data  .store(new TResource_Type()    , std::memory_order_release);
 	}
 
-	if (in_loading_mode == EResourceLoadingMode::Synchronous)
+	if (in_loading_mode == ESynchronizationMode::Synchronous)
 		return LoadingRoutine(in_manifest, in_descriptor);
 
 	m_scheduler_reference.ScheduleTask([in_manifest, &in_descriptor, this] {
@@ -86,25 +86,25 @@ DAEvoid ResourceManager::LoadResource(ResourceIdentifier const& in_unique_identi
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::RequestResource(ResourceIdentifier const& in_unique_identifier, ResourceLoadingDescriptor const& in_descriptor, EResourceLoadingMode const in_loading_mode) noexcept
+Handle<TResource_Type> ResourceManager::RequestResource(ResourceIdentifier const& in_unique_identifier, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
 {
 	ResourceManifest* manifest = RequestManifest(in_unique_identifier);
 
 	// If the resource isn't currently loaded: loading it
 	if (manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
-		LoadResource<TResource_Type>(in_unique_identifier, manifest, in_descriptor, in_loading_mode);
+		LoadResource<TResource_Type>(manifest, in_descriptor, in_loading_mode);
 
 	return std::move(Handle<TResource_Type>(manifest));
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::ReloadResource(Handle<TResource_Type> const& in_handle, EResourceLoadingMode const in_loading_mode) noexcept
+Handle<TResource_Type> ResourceManager::ReloadResource(Handle<TResource_Type> const& in_handle, ESynchronizationMode const in_loading_mode) noexcept
 {
 	// Cannot reload an unloaded or invalid handle
 	if (!in_handle.Available())
 		return in_handle;
 
-	if (in_loading_mode == EResourceLoadingMode::Synchronous)
+	if (in_loading_mode == ESynchronizationMode::Synchronous)
 		ReloadingRoutine(in_handle.m_manifest);
 	else
 	{
@@ -137,7 +137,7 @@ Handle<TResource_Type> ResourceManager::ReferenceResource(ResourceIdentifier con
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const& in_unique_identifier, EResourceLoadingMode const in_loading_mode) noexcept
+Handle<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode const in_loading_mode) noexcept
 {
 	ResourceManifest* manifest = RequestManifest(in_unique_identifier, false);
 	
@@ -145,7 +145,7 @@ Handle<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const&
 	if (!manifest || manifest->status != EResourceStatus::Loaded)
 		return Handle<TResource_Type>(manifest);
 
-	if (in_loading_mode == EResourceLoadingMode::Synchronous)
+	if (in_loading_mode == ESynchronizationMode::Synchronous)
 		ReloadingRoutine(manifest);
 	else
 	{

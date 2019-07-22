@@ -133,7 +133,7 @@ class Handle
 		 * \param in_gc_strategy New GC strategy
 		 * \return GC strategy
 		 */
-		EResourceGCStrategy GCStrategy(EResourceGCStrategy in_gc_strategy) noexcept;
+		EResourceGCStrategy GCStrategy(EResourceGCStrategy in_gc_strategy) const noexcept;
 
 		#pragma endregion
 

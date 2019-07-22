@@ -114,7 +114,7 @@ DAEbool Handle<TResource_Type>::WaitForValidity(DAEfloat in_timeout) const noexc
 	if (!m_manifest)
 		return false;
 
-	TODO("Jul 17 2019", "Implement the handle timeout");
+	TODO("Jul 23 2019", "Implement the handle timeout");
 	while (!Available())
 	{
 		// If something wrong happened, then stopping the wait here and notifying the user
@@ -134,7 +134,7 @@ EResourceGCStrategy const& Handle<TResource_Type>::GCStrategy() const noexcept
 }
 
 template <typename TResource_Type>
-EResourceGCStrategy Handle<TResource_Type>::GCStrategy(EResourceGCStrategy const in_gc_strategy) noexcept
+EResourceGCStrategy Handle<TResource_Type>::GCStrategy(EResourceGCStrategy const in_gc_strategy) const noexcept
 {
 	m_manifest->gc_strategy.store(in_gc_strategy, std::memory_order_release);
 	return in_gc_strategy;

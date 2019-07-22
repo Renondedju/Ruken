@@ -35,13 +35,13 @@
 #include "Threading/Scheduler.hpp"
 #include "Threading/Synchronized.hpp"
 #include "Threading/SynchronizedAccess.hpp"
+#include "Threading/ESynchronizationMode.hpp"
 
 #include "Resource/Handle.hpp"
 #include "Resource/ResourceIdentifier.hpp"
 #include "Resource/Enums/EGCCollectionMode.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"
 #include "Resource/ResourceProcessingFailure.hpp"
-#include "Resource/Enums/EResourceLoadingMode.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -70,9 +70,9 @@ class ResourceManager
 
 		#pragma region Methods
 
-		DAEvoid LoadingRoutine  (struct ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor) noexcept;
-		DAEvoid ReloadingRoutine(struct ResourceManifest* in_manifest) noexcept;
-		DAEvoid UnloadingRoutine(struct ResourceManifest* in_manifest) noexcept;
+		DAEvoid LoadingRoutine  (struct ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor);
+		DAEvoid ReloadingRoutine(struct ResourceManifest* in_manifest);
+		DAEvoid UnloadingRoutine(struct ResourceManifest* in_manifest);
 
 		/**
 		 * \brief Invalidates a resource and tags it's corresponding resource manager for garbage collection.
@@ -108,13 +108,12 @@ class ResourceManager
 		/**
 		 * \brief Loads a resource
 		 * \tparam TResource_Type Resource type to load
-		 * \param in_unique_identifier Unique identifier of the resource. This can be omitted (nullptr) and is only used to log the resource status
 		 * \param in_manifest Manifest to put the resource into
 		 * \param in_descriptor Parameters to pass to the resource loader
 		 * \param in_loading_mode Loading mode of the resource (async/sync)
 		 */
 		template <typename TResource_Type>
-		DAEvoid LoadResource(ResourceIdentifier const& in_unique_identifier, ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor, EResourceLoadingMode in_loading_mode) noexcept;
+		DAEvoid LoadResource(ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode in_loading_mode) noexcept;
 
 		/**
 		 * \brief Unloads all the currently loaded resources in the manager
@@ -174,11 +173,11 @@ class ResourceManager
 		 * 
 		 * \tparam TResource_Type Type of the resource to reload
 		 * \param in_unique_identifier Unique identifier of the resource
-		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
+		 * \param in_loading_mode Resource loading mode. See ESynchronizationMode for more detailed information.
 		 * \return Handle to the resource
 		 */
 		template <typename TResource_Type>
-		Handle<TResource_Type> ReloadResource(ResourceIdentifier const& in_unique_identifier, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
+		Handle<TResource_Type> ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
 
 		/**
 		 * \brief Reloads a resource. This requires the resource to already be loaded and available.
@@ -187,11 +186,11 @@ class ResourceManager
 		 * 
 		 * \tparam TResource_Type Type of the resource to reload
 		 * \param in_handle Unique identifier of the resource
-		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
+		 * \param in_loading_mode Resource loading mode. See ESynchronizationMode for more detailed information.
 		 * \return Handle to the resource
 		 */
 		template <typename TResource_Type>
-		Handle<TResource_Type> ReloadResource(Handle<TResource_Type> const& in_handle, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
+		Handle<TResource_Type> ReloadResource(Handle<TResource_Type> const& in_handle, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
 
 		/**
 		 * \brief Requests a resource from the resource manager.
@@ -199,11 +198,11 @@ class ResourceManager
 		 * \tparam TResource_Type Type of the resource to request
 		 * \param in_unique_identifier Unique name of the resource, this identifier is the same whatever the type of the requested resource.
 		 * \param in_descriptor Description of the resource
-		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
+		 * \param in_loading_mode Resource loading mode. See ESynchronizationMode for more detailed information.
 		 * \return Handle to the resource
 		 */
 		template <typename TResource_Type>
-		Handle<TResource_Type> RequestResource(ResourceIdentifier const& in_unique_identifier, class ResourceLoadingDescriptor const& in_descriptor, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
+		Handle<TResource_Type> RequestResource(ResourceIdentifier const& in_unique_identifier, class ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
 		
 		/**
 		 * \brief Sets the garbage collection mode of the resource manager
@@ -223,10 +222,16 @@ class ResourceManager
 		 * \note The resource has to have a manual garbage collection mode in order to work
 		 * 
 		 * \param in_identifier Identifier of the resource to delete
-		 * \param in_loading_mode Resource loading mode. See EResourceLoadingMode for more detailed information.
+		 * \param in_loading_mode Resource loading mode. See ESynchronizationMode for more detailed information.
 		 * \return true if the resource has been successfully removed, false otherwise
 		 */
-		DAEbool UnloadResource(ResourceIdentifier const& in_identifier, EResourceLoadingMode in_loading_mode = EResourceLoadingMode::Asynchronous) noexcept;
+		DAEbool UnloadResource(ResourceIdentifier const& in_identifier, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
+
+		/**
+		 * \brief Returns the current number of resource operations being done. This number should go up in loading times, and stay close to 0 while playing.
+		 * \return Operation count
+		 */
+		DAEuint64 GetCurrentOperationCount() const noexcept;
 
 		#pragma endregion
 

@@ -34,21 +34,21 @@ USING_DAEMON_NAMESPACE
 
 struct TestResource final : IResource
 {
-	DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override
+	DAEvoid Load(ResourceManager&, ResourceLoadingDescriptor const&) override
 	{
 		std::cout << "Loading Resource" << std::endl;
 	}
 
-	DAEvoid Reload(ResourceManager& in_manager) override
+	DAEvoid Reload(ResourceManager&) override
 	{
 		std::cout << "Reloading Resource" << std::endl;
-		
-		throw ResourceLoadingFailure(EResourceProcessingFailureCode::Unknown, false, "Test error");
 	}
 
-	DAEvoid Unload(ResourceManager& in_manager) noexcept override
+	DAEvoid Unload(ResourceManager&) noexcept override
 	{
 		std::cout << "Unloading Resource" << std::endl;
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(1s);
 	}
 };
 
@@ -59,14 +59,11 @@ int main()
 	{
 		ResourceManager resource_manager(scheduler);
 
-		ResourceIdentifier   const identifier {"Test resource"};
-		Handle<TestResource> const resource = resource_manager.RequestResource<TestResource>(identifier, {}, EResourceLoadingMode::Asynchronous);
-
-		if (resource.WaitForValidity(10.0f))
-			resource_manager.ReloadResource<TestResource>(resource);
-
-		resource.WaitForValidity(10.0f);
-		std::cout << resource.Available() << std::endl;
+		for (int i = 0; i < 50; ++i)
+		{
+			ResourceIdentifier   const identifier ("Test resource" + std::to_string(i));
+			Handle<TestResource> const resource = resource_manager.RequestResource<TestResource>(identifier, {}, ESynchronizationMode::Asynchronous);
+		}
 	}
 
 	system("pause");

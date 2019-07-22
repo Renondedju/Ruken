@@ -249,6 +249,7 @@
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeQueue.hpp" />
@@ -265,7 +266,6 @@
     <ClInclude Include="Source\Include\Resource\Enums\EGCCollectionMode.hpp" />
     <ClInclude Include="Source\Include\Resource\Enums\EResourceGCStrategy.hpp" />
     <ClInclude Include="Source\Include\Resource\Enums\EResourceLoadingFailureCode.hpp" />
-    <ClInclude Include="Source\Include\Resource\Enums\EResourceLoadingMode.hpp" />
     <ClInclude Include="Source\Include\Resource\Enums\EResourceStatus.hpp" />
     <ClInclude Include="Source\Include\Resource\ResourceProcessingFailure.hpp" />
     <ClInclude Include="source\include\resource\Handle.hpp" />
