@@ -1,9 +1,12 @@
 # Daemon renderer gitignore
 
+!/DaemonRenderer/Source/Include/Debug/
+!/DaemonRenderer/Source/Src/Debug/
+
 # Temp and debug folders
 Build/
 Logs/
-Debug/
+Debug/*
 
 #logs
 *.bsc

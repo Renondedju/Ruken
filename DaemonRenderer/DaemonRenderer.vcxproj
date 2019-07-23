@@ -108,17 +108,17 @@
     <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
+    <IncludePath>$(ProjectDir)Source\Include;$(ProjectDir)Source\ThirdParty;$(ProjectDir)Source\Src;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
+    <IncludePath>$(ProjectDir)Source\Include;$(ProjectDir)Source\ThirdParty;$(ProjectDir)Source\Src;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
-    <IncludePath>$(ProjectDir)Source\Include;$(IncludePath);$(ProjectDir)Source\Src</IncludePath>
+    <IncludePath>$(ProjectDir)Source\Include;$(ProjectDir)Source\ThirdParty;$(ProjectDir)Source\Src;$(IncludePath)</IncludePath>
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
@@ -244,6 +244,8 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
+    <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
+    <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
@@ -308,6 +310,7 @@
     <ClInclude Include="Source\Include\Types\Unique.hpp" />
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
+    <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -344,6 +347,7 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
