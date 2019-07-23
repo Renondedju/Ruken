@@ -26,47 +26,12 @@
 
 #include "Config.hpp"
 
-#include "Threading/Scheduler.hpp"
-#include "Resource/ResourceManager.hpp"
-#include "Resource/ResourceLoadingDescriptor.hpp"
-
 USING_DAEMON_NAMESPACE
-
-struct TestResource final : IResource
-{
-	DAEvoid Load(ResourceManager&, ResourceLoadingDescriptor const&) override
-	{
-		std::cout << "Loading Resource" << std::endl;
-	}
-
-	DAEvoid Reload(ResourceManager&) override
-	{
-		std::cout << "Reloading Resource" << std::endl;
-	}
-
-	DAEvoid Unload(ResourceManager&) noexcept override
-	{
-		std::cout << "Unloading Resource" << std::endl;
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(1s);
-	}
-};
 
 int main()
 {
-	Scheduler scheduler;
-	
-	{
-		ResourceManager resource_manager(scheduler);
 
-		for (int i = 0; i < 50; ++i)
-		{
-			ResourceIdentifier   const identifier ("Test resource" + std::to_string(i));
-			Handle<TestResource> const resource = resource_manager.RequestResource<TestResource>(identifier, {}, ESynchronizationMode::Asynchronous);
-		}
-	}
 
 	system("pause");
-
 	return EXIT_SUCCESS;
 }
