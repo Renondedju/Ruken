@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <atomic>
 
 #include "Config.hpp"
@@ -41,7 +40,6 @@
 #include "Resource/ResourceIdentifier.hpp"
 #include "Resource/Enums/EGCCollectionMode.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"
-#include "Resource/ResourceProcessingFailure.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 

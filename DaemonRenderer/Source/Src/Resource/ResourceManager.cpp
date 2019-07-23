@@ -26,6 +26,7 @@
 
 #include "Resource/ResourceManager.hpp"
 #include "Resource/ResourceLoadingDescriptor.hpp"
+#include "Resource/ResourceProcessingFailure.hpp"
 
 USING_DAEMON_NAMESPACE
 
