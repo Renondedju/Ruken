@@ -40,10 +40,25 @@ class Clock
 
 		#pragma region Members
 
-		TimePoint m_last_time;
-		DAEfloat  m_accumulator;
-		DAEfloat  m_interval;
+		// Last time an update has been triggered
+		TimePoint m_last_update_time;
+
+		// Number of stored ticks
 		DAEuint64 m_ticks;
+
+		// Time accumulator, this is used to later extract ticks
+		DAEfloat m_accumulator;
+
+		// Time scale of the clock, this can be used to temporarily
+		// slow down or speed up the clock without having to modify the frequency of the clock
+		// Be careful since this also multiplies the impressions of the clock
+		DAEfloat m_time_scale;
+
+		// Time interval between 2 ticks
+		DAEfloat m_interval;
+
+		// Is the clock paused ?
+		DAEbool m_paused;
 
 		#pragma endregion
 
@@ -78,6 +93,22 @@ class Clock
 		DAEvoid Update() noexcept;
 
 		/**
+		 * \brief Returns the status of the clock
+		 * \return True if the clock is running, false otherwise
+		 */
+		DAEbool Status() const noexcept;
+
+		/**
+		 * \brief Pauses the clock, preventing it from generating any more ticks
+		 */
+		DAEvoid Pause() noexcept;
+
+		/**
+		 * \brief Unpauses the clock, resuming any previous activity
+		 */
+		DAEvoid Unpause() noexcept;
+
+		/**
 		 * \brief Consumes a tick if available and returns the new number of available ticks
 		 * \return Number of available ticks after consumption
 		 */
@@ -88,6 +119,13 @@ class Clock
 		 * \return Number of available ticks
 		 */
 		DAEuint64 Ticks() const noexcept;
+
+		/**
+		 * \brief Getter/setter for the time scale property
+		 * \return time scale of the clock
+		 */
+		DAEfloat const& TimeScale() const noexcept;
+		DAEfloat&       TimeScale() noexcept;
 
 		#pragma endregion
 

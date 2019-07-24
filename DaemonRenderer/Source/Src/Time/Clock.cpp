@@ -28,10 +28,12 @@
 USING_DAEMON_NAMESPACE
 
 Clock::Clock() noexcept:
-	m_last_time		{InternalClock::now()},
+	m_last_update_time		{InternalClock::now()},
+	m_ticks			{0Ui64},
 	m_accumulator	{0.0f},
+	m_time_scale	{1.0f},
 	m_interval		{1.0f/60.0f}, // Default is 60 ticks/sec
-	m_ticks			{0Ui64}
+	m_paused		{false}
 {}
 
 DAEvoid Clock::SetFrequency(DAEfloat const in_interval) noexcept
@@ -43,7 +45,7 @@ DAEvoid Clock::Reset() noexcept
 {
 	m_accumulator = 0.0f;
 	m_ticks		  = 0Ui64;
-	m_last_time   = InternalClock::now();
+	m_last_update_time   = InternalClock::now();
 }
 
 DAEvoid Clock::Update() noexcept
@@ -51,12 +53,28 @@ DAEvoid Clock::Update() noexcept
 	// Updating the accumulator
 	TimePoint const now = InternalClock::now();
 
-	m_accumulator += std::chrono::duration<decltype(m_accumulator), std::ratio<1>>(now - m_last_time).count();
-	m_last_time = now;
+	m_accumulator += (m_paused ? 0.0f : m_time_scale) * std::chrono::duration<decltype(m_accumulator), std::ratio<1>>(now - m_last_update_time).count();
 
 	// Extracting ticks from the accumulator
 	m_ticks += static_cast<DAEuint64>(m_accumulator / m_interval);
 	m_accumulator = fmodf(m_accumulator, m_interval);
+
+	m_last_update_time = now;
+}
+
+DAEbool Clock::Status() const noexcept
+{
+	return !m_paused;
+}
+
+DAEvoid Clock::Pause() noexcept
+{
+	m_paused = true;
+}
+
+DAEvoid Clock::Unpause() noexcept
+{
+	m_paused = false;
 }
 
 DAEuint64 Clock::ConsumeTick() noexcept
@@ -70,4 +88,14 @@ DAEuint64 Clock::ConsumeTick() noexcept
 DAEuint64 Clock::Ticks() const noexcept
 {
 	return m_ticks;
+}
+
+DAEfloat const& Clock::TimeScale() const noexcept
+{
+	return m_time_scale;
+}
+
+DAEfloat& Clock::TimeScale() noexcept
+{
+	return m_time_scale;
 }
