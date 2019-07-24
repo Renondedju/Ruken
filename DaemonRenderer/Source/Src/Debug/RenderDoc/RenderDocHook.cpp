@@ -96,7 +96,7 @@ DAEbool RenderDocHook::SetCaptureOptionF32(ERenderDocCaptureOption const in_opti
 	if (!m_renderdoc_api)
 		return false;
 
-	return m_renderdoc_api->SetCaptureOptionU32(static_cast<RENDERDOC_CaptureOption>(in_option), in_value);
+	return m_renderdoc_api->SetCaptureOptionF32(static_cast<RENDERDOC_CaptureOption>(in_option), in_value);
 }
 
 DAEuint32 RenderDocHook::GetCaptureOptionU32(ERenderDocCaptureOption in_option) const noexcept
