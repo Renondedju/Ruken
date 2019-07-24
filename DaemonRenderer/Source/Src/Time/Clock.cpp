@@ -22,34 +22,52 @@
  *  SOFTWARE.
  */
 
-#include <thread>
-#include <iostream>
-
-#include "Config.hpp"
 #include "Time/Clock.hpp"
-
-using namespace std::chrono_literals;
+#include <iostream>
 
 USING_DAEMON_NAMESPACE
 
-int main()
+Clock::Clock() noexcept:
+	m_last_time		{InternalClock::now()},
+	m_accumulator	{0.0f},
+	m_interval		{1.0f/60.0f}, // Default is 60 ticks/sec
+	m_ticks			{0Ui64}
+{}
+
+DAEvoid Clock::SetFrequency(DAEfloat const in_interval) noexcept
 {
-	Clock clock;
+	m_interval = in_interval;
+}
 
-	// 2 ticks every (1) second
-	clock.SetFrequency(1.0f / 2.0f);
+DAEvoid Clock::Reset() noexcept
+{
+	m_accumulator = 0.0f;
+	m_ticks		  = 0Ui64;
+	m_last_time   = InternalClock::now();
+}
 
-	while (true)
-	{
-		clock.Update();
+DAEvoid Clock::Update() noexcept
+{
+	// Updating the accumulator
+	TimePoint const now = InternalClock::now();
 
-		while (clock.Ticks())
-		{
-			clock.ConsumeTick();
-			std::cout << "Tick produced" << std::endl;
-		}
-	}
+	m_accumulator += std::chrono::duration<decltype(m_accumulator), std::ratio<1>>(now - m_last_time).count();
+	m_last_time = now;
 
-	system("pause");
-	return EXIT_SUCCESS;
+	// Extracting ticks from the accumulator
+	m_ticks += static_cast<DAEuint64>(m_accumulator / m_interval);
+	m_accumulator = fmodf(m_accumulator, m_interval);
+}
+
+DAEuint64 Clock::ConsumeTick() noexcept
+{
+	if (!m_ticks)
+		return 0;
+
+	return --m_ticks;
+}
+
+DAEuint64 Clock::Ticks() const noexcept
+{
+	return m_ticks;
 }
