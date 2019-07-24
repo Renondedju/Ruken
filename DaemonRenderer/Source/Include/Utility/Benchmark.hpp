@@ -98,9 +98,9 @@ namespace internal
 /**
  * \brief Benchmark macro, this is intended to quickly benchmark a part of your code.
  * \param in_benchmark_label Benchmark's label
- * \param in_benchmark_execttion_count Number of times to execute the benchmark
+ * \param in_benchmark_exection_count Number of times to execute the benchmark
  */
-#define LOOPED_BENCHMARK(in_benchmark_label, in_benchmark_execttion_count) \
-	for (internal::BenchmarkIterator benchmark_iterator = {0, Benchmark(in_benchmark_label, in_benchmark_execttion_count)}; benchmark_iterator.loop_count < in_benchmark_execttion_count; ++benchmark_iterator.loop_count)
+#define LOOPED_BENCHMARK(in_benchmark_label, in_benchmark_exection_count) \
+	for (internal::BenchmarkIterator benchmark_iterator = {0, Benchmark(in_benchmark_label, in_benchmark_exection_count)}; benchmark_iterator.loop_count < in_benchmark_exection_count; ++benchmark_iterator.loop_count)
 
 END_DAEMON_NAMESPACE
