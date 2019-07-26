@@ -53,7 +53,7 @@ struct LogicalAnd
 	{
 		using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return static_cast<Type&>(in_lhs) && static_cast<Type&>(in_rhs);
+		return static_cast<Type const>(in_lhs) && static_cast<Type const>(in_rhs);
 	}
 };
 

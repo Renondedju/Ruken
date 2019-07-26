@@ -52,7 +52,7 @@ struct LogicalNot
 	{
 		using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return !static_cast<Type&>(in_instance);
+		return !static_cast<Type const>(in_instance);
 	}
 };
 

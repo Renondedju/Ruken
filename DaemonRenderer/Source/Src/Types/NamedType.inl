@@ -24,12 +24,12 @@
 
 template <typename TBase, typename TUniquePhantom>
 template <typename ...TArgs, typename>
-constexpr NamedType<TBase, TUniquePhantom>::NamedType(TArgs... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...))):
-	m_value {std::forward<TArgs>(in_args)...}
+constexpr NamedType<TBase, TUniquePhantom>::NamedType(TArgs&&... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...))):
+	m_value {TBase(std::forward<TArgs>(in_args)...)}
 {}
 
 template <typename TBase, typename TUniquePhantom>
-constexpr NamedType<TBase, TUniquePhantom>::NamedType(TBase const in_base) noexcept(noexcept(TBase(in_base))):
+constexpr NamedType<TBase, TUniquePhantom>::NamedType(TBase const& in_base) noexcept(noexcept(TBase(in_base))):
 	m_value {in_base}
 {}
 

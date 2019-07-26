@@ -53,7 +53,7 @@ struct Equal
 	{
 		using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return static_cast<Type&>(in_rhs) == static_cast<Type&>(in_lhs);
+		return static_cast<Type const>(in_rhs) == static_cast<Type const>(in_lhs);
 	}
 };
 

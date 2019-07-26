@@ -75,13 +75,13 @@ class NamedType
 		 * \param in_args arguments
 		 */
 		template <typename ...TArgs, typename = std::enable_if_t<std::is_constructible_v<TBase, TArgs...>>>
-		constexpr NamedType(TArgs... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...)));
+		constexpr NamedType(TArgs&&... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...)));
 
 		/**
 		 * \brief Base init constructor
 		 * \param in_base base value
 		 */
-		explicit constexpr NamedType(TBase in_base) noexcept(noexcept(TBase(in_base)));
+		explicit constexpr NamedType(TBase const& in_base) noexcept(noexcept(TBase(in_base)));
 
 		/**
 		 * \brief Explicit const expression copy operator.
@@ -129,7 +129,7 @@ namespace internal
 	 * \return Base type of the NamedType
 	 */
 	template <typename TBase, typename TUniquePhantom>
-	TBase UnderlyingTypeImpl(NamedType<TBase, TUniquePhantom>);
+	constexpr TBase UnderlyingTypeImpl(NamedType<TBase, TUniquePhantom>);
 
 	/**
 	 * \brief UnderlyingType helper method, this is used internally to get the underlying type of complex NamedType types
