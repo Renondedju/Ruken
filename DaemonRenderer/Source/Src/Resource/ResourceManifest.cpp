@@ -57,7 +57,7 @@ ResourceIdentifier const& ResourceManifest::GetIdentifier() const noexcept
 
 ResourceIdentifier ResourceManifest::GetIdentifier() const noexcept
 {
-	return ResourceIdentifier();
+	return ResourceIdentifier("");
 }
 
 #endif
