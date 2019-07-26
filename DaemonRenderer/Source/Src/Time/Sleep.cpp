@@ -22,23 +22,38 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#include <chrono>
+#include <thread>
 
-#include "Config.hpp"
-#include "Time/ControlClock.hpp"
-#include "Utility/Benchmark.hpp"
+#include "Time/Sleep.hpp"
+#include "Utility/WindowsOS.hpp"
 
 USING_DAEMON_NAMESPACE
 
-int main()
+DAEbool Sleep::NsSleep(DAEint64 const in_nanoseconds) noexcept
 {
-	ControlClock clock;
-	clock.SetControlFrequency(1.0f / 240.0f);
+	HANDLE const timer = CreateWaitableTimer(nullptr, true, nullptr);
+	LARGE_INTEGER li;
 
-	LOOPED_BENCHMARK("Clock", 240 * 5)
-		clock.ControlPoint();
+	if(!timer)
+		return false;
 
-	system("pause");
-	
-	return EXIT_SUCCESS;
+	li.QuadPart = -in_nanoseconds;
+	if(!SetWaitableTimer(timer, &li, 0, nullptr, nullptr, false))
+	{
+		CloseHandle(timer);
+		return false;
+	}
+
+	WaitForSingleObject(timer, INFINITE);
+	CloseHandle(timer);
+	return true;
+}
+
+DAEvoid Sleep::StdSleep(DAEdouble const in_seconds) noexcept
+{
+	static constexpr std::chrono::duration<DAEdouble> min_sleep_duration(0);
+	std::chrono::steady_clock::time_point const start = std::chrono::steady_clock::now();
+	while (std::chrono::duration<DAEdouble>(std::chrono::steady_clock::now() - start).count() < in_seconds)
+		std::this_thread::sleep_for(min_sleep_duration);
 }

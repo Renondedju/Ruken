@@ -255,6 +255,8 @@
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeQueue.hpp" />
+    <ClInclude Include="Source\Include\Time\ControlClock.hpp" />
+    <ClInclude Include="Source\Include\Time\Sleep.hpp" />
     <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
     <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Operators.hpp" />
@@ -311,6 +313,7 @@
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
+    <ClInclude Include="Source\Include\Time\Timer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -355,6 +358,9 @@
     <ClCompile Include="Source\Src\Resource\ResourceManifest.cpp" />
     <ClCompile Include="Source\Src\Threading\Scheduler.cpp" />
     <ClCompile Include="Source\Src\Threading\Worker.cpp" />
+    <ClCompile Include="Source\Src\Time\ControlClock.cpp" />
+    <ClCompile Include="Source\Src\Time\Sleep.cpp" />
+    <ClCompile Include="Source\Src\Time\Timer.cpp" />
     <ClCompile Include="Source\Src\Utility\Benchmark.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -22,23 +22,37 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-
-#include "Config.hpp"
-#include "Time/ControlClock.hpp"
-#include "Utility/Benchmark.hpp"
+#include "Time/Timer.hpp"
+#include "Utility/WindowsOS.hpp"
 
 USING_DAEMON_NAMESPACE
 
-int main()
+Timer::Timer() noexcept:
+	m_win_handle {CreateWaitableTimer(nullptr, true, nullptr)}
+{}
+
+Timer::~Timer() noexcept
 {
-	ControlClock clock;
-	clock.SetControlFrequency(1.0f / 240.0f);
+	CloseHandle(static_cast<HANDLE>(m_win_handle));
+}
 
-	LOOPED_BENCHMARK("Clock", 240 * 5)
-		clock.ControlPoint();
+DAEbool Timer::SetTiming(DAEint64 const in_nanoseconds) const noexcept
+{
+	if(!m_win_handle)
+		return false;
 
-	system("pause");
-	
-	return EXIT_SUCCESS;
+	LARGE_INTEGER li;
+	li.QuadPart = -in_nanoseconds;
+
+	return SetWaitableTimer(m_win_handle, &li, 0, nullptr, nullptr, false);
+}
+
+DAEbool Timer::NSleep() const noexcept
+{
+	if(!m_win_handle)
+		return false;
+
+	WaitForSingleObject(m_win_handle, INFINITE);
+
+	return true;
 }

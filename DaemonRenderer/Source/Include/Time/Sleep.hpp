@@ -22,23 +22,28 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
 #include "Config.hpp"
-#include "Time/ControlClock.hpp"
-#include "Utility/Benchmark.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-USING_DAEMON_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
-int main()
+struct Sleep
 {
-	ControlClock clock;
-	clock.SetControlFrequency(1.0f / 240.0f);
+	/**
+	 * \brief Native nanosecond sleep
+	 * \param in_nanoseconds nanoseconds to sleep for
+	 * \return true if the operation succeeded, false otherwise
+	 */
+	static DAEbool NsSleep(DAEint64 in_nanoseconds) noexcept;
 
-	LOOPED_BENCHMARK("Clock", 240 * 5)
-		clock.ControlPoint();
+	/**
+	 * \brief Guaranteed to work on every platform but might use more CPU and be less precise than a native sleep
+	 * \brief ~ 0.5 ms precision, 1 ms min sleep
+	 * \param in_seconds Seconds to sleep
+	 */
+	static DAEvoid StdSleep(DAEdouble in_seconds) noexcept;
+};
 
-	system("pause");
-	
-	return EXIT_SUCCESS;
-}
+END_DAEMON_NAMESPACE

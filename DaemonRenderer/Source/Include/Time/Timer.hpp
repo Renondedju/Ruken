@@ -22,23 +22,54 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
 #include "Config.hpp"
-#include "Time/ControlClock.hpp"
-#include "Utility/Benchmark.hpp"
+#include "Types/Unique.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-USING_DAEMON_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
-int main()
+class Timer : Unique
 {
-	ControlClock clock;
-	clock.SetControlFrequency(1.0f / 240.0f);
+	private:
 
-	LOOPED_BENCHMARK("Clock", 240 * 5)
-		clock.ControlPoint();
+		DAEvoid* m_win_handle;
 
-	system("pause");
-	
-	return EXIT_SUCCESS;
-}
+	public:
+
+		#pragma region Constructors
+
+		Timer() noexcept;
+		Timer(Timer const& in_copy)	noexcept = delete;
+		Timer(Timer&&	   in_move)	noexcept = delete;
+		~Timer() noexcept;
+
+		#pragma endregion
+
+		#pragma region Methods
+
+		/**
+		 * \brief Sets the timer timing in nanoseconds
+		 * \param in_nanoseconds Amount of nanoseconds to set
+		 * \return true if the operation succeeded, false otherwise
+		 */
+		DAEbool SetTiming(DAEint64 in_nanoseconds) const noexcept;
+
+		/**
+		 * \brief Sleeps for x amount of nanoseconds (set via SetTiming())
+		 * \return true if the operation succeeded, false otherwise
+		 */
+		DAEbool NSleep() const noexcept;
+
+		#pragma endregion
+
+		#pragma region Operators
+
+		Timer& operator=(Timer const& in_copy) noexcept = delete;
+		Timer& operator=(Timer&&	  in_move) noexcept = delete;
+
+		#pragma endregion
+};
+
+END_DAEMON_NAMESPACE
