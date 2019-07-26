@@ -58,8 +58,6 @@ class Benchmark
 		 * \param in_execution_count Number of times that the benchmarked code will be executed
 		 */
 		Benchmark(const DAEchar* in_label, DAEuint64 in_execution_count) noexcept;
-
-		Benchmark()								= delete;
 		Benchmark(Benchmark const& in_copy)		= default;
 		Benchmark(Benchmark&& in_move) noexcept	= default;
 		~Benchmark();
