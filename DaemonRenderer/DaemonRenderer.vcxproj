@@ -255,7 +255,6 @@
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeQueue.hpp" />
-    <ClInclude Include="Source\Include\Time\Clock.hpp" />
     <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
     <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
     <ClInclude Include="Source\Include\Types\Operators\Operators.hpp" />
@@ -356,7 +355,6 @@
     <ClCompile Include="Source\Src\Resource\ResourceManifest.cpp" />
     <ClCompile Include="Source\Src\Threading\Scheduler.cpp" />
     <ClCompile Include="Source\Src\Threading\Worker.cpp" />
-    <ClCompile Include="Source\Src\Time\Clock.cpp" />
     <ClCompile Include="Source\Src\Utility\Benchmark.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
