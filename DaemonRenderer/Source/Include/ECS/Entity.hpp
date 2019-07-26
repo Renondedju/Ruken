@@ -22,22 +22,22 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
 #include "Config.hpp"
-#include "ECS/Entity.hpp"
+#include "Types/NamedType.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "Types/Operators/Comparison/Equal.hpp"
+#include "Types/Operators/Comparison/NotEqual.hpp"
 
-USING_DAEMON_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
-int main()
+class Entity :	public NamedType<DAEsize, Entity>,
+				Equal	 <Entity>,
+				NotEqual <Entity>
 {
-	Entity entity(123);
-	entity = Entity(183);
+	// Make constructors available
+	using NamedType::NamedType;
+};
 
-	if (entity == Entity(123))
-		std::cout << "Test" << std::endl;
-
-	system("pause");
-	
-	return EXIT_SUCCESS;
-}
+END_DAEMON_NAMESPACE
