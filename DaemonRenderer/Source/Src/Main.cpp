@@ -25,17 +25,11 @@
 #include <iostream>
 
 #include "Config.hpp"
-#include "ECS/Entity.hpp"
 
 USING_DAEMON_NAMESPACE
 
 int main()
 {
-	Entity entity(123);
-	entity = Entity(183);
-
-	if (entity == Entity(123))
-		std::cout << "Test" << std::endl;
 
 	system("pause");
 	

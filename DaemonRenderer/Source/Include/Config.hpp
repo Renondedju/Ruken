@@ -137,6 +137,9 @@
 #define BEGIN_DAEMON_NAMESPACE namespace DAEMON_NAMESPACE {
 #define END_DAEMON_NAMESPACE }
 
+// This avoids msvc error C2871 (or equivalent) to be triggered
+namespace DAEMON_NAMESPACE {}
+
 // ------------------------------
 //	        Threading
 
