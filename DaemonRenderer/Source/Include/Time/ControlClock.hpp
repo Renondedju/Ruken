@@ -74,10 +74,28 @@ class ControlClock
 
 		#pragma region Methods
 
+		/**
+		 * \brief Main method, must be called every time you wish to be synchronized with the clock
+		 * \note If you are too slow between 2 clock cycles, this method has no effect
+		 */
 		DAEvoid ControlPoint() noexcept;
 
+		/**
+		 * \brief Sets the target frequency of the clock
+		 * \param in_frequency frequency of the clock (number of seconds / cycle count)
+		 */
 		DAEvoid  SetControlFrequency(DAEfloat in_frequency) noexcept;
+
+		/**
+		 * \brief Queries the time spent between 2 ControlPoint() calls
+		 * \return Control time
+		 */
 		DAEfloat GetControlTime() const noexcept;
+
+		/**
+		 * \brief Queries the time spent between 2 ControlPoint() calls and omits the time scale of the clock
+		 * \return Unscaled control time
+		 */
 		DAEfloat GetUnscaledControlTime() const noexcept;
 
 		#pragma endregion
