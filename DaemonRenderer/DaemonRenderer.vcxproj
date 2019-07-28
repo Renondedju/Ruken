@@ -271,9 +271,11 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
+    <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
+    <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
     <ClInclude Include="Source\Include\Logic\Simulation.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
@@ -363,6 +365,7 @@
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
+    <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
     <None Include="Source\Src\Resource\Handle.inl" />

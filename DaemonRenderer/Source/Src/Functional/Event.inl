@@ -22,34 +22,49 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-
-#include "Config.hpp"
-#include "Functional/ReservedEvent.hpp"
-
-USING_DAEMON_NAMESPACE
-
-struct Window
+template <typename ... TArgs>
+DAEvoid Event<TArgs...>::Reset() noexcept
 {
-	DAEMON_DECLARE_RESERVED_EVENT(OnResize, Window, DAEuint16, DAEuint16);
+	m_subscribers.clear();
+}
 
-	OnResize resize_event;
-
-	Window()
-	{
-		resize_event.Subscribe([](DAEuint16 const in_width, DAEuint16 const in_height){
-			std::cout << in_width << "x" << in_height << std::endl;
-		});
-
-		resize_event(123, 456);
-	}
-};
-
-int main()
+template <typename ... TArgs>
+DAEvoid Event<TArgs...>::Subscribe(Function const& in_function) noexcept
 {
-	Window win;
+	m_subscribers.emplace_back(std::forward<Function>(in_function));
+}
 
-	system("pause");
-	
-	return EXIT_SUCCESS;
+template <typename ... TArgs>
+DAEvoid Event<TArgs...>::Subscribe(Function&& in_function) noexcept
+{
+	m_subscribers.emplace_back(std::forward<Function>(in_function));
+}
+
+template <typename ... TArgs>
+DAEvoid Event<TArgs...>::Invoke(TArgs... in_args) noexcept
+{
+	for (Function& function : m_subscribers)
+		function(std::forward<TArgs>(in_args)...);
+}
+
+template <typename ... TArgs>
+DAEvoid Event<TArgs...>::operator()(TArgs... in_args) noexcept
+{
+	Invoke(std::forward<TArgs>(in_args)...);
+}
+
+template <typename ... TArgs>
+Event<TArgs...>& Event<TArgs...>::operator+=(Function const& in_function) noexcept
+{
+	Subscribe(std::forward<Function>(in_function));
+
+	return *this;
+}
+
+template <typename ... TArgs>
+Event<TArgs...>& Event<TArgs...>::operator+=(Function&& in_function) noexcept
+{
+	Subscribe(std::forward<Function>(in_function));
+
+	return *this;
 }
