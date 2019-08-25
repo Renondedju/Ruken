@@ -270,13 +270,14 @@
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
+    <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
+    <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
-    <ClInclude Include="Source\Include\Logic\Simulation.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
@@ -380,7 +381,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
-    <ClCompile Include="Source\Src\Logic\Simulation.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
