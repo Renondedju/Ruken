@@ -25,36 +25,38 @@
 #pragma once
 
 #include "Config.hpp"
-
-#include "Containers/Vector.hpp"
 #include "Types/FundamentalTypes.hpp"
+
+#include <iterator>
 
 BEGIN_DAEMON_NAMESPACE
 
-class Entity
+class System
 {
-	private:
-
-		DAEsize					 m_entity_id;
-		Vector<class Component*> m_components;
-	
 	public:
 
 		#pragma region Constructors
 
-		Entity()					  noexcept = default;
-		Entity(Entity const& in_copy) noexcept = default;
-		Entity(Entity&&		 in_move) noexcept = default;
-		~Entity()					  noexcept = default;
+		System()					  noexcept = default;
+		System(System const& in_copy) noexcept = default;
+		System(System&&	     in_move) noexcept = default;
+		~System()					  noexcept = default;
 
 		#pragma endregion
-	
-		#pragma region Operators
 
-		Entity& operator=(Entity const& in_copy) noexcept = default;
-		Entity& operator=(Entity&&		in_move) noexcept = default;
+        #pragma region Methods
+
+        void Update(DAEfloat in_delta_time);
+
+		#pragma endregion
+
+		#pragma region Operators
+        
+		System& operator=(System const& in_copy) noexcept = default;
+		System& operator=(System&&	    in_move) noexcept = default;
 
 		#pragma endregion
 };
+
 
 END_DAEMON_NAMESPACE

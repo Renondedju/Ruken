@@ -26,35 +26,28 @@
 
 #include "Config.hpp"
 
-#include "Containers/Vector.hpp"
-#include "Types/FundamentalTypes.hpp"
-
 BEGIN_DAEMON_NAMESPACE
 
-class Entity
+class Component
 {
-	private:
+    public:
 
-		DAEsize					 m_entity_id;
-		Vector<class Component*> m_components;
-	
-	public:
+        #pragma region Constructors
 
-		#pragma region Constructors
+        Component()							noexcept = default;
+        Component(Component const& in_copy) noexcept = default;
+        Component(Component&&	   in_move) noexcept = default;
+        ~Component()						noexcept = default;
 
-		Entity()					  noexcept = default;
-		Entity(Entity const& in_copy) noexcept = default;
-		Entity(Entity&&		 in_move) noexcept = default;
-		~Entity()					  noexcept = default;
+        #pragma endregion
 
-		#pragma endregion
-	
-		#pragma region Operators
+        #pragma region Operators
 
-		Entity& operator=(Entity const& in_copy) noexcept = default;
-		Entity& operator=(Entity&&		in_move) noexcept = default;
+        Component& operator=(Component const& in_copy) noexcept = default;
+        Component& operator=(Component&&	  in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
+
 
 END_DAEMON_NAMESPACE
