@@ -25,29 +25,11 @@
 #include <iostream>
 
 #include "Config.hpp"
-#include "Functional/ReservedEvent.hpp"
 
 USING_DAEMON_NAMESPACE
 
-struct Window
-{
-	DAEMON_DECLARE_RESERVED_EVENT(OnResize, Window, DAEuint16, DAEuint16);
-
-	OnResize resize_event;
-
-	Window()
-	{
-		resize_event.Subscribe([](DAEuint16 const in_width, DAEuint16 const in_height){
-			std::cout << in_width << "x" << in_height << std::endl;
-		});
-
-		resize_event(123, 456);
-	}
-};
-
 int main()
 {
-	Window win;
 
 	system("pause");
 	

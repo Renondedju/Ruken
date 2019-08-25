@@ -84,7 +84,7 @@ class ControlClock
 		 * \brief Sets the target frequency of the clock
 		 * \param in_frequency frequency of the clock (number of seconds / cycle count)
 		 */
-		DAEvoid  SetControlFrequency(DAEfloat in_frequency) noexcept;
+		DAEvoid SetControlFrequency(DAEfloat in_frequency) noexcept;
 
 		/**
 		 * \brief Queries the time spent between 2 ControlPoint() calls

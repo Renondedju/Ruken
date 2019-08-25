@@ -23,6 +23,7 @@
  */
 
 #include "Time/ControlClock.hpp"
+#include <ctime>
 
 USING_DAEMON_NAMESPACE
 
