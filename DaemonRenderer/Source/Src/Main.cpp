@@ -31,7 +31,7 @@ USING_DAEMON_NAMESPACE
 int main()
 {
 
-	system("pause");
-	
-	return EXIT_SUCCESS;
+    system("pause");
+    
+    return EXIT_SUCCESS;
 }

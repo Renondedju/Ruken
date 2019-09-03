@@ -34,17 +34,17 @@ class Component
 
         #pragma region Constructors
 
-        Component()							noexcept = default;
+        Component()                            noexcept = default;
         Component(Component const& in_copy) noexcept = default;
-        Component(Component&&	   in_move) noexcept = default;
-        ~Component()						noexcept = default;
+        Component(Component&&       in_move) noexcept = default;
+        ~Component()                        noexcept = default;
 
         #pragma endregion
 
         #pragma region Operators
 
         Component& operator=(Component const& in_copy) noexcept = default;
-        Component& operator=(Component&&	  in_move) noexcept = default;
+        Component& operator=(Component&&      in_move) noexcept = default;
 
         #pragma endregion
 };

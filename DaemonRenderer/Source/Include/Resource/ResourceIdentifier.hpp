@@ -46,27 +46,27 @@ struct ResourceIdentifier
 
     #pragma region Constructors
 
-	ResourceIdentifier(String const& in_name)			  noexcept;
-	ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept;
-	ResourceIdentifier(ResourceIdentifier&&		 in_move) noexcept;
-	~ResourceIdentifier() = default;
+    ResourceIdentifier(String const& in_name)              noexcept;
+    ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept;
+    ResourceIdentifier(ResourceIdentifier&&         in_move) noexcept;
+    ~ResourceIdentifier() = default;
 
-	#pragma endregion
+    #pragma endregion
 
     #pragma region Operators
 
-	/**
-	* \brief Converts the ResourceIdentifier to a string representation
-	* \return String representation
-	*/
+    /**
+    * \brief Converts the ResourceIdentifier to a string representation
+    * \return String representation
+    */
     explicit operator String() const noexcept;
 
-	ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) noexcept;
-	ResourceIdentifier& operator=(ResourceIdentifier&&		in_move) noexcept;
+    ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) noexcept;
+    ResourceIdentifier& operator=(ResourceIdentifier&&        in_move) noexcept;
 
-	DAEbool operator==(ResourceIdentifier const& in_other) const noexcept;
+    DAEbool operator==(ResourceIdentifier const& in_other) const noexcept;
 
-	#pragma endregion
+    #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

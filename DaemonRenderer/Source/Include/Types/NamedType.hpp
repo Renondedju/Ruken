@@ -24,11 +24,11 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "Config.hpp"
 
 #include "Meta/Meta.hpp"
-
-#include <type_traits>
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -46,7 +46,7 @@ BEGIN_DAEMON_NAMESPACE
  * struct Meter : NamedType<float, Meter>, Addition<Meter>, Subtraction<Meter>
  * { using NamedType::NamedType };
  * 
- * \tparam TBase Base type, could be any fundamental type
+ * \tparam TBase          Base type, could be any fundamental type
  * \tparam TUniquePhantom Phantom type, this should be unique for each type
  * 
  * \see https://foonathan.net/blog/2016/10/19/strong-typedefs.html
@@ -55,65 +55,70 @@ BEGIN_DAEMON_NAMESPACE
 template <typename TBase, typename TUniquePhantom>
 class NamedType
 {
-	private:
+    private:
 
-		#pragma region Variables
+        #pragma region Variables
 
-		TBase m_value;
+        TBase m_value;
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		using UnderlyingType = TBase;
+        using UnderlyingType = TBase;
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		/**
-		 * \brief Constructs the content of the NamedType using the following constructor: TStrongType(TArgs...)
-		 * \tparam TArgs Arguments type
-		 * \param in_args arguments
-		 */
-		template <typename ...TArgs, typename = std::enable_if_t<std::is_constructible_v<TBase, TArgs...>>>
-		constexpr NamedType(TArgs&&... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...)));
+        /**
+         * \brief Constructs the content of the NamedType using the following constructor: TStrongType(TArgs...)
+         *
+         * \tparam TArgs Arguments type
+         *
+         * \param in_args arguments
+         */
+        template <typename ...TArgs, typename = std::enable_if_t<std::is_constructible_v<TBase, TArgs...>>>
+        constexpr NamedType(TArgs&&... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...)));
 
-		/**
-		 * \brief Base init constructor
-		 * \param in_base base value
-		 */
-		explicit constexpr NamedType(TBase const& in_base) noexcept(noexcept(TBase(in_base)));
+        /**
+         * \brief Base init constructor
+         *
+         * \param in_base base value
+         */
+        explicit constexpr NamedType(TBase const&       in_base) noexcept(noexcept(TBase(in_base)));
 
-		/**
-		 * \brief Explicit const expression copy operator.
-		 * This operator is noexcept if the corresponding base type operator is noexcept itself
-		 * 
-		 * \param in_copy Value to copy from
-		 */
-		explicit constexpr NamedType(NamedType const&	in_copy) noexcept(std::is_nothrow_copy_constructible_v<TBase>);
-	
-		/**
-		 * \brief Explicit const expression move operator.
-		 * This operator is noexcept if the corresponding base type operator is noexcept itself
-		 * 
-		 * \param in_move Value to move from
-		 */
-		explicit constexpr NamedType(NamedType&&		in_move) noexcept(std::is_nothrow_move_constructible_v<TBase>);
+        /**
+         * \brief Explicit const expression copy operator.
+         *
+         * This operator is noexcept if the corresponding base type operator is noexcept itself
+         * 
+         * \param in_copy Value to copy from
+         */
+        explicit constexpr NamedType(NamedType const&   in_copy) noexcept(std::is_nothrow_copy_constructible_v<TBase>);
+    
+        /**
+         * \brief Explicit const expression move operator.
+         *
+         * This operator is noexcept if the corresponding base type operator is noexcept itself
+         * 
+         * \param in_move Value to move from
+         */
+        explicit constexpr NamedType(NamedType&&        in_move) noexcept(std::is_nothrow_move_constructible_v<TBase>);
 
-		// Default constructor / destructor
-		constexpr NamedType () noexcept(std::is_nothrow_constructible_v<TBase>);
-				  ~NamedType() noexcept(std::is_nothrow_destructible_v <TBase>) = default;
+        // Default constructor / destructor
+        constexpr NamedType () noexcept(std::is_nothrow_constructible_v<TBase>);
+                  ~NamedType() noexcept(std::is_nothrow_destructible_v <TBase>) = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		explicit constexpr operator TBase&       ()		  noexcept;
-		explicit constexpr operator TBase const& () const noexcept;
+        explicit constexpr operator TBase&       () noexcept;
+        explicit constexpr operator TBase const& () const noexcept;
 
-		constexpr NamedType& operator=(NamedType const&	in_copy) noexcept(std::is_nothrow_copy_assignable_v<TBase>);
-		constexpr NamedType& operator=(NamedType&&		in_move) noexcept(std::is_nothrow_move_assignable_v<TBase>);
+        constexpr NamedType& operator=(NamedType const& in_copy) noexcept(std::is_nothrow_copy_assignable_v<TBase>);
+        constexpr NamedType& operator=(NamedType&&      in_move) noexcept(std::is_nothrow_move_assignable_v<TBase>);
 
-		#pragma endregion
+        #pragma endregion
 };
 
 #include "Types/NamedType.inl"
@@ -122,38 +127,45 @@ class NamedType
 
 namespace internal
 {
-	/**
-	 * \brief Implementation of the UnderlyingType method
-	 * \tparam TBase Base type of the NamedType
-	 * \tparam TUniquePhantom Phantom type of the NamedType
-	 * \return Base type of the NamedType
-	 */
-	template <typename TBase, typename TUniquePhantom>
-	constexpr TBase UnderlyingTypeImpl(NamedType<TBase, TUniquePhantom>);
+    /**
+     * \brief Implementation of the UnderlyingType method
+     *
+     * \tparam TBase          Base type of the NamedType
+     * \tparam TUniquePhantom Phantom type of the NamedType
+     *
+     * \return Base type of the NamedType
+     */
+    template <typename TBase, typename TUniquePhantom>
+    constexpr TBase UnderlyingTypeImpl(NamedType<TBase, TUniquePhantom>);
 
-	/**
-	 * \brief UnderlyingType helper method, this is used internally to get the underlying type of complex NamedType types
-	 * 
-	 * This has to be used instead of NamedType::UnderlyingType since complex NamedTypes inherits from the NamedType class.
-	 * This methods avoids the issue of ill-formed types.
-	 * 
-	 * \see This wonderful article, where everything is nicely explained : https://foonathan.net/blog/2016/10/19/strong-typedefs.html
-	 * \tparam TStrongType Base type of the NamedType
-	 */
-	template <typename TStrongType>
-	using UnderlyingType = decltype(UnderlyingTypeImpl(std::declval<TStrongType>()));
+    /**
+     * \brief UnderlyingType helper method, this is used internally to get the underlying type of complex NamedType types
+     * 
+     * This has to be used instead of NamedType::UnderlyingType since complex NamedTypes inherits from the NamedType class.
+     * This methods avoids the issue of ill-formed types.
+     * 
+     * \see This wonderful article, where everything is nicely explained : https://foonathan.net/blog/2016/10/19/strong-typedefs.html
+     *
+     * \tparam TStrongType Base type of the NamedType
+     */
+    template <typename TStrongType>
+    using UnderlyingType = decltype(UnderlyingTypeImpl(std::declval<TStrongType>()));
 }
 
 // --- Macros
 
 /**
  * \brief Creates a named type and a unique phantom type
+ *
  * \param in_typename Name of the type to create
  * \param in_basetype Base type used
+ *
  * \see NamedType
  * 
  * Creating a type using this macro allows every operation on this type.
  * This could be great for a "meter" type, but in the case of an "OGLHandle" type, this would allow nonsense like :
+ *
+ * Example:
  *
  * ```
  * OGLHandle handle;
@@ -165,14 +177,15 @@ namespace internal
  * To avoid this issue, please create a complex NamedType instead
  */
 #define DAEMON_CREATE_SIMPLE_NAMED_TYPE(in_typename, in_basetype) \
-	namespace internal { struct DAEMON_GLUE(Phantom, in_typename) {}; } \
-	using in_typename = NamedType<in_basetype, internal::DAEMON_GLUE(Phantom, in_typename)>;
+    namespace internal { struct DAEMON_GLUE(Phantom, in_typename) {}; } \
+    using in_typename = NamedType<in_basetype, internal::DAEMON_GLUE(Phantom, in_typename)>;
 
 /**
  * \brief Creates a literal for a NamedType
- * \param in_typename Name of the targeted type
+ *
+ * \param in_typename    Name of the targeted type
  * \param in_literaltype Type of the literal input
- * \param in_literalname desired literal prefix
+ * \param in_literalname Desired literal prefix
  * 
  * Example:
  * 
@@ -180,7 +193,7 @@ namespace internal
  * would allow to create test objects by writing ``12.2_test``
  */
 #define DAEMON_CREATE_NAMED_TYPE_LITERAL(in_typename, in_literaltype, in_literalname) \
-	constexpr in_typename operator"" DAEMON_GLUE(_, in_literalname)(in_literaltype const in_param) noexcept \
-	{ return in_typename(static_cast<DAEMON_GLUE(in_typename, ::UnderlyingType)>(in_param)); }
+    constexpr in_typename operator"" DAEMON_GLUE(_, in_literalname)(in_literaltype const in_param) noexcept \
+    { return in_typename(static_cast<DAEMON_GLUE(in_typename, ::UnderlyingType)>(in_param)); }
 
 END_DAEMON_NAMESPACE

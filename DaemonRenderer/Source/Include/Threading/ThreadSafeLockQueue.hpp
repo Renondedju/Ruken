@@ -43,81 +43,81 @@ BEGIN_DAEMON_NAMESPACE
 template <typename TType>
 class ThreadSafeLockQueue
 {
-	private:
+    private:
 
-		#pragma region Memebers
+        #pragma region Memebers
 
-		std::condition_variable		m_empty_notification;
-		std::condition_variable		m_push_notification;
-		std::atomic_bool			m_unlock_all;
-		std::mutex					m_empty_mutex;
-		std::mutex					m_push_mutex;
-		Synchronized<Queue<TType>>	m_queue;
-	
-		#pragma endregion 
+        std::condition_variable        m_empty_notification;
+        std::condition_variable        m_push_notification;
+        std::atomic_bool            m_unlock_all;
+        std::mutex                    m_empty_mutex;
+        std::mutex                    m_push_mutex;
+        Synchronized<Queue<TType>>    m_queue;
+    
+        #pragma endregion 
 
-		using QueueReadAccess  = typename decltype(m_queue)::ReadAccess;
-		using QueueWriteAccess = typename decltype(m_queue)::WriteAccess;
+        using QueueReadAccess  = typename decltype(m_queue)::ReadAccess;
+        using QueueWriteAccess = typename decltype(m_queue)::WriteAccess;
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		ThreadSafeLockQueue();
-		ThreadSafeLockQueue(ThreadSafeLockQueue const& in_copy)		= default;
-		ThreadSafeLockQueue(ThreadSafeLockQueue&& in_move) noexcept = default;
-		~ThreadSafeLockQueue();
+        ThreadSafeLockQueue();
+        ThreadSafeLockQueue(ThreadSafeLockQueue const& in_copy)        = default;
+        ThreadSafeLockQueue(ThreadSafeLockQueue&& in_move) noexcept = default;
+        ~ThreadSafeLockQueue();
 
-		#pragma endregion 
+        #pragma endregion 
 
-		#pragma region Methods
+        #pragma region Methods
 
-		/**
-		 * \brief Releases the queue
-		 */
-		DAEvoid Release();
+        /**
+         * \brief Releases the queue
+         */
+        DAEvoid Release();
 
-		/**
-		 * \brief Clears the queue
-		 */
-		DAEvoid Clear() noexcept;
+        /**
+         * \brief Clears the queue
+         */
+        DAEvoid Clear() noexcept;
 
-		/**
-		 * \brief Blocks the current thread until the queue gets emptied.
-		 */
-		DAEvoid WaitUntilEmpty();
+        /**
+         * \brief Blocks the current thread until the queue gets emptied.
+         */
+        DAEvoid WaitUntilEmpty();
 
-		/**
-		 * \brief Checks if the queue is empty
-		 * \return True if the queue is empty, false otherwise
-		 */
-		DAEbool Empty() noexcept;
+        /**
+         * \brief Checks if the queue is empty
+         * \return True if the queue is empty, false otherwise
+         */
+        DAEbool Empty() noexcept;
 
-		/**
-		 * \brief Enqueue an item
-		 * \param in_item Item to enqueue
-		 */
-		DAEvoid Enqueue(TType&& in_item) noexcept;
+        /**
+         * \brief Enqueue an item
+         * \param in_item Item to enqueue
+         */
+        DAEvoid Enqueue(TType&& in_item) noexcept;
 
-		/**
-		 * \brief Tries to dequeue an item, if the queue is empty,
-		 * \brief the caller thread will be locked until the queue gets a new item or gets released
-		 * 
-		 * \param out_item Dequeued item
-		 * \return True if the content of out_item is valid, false otherwise.
-		 * 
-		 * \note This method only returns false if Release() is called from another thread
-		 */
-		DAEbool Dequeue(TType& out_item) noexcept;
+        /**
+         * \brief Tries to dequeue an item, if the queue is empty,
+         * \brief the caller thread will be locked until the queue gets a new item or gets released
+         * 
+         * \param out_item Dequeued item
+         * \return True if the content of out_item is valid, false otherwise.
+         * 
+         * \note This method only returns false if Release() is called from another thread
+         */
+        DAEbool Dequeue(TType& out_item) noexcept;
 
-		#pragma endregion 
+        #pragma endregion 
 
-		#pragma region Operators
+        #pragma region Operators
 
-		ThreadSafeLockQueue& operator=(ThreadSafeLockQueue const& in_copy)		= default;
-		ThreadSafeLockQueue& operator=(ThreadSafeLockQueue&& in_move) noexcept	= default;
+        ThreadSafeLockQueue& operator=(ThreadSafeLockQueue const& in_copy)        = default;
+        ThreadSafeLockQueue& operator=(ThreadSafeLockQueue&& in_move) noexcept    = default;
 
-		#pragma endregion 
+        #pragma endregion 
 };
 
 #include "Threading/ThreadSafeLockQueue.inl"

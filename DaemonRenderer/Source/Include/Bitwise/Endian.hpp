@@ -39,7 +39,7 @@ BEGIN_DAEMON_NAMESPACE
  */
 static DAEuint16 Swap16Endian(DAEuint16 const in_x)
 {
-	return (in_x << 8) | (in_x >> 8);
+    return (in_x << 8) | (in_x >> 8);
 }
 
 /**
@@ -49,8 +49,8 @@ static DAEuint16 Swap16Endian(DAEuint16 const in_x)
  */
 static DAEuint32 Swap32Endian(DAEuint32 const in_x)
 {
-	return (in_x << 24) | (in_x >> 24) |
-		((in_x & 0xff00) << 8) | ((in_x >> 8) & 0xff00);
+    return (in_x << 24) | (in_x >> 24) |
+        ((in_x & 0xff00) << 8) | ((in_x >> 8) & 0xff00);
 }
 
 /**
@@ -60,10 +60,10 @@ static DAEuint32 Swap32Endian(DAEuint32 const in_x)
  */
 static DAEuint64 Swap64Endian( DAEuint64 const in_x )
 {
-	return (in_x << 56) | (in_x >> 56) |
-		((in_x & 0xff00) << 40) | ((in_x >> 40) & 0xff00) |
-		((in_x & 0xff0000) << 24) | ((in_x >> 24) & 0xff0000) |
-		((in_x & 0xff000000) << 8) | ((in_x >>  8) & 0xff000000);
+    return (in_x << 56) | (in_x >> 56) |
+        ((in_x & 0xff00) << 40) | ((in_x >> 40) & 0xff00) |
+        ((in_x & 0xff0000) << 24) | ((in_x >> 24) & 0xff0000) |
+        ((in_x & 0xff000000) << 8) | ((in_x >>  8) & 0xff000000);
 }
 
 /**
@@ -73,7 +73,7 @@ static DAEuint64 Swap64Endian( DAEuint64 const in_x )
  */
 static DAEuint16 ToBigEndian16(DAEuint16 in_x)
 {
-	return DAEMON_IS_BIG_ENDIAN ? in_x : Swap16Endian(in_x);
+    return DAEMON_IS_BIG_ENDIAN ? in_x : Swap16Endian(in_x);
 }
 
 /**
@@ -83,7 +83,7 @@ static DAEuint16 ToBigEndian16(DAEuint16 in_x)
  */
 static DAEuint32 ToBigEndian32(DAEuint32 in_x)
 {
-	return DAEMON_IS_BIG_ENDIAN ? in_x : Swap32Endian(in_x);
+    return DAEMON_IS_BIG_ENDIAN ? in_x : Swap32Endian(in_x);
 }
 
 /**
@@ -93,7 +93,7 @@ static DAEuint32 ToBigEndian32(DAEuint32 in_x)
  */
 static DAEuint64 ToBigEndian64(DAEuint64 in_x)
 {
-	return DAEMON_IS_BIG_ENDIAN ? in_x : Swap64Endian(in_x);
+    return DAEMON_IS_BIG_ENDIAN ? in_x : Swap64Endian(in_x);
 }
 
 /**
@@ -103,7 +103,7 @@ static DAEuint64 ToBigEndian64(DAEuint64 in_x)
  */
 static DAEuint16 ToLittleEndian16(DAEuint16 in_x)
 {
-	return DAEMON_IS_BIG_ENDIAN ? Swap16Endian(in_x) : in_x;
+    return DAEMON_IS_BIG_ENDIAN ? Swap16Endian(in_x) : in_x;
 }
 
 /**
@@ -113,7 +113,7 @@ static DAEuint16 ToLittleEndian16(DAEuint16 in_x)
  */
 static DAEuint32 ToLittleEndian32(DAEuint32 in_x)
 {
-	return DAEMON_IS_BIG_ENDIAN ? Swap32Endian(in_x) : in_x;
+    return DAEMON_IS_BIG_ENDIAN ? Swap32Endian(in_x) : in_x;
 }
 
 /**
@@ -123,7 +123,7 @@ static DAEuint32 ToLittleEndian32(DAEuint32 in_x)
  */
 static DAEuint64 ToLittleEndian64(DAEuint64 in_x)
 {
-	return DAEMON_IS_BIG_ENDIAN ? Swap64Endian(in_x) : in_x;
+    return DAEMON_IS_BIG_ENDIAN ? Swap64Endian(in_x) : in_x;
 }
 
 END_DAEMON_NAMESPACE

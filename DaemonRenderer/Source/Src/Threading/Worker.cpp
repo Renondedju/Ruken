@@ -30,66 +30,66 @@ USING_DAEMON_NAMESPACE
 #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
 
 Worker::Worker(DAEchar const* in_label) noexcept:
-	m_thread {},
-	m_label  {in_label}
+    m_thread {},
+    m_label  {in_label}
 {}
 
 Worker::Worker() noexcept:
-	m_thread {},
-	m_label  {"Unlabeled"}
+    m_thread {},
+    m_label  {"Unlabeled"}
 {}
 
 String const& Worker::Label() const noexcept
 {
-	return m_label;
+    return m_label;
 }
 
 String& Worker::Label() noexcept
 {
-	return m_label;
+    return m_label;
 }
 
 #else // Label disabled code
 
 Worker::Worker(DAEchar const*) noexcept:
-	m_thread {}
+    m_thread {}
 {}
 
 Worker::Worker() noexcept:
-	m_thread {}
+    m_thread {}
 {}
 
 String Worker::Label() const noexcept
 {
-	return "";
+    return "";
 }
 
 #endif
 
 Worker::~Worker() noexcept
 {
-	if (m_thread.joinable())
-		m_thread.join();
+    if (m_thread.joinable())
+        m_thread.join();
 }
 
 DAEbool Worker::Available() const noexcept
 {
-	return m_thread.joinable();
+    return m_thread.joinable();
 }
 
 DAEvoid Worker::WaitForAvailability() noexcept
 {
-	if (m_thread.joinable())
-		m_thread.join();
+    if (m_thread.joinable())
+        m_thread.join();
 }
 
 DAEvoid Worker::Detach() noexcept
 {
-	if (!m_thread.joinable())
-		m_thread.detach();
+    if (!m_thread.joinable())
+        m_thread.detach();
 }
 
 std::thread& Worker::Thread() noexcept
 {
-	return m_thread;
+    return m_thread;
 }

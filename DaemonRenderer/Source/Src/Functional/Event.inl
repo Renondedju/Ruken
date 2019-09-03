@@ -25,46 +25,46 @@
 template <typename ... TArgs>
 DAEvoid Event<TArgs...>::Reset() noexcept
 {
-	m_subscribers.clear();
+    m_subscribers.clear();
 }
 
 template <typename ... TArgs>
 DAEvoid Event<TArgs...>::Subscribe(Function const& in_function) noexcept
 {
-	m_subscribers.emplace_back(std::forward<Function>(in_function));
+    m_subscribers.emplace_back(std::forward<Function>(in_function));
 }
 
 template <typename ... TArgs>
 DAEvoid Event<TArgs...>::Subscribe(Function&& in_function) noexcept
 {
-	m_subscribers.emplace_back(std::forward<Function>(in_function));
+    m_subscribers.emplace_back(std::forward<Function>(in_function));
 }
 
 template <typename ... TArgs>
 DAEvoid Event<TArgs...>::Invoke(TArgs... in_args) noexcept
 {
-	for (Function& function : m_subscribers)
-		function(std::forward<TArgs>(in_args)...);
+    for (Function& function : m_subscribers)
+        function(std::forward<TArgs>(in_args)...);
 }
 
 template <typename ... TArgs>
 DAEvoid Event<TArgs...>::operator()(TArgs... in_args) noexcept
 {
-	Invoke(std::forward<TArgs>(in_args)...);
+    Invoke(std::forward<TArgs>(in_args)...);
 }
 
 template <typename ... TArgs>
 Event<TArgs...>& Event<TArgs...>::operator+=(Function const& in_function) noexcept
 {
-	Subscribe(std::forward<Function>(in_function));
+    Subscribe(std::forward<Function>(in_function));
 
-	return *this;
+    return *this;
 }
 
 template <typename ... TArgs>
 Event<TArgs...>& Event<TArgs...>::operator+=(Function&& in_function) noexcept
 {
-	Subscribe(std::forward<Function>(in_function));
+    Subscribe(std::forward<Function>(in_function));
 
-	return *this;
+    return *this;
 }

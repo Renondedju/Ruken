@@ -40,13 +40,13 @@ class IResource
 
         #pragma region Constructors
 
-		IResource()							noexcept = default;
-		IResource(IResource const& in_copy)	noexcept = default;
-		IResource(IResource&& in_move)		noexcept = default;
+        IResource()                            noexcept = default;
+        IResource(IResource const& in_copy)    noexcept = default;
+        IResource(IResource&& in_move)        noexcept = default;
 
-        virtual ~IResource()						 = default;
+        virtual ~IResource()                         = default;
 
-		#pragma endregion
+        #pragma endregion
 
         #pragma region Methods
 
@@ -84,14 +84,14 @@ class IResource
          */
         virtual DAEvoid Unload(class ResourceManager& in_manager) noexcept = 0;
 
-		#pragma endregion
+        #pragma endregion
 
         #pragma region Operators
 
-		IResource& operator=(IResource const&	in_copy) noexcept = default;
-		IResource& operator=(IResource&&		in_move) noexcept = default;
+        IResource& operator=(IResource const&    in_copy) noexcept = default;
+        IResource& operator=(IResource&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

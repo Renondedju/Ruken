@@ -27,18 +27,18 @@
 USING_DAEMON_NAMESPACE
 
 ResourceProcessingFailure::ResourceProcessingFailure(EResourceProcessingFailureCode const in_code, DAEbool const in_validity, DAEchar const* in_description) noexcept:
-	std::exception		{in_description},
-	description			{in_description},
-	resource_validity	{in_validity},
-	code				{in_code}
+    std::exception        {in_description},
+    description            {in_description},
+    resource_validity    {in_validity},
+    code                {in_code}
 {}
 
 ResourceProcessingFailure::operator String() const noexcept
 {
-	return EnumToString(code) + ": " + description;
+    return EnumToString(code) + ": " + description;
 }
 
 char const* ResourceProcessingFailure::what() const
 {
-	return std::exception::what();
+    return std::exception::what();
 }

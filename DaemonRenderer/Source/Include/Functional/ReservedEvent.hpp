@@ -37,32 +37,32 @@ BEGIN_DAEMON_NAMESPACE
 template <typename... TArgs>
 class ReservedEvent : public Event<TArgs...>
 {
-	protected:
+    protected:
 
-		#pragma region Methods
-		
-		using Event<TArgs...>::Invoke;
-		using Event<TArgs...>::operator();
+        #pragma region Methods
+        
+        using Event<TArgs...>::Invoke;
+        using Event<TArgs...>::operator();
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		ReservedEvent()									= default;
-		ReservedEvent(ReservedEvent const& in_copy)		= default;
-		ReservedEvent(ReservedEvent&& in_move) noexcept	= default;
-		~ReservedEvent()								= default;
-		
-		#pragma endregion
+        ReservedEvent()                                    = default;
+        ReservedEvent(ReservedEvent const& in_copy)        = default;
+        ReservedEvent(ReservedEvent&& in_move) noexcept    = default;
+        ~ReservedEvent()                                = default;
+        
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		ReservedEvent& operator=(ReservedEvent const& in_copy) noexcept = default;
-		ReservedEvent& operator=(ReservedEvent&&	  in_move) noexcept = default;
+        ReservedEvent& operator=(ReservedEvent const& in_copy) noexcept = default;
+        ReservedEvent& operator=(ReservedEvent&&      in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 /**

@@ -29,39 +29,39 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief NonCopyable class, helps the creation of non copyable objects by inheriting from the class.
+ * \brief This is a helper class for the creation of non copyable objects by inheriting from it.
  */
 class NonCopyable
 {
-	private:  // emphasize the following members are private
+    private:  // Emphasizes that the following members are private
 
-		#pragma region Constructors
-		
-		NonCopyable(NonCopyable const& in_copy) = default;
+        #pragma region Constructors
+        
+        NonCopyable(NonCopyable const& in_copy) = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		NonCopyable& operator=(NonCopyable const& in_copy) = default;
+        NonCopyable& operator=(NonCopyable const& in_copy) = default;
 
-		#pragma endregion
+        #pragma endregion
 
-	protected:
-		
-		#pragma region Constructors
+    protected:
+        
+        #pragma region Constructors
 
-		NonCopyable()						= default;
-		NonCopyable(NonCopyable&& in_move)	= default;
-		~NonCopyable()						= default;
-		
-		#pragma endregion
+        NonCopyable ()                      = default;
+        NonCopyable (NonCopyable&& in_move) = default;
+        ~NonCopyable()                      = default;
+        
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		NonCopyable& operator=(NonCopyable&& in_move) = default;
+        NonCopyable& operator=(NonCopyable&& in_move) = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

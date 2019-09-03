@@ -46,24 +46,24 @@ class Synchronized;
 template<class TData, EAccessMode TMode>
 class SynchronizedAccess final : public BaseSynchronizedAccess<TData, true>
 {
-	public:
-	
-		#pragma region Constructors
+    public:
+    
+        #pragma region Constructors
 
-		SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
-		SynchronizedAccess()									 noexcept = delete;
-		SynchronizedAccess(SynchronizedAccess const& in_copy)	 noexcept = default;
-		SynchronizedAccess(SynchronizedAccess&&		 in_move)	 noexcept = default;
-		~SynchronizedAccess()									 noexcept = default;
+        SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
+        SynchronizedAccess()                                     noexcept = delete;
+        SynchronizedAccess(SynchronizedAccess const& in_copy)     noexcept = default;
+        SynchronizedAccess(SynchronizedAccess&&         in_move)     noexcept = default;
+        ~SynchronizedAccess()                                     noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
-		SynchronizedAccess& operator=(SynchronizedAccess&&		in_move) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 /**
@@ -75,38 +75,38 @@ class SynchronizedAccess final : public BaseSynchronizedAccess<TData, true>
 template<class TData>
 class SynchronizedAccess<TData, EAccessMode::Read> final : public BaseSynchronizedAccess<TData, false>
 {
-	private:
+    private:
 
-		#pragma region Variables
+        #pragma region Variables
 
         std::shared_lock<std::shared_mutex> m_lock;
 
-		#pragma endregion 
+        #pragma endregion 
 
-	public:
-	
-		#pragma region Constructors
+    public:
+    
+        #pragma region Constructors
 
-		SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
-		SynchronizedAccess()									 noexcept = delete;
-		SynchronizedAccess(SynchronizedAccess const& in_copy)	 noexcept = default;
-		SynchronizedAccess(SynchronizedAccess&&		 in_move)	 noexcept = default;
-		~SynchronizedAccess()									 noexcept = default;
+        SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
+        SynchronizedAccess()                                     noexcept = delete;
+        SynchronizedAccess(SynchronizedAccess const& in_copy)     noexcept = default;
+        SynchronizedAccess(SynchronizedAccess&&         in_move)     noexcept = default;
+        ~SynchronizedAccess()                                     noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		std::shared_lock<std::shared_mutex>& GetLock() noexcept;
+        std::shared_lock<std::shared_mutex>& GetLock() noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
-		SynchronizedAccess& operator=(SynchronizedAccess&&		in_move) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 /**
@@ -118,38 +118,38 @@ class SynchronizedAccess<TData, EAccessMode::Read> final : public BaseSynchroniz
 template<class TData>
 class SynchronizedAccess<TData, EAccessMode::Write> final : public BaseSynchronizedAccess<TData, true>
 {
-	private:
+    private:
 
-		#pragma region Variables
+        #pragma region Variables
 
         std::unique_lock<std::shared_mutex> m_lock;
 
-		#pragma endregion 
+        #pragma endregion 
 
-	public:
-	
-		#pragma region Constructors
+    public:
+    
+        #pragma region Constructors
 
-		SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
-		SynchronizedAccess()									 noexcept = delete;
-		SynchronizedAccess(SynchronizedAccess const& in_copy)	 noexcept = default;
-		SynchronizedAccess(SynchronizedAccess&&		 in_move)	 noexcept = default;
-		~SynchronizedAccess()									 noexcept = default;
+        SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
+        SynchronizedAccess()                                     noexcept = delete;
+        SynchronizedAccess(SynchronizedAccess const& in_copy)     noexcept = default;
+        SynchronizedAccess(SynchronizedAccess&&         in_move)     noexcept = default;
+        ~SynchronizedAccess()                                     noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		std::unique_lock<std::shared_mutex>& GetLock() noexcept;
+        std::unique_lock<std::shared_mutex>& GetLock() noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
-		SynchronizedAccess& operator=(SynchronizedAccess&&		in_move) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 #include "Threading/SynchronizedAccess.inl"

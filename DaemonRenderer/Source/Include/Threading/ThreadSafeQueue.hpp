@@ -39,57 +39,57 @@ BEGIN_DAEMON_NAMESPACE
 template <typename TType>
 class ThreadSafeQueue
 {
-	private:
+    private:
 
-		#pragma region Members
+        #pragma region Members
 
-		Synchronized<Queue<TType>> m_queue;
+        Synchronized<Queue<TType>> m_queue;
 
-		using QueueReadAccess  = decltype(m_queue)::ReadAccess;
-		using QueueWriteAccess = decltype(m_queue)::WriteAccess;
+        using QueueReadAccess  = decltype(m_queue)::ReadAccess;
+        using QueueWriteAccess = decltype(m_queue)::WriteAccess;
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		ThreadSafeQueue()									= default;
-		ThreadSafeQueue(ThreadSafeQueue const& in_copy)		= default;
-		ThreadSafeQueue(ThreadSafeQueue&& in_move) noexcept = default;
-		~ThreadSafeQueue()									= default;
+        ThreadSafeQueue()                                    = default;
+        ThreadSafeQueue(ThreadSafeQueue const& in_copy)        = default;
+        ThreadSafeQueue(ThreadSafeQueue&& in_move) noexcept = default;
+        ~ThreadSafeQueue()                                    = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		/**
-		 * \brief Checks if the queue is empty
-		 * \return True if the queue is empty, false otherwise
-		 */
-		DAEbool Empty() const noexcept;
+        /**
+         * \brief Checks if the queue is empty
+         * \return True if the queue is empty, false otherwise
+         */
+        DAEbool Empty() const noexcept;
 
-		/**
-		 * \brief Enqueue an item
-		 * \param in_item Item to enqueue
-		 */
-		DAEvoid Enqueue(TType&& in_item) noexcept;
+        /**
+         * \brief Enqueue an item
+         * \param in_item Item to enqueue
+         */
+        DAEvoid Enqueue(TType&& in_item) noexcept;
 
-		/**
-		 * \brief Tries to dequeue an item
-		 * \warning If the queue is empty, the result of this function and the content of out_item are undefined
-		 * \param out_item Dequeued item
-		 */
-		DAEvoid Dequeue(TType& out_item) noexcept;
+        /**
+         * \brief Tries to dequeue an item
+         * \warning If the queue is empty, the result of this function and the content of out_item are undefined
+         * \param out_item Dequeued item
+         */
+        DAEvoid Dequeue(TType& out_item) noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		ThreadSafeQueue& operator=(ThreadSafeQueue const& in_copy)		= default;
-		ThreadSafeQueue& operator=(ThreadSafeQueue&& in_move) noexcept	= default;
+        ThreadSafeQueue& operator=(ThreadSafeQueue const& in_copy)        = default;
+        ThreadSafeQueue& operator=(ThreadSafeQueue&& in_move) noexcept    = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 #include "Threading/ThreadSafeQueue.inl"

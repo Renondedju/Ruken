@@ -36,7 +36,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 #define DAEMON_BITMASK(name, ...) enum class name : MinimumTypeT<DAEMON_GET_ARG_COUNT(##__VA_ARGS__)> { ##__VA_ARGS__ }; \
-	static_assert(DAEMON_GET_ARG_COUNT(##__VA_ARGS__) < 64, "Bitmask enums only supports a max of 64 values")
+    static_assert(DAEMON_GET_ARG_COUNT(##__VA_ARGS__) < 64, "Bitmask enums only supports a max of 64 values")
 
 /**
  * \brief A bitmask can be used to store multiple flags into a single integer.
@@ -53,142 +53,142 @@ BEGIN_DAEMON_NAMESPACE
 template<typename TEnum_Type>
 class Bitmask
 {
-	static_assert(std::is_enum<TEnum_Type>::value, "Cannot create a Bitmask from a non enum type");
+    static_assert(std::is_enum<TEnum_Type>::value, "Cannot create a Bitmask from a non enum type");
 
-	public: using Underlying_Type = typename std::underlying_type<TEnum_Type>::type;
+    public: using Underlying_Type = typename std::underlying_type<TEnum_Type>::type;
 
-	private:
+    private:
 
-		#pragma region Variables
+        #pragma region Variables
 
-		Underlying_Type m_data;
+        Underlying_Type m_data;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		constexpr Bitmask(Underlying_Type in_data) noexcept;
+        constexpr Bitmask(Underlying_Type in_data) noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
-		constexpr Bitmask(TData... in_data)	noexcept;
-		constexpr Bitmask()					noexcept;
+        template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
+        constexpr Bitmask(TData... in_data)    noexcept;
+        constexpr Bitmask()                    noexcept;
 
-		constexpr Bitmask(Bitmask const& in_copy) noexcept = default;
-		constexpr Bitmask(Bitmask&&		 in_move) noexcept = default;
-		
-		~Bitmask() noexcept = default;
+        constexpr Bitmask(Bitmask const& in_copy) noexcept = default;
+        constexpr Bitmask(Bitmask&&         in_move) noexcept = default;
+        
+        ~Bitmask() noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		/**
-		 * \brief Checks if the bitmask has all the flags passed as enabled
-		 * \tparam TData Types of the data to pass
-		 * \param in_data Data
-		 * \return True if the bitmask has the targeted flags enabled
-		 */
-		template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
-		[[nodiscard]]
-		constexpr DAEbool HasAll(TData... in_data)			const noexcept;
-		[[nodiscard]]
-		constexpr DAEbool HasAll(Bitmask const& in_bitmask) const noexcept;
+        /**
+         * \brief Checks if the bitmask has all the flags passed as enabled
+         * \tparam TData Types of the data to pass
+         * \param in_data Data
+         * \return True if the bitmask has the targeted flags enabled
+         */
+        template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
+        [[nodiscard]]
+        constexpr DAEbool HasAll(TData... in_data)            const noexcept;
+        [[nodiscard]]
+        constexpr DAEbool HasAll(Bitmask const& in_bitmask) const noexcept;
 
-		/**
-		 * \brief Checks if the bitmask has at least one the flags passed as enabled
-		 * \tparam TData Types of the data to pass
-		 * \param in_data Data
-		 * \return True if the bitmask has the targeted flags enabled
-		 */
-		template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
-		[[nodiscard]]
-		constexpr DAEbool HasOne(TData... in_data)			const noexcept;
-		[[nodiscard]]
-		constexpr DAEbool HasOne(Bitmask const& in_bitmask) const noexcept;
+        /**
+         * \brief Checks if the bitmask has at least one the flags passed as enabled
+         * \tparam TData Types of the data to pass
+         * \param in_data Data
+         * \return True if the bitmask has the targeted flags enabled
+         */
+        template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
+        [[nodiscard]]
+        constexpr DAEbool HasOne(TData... in_data)            const noexcept;
+        [[nodiscard]]
+        constexpr DAEbool HasOne(Bitmask const& in_bitmask) const noexcept;
 
-		/**
-		 * \brief Enables flags
-		 * \tparam TData Types of the data to pass
-		 * \param in_data Data
-		 */
-		template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
-		constexpr DAEvoid Add(TData... in_data)				noexcept;
-		constexpr DAEvoid Add(Bitmask const& in_bitmask)	noexcept;
+        /**
+         * \brief Enables flags
+         * \tparam TData Types of the data to pass
+         * \param in_data Data
+         */
+        template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
+        constexpr DAEvoid Add(TData... in_data)                noexcept;
+        constexpr DAEvoid Add(Bitmask const& in_bitmask)    noexcept;
 
-		/**
-		 * \brief Disable flags
-		 * \tparam TData Types of the data to pass
-		 * \param in_data Data
-		 */
-		template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
-		constexpr DAEvoid Remove(TData... in_data)			noexcept;
-		constexpr DAEvoid Remove(Bitmask const& in_bitmask)	noexcept;
+        /**
+         * \brief Disable flags
+         * \tparam TData Types of the data to pass
+         * \param in_data Data
+         */
+        template <typename... TData, typename = std::enable_if_t<std::conjunction_v<std::is_same<TData, TEnum_Type>...>>>
+        constexpr DAEvoid Remove(TData... in_data)            noexcept;
+        constexpr DAEvoid Remove(Bitmask const& in_bitmask)    noexcept;
 
-		/**
-		 * \brief Clears the bitmask
-		 */
-		constexpr DAEvoid Clear() noexcept;
+        /**
+         * \brief Clears the bitmask
+         */
+        constexpr DAEvoid Clear() noexcept;
 
-		/**
-		 * \brief Returns the number of enabled flags in the bitmask
-		 * 
-		 * Time Complexity: O(log n)
-		 * The implementation is based on the Brian Kernighan's Algorithm.
-		 *
-		 * I know that __popcnt16, __popcnt, __popcnt64 is a thing but I don't want to be dependent
-		 * of the ABM instruction set since it has been dropped on recent modern AMD CPUs
-		 * and isn't supported by many other processors such as ARM CPUs.
-		 *
-		 * \return count of enabled flags
-		 */
-		[[nodiscard]]
-		constexpr DAEuint16 Enabled() const noexcept;
+        /**
+         * \brief Returns the number of enabled flags in the bitmask
+         * 
+         * Time Complexity: O(log n)
+         * The implementation is based on the Brian Kernighan's Algorithm.
+         *
+         * I know that __popcnt16, __popcnt, __popcnt64 is a thing but I don't want to be dependent
+         * of the ABM instruction set since it has been dropped on recent modern AMD CPUs
+         * and isn't supported by many other processors such as ARM CPUs.
+         *
+         * \return count of enabled flags
+         */
+        [[nodiscard]]
+        constexpr DAEuint16 Enabled() const noexcept;
 
-		/**
-		 * \brief Executes a function pointer for each flag enabled in the set
-		 * \tparam TLambda_Type Type of the lambda, the signature of the function used must be PBRPBRvoid (*in_lambda)(Enum_Type in_flag);
-		 * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
-		 */
-		template <typename TLambda_Type>
-		constexpr DAEvoid Foreach(TLambda_Type in_lambda) const noexcept;
+        /**
+         * \brief Executes a function pointer for each flag enabled in the set
+         * \tparam TLambda_Type Type of the lambda, the signature of the function used must be PBRPBRvoid (*in_lambda)(Enum_Type in_flag);
+         * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
+         */
+        template <typename TLambda_Type>
+        constexpr DAEvoid Foreach(TLambda_Type in_lambda) const noexcept;
 
-		/**
-		 * \brief Returns the data stored by the bitmask
-		 * \return Data stored by the bitmask
-		 */
-		[[nodiscard]]
-		constexpr Underlying_Type  Data() const noexcept;
-		[[nodiscard]]
-		constexpr Underlying_Type& Data()		noexcept;
+        /**
+         * \brief Returns the data stored by the bitmask
+         * \return Data stored by the bitmask
+         */
+        [[nodiscard]]
+        constexpr Underlying_Type  Data() const noexcept;
+        [[nodiscard]]
+        constexpr Underlying_Type& Data()        noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		Bitmask& operator= (Bitmask const&  in_copy)						noexcept = default;
-		Bitmask& operator= (Bitmask&&		in_move) 						noexcept = default;
+        Bitmask& operator= (Bitmask const&  in_copy)                        noexcept = default;
+        Bitmask& operator= (Bitmask&&        in_move)                         noexcept = default;
 
-		constexpr Bitmask  operator+ (TEnum_Type const& in_bit)		const	noexcept;
-		constexpr Bitmask  operator+ (Bitmask   const& in_bitmask)	const	noexcept;
+        constexpr Bitmask  operator+ (TEnum_Type const& in_bit)        const    noexcept;
+        constexpr Bitmask  operator+ (Bitmask   const& in_bitmask)    const    noexcept;
 
-		constexpr Bitmask  operator+=(TEnum_Type const& in_bit)				noexcept;
-		constexpr Bitmask& operator+=(Bitmask   const& in_bitmask)			noexcept;
+        constexpr Bitmask  operator+=(TEnum_Type const& in_bit)                noexcept;
+        constexpr Bitmask& operator+=(Bitmask   const& in_bitmask)            noexcept;
 
-		constexpr Bitmask  operator- (TEnum_Type const& in_bit)		const	noexcept;
-		constexpr Bitmask  operator- (Bitmask   const& in_bitmask)	const	noexcept;
+        constexpr Bitmask  operator- (TEnum_Type const& in_bit)        const    noexcept;
+        constexpr Bitmask  operator- (Bitmask   const& in_bitmask)    const    noexcept;
 
-		constexpr Bitmask& operator-=(TEnum_Type const& in_bit)				noexcept;
-		constexpr Bitmask& operator-=(Bitmask   const& in_bitmask)			noexcept;
+        constexpr Bitmask& operator-=(TEnum_Type const& in_bit)                noexcept;
+        constexpr Bitmask& operator-=(Bitmask   const& in_bitmask)            noexcept;
 
-		constexpr DAEbool  operator==(Bitmask   const& in_bitmask)	const	noexcept;
+        constexpr DAEbool  operator==(Bitmask   const& in_bitmask)    const    noexcept;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 #pragma region External Operators

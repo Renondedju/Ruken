@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
 
@@ -32,44 +33,44 @@ BEGIN_DAEMON_NAMESPACE
 
 class Timer : Unique
 {
-	private:
+    private:
 
-		DAEvoid* m_win_handle;
+        DAEvoid* m_win_handle;
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		Timer() noexcept;
-		Timer(Timer const& in_copy)	noexcept = delete;
-		Timer(Timer&&	   in_move)	noexcept = delete;
-		~Timer() noexcept;
+        Timer ()                     noexcept;
+        Timer (Timer const& in_copy) noexcept = delete;
+        Timer (Timer&&      in_move) noexcept = delete;
+        ~Timer()                     noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		/**
-		 * \brief Sets the timer timing in nanoseconds
-		 * \param in_nanoseconds Amount of nanoseconds to set
-		 * \return true if the operation succeeded, false otherwise
-		 */
-		DAEbool SetTiming(DAEint64 in_nanoseconds) const noexcept;
+        /**
+         * \brief Sets the timer timing in nanoseconds
+         * \param in_nanoseconds Amount of nanoseconds to set
+         * \return true if the operation succeeded, false otherwise
+         */
+        DAEbool SetTiming(DAEint64 in_nanoseconds) const noexcept;
 
-		/**
-		 * \brief Sleeps for x amount of nanoseconds (set via SetTiming())
-		 * \return true if the operation succeeded, false otherwise
-		 */
-		DAEbool NSleep() const noexcept;
+        /**
+         * \brief Sleeps for x amount of nanoseconds (set via SetTiming())
+         * \return true if the operation succeeded, false otherwise
+         */
+        DAEbool NSleep() const noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		Timer& operator=(Timer const& in_copy) noexcept = delete;
-		Timer& operator=(Timer&&	  in_move) noexcept = delete;
+        Timer& operator=(Timer const& in_copy) noexcept = delete;
+        Timer& operator=(Timer&&      in_move) noexcept = delete;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

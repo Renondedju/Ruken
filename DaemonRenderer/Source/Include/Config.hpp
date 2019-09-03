@@ -24,31 +24,31 @@
 
 #pragma once
 
-#define	DAEMON_COPYRIGHT_STR "Copyright (c) 2019 Basile Combet, Philippe Yi"
-#define DAEMON_LICENCE_STR   "MIT License"
+#define DAEMON_COPYRIGHT_STR "Copyright (c) 2019 Basile Combet, Philippe Yi"
+#define DAEMON_LICENSE_STR   "MIT License"
 #define DAEMON_PROJECT_NAME  "Daemon Renderer"
 #define DAEMON_URL           "https://github.com/Renondedju/Daemon"
 
 
 // ------------------------------
-//	        Global Settings
+//            Global Settings
 
 #define DAEMON_CONFIG_LEVEL_DEBUG 0
 #define DAEMON_CONFIG_LEVEL_RELEASE 1
 #define DAEMON_CONFIG_LEVEL_SHIPPING 2
 
 #ifdef _DEBUG
-	#define DAEMON_CONFIG_LEVEL DAEMON_CONFIG_LEVEL_DEBUG
-	#define DAEMON_CONFIG_DEBUG
-	#define DAEMON_CONFIG_STR "Debug"
+    #define DAEMON_CONFIG_LEVEL DAEMON_CONFIG_LEVEL_DEBUG
+    #define DAEMON_CONFIG_DEBUG
+    #define DAEMON_CONFIG_STR "Debug"
 #elif defined(_RELEASE)
-	#define DAEMON_CONFIG_LEVEL DAEMON_CONFIG_LEVEL_RELEASE
-	#define DAEMON_CONFIG_RELEASE
-	#define DAEMON_CONFIG_STR "Release"
+    #define DAEMON_CONFIG_LEVEL DAEMON_CONFIG_LEVEL_RELEASE
+    #define DAEMON_CONFIG_RELEASE
+    #define DAEMON_CONFIG_STR "Release"
 #else
-	#define DAEMON_CONFIG_LEVEL DAEMON_CONFIG_LEVEL_SHIPPING
-	#define DAEMON_CONFIG_SHIPPING
-	#define DAEMON_CONFIG_STR "Shipping"
+    #define DAEMON_CONFIG_LEVEL DAEMON_CONFIG_LEVEL_SHIPPING
+    #define DAEMON_CONFIG_SHIPPING
+    #define DAEMON_CONFIG_STR "Shipping"
 #endif
 
 #define DAEMON_DEBUG            if constexpr(DAEMON_CONFIG_LEVEL == DAEMON_CONFIG_LEVEL_DEBUG)
@@ -58,79 +58,79 @@
 #define DAEMON_RELEASE_SHIPPING if constexpr(DAEMON_CONFIG_LEVEL == DAEMON_CONFIG_LEVEL_RELEASE || DAEMON_CONFIG_LEVEL == DAEMON_CONFIG_LEVEL_SHIPPING)
 
 #if !defined(no_multithread) && defined(__STDCPP_THREADS__)
-	#define DAEMON_MULTITHREAD_ENABLED
-	#define DAEMON_MULTITHREAD_STATUS_STR "Enabled"
+    #define DAEMON_MULTITHREAD_ENABLED
+    #define DAEMON_MULTITHREAD_STATUS_STR "Enabled"
 #else
-	#define DAEMON_MULTITHREAD_DISABLED
-	#define DAEMON_MULTITHREAD_STATUS_STR "Disabled"
+    #define DAEMON_MULTITHREAD_DISABLED
+    #define DAEMON_MULTITHREAD_STATUS_STR "Disabled"
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-	#define DAEMON_OS_WINDOWS
-	#define DAEMON_OS_STR "Windows"
+    #define DAEMON_OS_WINDOWS
+    #define DAEMON_OS_STR "Windows"
 #elif defined(__linux__)
-	#define DAEMON_OS_LINUX
-	#define DAEMON_OS_STR "Linux"
+    #define DAEMON_OS_LINUX
+    #define DAEMON_OS_STR "Linux"
 #elif defined(__unix__)
-	#define DAEMON_OS_UNIX
-	#define DAEMON_OS_STR "Unix"
+    #define DAEMON_OS_UNIX
+    #define DAEMON_OS_STR "Unix"
 #elif defined(_POSIX_VERSION)
-	#define DAEMON_OS_POSIX
-	#define DAEMON_OS_STR "Posix"
+    #define DAEMON_OS_POSIX
+    #define DAEMON_OS_STR "Posix"
 #elif defined(__APPLE__) || defined(__MACH__)
-	#define DAEMON_OS_APPLE
-	#define DAEMON_OS_STR "Apple"
+    #define DAEMON_OS_APPLE
+    #define DAEMON_OS_STR "Apple"
 
-	#include "TargetConditionals.h"
-	#if TARGET_OS_IPHONE && TARGET_IPHONE_SIMULATOR
-		#define DAEMON_OS_TARGET_APPLE_IPHONE_SIMULATOR
-		#define DAEMON_OS_TARGET_STR "Iphone simulator"
-	#elif TARGET_OS_IPHONE
-		#define DAEMON_OS_TARGET_APPLE_IPHONE
-		#define DAEMON_OS_TARGET_STR "Iphone"
-	#else
-		#define DAEMON_OS_TARGET_APPLE_OSX
-		#define DAEMON_OS_TARGET_STR "OSX"
-	#endif
+    #include "TargetConditionals.h"
+    #if TARGET_OS_IPHONE && TARGET_IPHONE_SIMULATOR
+        #define DAEMON_OS_TARGET_APPLE_IPHONE_SIMULATOR
+        #define DAEMON_OS_TARGET_STR "Iphone simulator"
+    #elif TARGET_OS_IPHONE
+        #define DAEMON_OS_TARGET_APPLE_IPHONE
+        #define DAEMON_OS_TARGET_STR "Iphone"
+    #else
+        #define DAEMON_OS_TARGET_APPLE_OSX
+        #define DAEMON_OS_TARGET_STR "OSX"
+    #endif
 #elif defined(__ANDROID__)
-	#define DAEMON_OS_ANDROID
-	#define DAEMON_OS_STR "Android"
+    #define DAEMON_OS_ANDROID
+    #define DAEMON_OS_STR "Android"
 #else
-	#define DAEMON_OS_UNKNOWN
-	#define DAEMON_OS_STR "Unknown"
+    #define DAEMON_OS_UNKNOWN
+    #define DAEMON_OS_STR "Unknown"
 #endif
 
 #if defined(__x86_64__) || defined(__ppc64__) || defined(_WIN64)
-	#define DAEMON_PLATFORM_X64
-	#define DAEMON_PLATFORM_STR "x64"
+    #define DAEMON_PLATFORM_X64
+    #define DAEMON_PLATFORM_STR "x64"
 #else
-	#define DAEMON_PLATFORM_X86
-	#define DAEMON_PLATFORM_STR "x86"
+    #define DAEMON_PLATFORM_X86
+    #define DAEMON_PLATFORM_STR "x86"
 #endif
 
-#if	defined(_MSC_VER)
-	#define DAEMON_COMPILER_MSVC
-	#define DAEMON_COMPILER_STR "msvc"
+#if    defined(_MSC_VER)
+    #define DAEMON_COMPILER_MSVC
+    #define DAEMON_COMPILER_STR "msvc"
 #elif defined(__ICL) || defined(__ICC) || defined(__INTEL_COMPILER)
-	#define DAEMON_COMPILER_INTEL
-	#define DAEMON_COMPILER_STR "intel"
+    #define DAEMON_COMPILER_INTEL
+    #define DAEMON_COMPILER_STR "intel"
 #elif defined(__clang__)
-	#define DAEMON_COMPILER_CLANG
-	#define DAEMON_COMPILER_GCC // GCC-Compatible
-	#define DAEMON_COMPILER_STR "clang"
+    #define DAEMON_COMPILER_CLANG
+    #define DAEMON_COMPILER_GCC // GCC-Compatible
+    #define DAEMON_COMPILER_STR "clang"
 #elif defined(__ghs__) // must appear _before_ __GNUC__ || __GNUG__
-	#define DAEMON_COMPILER_GHS
-	#define DAEMON_COMPILER_STR "ghs"
+    #define DAEMON_COMPILER_GHS
+    #define DAEMON_COMPILER_STR "ghs"
 #elif defined(__GNUC__) || defined(__GNUG__)
-	#define DAEMON_COMPILER_GCC
-	#define DAEMON_COMPILER_STR "gcc"
+    #define DAEMON_COMPILER_GCC
+    #define DAEMON_COMPILER_STR "gcc"
 #else
-	#define DAEMON_COMPILER_UNKNOWN
-	#define DAEMON_COMPILER_STR "unknown"
+    #define DAEMON_COMPILER_UNKNOWN
+    #define DAEMON_COMPILER_STR "unknown"
 #endif
 
 // ------------------------------
-//	        Namespace
+//            Namespace
 
 #define DAEMON_NAMESPACE daemon
 #define USING_DAEMON_NAMESPACE using namespace DAEMON_NAMESPACE;
@@ -141,22 +141,22 @@
 namespace DAEMON_NAMESPACE {}
 
 // ------------------------------
-//	        Threading
+//            Threading
 
 #if defined(DAEMON_CONFIG_DEBUG) || defined(DAEMON_CONFIG_RELEASE)
-	#define DAEMON_THREADING_ENABLE_THREAD_LABELS
+    #define DAEMON_THREADING_ENABLE_THREAD_LABELS
 #else
-	#define DAEMON_THREADING_DISABLE_THREAD_LABELS
+    #define DAEMON_THREADING_DISABLE_THREAD_LABELS
 #endif
 
 // ------------------------------
-//	   Standard containers
+//       Standard containers
 
 //#define DAEMON_CONTAINERS_USE_PMR_ALLOCATORS
 
 // ------------------------------
-//	   Resource management
+//       Resource management
 
 #if defined(DAEMON_CONFIG_DEBUG) || defined(DAEMON_CONFIG_RELEASE)
-	#define DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
+    #define DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
 #endif

@@ -27,39 +27,39 @@
 USING_DAEMON_NAMESPACE
 
 ResourceIdentifier::ResourceIdentifier(String const& in_name) noexcept:
-	name {in_name}
+    name {in_name}
 {}
 
 ResourceIdentifier::ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept
 {
-	name = in_copy.name;
+    name = in_copy.name;
 }
 
 ResourceIdentifier::ResourceIdentifier(ResourceIdentifier&& in_move) noexcept
 {
-	name = std::forward<String>(in_move.name);
+    name = std::forward<String>(in_move.name);
 }
 
 ResourceIdentifier::operator String() const noexcept
 {
-	return name;
+    return name;
 }
 
 ResourceIdentifier& ResourceIdentifier::operator=(ResourceIdentifier const& in_copy) noexcept
 {
-	name = in_copy.name;
+    name = in_copy.name;
 
-	return *this;
+    return *this;
 }
 
 ResourceIdentifier& ResourceIdentifier::operator=(ResourceIdentifier&& in_move) noexcept
 {
-	name = std::forward<String>(in_move.name);
+    name = std::forward<String>(in_move.name);
 
-	return *this;
+    return *this;
 }
 
 DAEbool ResourceIdentifier::operator==(ResourceIdentifier const& in_other) const noexcept
 {
-	return name == in_other.name;
+    return name == in_other.name;
 }

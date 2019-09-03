@@ -36,110 +36,110 @@ BEGIN_DAEMON_NAMESPACE
 
 class Worker : NonCopyable
 {
-	private:
+    private:
 
-		#pragma region Variables
+        #pragma region Variables
 
-		std::thread m_thread;
+        std::thread m_thread;
 
-		#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
-			String m_label;
-		#endif
+        #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
+            String m_label;
+        #endif
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		Worker(DAEchar const* in_label) noexcept;
-		Worker()						noexcept;
+        Worker(DAEchar const* in_label) noexcept;
+        Worker()                        noexcept;
 
-		Worker(Worker const& in_copy)	noexcept = delete;
-		Worker(Worker&&		 in_move)	noexcept = default;
-		~Worker()						noexcept;
+        Worker(Worker const& in_copy)    noexcept = delete;
+        Worker(Worker&&         in_move)    noexcept = default;
+        ~Worker()                        noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
+        #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
 
-		/**
-		 * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
-		 * \return Worker's label
-		 */
-		[[nodiscard]]
-		String const& Label() const noexcept;
-		
-		[[nodiscard]]
-		String&		  Label() noexcept;
+        /**
+         * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
+         * \return Worker's label
+         */
+        [[nodiscard]]
+        String const& Label() const noexcept;
+        
+        [[nodiscard]]
+        String&          Label() noexcept;
 
-		#else
+        #else
 
-		/**
-		 * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
-		 * \return Worker's label
-		 */
-		[[nodiscard]]
-		String Label() const noexcept;
+        /**
+         * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
+         * \return Worker's label
+         */
+        [[nodiscard]]
+        String Label() const noexcept;
 
-		#endif
+        #endif
 
-		/**
-		 * \brief Checks if the worker is busy or not 
-		 * \return True if the worker is busy
-		 */
-		[[nodiscard]]
-		DAEbool Available() const noexcept;
+        /**
+         * \brief Checks if the worker is busy or not 
+         * \return True if the worker is busy
+         */
+        [[nodiscard]]
+        DAEbool Available() const noexcept;
 
-		/**
-		 * \brief Waits for the last task to execute, and starts the execution of this new job 
-		 * \tparam TExecutable Type of the job
-		 * \param in_job job to execute when done with the previous one
-		 * \param in_args Args of the job to execute
-		 */
-		template <typename TExecutable, typename ...TArgs>
-		DAEvoid Execute(TExecutable in_job, TArgs... in_args) noexcept;
+        /**
+         * \brief Waits for the last task to execute, and starts the execution of this new job 
+         * \tparam TExecutable Type of the job
+         * \param in_job job to execute when done with the previous one
+         * \param in_args Args of the job to execute
+         */
+        template <typename TExecutable, typename ...TArgs>
+        DAEvoid Execute(TExecutable in_job, TArgs... in_args) noexcept;
 
-		/**
-		 * \brief Waits for the last task to execute, and starts the execution of this new job 
-		 * \tparam TExecutable Type of the job
-		 * \param in_job job to execute when done with the previous one
-		 * \param in_args Args of the job to execute
-		 */
-		template <typename TExecutable, typename ...TArgs>
-		DAEvoid ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept;
+        /**
+         * \brief Waits for the last task to execute, and starts the execution of this new job 
+         * \tparam TExecutable Type of the job
+         * \param in_job job to execute when done with the previous one
+         * \param in_args Args of the job to execute
+         */
+        template <typename TExecutable, typename ...TArgs>
+        DAEvoid ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept;
 
-		/**
-		 * \brief Locks the current thread until the current job has been done.
-		 * \brief If there was no job currently executed, this method has no effect.
-		 */
-		DAEvoid WaitForAvailability() noexcept;
+        /**
+         * \brief Locks the current thread until the current job has been done.
+         * \brief If there was no job currently executed, this method has no effect.
+         */
+        DAEvoid WaitForAvailability() noexcept;
 
-		/**
-		 * \brief Separates the thread of execution from the worker object, allowing execution to continue independently.
-		 * 
-		 * \note Any allocated resources will be freed once the thread exits.
-		 * \note If the worker was available, this method has no effect
-		 */
-		DAEvoid Detach() noexcept;
+        /**
+         * \brief Separates the thread of execution from the worker object, allowing execution to continue independently.
+         * 
+         * \note Any allocated resources will be freed once the thread exits.
+         * \note If the worker was available, this method has no effect
+         */
+        DAEvoid Detach() noexcept;
 
-		/**
-		 * \brief Returns the current underlying thread
-		 * \return Worker's thread
-		 */
-		[[nodiscard]]
-		std::thread& Thread() noexcept;
+        /**
+         * \brief Returns the current underlying thread
+         * \return Worker's thread
+         */
+        [[nodiscard]]
+        std::thread& Thread() noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		Worker& operator=(Worker const& in_copy) noexcept = delete;
-		Worker& operator=(Worker&&		in_move) noexcept = default;
+        Worker& operator=(Worker const& in_copy) noexcept = delete;
+        Worker& operator=(Worker&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
 };
 

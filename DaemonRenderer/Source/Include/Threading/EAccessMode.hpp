@@ -37,9 +37,9 @@ BEGIN_DAEMON_NAMESPACE
  */
 enum class EAccessMode : DAEbyte
 {
-	Read,
-	Write,
-	Unsafe
+    Read,
+    Write,
+    Unsafe
 };
 
 END_DAEMON_NAMESPACE

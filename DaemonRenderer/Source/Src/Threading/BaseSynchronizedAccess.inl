@@ -30,38 +30,38 @@ BaseSynchronizedAccess<TData, TWriteAccess>::BaseSynchronizedAccess(Synchronized
 template<class TData, DAEbool TWriteAccess>
 TData const& BaseSynchronizedAccess<TData, TWriteAccess>::Get() const noexcept
 {
-	return m_synchronized.m_value;
+    return m_synchronized.m_value;
 }
 
 template<class TData, DAEbool TWriteAccess>
 template<typename>
 TData& BaseSynchronizedAccess<TData, TWriteAccess>::Get() noexcept
 {
-	return m_synchronized.m_value;
+    return m_synchronized.m_value;
 }
 
 template<class TData, DAEbool TWriteAccess>
 TData const& BaseSynchronizedAccess<TData, TWriteAccess>::operator*() const noexcept
 {
-	return m_synchronized.m_value;
+    return m_synchronized.m_value;
 }
 
 template<class TData, DAEbool TWriteAccess>
 template<typename>
 TData& BaseSynchronizedAccess<TData, TWriteAccess>::operator*() noexcept
 {
-	return m_synchronized.m_value;
+    return m_synchronized.m_value;
 }
 
 template<class TData, DAEbool TWriteAccess>
 TData const* BaseSynchronizedAccess<TData, TWriteAccess>::operator->() const noexcept
 {
-	return &m_synchronized.m_value;
+    return &m_synchronized.m_value;
 }
 
 template<class TData, DAEbool TWriteAccess>
 template<typename>
 TData* BaseSynchronizedAccess<TData, TWriteAccess>::operator->() noexcept
 {
-	return &m_synchronized.m_value;
+    return &m_synchronized.m_value;
 }

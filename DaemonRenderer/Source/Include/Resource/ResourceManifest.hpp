@@ -33,7 +33,7 @@
 #include "Resource/ResourceIdentifier.hpp"
 
 #ifndef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
-	#define DAEMON_RESOURCE_MANIFEST_DONT_STORE_IDENTIFIER
+    #define DAEMON_RESOURCE_MANIFEST_DONT_STORE_IDENTIFIER
 #endif
 
 BEGIN_DAEMON_NAMESPACE
@@ -51,69 +51,69 @@ BEGIN_DAEMON_NAMESPACE
  */
 struct ResourceManifest
 {
-	private:
+    private:
 
-		#pragma region Members
+        #pragma region Members
 
 #ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
-		// This is only used for debug messages
-		const ResourceIdentifier m_identifier;
+        // This is only used for debug messages
+        const ResourceIdentifier m_identifier;
 #endif
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		typedef DAEuint32 ReferenceCountType;
+        typedef DAEuint32 ReferenceCountType;
 
-		#pragma region Members
+        #pragma region Members
 
-	    // Pointer to the resource itself
-	    std::atomic<class IResource*> data;
+        // Pointer to the resource itself
+        std::atomic<class IResource*> data;
 
-	    // Number of references to the resource
-	    std::atomic<ReferenceCountType> reference_count;
+        // Number of references to the resource
+        std::atomic<ReferenceCountType> reference_count;
 
-	    // Garbage collection (GC) strategy of the resource
-	    std::atomic<EResourceGCStrategy> gc_strategy;
+        // Garbage collection (GC) strategy of the resource
+        std::atomic<EResourceGCStrategy> gc_strategy;
 
-	    // Status / availability of the resource
-	    std::atomic<EResourceStatus> status;
+        // Status / availability of the resource
+        std::atomic<EResourceStatus> status;
 
-   		#pragma endregion
+           #pragma endregion
 
-	    #pragma region Constructors
+        #pragma region Constructors
 
-		ResourceManifest() noexcept;
+        ResourceManifest() noexcept;
 
-		ResourceManifest(ResourceIdentifier const& in_identifier, class IResource* in_data, EResourceGCStrategy in_gc_strategy) noexcept; 
+        ResourceManifest(ResourceIdentifier const& in_identifier, class IResource* in_data, EResourceGCStrategy in_gc_strategy) noexcept; 
 
-		ResourceManifest(ResourceManifest const& in_copy) noexcept = delete;
-		ResourceManifest(ResourceManifest&&		 in_move) noexcept = delete;
-		~ResourceManifest()										   = default;
+        ResourceManifest(ResourceManifest const& in_copy) noexcept = delete;
+        ResourceManifest(ResourceManifest&&         in_move) noexcept = delete;
+        ~ResourceManifest()                                           = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods 
+        #pragma region Methods 
 
-	    /**
-		 * \brief Returns the identifier of the manifest, if DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER isn't defined, this will return a default identifier instead
-		 * \return Resource identifier
-		 */
+        /**
+         * \brief Returns the identifier of the manifest, if DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER isn't defined, this will return a default identifier instead
+         * \return Resource identifier
+         */
 #ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
-		[[nodiscard]] ResourceIdentifier const& GetIdentifier() const noexcept;
+        [[nodiscard]] ResourceIdentifier const& GetIdentifier() const noexcept;
 #else
-		[[nodiscard]] ResourceIdentifier		GetIdentifier() const noexcept;
+        [[nodiscard]] ResourceIdentifier        GetIdentifier() const noexcept;
 #endif
 
-		#pragma endregion 
+        #pragma endregion 
 
-	    #pragma region Operators
+        #pragma region Operators
 
-		ResourceManifest& operator=(ResourceManifest const& in_copy) noexcept = delete;
-		ResourceManifest& operator=(ResourceManifest&& in_move)      noexcept = delete;
+        ResourceManifest& operator=(ResourceManifest const& in_copy) noexcept = delete;
+        ResourceManifest& operator=(ResourceManifest&& in_move)      noexcept = delete;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

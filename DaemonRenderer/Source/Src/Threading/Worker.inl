@@ -25,17 +25,17 @@
 template <typename TExecutable, typename ...TArgs>
 DAEvoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
 {
-	// This avoids an std::terminate throw
-	WaitForAvailability();
+    // This avoids an std::terminate throw
+    WaitForAvailability();
 
-	m_thread = std::thread {in_job, in_args...};
+    m_thread = std::thread {in_job, in_args...};
 }
 
 template <typename TExecutable, typename ...TArgs>
 DAEvoid Worker::ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept
 {
-	// This avoids an std::terminate throw
-	WaitForAvailability();
+    // This avoids an std::terminate throw
+    WaitForAvailability();
 
-	m_thread = std::thread{in_job, in_args..., this};
+    m_thread = std::thread{in_job, in_args..., this};
 }

@@ -33,29 +33,29 @@ BEGIN_DAEMON_NAMESPACE
 
 class System
 {
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		System()					  noexcept = default;
-		System(System const& in_copy) noexcept = default;
-		System(System&&	     in_move) noexcept = default;
-		~System()					  noexcept = default;
+        System()                      noexcept = default;
+        System(System const& in_copy) noexcept = default;
+        System(System&&         in_move) noexcept = default;
+        ~System()                      noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
         #pragma region Methods
 
         void Update(DAEfloat in_delta_time);
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
         
-		System& operator=(System const& in_copy) noexcept = default;
-		System& operator=(System&&	    in_move) noexcept = default;
+        System& operator=(System const& in_copy) noexcept = default;
+        System& operator=(System&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 

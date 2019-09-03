@@ -32,28 +32,28 @@ USING_DAEMON_NAMESPACE
 
 DAEbool Sleep::NsSleep(DAEint64 const in_nanoseconds) noexcept
 {
-	HANDLE const timer = CreateWaitableTimer(nullptr, true, nullptr);
-	LARGE_INTEGER li;
+    HANDLE const timer = CreateWaitableTimer(nullptr, true, nullptr);
+    LARGE_INTEGER li;
 
-	if(!timer)
-		return false;
+    if(!timer)
+        return false;
 
-	li.QuadPart = -in_nanoseconds;
-	if(!SetWaitableTimer(timer, &li, 0, nullptr, nullptr, false))
-	{
-		CloseHandle(timer);
-		return false;
-	}
+    li.QuadPart = -in_nanoseconds;
+    if(!SetWaitableTimer(timer, &li, 0, nullptr, nullptr, false))
+    {
+        CloseHandle(timer);
+        return false;
+    }
 
-	WaitForSingleObject(timer, INFINITE);
-	CloseHandle(timer);
-	return true;
+    WaitForSingleObject(timer, INFINITE);
+    CloseHandle(timer);
+    return true;
 }
 
 DAEvoid Sleep::StdSleep(DAEdouble const in_seconds) noexcept
 {
-	static constexpr std::chrono::duration<DAEdouble> min_sleep_duration(0);
-	std::chrono::steady_clock::time_point const start = std::chrono::steady_clock::now();
-	while (std::chrono::duration<DAEdouble>(std::chrono::steady_clock::now() - start).count() < in_seconds)
-		std::this_thread::sleep_for(min_sleep_duration);
+    static constexpr std::chrono::duration<DAEdouble> min_sleep_duration(0);
+    std::chrono::steady_clock::time_point const start = std::chrono::steady_clock::now();
+    while (std::chrono::duration<DAEdouble>(std::chrono::steady_clock::now() - start).count() < in_seconds)
+        std::this_thread::sleep_for(min_sleep_duration);
 }

@@ -39,12 +39,12 @@ BEGIN_DAEMON_NAMESPACE
  */
 template <DAEuint8 TSize>
 struct MinimumType {
-	using Type = std::conditional_t<TSize == 0u , DAEvoid,
-				 std::conditional_t<TSize <= 8u , DAEuint8,
-				 std::conditional_t<TSize <= 16u, DAEuint16,
-				 std::conditional_t<TSize <= 32u, DAEuint32,
-				 std::conditional_t<TSize <= 64u, DAEuint64,
-		DAEvoid>>>>>;
+    using Type = std::conditional_t<TSize == 0u , DAEvoid,
+                 std::conditional_t<TSize <= 8u , DAEuint8,
+                 std::conditional_t<TSize <= 16u, DAEuint16,
+                 std::conditional_t<TSize <= 32u, DAEuint32,
+                 std::conditional_t<TSize <= 64u, DAEuint64,
+        DAEvoid>>>>>;
 };
 
 /**

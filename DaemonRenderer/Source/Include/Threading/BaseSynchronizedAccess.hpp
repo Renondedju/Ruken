@@ -40,56 +40,56 @@ class BaseSynchronizedAccess
 {
     protected:
 
-		#pragma region Variables
+        #pragma region Variables
 
         Synchronized<TData>& m_synchronized;
 
-		#pragma endregion 
+        #pragma endregion 
 
-	public:
-	
-		#pragma region Constructors
+    public:
+    
+        #pragma region Constructors
 
-		BaseSynchronizedAccess(Synchronized<TData>& in_synchronized)     noexcept;
-		BaseSynchronizedAccess()									     noexcept = delete;
-		BaseSynchronizedAccess(BaseSynchronizedAccess const& in_copy)	 noexcept = default;
-		BaseSynchronizedAccess(BaseSynchronizedAccess&&		 in_move)	 noexcept = default;
-		virtual ~BaseSynchronizedAccess()							     noexcept = default;
+        BaseSynchronizedAccess(Synchronized<TData>& in_synchronized)     noexcept;
+        BaseSynchronizedAccess()                                         noexcept = delete;
+        BaseSynchronizedAccess(BaseSynchronizedAccess const& in_copy)     noexcept = default;
+        BaseSynchronizedAccess(BaseSynchronizedAccess&&         in_move)     noexcept = default;
+        virtual ~BaseSynchronizedAccess()                                 noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
         /**
          * \brief Synchronized getters
          * \return Synchronized's object content
          */
-		template<typename = std::enable_if_t<TWriteAccess == true>>
-		[[nodiscard]]
+        template<typename = std::enable_if_t<TWriteAccess == true>>
+        [[nodiscard]]
         TData&       Get()       noexcept;
-		[[nodiscard]]
+        [[nodiscard]]
         TData const& Get() const noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		template<typename = std::enable_if_t<TWriteAccess == true>>
-		[[nodiscard]]
+        template<typename = std::enable_if_t<TWriteAccess == true>>
+        [[nodiscard]]
         TData&       operator*()       noexcept;
-		[[nodiscard]]
-		TData const& operator*() const noexcept;
+        [[nodiscard]]
+        TData const& operator*() const noexcept;
 
-		template<typename = std::enable_if_t<TWriteAccess == true>>
-		[[nodiscard]]
+        template<typename = std::enable_if_t<TWriteAccess == true>>
+        [[nodiscard]]
         TData*       operator->()       noexcept;
-		[[nodiscard]]
-		TData const* operator->() const noexcept;
+        [[nodiscard]]
+        TData const* operator->() const noexcept;
 
-		BaseSynchronizedAccess& operator=(BaseSynchronizedAccess const& in_copy) noexcept = default;
-		BaseSynchronizedAccess& operator=(BaseSynchronizedAccess&&		in_move) noexcept = default;
+        BaseSynchronizedAccess& operator=(BaseSynchronizedAccess const& in_copy) noexcept = default;
+        BaseSynchronizedAccess& operator=(BaseSynchronizedAccess&&        in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 #include "Threading/BaseSynchronizedAccess.inl"

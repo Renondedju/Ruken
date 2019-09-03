@@ -27,62 +27,62 @@
 USING_DAEMON_NAMESPACE
 
 Scheduler::Scheduler(DAEuint16 const in_workers_count):
-	m_workers   {in_workers_count == 0u ? std::thread::hardware_concurrency() - 1 : in_workers_count},
-	m_running	{true},
-	m_job_queue {}
+    m_workers   {in_workers_count == 0u ? std::thread::hardware_concurrency() - 1 : in_workers_count},
+    m_running    {true},
+    m_job_queue {}
 {
-	DAEuint16 index = 0;
-	for (Worker& worker : m_workers)
-	{
-		worker.Label() = "Scheduler worker " + std::to_string(index++);
-		worker.Execute(&Scheduler::WorkersJob, this);
-	}
+    DAEuint16 index = 0;
+    for (Worker& worker : m_workers)
+    {
+        worker.Label() = "Scheduler worker " + std::to_string(index++);
+        worker.Execute(&Scheduler::WorkersJob, this);
+    }
 }
 
 Scheduler::~Scheduler()
 {
-	Shutdown();
+    Shutdown();
 }
 
 DAEvoid Scheduler::ScheduleTask(Job&& in_task) noexcept
 {
-	if (!m_running.load(std::memory_order_acquire))
-		return;
+    if (!m_running.load(std::memory_order_acquire))
+        return;
 
-	m_job_queue.Enqueue(std::forward<Job>(in_task));
+    m_job_queue.Enqueue(std::forward<Job>(in_task));
 }
 
 DAEvoid Scheduler::WaitForQueuedTasks() noexcept
 {
-	if (!m_running.load(std::memory_order_acquire))
-		return;
+    if (!m_running.load(std::memory_order_acquire))
+        return;
 
-	while (!m_job_queue.Empty())
-		std::this_thread::yield();
+    while (!m_job_queue.Empty())
+        std::this_thread::yield();
 }
 
 DAEvoid Scheduler::Shutdown() noexcept
 {
-	if (!m_running.load(std::memory_order_acquire))
-		return;
+    if (!m_running.load(std::memory_order_acquire))
+        return;
 
-	m_running.store(false, std::memory_order_release);
-	m_job_queue.Clear();
+    m_running.store(false, std::memory_order_release);
+    m_job_queue.Clear();
 
-	for (Worker& worker : m_workers)
-		worker.Detach();
+    for (Worker& worker : m_workers)
+        worker.Detach();
 }
 
 DAEvoid Scheduler::WorkersJob() noexcept
 {
-	Job current_job;
+    Job current_job;
 
-	while (m_running.load(std::memory_order_acquire))
-	{
-		// Always try to dequeue jobs, the job queue will lock us if nothing is available
-		DAEbool const job_validity = m_job_queue.Dequeue(current_job);
+    while (m_running.load(std::memory_order_acquire))
+    {
+        // Always try to dequeue jobs, the job queue will lock us if nothing is available
+        DAEbool const job_validity = m_job_queue.Dequeue(current_job);
 
-		if (job_validity)
-			current_job();
-	}
+        if (job_validity)
+            current_job();
+    }
 }

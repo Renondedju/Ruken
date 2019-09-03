@@ -41,10 +41,10 @@ BEGIN_DAEMON_NAMESPACE
  */
 enum class EResourceStatus : DAEuint8
 {
-	Pending,
-	Processed,
-	Loaded,
-	Invalid
+    Pending,
+    Processed,
+    Loaded,
+    Invalid
 };
 
 END_DAEMON_NAMESPACE

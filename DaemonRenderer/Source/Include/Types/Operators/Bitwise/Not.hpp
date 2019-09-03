@@ -34,25 +34,28 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Bitwise NOT operator class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct Not
 {
-	/**
-	 * \brief Bitwise NOT operator
-	 * \param in_instance Operand instance
-	 * \return Reference to the new instance
-	 */
-	friend constexpr TStrongTypedef operator~(TStrongTypedef const& in_instance) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Bitwise NOT operator
+     *
+     * \param in_instance Operand instance
+     *
+     * \return Value of the new instance
+     */
+    friend constexpr TStrongTypedef operator~(TStrongTypedef const& in_instance) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return TStrongTypedef(~static_cast<Type&>(in_instance));
-	}
+        return TStrongTypedef(~static_cast<Type const&>(in_instance));
+    }
 };
 
 END_DAEMON_NAMESPACE

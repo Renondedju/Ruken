@@ -37,19 +37,20 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Module regrouping all commons comparison operators
+ * \brief Module gathering all common comparison operators
+ *
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct Comparison:	Less		<TStrongTypedef>,
-					Equal		<TStrongTypedef>,
-					Greater		<TStrongTypedef>,
-					NotEqual	<TStrongTypedef>,
-					LessEqual	<TStrongTypedef>,
-					Spaceship	<TStrongTypedef>,
-					GreaterEqual<TStrongTypedef>
+struct Comparison:  Less        <TStrongTypedef>,
+                    Equal       <TStrongTypedef>,
+                    Greater     <TStrongTypedef>,
+                    NotEqual    <TStrongTypedef>,
+                    LessEqual   <TStrongTypedef>,
+                    Spaceship   <TStrongTypedef>,
+                    GreaterEqual<TStrongTypedef>
 {};
-	
 
 END_DAEMON_NAMESPACE
