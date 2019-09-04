@@ -50,7 +50,7 @@ struct ResourceIdentifier
     ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept;
     ResourceIdentifier(ResourceIdentifier&&         in_move) noexcept;
     ~ResourceIdentifier() = default;
-
+	
     #pragma endregion
 
     #pragma region Operators
