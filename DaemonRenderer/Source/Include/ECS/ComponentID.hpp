@@ -26,33 +26,39 @@
 
 #include "Config.hpp"
 
-#include "Containers/Vector.hpp"
+#include "Types/Operators/Arithmetic/Increment.hpp"
+#include "Types/Operators/Comparison.hpp"
 #include "Types/FundamentalTypes.hpp"
+#include "Types/NamedType.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class Entity
+/**
+ * \brief Strong typing of a component ID
+ */
+class ComponentID : public NamedType<DAEsize, ComponentID>,
+                    public Comparison<ComponentID>,
+                    public Increment <ComponentID>
 {
-    private:
-
-        DAEsize                  m_entity_id;
-        Vector<class Component*> m_components;
+    using Parent = NamedType<DAEsize, ComponentID>;
 
     public:
 
         #pragma region Constructors
 
-        Entity()                      noexcept = default;
-        Entity(Entity const& in_copy) noexcept = default;
-        Entity(Entity&&		 in_move) noexcept = default;
-        ~Entity()                     noexcept = default;
+        ComponentID()                           noexcept = default;
+        ComponentID(ComponentID const& in_copy) noexcept = default;
+        ComponentID(ComponentID&&      in_move) noexcept = default;
+        ~ComponentID()                          noexcept = default;
+
+        using Parent::Parent;
 
         #pragma endregion
 
         #pragma region Operators
 
-        Entity& operator=(Entity const& in_copy) noexcept = default;
-        Entity& operator=(Entity&&      in_move) noexcept = default;
+        ComponentID& operator=(ComponentID const& in_copy) noexcept = default;
+        ComponentID& operator=(ComponentID&&      in_move) noexcept = default;
 
         #pragma endregion
 };

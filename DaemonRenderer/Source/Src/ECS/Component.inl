@@ -22,39 +22,21 @@
  *  SOFTWARE.
  */
 
-#pragma once
+template <typename TDerived>
+UnorderedMap<ComponentID, TDerived> Component<TDerived>::m_storage{};
 
-#include "Config.hpp"
+template <typename TDerived>
+ComponentID Component<TDerived>::m_id_cache{0};
 
-#include "Containers/Vector.hpp"
-#include "Types/FundamentalTypes.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-class Entity
+template <typename TDerived>
+Component<TDerived>::Component() noexcept:
+    m_id {++m_id_cache}
 {
-    private:
+    m_storage.insert(m_id, std::move(*this));
+}
 
-        DAEsize                  m_entity_id;
-        Vector<class Component*> m_components;
-
-    public:
-
-        #pragma region Constructors
-
-        Entity()                      noexcept = default;
-        Entity(Entity const& in_copy) noexcept = default;
-        Entity(Entity&&		 in_move) noexcept = default;
-        ~Entity()                     noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Entity& operator=(Entity const& in_copy) noexcept = default;
-        Entity& operator=(Entity&&      in_move) noexcept = default;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+template <typename TDerived>
+Component<TDerived>::~Component() noexcept
+{
+    m_storage.erase(m_id);
+}

@@ -26,28 +26,53 @@
 
 #include "Config.hpp"
 
+#include "ECS/ComponentID.hpp"
+
+#include "Containers/UnorderedMap.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief Base component class
+ * \tparam TDerived Derived class
+ */
+template <typename TDerived>
 class Component
 {
+    private:
+
+        #pragma region Variables
+
+        ComponentID m_id;
+
+        // This is not the best container for this usage, ideally we would like to have
+        // a cache friendly associative container. This does the work for now 
+        static UnorderedMap<ComponentID, TDerived> m_storage;
+
+        // Id cache, used to generate new ids
+        static ComponentID m_id_cache;
+
+        #pragma endregion
+
     public:
 
         #pragma region Constructors
 
-        Component()							noexcept = default;
+        Component()                         noexcept;
         Component(Component const& in_copy) noexcept = default;
-        Component(Component&&	   in_move) noexcept = default;
-        ~Component()						noexcept = default;
+        Component(Component&&      in_move) noexcept = default;
+        ~Component()                        noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
         Component& operator=(Component const& in_copy) noexcept = default;
-        Component& operator=(Component&&	  in_move) noexcept = default;
+        Component& operator=(Component&&      in_move) noexcept = default;
 
         #pragma endregion
 };
 
+#include "ECS/Component.inl"
 
 END_DAEMON_NAMESPACE
