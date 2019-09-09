@@ -29,7 +29,8 @@ USING_DAEMON_NAMESPACE
 #pragma region      Public Constructor
 
 Logger::Logger(String const& in_name) noexcept :
-    m_name { in_name }
+    m_name  { in_name },
+    m_level { ELogLevel::NotSet }
 {
     
 }
@@ -53,15 +54,15 @@ DAEbool     Logger::IsEnabledFor    (ELogLevel in_level) const noexcept
 	return m_level <= in_level;
 }
 
-DAEvoid     Logger::Debug           () noexcept
+DAEvoid     Logger::Debug           (DAEchar const* in_message) noexcept
 {
-	if (m_level <= ELogLevel::Debug)
+	if (HasHandlers() && m_level <= ELogLevel::Debug)
 	{
-	    
+		LogRecord record(m_level, m_name, in_message, "", "", 0);
 	}
 }
 
-DAEvoid     Logger::Info            () noexcept
+DAEvoid     Logger::Info            (DAEchar const* in_message) noexcept
 {
 	if (m_level <= ELogLevel::Info)
 	{
@@ -69,7 +70,7 @@ DAEvoid     Logger::Info            () noexcept
 	}
 }
 
-DAEvoid     Logger::Warning         () noexcept
+DAEvoid     Logger::Warning         (DAEchar const* in_message) noexcept
 {
 	if (m_level <= ELogLevel::Warning)
 	{
@@ -77,7 +78,7 @@ DAEvoid     Logger::Warning         () noexcept
 	}
 }
 
-DAEvoid     Logger::Error           () noexcept
+DAEvoid     Logger::Error           (DAEchar const* in_message) noexcept
 {
 	if (m_level <= ELogLevel::Error)
 	{
@@ -85,32 +86,17 @@ DAEvoid     Logger::Error           () noexcept
 	}
 }
 
-DAEvoid     Logger::Fatal           () noexcept
+DAEvoid     Logger::Fatal           (DAEchar const* in_message) noexcept
 {
 
 }
 
-DAEvoid     Logger::AddFilter       (LogFilter const& in_filter) noexcept
-{
-	m_filters.push_front(in_filter);
-}
-
-DAEvoid     Logger::RemoveFilter    (LogFilter const& in_filter) noexcept
-{
-	m_filters.remove(in_filter);
-}
-
-DAEbool     Logger::Filter          (LogRecord const& in_record) noexcept
-{
-	return false;
-}
-
-DAEvoid     Logger::AddHandler      (Handler const& in_handler) noexcept
+DAEvoid     Logger::AddHandler      (Handler* in_handler) noexcept
 {
 	m_handlers.push_front(in_handler);
 }
 
-DAEvoid     Logger::RemoveHandler   (Handler const& in_handler) noexcept
+DAEvoid     Logger::RemoveHandler   (Handler* in_handler) noexcept
 {
 	m_handlers.remove(in_handler);
 }
@@ -118,11 +104,6 @@ DAEvoid     Logger::RemoveHandler   (Handler const& in_handler) noexcept
 DAEbool     Logger::Handle          (LogRecord const& in_record) noexcept
 {
 	return false;
-}
-
-DAEbool     Logger::HasFilters      () const noexcept
-{
-	return !m_filters.empty();
 }
 
 DAEbool     Logger::HasHandlers     () const noexcept

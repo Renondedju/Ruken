@@ -40,4 +40,25 @@ enum class ELogLevel : DAEuint8
     Fatal
 };
 
+inline DAEchar const* ToString(ELogLevel const in_log_level)
+{
+    switch (in_log_level)
+    {
+        case ELogLevel::NotSet:
+            return "NotSet";
+        case ELogLevel::Debug:
+            return "Debug";
+        case ELogLevel::Info:
+            return "Info";
+        case ELogLevel::Warning:
+            return "Warning";
+        case ELogLevel::Error:
+            return "Error";
+        case ELogLevel::Fatal:
+            return "Fatal";
+        default:
+            return "unknown";
+    }
+}
+
 END_DAEMON_NAMESPACE

@@ -22,18 +22,43 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Threading/SynchronizedAccess.hpp"
 
-#include "Handler.hpp"
+#include "Debug/Handlers/StreamHandler.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+USING_DAEMON_NAMESPACE
 
-/**
- * \brief This class does not do any formatting or output.
- */
-class NullHandler : public Handler
+#pragma region      Constructor
+
+StreamHandler::StreamHandler(LogFormatter& in_formatter) noexcept : Handler(in_formatter)
 {
+    
+}
 
-};
+#pragma endregion   Constructor
 
-END_DAEMON_NAMESPACE
+#pragma region      Local Methods
+
+DAEvoid StreamHandler::Flush() noexcept
+{
+    
+}
+
+DAEvoid StreamHandler::Close() noexcept
+{
+    
+}
+
+DAEvoid StreamHandler::Handle(LogRecord&& in_log_record) noexcept
+{
+	LogRecordsWriteAccess log_records(m_log_records);
+
+	log_records->emplace(in_log_record);
+}
+
+DAEvoid StreamHandler::Emit(LogRecord&& in_log_record) const noexcept
+{
+    
+}
+
+#pragma endregion   Local Method

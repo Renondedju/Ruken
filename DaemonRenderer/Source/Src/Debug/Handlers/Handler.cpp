@@ -22,39 +22,31 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Debug/Handlers/Handler.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
-    class Handler;
+#pragma region      Constructor
 
-    /**
- * \brief This class provides a finer grained facility for determining which log records to output.
- */
-class LogFilter
+Handler::Handler(LogFormatter& in_formatter) noexcept :
+    m_level     { ELogLevel::NotSet },
+    m_formatter { in_formatter }
 {
-    public:
+    
+}
 
-        #pragma region      Public Constructors and Destructor
+#pragma endregion   Constructor
 
-		LogFilter()                             noexcept = default;
-		LogFilter(LogFilter const&  in_copy)    noexcept = default;
-		LogFilter(LogFilter&&       in_move)    noexcept = default;
+#pragma region      Local Methods
 
-		~LogFilter() = default;
+DAEvoid Handler::SetLevel(ELogLevel const in_level) noexcept
+{
+	m_level = in_level;
+}
 
-        #pragma endregion   Public Constructors and Destructor
+DAEvoid Handler::SetFormatter(LogFormatter& in_formatter) const noexcept
+{
+	m_formatter = in_formatter;
+}
 
-        #pragma region      Public Operators
-
-		LogFilter& operator=(LogFilter const&   in_copy) noexcept = default;
-		LogFilter& operator=(LogFilter&&        in_move) noexcept = default;
-
-		DAEbool operator==(LogFilter const& in_other) const noexcept { return true;   }
-		DAEbool operator!=(LogFilter const& in_other) const noexcept { return false;  }
-
-        #pragma endregion   Public Operators
-};
-
-END_DAEMON_NAMESPACE
+#pragma endregion   Local Methods

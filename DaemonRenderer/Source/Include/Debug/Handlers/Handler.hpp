@@ -26,35 +26,62 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
-    class Logger;
+#include "Containers/Queue.hpp"
 
-    /**
+#include "Threading/Synchronized.hpp"
+
+#include "Debug/Logging/LogRecord.hpp"
+#include "Debug/Logging/LogFormatter.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+/**
  * \brief This class sends the log records (created by loggers) to the appropriate destination.
  */
-class Handler
+class __declspec(novtable) Handler
 {
+    protected:
+
+		ELogLevel                       m_level;
+		LogFormatter&                   m_formatter;
+		Synchronized<Queue<LogRecord>>  m_log_records;
+
+		using LogRecordsReadAccess  = decltype(m_log_records)::ReadAccess;
+		using LogRecordsWriteAccess = decltype(m_log_records)::WriteAccess;
+
     public:
 
-        #pragma region      Public Constructors and Destructor
+        #pragma region      Constructors and Destructor
 
-		Handler()                           noexcept = default;
-		Handler(Handler const&  in_copy)    noexcept = default;
-		Handler(Handler&&       in_move)    noexcept = default;
+		Handler(LogFormatter&   in_formatter)   noexcept;
+		Handler(Handler const&  in_copy)        noexcept = delete;
+		Handler(Handler&&       in_move)        noexcept = delete;
 
-		~Handler() = default;
+        virtual ~Handler() = default;
 
-        #pragma endregion   Public Constructors and Destructor
+        #pragma endregion   Constructors and Destructor
 
-        #pragma region      Public Operators
+        #pragma region      Local Operators
 
-		Handler& operator=(Handler const& in_copy) noexcept = default;
-		Handler& operator=(Handler&&      in_move) noexcept = default;
+		Handler& operator=(Handler const& in_copy) noexcept = delete;
+		Handler& operator=(Handler&&      in_move) noexcept = delete;
 
-		DAEbool operator==(Handler const& in_other) const noexcept { return true;   }
-		DAEbool operator!=(Handler const& in_other) const noexcept { return false;  }
+		virtual DAEbool operator==(Handler const& in_other) const = 0;
+		virtual DAEbool operator!=(Handler const& in_other) const = 0;
 
-        #pragma endregion   Public Operators
+        #pragma endregion   Local Operators
+
+        #pragma region      Local Methods
+
+		DAEvoid SetLevel    (ELogLevel      in_level)       noexcept;
+		DAEvoid SetFormatter(LogFormatter&  in_formatter)   const noexcept;
+
+		virtual DAEvoid Flush   ()                                = 0;
+		virtual DAEvoid Close   ()                                = 0;
+		virtual DAEvoid Handle  (LogRecord&& in_log_record)       = 0;
+		virtual DAEvoid Emit    (LogRecord&& in_log_record) const = 0;
+
+        #pragma endregion   Local Methods
 };
 
 END_DAEMON_NAMESPACE

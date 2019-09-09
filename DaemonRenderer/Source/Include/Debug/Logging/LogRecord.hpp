@@ -28,33 +28,55 @@
 
 #include "Containers/String.hpp"
 
+#include "Debug/Logging/ELogLevel.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Instances of this class are created automatically by the Logger every time something is logged, and can be created manually via MakeLogRecord().
+ * \brief Instances of this class are created automatically by the Logger every time something is logged.
  */
 class LogRecord
 {
     private:
 
-        #pragma region Members
+        #pragma region      Members
 
-		String m_name;
+		ELogLevel   m_level;
+		String      m_logger_name;
+		String      m_message;
+		String      m_filename;
+		String      m_function_name;
+		DAEint32    m_line_number;
 
-        #pragma endregion
+        #pragma endregion   Members
 
     public:
 
-        #pragma region Public Constructors and Destructor
+        #pragma region      Public Constructors and Destructor
 
-		LogRecord(String const&     in_name) noexcept;
+		LogRecord(ELogLevel     in_level,
+			      String const& in_logger_name,
+			      String const& in_message,
+			      String const& in_filename,
+			      String const& in_function_name,
+			      DAEint32      in_line_number) noexcept;
 
 		LogRecord(LogRecord const&  in_copy) noexcept = default;
 		LogRecord(LogRecord&&       in_move) noexcept = default;
 
 		~LogRecord() = default;
 
-        #pragma endregion
+        #pragma endregion   Public Constructors and Destructor
+
+        #pragma region      Public Operators
+
+		LogRecord& operator=(LogRecord const&   in_copy) noexcept = default;
+		LogRecord& operator=(LogRecord&&        in_move) noexcept = default;
+
+		DAEbool operator==(LogRecord const& in_other) const noexcept;
+		DAEbool operator!=(LogRecord const& in_other) const noexcept;
+
+        #pragma endregion   Public Operators
 };
 
 END_DAEMON_NAMESPACE

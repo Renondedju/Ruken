@@ -24,12 +24,10 @@
 
 #pragma once
 
-#include "LogLevel.hpp"
-#include "LogFilter.hpp"
-#include "LogRecord.hpp"
-
 #include "Containers/String.hpp"
 #include "Containers/ForwardList.hpp"
+
+#include "Debug/Logging/LogRecord.hpp"
 
 #include "Debug/Handlers/Handler.hpp"
 
@@ -43,11 +41,10 @@ class Logger
     private:
 
         #pragma region      Members
-
+        
 		String                  m_name;
 		ELogLevel               m_level;
-		ForwardList<LogFilter>  m_filters;
-		ForwardList<Handler>    m_handlers;
+		ForwardList<Handler*>   m_handlers;
 
         #pragma endregion   Members
 
@@ -72,26 +69,20 @@ class Logger
 
         #pragma region      Public Methods
 
-		ELogLevel   GetLevel    ()                  const noexcept;
-		DAEvoid     SetLevel    (ELogLevel in_level)       noexcept;
-		DAEbool     IsEnabledFor(ELogLevel in_level) const noexcept;
+		ELogLevel   GetLevel    ()                      const noexcept;
+		DAEvoid     SetLevel    (ELogLevel in_level)          noexcept;
+		DAEbool     IsEnabledFor(ELogLevel in_level)    const noexcept;
 
-		DAEvoid Debug   () noexcept;
-		DAEvoid Info    () noexcept;
-		DAEvoid Warning () noexcept;
-		DAEvoid Error   () noexcept;
-		DAEvoid Fatal   () noexcept;
+		DAEvoid Debug   (DAEchar const* in_message) noexcept;
+		DAEvoid Info    (DAEchar const* in_message) noexcept;
+		DAEvoid Warning (DAEchar const* in_message) noexcept;
+		DAEvoid Error   (DAEchar const* in_message) noexcept;
+		DAEvoid Fatal   (DAEchar const* in_message) noexcept;
 
-		DAEvoid AddFilter   (LogFilter const& in_filter) noexcept;
-		DAEvoid RemoveFilter(LogFilter const& in_filter) noexcept;
-		DAEbool Filter      (LogRecord const& in_record) noexcept;
-
-		DAEvoid AddHandler      (Handler   const& in_handler)   noexcept;
-		DAEvoid RemoveHandler   (Handler   const& in_handler)   noexcept;
-		DAEbool Handle          (LogRecord const& in_record)    noexcept;
-
-		DAEbool HasFilters  () const noexcept;
-		DAEbool HasHandlers () const noexcept;
+		DAEvoid AddHandler      (Handler  * in_handler)         noexcept;
+		DAEvoid RemoveHandler   (Handler  * in_handler)         noexcept;
+		DAEbool Handle          (LogRecord const& in_record)          noexcept;
+		DAEbool HasHandlers     ()                              const noexcept;
 
         #pragma endregion   Public Methods
 };
