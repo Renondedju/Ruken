@@ -25,35 +25,52 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "Types/FundamentalTypes.hpp"
 
-#include <iterator>
+#include "ECS/ComponentID.hpp"
+
+#include "Containers/Vector.hpp"
+#include "Containers/Tuple.hpp"
+#include "Containers/Array.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class System
+template <typename... TRequiredComponents>
+class __declspec(novtable) System
 {
+    using SystemPassComponents = Tuple<TRequiredComponents...>;
+
+    private:
+
+        #pragma region Members
+
+        // Array of all subscribed components
+        Vector<Array<ComponentID, sizeof...(TRequiredComponents)>> m_subscribers;
+
+        #pragma endregion 
+
     public:
 
         #pragma region Constructors
 
         System()                      noexcept = default;
         System(System const& in_copy) noexcept = default;
-        System(System&&         in_move) noexcept = default;
-        ~System()                      noexcept = default;
+        System(System&&	     in_move) noexcept = default;
+        ~System()                     noexcept = default;
 
         #pragma endregion
 
         #pragma region Methods
 
-        void Update(DAEfloat in_delta_time);
+        virtual void Update(DAEfloat in_delta_time) = 0;
 
         #pragma endregion
 
         #pragma region Operators
-        
+
         System& operator=(System const& in_copy) noexcept = default;
-        System& operator=(System&&        in_move) noexcept = default;
+        System& operator=(System&&	    in_move) noexcept = default;
 
         #pragma endregion
 };

@@ -279,6 +279,7 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentID.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
@@ -374,6 +375,7 @@
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
+    <None Include="Source\Src\ECS\Component.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />

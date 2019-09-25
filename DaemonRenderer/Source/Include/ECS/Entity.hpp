@@ -35,24 +35,24 @@ class Entity
 {
     private:
 
-        DAEsize                     m_entity_id;
+        DAEsize                  m_entity_id;
         Vector<class Component*> m_components;
-    
+
     public:
 
         #pragma region Constructors
 
         Entity()                      noexcept = default;
         Entity(Entity const& in_copy) noexcept = default;
-        Entity(Entity&&         in_move) noexcept = default;
-        ~Entity()                      noexcept = default;
+        Entity(Entity&&		 in_move) noexcept = default;
+        ~Entity()                     noexcept = default;
 
         #pragma endregion
-    
+
         #pragma region Operators
 
         Entity& operator=(Entity const& in_copy) noexcept = default;
-        Entity& operator=(Entity&&        in_move) noexcept = default;
+        Entity& operator=(Entity&&      in_move) noexcept = default;
 
         #pragma endregion
 };
