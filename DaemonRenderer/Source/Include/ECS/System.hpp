@@ -39,14 +39,13 @@ BEGIN_DAEMON_NAMESPACE
 template <typename... TRequiredComponents>
 class __declspec(novtable) System
 {
-    using SystemPassComponents = Tuple<TRequiredComponents...>;
-
-    private:
+    protected:
 
         #pragma region Members
 
         // Array of all subscribed components
         Vector<Array<ComponentID, sizeof...(TRequiredComponents)>> m_subscribers;
+        Tuple<TRequiredComponents& ...>                            m_components;
 
         #pragma endregion 
 
@@ -57,7 +56,7 @@ class __declspec(novtable) System
         System()                      noexcept = default;
         System(System const& in_copy) noexcept = default;
         System(System&&	     in_move) noexcept = default;
-        ~System()                     noexcept = default;
+        virtual ~System()             noexcept = default;
 
         #pragma endregion
 

@@ -256,6 +256,11 @@
     <ClInclude Include="Source\Include\Containers\Bitset.hpp" />
     <ClInclude Include="Source\Include\Containers\Deque.hpp" />
     <ClInclude Include="Source\Include\Containers\ForwardList.hpp" />
+    <ClInclude Include="Source\Include\Containers\Layout\BaseLayoutContainer.hpp" />
+    <ClInclude Include="Source\Include\Containers\Layout\DataLayoutItem.hpp" />
+    <ClInclude Include="Source\Include\Containers\Layout\DataLayoutPolicy.hpp" />
+    <ClInclude Include="Source\Include\Containers\Layout\EDataLayout.hpp" />
+    <ClInclude Include="Source\Include\Containers\Layout\LayoutIterator.hpp" />
     <ClInclude Include="Source\Include\Containers\List.hpp" />
     <ClInclude Include="Source\Include\Containers\Map.hpp" />
     <ClInclude Include="Source\Include\Containers\Pair.hpp" />
@@ -272,6 +277,8 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentID.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentItemBase.hpp" />
+    <ClInclude Include="Source\Include\ECS\EComponentStatus.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
@@ -281,6 +288,7 @@
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
@@ -344,6 +352,7 @@
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
+    <ClInclude Include="Source\Src\Meta\ReferenceWrapper.inl" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -367,7 +376,9 @@
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
-    <None Include="Source\Src\ECS\Component.inl" />
+    <None Include="Source\Src\Containers\Layout\BaseLayoutContainer.inl" />
+    <None Include="Source\Src\Containers\Layout\DataLayoutPolicy.inl" />
+    <None Include="Source\Src\Containers\Layout\LayoutIterator.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />

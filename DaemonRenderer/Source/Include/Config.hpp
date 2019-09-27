@@ -29,7 +29,6 @@
 #define DAEMON_PROJECT_NAME  "Daemon Renderer"
 #define DAEMON_URL           "https://github.com/Renondedju/Daemon"
 
-
 // ------------------------------
 //	        Global Settings
 

@@ -28,40 +28,51 @@
 
 #include "ECS/ComponentID.hpp"
 
-#include "Containers/UnorderedMap.hpp"
+#include "Containers/Vector.hpp"
+#include "Containers/Layout/BaseLayoutContainer.hpp"
+
+#include "Functional/ReservedEvent.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief Base component class
- * \tparam TDerived Derived class
- */
-template <typename TDerived>
+template<typename TComponentItem>
 class Component
 {
     private:
 
         #pragma region Variables
 
-        ComponentID m_id;
-
-        // This is not the best container for this usage, ideally we would like to have
-        // a cache friendly associative container. This does the work for now 
-        static UnorderedMap<ComponentID, TDerived> m_storage;
-
-        // Id cache, used to generate new ids
-        static ComponentID m_id_cache;
+        BaseLayoutContainer<Vector, EDataLayout::StructureOfArrays, typename TComponentItem::Layout> m_storage;
 
         #pragma endregion
 
     public:
 
+        #pragma region Events
+
+        /**
+         * \brief On component deletion event
+         * \param Array of all the deleted component IDs
+         */
+        DAEMON_DECLARE_RESERVED_EVENT(OnDeleteEvent, Component, Vector<ComponentID>);
+        OnDeleteEvent on_delete;
+
+        #pragma endregion
+
+    protected:
+
         #pragma region Constructors
 
-        Component()                         noexcept;
+        Component()                         noexcept = default;
         Component(Component const& in_copy) noexcept = default;
         Component(Component&&      in_move) noexcept = default;
-        ~Component()                        noexcept;
+        ~Component()                        noexcept = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        DAEvoid DeleteUnusedComponents() noexcept;
 
         #pragma endregion
 
@@ -72,7 +83,5 @@ class Component
 
         #pragma endregion
 };
-
-#include "ECS/Component.inl"
 
 END_DAEMON_NAMESPACE

@@ -26,40 +26,13 @@
 
 #include "Config.hpp"
 
-#include "Types/Operators/Arithmetic/Increment.hpp"
-#include "Types/Operators/Comparison.hpp"
-#include "Types/FundamentalTypes.hpp"
-#include "Types/NamedType.hpp"
-
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief Strong typing of a component ID
- */
-class ComponentID : public NamedType<DAEsize, ComponentID>,
-                    public Comparison<ComponentID>
+enum class EComponentStatus
 {
-    using Parent = NamedType<DAEsize, ComponentID>;
-
-    public:
-
-        #pragma region Constructors
-
-        ComponentID()                           noexcept = default;
-        ComponentID(ComponentID const& in_copy) noexcept = default;
-        ComponentID(ComponentID&&      in_move) noexcept = default;
-        ~ComponentID()                          noexcept = default;
-
-        using Parent::Parent;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        ComponentID& operator=(ComponentID const& in_copy) noexcept = default;
-        ComponentID& operator=(ComponentID&&      in_move) noexcept = default;
-
-        #pragma endregion
+    Enabled,
+    Disabled,
+    Deleted
 };
 
 END_DAEMON_NAMESPACE

@@ -22,21 +22,39 @@
  *  SOFTWARE.
  */
 
-template <typename TDerived>
-UnorderedMap<ComponentID, TDerived> Component<TDerived>::m_storage{};
+#pragma once
 
-template <typename TDerived>
-ComponentID Component<TDerived>::m_id_cache{0};
+#include "Config.hpp"
 
-template <typename TDerived>
-Component<TDerived>::Component() noexcept:
-    m_id {++m_id_cache}
+#include "Containers/Tuple.hpp"
+#include "ECS/EComponentStatus.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "Containers/Layout/DataLayoutItem.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+template<typename... TTypes>
+class ComponentItemBase : DataLayoutItem<TTypes..., EComponentStatus>
 {
-    m_storage.insert(m_id, std::move(*this));
-}
+    protected:
 
-template <typename TDerived>
-Component<TDerived>::~Component() noexcept
-{
-    m_storage.erase(m_id);
-}
+        template<DAEsize TIndex>
+        constexpr auto& Get()       { return std::get<TIndex>(*this); }
+
+        template<DAEsize TIndex>
+        constexpr auto& Get() const { return std::get<TIndex>(*this); }
+
+    public:
+
+        // Constructors
+        using Tuple<TTypes...>::tuple;
+
+        /**
+         * \brief Component status getter/setter
+         * \return Component status
+         */
+        auto& GetComponentStatus()       { return std::get<std::tuple_size_v<Tuple<TTypes...>> - 1> (*this); }
+        auto  GetComponentStatus() const { return std::get<std::tuple_size_v<Tuple<TTypes...>> - 1> (*this); }
+};
+
+END_DAEMON_NAMESPACE

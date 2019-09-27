@@ -26,10 +26,37 @@
 
 #include "Config.hpp"
 
+#include "ECS/ComponentItemBase.hpp"
+#include "ECS/Component.hpp"
+#include "ECS/System.hpp"
+
 USING_DAEMON_NAMESPACE
+
+struct LifeComponentItem : public ComponentItemBase<DAEfloat, DAEfloat>
+{
+    enum EMembers
+    {
+        Life,
+        MaxLife
+    };
+
+    auto&       GetLife()       { return Get<Life>(); }
+    auto const& GetLife() const { return Get<Life>(); }
+
+    auto&       GetMaxLife()       { return Get<MaxLife>(); }
+    auto const& GetMaxLife() const { return Get<MaxLife>(); }
+};
 
 int main()
 {
+    BaseLayoutContainer<Vector, EDataLayout::StructureOfArrays, LifeComponentItem> container(1000);
+
+    for (auto& life: container)
+	{
+        life.GetLife           () = 13.0f;
+        life.GetComponentStatus() = EComponentStatus::Enabled;
+	}
+
     system("pause");
     
     return EXIT_SUCCESS;
