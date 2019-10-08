@@ -35,26 +35,29 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Greater operator class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct Greater
 {
-	/**
-	 * \brief Greater operator
-	 * \param in_rhs Right hand side operand
-	 * \param in_lhs Left hand side operand
-	 * \return Returns true if lhs is greater than rhs, false otherwise.
-	 */
-	friend constexpr DAEbool operator>(TStrongTypedef const& in_rhs, TStrongTypedef const& in_lhs) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Greater operator
+     *
+     * \param in_lhs Left-hand side operand
+     * \param in_rhs Right-hand side operand
+     *
+     * \return True if the left operand is greater than the right operand, false otherwise.
+     */
+    friend constexpr DAEbool operator>(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return static_cast<Type const>(in_rhs) > static_cast<Type const>(in_lhs);
-	}
+        return static_cast<Type const&>(in_lhs) > static_cast<Type const&>(in_rhs);
+    }
 };
 
 END_DAEMON_NAMESPACE

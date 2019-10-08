@@ -41,58 +41,58 @@ BEGIN_DAEMON_NAMESPACE
  */
 struct ResourceProcessingFailure final : std::exception
 {
-	#pragma region Variables
+    #pragma region Variables
 
-	/**
-	 * \brief Long description of the exception.
-	 * This will be logged by the resource manager
-	 */
-	String description;
+    /**
+     * \brief Long description of the exception.
+     * This will be logged by the resource manager
+     */
+    String description;
 
-	/**
-	 * \brief Resource validity after the exception.
-	 * If set to true, the error message will still be displayed but the resource will be considered as valid.
-	 * This can be useful if a resource by default has been loaded instead.
-	 */
-	DAEbool resource_validity;
+    /**
+     * \brief Resource validity after the exception.
+     * If set to true, the error message will still be displayed but the resource will be considered as valid.
+     * This can be useful if a resource by default has been loaded instead.
+     */
+    DAEbool resource_validity;
 
-	/**
-	 * \brief Error code.
-	 * This is a short description of the error and can be indicative of if a retry can be considered or not.
-	 */
-	EResourceProcessingFailureCode code;
+    /**
+     * \brief Error code.
+     * This is a short description of the error and can be indicative of if a retry can be considered or not.
+     */
+    EResourceProcessingFailureCode code;
 
-	#pragma endregion
+    #pragma endregion
 
-	#pragma region Constructors
+    #pragma region Constructors
 
-	explicit ResourceProcessingFailure (EResourceProcessingFailureCode in_code, DAEbool in_validity = false, DAEchar const* in_description = "") noexcept;
+    explicit ResourceProcessingFailure (EResourceProcessingFailureCode in_code, DAEbool in_validity = false, DAEchar const* in_description = "") noexcept;
 
-	ResourceProcessingFailure ()										 noexcept = delete;
-	ResourceProcessingFailure (ResourceProcessingFailure const& in_copy) noexcept = default;
-	ResourceProcessingFailure (ResourceProcessingFailure&& in_move)		 noexcept = default;
-	virtual ~ResourceProcessingFailure()										  = default;
+    ResourceProcessingFailure ()                                         noexcept = delete;
+    ResourceProcessingFailure (ResourceProcessingFailure const& in_copy) noexcept = default;
+    ResourceProcessingFailure (ResourceProcessingFailure&& in_move)         noexcept = default;
+    virtual ~ResourceProcessingFailure()                                          = default;
 
-	#pragma endregion
+    #pragma endregion
 
-	#pragma region Methods
-	
-	char const* what() const override;
+    #pragma region Methods
+    
+    char const* what() const override;
 
-	#pragma endregion 
+    #pragma endregion 
 
     #pragma region Operators
 
-	/**
-	 * \brief String representation
-	 */
-	[[nodiscard]]
-	explicit operator String() const noexcept;
+    /**
+     * \brief String representation
+     */
+    [[nodiscard]]
+    explicit operator String() const noexcept;
 
-	ResourceProcessingFailure& operator=(ResourceProcessingFailure const& in_copy) noexcept = default;
-	ResourceProcessingFailure& operator=(ResourceProcessingFailure&&	  in_move) noexcept = default;
+    ResourceProcessingFailure& operator=(ResourceProcessingFailure const& in_copy) noexcept = default;
+    ResourceProcessingFailure& operator=(ResourceProcessingFailure&&      in_move) noexcept = default;
 
-	#pragma endregion
+    #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

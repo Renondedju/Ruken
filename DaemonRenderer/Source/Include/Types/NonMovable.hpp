@@ -29,40 +29,39 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief NonMovable class, helps the creation of non movable objects by inheriting from the class.
+ * \brief This is a helper class for the creation of non movable objects by inheriting from it.
  */
 class NonMovable
 {
-	private:  // emphasize the following members are private
+    private:  // Emphasizes that the following members are private
 
-		#pragma region Constructors
-		
-		NonMovable(NonMovable&& in_move) = default;
+        #pragma region Constructors
+        
+        NonMovable(NonMovable&& in_move) = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		NonMovable& operator=(NonMovable&& in_move) = default;
+        NonMovable& operator=(NonMovable&& in_move) = default;
 
-		#pragma endregion
+        #pragma endregion
 
-	protected:
-		
-		#pragma region Constructors
+    protected:
+        
+        #pragma region Constructors
 
-		NonMovable()							= default;
-		NonMovable(NonMovable const& in_copy)	= default;
-		~NonMovable()							= default;
-		
-		#pragma endregion
+        NonMovable ()                           = default;
+        NonMovable (NonMovable const& in_copy)  = default;
+        ~NonMovable()                           = default;
+        
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		NonMovable& operator=(NonMovable const& in_copy) = default;
+        NonMovable& operator=(NonMovable const& in_copy) = default;
 
-		#pragma endregion
-
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

@@ -32,7 +32,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Unique class, this is a helper class easing the creation of unique objects by inheriting from it.
+ * \brief This is a helper class for the creation of unique objects by inheriting from it.
  * 
  * This class cannot be moved or copied.
  */

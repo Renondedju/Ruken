@@ -24,52 +24,52 @@
 
 #pragma once
 
-#include "Config.hpp"
-
 // stdint.h is used instead of cstdint on purpose, please don't modify this.
 #include <stdint.h>
 
+#include "Config.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
-//Booleans
+// Booleans
 
 using DAEbool = bool;
 
 //Characters
 
-using DAEchar	= char;
-using DAEschar	= signed char;
-using DAEuchar	= unsigned char;
-using DAEwchar	= wchar_t;
-using DAEchar8	= signed char;
-using DAEchar16	= char16_t;
-using DAEchar32	= char32_t;
+using DAEchar   = char;
+using DAEschar  = signed char;
+using DAEuchar  = unsigned char;
+using DAEwchar  = wchar_t;
+using DAEchar8  = signed char;
+using DAEchar16 = char16_t;
+using DAEchar32 = char32_t;
 
-//Integers
+// Integers
 
-using DAEint	= int;
+using DAEint    = int;
 
-using DAEint8	= int8_t;
-using DAEint16	= int16_t;
-using DAEint32	= int32_t;
-using DAEint64	= int64_t;
+using DAEint8   = int8_t;
+using DAEint16  = int16_t;
+using DAEint32  = int32_t;
+using DAEint64  = int64_t;
 
-using DAEuint8	= uint8_t;
-using DAEuint16	= uint16_t;
-using DAEuint32	= uint32_t;
-using DAEuint64	= uint64_t;
+using DAEuint8  = uint8_t;
+using DAEuint16 = uint16_t;
+using DAEuint32 = uint32_t;
+using DAEuint64 = uint64_t;
 
-using DAEsize	= size_t;
-using DAEbyte	= DAEuint8;
+using DAEsize   = size_t;
+using DAEbyte   = DAEuint8;
 
-//Floating points
+// Floating points
 
-using DAEfloat	 = float;
-using DAEdouble	 = double;
-using DAEldouble = long double;
+using DAEfloat      = float;
+using DAEdouble     = double;
+using DAEldouble    = long double;
 
-//Others
+// Others
 
-using DAEvoid    = void;
+using DAEvoid = void;
 
 END_DAEMON_NAMESPACE

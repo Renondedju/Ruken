@@ -17,3 +17,4 @@ Please keep in mind that this roadmap is subject to changes.
 - [ ] Tesselation
 - [ ] Controllable post processing
 - [ ] Global illumination
+- [ ] GPU profiler

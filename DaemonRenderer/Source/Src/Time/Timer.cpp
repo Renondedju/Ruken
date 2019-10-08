@@ -28,31 +28,31 @@
 USING_DAEMON_NAMESPACE
 
 Timer::Timer() noexcept:
-	m_win_handle {CreateWaitableTimer(nullptr, true, nullptr)}
+    m_win_handle {CreateWaitableTimer(nullptr, true, nullptr)}
 {}
 
 Timer::~Timer() noexcept
 {
-	CloseHandle(static_cast<HANDLE>(m_win_handle));
+    CloseHandle(static_cast<HANDLE>(m_win_handle));
 }
 
 DAEbool Timer::SetTiming(DAEint64 const in_nanoseconds) const noexcept
 {
-	if(!m_win_handle)
-		return false;
+    if(!m_win_handle)
+        return false;
 
-	LARGE_INTEGER li;
-	li.QuadPart = -in_nanoseconds;
+    LARGE_INTEGER li;
+    li.QuadPart = -in_nanoseconds;
 
-	return SetWaitableTimer(m_win_handle, &li, 0, nullptr, nullptr, false);
+    return SetWaitableTimer(m_win_handle, &li, 0, nullptr, nullptr, false);
 }
 
 DAEbool Timer::NSleep() const noexcept
 {
-	if(!m_win_handle)
-		return false;
+    if(!m_win_handle)
+        return false;
 
-	WaitForSingleObject(m_win_handle, INFINITE);
+    WaitForSingleObject(m_win_handle, INFINITE);
 
-	return true;
+    return true;
 }

@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-		
+        
 template<class TData, EAccessMode TMode>
 SynchronizedAccess<TData, TMode>::SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept:
     BaseSynchronizedAccess<TData, true> {in_synchronized}
@@ -31,23 +31,23 @@ SynchronizedAccess<TData, TMode>::SynchronizedAccess(Synchronized<TData>& in_syn
 template<class TData>
 SynchronizedAccess<TData, EAccessMode::Read>::SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept:
     BaseSynchronizedAccess<TData, false> {in_synchronized},
-    m_lock								 {in_synchronized.m_mutex}
+    m_lock                                 {in_synchronized.m_mutex}
 {}
 
 template<class TData>
 std::shared_lock<std::shared_mutex>& SynchronizedAccess<TData, EAccessMode::Read>::GetLock() noexcept
 {
-	return m_lock;
+    return m_lock;
 }
 
 template<class TData>
 SynchronizedAccess<TData, EAccessMode::Write>::SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept:
-    BaseSynchronizedAccess<TData, true>	{in_synchronized},
-    m_lock								{in_synchronized.m_mutex}
+    BaseSynchronizedAccess<TData, true>    {in_synchronized},
+    m_lock                                {in_synchronized.m_mutex}
 {}
 
 template<class TData>
 std::unique_lock<std::shared_mutex>& SynchronizedAccess<TData, EAccessMode::Write>::GetLock() noexcept
 {
-	return m_lock;
+    return m_lock;
 }

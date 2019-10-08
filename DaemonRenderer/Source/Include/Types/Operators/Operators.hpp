@@ -34,16 +34,17 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Module regrouping all operators
+ * \brief Module gathering all operators
+ *
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct Operators:	Bitwise		<TStrongTypedef>, 
-					Logical		<TStrongTypedef>,
-					Arithmetic	<TStrongTypedef>,
-					Comparison	<TStrongTypedef>
+struct Operators:   Bitwise     <TStrongTypedef>, 
+                    Logical     <TStrongTypedef>,
+                    Arithmetic  <TStrongTypedef>,
+                    Comparison  <TStrongTypedef>
 {};
-	
 
 END_DAEMON_NAMESPACE

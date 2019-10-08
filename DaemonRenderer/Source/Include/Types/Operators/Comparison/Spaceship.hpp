@@ -35,15 +35,16 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Spaceship than or equal class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct Spaceship
 {
-	// Not yet implemented (C++20)
+    // Not yet implemented (C++20)
 };
 
 END_DAEMON_NAMESPACE

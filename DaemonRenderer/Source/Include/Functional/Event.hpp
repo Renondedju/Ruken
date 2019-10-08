@@ -39,71 +39,71 @@ BEGIN_DAEMON_NAMESPACE
 template <typename... TArgs>
 class Event
 {
-	using Function = std::function<DAEvoid(TArgs...)>;
+    using Function = std::function<DAEvoid(TArgs...)>;
 
-	private:
+    private:
 
-		#pragma region Members
+        #pragma region Members
 
-		Vector<Function> m_subscribers;
+        Vector<Function> m_subscribers;
 
-		#pragma endregion 
+        #pragma endregion 
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		Event()							= default;
-		Event(Event const& in_copy)		= default;
-		Event(Event&& in_move) noexcept	= default;
-		~Event()						= default;
-		
-		#pragma endregion
+        Event()                            = default;
+        Event(Event const& in_copy)        = default;
+        Event(Event&& in_move) noexcept    = default;
+        ~Event()                        = default;
+        
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		/**
-		 * \brief Clears all the subscribers from the event
-		 */
-		DAEvoid Reset() noexcept;
+        /**
+         * \brief Clears all the subscribers from the event
+         */
+        DAEvoid Reset() noexcept;
 
-		/**
-		 * \brief Subscribes a new function to the event
-		 * \param in_function Function to subscribe
-		 */
-		DAEvoid Subscribe(Function const& in_function) noexcept;
-		DAEvoid Subscribe(Function&&	  in_function) noexcept;
+        /**
+         * \brief Subscribes a new function to the event
+         * \param in_function Function to subscribe
+         */
+        DAEvoid Subscribe(Function const& in_function) noexcept;
+        DAEvoid Subscribe(Function&&      in_function) noexcept;
 
-		/**
-		 * \brief Invokes the event
-		 * \note Every subscriber will be invoked in the same order as they subscribed
-		 * 
-		 * \param in_args Arguments to pass to all the subscribers
-		 */
-		DAEvoid Invoke(TArgs... in_args) noexcept;
+        /**
+         * \brief Invokes the event
+         * \note Every subscriber will be invoked in the same order as they subscribed
+         * 
+         * \param in_args Arguments to pass to all the subscribers
+         */
+        DAEvoid Invoke(TArgs... in_args) noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		/**
-		 * \brief Equivalent of the Invoke() method
-		 * \param in_args Arguments to pass to all the subscribers
-		 */
-		DAEvoid operator()(TArgs... in_args) noexcept;
+        /**
+         * \brief Equivalent of the Invoke() method
+         * \param in_args Arguments to pass to all the subscribers
+         */
+        DAEvoid operator()(TArgs... in_args) noexcept;
 
-		/**
-		 * \brief Equivalent of the Subscribe() method
-		 * \param in_function Function to subscribe
-		 * \return Instance of the event
-		 */
-		Event& operator+=(Function const& in_function) noexcept;
-		Event& operator+=(Function&&	  in_function) noexcept;
+        /**
+         * \brief Equivalent of the Subscribe() method
+         * \param in_function Function to subscribe
+         * \return Instance of the event
+         */
+        Event& operator+=(Function const& in_function) noexcept;
+        Event& operator+=(Function&&      in_function) noexcept;
 
-		Event& operator=(Event const& in_copy) noexcept = default;
-		Event& operator=(Event&&	  in_move) noexcept = default;
+        Event& operator=(Event const& in_copy) noexcept = default;
+        Event& operator=(Event&&      in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
 };
 

@@ -36,18 +36,19 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Module regrouping all commons bitwise operators
+ * \brief Module gathering all common bitwise operators
+ *
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct Bitwise:	Or		  <TStrongTypedef>,
-				And		  <TStrongTypedef>,
-				Not		  <TStrongTypedef>,
-				Xor		  <TStrongTypedef>,
-				LeftShift <TStrongTypedef>,
-				RightShift<TStrongTypedef>
+struct Bitwise: Or          <TStrongTypedef>,
+                And         <TStrongTypedef>,
+                Not         <TStrongTypedef>,
+                Xor         <TStrongTypedef>,
+                LeftShift   <TStrongTypedef>,
+                RightShift  <TStrongTypedef>
 {};
-	
 
 END_DAEMON_NAMESPACE

@@ -25,43 +25,44 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 #if defined(DAEMON_COMPILER_MSVC) && _MSC_VER <= 1800
-	#define TODO(...) // constexpr wont work :(
+    #define TODO(...) // constexpr wont work :(
 #else
 
 namespace internal
 {
-	struct Todo
-	{
-		template<unsigned TN>
-		static constexpr DAEuint64 Date(const char (&in_dt)[TN] )
-		{
-			return static_cast<DAEuint64>(
-					/*D*/ ( in_dt[4] == ' ' ? 0 : (in_dt[4] - '0') * 10 ) + (in_dt[5] - '0') +
-					/*M*/ ( in_dt[2] == 'n' ? 1
-						 : in_dt[2] == 'b' ? 2
-						 : in_dt[2] == 'r' && in_dt[0] == 'M' ? 3
-						 : in_dt[2] == 'r' && in_dt[0] != 'M' ? 4
-						 : in_dt[2] == 'y' ? 5
-						 : in_dt[2] == 'n' ? 6
-						 : in_dt[2] == 'l' ? 7
-						 : in_dt[2] == 'g' ? 8
-						 : in_dt[2] == 'p' ? 9
-						 : in_dt[2] == 't' ? 10
-						 : in_dt[2] == 'v' ? 11 : 12 ) * 100 +
-					/*Y*/ (in_dt[7] - '0') * 1e7 + (in_dt[8] - '0') * 1e6 + (in_dt[9] - '0') * 1e5 + (in_dt[10] - '0') * 1e4);
-		}
+    struct Todo
+    {
+        template<unsigned TN>
+        static constexpr DAEuint64 Date(DAEchar const (&in_dt)[TN] )
+        {
+            return static_cast<DAEuint64>(
+                    /*D*/ ( in_dt[4] == ' ' ? 0 : (in_dt[4] - '0') * 10 ) + (in_dt[5] - '0') +
+                    /*M*/ ( in_dt[2] == 'n' ? 1
+                          : in_dt[2] == 'b' ? 2
+                          : in_dt[2] == 'r' && in_dt[0] == 'M' ? 3
+                          : in_dt[2] == 'r' && in_dt[0] != 'M' ? 4
+                          : in_dt[2] == 'y' ? 5
+                          : in_dt[2] == 'n' ? 6
+                          : in_dt[2] == 'l' ? 7
+                          : in_dt[2] == 'g' ? 8
+                          : in_dt[2] == 'p' ? 9
+                          : in_dt[2] == 't' ? 10
+                          : in_dt[2] == 'v' ? 11 : 12 ) * 100 +
+                    /*Y*/ ( in_dt[7] -  '0') * 1e7 + (in_dt[8] - '0') * 1e6 + (in_dt[9] - '0') * 1e5 + (in_dt[10] - '0') * 1e4);
+        }
 
-		template<unsigned TN>
-		static constexpr bool Check( const char (&in_dt)[TN] )
-		{
-			return Date(__DATE__) < Date(in_dt);
-		}
-	};
+        template<unsigned TN>
+        static constexpr bool Check( DAEchar const (&in_dt)[TN] )
+        {
+            return Date(__DATE__) < Date(in_dt);
+        }
+    };
 }
 
 /**

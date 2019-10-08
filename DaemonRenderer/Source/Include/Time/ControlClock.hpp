@@ -27,85 +27,87 @@
 #include <chrono>
 
 #include "Config.hpp"
+
 #include "Time/Timer.hpp"
+
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class ControlClock
 {
-	using InternalClock = std::chrono::steady_clock;
-	using TimePoint		= std::chrono::time_point<InternalClock>;
+    using InternalClock = std::chrono::steady_clock;
+    using TimePoint     = std::chrono::time_point<InternalClock>;
 
-	private:
+    private:
 
-		#pragma region Members
+        #pragma region Members
 
-		// Last time an update has been triggered
-		TimePoint m_last_time;
+        // Last time an update has been triggered
+        TimePoint m_last_time;
 
-		// Measured time between 2 ControlPoint() calls
-		DAEdouble m_control_time;
-		DAEdouble m_corrected_control_time;
+        // Measured time between 2 ControlPoint() calls
+        DAEdouble m_control_time;
+        DAEdouble m_corrected_control_time;
 
-		// Timer, this is used to sleep if required
-		Timer m_timer;
+        // Timer, this is used to sleep if required
+        Timer m_timer;
 
-		// Maximum frequency allowed between 2 ControlPoint() calls
-		DAEfloat m_frequency;
+        // Maximum frequency allowed between 2 ControlPoint() calls
+        DAEfloat m_frequency;
 
-		// Time scale of the clock, this can be used to temporarily
-		// slow down or speed up the clock without having to modify the frequency of the clock
-		// Be careful since this also multiplies the impressions of the clock
-		DAEfloat m_time_scale;
+        // Time scale of the clock, this can be used to temporarily
+        // slow down or speed up the clock without having to modify the frequency of the clock
+        // Be careful since this also multiplies the impressions of the clock
+        DAEfloat m_time_scale;
 
-		#pragma endregion
+        #pragma endregion
 
-	public:
+    public:
 
-		#pragma region Constructors
+        #pragma region Constructors
 
-		ControlClock() noexcept;
-		ControlClock(ControlClock const& in_copy)	noexcept = default;
-		ControlClock(ControlClock&&		 in_move)	noexcept = default;
-		~ControlClock()								noexcept = default;
+        ControlClock ()                            noexcept;
+        ControlClock (ControlClock const& in_copy) noexcept = default;
+        ControlClock (ControlClock&&      in_move) noexcept = default;
+        ~ControlClock()                            noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Methods
+        #pragma region Methods
 
-		/**
-		 * \brief Main method, must be called every time you wish to be synchronized with the clock
-		 * \note If you are too slow between 2 clock cycles, this method has no effect
-		 */
-		DAEvoid ControlPoint() noexcept;
+        /**
+         * \brief Main method, must be called every time you wish to be synchronized with the clock
+         * \note If you are too slow between 2 clock cycles, this method has no effect
+         */
+        DAEvoid ControlPoint() noexcept;
 
-		/**
-		 * \brief Sets the target frequency of the clock
-		 * \param in_frequency frequency of the clock (number of seconds / cycle count)
-		 */
-		DAEvoid SetControlFrequency(DAEfloat in_frequency) noexcept;
+        /**
+         * \brief Sets the target frequency of the clock
+         * \param in_frequency frequency of the clock (number of seconds / cycle count)
+         */
+        DAEvoid SetControlFrequency(DAEfloat in_frequency) noexcept;
 
-		/**
-		 * \brief Queries the time spent between 2 ControlPoint() calls
-		 * \return Control time
-		 */
-		DAEfloat GetControlTime() const noexcept;
+        /**
+         * \brief Queries the time spent between 2 ControlPoint() calls
+         * \return Control time
+         */
+        DAEfloat GetControlTime() const noexcept;
 
-		/**
-		 * \brief Queries the time spent between 2 ControlPoint() calls and omits the time scale of the clock
-		 * \return Unscaled control time
-		 */
-		DAEfloat GetUnscaledControlTime() const noexcept;
+        /**
+         * \brief Queries the time spent between 2 ControlPoint() calls and omits the time scale of the clock
+         * \return Unscaled control time
+         */
+        DAEfloat GetUnscaledControlTime() const noexcept;
 
-		#pragma endregion
+        #pragma endregion
 
-		#pragma region Operators
+        #pragma region Operators
 
-		ControlClock& operator=(ControlClock const& in_copy) noexcept = default;
-		ControlClock& operator=(ControlClock&&	    in_move) noexcept = default;
+        ControlClock& operator=(ControlClock const& in_copy) noexcept = default;
+        ControlClock& operator=(ControlClock&&      in_move) noexcept = default;
 
-		#pragma endregion
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

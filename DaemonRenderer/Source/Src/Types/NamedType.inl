@@ -25,53 +25,53 @@
 template <typename TBase, typename TUniquePhantom>
 template <typename ...TArgs, typename>
 constexpr NamedType<TBase, TUniquePhantom>::NamedType(TArgs&&... in_args) noexcept(noexcept(TBase(std::forward<TArgs>(in_args)...))):
-	m_value {TBase(std::forward<TArgs>(in_args)...)}
+    m_value {TBase(std::forward<TArgs>(in_args)...)}
 {}
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::NamedType(TBase const& in_base) noexcept(noexcept(TBase(in_base))):
-	m_value {in_base}
+    m_value {in_base}
 {}
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::NamedType(NamedType const& in_copy) noexcept(std::is_nothrow_copy_constructible_v<TBase>):
-	m_value {in_copy}
+    m_value {in_copy}
 {}
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::NamedType(NamedType&& in_move) noexcept(std::is_nothrow_move_constructible_v<TBase>):
-	m_value {std::forward<TBase>(in_move)}
+    m_value {std::forward<TBase>(in_move)}
 {}
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::NamedType() noexcept(std::is_nothrow_constructible_v<TBase>):
-	m_value {}
+    m_value {}
 {}
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::operator TBase&() noexcept
 {
-	return m_value;
+    return m_value;
 }
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::operator TBase const& () const noexcept
 {
-	return m_value;	
+    return m_value;    
 }
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>& NamedType<TBase, TUniquePhantom>::
-	operator=(NamedType const& in_copy) noexcept(std::is_nothrow_copy_assignable_v<TBase>)
+    operator=(NamedType const& in_copy) noexcept(std::is_nothrow_copy_assignable_v<TBase>)
 {
-	m_value = std::forward<TBase>(in_copy.m_value);
-	return *this;
+    m_value = std::forward<TBase>(in_copy.m_value);
+    return *this;
 }
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>& NamedType<TBase, TUniquePhantom>::
-	operator=(NamedType&& in_move) noexcept(std::is_nothrow_move_assignable_v<TBase>)
+    operator=(NamedType&& in_move) noexcept(std::is_nothrow_move_assignable_v<TBase>)
 {
-	m_value = std::forward<TBase>(in_move.m_value);
-	return *this;
+    m_value = std::forward<TBase>(in_move.m_value);
+    return *this;
 }

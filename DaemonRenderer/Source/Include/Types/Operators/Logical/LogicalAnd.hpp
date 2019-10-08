@@ -35,26 +35,29 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Logical AND operator class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct LogicalAnd
 {
-	/**
-	 * \brief Logical AND operator
-	 * \param in_lhs Left hand side operand
-	 * \param in_rhs Right hand side operand
-	 * \return Logical AND
-	 */
-	friend constexpr DAEbool operator&&(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Logical AND operator
+     *
+     * \param in_lhs Left-hand side operand
+     * \param in_rhs Right-hand side operand
+     *
+     * \return Value of the operation
+     */
+    friend constexpr DAEbool operator&&(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return static_cast<Type const>(in_lhs) && static_cast<Type const>(in_rhs);
-	}
+        return static_cast<Type const&>(in_lhs) && static_cast<Type const&>(in_rhs);
+    }
 };
 
 END_DAEMON_NAMESPACE

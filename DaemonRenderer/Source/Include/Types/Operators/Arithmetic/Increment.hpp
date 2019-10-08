@@ -35,40 +35,42 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Increment operator class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct Increment
 {
-	/**
-	 * \brief Pre-Increment operator
-	 * \param in_instance Class instance
-	 * \return Reference to the new instance
-	 */
-	friend constexpr TStrongTypedef& operator++(TStrongTypedef& in_instance) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Pre-Increment operator
+     *
+     * \param in_instance Operand instance
+     *
+     * \return Reference to the new instance
+     */
+    friend constexpr TStrongTypedef& operator++(TStrongTypedef& in_instance) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		++static_cast<Type&>(in_instance);
-		return in_instance;
-	}
+        return ++static_cast<Type&>(in_instance);
+    }
 
-	/**
-	 * \brief Post-Increment operator
-	 * \param in_instance Class instance
-	 * \return Reference to the new instance
-	 */
-	friend constexpr TStrongTypedef operator++(TStrongTypedef& in_instance, DAEint) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Post-Increment operator
+     *
+     * \param in_instance Operand instance
+     *
+     * \return Value of the new instance
+     */
+    friend constexpr TStrongTypedef operator++(TStrongTypedef& in_instance, DAEint) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		TStrongTypedef const temp(in_instance);
-		static_cast<Type&>(in_instance)++;
-		return temp;
-	}
+        return static_cast<Type&>(in_instance)++;
+    }
 };
 
 END_DAEMON_NAMESPACE

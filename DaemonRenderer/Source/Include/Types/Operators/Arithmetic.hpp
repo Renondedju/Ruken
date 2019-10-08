@@ -39,21 +39,22 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Module regrouping all commons arithmetic operators
+ * \brief Module gathering all common arithmetic operators
+ *
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct Arithmetic:	Modulo			<TStrongTypedef>,
-					Addition		<TStrongTypedef>,
-					Division		<TStrongTypedef>,
-					Increment		<TStrongTypedef>,
-					Decrement		<TStrongTypedef>,
-					UnaryPlus		<TStrongTypedef>,
-					UnaryMinus		<TStrongTypedef>,
-					Subtraction		<TStrongTypedef>,
-					Multiplication	<TStrongTypedef>
+struct Arithmetic:  Modulo          <TStrongTypedef>,
+                    Addition        <TStrongTypedef>,
+                    Division        <TStrongTypedef>,
+                    Increment       <TStrongTypedef>,
+                    Decrement       <TStrongTypedef>,
+                    UnaryPlus       <TStrongTypedef>,
+                    UnaryMinus      <TStrongTypedef>,
+                    Subtraction     <TStrongTypedef>,
+                    Multiplication  <TStrongTypedef>
 {};
-	
 
 END_DAEMON_NAMESPACE

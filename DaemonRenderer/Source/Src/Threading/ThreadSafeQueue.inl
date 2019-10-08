@@ -25,24 +25,24 @@
 template <typename TType>
 DAEbool ThreadSafeQueue<TType>::Empty() const noexcept
 {
-	QueueReadAccess access(m_queue);
+    QueueReadAccess access(m_queue);
 
-	return access->empty();
+    return access->empty();
 }
 
 template <typename TType>
 DAEvoid ThreadSafeQueue<TType>::Enqueue(TType&& in_item) noexcept
 {
-	QueueWriteAccess access(m_queue);
+    QueueWriteAccess access(m_queue);
 
-	access->emplace_back(std::forward<TType>(in_item));
+    access->emplace_back(std::forward<TType>(in_item));
 }
 
 template <typename TType>
 DAEvoid ThreadSafeQueue<TType>::Dequeue(TType& out_item) noexcept
 {
-	QueueWriteAccess access(m_queue);
-	
-	out_item = std::move(access->front());
-	access->pop_front();
+    QueueWriteAccess access(m_queue);
+    
+    out_item = std::move(access->front());
+    access->pop_front();
 }

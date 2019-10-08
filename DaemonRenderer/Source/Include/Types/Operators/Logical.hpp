@@ -33,15 +33,16 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Module regrouping all commons logical operators
+ * \brief Module gathering all common logical operators
+ *
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
-struct Logical:	LogicalOr  <TStrongTypedef>,
-				LogicalAnd <TStrongTypedef>,
-				LogicalNot <TStrongTypedef>
+struct Logical: LogicalOr   <TStrongTypedef>,
+                LogicalAnd  <TStrongTypedef>,
+                LogicalNot  <TStrongTypedef>
 {};
-	
 
 END_DAEMON_NAMESPACE

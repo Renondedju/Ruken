@@ -35,26 +35,29 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Less than or equal class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct LessEqual
 {
-	/**
-	 * \brief Less than or equal operator
-	 * \param in_rhs Right hand side operand
-	 * \param in_lhs Left hand side operand
-	 * \return Returns true if lhs is less than or equal to rhs, false otherwise.
-	 */
-	friend constexpr DAEbool operator<=(TStrongTypedef const& in_rhs, TStrongTypedef const& in_lhs) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Less than or equal operator
+     *
+     * \param in_lhs Left-hand side operand
+     * \param in_rhs Right-hand side operand
+     *
+     * \return Returns True if the left operand is lesser than or equal to the right operand, false otherwise.
+     */
+    friend constexpr DAEbool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return static_cast<Type const>(in_rhs) <= static_cast<Type const>(in_lhs);
-	}
+        return static_cast<Type const&>(in_lhs) <= static_cast<Type const&>(in_rhs);
+    }
 };
 
 END_DAEMON_NAMESPACE

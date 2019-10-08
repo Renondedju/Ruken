@@ -25,134 +25,134 @@
 template <class TUnary_Predicate>
 DAEvoid ResourceManager::GarbageCollection(TUnary_Predicate in_predicate, DAEbool const in_clear_invalid_resources) noexcept
 {
-	if (m_collection_mode == EGCCollectionMode::Disabled)
-		return;
+    if (m_collection_mode == EGCCollectionMode::Disabled)
+        return;
 
-	// If the Resource manager is already processing some resources,
-	// we won't start the garbage collection now, to avoid conflicts and performances issues
-	if (m_current_operation_count.load(std::memory_order_acquire) > 0u)
-		return;
+    // If the Resource manager is already processing some resources,
+    // we won't start the garbage collection now, to avoid conflicts and performances issues
+    if (m_current_operation_count.load(std::memory_order_acquire) > 0u)
+        return;
 
-	ManifestsWriteAccess access(m_manifests);
+    ManifestsWriteAccess access(m_manifests);
 
-	// The loop doesn't auto increments the iterator because we might need to delete iterators while looping.
-	for (auto iterator = access->begin(); iterator != access->end();)
-	{
-		if (in_predicate(*iterator->second) && iterator->second->data)
-		{
-			// Scheduling the deletion
-			m_scheduler_reference.ScheduleTask([manifest = iterator->second, in_clear_invalid_resources, this] {
-				InvalidateResource(manifest);
+    // The loop doesn't auto increments the iterator because we might need to delete iterators while looping.
+    for (auto iterator = access->begin(); iterator != access->end();)
+    {
+        if (in_predicate(*iterator->second) && iterator->second->data)
+        {
+            // Scheduling the deletion
+            m_scheduler_reference.ScheduleTask([manifest = iterator->second, in_clear_invalid_resources, this] {
+                InvalidateResource(manifest);
 
-				if (in_clear_invalid_resources && manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
-					delete manifest;
-			});
-		}
+                if (in_clear_invalid_resources && manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
+                    delete manifest;
+            });
+        }
 
-		// If clearing invalid resources has been requested and the resource is invalid:
-		if (in_clear_invalid_resources && iterator->second->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
-			iterator = access->erase(iterator);
-		else
-			++iterator;
-	}
+        // If clearing invalid resources has been requested and the resource is invalid:
+        if (in_clear_invalid_resources && iterator->second->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
+            iterator = access->erase(iterator);
+        else
+            ++iterator;
+    }
 }
 
 template <typename TResource_Type>
 DAEvoid ResourceManager::LoadResource(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
 {
-	if (!in_manifest)
-		return;
+    if (!in_manifest)
+        return;
 
-	{
-		// Since this method is susceptible to be called from multiple threads at once,
-		// this ensures that a resource doesn't gets loaded twice (or more)
+    {
+        // Since this method is susceptible to be called from multiple threads at once,
+        // this ensures that a resource doesn't gets loaded twice (or more)
 
-		// TODO move this in a special synchronization structure to avoid slowing down the whole manager
-		ManifestsWriteAccess access(m_manifests);
+        // TODO move this in a special synchronization structure to avoid slowing down the whole manager
+        ManifestsWriteAccess access(m_manifests);
 
-		if (in_manifest->status.load(std::memory_order_acquire) != EResourceStatus::Invalid)
-			return;
+        if (in_manifest->status.load(std::memory_order_acquire) != EResourceStatus::Invalid)
+            return;
 
-		in_manifest->status.store(EResourceStatus::Pending, std::memory_order_release);
-		in_manifest->data  .store(new TResource_Type()    , std::memory_order_release);
-	}
+        in_manifest->status.store(EResourceStatus::Pending, std::memory_order_release);
+        in_manifest->data  .store(new TResource_Type()    , std::memory_order_release);
+    }
 
-	if (in_loading_mode == ESynchronizationMode::Synchronous)
-		return LoadingRoutine(in_manifest, in_descriptor);
+    if (in_loading_mode == ESynchronizationMode::Synchronous)
+        return LoadingRoutine(in_manifest, in_descriptor);
 
-	m_scheduler_reference.ScheduleTask([in_manifest, &in_descriptor, this] {
-		LoadingRoutine(in_manifest, in_descriptor);
-	});
+    m_scheduler_reference.ScheduleTask([in_manifest, &in_descriptor, this] {
+        LoadingRoutine(in_manifest, in_descriptor);
+    });
 }
 
 template <typename TResource_Type>
 Handle<TResource_Type> ResourceManager::RequestResource(ResourceIdentifier const& in_unique_identifier, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
 {
-	ResourceManifest* manifest = RequestManifest(in_unique_identifier);
+    ResourceManifest* manifest = RequestManifest(in_unique_identifier);
 
-	// If the resource isn't currently loaded: loading it
-	if (manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
-		LoadResource<TResource_Type>(manifest, in_descriptor, in_loading_mode);
+    // If the resource isn't currently loaded: loading it
+    if (manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
+        LoadResource<TResource_Type>(manifest, in_descriptor, in_loading_mode);
 
-	return std::move(Handle<TResource_Type>(manifest));
+    return std::move(Handle<TResource_Type>(manifest));
 }
 
 template <typename TResource_Type>
 Handle<TResource_Type> ResourceManager::ReloadResource(Handle<TResource_Type> const& in_handle, ESynchronizationMode const in_loading_mode) noexcept
 {
-	// Cannot reload an unloaded or invalid handle
-	if (!in_handle.Available())
-		return in_handle;
+    // Cannot reload an unloaded or invalid handle
+    if (!in_handle.Available())
+        return in_handle;
 
-	if (in_loading_mode == ESynchronizationMode::Synchronous)
-		ReloadingRoutine(in_handle.m_manifest);
-	else
-	{
-		m_scheduler_reference.ScheduleTask([&in_handle, this] {
-			ReloadingRoutine(in_handle.m_manifest);
-		});
-	}
+    if (in_loading_mode == ESynchronizationMode::Synchronous)
+        ReloadingRoutine(in_handle.m_manifest);
+    else
+    {
+        m_scheduler_reference.ScheduleTask([&in_handle, this] {
+            ReloadingRoutine(in_handle.m_manifest);
+        });
+    }
 
-	return in_handle;
+    return in_handle;
 }
 
 template <typename TResource_Type>
 Handle<TResource_Type> ResourceManager::ReferenceResource(ResourceIdentifier const& in_unique_identifier, TResource_Type* in_resource, EResourceGCStrategy const in_strategy) noexcept
 {
-	ManifestsWriteAccess access(m_manifests);
+    ManifestsWriteAccess access(m_manifests);
 
-	// If there is already a manifest with the target name or the resource is an empty pointer
-	if (access->find(in_unique_identifier) != access->end() || !in_resource)
-		return Handle<TResource_Type>(nullptr);
+    // If there is already a manifest with the target name or the resource is an empty pointer
+    if (access->find(in_unique_identifier) != access->end() || !in_resource)
+        return Handle<TResource_Type>(nullptr);
 
-	// Otherwise, referencing the resource
-	ResourceManifest* manifest = new ResourceManifest();
-	access.Get()[in_unique_identifier] = manifest;
+    // Otherwise, referencing the resource
+    ResourceManifest* manifest = new ResourceManifest();
+    access.Get()[in_unique_identifier] = manifest;
 
-	manifest->gc_strategy	= in_strategy;
-	manifest->data			= in_resource;
-	manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
+    manifest->gc_strategy    = in_strategy;
+    manifest->data            = in_resource;
+    manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
 
-	return Handle<TResource_Type>(manifest);
+    return Handle<TResource_Type>(manifest);
 }
 
 template <typename TResource_Type>
 Handle<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode const in_loading_mode) noexcept
 {
-	ResourceManifest* manifest = RequestManifest(in_unique_identifier, false);
-	
-	// Cannot reload an unloaded or invalid manifest
-	if (!manifest || manifest->status != EResourceStatus::Loaded)
-		return Handle<TResource_Type>(manifest);
+    ResourceManifest* manifest = RequestManifest(in_unique_identifier, false);
+    
+    // Cannot reload an unloaded or invalid manifest
+    if (!manifest || manifest->status != EResourceStatus::Loaded)
+        return Handle<TResource_Type>(manifest);
 
-	if (in_loading_mode == ESynchronizationMode::Synchronous)
-		ReloadingRoutine(manifest);
-	else
-	{
-		m_scheduler_reference.ScheduleTask([&manifest, this] {
-			ReloadingRoutine(manifest);
-		});
-	}
+    if (in_loading_mode == ESynchronizationMode::Synchronous)
+        ReloadingRoutine(manifest);
+    else
+    {
+        m_scheduler_reference.ScheduleTask([&manifest, this] {
+            ReloadingRoutine(manifest);
+        });
+    }
 
-	return Handle<TResource_Type>(manifest);
+    return Handle<TResource_Type>(manifest);
 }

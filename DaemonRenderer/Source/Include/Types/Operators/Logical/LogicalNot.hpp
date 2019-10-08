@@ -35,25 +35,28 @@ BEGIN_DAEMON_NAMESPACE
  * \brief Logical NOT operator class
  * 
  * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types
+ * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongTypedef Base NamedType
+ *
  * \see NamedType
  */
 template <typename TStrongTypedef>
 struct LogicalNot
 {
-	/**
-	 * \brief Logical NOT operator
-	 * \param in_instance Operand instance
-	 * \return Logical NOT
-	 */
-	friend constexpr DAEbool operator!(TStrongTypedef const& in_instance) noexcept
-	{
-		using Type = internal::UnderlyingType<TStrongTypedef>;
+    /**
+     * \brief Logical NOT operator
+     *
+     * \param in_instance Operand instance
+     *
+     * \return Value of the operation
+     */
+    friend constexpr DAEbool operator!(TStrongTypedef const& in_instance) noexcept
+    {
+        using Type = internal::UnderlyingType<TStrongTypedef>;
 
-		return !static_cast<Type const>(in_instance);
-	}
+        return !static_cast<Type const&>(in_instance);
+    }
 };
 
 END_DAEMON_NAMESPACE
