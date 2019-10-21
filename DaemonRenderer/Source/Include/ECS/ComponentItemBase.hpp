@@ -26,35 +26,28 @@
 
 #include "Config.hpp"
 
-#include "Containers/Tuple.hpp"
-#include "ECS/EComponentStatus.hpp"
-#include "Types/FundamentalTypes.hpp"
-#include "Containers/Layout/DataLayoutItem.hpp"
+#include "Containers/Vector.hpp"
+#include "Containers/SOA/DataLayoutItem.hpp"
+
+#include "ECS/EComponentItemStatus.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename... TTypes>
-class ComponentItemBase : DataLayoutItem<TTypes..., EComponentStatus>
+/**
+ * \brief This class implements what every component item should have. ie: A status, helper methods, etc...
+ * \tparam TTypes Item types
+ */
+template <typename... TTypes>
+class ComponentItemBase : public DataLayoutItem<Vector, TTypes..., EComponentItemStatus>
 {
-    protected:
+    // Default constructor
+    ComponentItemBase(TTypes&&... in_data) noexcept:
+        DataLayoutItem<Vector, TTypes..., EComponentItemStatus>(std::forward<TTypes>(in_data)..., EComponentItemStatus::Enabled)
+    {}
 
-        template<DAEsize TIndex>
-        constexpr auto& Get()       { return std::get<TIndex>(*this); }
-
-        template<DAEsize TIndex>
-        constexpr auto& Get() const { return std::get<TIndex>(*this); }
-
-    public:
-
-        // Constructors
-        using Tuple<TTypes...>::tuple;
-
-        /**
-         * \brief Component status getter/setter
-         * \return Component status
-         */
-        auto& GetComponentStatus()       { return std::get<std::tuple_size_v<Tuple<TTypes...>> - 1> (*this); }
-        auto  GetComponentStatus() const { return std::get<std::tuple_size_v<Tuple<TTypes...>> - 1> (*this); }
+    // Exposing constructors
+    using DataLayoutItem<Vector, TTypes..., EComponentItemStatus>::DataLayoutItem;
+    using DataLayoutItem<Vector, TTypes..., EComponentItemStatus>::operator=;
 };
 
 END_DAEMON_NAMESPACE

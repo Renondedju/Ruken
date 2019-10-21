@@ -25,63 +25,44 @@
 #pragma once
 
 #include "Config.hpp"
-
-#include "ECS/ComponentID.hpp"
-
-#include "Containers/Vector.hpp"
-#include "Containers/Layout/BaseLayoutContainer.hpp"
-
-#include "Functional/ReservedEvent.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-template<typename TComponentItem>
-class Component
+/**
+ * \brief This class only purpose is to implement the type id iterator method
+ */
+class ComponentTypeIdIterator
 {
-    private:
-
-        #pragma region Variables
-
-        BaseLayoutContainer<Vector, EDataLayout::StructureOfArrays, typename TComponentItem::Layout> m_storage;
-
-        #pragma endregion
-
     public:
-
-        #pragma region Events
-
-        /**
-         * \brief On component deletion event
-         * \param Array of all the deleted component IDs
-         */
-        DAEMON_DECLARE_RESERVED_EVENT(OnDeleteEvent, Component, Vector<ComponentID>);
-        OnDeleteEvent on_delete;
-
-        #pragma endregion
-
-    protected:
 
         #pragma region Constructors
 
-        Component()                         noexcept = default;
-        Component(Component const& in_copy) noexcept = default;
-        Component(Component&&      in_move) noexcept = default;
-        ~Component()                        noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        DAEvoid DeleteUnusedComponents() noexcept;
+        ComponentTypeIdIterator()                                       noexcept = default;
+        ComponentTypeIdIterator(ComponentTypeIdIterator const& in_copy) noexcept = default;
+        ComponentTypeIdIterator(ComponentTypeIdIterator&&      in_move) noexcept = default;
+        ~ComponentTypeIdIterator()                                      noexcept = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        Component& operator=(Component const& in_copy) noexcept = default;
-        Component& operator=(Component&&      in_move) noexcept = default;
+        ComponentTypeIdIterator& operator=(ComponentTypeIdIterator const& in_copy) noexcept = default;
+        ComponentTypeIdIterator& operator=(ComponentTypeIdIterator&&      in_move) noexcept = default;
 
         #pragma endregion
+
+    protected:
+
+        #pragma region Methods
+
+        /**
+         * \brief Iterates over an ID for each call of the method
+         * \return Unique ID
+         */
+        static DAEsize IdIterator() noexcept;
+
+        #pragma endregion 
 };
 
 END_DAEMON_NAMESPACE

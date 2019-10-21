@@ -22,17 +22,12 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "ECS/ComponentTypeIdIterator.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
-
-enum class EComponentStatus
+DAEsize ComponentTypeIdIterator::IdIterator() noexcept
 {
-    Enabled,
-    Disabled,
-    Deleted
-};
-
-END_DAEMON_NAMESPACE
+    static DAEsize id = 0;
+    return id++;
+}

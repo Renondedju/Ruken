@@ -25,54 +25,21 @@
 #pragma once
 
 #include "Config.hpp"
-
 #include "Types/FundamentalTypes.hpp"
-
-#include "ECS/ComponentID.hpp"
-
-#include "Containers/Vector.hpp"
-#include "Containers/Tuple.hpp"
-#include "Containers/Array.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-template <typename... TRequiredComponents>
-class __declspec(novtable) System
+/**
+ * Component Item Status enum
+ * Enabled  => The component item is enabled and currently in use by systems
+ * Disabled => The component item is disabled for now but might be enabled back later to be used at any moment
+ * Unused   => The component item is marked for deletion and isn't used anymore
+ */
+enum class EComponentItemStatus : DAEuint8
 {
-    protected:
-
-        #pragma region Members
-
-        // Array of all subscribed components
-        Vector<Array<ComponentID, sizeof...(TRequiredComponents)>> m_subscribers;
-        Tuple<TRequiredComponents& ...>                            m_components;
-
-        #pragma endregion 
-
-    public:
-
-        #pragma region Constructors
-
-        System()                      noexcept = default;
-        System(System const& in_copy) noexcept = default;
-        System(System&&	     in_move) noexcept = default;
-        virtual ~System()             noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        virtual void Update(DAEfloat in_delta_time) = 0;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        System& operator=(System const& in_copy) noexcept = default;
-        System& operator=(System&&	    in_move) noexcept = default;
-
-        #pragma endregion
+    Enabled,
+    Disabled,
+    Unused
 };
-
 
 END_DAEMON_NAMESPACE

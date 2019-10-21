@@ -281,12 +281,10 @@
     <ClInclude Include="Source\Include\Debug\Logging\LogRecord.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
-    <ClInclude Include="Source\Include\ECS\Component.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentID.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemBase.hpp" />
-    <ClInclude Include="Source\Include\ECS\EComponentStatus.hpp" />
-    <ClInclude Include="Source\Include\ECS\Entity.hpp" />
-    <ClInclude Include="Source\Include\ECS\System.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentTypeIdIterator.hpp" />
+    <ClInclude Include="Source\Include\ECS\EComponentItemStatus.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
@@ -383,6 +381,7 @@
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
+    <None Include="Source\Src\ECS\ComponentBase.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
@@ -403,6 +402,7 @@
     <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\LogRecord.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
+    <ClCompile Include="Source\Src\ECS\ComponentTypeIdIterator.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />

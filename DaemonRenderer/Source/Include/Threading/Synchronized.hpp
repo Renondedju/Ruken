@@ -74,7 +74,7 @@ class Synchronized
         #pragma region Variables
 
         mutable std::shared_mutex m_mutex;
-        TType                      m_value;
+        TType                     m_value;
 
         #pragma endregion
 
@@ -90,10 +90,10 @@ class Synchronized
         template <typename ...TArgs, typename = std::enable_if_t<std::is_constructible_v<TType, TArgs...>>>
         Synchronized(TArgs... in_args);
 
-        Synchronized()                                noexcept;
-        Synchronized(Synchronized const& in_copy)    noexcept;
-        Synchronized(Synchronized&&         in_move)    noexcept;
-        ~Synchronized()                                noexcept = default;
+        Synchronized()                            noexcept;
+        Synchronized(Synchronized const& in_copy) noexcept;
+        Synchronized(Synchronized&&      in_move) noexcept;
+        ~Synchronized()                           noexcept = default;
 
         #pragma endregion
 
@@ -111,7 +111,7 @@ class Synchronized
         #pragma region Operators
 
         Synchronized& operator=(Synchronized const& in_copy) noexcept = default;
-        Synchronized& operator=(Synchronized&&        in_move) noexcept = default;
+        Synchronized& operator=(Synchronized&&      in_move) noexcept = default;
 
         #pragma endregion
 };

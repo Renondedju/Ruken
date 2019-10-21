@@ -22,44 +22,17 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
-#include "Config.hpp"
-
-#include "Types/Operators/Arithmetic/Increment.hpp"
-#include "Types/Operators/Comparison.hpp"
-#include "Types/FundamentalTypes.hpp"
-#include "Types/NamedType.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief Strong typing of a component ID
- */
-class ComponentID : public NamedType<DAEsize, ComponentID>,
-                    public Comparison<ComponentID>
+template <typename TItem>
+DAEsize ComponentBase<TItem>::TypeId() noexcept
 {
-    using Parent = NamedType<DAEsize, ComponentID>;
+    static std::size_t type = IdIterator();
+    return type;
+}
 
-    public:
+template <typename TItem>
+typename ComponentBase<TItem>::ItemId ComponentBase<TItem>::CreateItem(TItem&& in_item)
+{
+    Layout::PushBack(m_storage, std::forward<TItem>(in_item));
 
-        #pragma region Constructors
-
-        ComponentID()                           noexcept = default;
-        ComponentID(ComponentID const& in_copy) noexcept = default;
-        ComponentID(ComponentID&&      in_move) noexcept = default;
-        ~ComponentID()                          noexcept = default;
-
-        using Parent::Parent;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        ComponentID& operator=(ComponentID const& in_copy) noexcept = default;
-        ComponentID& operator=(ComponentID&&      in_move) noexcept = default;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+    return ItemId(Layout::Size(m_storage) - 1);
+}
