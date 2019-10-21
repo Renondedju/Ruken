@@ -24,14 +24,36 @@
 
 #pragma once
 
+#include <tuple>
+
 #include "Config.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-enum class EDataLayout
+#pragma region Forward declarations
+
+template <template <typename> class TContainer, typename... TLayoutTypes>
+class DataLayout;
+
+template <class TSequence, typename... TTypes>
+struct DataLayoutView;
+
+#pragma endregion 
+
+/** 
+ * \brienf DataItem class
+ * This class is meant to describe a full data layout as well as implementing setters/getters
+ * This class also comes in handy for Item inheritance
+ */
+template <template <typename> typename TContainer, typename... TTypes>
+struct DataLayoutItem : public std::tuple<TTypes...>
 {
-    StructureOfArrays,
-    ArrayOfStructures
+    using Layout   = DataLayout<TContainer, TTypes...>;
+    using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
+
+    // Making constructors available
+    using std::tuple<TTypes...>::tuple;
+    using std::tuple<TTypes...>::operator=;
 };
 
 END_DAEMON_NAMESPACE

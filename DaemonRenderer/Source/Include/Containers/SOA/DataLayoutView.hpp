@@ -24,13 +24,36 @@
 
 #pragma once
 
+#include <tuple>
+
 #include "Config.hpp"
-#include "Containers/Tuple.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-template <typename... TTypes>
-struct DataLayoutItem : Tuple<TTypes...>
-{};
+/**
+ * Data layout view class
+ * 
+ * This class is used to fetch only certain fields when using DataLayout::Get
+ * \see DataLayout::Get
+ */
+template <class TSequence, typename... TTypes>
+struct DataLayoutView : public std::tuple<TTypes...>
+{
+    using Sequence = TSequence;
+
+    // Making constructors available
+    using std::tuple<TTypes...>::tuple;
+    using std::tuple<TTypes...>::operator=;
+};
+
+template <template <std::size_t...> class TSequence, typename... TTypes, std::size_t... TIndices>
+struct DataLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTypes...>
+{
+    using Sequence = TSequence<TIndices...>;
+
+    // Making constructors available
+    using std::tuple<TTypes...>::tuple;
+    using std::tuple<TTypes...>::operator=;
+};
 
 END_DAEMON_NAMESPACE
