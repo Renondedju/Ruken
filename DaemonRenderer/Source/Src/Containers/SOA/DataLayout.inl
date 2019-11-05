@@ -73,7 +73,7 @@ constexpr DAEvoid DataLayout<TContainer, TLayoutTypes...>::PushBack(
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
 constexpr DAEsize DataLayout<TContainer, TLayoutTypes...>::Size(
-    ContainerType& in_container) noexcept
+    ContainerType const& in_container) noexcept
 {
     return std::get<0>(in_container).size();
 }

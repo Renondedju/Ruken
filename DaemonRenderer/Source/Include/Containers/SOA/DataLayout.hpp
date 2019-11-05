@@ -48,10 +48,10 @@ class DataLayout
 
         #pragma region Constructors
 
-        DataLayout()                          noexcept = default;
-        DataLayout(DataLayout const& in_copy) noexcept = default;
-        DataLayout(DataLayout&&      in_move) noexcept = default;
-        ~DataLayout()                         noexcept = default;
+        DataLayout()                          = default;
+        DataLayout(DataLayout const& in_copy) = default;
+        DataLayout(DataLayout&&      in_move) = default;
+        ~DataLayout()                         = default;
 
         #pragma endregion 
 
@@ -91,8 +91,8 @@ class DataLayout
 
         #pragma region Operators
 
-        DataLayout& operator=(DataLayout const& in_copy) noexcept = default;
-        DataLayout& operator=(DataLayout&&      in_move) noexcept = default;
+        DataLayout& operator=(DataLayout const& in_copy) = default;
+        DataLayout& operator=(DataLayout&&      in_move) = default;
 
         #pragma endregion
 
@@ -131,7 +131,7 @@ class DataLayout
          * \param in_container Container instance
          * \return Container size
          */
-        constexpr static DAEsize Size(ContainerType& in_container) noexcept;
+        constexpr static DAEsize Size(ContainerType const& in_container) noexcept;
 
         #pragma endregion 
 };
