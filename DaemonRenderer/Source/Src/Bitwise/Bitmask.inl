@@ -34,7 +34,7 @@ template <typename... TData, typename>
 constexpr Bitmask<TEnum_Type>::Bitmask(TData... in_data) noexcept:
     m_data {static_cast<UnderlyingType>(0)}
 {
-    m_data = ((1 << static_cast<UnderlyingType>(in_data)) | ...);
+    m_data = ((1i64 << static_cast<UnderlyingType>(in_data)) | ...);
 }
 
 template <typename TEnum_Type>
@@ -77,7 +77,7 @@ template <typename TEnum_Type>
 template <typename... TData, typename>
 constexpr DAEvoid Bitmask<TEnum_Type>::Add(TData... in_data) noexcept
 {
-    m_data |= ((1 << static_cast<UnderlyingType>(in_data)) | ...);
+    m_data |= ((1i64 << static_cast<UnderlyingType>(in_data)) | ...);
 }
 
 template<typename TEnum_Type>
@@ -90,7 +90,7 @@ template <typename TEnum_Type>
 template <typename... TData, typename>
 constexpr DAEvoid Bitmask<TEnum_Type>::Remove(TData... in_data) noexcept
 {
-    m_data &= static_cast<UnderlyingType>(~(((1 << static_cast<UnderlyingType>(in_data))) | ...));
+    m_data &= static_cast<UnderlyingType>(~(((1i64 << static_cast<UnderlyingType>(in_data))) | ...));
 }
 
 template <typename TEnum_Type>
@@ -125,7 +125,7 @@ template <typename TLambda_Type>
 constexpr DAEvoid Bitmask<TEnum_Type>::Foreach(TLambda_Type in_lambda) const noexcept
 {
     for (DAEint16 index = 0; index < sizeof(UnderlyingType) * 8; index++)
-        if ((1 << index) & m_data)
+        if ((1i64 << index) & m_data)
             in_lambda(static_cast<TEnum_Type>(index));
 }
 
@@ -148,7 +148,7 @@ constexpr typename Bitmask<TEnum_Type>::UnderlyingType& Bitmask<TEnum_Type>::Dat
 template<typename TEnum_Type>
 constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator+ (TEnum_Type const& in_bit) const noexcept
 {
-    return Bitmask<TEnum_Type>(m_data | (1 << static_cast<UnderlyingType>(in_bit)));
+    return Bitmask<TEnum_Type>(m_data | (1i64 << static_cast<UnderlyingType>(in_bit)));
 }
 
 template<typename TEnum_Type>
@@ -167,14 +167,14 @@ constexpr Bitmask<TEnum_Type>& Bitmask<TEnum_Type>::operator+=(Bitmask<TEnum_Typ
 template<typename TEnum_Type>
 constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator+=(TEnum_Type const& in_bit) noexcept
 {
-    m_data |= 1 << static_cast<UnderlyingType>(in_bit);
+    m_data |= 1i64 << static_cast<UnderlyingType>(in_bit);
     return *this;
 }
 
 template<typename TEnum_Type>
 constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator- (TEnum_Type const& in_bit) const noexcept
 {
-    return Bitmask<TEnum_Type>(m_data - (1 << static_cast<UnderlyingType>(in_bit)));
+    return Bitmask<TEnum_Type>(m_data - (1i64 << static_cast<UnderlyingType>(in_bit)));
 }
 
 template<typename TEnum_Type>
@@ -186,7 +186,7 @@ constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator- (Bitmask<TEnum_Type
 template<typename TEnum_Type>
 constexpr Bitmask<TEnum_Type>& Bitmask<TEnum_Type>::operator-=(TEnum_Type const& in_bit) noexcept
 {
-    m_data &= ~(1 << static_cast<UnderlyingType>(in_bit));
+    m_data &= ~(1i64 << static_cast<UnderlyingType>(in_bit));
 
     return *this;
 }
@@ -214,7 +214,7 @@ std::ostream& operator<<(std::ostream& out_stream, Bitmask<TEnum_Type> const& in
         if ((i + 1) % 4 == 0)
             out_stream << ' ';
 
-        out_stream << ((static_cast<typename Bitmask<TEnum_Type>::UnderlyingType>((1 << i)) & in_bitmask.Data()) ? '1' : '0');
+        out_stream << ((static_cast<typename Bitmask<TEnum_Type>::UnderlyingType>((1i64 << i)) & in_bitmask.Data()) ? '1' : '0');
     }
 
     return out_stream;
