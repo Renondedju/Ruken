@@ -26,29 +26,18 @@
 
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
+#include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief This class only purpose is to implement the type id iterator method
- */
-class ComponentTypeIdIterator
+class ComponentSystemBase
 {
-    public:
+    private:
 
-        #pragma region Constructors
+        #pragma region Mebers
 
-        ComponentTypeIdIterator()                                       = default;
-        ComponentTypeIdIterator(ComponentTypeIdIterator const& in_copy) = default;
-        ComponentTypeIdIterator(ComponentTypeIdIterator&&      in_move) = default;
-        ~ComponentTypeIdIterator()                                      = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        ComponentTypeIdIterator& operator=(ComponentTypeIdIterator const& in_copy) = default;
-        ComponentTypeIdIterator& operator=(ComponentTypeIdIterator&&      in_move) = default;
+        DAEbool              m_enabled;
+        ArchetypeFingerprint m_target_fingerprint;
 
         #pragma endregion
 
@@ -57,12 +46,43 @@ class ComponentTypeIdIterator
         #pragma region Methods
 
         /**
-         * \brief Iterates over an ID for each call of the method
-         * \return Unique ID
+         * \brief Sets up the target fingerprint of the system
+         * \tparam TComponents Components of the system
          */
-        static DAEsize IdIterator() noexcept;
+        template <typename... TComponents>
+        DAEvoid SetupTargetFingerprint() noexcept;
 
-        #pragma endregion 
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors
+
+        ComponentSystemBase() noexcept;
+        ComponentSystemBase(ComponentSystemBase const& in_copy) = default;
+        ComponentSystemBase(ComponentSystemBase&&      in_move) = default;
+        ~ComponentSystemBase()                                  = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Returns the target archetype fingerprint required by the system
+         * \return Archetype fingerprint
+         */
+        ArchetypeFingerprint const& GetTargetFingerprint() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        ComponentSystemBase& operator=(ComponentSystemBase const& in_copy) = default;
+        ComponentSystemBase& operator=(ComponentSystemBase&&      in_move) = default;
+
+        #pragma endregion
 };
+
+#include "ECS/ComponentSystemBase.inl"
 
 END_DAEMON_NAMESPACE

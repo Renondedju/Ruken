@@ -272,19 +272,18 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
-    <ClInclude Include="Source\Include\Debug\Handlers\FileHandler.hpp" />
-    <ClInclude Include="Source\Include\Debug\Handlers\Handler.hpp" />
-    <ClInclude Include="Source\Include\Debug\Handlers\StreamHandler.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\LogFormatter.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\Logger.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\ELogLevel.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\LogRecord.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentItemBase.hpp" />
+    <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
+    <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
+    <ClInclude Include="Source\Include\ECS\Component.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentSystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentTypeIdIterator.hpp" />
     <ClInclude Include="Source\Include\ECS\EComponentItemStatus.hpp" />
+    <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
+    <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentSystem.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
@@ -381,7 +380,11 @@
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
-    <None Include="Source\Src\ECS\ComponentBase.inl" />
+    <None Include="Source\Src\ECS\Archetype.inl" />
+    <None Include="Source\Src\ECS\Component.inl" />
+    <None Include="Source\Src\ECS\ComponentSystem.inl" />
+    <None Include="Source\Src\ECS\ComponentSystemBase.inl" />
+    <None Include="Source\Src\ECS\EntityAdmin.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
@@ -396,13 +399,11 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Src\Debug\Handlers\FileHandler.cpp" />
-    <ClCompile Include="Source\Src\Debug\Handlers\Handler.cpp" />
-    <ClCompile Include="Source\Src\Debug\Handlers\StreamHandler.cpp" />
-    <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
-    <ClCompile Include="Source\Src\Debug\Logging\LogRecord.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
+    <ClCompile Include="Source\Src\ECS\ArchetypeFingerprint.cpp" />
+    <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentTypeIdIterator.cpp" />
+    <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />

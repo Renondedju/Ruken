@@ -24,34 +24,30 @@
 
 #pragma once
 
-#include <functional>
-
 #include "Config.hpp"
+
+#include "Containers/Vector.hpp"
+#include "Containers/SOA/DataLayoutItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This is a "decorated" std::reference_wrapper
- *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
+ * \brief This class implements what every component item should have. ie: A status, helper methods, etc...
+ * \tparam TTypes Item types
  */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+template <typename... TTypes>
+class ComponentItem : public DataLayoutItem<Vector, TTypes...>
 {
-    using std::reference_wrapper<TType>::operator TType&;
+    public:
 
-    ReferenceWrapper(TType& in_other);
+        // Default constructor
+        ComponentItem(TTypes&&... in_data) noexcept:
+            DataLayoutItem<Vector, TTypes...>(std::forward<TTypes>(in_data)...)
+        {}
 
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
+        // Exposing constructors
+        using DataLayoutItem<Vector, TTypes...>::DataLayoutItem;
+        using DataLayoutItem<Vector, TTypes...>::operator=;
 };
-
-#include "Meta/ReferenceWrapper.inl"
 
 END_DAEMON_NAMESPACE

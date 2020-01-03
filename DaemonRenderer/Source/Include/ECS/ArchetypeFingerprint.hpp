@@ -24,70 +24,60 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Config.hpp"
-#include "ECS/ComponentTypeIdIterator.hpp"
+#include "Bitwise/Bitmask.hpp"
+#include "Containers/Vector.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * Component base class.
- * This class is the actual component class used to store the items.
- * This class has to be instantiated in order to be used by a system.
- */
-template <typename TItem>
-class __declspec(novtable) ComponentBase : public ComponentTypeIdIterator
+class ArchetypeFingerprint
 {
     private:
 
+        enum class EFragmentContent : DAEsize
+        {};
+
         #pragma region Members
 
-        // Storage of the component
-        typename TItem::Layout::ContainerType m_storage;
+        Vector<Bitmask<EFragmentContent>> m_fingerprint;
 
-        #pragma endregion 
+        #pragma endregion
 
     public:
 
-        using Layout = typename TItem::Layout;
-        using Item   = TItem;
-        using ItemId = DAEsize;
-
         #pragma region Constructors
 
-        ComponentBase()                             noexcept = default;
-        ComponentBase(ComponentBase const& in_copy) noexcept = default;
-        ComponentBase(ComponentBase&&      in_move) noexcept = default;
-        ~ComponentBase()                            noexcept = default;
+        ArchetypeFingerprint()                                    = default;
+        ArchetypeFingerprint(ArchetypeFingerprint const& in_copy) = default;
+        ArchetypeFingerprint(ArchetypeFingerprint&&      in_move) = default;
+        ~ArchetypeFingerprint()                                   = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Returns the statically evaluated unique type id of the component
-         * \return Type id
+         * \brief Adds a trait to the current fingerprint. Duplicates will be skipped
+         * \param in_trait Trait to add
          */
-        static DAEsize TypeId() noexcept;
+        DAEvoid AddTrait(DAEsize in_trait) noexcept;
 
         /**
-         * \brief Creates an item into the component
-         * \param in_item item to push back
-         * \return Created item id
+         * \brief Checks if this fingerprint is a subset of another one
+         * \param in_other Other fingerprint
+         * \return True if this fingerprint is a subset of the other one, false otherwise
          */
-        ItemId CreateItem(TItem&& in_item);
+        DAEbool IsSubsetOf(ArchetypeFingerprint const& in_other) const noexcept;
 
-        #pragma endregion 
+        #pragma endregion
 
         #pragma region Operators
 
-        ComponentBase& operator=(ComponentBase const& in_copy) noexcept = default;
-        ComponentBase& operator=(ComponentBase&&      in_move) noexcept = default;
+        ArchetypeFingerprint& operator=(ArchetypeFingerprint const& in_copy) = default;
+        ArchetypeFingerprint& operator=(ArchetypeFingerprint&&      in_move) = default;
 
         #pragma endregion
 };
-
-#include "ECS/ComponentBase.inl"
 
 END_DAEMON_NAMESPACE

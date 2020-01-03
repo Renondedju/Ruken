@@ -22,36 +22,34 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include <algorithm>
 
-#include <functional>
+#include "ECS/ArchetypeFingerprint.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief This is a "decorated" std::reference_wrapper
- *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
- */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+DAEvoid ArchetypeFingerprint::AddTrait(DAEsize in_trait) noexcept
 {
-    using std::reference_wrapper<TType>::operator TType&;
+    DAEint64 const size    = sizeof(EFragmentContent) * 8Ui64;
+    DAEint64 const section = in_trait / size;
 
-    ReferenceWrapper(TType& in_other);
+    in_trait %= size;
 
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
-};
+    // Checking if the requested section is missing
+    for (int i = 0; (section + 1) - static_cast<DAEint64>(m_fingerprint.size()) > 0ll; ++i)
+        m_fingerprint.emplace_back(Bitmask<EFragmentContent>());
 
-#include "Meta/ReferenceWrapper.inl"
+    m_fingerprint[section].Add(static_cast<EFragmentContent>(in_trait));
+}
 
-END_DAEMON_NAMESPACE
+DAEbool ArchetypeFingerprint::IsSubsetOf(ArchetypeFingerprint const& in_other) const noexcept
+{
+    if (m_fingerprint.size() > in_other.m_fingerprint.size())
+        return false;
+
+    for (DAEsize index = 0; index < m_fingerprint.size(); ++index)
+        if (! in_other.m_fingerprint[index].HasAll(m_fingerprint[index]))
+            return false;
+
+    return true;    
+}

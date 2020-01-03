@@ -26,38 +26,58 @@
 
 #include "Config.hpp"
 
-#include "ECS/ComponentItemBase.hpp"
+#include "ECS/Archetype.hpp"
 #include "ECS/Component.hpp"
-#include "ECS/System.hpp"
+#include "ECS/ComponentItem.hpp"
+#include "ECS/ComponentSystem.hpp"
+#include "ECS/ArchetypeFingerprint.hpp"
 
 USING_DAEMON_NAMESPACE
 
-struct LifeComponentItem : public ComponentItemBase<DAEfloat, DAEfloat>
+struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
 {
     enum EMembers
     {
         Life,
         MaxLife
     };
+    
+    auto&       GetLife()       { return std::get<Life>(*this); }
+    auto const& GetLife() const { return std::get<Life>(*this); }
 
-    auto&       GetLife()       { return Get<Life>(); }
-    auto const& GetLife() const { return Get<Life>(); }
-
-    auto&       GetMaxLife()       { return Get<MaxLife>(); }
-    auto const& GetMaxLife() const { return Get<MaxLife>(); }
+    auto&       GetMaxLife()       { return std::get<MaxLife>(*this); }
+    auto const& GetMaxLife() const { return std::get<MaxLife>(*this); }
 };
+
+struct PositionComponentItem : public ComponentItem<DAEfloat, DAEfloat, DAEfloat>
+{
+    enum EMembers { X, Y, Z };
+    
+    auto&       GetX()       { return std::get<X>(*this); }
+    auto const& GetX() const { return std::get<X>(*this); }
+
+    auto&       GetY()       { return std::get<Y>(*this); }
+    auto const& GetY() const { return std::get<Y>(*this); }
+
+    auto&       GetZ()       { return std::get<Z>(*this); }
+    auto const& GetZ() const { return std::get<Z>(*this); }
+};
+
+using LifeComponent     = Component<LifeComponentItem>;
+using PositionComponent = Component<PositionComponentItem>;
 
 int main()
 {
-    BaseLayoutContainer<Vector, EDataLayout::StructureOfArrays, LifeComponentItem> container(1000);
+    ArchetypeFingerprint fingerprint;
 
-    for (auto& life: container)
-	{
-        life.GetLife           () = 13.0f;
-        life.GetComponentStatus() = EComponentStatus::Enabled;
-	}
+    fingerprint.AddTrait(LifeComponent::TypeId());
+    fingerprint.AddTrait(PositionComponent::TypeId());
 
-    system("pause");
-    
+    Archetype<LifeComponent, PositionComponent> archetype;
+    ComponentSystem<LifeComponent>              life_system;
+
+    for (int i = 0; i < 200; ++i)
+        archetype.CreateEntity();
+
     return EXIT_SUCCESS;
 }

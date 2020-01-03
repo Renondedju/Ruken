@@ -22,32 +22,16 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "ECS/ComponentSystemBase.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-#include "Containers/Vector.hpp"
-#include "Containers/SOA/DataLayoutItem.hpp"
+ComponentSystemBase::ComponentSystemBase() noexcept:
+    m_enabled            {true},
+    m_target_fingerprint {}
+{}
 
-#include "ECS/EComponentItemStatus.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief This class implements what every component item should have. ie: A status, helper methods, etc...
- * \tparam TTypes Item types
- */
-template <typename... TTypes>
-class ComponentItemBase : public DataLayoutItem<Vector, TTypes..., EComponentItemStatus>
+ArchetypeFingerprint const& ComponentSystemBase::GetTargetFingerprint() const noexcept
 {
-    // Default constructor
-    ComponentItemBase(TTypes&&... in_data) noexcept:
-        DataLayoutItem<Vector, TTypes..., EComponentItemStatus>(std::forward<TTypes>(in_data)..., EComponentItemStatus::Enabled)
-    {}
-
-    // Exposing constructors
-    using DataLayoutItem<Vector, TTypes..., EComponentItemStatus>::DataLayoutItem;
-    using DataLayoutItem<Vector, TTypes..., EComponentItemStatus>::operator=;
-};
-
-END_DAEMON_NAMESPACE
+    return m_target_fingerprint;
+}

@@ -24,34 +24,53 @@
 
 #pragma once
 
-#include <functional>
-
 #include "Config.hpp"
+#include "Containers/Vector.hpp"
+#include "ECS/ComponentSystemBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief This is a "decorated" std::reference_wrapper
- *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
- */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+class __declspec(novtable) EntityAdmin
 {
-    using std::reference_wrapper<TType>::operator TType&;
+    private:
 
-    ReferenceWrapper(TType& in_other);
+        Vector<ComponentSystemBase> m_systems;
 
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
+    public:
+
+        #pragma region Constructors
+
+        EntityAdmin()                           = default;
+        EntityAdmin(EntityAdmin const& in_copy) = default;
+        EntityAdmin(EntityAdmin&&      in_move) = default;
+        ~EntityAdmin()                          = default;
+
+        #pragma endregion
+
+        #pragma region Constructors
+
+        /**
+         * \brief 
+         * \tparam TSystem 
+         */
+        template <typename TSystem>
+        DAEvoid PushSystem() noexcept;
+
+        /**
+         * \brief Updates every system
+         */
+        DAEvoid UpdateSystems() noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        EntityAdmin& operator=(EntityAdmin const& in_copy) = default;
+        EntityAdmin& operator=(EntityAdmin&&      in_move) = default;
+
+        #pragma endregion
 };
 
-#include "Meta/ReferenceWrapper.inl"
+#include "ECS/EntityAdmin.inl"
 
 END_DAEMON_NAMESPACE

@@ -22,36 +22,8 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
-#include <functional>
-
-#include "Config.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief This is a "decorated" std::reference_wrapper
- *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
- */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+template <typename TSystem>
+DAEvoid EntityAdmin::PushSystem() noexcept
 {
-    using std::reference_wrapper<TType>::operator TType&;
-
-    ReferenceWrapper(TType& in_other);
-
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
-};
-
-#include "Meta/ReferenceWrapper.inl"
-
-END_DAEMON_NAMESPACE
+    m_systems.emplace_back(TSystem());
+}

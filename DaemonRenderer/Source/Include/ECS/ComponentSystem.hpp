@@ -24,34 +24,43 @@
 
 #pragma once
 
-#include <functional>
-
 #include "Config.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "ECS/ComponentSystemBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief This is a "decorated" std::reference_wrapper
- *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
- */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+template <typename... TComponents>
+class ComponentSystem : public ComponentSystemBase
 {
-    using std::reference_wrapper<TType>::operator TType&;
+    public:
 
-    ReferenceWrapper(TType& in_other);
+        #pragma region Constructors
 
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
+        ComponentSystem() noexcept;
+        ComponentSystem(ComponentSystem const& in_copy) = default;
+        ComponentSystem(ComponentSystem&&      in_move) = default;
+        virtual ~ComponentSystem()                      = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /*
+        virtual DAEvoid OnUpdate() const noexcept = 0;
+        virtual DAEvoid OnQuery () const noexcept = 0;
+        */
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        ComponentSystem& operator=(ComponentSystem const& in_copy) = default;
+        ComponentSystem& operator=(ComponentSystem&&      in_move) = default;
+
+        #pragma endregion
 };
 
-#include "Meta/ReferenceWrapper.inl"
+#include "ECS/ComponentSystem.inl"
 
 END_DAEMON_NAMESPACE

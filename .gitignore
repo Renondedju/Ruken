@@ -41,3 +41,4 @@ ipch
 *.mp3
 *.wav
 *.ogg
+_ReSharper.Caches

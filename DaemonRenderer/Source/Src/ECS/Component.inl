@@ -22,36 +22,31 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
-#include <functional>
-
-#include "Config.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief This is a "decorated" std::reference_wrapper
- *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
- */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+template <typename TItem>
+DAEsize Component<TItem>::TypeId() noexcept
 {
-    using std::reference_wrapper<TType>::operator TType&;
+    static DAEsize type = IdIterator();
+    return type;
+}
 
-    ReferenceWrapper(TType& in_other);
+template <typename TItem>
+typename Component<TItem>::ItemId Component<TItem>::CreateItem(TItem&& in_item)
+{
+    Layout::PushBack(m_storage, std::forward<TItem>(in_item));
 
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
-};
+    return ItemId(Layout::Size(m_storage) - 1);
+}
 
-#include "Meta/ReferenceWrapper.inl"
+template <typename TItem>
+typename Component<TItem>::ItemId Component<TItem>::CreateItem()
+{
+    Layout::PushBack(m_storage, std::forward<TItem>(TItem{}));
 
-END_DAEMON_NAMESPACE
+    return ItemId(Layout::Size(m_storage) - 1);
+}
+
+template <typename TItem>
+DAEsize Component<TItem>::GetItemCount() const noexcept
+{
+    return Layout::Size(m_storage);
+}

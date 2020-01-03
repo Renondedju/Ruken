@@ -24,34 +24,31 @@
 
 #pragma once
 
-#include <functional>
-
 #include "Config.hpp"
+
+#include "Types/NamedType.hpp"
+#include "Types/Operators/Comparison.hpp"
+#include "Types/Operators/Arithmetic/Decrement.hpp"
+#include "Types/Operators/Arithmetic/Increment.hpp"
+
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This is a "decorated" std::reference_wrapper
+ * \brief Entity ID class. This class is actually a strong typing of the DAEsize type
  *
- * This struct is used for the SOA implementation of the engine which can be found in Containers/Layout
- *
- * \tparam TType Wrapped type
+ * And entity ID is constant and valid for the whole application lifetime
+ * or until the attached entity is deleted or moved into another archetype
+ * (which should almost only happen when a scene is deleted/reloaded/loaded or
+ * in the context of a non runtime app like an editor)
  */
-template<typename TType>
-struct ReferenceWrapper : public std::reference_wrapper<TType>
+struct EntityID : public NamedType <DAEsize, EntityID>,
+                  public Comparison<EntityID>,
+                  public Decrement <EntityID>,
+                  public Increment <EntityID>
 {
-    using std::reference_wrapper<TType>::operator TType&;
-
-    ReferenceWrapper(TType& in_other);
-
-    /**
-	 * \brief Assignment operator
-	 * \param in_other Passed value
-	 * \return Wrapper instance
-	 */
-    ReferenceWrapper& operator=(TType&& in_other);
+    using NamedType::NamedType;
 };
-
-#include "Meta/ReferenceWrapper.inl"
 
 END_DAEMON_NAMESPACE

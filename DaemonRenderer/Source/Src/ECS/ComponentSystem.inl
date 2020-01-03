@@ -22,17 +22,8 @@
  *  SOFTWARE.
  */
 
-template <typename TItem>
-DAEsize ComponentBase<TItem>::TypeId() noexcept
+template <typename ... TComponents>
+ComponentSystem<TComponents...>::ComponentSystem() noexcept
 {
-    static std::size_t type = IdIterator();
-    return type;
-}
-
-template <typename TItem>
-typename ComponentBase<TItem>::ItemId ComponentBase<TItem>::CreateItem(TItem&& in_item)
-{
-    Layout::PushBack(m_storage, std::forward<TItem>(in_item));
-
-    return ItemId(Layout::Size(m_storage) - 1);
+    SetupTargetFingerprint<TComponents...>();
 }
