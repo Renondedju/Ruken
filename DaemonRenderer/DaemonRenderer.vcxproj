@@ -272,6 +272,13 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
+    <ClInclude Include="Source\Include\Debug\Handlers\FileHandler.hpp" />
+    <ClInclude Include="Source\Include\Debug\Handlers\Handler.hpp" />
+    <ClInclude Include="Source\Include\Debug\Handlers\StreamHandler.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\ELogLevel.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\LogFormatter.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\Logger.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\LogRecord.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
@@ -399,6 +406,11 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Debug\Handlers\FileHandler.cpp" />
+    <ClCompile Include="Source\Src\Debug\Handlers\Handler.cpp" />
+    <ClCompile Include="Source\Src\Debug\Handlers\StreamHandler.cpp" />
+    <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
+    <ClCompile Include="Source\Src\Debug\Logging\LogRecord.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
     <ClCompile Include="Source\Src\ECS\ArchetypeFingerprint.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
