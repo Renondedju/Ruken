@@ -1,0 +1,3 @@
+[submodule "PotatoMaths"]
+	path = PotatoMaths
+	url = https://github.com/Renondedju/PotatoMaths.git
