@@ -1,14 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DaemonRenderer", "DaemonRenderer\DaemonRenderer.vcxproj", "{91B56EA1-6D82-4200-A859-EF487BB0B39A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB} = {407B4D74-CC7D-4637-8F69-F037E7178CCB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PotatoMaths", "PotatoMaths\PotatoMaths\PotatoMaths\PotatoMaths.vcxproj", "{407B4D74-CC7D-4637-8F69-F037E7178CCB}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -20,21 +22,36 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x64.ActiveCfg = Debug|x64
 		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x64.Build.0 = Debug|x64
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x86.ActiveCfg = Debug|Win32
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x86.Build.0 = Debug|Win32
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x64.ActiveCfg = Release|x64
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x64.Build.0 = Release|x64
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x86.ActiveCfg = Release|Win32
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x86.Build.0 = Release|Win32
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x64.ActiveCfg = Shipping|x64
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x64.Build.0 = Shipping|x64
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x86.ActiveCfg = Shipping|Win32
-		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x86.Build.0 = Shipping|Win32
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x86.ActiveCfg = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x86.Build.0 = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x64.ActiveCfg = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x64.Build.0 = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x86.ActiveCfg = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x86.Build.0 = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x64.ActiveCfg = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x64.Build.0 = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x86.ActiveCfg = Debug|x64
+		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Shipping|x86.Build.0 = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Debug|x64.ActiveCfg = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Debug|x64.Build.0 = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Debug|x86.ActiveCfg = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Debug|x86.Build.0 = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Release|x64.ActiveCfg = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Release|x64.Build.0 = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Release|x86.ActiveCfg = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Release|x86.Build.0 = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Shipping|x64.ActiveCfg = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Shipping|x64.Build.0 = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Shipping|x86.ActiveCfg = Debug|x64
+		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Shipping|x86.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {885F8271-DD61-4F64-B566-F7D4179F0457}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

@@ -32,6 +32,8 @@
 #include "ECS/ComponentSystem.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
+#include "Vector/Vector.hpp"
+
 USING_DAEMON_NAMESPACE
 
 struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
@@ -79,5 +81,7 @@ int main()
     for (int i = 0; i < 200; ++i)
         archetype.CreateEntity();
 
+    system("pause");
+	
     return EXIT_SUCCESS;
 }

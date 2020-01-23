@@ -51,9 +51,9 @@ DAEvoid StreamHandler::Close() noexcept
 
 DAEvoid StreamHandler::Handle(LogRecord&& in_log_record) noexcept
 {
-	LogRecordsWriteAccess log_records(m_log_records);
+	/*LogRecordsWriteAccess log_records(m_log_records);
 
-	log_records->emplace(in_log_record);
+	log_records->emplace(in_log_record);*/
 }
 
 DAEvoid StreamHandler::Emit(LogRecord&& in_log_record) const noexcept
