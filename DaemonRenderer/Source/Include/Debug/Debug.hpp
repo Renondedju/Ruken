@@ -22,43 +22,19 @@
  *  SOFTWARE.
  */
 
-#include "Threading/SynchronizedAccess.hpp"
+#pragma once
 
-#include "Debug/Handlers/StreamHandler.hpp"
+#include "Config.hpp"
 
-USING_DAEMON_NAMESPACE
+#include "Types/Unique.hpp"
 
-#pragma region      Constructor
+#include "Logging/Logger.hpp"
 
-StreamHandler::StreamHandler(LogFormatter& in_formatter) noexcept : Handler(in_formatter)
+BEGIN_DAEMON_NAMESPACE
+
+class Debug : Unique
 {
-    
-}
 
-#pragma endregion   Constructor
+};
 
-#pragma region      Local Methods
-
-DAEvoid StreamHandler::Flush() noexcept
-{
-    
-}
-
-DAEvoid StreamHandler::Close() noexcept
-{
-    
-}
-
-DAEvoid StreamHandler::Handle(LogRecord&& in_log_record) noexcept
-{
-	/*LogRecordsWriteAccess log_records(m_log_records);
-
-	log_records->emplace(in_log_record);*/
-}
-
-DAEvoid StreamHandler::Emit(LogRecord&& in_log_record) const noexcept
-{
-    
-}
-
-#pragma endregion   Local Method
+END_DAEMON_NAMESPACE

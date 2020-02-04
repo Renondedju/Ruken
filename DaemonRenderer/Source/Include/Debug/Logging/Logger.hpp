@@ -24,12 +24,12 @@
 
 #pragma once
 
+#include "LogFilter.hpp"
+#include "LogRecord.hpp"
+#include "LogHandler.hpp"
+
 #include "Containers/String.hpp"
 #include "Containers/ForwardList.hpp"
-
-#include "Debug/Logging/LogRecord.hpp"
-
-#include "Debug/Handlers/Handler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -40,51 +40,176 @@ class Logger
 {
     private:
 
-        #pragma region      Members
-        
-		String                  m_name;
-		ELogLevel               m_level;
-		ForwardList<Handler*>   m_handlers;
+        #pragma region Members
 
-        #pragma endregion   Members
+        /**
+         * If this attribute evaluates to true, events logged to this logger will be passed to the handlers of higher level loggers,
+         * in addition to any handlers attached to this logger. Messages are passed directly to the ancestor loggersÅf handlers,
+         * neither the level nor filters of the ancestor loggers in question are considered.
+         *
+         * If this attribute evaluates to false, logging messages are not passed to the handlers of ancestor loggers.
+         */
+        DAEbool m_propagate;
+
+		String      m_name;
+		ELogLevel   m_level;
+        Logger*     m_parent;
+
+        ForwardList<LogFilter  const*> m_filters;
+        ForwardList<LogHandler const*> m_handlers;
+
+        #pragma endregion
 
     public:
 
-        #pragma region      Public Constructors and Destructor
+        #pragma region Constructors and Destructor
 
-		Logger(String const&    in_name) noexcept;
-		Logger(Logger const&    in_copy) noexcept = default;
-		Logger(Logger&&         in_move) noexcept = default;
+		Logger (String const&   in_name) noexcept;
+		Logger (Logger const&   in_copy) noexcept = default;
+		Logger (Logger&&        in_move) noexcept = default;
+		~Logger()                        noexcept = default;
 
-		~Logger() = default;
+        #pragma endregion
 
-        #pragma endregion   Public Constructors and Destructor
-
-        #pragma region      Public Operators
+        #pragma region Operators
 
 		Logger& operator=(Logger const& in_copy) noexcept = default;
 		Logger& operator=(Logger&&      in_move) noexcept = default;
 
-        #pragma endregion   Public Operators
+        #pragma endregion
 
-        #pragma region      Public Methods
+        #pragma region Methods
 
-		ELogLevel   GetLevel    ()                      const noexcept;
-		DAEvoid     SetLevel    (ELogLevel in_level)          noexcept;
-		DAEbool     IsEnabledFor(ELogLevel in_level)    const noexcept;
+        /**
+         * \brief Sets the threshold for this logger to the specified level.
+         *
+         * Logging messages which are less severe than level will be ignored;
+         * logging messages which have severity level or higher will be emitted by whichever handler or handlers service this logger,
+         * unless a handlerÅfs level has been set to a higher severity level than level.
+         *
+         * \param in_level The desired level.
+         */
+        DAEvoid SetLevel(ELogLevel in_level) noexcept;
 
-		DAEvoid Debug   (DAEchar const* in_message) noexcept;
-		DAEvoid Info    (DAEchar const* in_message) noexcept;
-		DAEvoid Warning (DAEchar const* in_message) noexcept;
-		DAEvoid Error   (DAEchar const* in_message) noexcept;
-		DAEvoid Fatal   (DAEchar const* in_message) noexcept;
+        /**
+         * \brief This method checks first the module's level set by Debug.Disable(in_level) and then the loggerÅfs effective level as determined by GetEffectiveLevel().
+         *
+         * \param in_level The level to check.
+         *
+         * \return True if a message of the specified level would be processed by this logger, else False.
+         */
+        DAEbool IsEnabledFor(ELogLevel in_level) const noexcept;
 
-		DAEvoid AddHandler      (Handler  * in_handler)         noexcept;
-		DAEvoid RemoveHandler   (Handler  * in_handler)         noexcept;
-		DAEbool Handle          (LogRecord const& in_record)          noexcept;
-		DAEbool HasHandlers     ()                              const noexcept;
+        /**
+         * If a value other than "NotSet" has been set using SetLevel(), it is returned.
+         * Otherwise, the hierarchy is traversed towards the root until a value other than "NotSet" is found, and that value is returned.
+         *
+         * \return The effective level for this logger.
+         */
+        ELogLevel GetEffectiveLevel() const noexcept;
 
-        #pragma endregion   Public Methods
+        /**
+         * \brief Logs a message with level "Debug" on this logger.
+         *
+         * \param in_message The message to log.
+         */
+        DAEvoid Debug(DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Logs a message with level "Info" on this logger.
+         *
+         * \param in_message The message to log.
+         */
+        DAEvoid Info(DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Logs a message with level "Warning" on this logger.
+         *
+         * \param in_message The message to log.
+         */
+        DAEvoid Warning(DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Logs a message with level "Error" on this logger.
+         *
+         * \param in_message The message to log.
+         */
+        DAEvoid Error(DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Logs a message with level "Fatal" on this logger.
+         *
+         * \param in_message The message to log.
+         */
+        DAEvoid Fatal(DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Adds the specified filter to this logger.
+         *
+         * \param in_filter The filter to add.
+         */
+        DAEvoid AddFilter(LogFilter const* in_filter);
+
+        /**
+         * \brief Removes the specified filter from this logger.
+         *
+         * \param in_filter The filter to remove.
+         */
+        DAEvoid RemoveFilter(LogFilter const* in_filter) noexcept;
+
+        /**
+         * \brief Apply this loggerÅfs filters to the record.
+         *
+         * The filters are consulted in turn, until one of them returns a false value.
+         * If none of them return a false value, the record will be processed (passed to handlers).
+         * If one returns a false value, no further processing of the record occurs.
+         *
+         * \param in_record The record to filter.
+         *
+         * \return True if the record is to be processed, else False.
+         */
+        DAEbool Filter(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \brief Adds the specified handler to this logger.
+         *
+         * \param in_handler The handler to add.
+         */
+        DAEvoid AddHandler(LogHandler const* in_handler);
+
+        /**
+         * \brief Removes the specified handler from this logger.
+         *
+         * \param in_handler The handler to remove.
+         */
+        DAEvoid RemoveHandler(LogHandler const* in_handler) noexcept;
+
+        /**
+         * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a false value of propagate is found).
+         *
+         * This method is used for unpickled records received from a socket, as well as those created locally.
+         *
+         * Logger-level filtering is applied using filter().
+         *
+         * \param in_record The record to filter.
+         *
+         * \return True if the record was handled, else False.
+         */
+        DAEbool Handle(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \brief Checks to see if this logger has any handlers configured.
+         *
+         * This is done by looking for handlers in this logger and its parents in the logger hierarchy.
+         *
+         * The method stops searching up the hierarchy whenever a logger with the 'propagate' attribute set to false is found,
+         * that will be the last logger which is checked for the existence of handlers.
+         *
+         * \return True if a handler was found, else False.
+         */
+        DAEbool HasHandlers() const noexcept;
+
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

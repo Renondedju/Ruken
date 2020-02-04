@@ -22,41 +22,6 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Debug/Debug.hpp"
 
-#include "Handler.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief This class sends logging output to streams.
- */
-class StreamHandler : public Handler
-{
-    public:
-
-        #pragma region      Constructor and Destructor
-
-		StreamHandler(LogFormatter& in_formatter) noexcept;
-
-        ~StreamHandler() = default;
-
-        #pragma endregion   Constructor and Destructor
-
-        #pragma region      Local Operators
-
-
-
-        #pragma endregion   Local Operators
-
-        #pragma region      Local Methods
-
-		DAEvoid Flush   ()                                noexcept override;
-		DAEvoid Close   ()                                noexcept override;
-		DAEvoid Handle  (LogRecord&& in_log_record)       noexcept override;
-		DAEvoid Emit    (LogRecord&& in_log_record) const noexcept override;
-
-        #pragma endregion   Local Methods
-};
-
-END_DAEMON_NAMESPACE
+USING_DAEMON_NAMESPACE

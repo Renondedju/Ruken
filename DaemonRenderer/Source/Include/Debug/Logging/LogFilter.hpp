@@ -24,14 +24,11 @@
 
 #pragma once
 
-#include "Handler.hpp"
+#include "ELogLevel.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief This class sends logging output to a disk file.
- */
-class FileHandler : public Handler
+class LogFilter
 {
 
 };

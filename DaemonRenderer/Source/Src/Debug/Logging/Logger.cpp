@@ -29,40 +29,54 @@ USING_DAEMON_NAMESPACE
 #pragma region      Public Constructor
 
 Logger::Logger(String const& in_name) noexcept :
+    m_propagate{true},
     m_name  { in_name },
-    m_level { ELogLevel::NotSet }
+    m_level { ELogLevel::NotSet },
+    m_parent {nullptr}
 {
     
 }
 
 #pragma endregion   Public Constructor
 
-#pragma region      Public Methods
+#pragma region Public Methods
 
-ELogLevel   Logger::GetLevel        () const noexcept
-{
-	return m_level;
-}
-
-DAEvoid     Logger::SetLevel        (ELogLevel in_level) noexcept
+DAEvoid Logger::SetLevel(ELogLevel const in_level) noexcept
 {
 	m_level = in_level;
 }
 
-DAEbool     Logger::IsEnabledFor    (ELogLevel in_level) const noexcept
+DAEbool Logger::IsEnabledFor(ELogLevel const in_level) const noexcept
 {
-	return m_level <= in_level;
+	return in_level >= GetEffectiveLevel();
 }
 
-DAEvoid     Logger::Debug           (DAEchar const* in_message) noexcept
+ELogLevel Logger::GetEffectiveLevel() const noexcept
 {
-	if (HasHandlers() && m_level <= ELogLevel::Debug)
+    Logger const* logger = this;
+
+    while (logger)
+    {
+        if (logger->m_level != ELogLevel::NotSet)
+        {
+            return logger->m_level;
+        }
+
+        logger = logger->m_parent;
+    }
+
+	return ELogLevel::NotSet;
+}
+
+DAEvoid Logger::Debug(DAEchar const* in_message) const noexcept
+{
+	if (m_level <= ELogLevel::Debug)
 	{
-		LogRecord record(m_level, m_name, in_message, "", "", 0);
+
 	}
 }
 
-DAEvoid     Logger::Info            (DAEchar const* in_message) noexcept
+DAEvoid Logger::Info(DAEchar const* in_message) const noexcept
 {
 	if (m_level <= ELogLevel::Info)
 	{
@@ -70,7 +84,7 @@ DAEvoid     Logger::Info            (DAEchar const* in_message) noexcept
 	}
 }
 
-DAEvoid     Logger::Warning         (DAEchar const* in_message) noexcept
+DAEvoid Logger::Warning(DAEchar const* in_message) const noexcept
 {
 	if (m_level <= ELogLevel::Warning)
 	{
@@ -78,7 +92,7 @@ DAEvoid     Logger::Warning         (DAEchar const* in_message) noexcept
 	}
 }
 
-DAEvoid     Logger::Error           (DAEchar const* in_message) noexcept
+DAEvoid Logger::Error(DAEchar const* in_message) const noexcept
 {
 	if (m_level <= ELogLevel::Error)
 	{
@@ -86,29 +100,81 @@ DAEvoid     Logger::Error           (DAEchar const* in_message) noexcept
 	}
 }
 
-DAEvoid     Logger::Fatal           (DAEchar const* in_message) noexcept
+DAEvoid Logger::Fatal(DAEchar const* in_message) const noexcept
 {
-
+    if (m_level <= ELogLevel::Fatal)
+    {
+        
+    }
 }
 
-DAEvoid     Logger::AddHandler      (Handler* in_handler) noexcept
+DAEvoid Logger::AddFilter(LogFilter const* in_filter)
+{
+    m_filters.push_front(in_filter);
+}
+
+DAEvoid Logger::RemoveFilter(LogFilter const* in_filter) noexcept
+{
+    m_filters.remove(in_filter);
+}
+
+DAEbool Logger::Filter(LogRecord const& in_record) const noexcept
+{
+    for (LogFilter const* filter : m_filters)
+    {
+        /** TODO Filtering the record. TODO */
+        if (filter)
+            return false;
+    }
+
+    return true;
+}
+
+DAEvoid Logger::AddHandler(LogHandler const* in_handler)
 {
 	m_handlers.push_front(in_handler);
 }
 
-DAEvoid     Logger::RemoveHandler   (Handler* in_handler) noexcept
+DAEvoid Logger::RemoveHandler(LogHandler const* in_handler) noexcept
 {
 	m_handlers.remove(in_handler);
 }
 
-DAEbool     Logger::Handle          (LogRecord const& in_record) noexcept
+DAEbool Logger::Handle(LogRecord const& in_record) const noexcept
 {
+    if (Filter(in_record))
+    {
+        Logger const* logger = this;
+
+	    while (logger)
+	    {
+            for (LogHandler const* handler : logger->m_handlers)
+            {
+                /** TODO Handling the record. TODO */
+            }
+
+            logger = logger->m_propagate ? logger->m_parent : nullptr;
+	    }
+
+        return true;
+    }
+
 	return false;
 }
 
-DAEbool     Logger::HasHandlers     () const noexcept
+DAEbool Logger::HasHandlers() const noexcept
 {
-	return !m_handlers.empty();
+    Logger const* logger = this;
+
+	while (logger)
+	{
+	    if (!logger->m_handlers.empty())
+            return true;
+
+        logger = logger->m_propagate ? logger->m_parent : nullptr;
+	}
+
+    return false;
 }
 
-#pragma endregion   Public Methods
+#pragma endregion

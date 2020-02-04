@@ -24,20 +24,18 @@
 
 #pragma once
 
-#include "Config.hpp"
-
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 enum class ELogLevel : DAEuint8
 {
-    NotSet,
-    Debug,
-    Info,
-    Warning,
-    Error,
-    Fatal
+    NotSet  = 0u,
+    Debug   = 10u,
+    Info    = 20u,
+    Warning = 30u,
+    Error   = 40u,
+    Fatal   = 50u
 };
 
 inline DAEchar const* ToString(ELogLevel const in_log_level)
@@ -57,7 +55,7 @@ inline DAEchar const* ToString(ELogLevel const in_log_level)
         case ELogLevel::Fatal:
             return "Fatal";
         default:
-            return "unknown";
+            return "Unknown";
     }
 }
 

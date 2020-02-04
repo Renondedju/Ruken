@@ -22,31 +22,22 @@
  *  SOFTWARE.
  */
 
-#include "Debug/Handlers/Handler.hpp"
+#include "Debug/Logging/LogHandler.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region      Constructor
+#pragma region Public Constructors
 
-Handler::Handler(LogFormatter& in_formatter) noexcept :
-    m_level     { ELogLevel::NotSet },
-    m_formatter { in_formatter }
+LogHandler::LogHandler(ELogLevel const in_level) noexcept :
+    m_level { in_level }
 {
     
 }
 
-#pragma endregion   Constructor
+#pragma endregion
 
-#pragma region      Local Methods
+#pragma region Public Methods
 
-DAEvoid Handler::SetLevel(ELogLevel const in_level) noexcept
-{
-	m_level = in_level;
-}
 
-DAEvoid Handler::SetFormatter(LogFormatter& in_formatter) const noexcept
-{
-	m_formatter = in_formatter;
-}
 
-#pragma endregion   Local Methods
+#pragma endregion
