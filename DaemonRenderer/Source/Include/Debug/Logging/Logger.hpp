@@ -24,9 +24,8 @@
 
 #pragma once
 
-#include "LogFilter.hpp"
-#include "LogRecord.hpp"
-#include "LogHandler.hpp"
+#include "Handlers/FileHandler.hpp"
+#include "Handlers/StreamHandler.hpp"
 
 #include "Containers/String.hpp"
 #include "Containers/ForwardList.hpp"
