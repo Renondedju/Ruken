@@ -28,35 +28,14 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-enum class ELogLevel : DAEuint8
+enum class ELogLevel : DAEint8
 {
-    NotSet  = 0u,
-    Debug   = 10u,
-    Info    = 20u,
-    Warning = 30u,
-    Error   = 40u,
-    Fatal   = 50u
+    NotSet  = 0,
+    Debug   = 10,
+    Info    = 20,
+    Warning = 30,
+    Error   = 40,
+    Fatal   = 50
 };
-
-inline DAEchar const* ToString(ELogLevel const in_log_level)
-{
-    switch (in_log_level)
-    {
-        case ELogLevel::NotSet:
-            return "NotSet";
-        case ELogLevel::Debug:
-            return "Debug";
-        case ELogLevel::Info:
-            return "Info";
-        case ELogLevel::Warning:
-            return "Warning";
-        case ELogLevel::Error:
-            return "Error";
-        case ELogLevel::Fatal:
-            return "Fatal";
-        default:
-            return "Unknown";
-    }
-}
 
 END_DAEMON_NAMESPACE

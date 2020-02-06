@@ -26,20 +26,21 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region      Public Constructor
-
-Logger::Logger(String const& in_name) noexcept :
-    m_propagate{true},
-    m_name  { in_name },
-    m_level { ELogLevel::NotSet },
-    m_parent {nullptr}
+Logger::Logger(String in_name) noexcept :
+    m_propagate { true },
+    m_parent    { nullptr },
+    m_name      { std::move(in_name) },
+    m_level     { ELogLevel::NotSet }
 {
     
 }
 
-#pragma endregion   Public Constructor
+Logger::~Logger() noexcept
+{
+    
+}
 
-#pragma region Public Methods
+#pragma region Methods
 
 DAEvoid Logger::SetLevel(ELogLevel const in_level) noexcept
 {
@@ -66,6 +67,11 @@ ELogLevel Logger::GetEffectiveLevel() const noexcept
     }
 
 	return ELogLevel::NotSet;
+}
+
+Logger const* Logger::GetChild(String const& in_suffix) const noexcept
+{
+    return nullptr;
 }
 
 DAEvoid Logger::Debug(DAEchar const* in_message) const noexcept
@@ -103,6 +109,14 @@ DAEvoid Logger::Error(DAEchar const* in_message) const noexcept
 DAEvoid Logger::Fatal(DAEchar const* in_message) const noexcept
 {
     if (m_level <= ELogLevel::Fatal)
+    {
+        
+    }
+}
+
+DAEvoid Logger::Exception(DAEchar const* in_message) const noexcept
+{
+    if (m_level <= ELogLevel::Warning)
     {
         
     }

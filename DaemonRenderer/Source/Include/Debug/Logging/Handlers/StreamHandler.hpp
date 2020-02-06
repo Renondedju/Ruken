@@ -39,7 +39,7 @@ class StreamHandler : LogHandler
 
         #pragma region Variables
 
-        std::ostream m_stream;
+
 
         #pragma endregion
 

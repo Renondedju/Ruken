@@ -33,7 +33,40 @@ BEGIN_DAEMON_NAMESPACE
  */
 class LogFormatter
 {
+    private:
 
+    public:
+
+        #pragma region Methods
+
+        /**
+         * \brief
+         *
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        String Format(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \brief
+         *
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        String FormatTime() const noexcept;
+
+        /**
+         * \brief
+         *
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        String FormatException() const noexcept;
+
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

@@ -30,12 +30,16 @@
 #include "Containers/String.hpp"
 #include "Containers/ForwardList.hpp"
 
+#include "Types/Unique.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief This class exposes the interface that application code directly uses.
+ *
+ * \note Loggers should NEVER be instantiated directly, but always through the module-level function Debug.GetLogger(name).
  */
-class Logger
+class Logger : Unique
 {
     private:
 
@@ -50,9 +54,9 @@ class Logger
          */
         DAEbool m_propagate;
 
+        Logger*     m_parent;
 		String      m_name;
 		ELogLevel   m_level;
-        Logger*     m_parent;
 
         ForwardList<LogFilter  const*> m_filters;
         ForwardList<LogHandler const*> m_handlers;
@@ -61,19 +65,11 @@ class Logger
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructor and Destructor
 
-		Logger (String const&   in_name) noexcept;
-		Logger (Logger const&   in_copy) noexcept = default;
-		Logger (Logger&&        in_move) noexcept = default;
-		~Logger()                        noexcept = default;
+		explicit Logger(String in_name) noexcept;
 
-        #pragma endregion
-
-        #pragma region Operators
-
-		Logger& operator=(Logger const& in_copy) noexcept = default;
-		Logger& operator=(Logger&&      in_move) noexcept = default;
+		~Logger() noexcept;
 
         #pragma endregion
 
@@ -82,16 +78,16 @@ class Logger
         /**
          * \brief Sets the threshold for this logger to the specified level.
          *
-         * Logging messages which are less severe than level will be ignored;
+         * Logging messages which are less severe than "in_level" will be ignored;
          * logging messages which have severity level or higher will be emitted by whichever handler or handlers service this logger,
-         * unless a handlerÅfs level has been set to a higher severity level than level.
+         * unless a handlerÅfs level has been set to a higher severity level than "in_level".
          *
          * \param in_level The desired level.
          */
         DAEvoid SetLevel(ELogLevel in_level) noexcept;
 
         /**
-         * \brief This method checks first the module's level set by Debug.Disable(in_level) and then the loggerÅfs effective level as determined by GetEffectiveLevel().
+         * \brief This method checks first the module's level and then the loggerÅfs effective level as determined by GetEffectiveLevel().
          *
          * \param in_level The level to check.
          *
@@ -100,12 +96,22 @@ class Logger
         DAEbool IsEnabledFor(ELogLevel in_level) const noexcept;
 
         /**
-         * If a value other than "NotSet" has been set using SetLevel(), it is returned.
+         * \brief If a value other than "NotSet" has been set using SetLevel(), it is returned.
+         *
          * Otherwise, the hierarchy is traversed towards the root until a value other than "NotSet" is found, and that value is returned.
          *
          * \return The effective level for this logger.
          */
         ELogLevel GetEffectiveLevel() const noexcept;
+
+        /**
+         * \brief Returns a logger which is a descendant to this logger, as determined by the suffix.
+         *
+         * \param in_suffix The name of the logger to look for.
+         *
+         * \return A pointer to the desired logger if found.
+         */
+        Logger const* GetChild(String const& in_suffix) const noexcept;
 
         /**
          * \brief Logs a message with level "Debug" on this logger.
@@ -141,6 +147,15 @@ class Logger
          * \param in_message The message to log.
          */
         DAEvoid Fatal(DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Logs a message with level ERROR on this logger.
+         *
+         * Exception info is added to the logging message.
+         *
+         * \note This method should only be called from an exception handler.
+         */
+        DAEvoid Exception(DAEchar const* in_message) const noexcept;
 
         /**
          * \brief Adds the specified filter to this logger.
