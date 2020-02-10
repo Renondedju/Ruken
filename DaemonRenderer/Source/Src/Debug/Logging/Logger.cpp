@@ -26,18 +26,29 @@
 
 USING_DAEMON_NAMESPACE
 
-Logger::Logger(String in_name) noexcept :
-    m_propagate { true },
+Logger::Logger() noexcept :
+    m_name      { "ROOT" },
+    m_level     { ELogLevel::Warning },
     m_parent    { nullptr },
+    m_propagate { true }
+{
+    
+}
+
+Logger::Logger(String in_name, ELogLevel const in_level, Logger* in_parent, bool const in_propagate) noexcept :
     m_name      { std::move(in_name) },
-    m_level     { ELogLevel::NotSet }
+    m_level     { in_level },
+    m_parent    { in_parent },
+    m_propagate { in_propagate }
 {
     
 }
 
 Logger::~Logger() noexcept
 {
-    
+    m_children.clear();
+    m_filters .clear();
+    m_handlers.clear();
 }
 
 #pragma region Methods
@@ -54,141 +65,115 @@ DAEbool Logger::IsEnabledFor(ELogLevel const in_level) const noexcept
 
 ELogLevel Logger::GetEffectiveLevel() const noexcept
 {
-    Logger const* logger = this;
-
-    while (logger)
-    {
-        if (logger->m_level != ELogLevel::NotSet)
-        {
-            return logger->m_level;
-        }
-
-        logger = logger->m_parent;
-    }
-
-	return ELogLevel::NotSet;
-}
-
-Logger const* Logger::GetChild(String const& in_suffix) const noexcept
-{
-    return nullptr;
+	return m_level != ELogLevel::NotSet ? m_level : m_parent ? m_parent->GetEffectiveLevel() : ELogLevel::NotSet;
 }
 
 DAEvoid Logger::Debug(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Debug)
+	if (IsEnabledFor(ELogLevel::Debug))
 	{
-
+        /* TODO Catch caller's data and pass it to the record TODO */
+        Handle(LogRecord(m_name, ELogLevel::Debug, __FILE__, __LINE__, in_message));
 	}
 }
 
 DAEvoid Logger::Info(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Info)
+	if (IsEnabledFor(ELogLevel::Info))
 	{
-
+        /* TODO Catch caller's data and pass it to the record TODO */
+        Handle(LogRecord(m_name, ELogLevel::Info, __FILE__, __LINE__, in_message));
 	}
 }
 
 DAEvoid Logger::Warning(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Warning)
+	if (IsEnabledFor(ELogLevel::Warning))
 	{
-
+        Handle(LogRecord(m_name, ELogLevel::Warning, __FILE__, __LINE__, in_message));
 	}
 }
 
 DAEvoid Logger::Error(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Error)
+	if (IsEnabledFor(ELogLevel::Error))
 	{
-
+        Handle(LogRecord(m_name, ELogLevel::Error, __FILE__, __LINE__, in_message));
 	}
 }
 
 DAEvoid Logger::Fatal(DAEchar const* in_message) const noexcept
 {
-    if (m_level <= ELogLevel::Fatal)
+    if (IsEnabledFor(ELogLevel::Fatal))
     {
-        
+        Handle(LogRecord(m_name, ELogLevel::Fatal, __FILE__, __LINE__, in_message));
     }
 }
 
 DAEvoid Logger::Exception(DAEchar const* in_message) const noexcept
 {
-    if (m_level <= ELogLevel::Warning)
+    if (IsEnabledFor(ELogLevel::Error))
     {
-        
+        Handle(LogRecord(m_name, ELogLevel::Error, __FILE__, __LINE__, in_message));
     }
 }
 
-DAEvoid Logger::AddFilter(LogFilter const* in_filter)
+DAEvoid Logger::AddFilter(LogFilter* in_filter)
 {
     m_filters.push_front(in_filter);
 }
 
-DAEvoid Logger::RemoveFilter(LogFilter const* in_filter) noexcept
+DAEvoid Logger::RemoveFilter(LogFilter* in_filter) noexcept
 {
     m_filters.remove(in_filter);
 }
 
 DAEbool Logger::Filter(LogRecord const& in_record) const noexcept
 {
-    for (LogFilter const* filter : m_filters)
+    for (LogFilter* filter : m_filters)
     {
-        /** TODO Filtering the record. TODO */
-        if (filter)
+        if (!filter || !filter->Filter(in_record))
             return false;
     }
 
     return true;
 }
 
-DAEvoid Logger::AddHandler(LogHandler const* in_handler)
+DAEvoid Logger::AddHandler(LogHandler* in_handler)
 {
 	m_handlers.push_front(in_handler);
 }
 
-DAEvoid Logger::RemoveHandler(LogHandler const* in_handler) noexcept
+DAEvoid Logger::RemoveHandler(LogHandler* in_handler) noexcept
 {
 	m_handlers.remove(in_handler);
 }
 
-DAEbool Logger::Handle(LogRecord const& in_record) const noexcept
+DAEvoid Logger::Handle(LogRecord const& in_record) const noexcept
 {
     if (Filter(in_record))
     {
-        Logger const* logger = this;
+        if (m_propagate && m_parent)
+        {
+            m_parent->Handle(in_record);
+        }
 
-	    while (logger)
-	    {
-            for (LogHandler const* handler : logger->m_handlers)
-            {
-                /** TODO Handling the record. TODO */
-            }
-
-            logger = logger->m_propagate ? logger->m_parent : nullptr;
-	    }
-
-        return true;
+        for (LogHandler* handler : m_handlers)
+        {
+            if (handler)
+                handler->Handle(in_record);
+        }
     }
-
-	return false;
 }
 
 DAEbool Logger::HasHandlers() const noexcept
 {
-    Logger const* logger = this;
+    if (m_propagate && m_parent)
+    {
+        return !m_handlers.empty() || m_parent->HasHandlers();
+    }
 
-	while (logger)
-	{
-	    if (!logger->m_handlers.empty())
-            return true;
-
-        logger = logger->m_propagate ? logger->m_parent : nullptr;
-	}
-
-    return false;
+    return !m_handlers.empty();
 }
 
 #pragma endregion

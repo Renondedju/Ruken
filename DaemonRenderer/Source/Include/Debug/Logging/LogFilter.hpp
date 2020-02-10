@@ -35,7 +35,31 @@ class LogFilter
 {
     private:
 
+        #pragma region Members
+
+        
+
+        #pragma endregion
+
     public:
+
+        #pragma region Constructors and Destructor
+
+        LogFilter() = default;
+
+        LogFilter(LogFilter const&  in_copy) noexcept = default;
+        LogFilter(LogFilter&&       in_move) noexcept = default;
+
+        ~LogFilter() = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogFilter& operator=(LogFilter const&   in_copy) noexcept = default;
+        LogFilter& operator=(LogFilter&&        in_move) noexcept = default;
+
+        #pragma endregion
 
         #pragma region Methods
 

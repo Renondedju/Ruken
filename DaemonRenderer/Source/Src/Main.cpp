@@ -34,6 +34,8 @@
 
 #include "Vector/Vector.hpp"
 
+#include "Debug/Logging/Logger.hpp"
+
 USING_DAEMON_NAMESPACE
 
 struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>

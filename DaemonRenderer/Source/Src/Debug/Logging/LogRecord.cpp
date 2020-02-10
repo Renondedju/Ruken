@@ -22,59 +22,45 @@
  *  SOFTWARE.
  */
 
+#include <utility>
+
+
 #include "Debug/Logging/LogRecord.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Public Constructors
-
-LogRecord::LogRecord(String    const&   in_logger_name,
+LogRecord::LogRecord(String             in_logger_name,
                      ELogLevel const    in_level,
-                     String    const&   in_path,
+                     String             in_path,
                      DAEuint32 const    in_line_number,
-                     String    const&   in_message,
-                     String    const&   in_function_name) noexcept :
-    m_logger_name   { in_logger_name },
+                     String             in_message,
+                     String             in_function_name) noexcept :
+    m_logger_name   { std::move(in_logger_name) },
     m_level         { in_level },
-    m_path          { in_path },
+    m_path          { std::move(in_path) },
     m_line_number   { in_line_number },
-    m_message       { in_message },
-    m_function_name { in_function_name }
+    m_message       { std::move(in_message) },
+    m_function_name { std::move(in_function_name) }
 {
-    
+
 }
-
-#pragma endregion
-
-#pragma region Public Operators
 
 DAEbool LogRecord::operator==(LogRecord const& in_other) const noexcept
 {
-    return m_level         == in_other.m_level         &&
-		   m_logger_name   == in_other.m_logger_name   &&
-		   m_message       == in_other.m_message       &&
-		   m_path          == in_other.m_path          &&
-		   m_function_name == in_other.m_function_name &&
-		   m_line_number   == in_other.m_line_number;
+    return m_logger_name   == in_other.m_logger_name &&
+           m_level         == in_other.m_level       &&
+           m_path          == in_other.m_path        &&
+           m_line_number   == in_other.m_line_number &&
+           m_message       == in_other.m_message     &&
+           m_function_name == in_other.m_function_name;
 }
 
 DAEbool LogRecord::operator!=(LogRecord const& in_other) const noexcept
 {
-    return m_level         != in_other.m_level         ||
-		   m_logger_name   != in_other.m_logger_name   ||
-		   m_message       != in_other.m_message       ||
-		   m_path          != in_other.m_path          ||
-		   m_function_name != in_other.m_function_name ||
-		   m_line_number   != in_other.m_line_number;
+    return m_logger_name   != in_other.m_logger_name ||
+           m_level         != in_other.m_level       ||
+           m_path          != in_other.m_path        ||
+           m_line_number   != in_other.m_line_number ||
+           m_message       != in_other.m_message     ||
+           m_function_name != in_other.m_function_name;
 }
-
-#pragma endregion
-
-#pragma region Public Methods
-
-String LogRecord::GetMessage() const noexcept
-{
-    return m_message;
-}
-
-#pragma endregion

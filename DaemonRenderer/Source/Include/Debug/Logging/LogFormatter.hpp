@@ -24,24 +24,46 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "LogRecord.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class specifies the layout of log records in the final output.
+ * \brief Formatter objects configure the final order, structure, and contents of the log message.
  */
 class LogFormatter
 {
     private:
 
+        #pragma region Members
+
+        
+
+        #pragma endregion
+
     public:
+
+        #pragma region Constructors and Destructor
+
+        LogFormatter() = default;
+
+        LogFormatter(LogFormatter const&    in_copy) noexcept = default;
+        LogFormatter(LogFormatter&&         in_move) noexcept = default;
+
+        virtual ~LogFormatter() = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogFormatter& operator=(LogFormatter const& in_copy) noexcept = default;
+        LogFormatter& operator=(LogFormatter&&      in_move) noexcept = default;
+
+        #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief
-         *
          * \param in_record The record to format.
          *
          * \return The resulting string.
@@ -49,22 +71,25 @@ class LogFormatter
         String Format(LogRecord const& in_record) const noexcept;
 
         /**
-         * \brief
-         *
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        String FormatTime() const noexcept;
+        virtual String FormatTime(LogRecord const& in_record) const noexcept;
 
         /**
-         * \brief
-         *
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        String FormatException() const noexcept;
+        virtual String FormatException(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        virtual String FormatStack(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 };

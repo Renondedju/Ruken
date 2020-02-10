@@ -28,23 +28,39 @@
 
 USING_DAEMON_NAMESPACE
 
-
-FileHandler::FileHandler(String             in_path,
-                         ELogLevel const    in_level) noexcept : StreamHandler(in_level)
+FileHandler::FileHandler(String             const&  in_path,
+                         std::ios::openmode const   in_mode,
+                         ELogLevel          const   in_level) noexcept : StreamHandler(new std::ofstream(in_path, in_mode), in_level)
 {
+    
+}
 
+FileHandler::~FileHandler() noexcept
+{
+    delete m_stream;
 }
 
 #pragma region Methods
 
-DAEvoid FileHandler::Close()
-{
-
-}
-
 DAEvoid FileHandler::Emit(LogRecord const& in_record)
 {
+    if (std::ofstream* stream = dynamic_cast<std::ofstream*>(m_stream))
+    {
+        if (!stream->is_open())
+        {
+            stream->open(m_path);
+        }
 
+        StreamHandler::Emit(in_record);
+    }
+}
+
+DAEvoid FileHandler::Close()
+{
+    if (std::ofstream* stream = dynamic_cast<std::ofstream*>(m_stream))
+    {
+        stream->close();
+    }
 }
 
 #pragma endregion

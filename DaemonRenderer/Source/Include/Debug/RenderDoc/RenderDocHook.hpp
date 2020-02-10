@@ -208,7 +208,7 @@ class RenderDocHook
          * 
          * The active window is the one that will be captured when the keybind to trigger a capture is pressed.
          * 
-         * \param in_device Handle to the API ëdeviceí object that will be set active. Must be valid.
+         * \param in_device Handle to the API ëdeviceÅEobject that will be set active. Must be valid.
          * \param in_window_handle Handle to the platform window handle that will be set active. Must be valid.
          * 
          * \note RENDERDOC_DevicePointer is a typedef to void *. The contents of it are API specific:
@@ -225,7 +225,7 @@ class RenderDocHook
         /**
          * \brief This function will immediately begin a capture for the specified device/window combination.
          * 
-         * \param in_device Handle to the API ëdeviceí object that will be set active. May be NULL to wildcard match.
+         * \param in_device Handle to the API ëdeviceÅEobject that will be set active. May be NULL to wildcard match.
          * \param in_window_handle Handle to the platform window handle that will be set active. May be NULL to wildcard match.
          * 
          * \note RENDERDOC_DevicePointer and RENDERDOC_WindowHandle are described above in SetActiveWindow().
@@ -248,7 +248,7 @@ class RenderDocHook
 
         /**
          * \brief This function will immediately end an active capture for the specified device/window combination.
-         * \param in_device Handle to the API ëdeviceí object that will be set active. May be NULL to wildcard match.
+         * \param in_device Handle to the API ëdeviceÅEobject that will be set active. May be NULL to wildcard match.
          * \param in_window_handle Handle to the platform window handle that will be set active. May be NULL to wildcard match.
          * 
          * \note RENDERDOC_DevicePointer and RENDERDOC_WindowHandle are described above in SetActiveWindow().
@@ -264,7 +264,7 @@ class RenderDocHook
          * 
          * This will be more efficient than EndFrameCapture() if the frame capture is not needed.
          * 
-         * \param in_device Handle to the API ëdeviceí object that will be set active. May be NULL to wildcard match.
+         * \param in_device Handle to the API ëdeviceÅEobject that will be set active. May be NULL to wildcard match.
          * \param in_window_handle Handle to the platform window handle that will be set active. May be NULL to wildcard match.
          * 
          * \note RENDERDOC_DevicePointer and RENDERDOC_WindowHandle are described above in SetActiveWindow().

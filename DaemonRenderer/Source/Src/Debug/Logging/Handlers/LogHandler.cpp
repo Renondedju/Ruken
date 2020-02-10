@@ -26,19 +26,19 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Public Constructors
-
 LogHandler::LogHandler(ELogLevel const in_level) noexcept :
-    m_level     { in_level },
-    m_formatter { nullptr },
-    m_filters   { ForwardList<LogFilter const*>() }
+    m_level { in_level }
 {
     
 }
 
-#pragma endregion
+LogHandler::~LogHandler() noexcept
+{
+    m_filters.clear();
+}
 
-#pragma region Public Methods
+
+#pragma region Methods
 
 DAEvoid LogHandler::CreateLock()
 {
@@ -60,7 +60,7 @@ DAEvoid LogHandler::SetLevel(ELogLevel const in_level) noexcept
     m_level = in_level;
 }
 
-DAEvoid LogHandler::SetFormatter(LogFormatter const* in_formatter) noexcept
+DAEvoid LogHandler::SetFormatter(LogFormatter const& in_formatter) noexcept
 {
     m_formatter = in_formatter;
 }
@@ -70,7 +70,7 @@ DAEvoid LogHandler::AddFilter(LogFilter const* in_filter)
     m_filters.push_front(in_filter);
 }
 
-DAEvoid LogHandler::RemoveFilter(LogFilter const* in_filter) noexcept
+DAEvoid LogHandler::RemoveFilter(LogFilter const* in_filter)
 {
     m_filters.remove(in_filter);
 }
@@ -79,12 +79,32 @@ DAEbool LogHandler::Filter(LogRecord const& in_record) const noexcept
 {
     for (LogFilter const* filter : m_filters)
     {
-        /** TODO Filtering the record. TODO*/
-        if (filter)
+        if (!filter || !filter->Filter(in_record))
             return false;
     }
 
     return true;
+}
+
+DAEvoid LogHandler::Handle(LogRecord const& in_record) noexcept
+{
+    if (Filter(in_record))
+    {
+        Emit(in_record);
+    }
+}
+
+DAEvoid LogHandler::HandleError(LogRecord const& in_record) const noexcept
+{
+    if (Filter(in_record))
+    {
+        /* TODO */
+    }
+}
+
+String LogHandler::Format(LogRecord const& in_record) const noexcept
+{
+    return m_formatter.Format(in_record);
 }
 
 DAEvoid LogHandler::Flush()
@@ -93,21 +113,6 @@ DAEvoid LogHandler::Flush()
 }
 
 DAEvoid LogHandler::Close()
-{
-
-}
-
-DAEvoid LogHandler::Handle(LogRecord const& in_record)
-{
-
-}
-
-DAEvoid LogHandler::HandleError(LogRecord const& in_record)
-{
-
-}
-
-DAEvoid LogHandler::Format(LogRecord const& in_record)
 {
 
 }

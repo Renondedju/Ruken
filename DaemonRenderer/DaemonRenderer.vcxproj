@@ -323,7 +323,6 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
-    <ClInclude Include="Source\Include\Debug\Debug.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\ELogLevel.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\FileHandler.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\LogHandler.hpp" />
@@ -459,7 +458,6 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Src\Debug\Debug.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\FileHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\LogHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\StreamHandler.cpp" />

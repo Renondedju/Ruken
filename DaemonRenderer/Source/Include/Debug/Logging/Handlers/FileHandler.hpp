@@ -33,26 +33,44 @@ BEGIN_DAEMON_NAMESPACE
  *
  * \note It inherits the output functionality from StreamHandler.
  */
-class FileHandler : StreamHandler
+class FileHandler final : StreamHandler
 {
+    protected:
+
+        #pragma region Members
+
+        String m_path;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Outputs the record to the file.
+         *
+         * \param in_record The record to emit.
+         */
+        DAEvoid Emit(LogRecord const& in_record) override;
+
+        #pragma endregion
+
     public:
 
         #pragma region Contructors and Destructor
 
-        FileHandler(String      in_path,
-                    ELogLevel   in_level = ELogLevel::NotSet) noexcept;
+        explicit FileHandler(String const& in_path, std::ios::openmode in_mode, ELogLevel in_level = ELogLevel::NotSet) noexcept;
 
-		FileHandler(FileHandler const&  in_copy) noexcept = default;
-		FileHandler(FileHandler&&       in_move) noexcept = default;
+        FileHandler(FileHandler const&  in_copy) = delete;
+        FileHandler(FileHandler&&       in_move) = delete;
 
-		~FileHandler() noexcept = default;
+        ~FileHandler() noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        FileHandler& operator=(FileHandler const& in_other) noexcept = default;
-        FileHandler& operator=(FileHandler&&      in_other) noexcept = default;
+        FileHandler& operator=(FileHandler const& in_other) = delete;
+        FileHandler& operator=(FileHandler&&      in_other) = delete;
 
         #pragma endregion
 
@@ -62,11 +80,6 @@ class FileHandler : StreamHandler
          * \brief Closes the file.
          */
         DAEvoid Close() override;
-
-        /**
-         * \brief Outputs the record to the file.
-         */
-        DAEvoid Emit(LogRecord const& in_record) override;
 
         #pragma endregion
 };

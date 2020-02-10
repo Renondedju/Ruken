@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <ostream>
+#include <iostream>
 
 #include "LogHandler.hpp"
 
@@ -37,29 +37,9 @@ class StreamHandler : LogHandler
 {
     protected:
 
-        #pragma region Variables
+        #pragma region Members
 
-
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Contructors and Destructor
-
-        StreamHandler(ELogLevel in_level = ELogLevel::NotSet) noexcept;
-
-		StreamHandler(StreamHandler const&  in_copy) noexcept = default;
-		StreamHandler(StreamHandler&&       in_move) noexcept = default;
-
-		~StreamHandler() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        StreamHandler& operator=(StreamHandler const& in_other) noexcept = default;
-        StreamHandler& operator=(StreamHandler&&      in_other) noexcept = default;
+        std::ostream* m_stream;
 
         #pragma endregion
 
@@ -68,23 +48,42 @@ class StreamHandler : LogHandler
         /**
          * \brief If a formatter is specified, it is used to format the record. The record is then written to the stream with a terminator.
          *
+         * \param in_record The record to emit.
+         *
          * \note If exception information is present, it is formatted and appended to the stream.
          */
         DAEvoid Emit(LogRecord const& in_record) override;
 
+        #pragma endregion
+
+    public:
+
+        #pragma region Contructors and Destructor
+
+        StreamHandler(std::ostream* in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+
+		StreamHandler(StreamHandler const&  in_copy) = delete;
+		StreamHandler(StreamHandler&&       in_move) = delete;
+
+		~StreamHandler() noexcept = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        StreamHandler& operator=(StreamHandler const& in_other) = delete;
+        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
+
+        #pragma endregion
+
+        #pragma region Methods
+
         /**
          * \brief Flushes the stream by calling its Flush() method.
          *
-         * \note The Close() method is inherited from "Handler" and so does no output, so an explicit Flush() call may be needed at times.
+         * \note The Close() method is inherited from "LogHandler" and so does no output, so an explicit Flush() call may be needed at times.
          */
         DAEvoid Flush() override;
-
-        /**
-         * \brief Sets the instanceÅfs stream to the specified value, if it is different.
-         *
-         * \note The old stream is flushed before the new stream is set.
-         */
-        DAEvoid SetStream(std::ostream&& in_stream) noexcept;
 
         #pragma endregion
 };
