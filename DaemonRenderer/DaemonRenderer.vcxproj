@@ -205,6 +205,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
     <ClInclude Include="Source\Include\Bitwise\Endian.hpp" />
+    <ClInclude Include="Source\Include\Bitwise\SizedBitmask.hpp" />
     <ClInclude Include="Source\Include\Build.hpp" />
     <ClInclude Include="Source\Include\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\Array.hpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Meta\LimitValues.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
@@ -346,6 +348,7 @@
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
+    <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />
     <None Include="Source\Src\ECS\Component.inl" />
