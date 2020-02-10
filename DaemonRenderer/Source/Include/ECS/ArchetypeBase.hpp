@@ -22,11 +22,34 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include "Config.hpp"
+#include "ECS/ArchetypeFingerprint.hpp"
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
+BEGIN_DAEMON_NAMESPACE
+
+class __declspec(novtable) ArchetypeBase
 {
-    
-}
+    protected:
+
+        #pragma region Members
+
+        ArchetypeFingerprint m_fingerprint;
+
+        #pragma endregion 
+
+    public:
+
+        #pragma region Methods
+
+        /**
+         * \brief Gets the fingerprint of the archetype
+         * \return Fingerprint
+         */
+        ArchetypeFingerprint const& GetFingerprint() const noexcept;
+
+        #pragma endregion 
+};
+
+END_DAEMON_NAMESPACE

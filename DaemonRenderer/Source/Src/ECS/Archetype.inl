@@ -85,9 +85,3 @@ DAEsize Archetype<TComponents...>::EntitiesCount() const noexcept
 {
     return std::get<0>(m_components).GetItemCount();
 }
-
-template <typename ... TComponents>
-ArchetypeFingerprint const& Archetype<TComponents...>::GetFingerprint() const noexcept
-{
-    return m_fingerprint;
-}

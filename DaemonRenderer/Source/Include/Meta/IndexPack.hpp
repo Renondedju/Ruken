@@ -22,11 +22,15 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include "Config.hpp"
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
-{
-    
-}
+#include "Types/FundamentalTypes.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+template <DAEsize... TIndices>
+struct IndexPack {};
+
+END_DAEMON_NAMESPACE

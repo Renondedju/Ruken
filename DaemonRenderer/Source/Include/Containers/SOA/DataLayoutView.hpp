@@ -37,23 +37,23 @@ BEGIN_DAEMON_NAMESPACE
  * \see DataLayout::Get
  */
 template <class TSequence, typename... TTypes>
-struct DataLayoutView : public std::tuple<TTypes...>
+struct DataLayoutView : public std::tuple<TTypes&...>
 {
     using Sequence = TSequence;
 
     // Making constructors available
-    using std::tuple<TTypes...>::tuple;
-    using std::tuple<TTypes...>::operator=;
+    using std::tuple<TTypes&...>::tuple;
+    using std::tuple<TTypes&...>::operator=;
 };
 
 template <template <std::size_t...> class TSequence, typename... TTypes, std::size_t... TIndices>
-struct DataLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTypes...>
+struct DataLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTypes&...>
 {
     using Sequence = TSequence<TIndices...>;
 
     // Making constructors available
-    using std::tuple<TTypes...>::tuple;
-    using std::tuple<TTypes...>::operator=;
+    using std::tuple<TTypes&...>::tuple;
+    using std::tuple<TTypes&...>::operator=;
 };
 
 END_DAEMON_NAMESPACE

@@ -25,16 +25,24 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "Containers/Vector.hpp"
+
+#include "ECS/ArchetypeBase.hpp"
 #include "ECS/ComponentSystemBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class __declspec(novtable) EntityAdmin
+class EntityAdmin
 {
     private:
 
+        #pragma region Members
+
         Vector<ComponentSystemBase> m_systems;
+        Vector<ArchetypeBase>       m_archetypes;
+
+        #pragma endregion 
 
     public:
 
@@ -51,10 +59,13 @@ class __declspec(novtable) EntityAdmin
 
         /**
          * \brief 
-         * \tparam TSystem 
+         * \tparam TSystem System type to push to the entity admin 
          */
         template <typename TSystem>
         DAEvoid PushSystem() noexcept;
+
+        
+        DAEvoid PushArchetype() noexcept;
 
         /**
          * \brief Updates every system

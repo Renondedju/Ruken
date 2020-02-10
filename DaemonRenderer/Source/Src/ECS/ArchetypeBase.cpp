@@ -22,11 +22,11 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#include "ECS/ArchetypeBase.hpp"
 
 USING_DAEMON_NAMESPACE
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
+ArchetypeFingerprint const& ArchetypeBase::GetFingerprint() const noexcept
 {
-    
+    return m_fingerprint;
 }

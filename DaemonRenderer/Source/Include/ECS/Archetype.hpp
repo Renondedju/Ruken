@@ -31,19 +31,18 @@
 #include "Types/FundamentalTypes.hpp"
 
 #include "ECS/EntityID.hpp"
-#include "ECS/ArchetypeFingerprint.hpp"
+#include "ECS/ArchetypeBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 template <typename... TComponents>
-class Archetype
+class Archetype : public ArchetypeBase
 {
     private:
 
         #pragma region Members
 
         std::tuple<TComponents...> m_components;
-        ArchetypeFingerprint       m_fingerprint;
 
         #pragma endregion
 
@@ -122,12 +121,6 @@ class Archetype
          * \return Entities count
          */
         DAEsize EntitiesCount() const noexcept;
-
-        /**
-         * \brief Gets the fingerprint of the archetype
-         * \return Fingerprint
-         */
-        ArchetypeFingerprint const& GetFingerprint() const noexcept;
 
         #pragma endregion
 

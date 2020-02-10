@@ -38,7 +38,7 @@ BEGIN_DAEMON_NAMESPACE
 template <typename TItem>
 class __declspec(novtable) Component : public ComponentTypeIdIterator
 {
-    private:
+    public:
 
         #pragma region Members
 

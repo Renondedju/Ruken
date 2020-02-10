@@ -26,13 +26,9 @@
 
 #include "Config.hpp"
 
-#include "ECS/Archetype.hpp"
 #include "ECS/Component.hpp"
 #include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentSystem.hpp"
-#include "ECS/ArchetypeFingerprint.hpp"
-
-#include "Vector/Vector.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -43,45 +39,21 @@ struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
         Life,
         MaxLife
     };
-    
-    auto&       GetLife()       { return std::get<Life>(*this); }
-    auto const& GetLife() const { return std::get<Life>(*this); }
-
-    auto&       GetMaxLife()       { return std::get<MaxLife>(*this); }
-    auto const& GetMaxLife() const { return std::get<MaxLife>(*this); }
 };
 
-struct PositionComponentItem : public ComponentItem<DAEfloat, DAEfloat, DAEfloat>
-{
-    enum EMembers { X, Y, Z };
-    
-    auto&       GetX()       { return std::get<X>(*this); }
-    auto const& GetX() const { return std::get<X>(*this); }
-
-    auto&       GetY()       { return std::get<Y>(*this); }
-    auto const& GetY() const { return std::get<Y>(*this); }
-
-    auto&       GetZ()       { return std::get<Z>(*this); }
-    auto const& GetZ() const { return std::get<Z>(*this); }
-};
-
-using LifeComponent     = Component<LifeComponentItem>;
-using PositionComponent = Component<PositionComponentItem>;
+using LifeComponent = Component<LifeComponentItem>;
+using LifeView      = LifeComponentItem::FullView;
 
 int main()
 {
-    ArchetypeFingerprint fingerprint;
-
-    fingerprint.AddTrait(LifeComponent::TypeId());
-    fingerprint.AddTrait(PositionComponent::TypeId());
-
-    Archetype<LifeComponent, PositionComponent> archetype;
-    ComponentSystem<LifeComponent>              life_system;
+    
+    LifeComponent life_component;
+    
+    for (int i = 0; i < 200; ++i)
+        life_component.CreateItem();
 
     for (int i = 0; i < 200; ++i)
-        archetype.CreateEntity();
-
-    system("pause");
-	
+        LifeComponent::Layout::Get<LifeView>(life_component.m_storage, i).Fetch<LifeComponentItem::MaxLife>() = i;
+        
     return EXIT_SUCCESS;
 }

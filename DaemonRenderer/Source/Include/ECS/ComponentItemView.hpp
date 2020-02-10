@@ -22,11 +22,33 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include <type_traits>
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
+#include "Config.hpp"
+
+#include "Meta/ValueIndexer.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "Containers/SOA/DataLayoutView.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+template <typename TPack, typename... TTypes>
+struct ComponentItemView;
+
+template <template <DAEsize...> class TPack, DAEsize... TIndices, typename... TTypes>
+struct ComponentItemView<TPack<TIndices...>, TTypes...> : public DataLayoutView<std::index_sequence<TIndices...>, TTypes...>
 {
-    
-}
+    template<DAEsize TMember>
+    auto&       Fetch()       { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
+
+    template<DAEsize TMember>
+    auto const& Fetch() const { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
+
+    // Making constructors available
+    using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::DataLayoutView;
+    using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::operator=;
+};
+
+END_DAEMON_NAMESPACE

@@ -238,9 +238,11 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
+    <ClInclude Include="Source\Include\ECS\ArchetypeBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentSystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentTypeIdIterator.hpp" />
     <ClInclude Include="Source\Include\ECS\EComponentItemStatus.hpp" />
@@ -253,8 +255,10 @@
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
+    <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
