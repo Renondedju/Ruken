@@ -25,197 +25,100 @@
 #pragma region Constructors
 
 template <typename TEnumType>
-constexpr Bitmask<TEnumType>::Bitmask(UnderlyingType in_data) noexcept:
-    m_data {in_data}
-{}
-
-template <typename TEnum_Type>
-template <typename... TData, typename>
-constexpr Bitmask<TEnum_Type>::Bitmask(TData... in_data) noexcept:
-    m_data {static_cast<UnderlyingType>(0)}
-{
-    m_data = ((1i64 << static_cast<UnderlyingType>(in_data)) | ...);
-}
-
-template <typename TEnum_Type>
-constexpr Bitmask<TEnum_Type>::Bitmask() noexcept:
-    m_data {static_cast<UnderlyingType>(0)}
+template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
+constexpr Bitmask<TEnumType>::Bitmask(TData... in_data) noexcept:
+    Parent(static_cast<UnderlyingType>(std::forward<TData>(in_data))...)
 {}
 
 #pragma endregion
 
 #pragma region Methods
 
-template <typename TEnum_Type>
-template <typename... TData, typename>
-constexpr DAEbool Bitmask<TEnum_Type>::HasAll(TData... in_data) const noexcept
+template <typename TEnumType>
+template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
+constexpr DAEbool Bitmask<TEnumType>::HasAll(TData... in_data) const noexcept
 {
-    UnderlyingType bitmask = ((1 << static_cast<UnderlyingType>(in_data)) | ...);
-    return ((m_data & bitmask) == bitmask);
+    return Parent::HasAll(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
-template <typename TEnum_Type>
-constexpr DAEbool Bitmask<TEnum_Type>::HasAll(Bitmask<TEnum_Type> const& in_bitmask) const noexcept
+template <typename TEnumType>
+constexpr DAEbool Bitmask<TEnumType>::HasAll(Bitmask<TEnumType> const& in_bitmask) const noexcept
 {
-    return ((m_data & in_bitmask.m_data) == in_bitmask.m_data);
+    return Parent::HasAll(static_cast<Parent>(*this));
 }
 
-template <typename TEnum_Type>
-template <typename... TData, typename>
-constexpr DAEbool Bitmask<TEnum_Type>::HasOne(TData... in_data) const noexcept
+template <typename TEnumType>
+template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
+constexpr DAEbool Bitmask<TEnumType>::HasOne(TData... in_data) const noexcept
 {
-    return m_data & ((1 << static_cast<UnderlyingType>(in_data)) | ...);
+    return Parent::HasOne(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
-template <typename TEnum_Type>
-constexpr DAEbool Bitmask<TEnum_Type>::HasOne(Bitmask<TEnum_Type> const& in_bitmask) const noexcept
+template <typename TEnumType>
+constexpr DAEbool Bitmask<TEnumType>::HasOne(Bitmask<TEnumType> const& in_bitmask) const noexcept
 {
-    return m_data & in_bitmask.m_data;
+    return Parent::HasOne(static_cast<Parent>(*this));
 }
 
-template <typename TEnum_Type>
-template <typename... TData, typename>
-constexpr DAEvoid Bitmask<TEnum_Type>::Add(TData... in_data) noexcept
+template <typename TEnumType>
+template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
+constexpr DAEvoid Bitmask<TEnumType>::Add(TData... in_data) noexcept
 {
-    m_data |= ((1i64 << static_cast<UnderlyingType>(in_data)) | ...);
+    Parent::Add(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
-template<typename TEnum_Type>
-constexpr DAEvoid Bitmask<TEnum_Type>::Add(Bitmask<TEnum_Type> const& in_bitmask) noexcept
+template <typename TEnumType>
+constexpr DAEvoid Bitmask<TEnumType>::Add(Bitmask<TEnumType> const& in_bitmask) noexcept
 {
-    m_data |= in_bitmask.m_data;
+    Parent::Add(static_cast<Parent>(in_bitmask));
 }
 
-template <typename TEnum_Type>
-template <typename... TData, typename>
-constexpr DAEvoid Bitmask<TEnum_Type>::Remove(TData... in_data) noexcept
+template <typename TEnumType>
+template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
+constexpr DAEvoid Bitmask<TEnumType>::Remove(TData... in_data) noexcept
 {
-    m_data &= static_cast<UnderlyingType>(~(((1i64 << static_cast<UnderlyingType>(in_data))) | ...));
+    Parent::Remove(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
-template <typename TEnum_Type>
-constexpr DAEvoid Bitmask<TEnum_Type>::Remove(Bitmask<TEnum_Type> const& in_bitmask) noexcept
+template <typename TEnumType>
+constexpr DAEvoid Bitmask<TEnumType>::Remove(Bitmask<TEnumType> const& in_bitmask) noexcept
 {
-    m_data &= ~in_bitmask.m_data;
+    Parent::Remove(static_cast<Parent>(in_bitmask));
 }
 
-template <typename TEnum_Type>
-constexpr DAEvoid Bitmask<TEnum_Type>::Clear() noexcept
+template <typename TEnumType>
+template <typename TLambdaType>
+constexpr DAEvoid Bitmask<TEnumType>::Foreach(TLambdaType in_lambda) const noexcept
 {
-    m_data = 0;
-}
-
-template <typename TEnum_Type>
-constexpr DAEuint16 Bitmask<TEnum_Type>::Enabled() const noexcept
-{
-    DAEuint16 count = 0u;
-    UnderlyingType data = m_data;
-
-    while (data) 
-    { 
-        data &= (data - 1);
-        count++;
-    }
-
-    return count;
-}
-
-template <typename TEnum_Type>
-template <typename TLambda_Type>
-constexpr DAEvoid Bitmask<TEnum_Type>::Foreach(TLambda_Type in_lambda) const noexcept
-{
-    for (DAEint16 index = 0; index < sizeof(UnderlyingType) * 8; index++)
-        if ((1i64 << index) & m_data)
-            in_lambda(static_cast<TEnum_Type>(index));
-}
-
-template <typename TEnum_Type>
-constexpr typename Bitmask<TEnum_Type>::UnderlyingType Bitmask<TEnum_Type>::Data() const noexcept
-{
-    return m_data;
-}
-
-template <typename TEnum_Type>
-constexpr typename Bitmask<TEnum_Type>::UnderlyingType& Bitmask<TEnum_Type>::Data() noexcept
-{
-    return m_data;
+    Parent::template Foreach<TLambdaType, UnderlyingType>(std::forward(in_lambda));
 }
 
 #pragma endregion
 
 #pragma region Operators
 
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator+ (TEnum_Type const& in_bit) const noexcept
+template<typename TEnumType>
+constexpr Bitmask<TEnumType> Bitmask<TEnumType>::operator+ (TEnumType const& in_bit) const noexcept
 {
-    return Bitmask<TEnum_Type>(m_data | (1i64 << static_cast<UnderlyingType>(in_bit)));
+    return Parent::operator+(std::forward(static_cast<UnderlyingType>(in_bit)));
 }
 
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator+ (Bitmask<TEnum_Type> const& in_bitmask) const noexcept
+template<typename TEnumType>
+constexpr Bitmask<TEnumType> Bitmask<TEnumType>::operator- (TEnumType const& in_bit) const noexcept
 {
-    return Bitmask<TEnum_Type>(m_data | in_bitmask.m_data);
+    return Parent::operator-(std::forward(static_cast<UnderlyingType>(in_bit)));
 }
 
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type>& Bitmask<TEnum_Type>::operator+=(Bitmask<TEnum_Type> const& in_bitmask) noexcept
+template<typename TEnumType>
+constexpr Bitmask<TEnumType>& Bitmask<TEnumType>::operator-=(TEnumType const& in_bit) noexcept
 {
-    m_data |= in_bitmask.m_data;
-    return *this;
+    return Parent::operator-=(std::forward(static_cast<UnderlyingType>(in_bit)));
 }
 
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator+=(TEnum_Type const& in_bit) noexcept
+template <typename TEnumType>
+constexpr Bitmask<TEnumType>& Bitmask<TEnumType>::operator+=(TEnumType const& in_bit) noexcept
 {
-    m_data |= 1i64 << static_cast<UnderlyingType>(in_bit);
-    return *this;
-}
-
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator- (TEnum_Type const& in_bit) const noexcept
-{
-    return Bitmask<TEnum_Type>(m_data - (1i64 << static_cast<UnderlyingType>(in_bit)));
-}
-
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type> Bitmask<TEnum_Type>::operator- (Bitmask<TEnum_Type> const& in_bitmask) const noexcept
-{
-    return Bitmask<TEnum_Type>(m_data - in_bitmask.m_data);
-}
-
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type>& Bitmask<TEnum_Type>::operator-=(TEnum_Type const& in_bit) noexcept
-{
-    m_data &= ~(1i64 << static_cast<UnderlyingType>(in_bit));
-
-    return *this;
-}
-
-template<typename TEnum_Type>
-constexpr Bitmask<TEnum_Type>& Bitmask<TEnum_Type>::operator-=(Bitmask<TEnum_Type> const& in_bitmask) noexcept
-{
-    m_data &= ~in_bitmask.m_data;
-    return *this;
-}
-
-template<typename TEnum_Type>
-constexpr DAEbool Bitmask<TEnum_Type>::operator==(Bitmask<TEnum_Type> const& in_bitmask) const noexcept
-{
-    return m_data == in_bitmask.m_data;
+    return Parent::operator+=(std::forward(static_cast<UnderlyingType>(in_bit)));
 }
 
 #pragma endregion
-
-template<typename TEnum_Type>
-std::ostream& operator<<(std::ostream& out_stream, Bitmask<TEnum_Type> const& in_bitmask)
-{
-    for (DAEint16 i = sizeof(typename Bitmask<TEnum_Type>::UnderlyingType) * 8 - 1; i >= 0; --i)
-    {
-        if ((i + 1) % 4 == 0)
-            out_stream << ' ';
-
-        out_stream << ((static_cast<typename Bitmask<TEnum_Type>::UnderlyingType>((1i64 << i)) & in_bitmask.Data()) ? '1' : '0');
-    }
-
-    return out_stream;
-}

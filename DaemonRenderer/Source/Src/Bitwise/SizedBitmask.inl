@@ -23,9 +23,13 @@
  */
 
 template <DAEsize TSize, typename TChunk>
-constexpr SizedBitmask<TSize, TChunk>::SizedBitmask() noexcept:
+template <typename... TData, internal::CheckIntegralTypes<TData...>>
+constexpr SizedBitmask<TSize, TChunk>::SizedBitmask(TData... in_data) noexcept:
     m_data {}
-{}
+{
+    Add(in_data...);
+}
+
 
 // --- Methods
 
@@ -120,13 +124,13 @@ constexpr DAEvoid SizedBitmask<TSize, TChunk>::Clear() noexcept
 }
 
 template <DAEsize TSize, typename TChunk>
-template <typename TLambdaType>
+template <typename TLambdaType, typename TPreCast>
 constexpr DAEvoid SizedBitmask<TSize, TChunk>::Foreach(TLambdaType in_lambda) const noexcept
 {
     for (DAEsize index = 0; index < TSize; ++index)
         for (DAEsize sub_index = 0; sub_index < sizeof_chunk; ++sub_index)
             if ((TChunk(1) << sub_index) & m_data[index])
-                in_lambda(index * sizeof_chunk + sub_index);
+                in_lambda(static_cast<TPreCast>(index * sizeof_chunk + sub_index));
 }
 
 // --- Operators

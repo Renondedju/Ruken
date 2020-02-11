@@ -55,11 +55,13 @@ class SizedBitmask
 {
     static_assert(std::is_integral_v<TChunk>, "TChunk must be an integral type");
 
-    #pragma region Members
+    private:
 
-    TChunk m_data[TSize];
+        #pragma region Members
 
-    #pragma endregion
+        TChunk m_data[TSize];
+
+        #pragma endregion
 
     public:
 
@@ -68,7 +70,9 @@ class SizedBitmask
 
         #pragma region Constructors
 
-        constexpr SizedBitmask() noexcept;
+        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
+        constexpr SizedBitmask(TData... in_data) noexcept;
+
         constexpr SizedBitmask(SizedBitmask const& in_copy) = default;
         constexpr SizedBitmask(SizedBitmask&&      in_move) = default;
                  ~SizedBitmask()                            = default;
@@ -144,9 +148,10 @@ class SizedBitmask
         /**
          * \brief Executes a function pointer on each enabled flag in the bitmask.
          * \tparam TLambdaType Type of the lambda, the signature of the function used must be DAEvoid (*in_lambda)(TEnumType in_flag)
+         * \tparam TPreCast Type to cast the value into before sending it into the predicate
          * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
          */
-        template <typename TLambdaType>
+        template <typename TLambdaType, typename TPreCast = TChunk>
         constexpr DAEvoid Foreach(TLambdaType in_lambda) const noexcept;
 
         #pragma endregion 
