@@ -34,24 +34,24 @@ BEGIN_DAEMON_NAMESPACE
 /**
  * \brief Returns the minimum type required to store an object containing ``TSize`` bytes
  * \tparam TSize Number of required bytes
- * 
- * \warning When exceeding a value of TSize == 64, this will return a DAEvoid type
+ * \tparam TExcessType Excess type, default is DAEvoid
  */
-template <DAEuint8 TSize>
+template <DAEuint8 TSize, typename TExcessType = DAEvoid>
 struct MinimumType {
     using Type = std::conditional_t<TSize == 0u , DAEvoid,
                  std::conditional_t<TSize <= 8u , DAEuint8,
                  std::conditional_t<TSize <= 16u, DAEuint16,
                  std::conditional_t<TSize <= 32u, DAEuint32,
                  std::conditional_t<TSize <= 64u, DAEuint64,
-        DAEvoid>>>>>;
+        TExcessType>>>>>;
 };
 
 /**
  * \brief Helper type alias for MinimumType<TSize>::Type
  * \tparam TSize Number of required bytes
+ * \tparam TExcessType Excess type, default is DAEvoid
  */
-template <DAEuint8 TSize>
-using MinimumTypeT = typename MinimumType<TSize>::Type;
+template <DAEuint8 TSize, typename TExcessType = DAEvoid>
+using MinimumTypeT = typename MinimumType<TSize, TExcessType>::Type;
 
 END_DAEMON_NAMESPACE

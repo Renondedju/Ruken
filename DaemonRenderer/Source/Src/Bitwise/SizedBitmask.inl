@@ -30,68 +30,41 @@ constexpr SizedBitmask<TSize, TChunk>::SizedBitmask() noexcept:
 // --- Methods
 
 template <DAEsize TSize, typename TChunk>
-template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...>>
-constexpr DAEvoid SizedBitmask<TSize, TChunk>::SetData(TChunk out_data[TSize]) noexcept
+template <typename... TData, internal::CheckIntegralTypes<TData...>>
+constexpr DAEbool SizedBitmask<TSize, TChunk>::HasAll(TData... in_data) const noexcept
 {
-    ((out_data[TData / sizeof_chunk] |= TChunk(1) << TData % sizeof_chunk), ...);
-}
-
-template <DAEsize TSize, typename TChunk>
-template <typename TPredicate, DAEsize... TIds>
-constexpr DAEbool SizedBitmask<TSize, TChunk>::Conjunction(TChunk in_data[TSize], TPredicate in_predicate, std::index_sequence<TIds...>) const noexcept
-{
-    return (in_predicate(m_data[TIds], in_data[TIds]) && ...);
-}
-
-template <DAEsize TSize, typename TChunk>
-template <typename TPredicate, DAEsize... TIds>
-constexpr DAEbool SizedBitmask<TSize, TChunk>::Disjunction(TChunk in_data[TSize], TPredicate in_predicate, std::index_sequence<TIds...>) const noexcept
-{
-    return (in_predicate(m_data[TIds], in_data[TIds]) || ...);
-}
-
-template <DAEsize TSize, typename TChunk>
-template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...>>
-constexpr DAEbool SizedBitmask<TSize, TChunk>::HasAll() const noexcept
-{
-    TChunk bitmask[TSize] {};
-    SetData<TData...>(bitmask);
-
-    return Conjunction(bitmask, [](TChunk const& in_member_chunk, TChunk const& in_visitor_chunk) {
-        return (in_member_chunk & in_visitor_chunk) == in_visitor_chunk;
-    }, std::make_index_sequence<TSize>());
+    return (((m_data[in_data / sizeof_chunk] & TChunk(1) << (in_data % sizeof_chunk)) == TChunk(1) << (in_data % sizeof_chunk)) && ...);
 }
 
 template <DAEsize TSize, typename TChunk>
 constexpr DAEbool SizedBitmask<TSize, TChunk>::HasAll(SizedBitmask const& in_bitmask) const noexcept
 {
-    return Conjunction(in_bitmask.m_data, [](TChunk const& in_member_chunk, TChunk const& in_visitor_chunk) {
-        return (in_member_chunk & in_visitor_chunk) == in_visitor_chunk;
-    }, std::make_index_sequence<TSize>());
+    for (DAEsize index = 0; index < TSize; ++index)
+        if (!((m_data[index] & in_bitmask.m_data[index]) == in_bitmask.m_data[index]))
+            return false;
+
+    return true;
 }
 
 template <DAEsize TSize, typename TChunk>
-template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...>>
-constexpr DAEbool SizedBitmask<TSize, TChunk>::HasOne() const noexcept
+template <typename... TData, internal::CheckIntegralTypes<TData...>>
+constexpr DAEbool SizedBitmask<TSize, TChunk>::HasOne(TData... in_data) const noexcept
 {
-    TChunk bitmask[TSize] {};
-    SetData<TData...>(bitmask);
-
-    return Disjunction(bitmask, [](TChunk const& in_member_chunk, TChunk const& in_visitor_chunk) {
-        return in_member_chunk & in_visitor_chunk;
-    }, std::make_index_sequence<TSize>());
+    return ((m_data[in_data / sizeof_chunk] & TChunk(1) << (in_data % sizeof_chunk)) || ...);
 }
 
 template <DAEsize TSize, typename TChunk>
 constexpr DAEbool SizedBitmask<TSize, TChunk>::HasOne(SizedBitmask const& in_bitmask) const noexcept
 {
-    return Disjunction(in_bitmask.m_data, [](TChunk const& in_member_chunk, TChunk const& in_visitor_chunk) {
-        return in_member_chunk & in_visitor_chunk;
-    }, std::make_index_sequence<TSize>());
+    for (DAEsize index = 0; index < TSize; ++index)
+        if ((m_data[index] & in_bitmask.m_data[index]))
+            return true;
+
+    return false;
 }
 
 template <DAEsize TSize, typename TChunk>
-constexpr DAEuint16 SizedBitmask<TSize, TChunk>::Enabled() const noexcept
+constexpr DAEuint16 SizedBitmask<TSize, TChunk>::Popcnt() const noexcept
 {
     // I know that __popcnt16, __popcnt, __popcnt64 is a thing but I don't want to be dependent
     // of the ABM instruction set since it has been dropped on recent modern AMD CPUs
@@ -113,10 +86,10 @@ constexpr DAEuint16 SizedBitmask<TSize, TChunk>::Enabled() const noexcept
 }
 
 template <DAEsize TSize, typename TChunk>
-template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...>>
-constexpr DAEvoid SizedBitmask<TSize, TChunk>::Add() noexcept
+template <typename... TData, internal::CheckIntegralTypes<TData...>>
+constexpr DAEvoid SizedBitmask<TSize, TChunk>::Add(TData... in_data) noexcept
 {
-    SetData<TData...>(m_data);
+    ((m_data[in_data / sizeof_chunk] |= (TChunk(1) << (in_data % sizeof_chunk))), ...);
 }
 
 template <DAEsize TSize, typename TChunk>
@@ -127,14 +100,10 @@ constexpr DAEvoid SizedBitmask<TSize, TChunk>::Add(SizedBitmask const& in_bitmas
 }
 
 template <DAEsize TSize, typename TChunk>
-template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...>>
-constexpr DAEvoid SizedBitmask<TSize, TChunk>::Remove() noexcept
+template <typename... TData, internal::CheckIntegralTypes<TData...>>
+constexpr DAEvoid SizedBitmask<TSize, TChunk>::Remove(TData... in_data) noexcept
 {
-    TChunk bitmask[TSize] {};
-    SetData<TData...>(bitmask);
-
-    for (DAEsize index = 0; index < TSize; ++index)
-        m_data[index] &= ~bitmask[index];
+    ((m_data[in_data / sizeof_chunk] &= ~(TChunk(1) << (in_data % sizeof_chunk))), ...);
 }
 
 template <DAEsize TSize, typename TChunk>

@@ -27,10 +27,16 @@
 #include <type_traits>
 
 #include "Config.hpp"
-#include "Meta/LimitValues.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+namespace internal
+{
+    // Used by the SizedBitmask to check if all passed types are integral types
+    template <typename... TTypes>
+    using CheckIntegralTypes = std::enable_if_t<std::conjunction_v<std::is_integral<TTypes>...>, DAEbool>;
+}
 
 /**
  * \brief A bitmask can be used to store multiple flags into a single integer.
@@ -55,40 +61,6 @@ class SizedBitmask
 
     #pragma endregion
 
-    #pragma region Methods
-
-    /**
-     * \brief Enables the passed flags in the passed data array
-     * \tparam TData Flags to enable
-     * \param out_data data array to enable the flags in
-     */
-    template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...> = true>
-    constexpr static DAEvoid SetData(TChunk out_data[TSize]) noexcept;
-
-    /**
-     * \brief Forms the logical conjunction of the passed predicate
-     * \tparam TPredicate Predicate to test for each chunk
-     * \tparam TIds Chunk ids to iterate through
-     * \param in_data Data to match against the current data of the instance via the passed predicate
-     * \param in_predicate predicate instance
-     * \return Conjunction of all the predicate results
-     */
-    template <typename TPredicate, DAEsize... TIds>
-    constexpr DAEbool Conjunction(TChunk in_data[TSize], TPredicate in_predicate, std::index_sequence<TIds...>) const noexcept;
-
-    /**
-     * \brief Forms the logical disjunction of the passed predicate
-     * \tparam TPredicate Predicate to test for each chunk
-     * \tparam TIds Chunk ids to iterate through
-     * \param in_data Data to match against the current data of the instance via the passed predicate
-     * \param in_predicate predicate instance
-     * \return Disjunction of all the predicate results
-     */
-    template <typename TPredicate, DAEsize... TIds>
-    constexpr DAEbool Disjunction(TChunk in_data[TSize], TPredicate in_predicate, std::index_sequence<TIds...>) const noexcept;
-
-    #pragma endregion 
-
     public:
 
         static constexpr DAEsize sizeof_chunk = sizeof(TChunk) * 8; 
@@ -107,20 +79,28 @@ class SizedBitmask
 
         /**
          * \brief Checks if the bitmask has all the flags passed as enabled.
-         * \tparam TData Flags to check
+         * \tparam TData Flags to check must be an integral type
+         * \param in_data Flags to check 
          * \return True if the bitmask has all the specified flags enabled
+         *
+         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+         *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
-        template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...> = true>
-        [[nodiscard]] constexpr DAEbool HasAll()                               const noexcept;
+        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
+        [[nodiscard]] constexpr DAEbool HasAll(TData... in_data)               const noexcept;
         [[nodiscard]] constexpr DAEbool HasAll(SizedBitmask const& in_bitmask) const noexcept;
 
         /**
          * \brief Checks if the bitmask has at least one the flags passed as enabled.
-         * \tparam TData Flags to check
+         * \tparam TData Flags to check must be an integral type
+         * \param in_data Flags to check 
          * \return True if the bitmask has at least one of the specified flags enabled
+         *
+         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+         *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
-        template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...> = true>
-        [[nodiscard]] constexpr DAEbool HasOne()                               const noexcept;
+        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
+        [[nodiscard]] constexpr DAEbool HasOne(TData... in_data)               const noexcept;
         [[nodiscard]] constexpr DAEbool HasOne(SizedBitmask const& in_bitmask) const noexcept;
 
         /**
@@ -130,22 +110,30 @@ class SizedBitmask
          * \return Number of enabled flags
          * \note Time Complexity: O(log n).
          */
-        [[nodiscard]] constexpr DAEuint16 Enabled() const noexcept;
+        [[nodiscard]] constexpr DAEuint16 Popcnt() const noexcept;
 
         /**
          * \brief Enables the specified flags.
-         * \tparam TData Flags to enable
+         * \tparam TData Flags to enable must be an integral type
+         * \param in_data Flags to enable
+         *
+         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+         *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
-        template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...> = true>
-        constexpr DAEvoid Add()                               noexcept;
+        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
+        constexpr DAEvoid Add(TData... in_data)               noexcept;
         constexpr DAEvoid Add(SizedBitmask const& in_bitmask) noexcept;
 
         /**
          * \brief Disables the specified flags.
-         * \tparam TData Flags to disable
+         * \tparam TData Flags to disable must be an integral type
+         * \param in_data Flags to disable
+         *
+         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+         *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
-        template <DAEsize... TData, LimitValues<sizeof(TChunk) * 8 * TSize, TData...> = true>
-        constexpr DAEvoid Remove()                               noexcept;
+        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
+        constexpr DAEvoid Remove(TData... in_data)               noexcept;
         constexpr DAEvoid Remove(SizedBitmask const& in_bitmask) noexcept;
 
         /**
