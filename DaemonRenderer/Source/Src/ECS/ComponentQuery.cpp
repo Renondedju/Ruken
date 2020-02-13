@@ -22,15 +22,20 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentSystemBase.hpp"
+#include "ECS/ComponentQuery.hpp"
+#include "ECS/ArchetypeBase.hpp"
 
 USING_DAEMON_NAMESPACE
 
-ComponentSystemBase::ComponentSystemBase() noexcept:
-    m_enabled {true}
-{}
-
-DAEbool ComponentSystemBase::Enabled() const
+DAEbool ComponentQuery::Match(ArchetypeBase const& in_archetype) const noexcept
 {
-    return m_enabled;
+    // Checking inclusion
+    if (!in_archetype.GetFingerprint().HasAll(m_included))
+        return false;
+
+    // Checking exclusion
+    if (in_archetype.GetFingerprint().HasOne(m_excluded))
+        return false;
+
+    return true;
 }

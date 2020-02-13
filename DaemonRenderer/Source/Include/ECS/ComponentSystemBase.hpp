@@ -25,7 +25,10 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "Types/FundamentalTypes.hpp"
+
+#include "ECS/ComponentQuery.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -36,8 +39,8 @@ class ComponentSystemBase
 
         #pragma region Mebers
 
-        DAEbool              m_enabled;
-        ArchetypeFingerprint m_target_fingerprint;
+        DAEbool        m_enabled;
+        ComponentQuery m_query;
 
         #pragma endregion
 
@@ -61,17 +64,16 @@ class ComponentSystemBase
         ComponentSystemBase() noexcept;
         ComponentSystemBase(ComponentSystemBase const& in_copy) = default;
         ComponentSystemBase(ComponentSystemBase&&      in_move) = default;
-        ~ComponentSystemBase()                                  = default;
+        virtual ~ComponentSystemBase()                          = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Returns the target archetype fingerprint required by the system
-         * \return Archetype fingerprint
+         * \brief Checks if the system is enabled 
          */
-        ArchetypeFingerprint const& GetTargetFingerprint() const noexcept;
+        DAEbool Enabled() const;
 
         #pragma endregion
 

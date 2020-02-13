@@ -23,37 +23,74 @@
  */
 
 #include <iostream>
+#include <Vector/Vector.hpp>
 
 #include "Config.hpp"
 
 #include "ECS/Component.hpp"
+#include "ECS/EntityAdmin.hpp"
 #include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentSystem.hpp"
 
 USING_DAEMON_NAMESPACE
 
-struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
+/**
+ * \brief This table keeps track of every available component in the ECS
+ *        it is also used to create and maintain every component ID,
+ *        see the Component class for more info.
+ */
+enum class EComponentsTable
 {
-    enum EMembers
-    {
-        Life,
-        MaxLife
-    };
+    Position,
+    Counter,
+    Life,
 };
 
-using LifeComponent = Component<LifeComponentItem>;
-using LifeView      = LifeComponentItem::FullView;
+struct PositionComponentItem : public ComponentItem<Vector3f>
+{
+    enum class EMembers
+    { Position };
+};
+
+struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
+{
+    enum class EMembers
+    { Life, MaxLife };
+};
+
+struct CounterComponentItem : public ComponentItem<DAEfloat> 
+{
+    enum class EMembers
+    { Counter };
+};
+
+DAEMON_DEFINE_COMPONENT(EComponentsTable, Position);
+DAEMON_DEFINE_COMPONENT(EComponentsTable, Counter);
+DAEMON_DEFINE_COMPONENT(EComponentsTable, Life);
 
 int main()
 {
-    
-    LifeComponent life_component;
-    
-    for (int i = 0; i < 200; ++i)
-        life_component.CreateItem();
+    EntityAdmin admin;
 
-    for (int i = 0; i < 200; ++i)
-        LifeComponent::Layout::Get<LifeView>(life_component.m_storage, i).Fetch<LifeComponentItem::MaxLife>() = i;
-        
+    admin.CreateEntity<LifeComponent>();
+    admin.CreateEntity<LifeComponent>();
+    admin.CreateEntity<LifeComponent, CounterComponent>();
+    admin.CreateEntity<LifeComponent, PositionComponent>();
+    admin.CreateEntity<PositionComponent, LifeComponent>();
+    admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
+    admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
+
+    ComponentQuery query;
+    query.SetupInclusionQuery<LifeComponent, PositionComponent>();
+    query.SetupExclusionQuery<CounterComponent>();
+
+    std::cout << query.Match(Archetype<LifeComponent>())                                      << std::endl;
+    std::cout << query.Match(Archetype<LifeComponent, CounterComponent>())                    << std::endl;
+    std::cout << query.Match(Archetype<LifeComponent, PositionComponent>())                   << std::endl;
+    std::cout << query.Match(Archetype<PositionComponent, LifeComponent>())                   << std::endl;
+    std::cout << query.Match(Archetype<PositionComponent, LifeComponent, CounterComponent>()) << std::endl;
+
+    system("pause");
+
     return EXIT_SUCCESS;
 }

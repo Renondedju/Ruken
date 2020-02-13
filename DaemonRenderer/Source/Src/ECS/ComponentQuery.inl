@@ -22,15 +22,14 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentSystemBase.hpp"
-
-USING_DAEMON_NAMESPACE
-
-ComponentSystemBase::ComponentSystemBase() noexcept:
-    m_enabled {true}
-{}
-
-DAEbool ComponentSystemBase::Enabled() const
+template <typename ... TComponents>
+DAEvoid ComponentQuery::SetupInclusionQuery() noexcept
 {
-    return m_enabled;
+    (m_included.Add(TComponents::id), ...);
+}
+
+template <typename ... TComponents>
+DAEvoid ComponentQuery::SetupExclusionQuery() noexcept
+{
+    (m_excluded.Add(TComponents::id), ...);
 }
