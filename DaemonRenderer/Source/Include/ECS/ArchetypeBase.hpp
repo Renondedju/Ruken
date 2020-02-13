@@ -25,11 +25,12 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class __declspec(novtable) ArchetypeBase
+class ArchetypeBase
 {
     protected:
 
@@ -41,6 +42,15 @@ class __declspec(novtable) ArchetypeBase
 
     public:
 
+        #pragma region Constructors
+
+        ArchetypeBase()                             = default;
+        ArchetypeBase(ArchetypeBase const& in_copy) = default;
+        ArchetypeBase(ArchetypeBase&&      in_move) = default;
+        ~ArchetypeBase()                            = default;
+
+        #pragma endregion
+
         #pragma region Methods
 
         /**
@@ -49,7 +59,14 @@ class __declspec(novtable) ArchetypeBase
          */
         ArchetypeFingerprint const& GetFingerprint() const noexcept;
 
-        #pragma endregion 
+        #pragma endregion
+
+        #pragma region Operators
+
+        ArchetypeBase& operator=(ArchetypeBase const& in_copy) = default;
+        ArchetypeBase& operator=(ArchetypeBase&&      in_move) = default;
+
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE
