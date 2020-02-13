@@ -124,6 +124,16 @@ constexpr DAEvoid SizedBitmask<TSize, TChunk>::Clear() noexcept
 }
 
 template <DAEsize TSize, typename TChunk>
+constexpr DAEsize SizedBitmask<TSize, TChunk>::HashCode() const noexcept
+{
+    DAEsize hash = 0;
+    for (DAEsize index = 0; index < TSize; ++index)
+        hash ^= m_data[index];
+
+    return hash;
+}
+
+template <DAEsize TSize, typename TChunk>
 template <typename TLambdaType, typename TPreCast>
 constexpr DAEvoid SizedBitmask<TSize, TChunk>::Foreach(TLambdaType in_lambda) const noexcept
 {
@@ -148,9 +158,13 @@ constexpr SizedBitmask<TSize, TChunk> SizedBitmask<TSize, TChunk>::operator-(Siz
 }
 
 template <DAEsize TSize, typename TChunk>
-constexpr DAEbool SizedBitmask<TSize, TChunk>::operator==(SizedBitmask const& in_bitmask) const noexcept
+constexpr DAEbool SizedBitmask<TSize, TChunk>::operator==(SizedBitmask const& in_other) const noexcept
 {
-    return m_data == in_bitmask.m_data;
+    for (DAEsize index = 0; index < TSize; ++index)
+        if (m_data[index] != in_other.m_data[index])
+            return false;
+
+    return true;
 }
 
 template <DAEsize TSize, typename TChunk>

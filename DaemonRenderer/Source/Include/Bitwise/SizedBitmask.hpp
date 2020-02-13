@@ -146,6 +146,12 @@ class SizedBitmask
         constexpr DAEvoid Clear() noexcept;
 
         /**
+         * \brief Creates a hash code for the given bitmask
+         * \return Generated hash code
+         */
+        constexpr DAEsize HashCode() const noexcept;
+
+        /**
          * \brief Executes a function pointer on each enabled flag in the bitmask.
          * \tparam TLambdaType Type of the lambda, the signature of the function used must be DAEvoid (*in_lambda)(TEnumType in_flag)
          * \tparam TPreCast Type to cast the value into before sending it into the predicate
@@ -163,9 +169,10 @@ class SizedBitmask
 
         constexpr SizedBitmask  operator+ (SizedBitmask const& in_bitmask) const noexcept;
         constexpr SizedBitmask  operator- (SizedBitmask const& in_bitmask) const noexcept;
-        constexpr DAEbool       operator==(SizedBitmask const& in_bitmask) const noexcept;
+        constexpr DAEbool       operator==(SizedBitmask const& in_other)   const noexcept;
         constexpr SizedBitmask& operator+=(SizedBitmask const& in_bitmask)       noexcept;
         constexpr SizedBitmask& operator-=(SizedBitmask const& in_bitmask)       noexcept;
+
 
         #pragma endregion
 };
