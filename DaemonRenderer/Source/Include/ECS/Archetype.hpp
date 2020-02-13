@@ -27,16 +27,18 @@
 #include <tuple>
 
 #include "Config.hpp"
-#include "Containers/Vector.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #include "ECS/EntityID.hpp"
 #include "ECS/ArchetypeBase.hpp"
 
+#include "Meta/ValueIndexer.hpp"
+#include "Meta/IndexSequence/QuicksortIndexSequence.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
 template <typename... TComponents>
-class Archetype : public ArchetypeBase
+class Archetype: public ArchetypeBase
 {
     private:
 
@@ -131,6 +133,38 @@ class Archetype : public ArchetypeBase
 
         #pragma endregion
 };
+
+namespace internal
+{
+    // Hidden template magic used to make the "MakeArchetype" work
+
+    template <std::size_t TIndex, typename... TComponents>
+    using ComponentIndexerT = typename decltype(Select<TIndex>(
+        Indexer<std::index_sequence<TComponents::id...>, TComponents...>{}
+    ))::Type;
+
+    template <std::size_t TLhs, std::size_t TRhs>
+    struct LessComparator : std::integral_constant<DAEbool, (TLhs < TRhs)>
+    {};
+
+    template <typename TTuple, typename TSequence>
+    struct ArchetypeFactory;
+
+    template <template <typename...> class TTuple, std::size_t... TIds, typename... TComponents>
+    struct ArchetypeFactory<TTuple<TComponents...>, std::index_sequence<TIds...>>
+    {
+        using Type = Archetype<internal::ComponentIndexerT<TIds, TComponents...>...>;
+    };
+}
+
+/**
+ * \brief Creates an archetype by reordering components based on their id.
+ *        This makes sure that the only one archetype type is used per component combination.
+ *
+ * \tparam TComponents Components of the archetype to create
+ */
+template <typename... TComponents>
+using MakeArchetype = typename internal::ArchetypeFactory<std::tuple<TComponents...>, QuicksortIndexSequenceT<internal::LessComparator, std::index_sequence<TComponents::id...>>>::Type;
 
 #include "ECS/Archetype.inl"
 
