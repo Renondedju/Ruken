@@ -258,7 +258,10 @@
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexSequence\ConcatenateIndexSequence.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexSequence\QuicksortIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexSequence\PartitionIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
