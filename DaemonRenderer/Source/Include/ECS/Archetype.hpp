@@ -52,28 +52,11 @@ class Archetype: public ArchetypeBase
 
         /**
          * \brief Create entity helper 
-         * \tparam TItems Item types to emplace back
-         * \tparam TIds Indices of the tuple elements
-         * \param in_entity_items Item to emplace back
-         * \return New entity id
-         */
-        template<typename... TItems, DAEsize... TIds>
-        EntityID CreateEntityHelper(TItems&&... in_entity_items, std::index_sequence<TIds...>) noexcept;
-
-        /**
-         * \brief Create entity helper 
          * \tparam TIds Indices of the tuple elements
          * \return New entity id
          */
         template<DAEsize... TIds>
         EntityID CreateEntityHelper(std::index_sequence<TIds...>) noexcept;
-
-        /**
-         * \brief Setups the fingerprint of the archetype
-         * \tparam TIds Tuple index
-         */
-        template<DAEsize... TIds>
-        DAEvoid SetupFingerprint(std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
 
@@ -109,13 +92,8 @@ class Archetype: public ArchetypeBase
         /**
          * \brief Creates an entity in the archetype
          * \return The new ID of this entity.
-         *
-         * \param in_entity_items Items to init the new entity with
-         *
          * \see EntityID for lifetime info
          */
-        template <typename... TItems>
-        EntityID CreateEntity(TItems&&... in_entity_items) noexcept;
         EntityID CreateEntity() noexcept;
 
         /**
