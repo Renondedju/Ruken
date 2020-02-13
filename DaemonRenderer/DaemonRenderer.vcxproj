@@ -245,7 +245,6 @@
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentSystemBase.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentTypeIdIterator.hpp" />
     <ClInclude Include="Source\Include\ECS\EComponentItemStatus.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
@@ -383,7 +382,6 @@
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
     <ClCompile Include="Source\Src\ECS\ArchetypeFingerprint.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
-    <ClCompile Include="Source\Src\ECS\ComponentTypeIdIterator.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
