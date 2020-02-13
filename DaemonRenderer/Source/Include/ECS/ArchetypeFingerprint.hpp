@@ -25,25 +25,15 @@
 #pragma once
 
 #include "Config.hpp"
-#include "Bitwise/Bitmask.hpp"
-#include "Containers/Vector.hpp"
+
+#include "Meta/MinimumType.hpp"
+#include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class ArchetypeFingerprint
+class ArchetypeFingerprint : public SizedBitmask<DAEMON_MAX_ECS_COMPONENTS / 64, MinimumTypeT<64, DAEsize>>
 {
-    private:
-
-        enum class EFragmentContent : DAEsize
-        {};
-
-        #pragma region Members
-
-        Vector<Bitmask<EFragmentContent>> m_fingerprint;
-
-        #pragma endregion
-
     public:
 
         #pragma region Constructors
@@ -58,17 +48,10 @@ class ArchetypeFingerprint
         #pragma region Methods
 
         /**
-         * \brief Adds a trait to the current fingerprint. Duplicates will be skipped
-         * \param in_trait Trait to add
+         * \brief Creates a new fingerprint and setups traits based on the passed components
          */
-        DAEvoid AddTrait(DAEsize in_trait) noexcept;
-
-        /**
-         * \brief Checks if this fingerprint is a subset of another one
-         * \param in_other Other fingerprint
-         * \return True if this fingerprint is a subset of the other one, false otherwise
-         */
-        DAEbool IsSubsetOf(ArchetypeFingerprint const& in_other) const noexcept;
+        template <typename... TComponents>
+        static ArchetypeFingerprint CreateFingerPrintFrom() noexcept;
 
         #pragma endregion
 
@@ -80,4 +63,19 @@ class ArchetypeFingerprint
         #pragma endregion
 };
 
+#include "ECS/ArchetypeFingerprint.inl"
+
 END_DAEMON_NAMESPACE
+
+// std::hash specialization for ArchetypeFingerprint
+namespace std
+{
+    template <>
+    struct hash<DAEMON_NAMESPACE::ArchetypeFingerprint>
+    {
+        size_t operator()(DAEMON_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
+        {
+            return in_key.HashCode();
+        }
+    };
+}
