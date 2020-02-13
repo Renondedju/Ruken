@@ -26,6 +26,15 @@
 
 USING_DAEMON_NAMESPACE
 
+EntityAdmin::~EntityAdmin()
+{
+    for (auto const& archetype: m_archetypes)
+        delete archetype.second;
+
+    for (auto system: m_systems)
+        delete system;
+}
+
 DAEvoid EntityAdmin::UpdateSystems() noexcept
 {
     
