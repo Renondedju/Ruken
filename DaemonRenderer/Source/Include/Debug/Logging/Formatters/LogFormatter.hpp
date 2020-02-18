@@ -37,7 +37,20 @@ class LogFormatter
 
         #pragma region
 
-        virtual String ComputeLabel(LogRecord const& in_record) const noexcept;
+        
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief
+         *
+         * \param in_record
+         *
+         * \return 
+         */
+        [[nodiscard]] virtual String ComputeLabel(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 
@@ -68,28 +81,28 @@ class LogFormatter
          *
          * \return The resulting string.
          */
-        virtual String Format(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual String Format(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        virtual String FormatTime(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual String FormatTime(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        virtual String FormatException(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual String FormatException(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        virtual String FormatStack(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual String FormatStack(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 };

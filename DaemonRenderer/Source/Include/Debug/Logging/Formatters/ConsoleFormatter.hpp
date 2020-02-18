@@ -33,7 +33,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief ConsoleFormatter objects configure the final order, structure, and contents of the log message for the console.
+ * \brief sdq
  */
 class ConsoleFormatter final : public LogFormatter
 {

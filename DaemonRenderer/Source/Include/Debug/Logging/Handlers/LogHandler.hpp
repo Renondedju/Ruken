@@ -27,7 +27,9 @@
 #include "Containers/ForwardList.hpp"
 
 #include "../Filters/LogFilter.hpp"
-#include "../Formatters/LogFormatter.hpp"
+
+#include "../Formatters/ConsoleFormatter.hpp"
+#include "../Formatters/FileFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
