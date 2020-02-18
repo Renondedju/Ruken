@@ -22,20 +22,20 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#include "ECS/ComponentQuery.hpp"
+#include "ECS/ArchetypeBase.hpp"
 
 USING_DAEMON_NAMESPACE
 
-EntityAdmin::~EntityAdmin()
+DAEbool ComponentQuery::Match(ArchetypeBase const& in_archetype) const noexcept
 {
-    for (auto const& archetype: m_archetypes)
-        delete archetype.second;
+    // Checking inclusion
+    if (!in_archetype.GetFingerprint().HasAll(m_included))
+        return false;
 
-    for (auto system: m_systems)
-        delete system;
-}
+    // Checking exclusion
+    if (in_archetype.GetFingerprint().HasOne(m_excluded))
+        return false;
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
-{
-    
+    return true;
 }

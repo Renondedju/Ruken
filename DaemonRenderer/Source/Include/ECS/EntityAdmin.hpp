@@ -25,16 +25,27 @@
 #pragma once
 
 #include "Config.hpp"
+
 #include "Containers/Vector.hpp"
+#include "Containers/UnorderedMap.hpp"
+
+#include "ECS/EntityID.hpp"
+#include "ECS/Archetype.hpp"
+#include "ECS/ArchetypeBase.hpp"
 #include "ECS/ComponentSystemBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class __declspec(novtable) EntityAdmin
+class EntityAdmin
 {
     private:
 
-        Vector<ComponentSystemBase> m_systems;
+        #pragma region Members
+
+        Vector      <ComponentSystemBase*>                 m_systems;
+        UnorderedMap<ArchetypeFingerprint, ArchetypeBase*> m_archetypes;
+        
+        #pragma endregion 
 
     public:
 
@@ -43,23 +54,31 @@ class __declspec(novtable) EntityAdmin
         EntityAdmin()                           = default;
         EntityAdmin(EntityAdmin const& in_copy) = default;
         EntityAdmin(EntityAdmin&&      in_move) = default;
-        ~EntityAdmin()                          = default;
+        ~EntityAdmin();
 
         #pragma endregion
 
-        #pragma region Constructors
+        #pragma region Methods
 
         /**
          * \brief 
-         * \tparam TSystem 
+         * \tparam TSystem System type to push to the entity admin 
          */
         template <typename TSystem>
-        DAEvoid PushSystem() noexcept;
+        DAEvoid CreateSystem() noexcept;
 
         /**
          * \brief Updates every system
          */
         DAEvoid UpdateSystems() noexcept;
+
+        /**
+         * \brief 
+         * \tparam TComponents 
+         * \return 
+         */
+        template <typename... TComponents>
+        EntityID CreateEntity() noexcept;
 
         #pragma endregion
 

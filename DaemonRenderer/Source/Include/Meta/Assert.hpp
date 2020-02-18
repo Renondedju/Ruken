@@ -22,20 +22,29 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include <iostream>
 
-EntityAdmin::~EntityAdmin()
+#include "Config.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+#define DAEMON_STATIC_ASSERT(in_expr, in_message) static_assert(in_expr, in_message)
+#define DAEMON_ASSERT_MESSAGE(in_expr, in_message) internal::Assert(#in_expr, in_expr, __FILE__, __LINE__, in_message)
+
+namespace internal
 {
-    for (auto const& archetype: m_archetypes)
-        delete archetype.second;
-
-    for (auto system: m_systems)
-        delete system;
+    inline void Assert(const char* in_expr_str, bool const in_expr, const char* in_file, int const in_line, const char* in_msg)
+    {
+        if (!in_expr)
+        {
+            std::cerr << "Assert failed: " << in_msg      << '\n'
+                      << "Expected: "      << in_expr_str << '\n'
+                      << "Source: "        << in_file     << ", line " << in_line << '\n';
+            abort();
+        }
+    }
 }
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
-{
-    
-}
+END_DAEMON_NAMESPACE

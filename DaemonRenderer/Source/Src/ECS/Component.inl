@@ -22,31 +22,24 @@
  *  SOFTWARE.
  */
 
-template <typename TItem>
-DAEsize Component<TItem>::TypeId() noexcept
-{
-    static DAEsize type = IdIterator();
-    return type;
-}
-
-template <typename TItem>
-typename Component<TItem>::ItemId Component<TItem>::CreateItem(TItem&& in_item)
+template <typename TItem, DAEsize TUniqueId>
+typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::CreateItem(TItem&& in_item)
 {
     Layout::PushBack(m_storage, std::forward<TItem>(in_item));
 
     return ItemId(Layout::Size(m_storage) - 1);
 }
 
-template <typename TItem>
-typename Component<TItem>::ItemId Component<TItem>::CreateItem()
+template <typename TItem, DAEsize TUniqueId>
+typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::CreateItem()
 {
     Layout::PushBack(m_storage, std::forward<TItem>(TItem{}));
 
     return ItemId(Layout::Size(m_storage) - 1);
 }
 
-template <typename TItem>
-DAEsize Component<TItem>::GetItemCount() const noexcept
+template <typename TItem, DAEsize TUniqueId>
+DAEsize Component<TItem, TUniqueId>::GetItemCount() const noexcept
 {
     return Layout::Size(m_storage);
 }

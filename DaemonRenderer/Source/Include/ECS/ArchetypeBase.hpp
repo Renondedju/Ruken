@@ -26,56 +26,47 @@
 
 #include "Config.hpp"
 
-#include "Meta/MinimumType.hpp"
-#include "Bitwise/SizedBitmask.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class ArchetypeFingerprint : public SizedBitmask<DAEMON_MAX_ECS_COMPONENTS / 64, MinimumTypeT<64, DAEsize>>
+class ArchetypeBase
 {
+    protected:
+
+        #pragma region Members
+
+        ArchetypeFingerprint m_fingerprint;
+
+        #pragma endregion 
+
     public:
 
         #pragma region Constructors
 
-        ArchetypeFingerprint()                                    = default;
-        ArchetypeFingerprint(ArchetypeFingerprint const& in_copy) = default;
-        ArchetypeFingerprint(ArchetypeFingerprint&&      in_move) = default;
-        ~ArchetypeFingerprint()                                   = default;
+        ArchetypeBase()                             = default;
+        ArchetypeBase(ArchetypeBase const& in_copy) = default;
+        ArchetypeBase(ArchetypeBase&&      in_move) = default;
+        ~ArchetypeBase()                            = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Creates a new fingerprint and setups traits based on the passed components
+         * \brief Gets the fingerprint of the archetype
+         * \return Fingerprint
          */
-        template <typename... TComponents>
-        static ArchetypeFingerprint CreateFingerPrintFrom() noexcept;
+        ArchetypeFingerprint const& GetFingerprint() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        ArchetypeFingerprint& operator=(ArchetypeFingerprint const& in_copy) = default;
-        ArchetypeFingerprint& operator=(ArchetypeFingerprint&&      in_move) = default;
+        ArchetypeBase& operator=(ArchetypeBase const& in_copy) = default;
+        ArchetypeBase& operator=(ArchetypeBase&&      in_move) = default;
 
         #pragma endregion
 };
 
-#include "ECS/ArchetypeFingerprint.inl"
-
 END_DAEMON_NAMESPACE
-
-// std::hash specialization for ArchetypeFingerprint
-namespace std
-{
-    template <>
-    struct hash<DAEMON_NAMESPACE::ArchetypeFingerprint>
-    {
-        size_t operator()(DAEMON_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
-        {
-            return in_key.HashCode();
-        }
-    };
-}

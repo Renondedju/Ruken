@@ -153,9 +153,22 @@ namespace DAEMON_NAMESPACE {}
 
 //#define DAEMON_CONTAINERS_USE_PMR_ALLOCATORS
 
+#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+    #define DAEMON_CONTAINERS_ALLOCATORS_STR "PMR"
+#else
+    #define DAEMON_CONTAINERS_ALLOCATORS_STR "default"
+#endif
+
 // ------------------------------
 //       Resource management
 
 #if defined(DAEMON_CONFIG_DEBUG) || defined(DAEMON_CONFIG_RELEASE)
     #define DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
 #endif
+
+// ------------------------------
+//              ECS
+
+// Sets the maximum number of components allowed by the ECS, keep this number
+// as low as possible. Must be a power of 2 with a minimum of 8.
+#define DAEMON_MAX_ECS_COMPONENTS 64

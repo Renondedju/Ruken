@@ -23,7 +23,32 @@
  */
 
 template <typename TSystem>
-DAEvoid EntityAdmin::PushSystem() noexcept
+DAEvoid EntityAdmin::CreateSystem() noexcept
 {
-    m_systems.emplace_back(TSystem());
+    m_systems.emplace_back(new TSystem());
+}
+
+template <typename... TComponents>
+EntityID EntityAdmin::CreateEntity() noexcept
+{
+    using TargetArchetype = MakeArchetype<TComponents...>;
+
+    // Looking for the archetype of the entity
+    ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
+
+    TargetArchetype* target_archetype;
+
+    // If we didn't found any corresponding archetypes, creating it
+    if (m_archetypes.find(targeted_fingerprint) == m_archetypes.end())
+    {
+        target_archetype                   = new TargetArchetype();
+        m_archetypes[targeted_fingerprint] = target_archetype;
+    }
+    // Otherwise, fetching it
+    else
+    {
+        target_archetype = static_cast<TargetArchetype*>(m_archetypes[targeted_fingerprint]);
+    }
+
+    return target_archetype->CreateEntity();
 }

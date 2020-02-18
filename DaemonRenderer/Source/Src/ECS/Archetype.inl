@@ -22,17 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
-template <typename ... TItems, DAEsize ... TIds>
-EntityID Archetype<TComponents...>::CreateEntityHelper(TItems&&... in_entity_items, std::index_sequence<TIds...>) noexcept
-{
-    std::tuple<TItems&&...> items { std::forward<TItems>(in_entity_items)... };
-
-	(std::get<TIds>(m_components).CreateItem(std::forward<TItems>(std::get<TIds>(items))), ...);
-    return EntityID {EntitiesCount() - 1};
-}
-
-template <typename ... TComponents>
+template <typename... TComponents>
 template <DAEsize... TIds>
 EntityID Archetype<TComponents...>::CreateEntityHelper(std::index_sequence<TIds...>) noexcept
 {
@@ -41,16 +31,10 @@ EntityID Archetype<TComponents...>::CreateEntityHelper(std::index_sequence<TIds.
 }
 
 template <typename ... TComponents>
-template <DAEsize... TIds>
-DAEvoid Archetype<TComponents...>::SetupFingerprint(std::index_sequence<TIds...>) noexcept
+Archetype<TComponents...>::Archetype():
+    m_components {}
 {
-    (m_fingerprint.AddTrait(std::get<TIds>(m_components).TypeId()), ...);
-}
-
-template <typename ... TComponents>
-Archetype<TComponents...>::Archetype()
-{
-    SetupFingerprint(std::make_index_sequence<sizeof...(TComponents)>());
+    m_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>(); 
 }
 
 template <typename ... TComponents>
@@ -68,13 +52,6 @@ auto Archetype<TComponents...>::GetComponent() noexcept
 }
 
 template <typename ... TComponents>
-template <typename ... TItems>
-EntityID Archetype<TComponents...>::CreateEntity(TItems&&... in_entity_items) noexcept
-{
-    return CreateEntityHelper<TItems...>(std::forward<TItems>(in_entity_items)..., std::make_index_sequence<sizeof...(TComponents)>());
-}
-
-template <typename ... TComponents>
 EntityID Archetype<TComponents...>::CreateEntity() noexcept
 {
     return CreateEntityHelper(std::make_index_sequence<sizeof...(TComponents)>());
@@ -84,10 +61,4 @@ template <typename ... TComponents>
 DAEsize Archetype<TComponents...>::EntitiesCount() const noexcept
 {
     return std::get<0>(m_components).GetItemCount();
-}
-
-template <typename ... TComponents>
-ArchetypeFingerprint const& Archetype<TComponents...>::GetFingerprint() const noexcept
-{
-    return m_fingerprint;
 }

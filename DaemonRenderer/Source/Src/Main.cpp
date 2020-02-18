@@ -23,67 +23,76 @@
  */
 
 #include <iostream>
+#include <Vector/Vector.hpp>
 
 #include "Config.hpp"
 
-#include "ECS/Archetype.hpp"
 #include "ECS/Component.hpp"
+#include "ECS/EntityAdmin.hpp"
 #include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentSystem.hpp"
-#include "ECS/ArchetypeFingerprint.hpp"
-
-#include "Vector/Vector.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
 USING_DAEMON_NAMESPACE
 
+/**
+ * \brief This table keeps track of every available component in the ECS
+ *        it is also used to create and maintain every component ID,
+ *        see the Component class for more info.
+ */
+enum class EComponentsTable
+{
+    Position,
+    Counter,
+    Life,
+};
+
+struct PositionComponentItem : public ComponentItem<Vector3f>
+{
+    enum class EMembers
+    { Position };
+};
+
 struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
 {
-    enum EMembers
-    {
-        Life,
-        MaxLife
-    };
-    
-    auto&       GetLife()       { return std::get<Life>(*this); }
-    auto const& GetLife() const { return std::get<Life>(*this); }
-
-    auto&       GetMaxLife()       { return std::get<MaxLife>(*this); }
-    auto const& GetMaxLife() const { return std::get<MaxLife>(*this); }
+    enum class EMembers
+    { Life, MaxLife };
 };
 
-struct PositionComponentItem : public ComponentItem<DAEfloat, DAEfloat, DAEfloat>
+struct CounterComponentItem : public ComponentItem<DAEfloat> 
 {
-    enum EMembers { X, Y, Z };
-    
-    auto&       GetX()       { return std::get<X>(*this); }
-    auto const& GetX() const { return std::get<X>(*this); }
-
-    auto&       GetY()       { return std::get<Y>(*this); }
-    auto const& GetY() const { return std::get<Y>(*this); }
-
-    auto&       GetZ()       { return std::get<Z>(*this); }
-    auto const& GetZ() const { return std::get<Z>(*this); }
+    enum class EMembers
+    { Counter };
 };
 
-using LifeComponent     = Component<LifeComponentItem>;
-using PositionComponent = Component<PositionComponentItem>;
+DAEMON_DEFINE_COMPONENT(EComponentsTable, Position);
+DAEMON_DEFINE_COMPONENT(EComponentsTable, Counter);
+DAEMON_DEFINE_COMPONENT(EComponentsTable, Life);
 
 int main()
 {
-    ArchetypeFingerprint fingerprint;
+    EntityAdmin admin;
 
-    fingerprint.AddTrait(LifeComponent::TypeId());
-    fingerprint.AddTrait(PositionComponent::TypeId());
+    admin.CreateEntity<LifeComponent>();
+    admin.CreateEntity<LifeComponent>();
+    admin.CreateEntity<LifeComponent, CounterComponent>();
+    admin.CreateEntity<LifeComponent, PositionComponent>();
+    admin.CreateEntity<PositionComponent, LifeComponent>();
+    admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
+    admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
 
-    Archetype<LifeComponent, PositionComponent> archetype;
-    ComponentSystem<LifeComponent>              life_system;
+    ComponentQuery query;
+    query.SetupInclusionQuery<LifeComponent, PositionComponent>();
+    query.SetupExclusionQuery<CounterComponent>();
 
-    for (int i = 0; i < 200; ++i)
-        archetype.CreateEntity();
+    std::cout << query.Match(Archetype<LifeComponent>())                                      << std::endl;
+    std::cout << query.Match(Archetype<LifeComponent, CounterComponent>())                    << std::endl;
+    std::cout << query.Match(Archetype<LifeComponent, PositionComponent>())                   << std::endl;
+    std::cout << query.Match(Archetype<PositionComponent, LifeComponent>())                   << std::endl;
+    std::cout << query.Match(Archetype<PositionComponent, LifeComponent, CounterComponent>()) << std::endl;
 
     system("pause");
-	
+
     return EXIT_SUCCESS;
 }

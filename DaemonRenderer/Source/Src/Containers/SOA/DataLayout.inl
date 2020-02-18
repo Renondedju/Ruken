@@ -28,7 +28,7 @@ constexpr auto DataLayout<TContainer, TLayoutTypes...>::GetHelper(
     ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
-    return TLayoutView{ std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
+    return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
 }
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>

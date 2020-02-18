@@ -22,12 +22,11 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentTypeIdIterator.hpp"
+#include "ECS/ArchetypeBase.hpp"
 
 USING_DAEMON_NAMESPACE
 
-DAEsize ComponentTypeIdIterator::IdIterator() noexcept
+ArchetypeFingerprint const& ArchetypeBase::GetFingerprint() const noexcept
 {
-    static DAEsize id = 0;
-    return id++;
+    return m_fingerprint;
 }

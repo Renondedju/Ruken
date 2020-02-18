@@ -27,18 +27,12 @@
 #include <tuple>
 
 #include "Config.hpp"
+#include "Meta/ValueIndexer.hpp"
+
+#include "Containers/SOA/DataLayout.hpp"
+#include "Containers/SOA/DataLayoutView.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-#pragma region Forward declarations
-
-template <template <typename> class TContainer, typename... TLayoutTypes>
-class DataLayout;
-
-template <class TSequence, typename... TTypes>
-struct DataLayoutView;
-
-#pragma endregion 
 
 /** 
  * \brienf DataItem class
@@ -48,12 +42,15 @@ struct DataLayoutView;
 template <template <typename> typename TContainer, typename... TTypes>
 struct DataLayoutItem : public std::tuple<TTypes...>
 {
-    using Layout   = DataLayout<TContainer, TTypes...>;
-    using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
-
     // Making constructors available
     using std::tuple<TTypes...>::tuple;
     using std::tuple<TTypes...>::operator=;
+
+    using Layout   = DataLayout<TContainer, TTypes...>;
+    using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
+
+    template <DAEsize... TItems>
+    using MakeView = DataLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
 };
 
 END_DAEMON_NAMESPACE

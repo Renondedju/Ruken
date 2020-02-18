@@ -17,14 +17,6 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Shipping|Win32">
-      <Configuration>Shipping</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Shipping|x64">
-      <Configuration>Shipping</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -46,13 +38,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -60,13 +45,6 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
@@ -84,16 +62,10 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -109,13 +81,6 @@
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <GenerateManifest>false</GenerateManifest>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
@@ -123,13 +88,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <GenerateManifest>false</GenerateManifest>
     <OutDir>$(SolutionDir)$(ProjectName)\Build\Binaries\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\Build\Intermediate\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
@@ -161,7 +119,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <StringPooling>true</StringPooling>
@@ -171,35 +129,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableModules>false</EnableModules>
       <SDLCheck>true</SDLCheck>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
-      <SubSystem>NotSet</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Platform)\Static;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <EnableModules>false</EnableModules>
-      <ProgramDataBaseFileName />
-      <SDLCheck>true</SDLCheck>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -209,25 +143,20 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Platform)\Static;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ProgramDatabaseFile />
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
-    <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Platform)\Static;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Platform)\Static;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>NotSet</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -246,38 +175,12 @@
       <EnableModules>false</EnableModules>
       <SDLCheck>true</SDLCheck>
       <OmitFramePointers>false</OmitFramePointers>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
-    <Link>
-      <ProgramDatabaseFile>
-      </ProgramDatabaseFile>
-      <OptimizeReferences>true</OptimizeReferences>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Platform)\Static;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>NotSet</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-    </Link>
-    <ClCompile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>
-      </PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <StringPooling>true</StringPooling>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <ProgramDataBaseFileName />
-      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>Level4</WarningLevel>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <EnableModules>false</EnableModules>
-      <SDLCheck>true</SDLCheck>
-      <OmitFramePointers>false</OmitFramePointers>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -302,6 +205,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
     <ClInclude Include="Source\Include\Bitwise\Endian.hpp" />
+    <ClInclude Include="Source\Include\Bitwise\SizedBitmask.hpp" />
     <ClInclude Include="Source\Include\Build.hpp" />
     <ClInclude Include="Source\Include\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\Array.hpp" />
@@ -334,11 +238,13 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
+    <ClInclude Include="Source\Include\ECS\ArchetypeBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentSystemBase.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentTypeIdIterator.hpp" />
     <ClInclude Include="Source\Include\ECS\EComponentItemStatus.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
@@ -348,9 +254,15 @@
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
+    <ClInclude Include="Source\Include\Meta\Assert.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexSequence\ConcatenateIndexSequence.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexSequence\QuicksortIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Meta\IndexSequence\PartitionIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
+    <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
@@ -438,9 +350,12 @@
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
+    <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />
+    <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
     <None Include="Source\Src\ECS\Component.inl" />
+    <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentSystem.inl" />
     <None Include="Source\Src\ECS\ComponentSystemBase.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
@@ -466,9 +381,9 @@
     <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\LogRecord.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
-    <ClCompile Include="Source\Src\ECS\ArchetypeFingerprint.cpp" />
+    <ClCompile Include="Source\Src\ECS\ArchetypeBase.cpp" />
+    <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
-    <ClCompile Include="Source\Src\ECS\ComponentTypeIdIterator.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />

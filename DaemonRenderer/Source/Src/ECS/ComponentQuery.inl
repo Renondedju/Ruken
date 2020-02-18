@@ -22,20 +22,14 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
-
-USING_DAEMON_NAMESPACE
-
-EntityAdmin::~EntityAdmin()
+template <typename ... TComponents>
+DAEvoid ComponentQuery::SetupInclusionQuery() noexcept
 {
-    for (auto const& archetype: m_archetypes)
-        delete archetype.second;
-
-    for (auto system: m_systems)
-        delete system;
+    (m_included.Add(TComponents::id), ...);
 }
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
+template <typename ... TComponents>
+DAEvoid ComponentQuery::SetupExclusionQuery() noexcept
 {
-    
+    (m_excluded.Add(TComponents::id), ...);
 }

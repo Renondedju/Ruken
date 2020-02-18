@@ -27,11 +27,10 @@
 USING_DAEMON_NAMESPACE
 
 ComponentSystemBase::ComponentSystemBase() noexcept:
-    m_enabled            {true},
-    m_target_fingerprint {}
+    m_enabled {true}
 {}
 
-ArchetypeFingerprint const& ComponentSystemBase::GetTargetFingerprint() const noexcept
+DAEbool ComponentSystemBase::Enabled() const
 {
-    return m_target_fingerprint;
+    return m_enabled;
 }

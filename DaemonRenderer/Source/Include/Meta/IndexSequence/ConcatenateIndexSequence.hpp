@@ -22,20 +22,40 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include <typeindex>
 
-EntityAdmin::~EntityAdmin()
+#include "Config.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+/**
+ * \brief Concatenates multiple std::index_sequence together
+ * \tparam TSequences Sequences to concatenate
+ */
+template <typename... TSequences>
+struct ConcatenateIndexSequence;
+
+/**
+ * \brief Concatenates multiple std::index_sequence together (type shorthand)
+ * \tparam TSequences Sequences to concatenate
+ */
+template <typename... TSequences>
+using ConcatenateIndexSequenceT = typename ConcatenateIndexSequence<TSequences...>::Type;
+
+template <std::size_t... TIds>
+struct ConcatenateIndexSequence<std::index_sequence<TIds...>>
 {
-    for (auto const& archetype: m_archetypes)
-        delete archetype.second;
+    using Type = std::index_sequence<TIds...>;
+};
 
-    for (auto system: m_systems)
-        delete system;
-}
-
-DAEvoid EntityAdmin::UpdateSystems() noexcept
+template <std::size_t... TIds1, std::size_t... TIds2, typename... TTailSequences>
+struct ConcatenateIndexSequence<std::index_sequence<TIds1...>,
+              std::index_sequence<TIds2...>,
+              TTailSequences...>
 {
-    
-}
+    using Type = ConcatenateIndexSequenceT<std::index_sequence<TIds1..., TIds2...>, TTailSequences...>;
+};
+
+END_DAEMON_NAMESPACE

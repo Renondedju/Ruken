@@ -22,34 +22,33 @@
  *  SOFTWARE.
  */
 
-#include <algorithm>
+#pragma once
 
-#include "ECS/ArchetypeFingerprint.hpp"
+#include <type_traits>
 
-USING_DAEMON_NAMESPACE
+#include "Config.hpp"
 
-DAEvoid ArchetypeFingerprint::AddTrait(DAEsize in_trait) noexcept
+#include "Meta/ValueIndexer.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "Containers/SOA/DataLayoutView.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+template <typename TPack, typename... TTypes>
+struct ComponentItemView;
+
+template <template <DAEsize...> class TPack, DAEsize... TIndices, typename... TTypes>
+struct ComponentItemView<TPack<TIndices...>, TTypes...> : public DataLayoutView<std::index_sequence<TIndices...>, TTypes...>
 {
-    DAEint64 const size    = sizeof(EFragmentContent) * 8Ui64;
-    DAEint64 const section = in_trait / size;
+    template<DAEsize TMember>
+    auto&       Fetch()       { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
 
-    in_trait %= size;
+    template<DAEsize TMember>
+    auto const& Fetch() const { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
 
-    // Checking if the requested section is missing
-    for (int i = 0; (section + 1) - static_cast<DAEint64>(m_fingerprint.size()) > 0ll; ++i)
-        m_fingerprint.emplace_back(Bitmask<EFragmentContent>());
+    // Making constructors available
+    using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::DataLayoutView;
+    using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::operator=;
+};
 
-    m_fingerprint[section].Add(static_cast<EFragmentContent>(in_trait));
-}
-
-DAEbool ArchetypeFingerprint::IsSubsetOf(ArchetypeFingerprint const& in_other) const noexcept
-{
-    if (m_fingerprint.size() > in_other.m_fingerprint.size())
-        return false;
-
-    for (DAEsize index = 0; index < m_fingerprint.size(); ++index)
-        if (! in_other.m_fingerprint[index].HasAll(m_fingerprint[index]))
-            return false;
-
-    return true;    
-}
+END_DAEMON_NAMESPACE

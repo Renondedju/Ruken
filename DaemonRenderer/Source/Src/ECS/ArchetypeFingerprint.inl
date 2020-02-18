@@ -22,47 +22,11 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
-#include "Config.hpp"
-#include "Types/FundamentalTypes.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief This class only purpose is to implement the type id iterator method
- */
-class ComponentTypeIdIterator
+template <typename... TComponents>
+ArchetypeFingerprint ArchetypeFingerprint::CreateFingerPrintFrom() noexcept
 {
-    public:
+    ArchetypeFingerprint fingerprint;
+    (fingerprint.Add(TComponents::id), ...);
 
-        #pragma region Constructors
-
-        ComponentTypeIdIterator()                                       = default;
-        ComponentTypeIdIterator(ComponentTypeIdIterator const& in_copy) = default;
-        ComponentTypeIdIterator(ComponentTypeIdIterator&&      in_move) = default;
-        ~ComponentTypeIdIterator()                                      = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        ComponentTypeIdIterator& operator=(ComponentTypeIdIterator const& in_copy) = default;
-        ComponentTypeIdIterator& operator=(ComponentTypeIdIterator&&      in_move) = default;
-
-        #pragma endregion
-
-    protected:
-
-        #pragma region Methods
-
-        /**
-         * \brief Iterates over an ID for each call of the method
-         * \return Unique ID
-         */
-        static DAEsize IdIterator() noexcept;
-
-        #pragma endregion 
-};
-
-END_DAEMON_NAMESPACE
+    return fingerprint;
+}

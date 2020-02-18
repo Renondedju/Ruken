@@ -26,13 +26,15 @@
 
 #include "Config.hpp"
 
+#include "Meta/IndexPack.hpp"
+#include "ECS/ComponentItemView.hpp"
 #include "Containers/Vector.hpp"
 #include "Containers/SOA/DataLayoutItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class implements what every component item should have. ie: A status, helper methods, etc...
+ * \brief This class describes the memory layout of your component to the ECS
  * \tparam TTypes Item types
  */
 template <typename... TTypes>
@@ -48,6 +50,19 @@ class ComponentItem : public DataLayoutItem<Vector, TTypes...>
         // Exposing constructors
         using DataLayoutItem<Vector, TTypes...>::DataLayoutItem;
         using DataLayoutItem<Vector, TTypes...>::operator=;
+
+        // View constructors
+        template <DAEsize... TItems>
+        using MakeView = ComponentItemView<IndexPack<TItems...>, SelectType<TItems, TTypes...>...>;
+
+    private:
+
+        template <DAEsize... TItems>
+        constexpr static MakeView<TItems...> MakeFullViewHelper(std::index_sequence<TItems...>);
+
+    public:
+
+        using FullView = decltype(MakeFullViewHelper(std::make_index_sequence<sizeof...(TTypes)>()));
 };
 
 END_DAEMON_NAMESPACE

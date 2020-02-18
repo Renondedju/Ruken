@@ -25,19 +25,26 @@
 #pragma once
 
 #include "Config.hpp"
+
+#include "Meta/Assert.hpp"
 #include "Containers/SOA/DataLayout.hpp"
-#include "ECS/ComponentTypeIdIterator.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * Component base class.
- * This class is the actual component class used to store the items.
- * This class has to be instantiated in order to be used by a system.
+ * \brief This class is the actual component class used to store the items.
+ * \tparam TItem Associated item of the component, must be a subtype of ComponentItem
+ * \tparam TUniqueId Unique ID of the component.
+ *                   Ideally this would be generated automatically at compile time but doing so in c++ is
+ *                   really hard and not 100% reliable. Since this ID must be unique for each component, the best way to maintain it
+ *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
+ *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <typename TItem>
-class __declspec(novtable) Component : public ComponentTypeIdIterator
+template <typename TItem, DAEsize TUniqueId>
+class Component
 {
+     DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+
     private:
 
         #pragma region Members
@@ -53,6 +60,8 @@ class __declspec(novtable) Component : public ComponentTypeIdIterator
         using Item   = TItem;
         using ItemId = DAEsize;
 
+        static constexpr DAEsize id = TUniqueId;
+
         #pragma region Constructors
 
         Component()                         = default;
@@ -63,12 +72,6 @@ class __declspec(novtable) Component : public ComponentTypeIdIterator
         #pragma endregion
 
         #pragma region Methods
-
-        /**
-         * \brief Returns the statically evaluated unique type id of the component
-         * \return Type id
-         */
-        static DAEsize TypeId() noexcept;
 
         /**
          * \brief Creates an item into the component
@@ -93,6 +96,16 @@ class __declspec(novtable) Component : public ComponentTypeIdIterator
 
         #pragma endregion
 };
+
+/**
+ * \brief Shorthand to declare a component alias named "<in_component_name>Component"
+ * \note The component item must be named "<in_component_name>ComponentItem"
+ * \note This macro also enables the usage of an enum class for the component table enum
+ * \param in_component_table Component table enum
+ * \param in_component_name Name of the component as described in the above component table enum
+ */
+#define DAEMON_DEFINE_COMPONENT(in_component_table, in_component_name)\
+    using in_component_name##Component = Component<in_component_name##ComponentItem, static_cast<DAEsize>(in_component_table::in_component_name)>
 
 #include "ECS/Component.inl"
 

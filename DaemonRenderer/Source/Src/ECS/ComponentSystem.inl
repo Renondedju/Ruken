@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
+template <typename... TComponents>
 ComponentSystem<TComponents...>::ComponentSystem() noexcept
 {
     SetupTargetFingerprint<TComponents...>();

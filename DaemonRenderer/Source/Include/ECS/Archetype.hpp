@@ -27,37 +27,28 @@
 #include <tuple>
 
 #include "Config.hpp"
-#include "Containers/Vector.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #include "ECS/EntityID.hpp"
-#include "ECS/ArchetypeFingerprint.hpp"
+#include "ECS/ArchetypeBase.hpp"
+
+#include "Meta/ValueIndexer.hpp"
+#include "Meta/IndexSequence/QuicksortIndexSequence.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 template <typename... TComponents>
-class Archetype
+class Archetype: public ArchetypeBase
 {
     private:
 
         #pragma region Members
 
         std::tuple<TComponents...> m_components;
-        ArchetypeFingerprint       m_fingerprint;
 
         #pragma endregion
 
         #pragma region Methods
-
-        /**
-         * \brief Create entity helper 
-         * \tparam TItems Item types to emplace back
-         * \tparam TIds Indices of the tuple elements
-         * \param in_entity_items Item to emplace back
-         * \return New entity id
-         */
-        template<typename... TItems, DAEsize... TIds>
-        EntityID CreateEntityHelper(TItems&&... in_entity_items, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief Create entity helper 
@@ -66,13 +57,6 @@ class Archetype
          */
         template<DAEsize... TIds>
         EntityID CreateEntityHelper(std::index_sequence<TIds...>) noexcept;
-
-        /**
-         * \brief Setups the fingerprint of the archetype
-         * \tparam TIds Tuple index
-         */
-        template<DAEsize... TIds>
-        DAEvoid SetupFingerprint(std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
 
@@ -108,13 +92,8 @@ class Archetype
         /**
          * \brief Creates an entity in the archetype
          * \return The new ID of this entity.
-         *
-         * \param in_entity_items Items to init the new entity with
-         *
          * \see EntityID for lifetime info
          */
-        template <typename... TItems>
-        EntityID CreateEntity(TItems&&... in_entity_items) noexcept;
         EntityID CreateEntity() noexcept;
 
         /**
@@ -122,12 +101,6 @@ class Archetype
          * \return Entities count
          */
         DAEsize EntitiesCount() const noexcept;
-
-        /**
-         * \brief Gets the fingerprint of the archetype
-         * \return Fingerprint
-         */
-        ArchetypeFingerprint const& GetFingerprint() const noexcept;
 
         #pragma endregion
 
@@ -138,6 +111,38 @@ class Archetype
 
         #pragma endregion
 };
+
+namespace internal
+{
+    // Hidden template magic used to make the "MakeArchetype" work
+
+    template <std::size_t TIndex, typename... TComponents>
+    using ComponentIndexerT = typename decltype(Select<TIndex>(
+        Indexer<std::index_sequence<TComponents::id...>, TComponents...>{}
+    ))::Type;
+
+    template <std::size_t TLhs, std::size_t TRhs>
+    struct LessComparator : std::integral_constant<DAEbool, (TLhs < TRhs)>
+    {};
+
+    template <typename TTuple, typename TSequence>
+    struct ArchetypeFactory;
+
+    template <template <typename...> class TTuple, std::size_t... TIds, typename... TComponents>
+    struct ArchetypeFactory<TTuple<TComponents...>, std::index_sequence<TIds...>>
+    {
+        using Type = Archetype<internal::ComponentIndexerT<TIds, TComponents...>...>;
+    };
+}
+
+/**
+ * \brief Creates an archetype by reordering components based on their id.
+ *        This makes sure that the only one archetype type is used per component combination.
+ *
+ * \tparam TComponents Components of the archetype to create
+ */
+template <typename... TComponents>
+using MakeArchetype = typename internal::ArchetypeFactory<std::tuple<TComponents...>, QuicksortIndexSequenceT<internal::LessComparator, std::index_sequence<TComponents::id...>>>::Type;
 
 #include "ECS/Archetype.inl"
 

@@ -22,20 +22,15 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include "Config.hpp"
 
-EntityAdmin::~EntityAdmin()
-{
-    for (auto const& archetype: m_archetypes)
-        delete archetype.second;
+#include "Types/FundamentalTypes.hpp"
 
-    for (auto system: m_systems)
-        delete system;
-}
+BEGIN_DAEMON_NAMESPACE
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
-{
-    
-}
+template <DAEsize... TIndices>
+struct IndexPack {};
+
+END_DAEMON_NAMESPACE
