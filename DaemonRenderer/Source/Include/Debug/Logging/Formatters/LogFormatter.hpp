@@ -24,66 +24,72 @@
 
 #pragma once
 
-#include <iostream>
-
-#include "LogHandler.hpp"
+#include "../LogRecord.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class, located in the core logging package, sends logging output to streams.
+ * \brief Formatter objects configure the final order, structure, and contents of the log message.
  */
-class StreamHandler : public LogHandler
+class LogFormatter
 {
     protected:
 
-        #pragma region Members
+        #pragma region
 
-        std::ostream* m_stream;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief If a formatter is specified, it is used to format the record. The record is then written to the stream with a terminator.
-         *
-         * \param in_record The record to emit.
-         *
-         * \note If exception information is present, it is formatted and appended to the stream.
-         */
-        DAEvoid Emit(LogRecord const& in_record) override;
+        virtual String ComputeLabel(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 
     public:
 
-        #pragma region Contructors and Destructor
+        #pragma region Constructors and Destructor
 
-        explicit StreamHandler(std::ostream* in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        LogFormatter() = default;
 
-		StreamHandler(StreamHandler const&  in_copy) = delete;
-		StreamHandler(StreamHandler&&       in_move) = delete;
+        LogFormatter(LogFormatter const&    in_copy) noexcept = default;
+        LogFormatter(LogFormatter&&         in_move) noexcept = default;
 
-		virtual ~StreamHandler() noexcept = default;
+        virtual ~LogFormatter() = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        StreamHandler& operator=(StreamHandler const& in_other) = delete;
-        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
+        LogFormatter& operator=(LogFormatter const& in_copy) noexcept = default;
+        LogFormatter& operator=(LogFormatter&&      in_move) noexcept = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Flushes the stream by calling its Flush() method.
+         * \param in_record The record to format.
          *
-         * \note The Close() method is inherited from "LogHandler" and so does no output, so an explicit Flush() call may be needed at times.
+         * \return The resulting string.
          */
-        DAEvoid Flush() override;
+        virtual String Format(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        virtual String FormatTime(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        virtual String FormatException(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        virtual String FormatStack(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 };

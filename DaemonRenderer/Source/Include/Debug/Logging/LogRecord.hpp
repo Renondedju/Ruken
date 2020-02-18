@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "ELogLevel.hpp"
+#include "LogLevel.hpp"
 
 #include "Containers/String.hpp"
 
@@ -39,12 +39,12 @@ struct LogRecord
 {
     #pragma region Members
 
-    String      m_logger_name;
-    ELogLevel   m_level;
-    String      m_path;
-    DAEuint32   m_line_number;
-    String      m_message;
-    String      m_function_name;
+    String      logger_name;
+    ELogLevel   level;
+    String      message;
+    String      filename;
+    DAEint32    line_number;
+    String      function_name;
 
     #pragma endregion
 
@@ -52,12 +52,12 @@ struct LogRecord
 
     LogRecord() = delete;
 
-    LogRecord(String in_logger_name,
-              ELogLevel     in_level,
-              String in_path,
-              DAEuint32     in_line_number,
-              String in_message,
-              String in_function_name = "") noexcept;
+    LogRecord(String    in_logger_name,
+              ELogLevel in_level,
+              String    in_message,
+              String    in_filename      = "",
+              DAEint32  in_line_number   = -1,
+              String    in_function_name = "") noexcept;
 
     LogRecord(LogRecord const&  in_copy) noexcept = default;
     LogRecord(LogRecord&&       in_move) noexcept = default;

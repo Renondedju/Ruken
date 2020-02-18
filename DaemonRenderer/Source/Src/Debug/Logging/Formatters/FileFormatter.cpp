@@ -22,55 +22,26 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Debug/Logging/Formatters/FileFormatter.hpp"
 
-#include "LogRecord.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief Filters objects can be used by Handlers and Loggers for more sophisticated filtering than is provided by levels.
- */
-class LogFilter
+String FileFormatter::Format(LogRecord const& in_record) const noexcept
 {
-    private:
+    return LogFormatter::Format(in_record);
+}
 
-        #pragma region Members
+String FileFormatter::FormatTime(LogRecord const& in_record) const noexcept
+{
+    return LogFormatter::FormatTime(in_record);
+}
 
-        
+String FileFormatter::FormatException(LogRecord const& in_record) const noexcept
+{
+    return LogFormatter::FormatException(in_record);
+}
 
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructors and Destructor
-
-        LogFilter() = default;
-
-        LogFilter(LogFilter const&  in_copy) noexcept = default;
-        LogFilter(LogFilter&&       in_move) noexcept = default;
-
-        ~LogFilter() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogFilter& operator=(LogFilter const&   in_copy) noexcept = default;
-        LogFilter& operator=(LogFilter&&        in_move) noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \param in_record The record to filter.
-         *
-         * \return True if the specified record is to be logged, else False.
-         */
-        DAEbool Filter(LogRecord const& in_record) const noexcept;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+String FileFormatter::FormatStack(LogRecord const& in_record) const noexcept
+{
+    return LogFormatter::FormatStack(in_record);
+}

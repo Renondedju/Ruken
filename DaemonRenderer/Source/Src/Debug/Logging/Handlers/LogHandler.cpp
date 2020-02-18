@@ -27,7 +27,8 @@
 USING_DAEMON_NAMESPACE
 
 LogHandler::LogHandler(ELogLevel const in_level) noexcept :
-    m_level { in_level }
+    m_level { in_level },
+    m_formatter { nullptr }
 {
     
 }
@@ -60,7 +61,7 @@ DAEvoid LogHandler::SetLevel(ELogLevel const in_level) noexcept
     m_level = in_level;
 }
 
-DAEvoid LogHandler::SetFormatter(LogFormatter const& in_formatter) noexcept
+DAEvoid LogHandler::SetFormatter(LogFormatter const* in_formatter) noexcept
 {
     m_formatter = in_formatter;
 }
@@ -104,7 +105,7 @@ DAEvoid LogHandler::HandleError(LogRecord const& in_record) const noexcept
 
 String LogHandler::Format(LogRecord const& in_record) const noexcept
 {
-    return m_formatter.Format(in_record);
+    return m_formatter->Format(in_record);
 }
 
 DAEvoid LogHandler::Flush()

@@ -24,11 +24,10 @@
 
 #pragma once
 
-#include "../LogFilter.hpp"
-#include "../LogRecord.hpp"
-#include "../LogFormatter.hpp"
-
 #include "Containers/ForwardList.hpp"
+
+#include "../Filters/LogFilter.hpp"
+#include "../Formatters/LogFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -51,7 +50,7 @@ class LogHandler
         /**
          * 
          */
-        LogFormatter m_formatter;
+        LogFormatter const* m_formatter;
 
         /**
          * 
@@ -126,7 +125,7 @@ class LogHandler
          *
          * \param in_formatter The desired formatter.
          */
-        DAEvoid SetFormatter(LogFormatter const& in_formatter) noexcept;
+        DAEvoid SetFormatter(LogFormatter const* in_formatter) noexcept;
 
         /**
          * \brief Adds the specified filter filter to this handler.

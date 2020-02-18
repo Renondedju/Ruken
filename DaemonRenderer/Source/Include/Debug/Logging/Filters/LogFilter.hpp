@@ -22,17 +22,47 @@
  *  SOFTWARE.
  */
 
-#include "Debug/Logging/LogFilter.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include "../LogRecord.hpp"
 
-#pragma region Methods
+BEGIN_DAEMON_NAMESPACE
 
-DAEbool LogFilter::Filter(LogRecord const& in_record) const noexcept
+/**
+ * \brief Filters objects can be used by Handlers and Loggers for more sophisticated filtering than is provided by levels.
+ */
+class LogFilter
 {
-    (void)in_record;
+    public:
 
-    return true;
-}
+        #pragma region Constructors and Destructor
 
-#pragma endregion
+        LogFilter() = default;
+
+        LogFilter(LogFilter const&  in_copy) noexcept = default;
+        LogFilter(LogFilter&&       in_move) noexcept = default;
+
+        virtual ~LogFilter() = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogFilter& operator=(LogFilter const&   in_copy) noexcept = default;
+        LogFilter& operator=(LogFilter&&        in_move) noexcept = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \param in_record The record to filter.
+         *
+         * \return True if the specified record is to be logged, else False.
+         */
+        virtual DAEbool Filter(LogRecord const& in_record) const = 0;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

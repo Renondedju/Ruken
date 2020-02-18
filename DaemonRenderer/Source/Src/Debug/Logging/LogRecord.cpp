@@ -24,43 +24,42 @@
 
 #include <utility>
 
-
 #include "Debug/Logging/LogRecord.hpp"
 
 USING_DAEMON_NAMESPACE
 
 LogRecord::LogRecord(String             in_logger_name,
                      ELogLevel const    in_level,
-                     String             in_path,
-                     DAEuint32 const    in_line_number,
                      String             in_message,
+                     String             in_filename,
+                     DAEint32 const     in_line_number,
                      String             in_function_name) noexcept :
-    m_logger_name   { std::move(in_logger_name) },
-    m_level         { in_level },
-    m_path          { std::move(in_path) },
-    m_line_number   { in_line_number },
-    m_message       { std::move(in_message) },
-    m_function_name { std::move(in_function_name) }
+    logger_name     { std::move(in_logger_name) },
+    level           { in_level },
+    message         { std::move(in_message) },
+    filename        { std::move(in_filename) },
+    line_number     { in_line_number },
+    function_name   { std::move(in_function_name) }
 {
 
 }
 
 DAEbool LogRecord::operator==(LogRecord const& in_other) const noexcept
 {
-    return m_logger_name   == in_other.m_logger_name &&
-           m_level         == in_other.m_level       &&
-           m_path          == in_other.m_path        &&
-           m_line_number   == in_other.m_line_number &&
-           m_message       == in_other.m_message     &&
-           m_function_name == in_other.m_function_name;
+    return logger_name   == in_other.logger_name &&
+           level         == in_other.level       &&
+           message       == in_other.message     &&
+           filename      == in_other.filename    &&
+           line_number   == in_other.line_number &&
+           function_name == in_other.function_name;
 }
 
 DAEbool LogRecord::operator!=(LogRecord const& in_other) const noexcept
 {
-    return m_logger_name   != in_other.m_logger_name ||
-           m_level         != in_other.m_level       ||
-           m_path          != in_other.m_path        ||
-           m_line_number   != in_other.m_line_number ||
-           m_message       != in_other.m_message     ||
-           m_function_name != in_other.m_function_name;
+    return logger_name   != in_other.logger_name ||
+           level         != in_other.level       ||
+           message       != in_other.message     ||
+           filename      != in_other.filename    ||
+           line_number   != in_other.line_number ||
+           function_name != in_other.function_name;
 }

@@ -33,7 +33,7 @@ BEGIN_DAEMON_NAMESPACE
  *
  * \note It inherits the output functionality from StreamHandler.
  */
-class FileHandler final : StreamHandler
+class FileHandler final : public StreamHandler
 {
     protected:
 

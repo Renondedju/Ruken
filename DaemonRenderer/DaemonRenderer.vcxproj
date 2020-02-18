@@ -227,12 +227,14 @@
     <ClInclude Include="Source\Include\Containers\UnorderedMap.hpp" />
     <ClInclude Include="Source\Include\Containers\UnorderedSet.hpp" />
     <ClInclude Include="Source\Include\Containers\Vector.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\ELogLevel.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\Formatters\ConsoleFormatter.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\Formatters\FileFormatter.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\LogLevel.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\FileHandler.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\LogHandler.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\StreamHandler.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\LogFilter.hpp" />
-    <ClInclude Include="Source\Include\Debug\Logging\LogFormatter.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\Filters\LogFilter.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\Formatters\LogFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Logger.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\LogRecord.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
@@ -373,11 +375,12 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Debug\Logging\Formatters\ConsoleFormatter.cpp" />
+    <ClCompile Include="Source\Src\Debug\Logging\Formatters\FileFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\FileHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\LogHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\StreamHandler.cpp" />
-    <ClCompile Include="Source\Src\Debug\Logging\LogFilter.cpp" />
-    <ClCompile Include="Source\Src\Debug\Logging\LogFormatter.cpp" />
+    <ClCompile Include="Source\Src\Debug\Logging\Formatters\LogFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\LogRecord.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />

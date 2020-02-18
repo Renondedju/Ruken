@@ -22,30 +22,41 @@
  *  SOFTWARE.
  */
 
-#include "Debug/Logging/LogFormatter.hpp"
+#include "Debug/Logging/Formatters/LogFormatter.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Methods
+String LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
+{
+    switch (in_record.level)
+    {
+        case ELogLevel::NotSet:     return "[NOTSET]";
+        case ELogLevel::Debug:      return "[DEBUG]";
+        case ELogLevel::Info:       return "[INFO]";
+        case ELogLevel::Warning:    return "[WARNING]";
+        case ELogLevel::Error:      return "[ERROR]";
+        case ELogLevel::Fatal:      return "[FATAL]";
+    }
+
+    return "";
+}
 
 String LogFormatter::Format(LogRecord const& in_record) const noexcept
 {
-    return in_record.m_message;
+    return ComputeLabel(in_record) + ": " + in_record.logger_name + ": " + in_record.message + "\n";
 }
 
 String LogFormatter::FormatTime(LogRecord const& in_record) const noexcept
 {
-    return in_record.m_message;
+    return in_record.message;
 }
 
 String LogFormatter::FormatException(LogRecord const& in_record) const noexcept
 {
-    return in_record.m_message;
+    return in_record.message;
 }
 
 String LogFormatter::FormatStack(LogRecord const& in_record) const noexcept
 {
-    return in_record.m_message;
+    return in_record.message;
 }
-
-#pragma endregion
