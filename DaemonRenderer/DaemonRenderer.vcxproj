@@ -328,6 +328,9 @@
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
+    <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
+    <ClInclude Include="Source\Include\Windowing\Window.hpp" />
+    <ClInclude Include="Source\Include\Windowing\WindowManager.hpp" />
     <ClInclude Include="Source\Src\Meta\ReferenceWrapper.inl" />
   </ItemGroup>
   <ItemGroup>
@@ -399,6 +402,9 @@
     <ClCompile Include="Source\Src\Time\Sleep.cpp" />
     <ClCompile Include="Source\Src\Time\Timer.cpp" />
     <ClCompile Include="Source\Src\Utility\Benchmark.cpp" />
+    <ClCompile Include="Source\Src\Windowing\Screen.cpp" />
+    <ClCompile Include="Source\Src\Windowing\Window.cpp" />
+    <ClCompile Include="Source\Src\Windowing\WindowManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

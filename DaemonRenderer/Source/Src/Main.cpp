@@ -24,16 +24,16 @@
 
 #include <Vector/Vector.hpp>
 
-
-
-#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
-#include "Debug/Logging/Handlers/StreamHandler.hpp"
 #include "ECS/Component.hpp"
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentSystem.hpp"
 
-#include "Debug/Logging/Logger.hpp"
+#include "Windowing/WindowManager.hpp"
+
+#include "Debug/Logging/Handlers/StreamHandler.hpp"
+
+#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
 USING_DAEMON_NAMESPACE
 

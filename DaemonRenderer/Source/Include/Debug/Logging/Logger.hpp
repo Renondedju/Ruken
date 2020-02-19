@@ -84,6 +84,14 @@ class Logger
         #pragma region Methods
 
         /**
+         * \brief Logs a message with the specified level on this logger.
+         *
+         * \param in_level The level to log.
+         * \param in_message The message to log.
+         */
+        DAEvoid Log(ELogLevel in_level, String in_message) const noexcept;
+
+        /**
          * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a false value of 'propagate' is found).
          *
          * No filtering is applied.
@@ -203,43 +211,35 @@ class Logger
          *
          * \param in_message The message to log.
          */
-        DAEvoid Debug(DAEchar const* in_message) const noexcept;
+        DAEvoid Debug(String in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Info' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Info(DAEchar const* in_message) const noexcept;
+        DAEvoid Info(String in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Warning' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Warning(DAEchar const* in_message) const noexcept;
+        DAEvoid Warning(String in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Error' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Error(DAEchar const* in_message) const noexcept;
+        DAEvoid Error(String in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Fatal' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Fatal(DAEchar const* in_message) const noexcept;
-
-        /**
-         * \brief Logs a message with the specified level on this logger.
-         *
-         * \param in_level The level to log.
-         * \param in_message The message to log.
-         */
-        DAEvoid Log(ELogLevel in_level, DAEchar const* in_message) const noexcept;
+        DAEvoid Fatal(String in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Error' on this logger.
@@ -250,7 +250,7 @@ class Logger
          *
          * \note This method should only be called from an exception handler.
          */
-        DAEvoid Exception(DAEchar const* in_message) const noexcept;
+        DAEvoid Exception(String in_message) const noexcept;
 
         /**
          * \brief Adds the specified filter to this logger.
