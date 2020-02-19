@@ -68,7 +68,7 @@ class LogHandler
 
         #pragma region Contructors and Destructor
 
-        explicit LogHandler(ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        explicit LogHandler(LogFormatter const* in_formatter, ELogLevel in_level = ELogLevel::NotSet) noexcept;
 
         LogHandler(LogHandler const&    in_copy) = delete;
         LogHandler(LogHandler&&         in_move) = delete;

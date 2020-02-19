@@ -60,9 +60,10 @@ class FileHandler final : public LogHandler
 
         #pragma region Contructors and Destructor
 
-        explicit FileHandler(String const&      in_path,
-                             std::ios::openmode in_mode,
-                             ELogLevel          in_level = ELogLevel::NotSet) noexcept;
+        explicit FileHandler(LogFormatter const*    in_formatter,
+                             String       const&    in_path,
+                             std::ios::openmode     in_mode,
+                             ELogLevel              in_level = ELogLevel::NotSet) noexcept;
 
         FileHandler(FileHandler const&  in_copy) = delete;
         FileHandler(FileHandler&&       in_move) = delete;

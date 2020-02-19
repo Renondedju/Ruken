@@ -33,9 +33,10 @@ DAEvoid FileHandler::Emit(LogRecord const& in_record)
     m_stream << m_formatter->Format(in_record);
 }
 
-FileHandler::FileHandler(String             const&  in_path,
+FileHandler::FileHandler(LogFormatter       const*  in_formatter,
+                         String             const&  in_path,
                          std::ios::openmode const   in_mode,
-                         ELogLevel          const   in_level) noexcept : LogHandler(in_level),
+                         ELogLevel          const   in_level) noexcept : LogHandler(in_formatter, in_level),
     m_stream { in_path, in_mode }
 {
     

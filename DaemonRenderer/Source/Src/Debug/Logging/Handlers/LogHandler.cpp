@@ -26,9 +26,10 @@
 
 USING_DAEMON_NAMESPACE
 
-LogHandler::LogHandler(ELogLevel const in_level) noexcept :
+LogHandler::LogHandler(LogFormatter const*  in_formatter,
+                       ELogLevel    const   in_level) noexcept :
     m_level     { in_level },
-    m_formatter { nullptr }
+    m_formatter { in_formatter }
 {
     
 }
