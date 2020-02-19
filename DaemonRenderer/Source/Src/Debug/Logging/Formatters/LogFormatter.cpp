@@ -43,7 +43,7 @@ String LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 
 String LogFormatter::Format(LogRecord const& in_record) const noexcept
 {
-    return ComputeLabel(in_record) + ": " + in_record.logger_name + ": " + in_record.message + "\n";
+    return ComputeLabel(in_record) + " : " + in_record.logger_name + " : " + in_record.message + "\n";
 }
 
 String LogFormatter::FormatTime(LogRecord const& in_record) const noexcept

@@ -75,12 +75,60 @@ ELogLevel Logger::GetEffectiveLevel() const noexcept
 	return m_level != ELogLevel::NotSet ? m_level : m_parent ? m_parent->GetEffectiveLevel() : m_level;
 }
 
-DAEvoid Logger::Log(ELogLevel const in_level, DAEchar const* in_message) const noexcept
+Logger* Logger::AddChild(DAEchar const* in_name)
 {
-    if (IsEnabledFor(in_level))
-	{
-        Handle(LogRecord(m_name, in_level, in_message));
-	}
+    auto const& logger = new Logger(in_name, m_level, this, propagate);
+
+    m_children.push_front(logger);
+
+    return logger;
+}
+
+DAEbool Logger::RemoveChild(DAEchar const* in_name)
+{
+    for (auto const& child : m_children)
+    {
+        if (child->m_name == in_name)
+        {
+            m_children.remove(child);
+
+            delete child;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+DAEbool Logger::RemoveChild(Logger const* in_logger)
+{
+    for (auto const& child : m_children)
+    {
+        if (child->m_name == in_logger->m_name)
+        {
+            m_children.remove(child);
+
+            delete child;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+Logger* Logger::GetChild(DAEchar const* in_name) const noexcept
+{
+    for (auto const& child : m_children)
+    {
+        if (child->m_name == in_name)
+        {
+            return child;
+        }
+    }
+
+    return nullptr;
 }
 
 DAEvoid Logger::Debug(DAEchar const* in_message) const noexcept
@@ -108,31 +156,17 @@ DAEvoid Logger::Fatal(DAEchar const* in_message) const noexcept
     Log(ELogLevel::Fatal, in_message);
 }
 
+DAEvoid Logger::Log(ELogLevel const in_level, DAEchar const* in_message) const noexcept
+{
+    if (IsEnabledFor(in_level))
+	{
+        Handle(LogRecord(m_name.c_str(), in_level, in_message));
+	}
+}
+
 DAEvoid Logger::Exception(DAEchar const* in_message) const noexcept
 {
     Log(ELogLevel::Error, in_message);
-}
-
-Logger* Logger::AddChild(DAEchar const* in_name)
-{
-    auto const& logger = new Logger(in_name, m_level, this);
-
-    m_children.push_front(logger);
-
-    return logger;
-}
-
-Logger* Logger::GetChild(DAEchar const* in_name) const noexcept
-{
-    for (auto const& child : m_children)
-    {
-        if (child->m_name == in_name)
-        {
-            return child;
-        }
-    }
-
-    return nullptr;
 }
 
 DAEvoid Logger::AddFilter(LogFilter* in_filter)

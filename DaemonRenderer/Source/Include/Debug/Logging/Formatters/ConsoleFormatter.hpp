@@ -27,13 +27,15 @@
 #include "LogFormatter.hpp"
 
 #ifdef DAEMON_OS_WINDOWS
-    #include "Utility/WindowsOS.hpp"
+
+#include "Utility/WindowsOS.hpp"
+
 #endif
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief sdq
+ * \brief This class configures the final order, structure, and contents of the log message for the console.
  */
 class ConsoleFormatter final : public LogFormatter
 {
@@ -51,7 +53,14 @@ class ConsoleFormatter final : public LogFormatter
 
         #pragma region Methods
 
-        String ComputeLabel(LogRecord const& in_record) const noexcept override;
+        /**
+         * \brief 
+         *
+         * \param in_record 
+         *
+         * \return 
+         */
+        [[nodiscard]] String ComputeLabel(LogRecord const& in_record) const noexcept override;
 
         #pragma endregion
 
@@ -59,51 +68,25 @@ class ConsoleFormatter final : public LogFormatter
 
         #pragma region Constructors and Destructor
 
-        ConsoleFormatter();
+        ConsoleFormatter() noexcept;
 
-        ConsoleFormatter(ConsoleFormatter const&    in_copy) noexcept = default;
-        ConsoleFormatter(ConsoleFormatter&&         in_move) noexcept = default;
+        ConsoleFormatter(ConsoleFormatter const&    in_copy) = delete;
+        ConsoleFormatter(ConsoleFormatter&&         in_move) = delete;
 
-        ~ConsoleFormatter() = default;
+        ~ConsoleFormatter() noexcept = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        ConsoleFormatter& operator=(ConsoleFormatter const& in_copy) noexcept = default;
-        ConsoleFormatter& operator=(ConsoleFormatter&&      in_move) noexcept = default;
+        ConsoleFormatter& operator=(ConsoleFormatter const& in_copy) = delete;
+        ConsoleFormatter& operator=(ConsoleFormatter&&      in_move) = delete;
 
         #pragma endregion
 
         #pragma region Methods
 
-        /**
-         * \param in_record The record to format.
-         *
-         * \return The resulting string.
-         */
-        String Format(LogRecord const& in_record) const noexcept override;
-
-        /**
-         * \param in_record The record to format.
-         *
-         * \return The resulting string.
-         */
-        String FormatTime(LogRecord const& in_record) const noexcept override;
-
-        /**
-         * \param in_record The record to format.
-         *
-         * \return The resulting string.
-         */
-        String FormatException(LogRecord const& in_record) const noexcept override;
-
-        /**
-         * \param in_record The record to format.
-         *
-         * \return The resulting string.
-         */
-        String FormatStack(LogRecord const& in_record) const noexcept override;
+        
 
         #pragma endregion
 };

@@ -27,33 +27,10 @@
 USING_DAEMON_NAMESPACE
 
 LogHandler::LogHandler(ELogLevel const in_level) noexcept :
-    m_level { in_level },
+    m_level     { in_level },
     m_formatter { nullptr }
 {
     
-}
-
-LogHandler::~LogHandler() noexcept
-{
-    m_filters.clear();
-}
-
-
-#pragma region Methods
-
-DAEvoid LogHandler::CreateLock()
-{
-
-}
-
-DAEvoid LogHandler::Acquire()
-{
-
-}
-
-DAEvoid LogHandler::Release()
-{
-
 }
 
 DAEvoid LogHandler::SetLevel(ELogLevel const in_level) noexcept
@@ -78,10 +55,12 @@ DAEvoid LogHandler::RemoveFilter(LogFilter const* in_filter)
 
 DAEbool LogHandler::Filter(LogRecord const& in_record) const noexcept
 {
-    for (LogFilter const* filter : m_filters)
+    for (auto const& filter : m_filters)
     {
-        if (!filter || !filter->Filter(in_record))
+        if (filter && !filter->Filter(in_record))
+        {
             return false;
+        }
     }
 
     return true;
@@ -95,27 +74,17 @@ DAEvoid LogHandler::Handle(LogRecord const& in_record) noexcept
     }
 }
 
-DAEvoid LogHandler::HandleError(LogRecord const& in_record) const noexcept
+DAEvoid LogHandler::HandleError(LogRecord const& in_record) noexcept
 {
     if (Filter(in_record))
     {
-        /* TODO */
+        Emit(in_record);
     }
 }
 
 String LogHandler::Format(LogRecord const& in_record) const noexcept
 {
     return m_formatter->Format(in_record);
-}
-
-DAEvoid LogHandler::Flush()
-{
-
-}
-
-DAEvoid LogHandler::Close()
-{
-
 }
 
 #pragma endregion

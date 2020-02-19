@@ -29,7 +29,9 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Filters objects can be used by Handlers and Loggers for more sophisticated filtering than is provided by levels.
+ * \brief This class provides a finer grained facility for determining which log records to output.
+ *
+ * \note Filters objects can be used by Handlers and Loggers for more sophisticated filtering than is provided by levels.
  */
 class LogFilter
 {
@@ -60,7 +62,7 @@ class LogFilter
          *
          * \return True if the specified record is to be logged, else False.
          */
-        virtual DAEbool Filter(LogRecord const& in_record) const = 0;
+        [[nodiscard]] virtual DAEbool Filter(LogRecord const& in_record) const = 0;
 
         #pragma endregion
 };

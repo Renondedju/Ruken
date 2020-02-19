@@ -24,14 +24,14 @@
 
 #pragma once
 
-#include "LogLevel.hpp"
-
 #include "Containers/String.hpp"
+
+#include "LogLevel.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Instances of this structure are created automatically by the Logger every time something is logged and be created manually.
+ * \brief Instances of this structure are created automatically by the Logger every time something is logged and can be created manually.
  *
  * It contains all the information pertinent to the event being logged.
  */
@@ -52,12 +52,12 @@ struct LogRecord
 
     LogRecord() = delete;
 
-    LogRecord(String    in_logger_name,
-              ELogLevel in_level,
-              String    in_message,
-              String    in_filename      = "",
-              DAEint32  in_line_number   = -1,
-              String    in_function_name = "") noexcept;
+    LogRecord(DAEchar const*    in_logger_name,
+              ELogLevel         in_level,
+              DAEchar const*    in_message,
+              DAEchar const*    in_filename      = "",
+              DAEint32          in_line_number   = -1,
+              DAEchar const*    in_function_name = "") noexcept;
 
     LogRecord(LogRecord const&  in_copy) noexcept = default;
     LogRecord(LogRecord&&       in_move) noexcept = default;

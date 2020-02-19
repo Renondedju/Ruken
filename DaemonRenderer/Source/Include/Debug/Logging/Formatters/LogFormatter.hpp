@@ -29,22 +29,22 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Formatter objects configure the final order, structure, and contents of the log message.
+ * \brief This class configures the final order, structure, and contents of the log message.
  */
 class LogFormatter
 {
     protected:
 
-        #pragma region
+        #pragma region Default Constructor
 
-        
+        LogFormatter() noexcept = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief
+         * \brief 
          *
          * \param in_record
          *
@@ -58,10 +58,8 @@ class LogFormatter
 
         #pragma region Constructors and Destructor
 
-        LogFormatter() = default;
-
-        LogFormatter(LogFormatter const&    in_copy) noexcept = default;
-        LogFormatter(LogFormatter&&         in_move) noexcept = default;
+        LogFormatter(LogFormatter const&    in_copy) = delete;
+        LogFormatter(LogFormatter&&         in_move) = delete;
 
         virtual ~LogFormatter() = default;
 
@@ -69,8 +67,8 @@ class LogFormatter
 
         #pragma region Operators
 
-        LogFormatter& operator=(LogFormatter const& in_copy) noexcept = default;
-        LogFormatter& operator=(LogFormatter&&      in_move) noexcept = default;
+        LogFormatter& operator=(LogFormatter const& in_copy) = delete;
+        LogFormatter& operator=(LogFormatter&&      in_move) = delete;
 
         #pragma endregion
 

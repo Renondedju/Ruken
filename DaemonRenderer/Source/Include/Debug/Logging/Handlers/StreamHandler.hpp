@@ -31,15 +31,15 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class, located in the core logging package, sends logging output to streams.
+ * \brief This class sends logging output to streams.
  */
-class StreamHandler : public LogHandler
+class StreamHandler final : public LogHandler
 {
     protected:
 
         #pragma region Members
 
-        std::ostream* m_stream;
+        std::ostream m_stream;
 
         #pragma endregion
 
@@ -60,12 +60,12 @@ class StreamHandler : public LogHandler
 
         #pragma region Contructors and Destructor
 
-        explicit StreamHandler(std::ostream* in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        explicit StreamHandler(std::ostream& in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
 
-		StreamHandler(StreamHandler const&  in_copy) = delete;
-		StreamHandler(StreamHandler&&       in_move) = delete;
+        StreamHandler(StreamHandler const&  in_copy) = delete;
+        StreamHandler(StreamHandler&&       in_move) = delete;
 
-		virtual ~StreamHandler() noexcept = default;
+        ~StreamHandler();
 
         #pragma endregion
 
@@ -79,9 +79,7 @@ class StreamHandler : public LogHandler
         #pragma region Methods
 
         /**
-         * \brief Flushes the stream by calling its Flush() method.
-         *
-         * \note The Close() method is inherited from "LogHandler" and so does no output, so an explicit Flush() call may be needed at times.
+         * \brief Flushes the stream.
          */
         DAEvoid Flush() override;
 

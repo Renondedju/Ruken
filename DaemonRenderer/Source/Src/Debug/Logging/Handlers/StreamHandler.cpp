@@ -24,32 +24,27 @@
 
 #include "Debug/Logging/Handlers/StreamHandler.hpp"
 
-#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
-
 USING_DAEMON_NAMESPACE
 
-StreamHandler::StreamHandler(std::ostream* in_stream, ELogLevel const in_level) noexcept : LogHandler(in_level),
-    m_stream { in_stream }
+DAEvoid StreamHandler::Emit(LogRecord const& in_record)
+{
+    m_stream << m_formatter->Format(in_record);
+}
+
+StreamHandler::StreamHandler(std::ostream& in_stream, ELogLevel const in_level) noexcept : LogHandler(in_level),
+    m_stream { in_stream.rdbuf() }
 {
 
 }
 
-#pragma region Methods
-
-DAEvoid StreamHandler::Emit(LogRecord const& in_record)
+StreamHandler::~StreamHandler()
 {
-    if (m_stream)
-    {
-        *m_stream << m_formatter->Format(in_record);
-    }
+    Flush();
 }
 
 DAEvoid StreamHandler::Flush()
 {
-    if (m_stream)
-    {
-        m_stream->flush();
-    }
+    m_stream.flush();
 }
 
 #pragma endregion

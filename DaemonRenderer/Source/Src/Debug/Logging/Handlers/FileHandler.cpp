@@ -28,39 +28,27 @@
 
 USING_DAEMON_NAMESPACE
 
+DAEvoid FileHandler::Emit(LogRecord const& in_record)
+{
+    m_stream << m_formatter->Format(in_record);
+}
+
 FileHandler::FileHandler(String             const&  in_path,
                          std::ios::openmode const   in_mode,
-                         ELogLevel          const   in_level) noexcept : StreamHandler(new std::ofstream(in_path, in_mode), in_level)
+                         ELogLevel          const   in_level) noexcept : LogHandler(in_level),
+    m_stream { in_path, in_mode }
 {
     
 }
 
-FileHandler::~FileHandler() noexcept
+FileHandler::~FileHandler()
 {
-    delete m_stream;
+    Flush();
 }
 
-#pragma region Methods
-
-DAEvoid FileHandler::Emit(LogRecord const& in_record)
+DAEvoid FileHandler::Flush()
 {
-    if (std::ofstream* stream = dynamic_cast<std::ofstream*>(m_stream))
-    {
-        if (!stream->is_open())
-        {
-            stream->open(m_path);
-        }
-
-        StreamHandler::Emit(in_record);
-    }
-}
-
-DAEvoid FileHandler::Close()
-{
-    if (std::ofstream* stream = dynamic_cast<std::ofstream*>(m_stream))
-    {
-        stream->close();
-    }
+    m_stream.flush();
 }
 
 #pragma endregion

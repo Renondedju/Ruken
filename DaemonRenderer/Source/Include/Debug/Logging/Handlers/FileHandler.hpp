@@ -24,22 +24,24 @@
 
 #pragma once
 
-#include "StreamHandler.hpp"
+#include <iostream>
+
+#include "LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class, located in the core logging package, sends logging output to a disk file.
+ * \brief This class sends logging output to a disk file.
  *
  * \note It inherits the output functionality from StreamHandler.
  */
-class FileHandler final : public StreamHandler
+class FileHandler final : public LogHandler
 {
     protected:
 
         #pragma region Members
 
-        String m_path;
+        std::ofstream m_stream;
 
         #pragma endregion
 
@@ -58,12 +60,14 @@ class FileHandler final : public StreamHandler
 
         #pragma region Contructors and Destructor
 
-        explicit FileHandler(String const& in_path, std::ios::openmode in_mode, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        explicit FileHandler(String const&      in_path,
+                             std::ios::openmode in_mode,
+                             ELogLevel          in_level = ELogLevel::NotSet) noexcept;
 
         FileHandler(FileHandler const&  in_copy) = delete;
         FileHandler(FileHandler&&       in_move) = delete;
 
-        ~FileHandler() noexcept;
+        ~FileHandler();
 
         #pragma endregion
 
@@ -77,9 +81,9 @@ class FileHandler final : public StreamHandler
         #pragma region Methods
 
         /**
-         * \brief Closes the file.
+         * \brief Flushes the stream.
          */
-        DAEvoid Close() override;
+        DAEvoid Flush() override;
 
         #pragma endregion
 };

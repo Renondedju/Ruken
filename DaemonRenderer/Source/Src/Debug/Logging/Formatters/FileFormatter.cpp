@@ -25,23 +25,3 @@
 #include "Debug/Logging/Formatters/FileFormatter.hpp"
 
 USING_DAEMON_NAMESPACE
-
-String FileFormatter::Format(LogRecord const& in_record) const noexcept
-{
-    return LogFormatter::Format(in_record);
-}
-
-String FileFormatter::FormatTime(LogRecord const& in_record) const noexcept
-{
-    return LogFormatter::FormatTime(in_record);
-}
-
-String FileFormatter::FormatException(LogRecord const& in_record) const noexcept
-{
-    return LogFormatter::FormatException(in_record);
-}
-
-String FileFormatter::FormatStack(LogRecord const& in_record) const noexcept
-{
-    return LogFormatter::FormatStack(in_record);
-}
