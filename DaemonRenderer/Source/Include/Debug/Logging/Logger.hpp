@@ -317,6 +317,9 @@ class Logger
         [[nodiscard]] DAEbool HasHandlers() const noexcept;
 
         #pragma endregion
+
+        /** TODO This should be removed after Debug Kernel is setup TODO */
+        friend struct GlobalServices;
 };
 
 END_DAEMON_NAMESPACE

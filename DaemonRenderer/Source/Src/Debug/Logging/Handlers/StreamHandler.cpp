@@ -31,7 +31,9 @@ DAEvoid StreamHandler::Emit(LogRecord const& in_record)
     m_stream << m_formatter->Format(in_record);
 }
 
-StreamHandler::StreamHandler(std::ostream& in_stream, ELogLevel const in_level) noexcept : LogHandler(in_level),
+StreamHandler::StreamHandler(LogFormatter const*    in_formatter,
+                             std::ostream&          in_stream,
+                             ELogLevel    const     in_level) noexcept : LogHandler(in_formatter, in_level),
     m_stream { in_stream.rdbuf() }
 {
 

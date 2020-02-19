@@ -60,7 +60,9 @@ class StreamHandler final : public LogHandler
 
         #pragma region Contructors and Destructor
 
-        explicit StreamHandler(std::ostream& in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        explicit StreamHandler(LogFormatter const*  in_formatter,
+                               std::ostream&        in_stream,
+                               ELogLevel            in_level = ELogLevel::NotSet) noexcept;
 
         StreamHandler(StreamHandler const&  in_copy) = delete;
         StreamHandler(StreamHandler&&       in_move) = delete;

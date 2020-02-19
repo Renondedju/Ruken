@@ -22,11 +22,12 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
 #include <Vector/Vector.hpp>
 
-#include "Config.hpp"
 
+
+#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
+#include "Debug/Logging/Handlers/StreamHandler.hpp"
 #include "ECS/Component.hpp"
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/ComponentItem.hpp"
@@ -70,8 +71,30 @@ DAEMON_DEFINE_COMPONENT(EComponentsTable, Position);
 DAEMON_DEFINE_COMPONENT(EComponentsTable, Counter);
 DAEMON_DEFINE_COMPONENT(EComponentsTable, Life);
 
+/** TODO This should be removed after Debug Kernel is setup TODO */
+
+BEGIN_DAEMON_NAMESPACE
+
+struct GlobalServices
+{
+    Logger root_logger;
+
+    GlobalServices() : root_logger { Logger("ROOT", ELogLevel::Debug, nullptr) } {}
+};
+
+END_DAEMON_NAMESPACE
+
+static GlobalServices Services = GlobalServices();
+
+/** TODO This should be removed after Debug Kernel is setup TODO */
+
 int main()
 {
+    ConsoleFormatter formatter;
+    StreamHandler    stream   (&formatter, std::cout);
+
+    Services.root_logger.AddHandler(&stream);
+
     EntityAdmin admin;
 
     admin.CreateEntity<LifeComponent>();
@@ -83,14 +106,15 @@ int main()
     admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
 
     ComponentQuery query;
+
     query.SetupInclusionQuery<LifeComponent, PositionComponent>();
     query.SetupExclusionQuery<CounterComponent>();
 
-    std::cout << query.Match(Archetype<LifeComponent>())                                      << std::endl;
-    std::cout << query.Match(Archetype<LifeComponent, CounterComponent>())                    << std::endl;
-    std::cout << query.Match(Archetype<LifeComponent, PositionComponent>())                   << std::endl;
-    std::cout << query.Match(Archetype<PositionComponent, LifeComponent>())                   << std::endl;
-    std::cout << query.Match(Archetype<PositionComponent, LifeComponent, CounterComponent>()) << std::endl;
+    Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent>()))                                     .c_str());
+    Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent, CounterComponent>()))                   .c_str());
+    Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent, PositionComponent>()))                  .c_str());
+    Services.root_logger.Info(std::to_string(query.Match(Archetype<PositionComponent, LifeComponent>()))                  .c_str());
+    Services.root_logger.Info(std::to_string(query.Match(Archetype<PositionComponent, LifeComponent, CounterComponent>())).c_str());
 
     system("pause");
 
