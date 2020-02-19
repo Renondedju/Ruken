@@ -24,65 +24,57 @@
 
 #pragma once
 
-#include "ELogLevel.hpp"
-
 #include "Containers/String.hpp"
+
+#include "LogLevel.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Instances of this class are created automatically by the Logger every time something is logged and be created manually.
+ * \brief Instances of this structure are created automatically by the Logger every time something is logged and can be created manually.
  *
  * It contains all the information pertinent to the event being logged.
  */
-class LogRecord
+struct LogRecord
 {
-    private:
+    #pragma region Members
 
-        #pragma region Members
+    String      logger_name;
+    ELogLevel   level;
+    String      message;
+    String      filename;
+    DAEint32    line_number;
+    String      function_name;
 
-		String      m_logger_name;
-		ELogLevel   m_level;
-		String      m_path;
-		DAEuint32   m_line_number;
-		String      m_message;
-		String      m_function_name;
+    #pragma endregion
 
-        #pragma endregion
+    #pragma region Constructors and Destructor
 
-    public:
+    LogRecord() = delete;
 
-        #pragma region Constructors and Destructor
+    LogRecord(DAEchar const*    in_logger_name,
+              ELogLevel         in_level,
+              DAEchar const*    in_message,
+              DAEchar const*    in_filename      = "",
+              DAEint32          in_line_number   = -1,
+              DAEchar const*    in_function_name = "") noexcept;
 
-        LogRecord (String    const& in_logger_name,
-                   ELogLevel const  in_level,
-                   String    const& in_path,
-                   DAEuint32 const  in_line_number,
-                   String    const& in_message,
-                   String    const& in_function_name = "") noexcept;
+    LogRecord(LogRecord const&  in_copy) noexcept = default;
+    LogRecord(LogRecord&&       in_move) noexcept = default;
 
-		LogRecord(LogRecord const&  in_copy) noexcept = default;
-		LogRecord(LogRecord&&       in_move) noexcept = default;
+    ~LogRecord() = default;
 
-		~LogRecord() = default;
+    #pragma endregion
 
-        #pragma endregion
+    #pragma region Operators
 
-        #pragma region Operators
+    LogRecord& operator=(LogRecord const&   in_copy) noexcept = default;
+    LogRecord& operator=(LogRecord&&        in_move) noexcept = default;
 
-		LogRecord& operator=(LogRecord const&   in_copy) noexcept = default;
-		LogRecord& operator=(LogRecord&&        in_move) noexcept = default;
+    DAEbool operator==(LogRecord const& in_other) const noexcept;
+    DAEbool operator!=(LogRecord const& in_other) const noexcept;
 
-		DAEbool operator==(LogRecord const& in_other) const noexcept;
-		DAEbool operator!=(LogRecord const& in_other) const noexcept;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        String GetMessage() const noexcept;
-
-        #pragma endregion
+    #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

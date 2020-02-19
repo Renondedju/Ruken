@@ -24,24 +24,79 @@
 
 #pragma once
 
-#include "Handlers/FileHandler.hpp"
-#include "Handlers/StreamHandler.hpp"
-
 #include "Containers/String.hpp"
 #include "Containers/ForwardList.hpp"
 
-#include "Types/Unique.hpp"
+#include "Filters/LogFilter.hpp"
+
+#include "Handlers/LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief This class exposes the interface that application code directly uses.
  *
- * \note Loggers should NEVER be instantiated directly, but always through the module-level function Debug.GetLogger(name).
+ * Logger objects have a threefold job.
+ *
+ * First, they expose several methods to application code so that applications can log messages at runtime.
+ *
+ * Second, logger objects determine which log messages to act upon based upon severity (the default filtering facility) or filter objects.
+ *
+ * Third, logger objects pass along relevant log messages to all interested log handlers.
+ *
+ * \note Loggers should NEVER be instantiated directly, but always through the root logger's method "AddChild()".
  */
-class Logger : Unique
+class Logger
 {
     private:
+
+        #pragma region Members
+
+        String      m_name;
+        ELogLevel   m_level;
+        Logger*     m_parent;
+
+        ForwardList<Logger*>        m_children;
+        ForwardList<LogFilter*>     m_filters;
+        ForwardList<LogHandler*>    m_handlers;
+
+        #pragma endregion
+
+        #pragma region Constructor
+
+        /**
+         * \brief Creates a new logger with the specified parameters.
+         *
+         * \param in_name The name of the new logger.
+         * \param in_level The level of the new logger.
+         * \param in_parent The logger who created the new logger.
+         * \param in_propagate Whether or not messages are passed to the parent.
+         *
+         * \note This constructor should only be used by the root logger or to create it.
+         */
+        explicit Logger(DAEchar const*  in_name,
+                        ELogLevel       in_level,
+                        Logger*         in_parent,
+                        bool            in_propagate = true) noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a false value of 'propagate' is found).
+         *
+         * No filtering is applied.
+         *
+         * \param in_record The record to handle.
+         *
+         * \note This methods should only be called by "Handle()".
+         */
+        DAEvoid ForceHandle(LogRecord const& in_record) const noexcept;
+
+        #pragma endregion
+
+    public:
 
         #pragma region Members
 
@@ -50,26 +105,27 @@ class Logger : Unique
          * in addition to any handlers attached to this logger. Messages are passed directly to the ancestor loggersÅf handlers,
          * neither the level nor filters of the ancestor loggers in question are considered.
          *
-         * If this attribute evaluates to false, logging messages are not passed to the handlers of ancestor loggers.
+         * \note If this attribute evaluates to false, logging messages are not passed to the handlers of ancestor loggers.
          */
-        DAEbool m_propagate;
-
-        Logger*     m_parent;
-		String      m_name;
-		ELogLevel   m_level;
-
-        ForwardList<LogFilter  const*> m_filters;
-        ForwardList<LogHandler const*> m_handlers;
+        DAEbool propagate;
 
         #pragma endregion
 
-    public:
+        #pragma region Constructors and Destructor
 
-        #pragma region Constructor and Destructor
+        Logger() = delete;
 
-		explicit Logger(String in_name) noexcept;
+        Logger(Logger const&    in_copy) = delete;
+        Logger(Logger&&         in_move) = delete;
 
-		~Logger() noexcept;
+        ~Logger() noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Logger& operator=(Logger const& in_copy) = delete;
+        Logger& operator=(Logger&&      in_move) = delete;
 
         #pragma endregion
 
@@ -80,78 +136,117 @@ class Logger : Unique
          *
          * Logging messages which are less severe than "in_level" will be ignored;
          * logging messages which have severity level or higher will be emitted by whichever handler or handlers service this logger,
-         * unless a handlerÅfs level has been set to a higher severity level than "in_level".
+         * unless a handlerÅfs level has been set to a higher severity level than the specified one.
          *
-         * \param in_level The desired level.
+         * \param in_level The new level.
          */
         DAEvoid SetLevel(ELogLevel in_level) noexcept;
 
         /**
-         * \brief This method checks first the module's level and then the loggerÅfs effective level as determined by GetEffectiveLevel().
+         * \brief This method checks the loggerÅfs effective level as determined by "GetEffectiveLevel()".
          *
          * \param in_level The level to check.
          *
          * \return True if a message of the specified level would be processed by this logger, else False.
          */
-        DAEbool IsEnabledFor(ELogLevel in_level) const noexcept;
+        [[nodiscard]] DAEbool IsEnabledFor(ELogLevel in_level) const noexcept;
 
         /**
-         * \brief If a value other than "NotSet" has been set using SetLevel(), it is returned.
+         * \brief If a value other than 'NotSet' has been set using "SetLevel()", it is returned.
          *
-         * Otherwise, the hierarchy is traversed towards the root until a value other than "NotSet" is found, and that value is returned.
+         * Otherwise, the hierarchy is traversed towards the root until a value other than 'NotSet' is found, and that value is returned.
          *
-         * \return The effective level for this logger.
+         * \return The effective level of this logger.
          */
-        ELogLevel GetEffectiveLevel() const noexcept;
+        [[nodiscard]] ELogLevel GetEffectiveLevel() const noexcept;
 
         /**
-         * \brief Returns a logger which is a descendant to this logger, as determined by the suffix.
+         * \brief Creates a new logger and sets its parent as the current one.
          *
-         * \param in_suffix The name of the logger to look for.
+         * \param in_name The name of the logger to create.
          *
-         * \return A pointer to the desired logger if found.
+         * \return A pointer to the newly created logger.
+         *
+         * \note The logger is created with this logger's parameters.
          */
-        Logger const* GetChild(String const& in_suffix) const noexcept;
+        Logger* AddChild(DAEchar const* in_name);
 
         /**
-         * \brief Logs a message with level "Debug" on this logger.
+         * \brief Deletes the logger with the specified name.
+         *
+         * \param in_name The name of the logger to look for.
+         *
+         * \return True if the logger could be removed, else False.
+         */
+        DAEbool RemoveChild(DAEchar const* in_name);
+
+        /**
+         * \brief Deletes the specified logger.
+         *
+         * \param in_logger The logger to look for.
+         *
+         * \return True if the logger could be removed, else False.
+         */
+        DAEbool RemoveChild(Logger const* in_logger);
+
+        /**
+         * \brief Finds a logger which is a descendant to this logger, as determined by the specified name.
+         *
+         * \param in_name The name of the logger to look for.
+         *
+         * \return A pointer to the logger if it was found, else nullptr.
+         */
+        Logger* GetChild(DAEchar const* in_name) const noexcept;
+
+        /**
+         * \brief Logs a message with level 'Debug' on this logger.
          *
          * \param in_message The message to log.
          */
         DAEvoid Debug(DAEchar const* in_message) const noexcept;
 
         /**
-         * \brief Logs a message with level "Info" on this logger.
+         * \brief Logs a message with level 'Info' on this logger.
          *
          * \param in_message The message to log.
          */
         DAEvoid Info(DAEchar const* in_message) const noexcept;
 
         /**
-         * \brief Logs a message with level "Warning" on this logger.
+         * \brief Logs a message with level 'Warning' on this logger.
          *
          * \param in_message The message to log.
          */
         DAEvoid Warning(DAEchar const* in_message) const noexcept;
 
         /**
-         * \brief Logs a message with level "Error" on this logger.
+         * \brief Logs a message with level 'Error' on this logger.
          *
          * \param in_message The message to log.
          */
         DAEvoid Error(DAEchar const* in_message) const noexcept;
 
         /**
-         * \brief Logs a message with level "Fatal" on this logger.
+         * \brief Logs a message with level 'Fatal' on this logger.
          *
          * \param in_message The message to log.
          */
         DAEvoid Fatal(DAEchar const* in_message) const noexcept;
 
         /**
-         * \brief Logs a message with level ERROR on this logger.
+         * \brief Logs a message with the specified level on this logger.
+         *
+         * \param in_level The level to log.
+         * \param in_message The message to log.
+         */
+        DAEvoid Log(ELogLevel in_level, DAEchar const* in_message) const noexcept;
+
+        /**
+         * \brief Logs a message with level 'Error' on this logger.
          *
          * Exception info is added to the logging message.
+         *
+         * \param in_message The message to log.
          *
          * \note This method should only be called from an exception handler.
          */
@@ -162,17 +257,17 @@ class Logger : Unique
          *
          * \param in_filter The filter to add.
          */
-        DAEvoid AddFilter(LogFilter const* in_filter);
+        DAEvoid AddFilter(LogFilter* in_filter);
 
         /**
          * \brief Removes the specified filter from this logger.
          *
          * \param in_filter The filter to remove.
          */
-        DAEvoid RemoveFilter(LogFilter const* in_filter) noexcept;
+        DAEvoid RemoveFilter(LogFilter* in_filter) noexcept;
 
         /**
-         * \brief Apply this loggerÅfs filters to the record.
+         * \brief Applies this loggerÅfs filters to the record.
          *
          * The filters are consulted in turn, until one of them returns a false value.
          * If none of them return a false value, the record will be processed (passed to handlers).
@@ -182,34 +277,32 @@ class Logger : Unique
          *
          * \return True if the record is to be processed, else False.
          */
-        DAEbool Filter(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] DAEbool Filter(LogRecord const& in_record) const noexcept;
 
         /**
          * \brief Adds the specified handler to this logger.
          *
          * \param in_handler The handler to add.
          */
-        DAEvoid AddHandler(LogHandler const* in_handler);
+        DAEvoid AddHandler(LogHandler* in_handler);
 
         /**
          * \brief Removes the specified handler from this logger.
          *
          * \param in_handler The handler to remove.
          */
-        DAEvoid RemoveHandler(LogHandler const* in_handler) noexcept;
+        DAEvoid RemoveHandler(LogHandler* in_handler) noexcept;
 
         /**
-         * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a false value of propagate is found).
+         * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a "false" value of propagate is found).
          *
-         * This method is used for unpickled records received from a socket, as well as those created locally.
+         * Logger-level filtering is applied using "Filter()".
          *
-         * Logger-level filtering is applied using filter().
+         * \param in_record The record to handle.
          *
-         * \param in_record The record to filter.
-         *
-         * \return True if the record was handled, else False.
+         * \note This method is used for unpickled records received from a socket, as well as those created locally.
          */
-        DAEbool Handle(LogRecord const& in_record) const noexcept;
+        DAEvoid Handle(LogRecord const& in_record) const noexcept;
 
         /**
          * \brief Checks to see if this logger has any handlers configured.
@@ -219,9 +312,9 @@ class Logger : Unique
          * The method stops searching up the hierarchy whenever a logger with the 'propagate' attribute set to false is found,
          * that will be the last logger which is checked for the existence of handlers.
          *
-         * \return True if a handler was found, else False.
+         * \return True if a handler could be found, else False.
          */
-        DAEbool HasHandlers() const noexcept;
+        [[nodiscard]] DAEbool HasHandlers() const noexcept;
 
         #pragma endregion
 };

@@ -24,47 +24,83 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "../LogRecord.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class specifies the layout of log records in the final output.
+ * \brief This class configures the final order, structure, and contents of the log message.
  */
 class LogFormatter
 {
-    private:
+    protected:
 
-    public:
+        #pragma region Default Constructor
+
+        LogFormatter() noexcept = default;
+
+        #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief
+         * \brief 
          *
-         * \param in_record The record to format.
+         * \param in_record
          *
-         * \return The resulting string.
+         * \return 
          */
-        String Format(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual String ComputeLabel(LogRecord const& in_record) const noexcept;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors and Destructor
+
+        LogFormatter(LogFormatter const&    in_copy) = delete;
+        LogFormatter(LogFormatter&&         in_move) = delete;
+
+        virtual ~LogFormatter() = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogFormatter& operator=(LogFormatter const& in_copy) = delete;
+        LogFormatter& operator=(LogFormatter&&      in_move) = delete;
+
+        #pragma endregion
+
+        #pragma region Methods
 
         /**
-         * \brief
-         *
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        String FormatTime() const noexcept;
+        [[nodiscard]] virtual String Format(LogRecord const& in_record) const noexcept;
 
         /**
-         * \brief
-         *
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        String FormatException() const noexcept;
+        [[nodiscard]] virtual String FormatTime(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        [[nodiscard]] virtual String FormatException(LogRecord const& in_record) const noexcept;
+
+        /**
+         * \param in_record The record to format.
+         *
+         * \return The resulting string.
+         */
+        [[nodiscard]] virtual String FormatStack(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 };

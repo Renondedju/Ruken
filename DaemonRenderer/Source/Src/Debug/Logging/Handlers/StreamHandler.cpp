@@ -26,26 +26,25 @@
 
 USING_DAEMON_NAMESPACE
 
-StreamHandler::StreamHandler(ELogLevel const in_level) noexcept : LogHandler(in_level)
+DAEvoid StreamHandler::Emit(LogRecord const& in_record)
+{
+    m_stream << m_formatter->Format(in_record);
+}
+
+StreamHandler::StreamHandler(std::ostream& in_stream, ELogLevel const in_level) noexcept : LogHandler(in_level),
+    m_stream { in_stream.rdbuf() }
 {
 
 }
 
-#pragma region Methods
-
-DAEvoid StreamHandler::Emit(LogRecord const& in_record)
+StreamHandler::~StreamHandler()
 {
-
+    Flush();
 }
 
 DAEvoid StreamHandler::Flush()
 {
-
-}
-
-DAEvoid StreamHandler::SetStream(std::ostream&& in_stream) noexcept
-{
-
+    m_stream.flush();
 }
 
 #pragma endregion

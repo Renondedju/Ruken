@@ -24,49 +24,66 @@
 
 #pragma once
 
-#include "StreamHandler.hpp"
+#include <iostream>
+
+#include "LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class, located in the core logging package, sends logging output to a disk file.
+ * \brief This class sends logging output to a disk file.
  *
  * \note It inherits the output functionality from StreamHandler.
  */
-class FileHandler : StreamHandler
+class FileHandler final : public LogHandler
 {
-    public:
+    protected:
 
-        #pragma region Contructors and Destructor
+        #pragma region Members
 
-        FileHandler(String      in_path,
-                    ELogLevel   in_level = ELogLevel::NotSet) noexcept;
-
-		FileHandler(FileHandler const&  in_copy) noexcept = default;
-		FileHandler(FileHandler&&       in_move) noexcept = default;
-
-		~FileHandler() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        FileHandler& operator=(FileHandler const& in_other) noexcept = default;
-        FileHandler& operator=(FileHandler&&      in_other) noexcept = default;
+        std::ofstream m_stream;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Closes the file.
-         */
-        DAEvoid Close() override;
-
-        /**
          * \brief Outputs the record to the file.
+         *
+         * \param in_record The record to emit.
          */
         DAEvoid Emit(LogRecord const& in_record) override;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Contructors and Destructor
+
+        explicit FileHandler(String const&      in_path,
+                             std::ios::openmode in_mode,
+                             ELogLevel          in_level = ELogLevel::NotSet) noexcept;
+
+        FileHandler(FileHandler const&  in_copy) = delete;
+        FileHandler(FileHandler&&       in_move) = delete;
+
+        ~FileHandler();
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        FileHandler& operator=(FileHandler const& in_other) = delete;
+        FileHandler& operator=(FileHandler&&      in_other) = delete;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Flushes the stream.
+         */
+        DAEvoid Flush() override;
 
         #pragma endregion
 };

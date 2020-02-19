@@ -24,64 +24,69 @@
 
 #pragma once
 
-#include <iostream>
+#include "LogFormatter.hpp"
 
-#include "LogHandler.hpp"
+#ifdef DAEMON_OS_WINDOWS
+
+#include "Utility/WindowsOS.hpp"
+
+#endif
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class sends logging output to streams.
+ * \brief This class configures the final order, structure, and contents of the log message for the console.
  */
-class StreamHandler final : public LogHandler
+class ConsoleFormatter final : public LogFormatter
 {
     protected:
 
         #pragma region Members
 
-        std::ostream m_stream;
+        #ifdef DAEMON_OS_WINDOWS
+
+        HANDLE m_handle;
+
+        #endif
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief If a formatter is specified, it is used to format the record. The record is then written to the stream with a terminator.
+         * \brief 
          *
-         * \param in_record The record to emit.
+         * \param in_record 
          *
-         * \note If exception information is present, it is formatted and appended to the stream.
+         * \return 
          */
-        DAEvoid Emit(LogRecord const& in_record) override;
+        [[nodiscard]] String ComputeLabel(LogRecord const& in_record) const noexcept override;
 
         #pragma endregion
 
     public:
 
-        #pragma region Contructors and Destructor
+        #pragma region Constructors and Destructor
 
-        explicit StreamHandler(std::ostream& in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        ConsoleFormatter() noexcept;
 
-        StreamHandler(StreamHandler const&  in_copy) = delete;
-        StreamHandler(StreamHandler&&       in_move) = delete;
+        ConsoleFormatter(ConsoleFormatter const&    in_copy) = delete;
+        ConsoleFormatter(ConsoleFormatter&&         in_move) = delete;
 
-        ~StreamHandler();
+        ~ConsoleFormatter() noexcept = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        StreamHandler& operator=(StreamHandler const& in_other) = delete;
-        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
+        ConsoleFormatter& operator=(ConsoleFormatter const& in_copy) = delete;
+        ConsoleFormatter& operator=(ConsoleFormatter&&      in_move) = delete;
 
         #pragma endregion
 
         #pragma region Methods
 
-        /**
-         * \brief Flushes the stream.
-         */
-        DAEvoid Flush() override;
+        
 
         #pragma endregion
 };

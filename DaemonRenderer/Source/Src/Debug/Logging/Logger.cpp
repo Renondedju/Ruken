@@ -26,21 +26,39 @@
 
 USING_DAEMON_NAMESPACE
 
-Logger::Logger(String in_name) noexcept :
-    m_propagate { true },
-    m_parent    { nullptr },
-    m_name      { std::move(in_name) },
-    m_level     { ELogLevel::NotSet }
+Logger::Logger(DAEchar   const* in_name,
+               ELogLevel const  in_level,
+               Logger*          in_parent,
+               bool      const  in_propagate) noexcept :
+    m_name      { in_name },
+    m_level     { in_level },
+    m_parent    { in_parent },
+    propagate   { in_propagate }
 {
     
 }
 
 Logger::~Logger() noexcept
 {
-    
+    for (auto const& child : m_children)
+    {
+        delete child;
+    }
 }
 
-#pragma region Methods
+DAEvoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
+{
+    if (propagate && m_parent)
+    {
+        m_parent->ForceHandle(in_record);
+    }
+
+    for (auto const& handler : m_handlers)
+    {
+        if (handler)
+            handler->Handle(in_record);
+    }
+}
 
 DAEvoid Logger::SetLevel(ELogLevel const in_level) noexcept
 {
@@ -54,141 +72,150 @@ DAEbool Logger::IsEnabledFor(ELogLevel const in_level) const noexcept
 
 ELogLevel Logger::GetEffectiveLevel() const noexcept
 {
-    Logger const* logger = this;
-
-    while (logger)
-    {
-        if (logger->m_level != ELogLevel::NotSet)
-        {
-            return logger->m_level;
-        }
-
-        logger = logger->m_parent;
-    }
-
-	return ELogLevel::NotSet;
+	return m_level != ELogLevel::NotSet ? m_level : m_parent ? m_parent->GetEffectiveLevel() : m_level;
 }
 
-Logger const* Logger::GetChild(String const& in_suffix) const noexcept
+Logger* Logger::AddChild(DAEchar const* in_name)
 {
+    auto const& logger = new Logger(in_name, m_level, this, propagate);
+
+    m_children.push_front(logger);
+
+    return logger;
+}
+
+DAEbool Logger::RemoveChild(DAEchar const* in_name)
+{
+    for (auto const& child : m_children)
+    {
+        if (child->m_name == in_name)
+        {
+            m_children.remove(child);
+
+            delete child;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+DAEbool Logger::RemoveChild(Logger const* in_logger)
+{
+    for (auto const& child : m_children)
+    {
+        if (child->m_name == in_logger->m_name)
+        {
+            m_children.remove(child);
+
+            delete child;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+Logger* Logger::GetChild(DAEchar const* in_name) const noexcept
+{
+    for (auto const& child : m_children)
+    {
+        if (child->m_name == in_name)
+        {
+            return child;
+        }
+    }
+
     return nullptr;
 }
 
 DAEvoid Logger::Debug(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Debug)
-	{
-
-	}
+    Log(ELogLevel::Debug, in_message);
 }
 
 DAEvoid Logger::Info(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Info)
-	{
-
-	}
+    Log(ELogLevel::Info, in_message);
 }
 
 DAEvoid Logger::Warning(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Warning)
-	{
-
-	}
+    Log(ELogLevel::Warning, in_message);
 }
 
 DAEvoid Logger::Error(DAEchar const* in_message) const noexcept
 {
-	if (m_level <= ELogLevel::Error)
-	{
-
-	}
+    Log(ELogLevel::Error, in_message);
 }
 
 DAEvoid Logger::Fatal(DAEchar const* in_message) const noexcept
 {
-    if (m_level <= ELogLevel::Fatal)
-    {
-        
-    }
+    Log(ELogLevel::Fatal, in_message);
+}
+
+DAEvoid Logger::Log(ELogLevel const in_level, DAEchar const* in_message) const noexcept
+{
+    if (IsEnabledFor(in_level))
+	{
+        Handle(LogRecord(m_name.c_str(), in_level, in_message));
+	}
 }
 
 DAEvoid Logger::Exception(DAEchar const* in_message) const noexcept
 {
-    if (m_level <= ELogLevel::Warning)
-    {
-        
-    }
+    Log(ELogLevel::Error, in_message);
 }
 
-DAEvoid Logger::AddFilter(LogFilter const* in_filter)
+DAEvoid Logger::AddFilter(LogFilter* in_filter)
 {
     m_filters.push_front(in_filter);
 }
 
-DAEvoid Logger::RemoveFilter(LogFilter const* in_filter) noexcept
+DAEvoid Logger::RemoveFilter(LogFilter* in_filter) noexcept
 {
     m_filters.remove(in_filter);
 }
 
 DAEbool Logger::Filter(LogRecord const& in_record) const noexcept
 {
-    for (LogFilter const* filter : m_filters)
+    for (auto const& filter : m_filters)
     {
-        /** TODO Filtering the record. TODO */
-        if (filter)
+        if (filter && !filter->Filter(in_record))
+        {
             return false;
+        }
     }
 
     return true;
 }
 
-DAEvoid Logger::AddHandler(LogHandler const* in_handler)
+DAEvoid Logger::AddHandler(LogHandler* in_handler)
 {
 	m_handlers.push_front(in_handler);
 }
 
-DAEvoid Logger::RemoveHandler(LogHandler const* in_handler) noexcept
+DAEvoid Logger::RemoveHandler(LogHandler* in_handler) noexcept
 {
 	m_handlers.remove(in_handler);
 }
 
-DAEbool Logger::Handle(LogRecord const& in_record) const noexcept
+DAEvoid Logger::Handle(LogRecord const& in_record) const noexcept
 {
     if (Filter(in_record))
     {
-        Logger const* logger = this;
-
-	    while (logger)
-	    {
-            for (LogHandler const* handler : logger->m_handlers)
-            {
-                /** TODO Handling the record. TODO */
-            }
-
-            logger = logger->m_propagate ? logger->m_parent : nullptr;
-	    }
-
-        return true;
+        ForceHandle(in_record);
     }
-
-	return false;
 }
 
 DAEbool Logger::HasHandlers() const noexcept
 {
-    Logger const* logger = this;
+    if (propagate && m_parent)
+    {
+        return !m_handlers.empty() || m_parent->HasHandlers();
+    }
 
-	while (logger)
-	{
-	    if (!logger->m_handlers.empty())
-            return true;
-
-        logger = logger->m_propagate ? logger->m_parent : nullptr;
-	}
-
-    return false;
+    return !m_handlers.empty();
 }
-
-#pragma endregion

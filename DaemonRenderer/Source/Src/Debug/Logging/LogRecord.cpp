@@ -26,55 +26,38 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Public Constructors
-
-LogRecord::LogRecord(String    const&   in_logger_name,
+LogRecord::LogRecord(DAEchar   const*   in_logger_name,
                      ELogLevel const    in_level,
-                     String    const&   in_path,
-                     DAEuint32 const    in_line_number,
-                     String    const&   in_message,
-                     String    const&   in_function_name) noexcept :
-    m_logger_name   { in_logger_name },
-    m_level         { in_level },
-    m_path          { in_path },
-    m_line_number   { in_line_number },
-    m_message       { in_message },
-    m_function_name { in_function_name }
+                     DAEchar   const*   in_message,
+                     DAEchar   const*   in_filename,
+                     DAEint32  const    in_line_number,
+                     DAEchar   const*   in_function_name) noexcept :
+    logger_name     { in_logger_name },
+    level           { in_level },
+    message         { in_message },
+    filename        { in_filename },
+    line_number     { in_line_number },
+    function_name   { in_function_name }
 {
-    
+
 }
-
-#pragma endregion
-
-#pragma region Public Operators
 
 DAEbool LogRecord::operator==(LogRecord const& in_other) const noexcept
 {
-    return m_level         == in_other.m_level         &&
-		   m_logger_name   == in_other.m_logger_name   &&
-		   m_message       == in_other.m_message       &&
-		   m_path          == in_other.m_path          &&
-		   m_function_name == in_other.m_function_name &&
-		   m_line_number   == in_other.m_line_number;
+    return logger_name   == in_other.logger_name &&
+           level         == in_other.level       &&
+           message       == in_other.message     &&
+           filename      == in_other.filename    &&
+           line_number   == in_other.line_number &&
+           function_name == in_other.function_name;
 }
 
 DAEbool LogRecord::operator!=(LogRecord const& in_other) const noexcept
 {
-    return m_level         != in_other.m_level         ||
-		   m_logger_name   != in_other.m_logger_name   ||
-		   m_message       != in_other.m_message       ||
-		   m_path          != in_other.m_path          ||
-		   m_function_name != in_other.m_function_name ||
-		   m_line_number   != in_other.m_line_number;
+    return logger_name   != in_other.logger_name ||
+           level         != in_other.level       ||
+           message       != in_other.message     ||
+           filename      != in_other.filename    ||
+           line_number   != in_other.line_number ||
+           function_name != in_other.function_name;
 }
-
-#pragma endregion
-
-#pragma region Public Methods
-
-String LogRecord::GetMessage() const noexcept
-{
-    return m_message;
-}
-
-#pragma endregion

@@ -24,64 +24,38 @@
 
 #pragma once
 
-#include <iostream>
-
-#include "LogHandler.hpp"
+#include "LogFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class sends logging output to streams.
+ * \brief This class configures the final order, structure, and contents of the log message for files.
  */
-class StreamHandler final : public LogHandler
+class FileFormatter final : public LogFormatter
 {
-    protected:
-
-        #pragma region Members
-
-        std::ostream m_stream;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief If a formatter is specified, it is used to format the record. The record is then written to the stream with a terminator.
-         *
-         * \param in_record The record to emit.
-         *
-         * \note If exception information is present, it is formatted and appended to the stream.
-         */
-        DAEvoid Emit(LogRecord const& in_record) override;
-
-        #pragma endregion
-
     public:
 
-        #pragma region Contructors and Destructor
+        #pragma region Constructors and Destructor
 
-        explicit StreamHandler(std::ostream& in_stream, ELogLevel in_level = ELogLevel::NotSet) noexcept;
+        FileFormatter() noexcept = default;
 
-        StreamHandler(StreamHandler const&  in_copy) = delete;
-        StreamHandler(StreamHandler&&       in_move) = delete;
+        FileFormatter(FileFormatter const&  in_copy) = delete;
+        FileFormatter(FileFormatter&&       in_move) = delete;
 
-        ~StreamHandler();
+        ~FileFormatter() noexcept = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        StreamHandler& operator=(StreamHandler const& in_other) = delete;
-        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
+        FileFormatter& operator=(FileFormatter const&   in_copy) = delete;
+        FileFormatter& operator=(FileFormatter&&        in_move) = delete;
 
         #pragma endregion
 
         #pragma region Methods
 
-        /**
-         * \brief Flushes the stream.
-         */
-        DAEvoid Flush() override;
+        
 
         #pragma endregion
 };

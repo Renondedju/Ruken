@@ -22,31 +22,6 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Debug/Logging/Formatters/FileFormatter.hpp"
 
-#include "LogRecord.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/**
- * \brief Filters objects can be used by Handlers and Loggers for more sophisticated filtering than is provided by levels.
- */
-class LogFilter
-{
-    private:
-
-    public:
-
-        #pragma region Methods
-
-        /**
-         * \param in_record The record to filter.
-         *
-         * \return True if the specified record is to be logged, else False.
-         */
-        DAEbool Filter(LogRecord const& in_record) const noexcept;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+USING_DAEMON_NAMESPACE

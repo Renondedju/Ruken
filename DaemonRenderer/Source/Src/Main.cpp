@@ -32,6 +32,8 @@
 #include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentSystem.hpp"
 
+#include "Debug/Logging/Logger.hpp"
+
 USING_DAEMON_NAMESPACE
 
 /**

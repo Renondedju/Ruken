@@ -24,103 +24,99 @@
 
 #pragma once
 
-#include "../LogFilter.hpp"
-#include "../LogRecord.hpp"
-#include "../LogFormatter.hpp"
-
 #include "Containers/ForwardList.hpp"
+
+#include "../Filters/LogFilter.hpp"
+
+#include "../Formatters/LogFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Handler objects are responsible for dispatching the appropriate log messages (based on the log messagesÅf severity) to the handlerÅfs specified destination.
+ * \brief This class is responsible for dispatching the appropriate log messages (based on the log messagesÅf severity) to the handlerÅfs specified destination.
  *
- * Logger objects can add zero or more handler objects to themselves with an AddHandler() method.
- *
- * As an example scenario, an application may want to send all log messages to a log file,
- * all log messages of error or higher to stdout, and all messages of critical to an email address.
- * This scenario requires three individual handlers where each handler is responsible for sending messages of a specific severity to a specific location.
+ * \note Logger objects can add zero or more handler objects to themselves with an "AddHandler()" method.
  */
 class LogHandler
 {
     protected:
 
-        #pragma region Variables
+        #pragma region Members
 
         ELogLevel m_level;
+
         LogFormatter const* m_formatter;
+
         ForwardList<LogFilter const*> m_filters;
 
         #pragma endregion
 
-        #pragma region Contructors and Destructor
+        #pragma region Methods
 
-        LogHandler(ELogLevel in_level = ELogLevel::NotSet) noexcept;
-
-		LogHandler(LogHandler const&    in_copy) noexcept = default;
-		LogHandler(LogHandler&&         in_move) noexcept = default;
-
-		virtual ~LogHandler() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogHandler& operator=(LogHandler const& in_other) noexcept = default;
-        LogHandler& operator=(LogHandler&&      in_other) noexcept = default;
+        /**
+         * \brief Does whatever it takes to actually log the specified logging record.
+         *
+         * \param in_record The record to emit.
+         *
+         * \note This version is intended to be implemented by subclasses.
+         */
+        virtual DAEvoid Emit(LogRecord const& in_record) = 0;
 
         #pragma endregion
 
     public:
 
+        #pragma region Contructors and Destructor
+
+        explicit LogHandler(ELogLevel in_level = ELogLevel::NotSet) noexcept;
+
+        LogHandler(LogHandler const&    in_copy) = delete;
+        LogHandler(LogHandler&&         in_move) = delete;
+
+        virtual ~LogHandler() = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogHandler& operator=(LogHandler const& in_other) = delete;
+        LogHandler& operator=(LogHandler&&      in_other) = delete;
+
+        #pragma endregion
+
         #pragma region Methods
-
-        /**
-         * \brief Initializes a thread lock which can be used to serialize access to underlying I/O functionality which may not be thread-safe.
-         */
-        virtual DAEvoid CreateLock();
-
-        /**
-         * \brief Acquires the thread lock created with CreateLock().
-         */
-        virtual DAEvoid Acquire();
-
-        /**
-         * \brief Releases the thread lock acquired with Acquire().
-         */
-        virtual DAEvoid Release();
 
         /**
          * \brief Sets the threshold for this handler to the specified level.
          *
          * Logging messages which are less severe than this level will be ignored.
          *
-         * When a handler is created, the level is set to "NotSet" (which causes all messages to be processed).
+         * \param in_level The desired log level.
          *
-         * \param in_level The desired level.
+         * \note When a handler is created, the level is set to 'NotSet' (which causes all messages to be processed).
          */
-        virtual DAEvoid SetLevel(ELogLevel in_level) noexcept;
+        DAEvoid SetLevel(ELogLevel in_level) noexcept;
 
         /**
-         * \brief Sets the "Formatter" for this handler to the specified one.
+         * \brief Sets the formatter for this handler to the specified one.
          *
-         * \param in_formatter The desired formatter.
+         * \param in_formatter The new formatter.
          */
-        virtual DAEvoid SetFormatter(LogFormatter const* in_formatter) noexcept;
+        DAEvoid SetFormatter(LogFormatter const* in_formatter) noexcept;
 
         /**
-         * \brief Adds the specified filter filter to this handler.
+         * \brief Adds the specified filter to this handler.
          *
          * \param in_filter The filter to add.
          */
-        virtual DAEvoid AddFilter(LogFilter const* in_filter);
+        DAEvoid AddFilter(LogFilter const* in_filter);
 
         /**
-         * \brief Removes the specified filter filter from this handler.
+         * \brief Removes the specified filter from this handler.
          *
          * \param in_filter The filter to remove.
          */
-        virtual DAEvoid RemoveFilter(LogFilter const* in_filter) noexcept;
+        DAEvoid RemoveFilter(LogFilter const* in_filter);
 
         /**
          * \brief Applies this handlerÅfs filters to the record.
@@ -131,55 +127,37 @@ class LogHandler
          *
          * \return True if the record is to be processed, else False.
          */
-        virtual DAEbool Filter(LogRecord const& in_record) const noexcept;
-
-        /**
-         * \brief Ensures all logging output has been flushed.
-         *
-         * This version does nothing and is intended to be implemented by subclasses.
-         */
-        virtual DAEvoid Flush();
-
-        /**
-         * \brief Tidies up any resources used by the handler.
-         *
-         * This version does no output but removes the handler from an internal list of handlers which is closed when Shutdown() is called.
-         *
-         * Subclasses should ensure that this gets called from overridden Close() methods.
-         */
-        virtual DAEvoid Close();
+        [[nodiscard]] DAEbool Filter(LogRecord const& in_record) const noexcept;
 
         /**
          * \brief Conditionally emits the specified logging record, depending on filters which may have been added to the handler.
          *
-         * Wraps the actual emission of the record with acquisition/release of the I/O thread lock.
+         * \param in_record The record to handle.
+         */
+        DAEvoid Handle(LogRecord const& in_record) noexcept;
+
+        /**
+         * \brief This method should be called from handlers when an exception is encountered during an "Emit()" call.
          *
          * \param in_record The record to handle.
          */
-        virtual DAEvoid Handle(LogRecord const& in_record);
+        DAEvoid HandleError(LogRecord const& in_record) noexcept;
 
         /**
-         * \brief This method should be called from handlers when an exception is encountered during an Emit() call.
-         *
-         * \param in_record The record to handle.
-         */
-        virtual DAEvoid HandleError(LogRecord const& in_record);
-
-        /**
-         * \brief Does formatting for a record - if a formatter is set, use it. Otherwise, use the default formatter for the module.
+         * \brief Does formatting for a record - if a formatter is set, use it.
          *
          * \param in_record The record to format.
+         *
+         * \return The resulting string.
          */
-        virtual DAEvoid Format(LogRecord const& in_record);
+        [[nodiscard]] String Format(LogRecord const& in_record) const noexcept;
 
-         /**
-         * \brief Does whatever it takes to actually log the specified logging record.
+        /**
+         * \brief Ensures all logging output has been flushed.
          *
-         * This version is intended to be implemented by subclasses.
-         *
-         * \param in_record The record to emit.
+         * \note This version does nothing and is intended to be implemented by subclasses.
          */
-        virtual DAEvoid Emit(LogRecord const& in_record) = 0;
+        virtual DAEvoid Flush() = 0;
 
         #pragma endregion
 };
