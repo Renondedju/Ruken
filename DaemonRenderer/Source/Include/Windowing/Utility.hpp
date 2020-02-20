@@ -62,6 +62,14 @@ struct Area2D
     Extent2D    extent;
 };
 
+struct Square2D
+{
+    DAEint32 left   = 0;
+    DAEint32 top    = 0;
+    DAEint32 right  = 0;
+    DAEint32 bottom = 0;
+};
+
 struct VideoMode
 {
     DAEint32 width;
@@ -82,21 +90,93 @@ struct GammaRamp
 
 struct WindowParameters
 {
-    String      name;
-    Position2D  position;
-    Extent2D    size;
-    DAEfloat    opacity;
-    DAEbool     fullscreen;
-    DAEbool     focused;
-    DAEbool     iconified;
-    DAEbool     maximized;
-    DAEbool     visible;
-    DAEbool     resizable;
-    DAEbool     decorated;
-    DAEbool     auto_iconified;
-    DAEbool     floating;
-    DAEbool     transparent_framebuffer;
-    DAEbool     focused_on_show;
+    /**
+     * \brief The UTF-8 encoded window title.
+     */
+    String name = "NONE";
+
+    /**
+     * \brief The position, in screen coordinates, of the upper-left corner of the content area of the window.
+     */
+    Position2D position = { 0, 0 };
+
+    /**
+     * \brief The size, in screen coordinates, of the content area of the window.
+     */
+    Extent2D size = { 1600, 900 };
+
+    /**
+     * \brief The opacity (or alpha) value is a positive finite number between zero and one, where zero is fully transparent and one is fully opaque.
+     */
+    DAEfloat opacity = 1.0f;
+
+    /**
+     * \brief Whether the window starts in full screen mode.
+     */
+    DAEbool fullscreen = false;
+
+    /**
+     * \brief Whether the windowed mode window will be resizable by the user. 
+     */
+    DAEbool resizable = true;
+
+    /**
+     * \brief Whether the windowed mode window will be initially visible.
+     */
+    DAEbool visible = true;
+
+    /**
+     * \brief Whether the windowed mode window will have window decorations such as a border, a close widget, etc.
+     *
+     * \note An undecorated window will not be resizable by the user but will still allow the user to generate close events on some platforms.
+     */
+    DAEbool decorated = true;
+
+    /**
+     * \brief Whether the windowed mode window will be given input focus when created.
+     */
+    DAEbool focused = true;
+
+    /**
+     * \brief Whether the full screen window will automatically iconify and restore the previous video mode on input focus loss.
+     */
+    DAEbool auto_iconified = true;
+
+    /**
+     * \brief Whether the windowed mode window will be floating above other regular windows, also called topmost or always-on-top.
+     *
+     * \note This is intended primarily for debugging purposes and cannot be used to implement proper full screen windows.
+     */
+    DAEbool floating = false;
+
+    /**
+     * \brief Whether the windowed mode window will be maximized when created.
+     */
+    DAEbool maximized = false;
+
+    /**
+     * \brief Whether the cursor should be centered over newly created full screen windows.
+     */
+    DAEbool cursor_centered = true;
+
+    /**
+     * \brief Whether the window framebuffer will be transparent.
+     *
+     * \note If enabled and supported by the system, the window framebuffer alpha channel will be used to combine the framebuffer with the background.
+     */
+    DAEbool transparent_framebuffer = false;
+
+    /**
+     * \brief whether the window will be given input focus when shown.
+     */
+    DAEbool focused_on_show = true;
+
+    /**
+     * \brief Whether the window content area should be resized based on the monitor content scale of any monitor it is placed on.
+     *
+     * \note This includes the initial placement when the window is created.
+     */
+    DAEbool scale_to_monitor = false;
 };
 
 END_DAEMON_NAMESPACE

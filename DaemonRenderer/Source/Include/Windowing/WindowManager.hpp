@@ -126,6 +126,11 @@ class WindowManager
         DAEbool Initialize();
 
         /**
+         * \brief Processes all pending events.
+         */
+        DAEvoid Update() noexcept;
+
+        /**
          * \return A pointer to the newly created window.
          */
         Window* CreateWindow(WindowParameters&& in_parameters);

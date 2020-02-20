@@ -109,9 +109,9 @@ class Logger
         #pragma region Members
 
         /**
-         * If this attribute evaluates to true, events logged to this logger will be passed to the handlers of higher level loggers,
-         * in addition to any handlers attached to this logger. Messages are passed directly to the ancestor loggersÅf handlers,
-         * neither the level nor filters of the ancestor loggers in question are considered.
+         * \brief If this attribute evaluates to true, events logged to this logger will be passed to the handlers of higher level loggers,
+         *        in addition to any handlers attached to this logger. Messages are passed directly to the ancestor loggersÅf handlers,
+         *        neither the level nor filters of the ancestor loggers in question are considered.
          *
          * \note If this attribute evaluates to false, logging messages are not passed to the handlers of ancestor loggers.
          */

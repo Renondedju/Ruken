@@ -51,7 +51,7 @@ class Window
 
         #pragma region Default Constructor
 
-        explicit Window(WindowParameters&& in_parameters) noexcept;
+        explicit Window() noexcept = default;
 
         #pragma endregion
 
@@ -76,7 +76,7 @@ class Window
         static DAEvoid WindowSizeCallback(GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
 
         /**
-         * \brief This is called when the content area of the window needs to be redrawn.
+         * \brief This is called when the user attempts to close the window, for example by clicking the close widget in the title bar.
          *
          * \param in_window The window that the user attempted to close.
          */
@@ -156,21 +156,54 @@ class Window
 
         #pragma region Members
 
-        Event<Position2D>   on_moved;
-        Event<Extent2D>     on_resized;
-        Event<>             on_closed;
-        Event<>             on_refreshed;
-        Event<DAEbool>      on_focused;
-        Event<DAEbool>      on_iconified;
-        Event<DAEbool>      on_maximized;
-        Event<Extent2D>     on_framebuffer_resized;
-        Event<Scale2D>      on_content_rescaled;
+        /**
+         * \brief This is called when the window is moved.
+         */
+        Event<Position2D> on_moved;
+
+        /**
+         * \brief This is called when the window is resized.
+         */
+        Event<Extent2D> on_resized;
+
+        /**
+         * \brief This is called when the user attempts to close the window.
+         */
+        Event<> on_closed;
+
+        /**
+         * \brief This is called when the content area of the window needs to be redrawn.
+         */
+        Event<> on_refreshed;
+
+        /**
+         * \brief This is called when the window gains or loses input focus.
+         */
+        Event<DAEbool> on_focused;
+
+        /**
+         * \brief This is called when the window is iconified or restored.
+         */
+        Event<DAEbool> on_iconified;
+
+        /**
+         * \brief This is called when the window is maximized or restored.
+         */
+        Event<DAEbool> on_maximized;
+
+        /**
+         * \brief This is called when the framebuffer of the specified window is resized.
+         */
+        Event<Extent2D> on_framebuffer_resized;
+
+        /**
+         * \brief This is called when the content scale of the specified window changes.
+         */
+        Event<Scale2D> on_content_rescaled;
 
         #pragma endregion
 
         #pragma region Constructors and Destructor
-
-        Window() = delete;
 
         Window(Window const&    in_other) noexcept = delete;
         Window(Window&&         in_other) noexcept = default;
@@ -189,188 +222,252 @@ class Window
         #pragma region Methods
 
         /**
-         * \brief
+         * 
+         */
+        DAEvoid Initialize(WindowParameters&& in_parameters) noexcept;
+
+        /**
+         * \return The value of the close flag of the window.
+         */
+        [[nodiscard]] DAEbool ShouldClose() const noexcept;
+
+        /**
+         * \brief This can be used to override the user's attempt to close this window, or to signal that it should be closed.
          *
-         * \param in_name 
+         * \param in_should_close The new value.
+         */
+        DAEvoid SetClosed(DAEbool in_should_close) const noexcept;
+
+        /**
+         * \brief Sets the title, encoded as UTF-8, of this window.
+         *
+         * \param in_name The UTF-8 encoded window title.
          */
         DAEvoid SetName(String&& in_name) noexcept;
 
         /**
-         * \brief
+         * \brief Sets the position, in screen coordinates, of the upper-left corner of the content area of the window.
          *
-         * \param in_position 
+         * \param in_position The coordinates of the upper-left corner of the content area.
+         *
+         * \note If the window is a full screen window, this function does nothing.
          */
         DAEvoid SetPosition(Position2D&& in_position) const noexcept;
 
         /**
-         * \brief
+         * \brief Sets the size limits of the content area of the window.
          *
-         * \param in_min 
-         * \param in_max 
+         * \param in_min The minimum size, in screen coordinates, of the content area.
+         * \param in_max The maximum size, in screen coordinates, of the content area.
+         *
+         * \note If the window is full screen, the size limits only take effect once it is made windowed. If the window is not resizable, this function does nothing.
          */
         DAEvoid SetSizeLimits(Extent2D&& in_min, Extent2D&& in_max) const noexcept;
 
         /**
-         * \brief
+         * \brief Sets the required aspect ratio of the content area of the window.
          *
-         * \param in_numerator 
-         * \param in_denominator 
+         * \param in_numerator   The numerator of the desired aspect ratio.
+         * \param in_denominator The denominator of the desired aspect ratio.
+         *
+         * \note If the window is full screen, the aspect ratio only takes effect once it is made windowed. If the window is not resizable, this function does nothing.
          */
         DAEvoid SetAspectRatio(DAEint32 in_numerator, DAEint32 in_denominator) const noexcept;
 
         /**
-         * \brief
+         * \brief Sets the size, in screen coordinates, of the content area of the window.
          *
-         * \param in_size 
+         * \param in_size The desired size, in screen coordinates, of the window content area.
+         *
+         * \note For full screen windows, this function updates the resolution of its desired video mode and switches to the video mode closest to it, without affecting the window's context.
          */
         DAEvoid SetSize(Extent2D&& in_size) const noexcept;
 
         /**
-         * \brief
+         * \brief Sets the opacity of the window, including any decorations.
          *
-         * \param in_opacity 
+         * The opacity (or alpha) value is a positive finite number between zero and one, where zero is fully transparent and one is fully opaque.
+         *
+         * \param in_opacity The desired opacity of the window.
+         *
+         * \note A window created with framebuffer transparency may not use whole window transparency. The results of doing this are undefined.
          */
         DAEvoid SetOpacity(DAEfloat in_opacity) const noexcept;
 
         /**
-         * \brief
+         * \brief Iconifies (minimizes) the window if it was previously restored. If the window is already iconified, this function does nothing.
          *
-         * \param in_fullscreen 
-         */
-        DAEvoid SetFullscreen(DAEbool in_fullscreen) const noexcept;
-
-        /**
-         * \brief 
+         * \note If the specified window is a full screen window, the original monitor resolution is restored until the window is restored.
          */
         DAEvoid Iconify() const noexcept;
 
         /**
-         * \brief 
+         * \brief Restores the window if it was previously iconified (minimized) or maximized. If the window is already restored, this function does nothing.
+         *
+         * \note If the specified window is a full screen window, the resolution chosen for the window is restored on the selected monitor.
          */
         DAEvoid Restore() const noexcept;
 
         /**
-         * \brief 
+         * \brief Maximizes the window if it was previously not maximized. If the window is already maximized, this function does nothing.
+         *
+         * \note If the window is a full screen window, this function does nothing.
          */
         DAEvoid Maximize() const noexcept;
 
         /**
-         * \brief 
+         * \brief Makes the window visible if it was previously hidden. If the window is already visible or is in full screen mode, this function does nothing.
+         *
+         * \note By default, windowed mode windows are focused when shown. Set the 'focused_on_show' parameter to change this behavior for a newly created window.
          */
         DAEvoid Show() const noexcept;
 
         /**
-         * \brief 
+         * \brief Hides the window if it was previously visible. If the window is already hidden or is in full screen mode, this function does nothing.
          */
         DAEvoid Hide() const noexcept;
 
         /**
-         * \brief 
+         * \brief Brings the window to front and sets input focus. The window should already be visible and not iconified.
+         *
+         * \note By default, both windowed and full screen mode windows are focused when initially created. Also by default, windowed mode windows are focused when shown.
          */
         DAEvoid Focus() const noexcept;
 
         /**
-         * \brief 
+         * \brief Requests user attention to the window.
+         *
+         * \note On platforms where this is not supported, attention is requested to the application as a whole.
          */
         DAEvoid RequestAttention() const noexcept;
 
         /**
-         * \return 
+         * \brief Makes the window full screen or windowed.
+         *
+         * \param in_fullscreen The new mode of the window.
+         *
+         * \note When a window transitions from full screen to windowed mode, this function restores any previous window settings
+         *       such as whether it is decorated, floating, resizable, has size or aspect ratio limits, etc.
+         */
+        DAEvoid SetFullscreen(DAEbool in_fullscreen) const noexcept;
+
+        /**
+         * \return Opaque window object.
          */
         [[nodiscard]] GLFWwindow* GetHandle() const noexcept;
 
         /**
-         * \return 
+         * \return The UTF-8 encoded window title.
          */
         [[nodiscard]] String const& GetName() const noexcept;
 
         /**
-         * \return 
+         * \return The window's current parameters.
+         */
+        [[nodiscard]] WindowParameters GetParameters() const noexcept;
+
+        /**
+         * \return The position, in screen coordinates, of the upper-left corner of the content area of the window.
          */
         [[nodiscard]] Position2D GetPosition() const noexcept;
 
         /**
-         * \return 
+         * \return The size, in screen coordinates, of the content area of the window.
          */
         [[nodiscard]] Extent2D GetSize() const noexcept;
 
         /**
-         * \return 
+         * \return The size, in pixels, of the framebuffer of the window.
          */
         [[nodiscard]] Extent2D GetFramebufferSize() const noexcept;
 
         /**
-         * \return 
+         * \return The size, in screen coordinates, of each edge of the frame of the window.
+         *
+         * \note This size includes the title bar, if the window has one.
+         */
+        [[nodiscard]] Square2D GetFrameSize() const noexcept;
+
+        /**
+         * \brief The content scale is the ratio between the current DPI and the platform's default DPI.
+         *
+         * \return The content scale for the window.
+         *
+         * \note On systems where each monitors can have its own content scale, the window content scale will depend on which monitor the system considers the window to be on.
          */
         [[nodiscard]] Scale2D GetContentScale() const noexcept;
 
         /**
-         * \return 
+         * \brief The opacity (or alpha) value is a positive finite number between zero and one, where zero is fully transparent and one is fully opaque.
+         *
+         * \return The opacity of the window, including any decorations.
+         *
+         * \note If the system does not support whole window transparency, this function always returns one.
          */
         [[nodiscard]] DAEfloat GetOpacity() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is in full screen mode.
          */
         [[nodiscard]] DAEbool IsFullscreen() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window has input focus.
          */
         [[nodiscard]] DAEbool IsFocused() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is iconified.
          */
         [[nodiscard]] DAEbool IsIconified() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is maximized.
          */
         [[nodiscard]] DAEbool IsMaximized() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the cursor is currently directly over the content area of the window, with no other windows between.
          */
         [[nodiscard]] DAEbool IsHovered() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is visible.
          */
         [[nodiscard]] DAEbool IsVisible() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is resizable by the user.
          */
         [[nodiscard]] DAEbool IsResizable() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window has decorations such as a border, a close widget, etc.
          */
         [[nodiscard]] DAEbool IsDecorated() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the full screen window is iconified on focus loss, a close widget, etc.
          */
         [[nodiscard]] DAEbool IsAutoIconified() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is floating, also called topmost or always-on-top.
          */
         [[nodiscard]] DAEbool IsFloating() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window has a transparent framebuffer, i.e. the window contents is composited with the background using the window framebuffer alpha channel.
          */
         [[nodiscard]] DAEbool IsFramebufferTransparent() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window will be given input focus when shown.
          */
         [[nodiscard]] DAEbool IsFocusedOnShow() const noexcept;
 
         /**
-         * \return 
+         * \return Whether the window is valid.
          */
         [[nodiscard]] DAEbool IsValid() const noexcept;
 

@@ -78,6 +78,7 @@ BEGIN_DAEMON_NAMESPACE
 struct GlobalServices
 {
     Logger root_logger;
+    WindowManager window_manager;
 
     GlobalServices() : root_logger { Logger("ROOT", ELogLevel::Debug, nullptr) } {}
 };
@@ -94,6 +95,17 @@ int main()
     StreamHandler    stream   (&formatter, std::cout);
 
     Services.root_logger.AddHandler(&stream);
+
+    Services.window_manager.Initialize();
+
+    WindowParameters params;
+
+    Services.window_manager.CreateWindow(std::move(params));
+
+    while (!Services.window_manager.GetMainWindow()->ShouldClose())
+    {
+        Services.window_manager.Update();
+    }
 
     EntityAdmin admin;
 
@@ -115,8 +127,6 @@ int main()
     Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent, PositionComponent>()))                  .c_str());
     Services.root_logger.Info(std::to_string(query.Match(Archetype<PositionComponent, LifeComponent>()))                  .c_str());
     Services.root_logger.Info(std::to_string(query.Match(Archetype<PositionComponent, LifeComponent, CounterComponent>())).c_str());
-
-    system("pause");
 
     return EXIT_SUCCESS;
 }

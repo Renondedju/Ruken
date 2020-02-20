@@ -22,20 +22,9 @@
  *  SOFTWARE.
  */
 
-#include "Windowing/Window.hpp"
+#include "Windowing/WindowManager.hpp"
 
 USING_DAEMON_NAMESPACE
-
-Window::Window(WindowParameters&& in_parameters) noexcept :
-    m_handle    { nullptr },
-    m_name      { std::move(in_parameters.name) }
-{
-    SetupWindow(std::move(in_parameters));
-
-    glfwSetWindowUserPointer(m_handle, this);
-
-    SetupCallbacks();
-}
 
 Window::~Window() noexcept
 {
@@ -128,18 +117,25 @@ DAEvoid Window::SetupWindow(WindowParameters&& in_parameters) noexcept
     glfwWindowHint(GLFW_AUTO_ICONIFY,            in_parameters.auto_iconified);
     glfwWindowHint(GLFW_FLOATING,                in_parameters.floating);
     glfwWindowHint(GLFW_MAXIMIZED,               in_parameters.maximized);
+    glfwWindowHint(GLFW_CENTER_CURSOR,           in_parameters.cursor_centered);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, in_parameters.transparent_framebuffer);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW,           in_parameters.focused_on_show);
+    glfwWindowHint(GLFW_SCALE_TO_MONITOR,        in_parameters.scale_to_monitor);
 
     if (in_parameters.fullscreen)
     {
+        GLFWmonitor*       monitor    = glfwGetPrimaryMonitor();
+        GLFWvidmode const* video_mode = glfwGetVideoMode     (monitor);
 
+        m_handle = glfwCreateWindow(video_mode->width, video_mode->height, m_name.c_str(), monitor, nullptr);
     }
 
     else
     {
         m_handle = glfwCreateWindow(in_parameters.size.width, in_parameters.size.height, m_name.c_str(), nullptr, nullptr);
     }
+
+    glfwSetWindowOpacity(m_handle, in_parameters.opacity);
 }
 
 DAEvoid Window::SetupCallbacks() const noexcept
@@ -153,6 +149,22 @@ DAEvoid Window::SetupCallbacks() const noexcept
     glfwSetWindowMaximizeCallback    (m_handle, &WindowMaximizeCallback);
     glfwSetFramebufferSizeCallback   (m_handle, &FramebufferSizeCallback);
     glfwSetWindowContentScaleCallback(m_handle, &WindowContentScaleCallback);
+}
+
+DAEvoid Window::Initialize(WindowParameters&& in_parameters) noexcept
+{
+    m_name = std::move(in_parameters.name);
+
+    SetupWindow(std::move(in_parameters));
+
+    glfwSetWindowUserPointer(m_handle, this);
+
+    SetupCallbacks();
+}
+
+DAEvoid Window::SetClosed(DAEbool const in_should_close) const noexcept
+{
+    glfwSetWindowShouldClose(m_handle, in_should_close);
 }
 
 DAEvoid Window::SetName(String&& in_name) noexcept
@@ -235,6 +247,11 @@ DAEvoid Window::RequestAttention() const noexcept
     glfwRequestWindowAttention(m_handle);
 }
 
+DAEbool Window::ShouldClose() const noexcept
+{
+    return glfwWindowShouldClose(m_handle);
+}
+
 GLFWwindow* Window::GetHandle() const noexcept
 {
     return m_handle;
@@ -243,6 +260,28 @@ GLFWwindow* Window::GetHandle() const noexcept
 String const& Window::GetName() const noexcept
 {
     return m_name;
+}
+
+WindowParameters Window::GetParameters() const noexcept
+{
+    return
+    {
+        m_name,
+        GetPosition(),
+        GetSize(),
+        GetOpacity(),
+        IsFullscreen(),
+        IsFocused(),
+        IsIconified(),
+        IsMaximized(),
+        IsVisible(),
+        IsResizable(),
+        IsDecorated(),
+        IsAutoIconified(),
+        IsFloating(),
+        IsFramebufferTransparent(),
+        IsFocusedOnShow()
+    };
 }
 
 Position2D Window::GetPosition() const noexcept
@@ -270,6 +309,15 @@ Extent2D Window::GetFramebufferSize() const noexcept
     glfwGetFramebufferSize(m_handle, &size.width, &size.height);
 
     return size;
+}
+
+Square2D Window::GetFrameSize() const noexcept
+{
+    Square2D frame;
+
+    glfwGetWindowFrameSize(m_handle, &frame.left, &frame.top, &frame.right, &frame.bottom);
+
+    return frame;
 }
 
 Scale2D Window::GetContentScale() const noexcept

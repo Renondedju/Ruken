@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-#include "Windowing/Screen.hpp"
+#include "Windowing/WindowManager.hpp"
 
 USING_DAEMON_NAMESPACE
 
