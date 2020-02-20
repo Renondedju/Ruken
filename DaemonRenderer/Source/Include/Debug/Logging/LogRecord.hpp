@@ -52,12 +52,12 @@ struct LogRecord
 
     LogRecord() = delete;
 
-    LogRecord(DAEchar const*    in_logger_name,
-              ELogLevel         in_level,
-              DAEchar const*    in_message,
-              DAEchar const*    in_filename      = "",
-              DAEint32          in_line_number   = -1,
-              DAEchar const*    in_function_name = "") noexcept;
+    LogRecord(String    in_logger_name,
+              ELogLevel in_level,
+              String    in_message,
+              String    in_filename      = "",
+              DAEint32  in_line_number   = -1,
+              String    in_function_name = "") noexcept;
 
     LogRecord(LogRecord const&  in_copy) noexcept = default;
     LogRecord(LogRecord&&       in_move) noexcept = default;

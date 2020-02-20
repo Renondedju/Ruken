@@ -22,22 +22,25 @@
  *  SOFTWARE.
  */
 
+#include <utility>
+
+
 #include "Debug/Logging/LogRecord.hpp"
 
 USING_DAEMON_NAMESPACE
 
-LogRecord::LogRecord(DAEchar   const*   in_logger_name,
-                     ELogLevel const    in_level,
-                     DAEchar   const*   in_message,
-                     DAEchar   const*   in_filename,
-                     DAEint32  const    in_line_number,
-                     DAEchar   const*   in_function_name) noexcept :
-    logger_name     { in_logger_name },
+LogRecord::LogRecord(String          in_logger_name,
+                     ELogLevel const in_level,
+                     String          in_message,
+                     String          in_filename,
+                     DAEint32  const in_line_number,
+                     String          in_function_name) noexcept :
+    logger_name     {std::move(in_logger_name)},
     level           { in_level },
-    message         { in_message },
-    filename        { in_filename },
+    message         {std::move(in_message)},
+    filename        {std::move(in_filename)},
     line_number     { in_line_number },
-    function_name   { in_function_name }
+    function_name   {std::move(in_function_name)}
 {
 
 }

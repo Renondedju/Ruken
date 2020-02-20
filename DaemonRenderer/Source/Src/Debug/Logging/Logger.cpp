@@ -22,6 +22,9 @@
  *  SOFTWARE.
  */
 
+#include <utility>
+
+
 #include "Debug/Logging/Logger.hpp"
 
 USING_DAEMON_NAMESPACE
@@ -44,6 +47,14 @@ Logger::~Logger() noexcept
     {
         delete child;
     }
+}
+
+DAEvoid Logger::Log(ELogLevel const in_level, String in_message) const noexcept
+{
+    if (IsEnabledFor(in_level))
+	{
+        Handle(LogRecord(m_name, in_level, std::move(in_message)));
+	}
 }
 
 DAEvoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
@@ -131,42 +142,34 @@ Logger* Logger::GetChild(DAEchar const* in_name) const noexcept
     return nullptr;
 }
 
-DAEvoid Logger::Debug(DAEchar const* in_message) const noexcept
+DAEvoid Logger::Debug(String in_message) const noexcept
 {
-    Log(ELogLevel::Debug, in_message);
+    Log(ELogLevel::Debug, std::move(in_message));
 }
 
-DAEvoid Logger::Info(DAEchar const* in_message) const noexcept
+DAEvoid Logger::Info(String in_message) const noexcept
 {
-    Log(ELogLevel::Info, in_message);
+    Log(ELogLevel::Info, std::move(in_message));
 }
 
-DAEvoid Logger::Warning(DAEchar const* in_message) const noexcept
+DAEvoid Logger::Warning(String in_message) const noexcept
 {
-    Log(ELogLevel::Warning, in_message);
+    Log(ELogLevel::Warning, std::move(in_message));
 }
 
-DAEvoid Logger::Error(DAEchar const* in_message) const noexcept
+DAEvoid Logger::Error(String in_message) const noexcept
 {
-    Log(ELogLevel::Error, in_message);
+    Log(ELogLevel::Error, std::move(in_message));
 }
 
-DAEvoid Logger::Fatal(DAEchar const* in_message) const noexcept
+DAEvoid Logger::Fatal(String in_message) const noexcept
 {
-    Log(ELogLevel::Fatal, in_message);
+    Log(ELogLevel::Fatal, std::move(in_message));
 }
 
-DAEvoid Logger::Log(ELogLevel const in_level, DAEchar const* in_message) const noexcept
+DAEvoid Logger::Exception(String in_message) const noexcept
 {
-    if (IsEnabledFor(in_level))
-	{
-        Handle(LogRecord(m_name.c_str(), in_level, in_message));
-	}
-}
-
-DAEvoid Logger::Exception(DAEchar const* in_message) const noexcept
-{
-    Log(ELogLevel::Error, in_message);
+    Log(ELogLevel::Error, std::move(in_message));
 }
 
 DAEvoid Logger::AddFilter(LogFilter* in_filter)
