@@ -162,9 +162,9 @@ DAEbool WindowManager::Initialize()
     return false;
 }
 
-Window* WindowManager::CreateWindow()
+Window* WindowManager::CreateWindow(WindowParameters&& in_parameters)
 {
-    return &m_windows.emplace_back(Window());
+    return &m_windows.emplace_back(Window(std::move(in_parameters)));
 }
 
 DAEbool WindowManager::DestroyWindow(Window* in_window) noexcept

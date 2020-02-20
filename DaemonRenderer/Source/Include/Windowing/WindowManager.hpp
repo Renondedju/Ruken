@@ -27,7 +27,7 @@
 #include "Screen.hpp"
 #include "Window.hpp"
 
-#include "Containers/Vector.hpp"
+#undef CreateWindow
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -128,7 +128,7 @@ class WindowManager
         /**
          * \return A pointer to the newly created window.
          */
-        Window* CreateWindow();
+        Window* CreateWindow(WindowParameters&& in_parameters);
 
         /**
          * \param in_window The window to destroy.

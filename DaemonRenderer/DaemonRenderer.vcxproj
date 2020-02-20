@@ -329,6 +329,7 @@
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
     <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
+    <ClInclude Include="Source\Include\Windowing\Utility.hpp" />
     <ClInclude Include="Source\Include\Windowing\Window.hpp" />
     <ClInclude Include="Source\Include\Windowing\WindowManager.hpp" />
     <ClInclude Include="Source\Src\Meta\ReferenceWrapper.inl" />

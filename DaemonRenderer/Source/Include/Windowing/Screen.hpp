@@ -24,58 +24,9 @@
 
 #pragma once
 
-#include "Config.hpp"
-
-#include <GLFW/glfw3.h>
-
-#include "Types/FundamentalTypes.hpp"
-
-#include "Containers/String.hpp"
-#include "Containers/Vector.hpp"
+#include "Utility.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-struct Extent2D
-{
-    DAEint32 width  = 0;
-    DAEint32 height = 0;
-};
-
-struct Scale2D
-{
-    DAEfloat x = 0.0f;
-    DAEfloat y = 0.0f;
-};
-
-struct OffSet2D
-{
-    DAEint32 x = 0;
-    DAEint32 y = 0;
-};
-
-struct Area2D
-{
-    OffSet2D position;
-    Extent2D extent;
-};
-
-struct VideoMode
-{
-    DAEint32 width;
-    DAEint32 height;
-    DAEint32 red_bits;
-    DAEint32 green_bits;
-    DAEint32 blue_bits;
-    DAEint32 refresh_rate;
-};
-
-struct GammaRamp
-{
-    DAEuint16*  red;
-    DAEuint16*  green;
-    DAEuint16*  blue;
-    DAEuint32   size;
-};
 
 /**
  * \brief This class manages a currently connected monitor.
@@ -95,7 +46,7 @@ class Screen
         String              m_name;
         Extent2D            m_physical_size;
         Scale2D             m_content_scale;
-        OffSet2D            m_position;
+        Position2D          m_position;
         Area2D              m_work_area;
         Vector<VideoMode>   m_video_modes;
 
@@ -154,7 +105,7 @@ class Screen
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the monitor.
          */
-        [[nodiscard]] OffSet2D const& GetPosition() const noexcept;
+        [[nodiscard]] Position2D const& GetPosition() const noexcept;
 
         /**
          * \brief The work area is defined as the area of the monitor not occluded by the operating system task bar where present.

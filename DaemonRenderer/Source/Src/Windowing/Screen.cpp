@@ -82,7 +82,7 @@ Scale2D const& Screen::GetContentScale() const noexcept
     return m_content_scale;
 }
 
-OffSet2D const& Screen::GetPosition() const noexcept
+Position2D const& Screen::GetPosition() const noexcept
 {
     return m_position;
 }
