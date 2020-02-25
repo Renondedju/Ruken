@@ -22,8 +22,35 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
-RkVoid ComponentSystemBase::SetupTargetFingerprint() noexcept
+#pragma once
+
+#include <Vector/Vector.hpp>
+
+#include "ECS/Component.hpp"
+#include "ECS/ComponentItem.hpp"
+
+#include "ECS/Test/ComponentTable.hpp"
+
+USING_DAEMON_NAMESPACE
+
+struct PositionComponentItem : public ComponentItem<Vector3f>
 {
-    (m_target_fingerprint.AddTrait(TComponents::TypeId()), ...);
-}
+    enum EMembers
+    { Position };
+};
+
+struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
+{
+    enum EMembers
+    { Life, MaxLife };
+};
+
+struct CounterComponentItem : public ComponentItem<DAEsize> 
+{
+    enum EMembers
+    { Counter };
+};
+
+DAEMON_DEFINE_COMPONENT(Position);
+DAEMON_DEFINE_COMPONENT(Counter);
+DAEMON_DEFINE_COMPONENT(Life);

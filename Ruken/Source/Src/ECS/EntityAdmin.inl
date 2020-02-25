@@ -29,26 +29,37 @@ RkVoid EntityAdmin::CreateSystem() noexcept
 }
 
 template <typename... TComponents>
+Archetype* EntityAdmin::CreateArchetype() noexcept
+{
+    ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
+
+    // Creating the actual instance
+    Archetype* new_archetype = new Archetype();
+    *new_archetype = Archetype::CreateArchetype<TComponents...>();
+
+    m_archetypes[targeted_fingerprint] = new_archetype;
+
+    // Setup
+    for (ComponentSystemBase* system: m_systems)
+        if (system->GetQuery().Match(*new_archetype))
+            system->AddReferenceGroup(*new_archetype);
+
+    return new_archetype; 
+}
+
+template <typename... TComponents>
 EntityID EntityAdmin::CreateEntity() noexcept
 {
-    using TargetArchetype = MakeArchetype<TComponents...>;
-
     // Looking for the archetype of the entity
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
 
-    TargetArchetype* target_archetype;
+    Archetype* target_archetype;
 
     // If we didn't found any corresponding archetypes, creating it
     if (m_archetypes.find(targeted_fingerprint) == m_archetypes.end())
-    {
-        target_archetype                   = new TargetArchetype();
-        m_archetypes[targeted_fingerprint] = target_archetype;
-    }
-    // Otherwise, fetching it
+        target_archetype = CreateArchetype<TComponents...>();
     else
-    {
-        target_archetype = static_cast<TargetArchetype*>(m_archetypes[targeted_fingerprint]);
-    }
+        target_archetype = m_archetypes[targeted_fingerprint];
 
     return target_archetype->CreateEntity();
 }

@@ -24,47 +24,35 @@
 
 #pragma once
 
-#include <tuple>
+#include <memory>
 
 #include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
 
+#include "ECS/Group.hpp"
 #include "ECS/EntityID.hpp"
-#include "ECS/ArchetypeBase.hpp"
+#include "ECS/ComponentBase.hpp"
+#include "Containers/UnorderedMap.hpp"
+#include "ECS/ArchetypeFingerprint.hpp"
 
-#include "Meta/ValueIndexer.hpp"
-#include "Meta/IndexSequence/QuicksortIndexSequence.hpp"
+BEGIN_DAEMON_NAMESPACE
 
-BEGIN_RUKEN_NAMESPACE
-
-template <typename... TComponents>
-class Archetype: public ArchetypeBase
+class Archetype
 {
-    private:
+    protected:
 
         #pragma region Members
+        
+        UnorderedMap<DAEsize, std::unique_ptr<ComponentBase>> m_components;
+        ArchetypeFingerprint                                  m_fingerprint;
 
-        std::tuple<TComponents...> m_components;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief Create entity helper 
-         * \tparam TIds Indices of the tuple elements
-         * \return New entity id
-         */
-        template<RkSize... TIds>
-        EntityID CreateEntityHelper(std::index_sequence<TIds...>) noexcept;
-
-        #pragma endregion
+        #pragma endregion 
 
     public:
 
         #pragma region Constructors
 
-        Archetype();
+        Archetype()                         = default;
         Archetype(Archetype const& in_copy) = default;
         Archetype(Archetype&&      in_move) = default;
         ~Archetype()                        = default;
@@ -74,20 +62,19 @@ class Archetype: public ArchetypeBase
         #pragma region Methods
 
         /**
-         * \brief Returns the first occurence of the component in the archetype
-         * \tparam TComponent Component to look for
-         * \return First component storage occurence
+         * \brief Gets the fingerprint of the archetype
+         * \return Fingerprint
          */
-        template<typename TComponent>
-        auto GetComponent() noexcept;
+        ArchetypeFingerprint const& GetFingerprint() const noexcept;
 
         /**
-         * \brief Returns the component storage at the `TIndex` position of the archetype
-         * \tparam TIndex Index to look for
-         * \return Component storage reference
+         * \brief Returns a component of the passed type stored in this archetype
+         * \tparam TComponent Component to look for
+         * \note Passing a component type that does not exists in this archetype will result in a crash
+         * \return Found component
          */
-        template<RkSize TIndex>
-        auto GetComponent() noexcept;
+        template<typename TComponent>
+        TComponent& GetComponent() noexcept;
 
         /**
          * \brief Creates an entity in the archetype
@@ -100,7 +87,23 @@ class Archetype: public ArchetypeBase
          * \brief Returns the total count of entity stored in this archetype
          * \return Entities count
          */
-        RkSize EntitiesCount() const noexcept;
+        DAEsize EntitiesCount() const noexcept;
+
+        /**
+         * \brief Creates a components reference group
+         * \tparam TComponents Components to include in the group
+         * \return Newly created reference group
+         */
+        template <typename... TComponents>
+        Group<TComponents...> CreateGroupReference() noexcept;
+
+        /**
+         * \brief Creates an archetype
+         * \tparam TComponents Components to use for the archetype initialization
+         * \return New archetype
+         */
+        template <typename... TComponents>
+        static Archetype CreateArchetype() noexcept;
 
         #pragma endregion
 
@@ -112,38 +115,6 @@ class Archetype: public ArchetypeBase
         #pragma endregion
 };
 
-namespace internal
-{
-    // Hidden template magic used to make the "MakeArchetype" work
-
-    template <std::size_t TIndex, typename... TComponents>
-    using ComponentIndexerT = typename decltype(Select<TIndex>(
-        Indexer<std::index_sequence<TComponents::id...>, TComponents...>{}
-    ))::Type;
-
-    template <std::size_t TLhs, std::size_t TRhs>
-    struct LessComparator : std::integral_constant<RkBool, (TLhs < TRhs)>
-    {};
-
-    template <typename TTuple, typename TSequence>
-    struct ArchetypeFactory;
-
-    template <template <typename...> class TTuple, std::size_t... TIds, typename... TComponents>
-    struct ArchetypeFactory<TTuple<TComponents...>, std::index_sequence<TIds...>>
-    {
-        using Type = Archetype<internal::ComponentIndexerT<TIds, TComponents...>...>;
-    };
-}
-
-/**
- * \brief Creates an archetype by reordering components based on their id.
- *        This makes sure that the only one archetype type is used per component combination.
- *
- * \tparam TComponents Components of the archetype to create
- */
-template <typename... TComponents>
-using MakeArchetype = typename internal::ArchetypeFactory<std::tuple<TComponents...>, QuicksortIndexSequenceT<internal::LessComparator, std::index_sequence<TComponents::id...>>>::Type;
-
 #include "ECS/Archetype.inl"
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

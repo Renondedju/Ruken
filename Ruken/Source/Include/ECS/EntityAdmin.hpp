@@ -31,10 +31,9 @@
 
 #include "ECS/EntityID.hpp"
 #include "ECS/Archetype.hpp"
-#include "ECS/ArchetypeBase.hpp"
 #include "ECS/ComponentSystemBase.hpp"
 
-BEGIN_RUKEN_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
 class EntityAdmin
 {
@@ -45,6 +44,17 @@ class EntityAdmin
         std::vector       <ComponentSystemBase*>                 m_systems;
         std::unordered_map<ArchetypeFingerprint, ArchetypeBase*> m_archetypes;
         
+        #pragma endregion 
+
+        #pragma region Methods
+
+        /**
+         * \brief Creates a new archetype and handles any setup co-routine
+         * \tparam TComponents 
+         */
+        template <typename... TComponents>
+        Archetype* CreateArchetype() noexcept;
+
         #pragma endregion 
 
     public:
@@ -60,22 +70,21 @@ class EntityAdmin
 
         #pragma region Methods
 
+        DAEvoid StartSimulation () noexcept;
+        DAEvoid UpdateSimulation() noexcept;
+        DAEvoid EndSimulation   () noexcept;
+
         /**
-         * \brief 
+         * \brief Creates a system and adds it to the world
          * \tparam TSystem System type to push to the entity admin 
          */
         template <typename TSystem>
-        RkVoid CreateSystem() noexcept;
+        DAEvoid CreateSystem() noexcept;
 
         /**
-         * \brief Updates every system
-         */
-        RkVoid UpdateSystems() noexcept;
-
-        /**
-         * \brief 
-         * \tparam TComponents 
-         * \return 
+         * \brief Creates a new entity with given components
+         * \tparam TComponents Components to attach to the new entity
+         * \return Created entity id
          */
         template <typename... TComponents>
         EntityID CreateEntity() noexcept;
@@ -92,4 +101,4 @@ class EntityAdmin
 
 #include "ECS/EntityAdmin.inl"
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

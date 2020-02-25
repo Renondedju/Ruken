@@ -25,48 +25,38 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-#include "ECS/ArchetypeFingerprint.hpp"
+BEGIN_DAEMON_NAMESPACE
 
-BEGIN_RUKEN_NAMESPACE
-
-class ArchetypeBase
+class ComponentBase
 {
-    protected:
-
-        #pragma region Members
-
-        ArchetypeFingerprint m_fingerprint;
-
-        #pragma endregion 
-
     public:
+
+        using ItemId = DAEsize;
 
         #pragma region Constructors
 
-        ArchetypeBase()                             = default;
-        ArchetypeBase(ArchetypeBase const& in_copy) = default;
-        ArchetypeBase(ArchetypeBase&&      in_move) = default;
-        ~ArchetypeBase()                            = default;
+        ComponentBase()                             = default;
+        ComponentBase(ComponentBase const& in_copy) = default;
+        ComponentBase(ComponentBase&&      in_move) = default;
+        virtual ~ComponentBase()                    = default;
 
         #pragma endregion
 
         #pragma region Methods
 
-        /**
-         * \brief Gets the fingerprint of the archetype
-         * \return Fingerprint
-         */
-        ArchetypeFingerprint const& GetFingerprint() const noexcept;
+        virtual ItemId  CreateItem  ()       noexcept = 0;
+        virtual DAEsize GetItemCount() const noexcept = 0;
 
-        #pragma endregion
+        #pragma endregion 
 
         #pragma region Operators
 
-        ArchetypeBase& operator=(ArchetypeBase const& in_copy) = default;
-        ArchetypeBase& operator=(ArchetypeBase&&      in_move) = default;
+        ComponentBase& operator=(ComponentBase const& in_copy) = default;
+        ComponentBase& operator=(ComponentBase&&      in_move) = default;
 
         #pragma endregion
 };
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

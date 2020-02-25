@@ -150,9 +150,9 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\ERenderDocCaptureOption.hpp" />
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
-    <ClInclude Include="Source\Include\ECS\ArchetypeBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
@@ -161,6 +161,9 @@
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentSystem.hpp" />
+    <ClInclude Include="Source\Include\ECS\Group.hpp" />
+    <ClInclude Include="Source\Include\ECS\Test\Components.hpp" />
+    <ClInclude Include="Source\Include\ECS\Test\ComponentTable.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
@@ -171,10 +174,7 @@
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
-    <ClInclude Include="Source\Include\Meta\IndexSequence\ConcatenateIndexSequence.hpp" />
-    <ClInclude Include="Source\Include\Meta\IndexSequence\QuicksortIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
-    <ClInclude Include="Source\Include\Meta\IndexSequence\PartitionIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
@@ -317,8 +317,8 @@
     <None Include="Source\Src\ECS\Component.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentSystem.inl" />
-    <None Include="Source\Src\ECS\ComponentSystemBase.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
+    <None Include="Source\Src\ECS\Group.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
@@ -373,7 +373,7 @@
     <ClCompile Include="Source\Src\Debug\Logging\Formatters\LogFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
-    <ClCompile Include="Source\Src\ECS\ArchetypeBase.cpp" />
+    <ClCompile Include="Source\Src\ECS\Archetype.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />

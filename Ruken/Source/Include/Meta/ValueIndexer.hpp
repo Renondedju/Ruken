@@ -26,7 +26,9 @@
 
 #include <type_traits>
 
-BEGIN_RUKEN_NAMESPACE
+#include "Config.hpp"
+
+BEGIN_DAEMON_NAMESPACE
 
 template <std::size_t TIndex, typename TType>
 struct Indexed
@@ -116,4 +118,4 @@ inline constexpr std::size_t SelectValueIndex = typename decltype(ValueInvertedS
     ValueIndexer<std::make_index_sequence<sizeof...(TValues)>, TValues...>{}
 ))::index;
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

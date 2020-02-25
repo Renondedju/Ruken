@@ -26,38 +26,28 @@
 
 #include "Build/Namespace.hpp"
 
+#include "ECS/ComponentQuery.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/ArchetypeFingerprint.hpp"
-
-BEGIN_RUKEN_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
 class ComponentSystemBase
 {
-    private:
+    protected:
 
         #pragma region Mebers
 
-        RkBool        m_enabled;
         ComponentQuery m_query;
 
         #pragma endregion
 
-    protected:
+    public:
 
-        #pragma region Methods
+        #pragma region Mebers
 
-        /**
-         * \brief Sets up the target fingerprint of the system
-         * \tparam TComponents Components of the system
-         */
-        template <typename... TComponents>
-        RkVoid SetupTargetFingerprint() noexcept;
+        DAEbool enabled;
 
         #pragma endregion
-
-    public:
 
         #pragma region Constructors
 
@@ -71,9 +61,40 @@ class ComponentSystemBase
         #pragma region Methods
 
         /**
-         * \brief Checks if the system is enabled 
+         * \brief Returns the component query of the system
+         * \return Component query
          */
-        RkBool Enabled() const;
+        ComponentQuery const& GetQuery() const noexcept;
+
+        // --- Virtual
+
+        /**
+         * \brief Adds a component reference group to the system.
+         *        This is called by the entity admin at the creation of a new archetype
+         *        if the component query of this archetype and the system matches
+         * \param in_archetype Referenced archetype of the group to create 
+         */
+        virtual DAEvoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
+
+        /**
+         * \brief Called once at the start of a simulation
+         * \note This method could be called multiple times for the same
+         *       instance if the simulation is restated without reloading the whole ECS 
+         */
+        virtual DAEvoid OnStart() noexcept;
+
+        /**
+         * \brief Called every frame
+         * \param in_delta_time Time passed in seconds since the last frame
+         */
+        virtual DAEvoid OnUpdate(DAEfloat in_delta_time) noexcept;
+
+        /**
+         * \brief Called once at the end of a simulation
+         * \note This method could be called multiple times for the same
+         *       instance if the simulation is restated without reloading the whole ECS 
+         */
+        virtual DAEvoid OnEnd() noexcept;
 
         #pragma endregion
 
@@ -85,6 +106,4 @@ class ComponentSystemBase
         #pragma endregion
 };
 
-#include "ECS/ComponentSystemBase.inl"
-
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

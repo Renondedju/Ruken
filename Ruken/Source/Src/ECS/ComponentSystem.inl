@@ -22,8 +22,14 @@
  *  SOFTWARE.
  */
 
-template <typename... TComponents>
+template <typename ... TComponents>
 ComponentSystem<TComponents...>::ComponentSystem() noexcept
 {
-    SetupTargetFingerprint<TComponents...>();
+    m_query.SetupInclusionQuery<TComponents...>();
+}
+
+template <typename ... TComponents>
+DAEvoid ComponentSystem<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
+{
+    groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
 }

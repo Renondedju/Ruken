@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,21 @@
  *  SOFTWARE.
  */
 
-#pragma once
+template <typename ... TComponents>
+Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_components) noexcept
+    : m_archetype  {in_archetype},
+      m_components {std::forward_as_tuple(in_components...)}
+{}
 
-#include <typeindex>
-
-#include "Build/Namespace.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-/**
- * \brief Concatenates multiple std::index_sequence together
- * \tparam TSequences Sequences to concatenate
- */
-template <typename... TSequences>
-struct ConcatenateIndexSequence;
-
-/**
- * \brief Concatenates multiple std::index_sequence together (type shorthand)
- * \tparam TSequences Sequences to concatenate
- */
-template <typename... TSequences>
-using ConcatenateIndexSequenceT = typename ConcatenateIndexSequence<TSequences...>::Type;
-
-template <std::size_t... TIds>
-struct ConcatenateIndexSequence<std::index_sequence<TIds...>>
+template <typename ... TComponents>
+template<typename TComponent>
+TComponent& Group<TComponents...>::GetComponent() noexcept
 {
-    using Type = std::index_sequence<TIds...>;
-};
+    return std::get<TComponent&>(m_components);
+}
 
-template <std::size_t... TIds1, std::size_t... TIds2, typename... TTailSequences>
-struct ConcatenateIndexSequence<std::index_sequence<TIds1...>,
-              std::index_sequence<TIds2...>,
-              TTailSequences...>
+template <typename ... TComponents>
+Archetype& Group<TComponents...>::GetReferencedArchetype() const noexcept
 {
-    using Type = ConcatenateIndexSequenceT<std::index_sequence<TIds1..., TIds2...>, TTailSequences...>;
-};
-
-END_RUKEN_NAMESPACE
+    return m_archetype;
+}

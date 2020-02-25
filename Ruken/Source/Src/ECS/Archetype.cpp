@@ -22,11 +22,26 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ArchetypeBase.hpp"
+#include "ECS/Archetype.hpp"
 
-USING_RUKEN_NAMESPACE
+USING_DAEMON_NAMESPACE
 
-ArchetypeFingerprint const& ArchetypeBase::GetFingerprint() const noexcept
+ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 {
     return m_fingerprint;
+}
+
+EntityID Archetype::CreateEntity() noexcept
+{
+    ComponentBase::ItemId id = 0;
+
+    for (auto&& component: m_components)
+        id = component.second->CreateItem();
+
+    return id;
+}
+
+DAEsize Archetype::EntitiesCount() const noexcept
+{
+    return m_components.cbegin()->second->GetItemCount();
 }
