@@ -33,7 +33,7 @@ ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 
 EntityID Archetype::CreateEntity() noexcept
 {
-    ComponentBase::ItemId id = 0;
+    EntityID id = 0;
 
     for (auto&& component: m_components)
         id = component.second->CreateItem();

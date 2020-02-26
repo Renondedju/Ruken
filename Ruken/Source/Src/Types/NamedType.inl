@@ -40,7 +40,7 @@ constexpr NamedType<TBase, TUniquePhantom>::NamedType(NamedType const& in_copy) 
 
 template <typename TBase, typename TUniquePhantom>
 constexpr NamedType<TBase, TUniquePhantom>::NamedType(NamedType&& in_move) noexcept(std::is_nothrow_move_constructible_v<TBase>):
-    m_value {std::forward<TBase>(in_move)}
+    m_value {std::forward<TBase>(in_move.m_value)}
 {}
 
 template <typename TBase, typename TUniquePhantom>

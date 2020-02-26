@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
+#include "ECS/EntityID.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -32,8 +33,6 @@ BEGIN_DAEMON_NAMESPACE
 class ComponentBase
 {
     public:
-
-        using ItemId = DAEsize;
 
         #pragma region Constructors
 
@@ -46,8 +45,8 @@ class ComponentBase
 
         #pragma region Methods
 
-        virtual ItemId  CreateItem  ()       noexcept = 0;
-        virtual DAEsize GetItemCount() const noexcept = 0;
+        virtual EntityID CreateItem  ()       noexcept = 0;
+        virtual DAEsize  GetItemCount() const noexcept = 0;
 
         #pragma endregion 
 
