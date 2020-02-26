@@ -23,13 +23,15 @@
  */
 
 template <typename ... TComponents>
-ComponentSystem<TComponents...>::ComponentSystem() noexcept
+System<TComponents...>::System() noexcept :
+    m_groups {},
+    m_admin  {}
 {
     m_query.SetupInclusionQuery<TComponents...>();
 }
 
 template <typename ... TComponents>
-DAEvoid ComponentSystem<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
+DAEvoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
 {
-    groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
+    m_groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
 }

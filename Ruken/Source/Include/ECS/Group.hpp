@@ -31,6 +31,15 @@ BEGIN_DAEMON_NAMESPACE
 
 class Archetype;
 
+/**
+ * \brief Systems do not work on archetypes immediately.
+ *        It would be tedious to declare the exhaustive list of archetypes to work with.
+ *        Instead, systems describe their requirements as a query;
+ *        each group storing a reference onto the matching components (from possibly multiple archetypes),
+ *        thus allowing component access under a unified view.
+ *        
+ * \tparam TComponents Component types to keep a reference onto
+ */
 template <typename... TComponents>
 class Group
 {
@@ -47,6 +56,11 @@ class Group
 
         #pragma region Constructors
 
+        /**
+         * \brief Referencing group constructor
+         * \param in_archetype Referenced archetype of the group
+         * \param in_components Referenced components of the group
+         */
         Group(Archetype& in_archetype, TComponents&... in_components) noexcept;
 
         Group(Group const& in_copy) = default;
@@ -71,8 +85,8 @@ class Group
 
         #pragma region Operators
 
-        Group& operator=(Group const& in_copy) = default;
-        Group& operator=(Group&&      in_move) = default;
+        Group& operator=(Group const& in_copy) = delete;
+        Group& operator=(Group&&      in_move) = delete;
 
         #pragma endregion
 };

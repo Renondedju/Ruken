@@ -32,7 +32,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class is the actual component class used to store the items.
+ * \brief A component is a simple data store which contains no behavior, no code logic to transform its data.
  * \tparam TItem Associated item of the component, must be a subtype of ComponentItem
  * \tparam TUniqueId Unique ID of the component.
  *                   Ideally this would be generated automatically at compile time but doing so in c++ is

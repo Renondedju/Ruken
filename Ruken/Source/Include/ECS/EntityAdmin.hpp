@@ -31,10 +31,15 @@
 
 #include "ECS/EntityID.hpp"
 #include "ECS/Archetype.hpp"
-#include "ECS/ComponentSystemBase.hpp"
+#include "ECS/SystemBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief EntityAdmins are for isolation.
+ *        Each admin can be described as a simulation containing entities
+ *        and a group of system to maintain and update theses entities.
+ */
 class EntityAdmin
 {
     private:
@@ -64,7 +69,7 @@ class EntityAdmin
         EntityAdmin()                           = default;
         EntityAdmin(EntityAdmin const& in_copy) = default;
         EntityAdmin(EntityAdmin&&      in_move) = default;
-        ~EntityAdmin();
+        ~EntityAdmin()                          = default;
 
         #pragma endregion
 

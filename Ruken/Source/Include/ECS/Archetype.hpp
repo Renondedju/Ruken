@@ -29,22 +29,40 @@
 #include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
 
+#include "Containers/SmartPtr.hpp"
+#include "Containers/UnorderedMap.hpp"
+
 #include "ECS/Group.hpp"
 #include "ECS/EntityID.hpp"
 #include "ECS/ComponentBase.hpp"
-#include "Containers/UnorderedMap.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief Archetypes are at the very core of this ECS implementation.
+ *        They are responsible for storing and organizing the components
+ *        so that systems can query and work on those in the most efficient way.
+ *
+ * An archetype is a unique set of arrays, each array being used to store one (and one only) type of component.
+ * All these arrays are ordered so that all components at a given index correspond to the same entity;
+ * and so, all entities stored in a given archetype share the exact same set of components.
+ * By storing the components in contiguous homogeneous arrays, the systems can iterate on them very efficiently,
+ * leveraging the hardware pre-fetcher to its fullest potential.
+ *
+ * \note This has a very important implication: each time the structure of an entity is modified
+ *       (i.e. each time we add or remove a component to an entity), it must be memmoved to another archetype.
+ *       This has a cost, especially if doing this on lots of entities very frequently.
+ *       Take this fact into consideration when designing your code.
+ */
 class Archetype
 {
     protected:
 
         #pragma region Members
         
-        UnorderedMap<DAEsize, std::unique_ptr<ComponentBase>> m_components;
-        ArchetypeFingerprint                                  m_fingerprint;
+        UnorderedMap<DAEsize, UniquePtr<ComponentBase>> m_components;
+        ArchetypeFingerprint                            m_fingerprint;
 
         #pragma endregion 
 

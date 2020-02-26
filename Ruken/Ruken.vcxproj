@@ -156,11 +156,10 @@
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentSystemBase.hpp" />
-    <ClInclude Include="Source\Include\ECS\EComponentItemStatus.hpp" />
+    <ClInclude Include="Source\Include\ECS\SystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentSystem.hpp" />
+    <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\ECS\Group.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\Components.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\ComponentTable.hpp" />
@@ -316,7 +315,7 @@
     <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
     <None Include="Source\Src\ECS\Component.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
-    <None Include="Source\Src\ECS\ComponentSystem.inl" />
+    <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
     <None Include="Source\Src\ECS\Group.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
@@ -375,7 +374,7 @@
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
     <ClCompile Include="Source\Src\ECS\Archetype.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
-    <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
+    <ClCompile Include="Source\Src\ECS\SystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Core\Kernel.cpp" />
     <ClCompile Include="Source\Src\Core\KernelProxy.cpp" />

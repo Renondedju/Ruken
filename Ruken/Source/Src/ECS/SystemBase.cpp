@@ -22,24 +22,24 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "ECS/SystemBase.hpp"
 
-#include "Build/Namespace.hpp"
-#include "Types/FundamentalTypes.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_RUKEN_NAMESPACE
+SystemBase::SystemBase() noexcept:
+    enabled {true}
+{}
 
-/**
- * Component Item Status enum
- * Enabled  => The component item is enabled and currently in use by systems
- * Disabled => The component item is disabled for now but might be enabled back later to be used at any moment
- * Unused   => The component item is marked for deletion and isn't used anymore
- */
-enum class EComponentItemStatus : RkUint8
+ComponentQuery const& SystemBase::GetQuery() const noexcept
 {
-    Enabled,
-    Disabled,
-    Unused
-};
+    return m_query;
+}
 
-END_RUKEN_NAMESPACE
+DAEvoid SystemBase::OnStart() noexcept
+{}
+
+DAEvoid SystemBase::OnUpdate(DAEfloat) noexcept
+{}
+
+DAEvoid SystemBase::OnEnd() noexcept
+{}

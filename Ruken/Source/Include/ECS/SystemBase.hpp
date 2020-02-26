@@ -25,43 +25,48 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Types/FundamentalTypes.hpp"
-#include "Containers/Vector.hpp"
 
-#include "ECS/Group.hpp"
-#include "ECS/Archetype.hpp"
-#include "ECS/ComponentSystemBase.hpp"
+#include "ECS/ComponentQuery.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief A system is in charge of only maintaining the data contained in components
- * \tparam TComponents Required components for the system to operate
- */
-template <typename... TComponents>
-class ComponentSystem : public ComponentSystemBase
+class SystemBase
 {
+    protected:
+
+        #pragma region Mebers
+
+        ComponentQuery m_query;
+
+        #pragma endregion
+
     public:
 
-        #pragma region Members
+        #pragma region Mebers
 
-        // This vector stores every group we wish to read/write
-        // You really should not try to edit the vector itself yourself.
-        // Instead, use it for iteration purposes only !
-        Vector<Group<TComponents...>> groups;
+        DAEbool enabled;
 
         #pragma endregion
 
         #pragma region Constructors
 
-        ComponentSystem() noexcept;
-        ComponentSystem(ComponentSystem const& in_copy) = default;
-        ComponentSystem(ComponentSystem&&      in_move) = default;
-        virtual ~ComponentSystem()                      = default;
+        SystemBase() noexcept;
+        SystemBase(SystemBase const& in_copy) = default;
+        SystemBase(SystemBase&&      in_move) = default;
+        virtual ~SystemBase()                 = default;
 
         #pragma endregion
 
         #pragma region Methods
+
+        /**
+         * \brief Returns the component query of the system
+         * \return Component query
+         */
+        ComponentQuery const& GetQuery() const noexcept;
+
+        // --- Virtual
 
         /**
          * \brief Adds a component reference group to the system.
@@ -69,18 +74,36 @@ class ComponentSystem : public ComponentSystemBase
          *        if the component query of this archetype and the system matches
          * \param in_archetype Referenced archetype of the group to create 
          */
-        virtual DAEvoid AddReferenceGroup(Archetype& in_archetype) noexcept override final;
+        virtual DAEvoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
+
+        /**
+         * \brief Called once at the start of a simulation
+         * \note This method could be called multiple times for the same
+         *       instance if the simulation is restated without reloading the whole ECS 
+         */
+        virtual DAEvoid OnStart() noexcept;
+
+        /**
+         * \brief Called every frame
+         * \param in_delta_time Time passed in seconds since the last frame
+         */
+        virtual DAEvoid OnUpdate(DAEfloat in_delta_time) noexcept;
+
+        /**
+         * \brief Called once at the end of a simulation
+         * \note This method could be called multiple times for the same
+         *       instance if the simulation is restated without reloading the whole ECS 
+         */
+        virtual DAEvoid OnEnd() noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        ComponentSystem& operator=(ComponentSystem const& in_copy) = default;
-        ComponentSystem& operator=(ComponentSystem&&      in_move) = default;
+        SystemBase& operator=(SystemBase const& in_copy) = default;
+        SystemBase& operator=(SystemBase&&      in_move) = default;
 
         #pragma endregion
 };
-
-#include "ECS/ComponentSystem.inl"
 
 END_DAEMON_NAMESPACE
