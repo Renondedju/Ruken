@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,13 @@
 
 #pragma once
 
-#include <Vector/Vector.hpp>
+#include <type_traits>
 
-#include "ECS/Component.hpp"
-#include "ECS/ComponentItem.hpp"
+#include "Config.hpp"
 
-#include "ECS/Test/ComponentTable.hpp"
+BEGIN_DAEMON_NAMESPACE
 
-USING_DAEMON_NAMESPACE
+template <class TSource, class TDestination>
+using CopyConst = std::conditional_t<std::is_const_v<TSource>, const TDestination, std::remove_const_t<TDestination>>;
 
-struct PositionComponentItem : public ComponentItem<Vector3f>
-{
-    enum EMembers
-    { Position };
-};
-
-struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
-{
-    enum EMembers
-    { Life, MaxLife };
-};
-
-struct CounterComponentItem : public ComponentItem<DAEsize> 
-{
-    enum EMembers
-    { Counter };
-};
-
-DAEMON_DEFINE_COMPONENT(Position);
-DAEMON_DEFINE_COMPONENT(Counter);
-DAEMON_DEFINE_COMPONENT(Life);
+END_DAEMON_NAMESPACE

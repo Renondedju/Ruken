@@ -22,31 +22,31 @@
  *  SOFTWARE.
  */
 
-template <DAEsize TUniqueId, typename TItem>
-EntityID Component<TUniqueId, TItem>::CreateItem(TItem&& in_item) noexcept
+template <DAEsize TUniqueId, typename... TMembers>
+EntityID Component<TUniqueId, TMembers...>::CreateItem(Item&& in_item) noexcept
 {
-    Layout::PushBack(m_storage, std::forward<TItem>(in_item));
+    Layout::PushBack(m_storage, std::forward<Item>(in_item));
 
     return EntityID(Layout::Size(m_storage) - 1);
 }
 
-template <DAEsize TUniqueId, typename TItem>
-EntityID Component<TUniqueId, TItem>::CreateItem() noexcept
+template <DAEsize TUniqueId, typename... TMembers>
+EntityID Component<TUniqueId, TMembers...>::CreateItem() noexcept
 {
-    Layout::PushBack(m_storage, std::forward<TItem>(TItem{}));
+    Layout::PushBack(m_storage, std::forward<Item>(Item{}));
 
     return EntityID(Layout::Size(m_storage) - 1);
 }
 
-template <DAEsize TUniqueId, typename TItem>
-DAEsize Component<TUniqueId, TItem>::GetItemCount() const noexcept
+template <DAEsize TUniqueId, typename... TMembers>
+DAEsize Component<TUniqueId, TMembers...>::GetItemCount() const noexcept
 {
     return Layout::Size(m_storage);
 }
 
-template <DAEsize TUniqueId, typename TItem>
+template <DAEsize TUniqueId, typename... TMembers>
 template <typename TView>
-auto Component<TUniqueId, TItem>::GetItemView(EntityID in_entity) noexcept
+auto Component<TUniqueId, TMembers...>::GetItemView(EntityID in_entity) noexcept
 {
-    return Layout::Get<TView>(m_storage, static_cast<DAEsize>(in_entity));
+    return Layout::template Get<TView>(m_storage, static_cast<DAEsize>(in_entity));
 }

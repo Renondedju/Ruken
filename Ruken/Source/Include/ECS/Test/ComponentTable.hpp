@@ -32,7 +32,5 @@
  *        see the Component class for more info.
  */
 DAEMON_DEFINE_COMPONENT_TABLE(
-    Position,
     Counter,
-    Life
 );

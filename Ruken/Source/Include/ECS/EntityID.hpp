@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#include <Types/NamedType.hpp>
+#include <Types/Operators/Comparison.hpp>
+#include <Types/Operators/Arithmetic/Decrement.hpp>
+#include <Types/Operators/Arithmetic/Increment.hpp>
 
-#include "Types/NamedType.hpp"
-#include "Types/Operators/Comparison.hpp"
-#include "Types/Operators/Arithmetic/Decrement.hpp"
-#include "Types/Operators/Arithmetic/Increment.hpp"
+#include "Config.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 

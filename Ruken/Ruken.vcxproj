@@ -153,6 +153,7 @@
     <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentField.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
@@ -161,8 +162,9 @@
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\ECS\Group.hpp" />
-    <ClInclude Include="Source\Include\ECS\Test\Components.hpp" />
+    <ClInclude Include="Source\Include\ECS\Test\CounterComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\ComponentTable.hpp" />
+    <ClInclude Include="Source\Include\ECS\Test\CounterSystem.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
@@ -175,6 +177,8 @@
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
+    <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
+    <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
@@ -214,9 +218,10 @@
     <ClInclude Include="Source\Include\Threading\ThreadSafeQueue.hpp" />
     <ClInclude Include="Source\Include\Time\ControlClock.hpp" />
     <ClInclude Include="Source\Include\Time\Sleep.hpp" />
+    <ClInclude Include="Source\Include\Meta\CopyConst.hpp" />
+    <ClInclude Include="Source\Include\Types\FundamentalTypes.hpp" />
     <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
     <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
-    <ClInclude Include="Source\Include\Types\FundamentalTypes.hpp" />
     <ClInclude Include="Source\Include\Meta\Meta.hpp" />
     <ClInclude Include="Source\Include\Meta\MinimumType.hpp" />
     <ClInclude Include="source\include\resource\ResourceLoadingDescriptor.hpp" />

@@ -28,42 +28,53 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/IndexPack.hpp"
 #include "ECS/ComponentItemView.hpp"
+
+#include "Meta/IndexPack.hpp"
+#include "Meta/TupleIndex.hpp"
+
 #include "Containers/SOA/DataLayoutItem.hpp"
 
-BEGIN_RUKEN_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief This class describes the memory layout of your component to the ECS
- * \tparam TTypes Item types
+ * \tparam TMembers Variable types
  */
-template <typename... TTypes>
-class ComponentItem : public DataLayoutItem<std::vector, TTypes...>
+template <typename... TMembers>
+class ComponentItem : public DataLayoutItem<std::vector, typename TMembers::Type...>
 {
+    private:
+
+        template <typename TMember>
+        using VariableIndex = TupleIndex<std::remove_const_t<TMember>, Tuple<TMembers...>>;
+
     public:
 
         // Default constructor
-        ComponentItem(TTypes&&... in_data) noexcept:
-            DataLayoutItem<std::vector, TTypes...>(std::forward<TTypes>(in_data)...)
+        ComponentItem(typename TMembers::Type&&... in_data) noexcept:
+            DataLayoutItem<Vector, typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
         {}
 
-        // Exposing constructors
-        using DataLayoutItem<std::vector, TTypes...>::DataLayoutItem;
-        using DataLayoutItem<std::vector, TTypes...>::operator=;
-
         // View constructors
-        template <RkSize... TItems>
+        template <DAEsize... TItems>
         using MakeView = ComponentItemView<IndexPack<TItems...>, SelectType<TItems, TTypes...>...>;
 
     private:
 
-        template <RkSize... TItems>
+        template <DAEsize... TItems>
         constexpr static MakeView<TItems...> MakeFullViewHelper(std::index_sequence<TItems...>);
 
     public:
+        // Exposing parent constructors
+        using DataLayoutItem<Vector, typename TMembers::Type...>::DataLayoutItem;
+        using DataLayoutItem<Vector, typename TMembers::Type...>::operator=;
 
-        using FullView = decltype(MakeFullViewHelper(std::make_index_sequence<sizeof...(TTypes)>()));
+        // View constructors
+        template <typename... TSelectedVariables>
+        using MakeView         = ComponentItemView<IndexPack<VariableIndex<TSelectedVariables>::value...>, TSelectedVariables...>;
+        using FullView         = MakeView<TMembers...>;
+        using FullReadonlyView = MakeView<TMembers const...> const;
 };
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

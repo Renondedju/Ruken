@@ -24,33 +24,17 @@
 
 #pragma once
 
-#include <tuple>
+#include "Containers/Array.hpp"
 
-#include "Build/Namespace.hpp"
-#include "Meta/ValueIndexer.hpp"
+#include "ECS/Component.hpp"
+#include "ECS/ComponentField.hpp"
+#include "ECS/Test/ComponentTable.hpp"
 
-#include "Containers/SOA/DataLayout.hpp"
-#include "Containers/SOA/DataLayoutView.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
+struct Count       : ComponentField<DAEsize>            {};
+struct TestPadding : ComponentField<Array<DAEsize, 10>> {};
 
-/** 
- * \brienf DataItem class
- * This class is meant to describe a full data layout as well as implementing setters/getters
- * This class also comes in handy for Item inheritance
- */
-template <template <typename> typename TContainer, typename... TTypes>
-struct DataLayoutItem : public std::tuple<TTypes...>
-{
-    // Making constructors available
-    using std::tuple<TTypes...>::tuple;
-    using std::tuple<TTypes...>::operator=;
-
-    template <DAEsize... TItems>
-    using MakeView = DataLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
-    using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
-
-    using Layout   = DataLayout<TContainer, TTypes...>;
-};
-
-END_DAEMON_NAMESPACE
+DAEMON_DEFINE_COMPONENT(Counter,
+    Count,        // Actual count variable
+    TestPadding); // Test padding to demonstrate views 

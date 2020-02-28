@@ -28,36 +28,39 @@
 
 #include "Meta/Assert.hpp"
 #include "ECS/ComponentBase.hpp"
+#include "ECS/ComponentItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief A component is a simple data store which contains no behavior, no code logic to transform its data.
- * \tparam TItem Associated item of the component, must be a subtype of ComponentItem
+ * \tparam TFields Fields of the component
  * \tparam TUniqueId Unique ID of the component.
  *                   Ideally this would be generated automatically at compile time but doing so in c++ is
  *                   really hard and not 100% reliable. Since this ID must be unique for each component, the best way to maintain it
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <DAEsize TUniqueId, typename TItem>
+template <DAEsize TUniqueId, typename... TFields>
 class Component final : public ComponentBase
 {
-     DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+    DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+
+    public:
+
+        using Item   = ComponentItem<TFields...>;
+        using Layout = typename Item::Layout;
 
     private:
 
         #pragma region Members
 
         // Storage of the component
-        typename TItem::Layout::ContainerType m_storage;
+        typename Layout::ContainerType m_storage;
 
         #pragma endregion 
 
     public:
-
-        using Layout = typename TItem::Layout;
-        using Item   = TItem;
 
         static constexpr DAEsize id = TUniqueId;
 
@@ -77,8 +80,8 @@ class Component final : public ComponentBase
          * \param in_item item to push back
          * \return Created item id
          */
-        EntityID CreateItem(TItem&& in_item) noexcept;
-        EntityID CreateItem()                noexcept override;
+        EntityID CreateItem(Item&& in_item) noexcept;
+        EntityID CreateItem()               noexcept override;
 
         /**
          * \brief Returns the count of items in this component
@@ -109,10 +112,11 @@ class Component final : public ComponentBase
  * \brief Shorthand to declare a component alias named "<in_component_name>Component"
  * \note The component item must be named "<in_component_name>ComponentItem"
  * \note This macro also automatically registers this component
- * \param in_component_name Name of the component as defined in the component table 
+ * \param in_component_name Name of the component as defined in the component table
+ * \param ... Fields of the component. Theses must inherit from the ComponentField class
  */
-#define DAEMON_DEFINE_COMPONENT(in_component_name)\
-    using in_component_name##Component = Component<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name), in_component_name##ComponentItem>
+#define DAEMON_DEFINE_COMPONENT(in_component_name, ...)\
+    using in_component_name##Component = Component<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name), __VA_ARGS__>
     
 /**
  * \brief Creates an enum called EComponentTable used to keep track of every available

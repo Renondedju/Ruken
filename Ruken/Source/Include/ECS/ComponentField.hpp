@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,14 @@
 
 #pragma once
 
-#include <tuple>
-
-#include "Build/Namespace.hpp"
-#include "Meta/ValueIndexer.hpp"
-
-#include "Containers/SOA/DataLayout.hpp"
-#include "Containers/SOA/DataLayoutView.hpp"
+#include "Config.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-/** 
- * \brienf DataItem class
- * This class is meant to describe a full data layout as well as implementing setters/getters
- * This class also comes in handy for Item inheritance
- */
-template <template <typename> typename TContainer, typename... TTypes>
-struct DataLayoutItem : public std::tuple<TTypes...>
+template <typename TDataType>
+struct ComponentField
 {
-    // Making constructors available
-    using std::tuple<TTypes...>::tuple;
-    using std::tuple<TTypes...>::operator=;
-
-    template <DAEsize... TItems>
-    using MakeView = DataLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
-    using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
-
-    using Layout   = DataLayout<TContainer, TTypes...>;
+    using Type = TDataType;
 };
 
 END_DAEMON_NAMESPACE

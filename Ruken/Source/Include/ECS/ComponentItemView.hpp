@@ -28,27 +28,65 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/ValueIndexer.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include "Meta/CopyConst.hpp"
+#include "Meta/TupleIndex.hpp"
+#include "Meta/TupleHasType.hpp"
 #include "Containers/SOA/DataLayoutView.hpp"
 
-BEGIN_RUKEN_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
-template <typename TPack, typename... TTypes>
+/**
+ * \brief Allows to fetch only the required fields in a component, saving on data bus bandwidth and cache
+ * \note All instances of this class are generated via the item type of each component
+ * \tparam TPack Index pack enumerating the index of the members to fetch
+ * \tparam TMembers Member types to create a reference onto
+ */
+template <typename TPack, typename... TMembers>
 struct ComponentItemView;
 
-template <template <RkSize...> class TPack, RkSize... TIndices, typename... TTypes>
-struct ComponentItemView<TPack<TIndices...>, TTypes...> : public DataLayoutView<std::index_sequence<TIndices...>, TTypes...>
+template <template <DAEsize...> class TPack, DAEsize... TIndices, typename... TMembers>
+struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>
 {
-    template<RkSize TMember>
-    auto&       Fetch()       { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
+    private:
 
-    template<RkSize TMember>
-    auto const& Fetch() const { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
+        /**
+         * \brief Returns the index of a member inside of the view
+         * \tparam TMember Member to look for
+         */
+        template <typename TMember>
+        using MemberIndex = TupleIndex<std::remove_const_t<TMember>, Tuple<std::remove_const_t<TMembers>...>>;
 
-    // Making constructors available
-    using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::DataLayoutView;
-    using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::operator=;
+        /**
+         * \brief Checks if a given member exists in this view,
+         *        if not SFINAE will prevent compilation to avoid some more ugly errors 
+         * \tparam TMember Member to look for
+         */
+        template <typename TMember>
+        using MemberExists = std::enable_if_t<TupleHasType<TMember, Tuple<std::remove_const_t<TMembers>...>>::value, DAEbool>;
+
+    public:
+
+        // Making parent constructors available
+        using DataLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::DataLayoutView;
+        using DataLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::operator=;
+
+        /**
+         * \brief Returns a reference onto a given member stored in the view.
+         * \note The view must include the requested member to work
+         * \tparam TMember Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
+         * \return Member reference
+         */
+        template<typename TMember, MemberExists<TMember> = true>
+        auto&       Fetch()       { return std::get<MemberIndex<TMember>::value>(*this); }
+
+        /**
+         * \brief Returns a constant reference onto a given member stored in the view.
+         * \note The view must include the requested member to work
+         * \tparam TMember Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
+         * \return Member constant reference
+         */
+        template<typename TMember, MemberExists<TMember> = true>
+        auto const& Fetch() const { return std::get<MemberIndex<TMember>::value>(*this); }
 };
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE
