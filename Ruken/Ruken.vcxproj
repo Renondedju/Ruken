@@ -216,10 +216,6 @@
     <ClInclude Include="Source\Include\Time\Sleep.hpp" />
     <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
     <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Operators.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Decrement.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Division.hpp" />
     <ClInclude Include="Source\Include\Types\FundamentalTypes.hpp" />
     <ClInclude Include="Source\Include\Meta\Meta.hpp" />
     <ClInclude Include="Source\Include\Meta\MinimumType.hpp" />
@@ -238,33 +234,6 @@
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\Worker.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Addition.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Increment.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Modulo.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Multiplication.hpp" />
-    <ClInclude Include="Source\Include\Types\NamedType.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\Subtraction.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\UnaryMinus.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Arithmetic\UnaryPlus.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise\And.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise\LeftShift.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise\Not.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise\Or.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise\RightShift.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Bitwise\Xor.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\Equal.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\Greater.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\GreaterEqual.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\Less.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\LessEqual.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\NotEqual.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Comparison\Spaceship.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Logical.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalAnd.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalNot.hpp" />
-    <ClInclude Include="Source\Include\Types\Operators\Logical\LogicalOr.hpp" />
     <ClInclude Include="Source\Include\Types\Unique.hpp" />
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
@@ -328,7 +297,6 @@
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
     <None Include="Source\Src\Threading\Worker.inl" />
-    <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
