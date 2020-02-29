@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,40 +24,34 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#include "Config.hpp"
 
 #include "Meta/Assert.hpp"
 #include "ECS/ComponentBase.hpp"
-#include "ECS/ComponentItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief A component is a simple data store which contains no behavior, no code logic to transform its data.
- * \tparam TFields Fields of the component
+ * \brief A tag component does not hold any data, its only purpose is to differentiate 2 entities from each other by "tagging" it.
  * \tparam TUniqueId Unique ID of the component.
  *                   Ideally this would be generated automatically at compile time but doing so in c++ is
  *                   really hard and not 100% reliable. Since this ID must be unique for each component, the best way to maintain it
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <DAEsize TUniqueId, typename... TFields>
-class Component final : public ComponentBase
+template <DAEsize TUniqueId>
+class TagComponent final : public ComponentBase
 {
-    DAEMON_STATIC_ASSERT(sizeof...(TFields) > 0               , "A component must have at least one field, use a TagComponent instead."    );
     DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
-
-    public:
-
-        using Item   = ComponentItem<TFields...>;
-        using Layout = typename Item::Layout;
 
     private:
 
-        #pragma region Members
+        #pragma region Methods
 
-        // Storage of the component
-        typename Layout::ContainerType m_storage;
+        // The size of the component must still be tracked in case where the
+        // archetype we are living in queries us to find its size.
+        // TODO(Basile): That job could be handled by the Archetype instead
+        DAEsize m_component_size;
 
         #pragma endregion 
 
@@ -67,10 +61,10 @@ class Component final : public ComponentBase
 
         #pragma region Constructors
 
-        Component()                         = default;
-        Component(Component const& in_copy) = default;
-        Component(Component&&      in_move) = default;
-        virtual ~Component()                = default;
+        TagComponent()                            = default;
+        TagComponent(TagComponent const& in_copy) = default;
+        TagComponent(TagComponent&&      in_move) = default;
+        virtual ~TagComponent()                   = default;
 
         #pragma endregion
 
@@ -78,11 +72,9 @@ class Component final : public ComponentBase
 
         /**
          * \brief Creates an item into the component
-         * \param in_item item to push back
          * \return Created item id
          */
-        EntityID CreateItem(Item&& in_item) noexcept;
-        EntityID CreateItem()               noexcept override;
+        EntityID CreateItem() noexcept override;
 
         /**
          * \brief Returns the count of items in this component
@@ -90,41 +82,24 @@ class Component final : public ComponentBase
          */
         DAEsize GetItemCount() const noexcept override;
 
-        /**
-         * \brief Returns a view containing all the requested fields of a given entity
-         * \tparam TView View type
-         * \param in_entity Entity to fetch
-         * \return View containing all the requested fields of the given entity
-         */
-        template <typename TView>
-        auto GetItemView(EntityID in_entity) noexcept;
-
         #pragma endregion 
 
         #pragma region Operators
 
-        Component& operator=(Component const& in_copy) = default;
-        Component& operator=(Component&&      in_move) = default;
+        TagComponent& operator=(TagComponent const& in_copy) = default;
+        TagComponent& operator=(TagComponent&&      in_move) = default;
 
         #pragma endregion
 };
 
+#include "ECS/TagComponent.inl"
+
 /**
- * \brief Shorthand to declare a component named "<in_component_name>Component"
+ * \brief Shorthand to declare a tag component named "<in_component_name>Component"
  * \param in_component_name Name of the component as defined in the component table
  * \param ... Fields of the component. Theses must inherit from the ComponentField class
  */
-#define DAEMON_DEFINE_COMPONENT(in_component_name, ...)\
-    using DAEMON_GLUE(in_component_name, Component) = Component<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name), __VA_ARGS__>
-    
-/**
- * \brief Creates an enum called EComponentTable used to keep track of every available
- *        component in the ECS. It is also used to create and maintain every component ID.
- *        See the Component class for more info.
- */
-#define DAEMON_DEFINE_COMPONENT_TABLE(...)\
-    enum class EComponentTable { __VA_ARGS__ }
-
-#include "ECS/Component.inl"
+#define DAEMON_DEFINE_TAG_COMPONENT(in_component_name, ...)\
+    using DAEMON_GLUE(in_component_name, Component) = TagComponent<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name)>
 
 END_DAEMON_NAMESPACE

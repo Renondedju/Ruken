@@ -33,4 +33,5 @@
  */
 DAEMON_DEFINE_COMPONENT_TABLE(
     Counter,
+    TestTag
 );

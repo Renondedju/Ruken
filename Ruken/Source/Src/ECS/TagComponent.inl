@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,15 @@
 
 #pragma once
 
-#include "Containers/Array.hpp"
+template <DAEsize TUniqueId>
+EntityID TagComponent<TUniqueId>::CreateItem() noexcept
+{
+    return m_component_size++;
+}
 
-#include "ECS/Component.hpp"
-#include "ECS/TagComponent.hpp"
-#include "ECS/ComponentField.hpp"
-#include "ECS/Test/ComponentTable.hpp"
+template <DAEsize TUniqueId>
+DAEsize TagComponent<TUniqueId>::GetItemCount() const noexcept
+{
+    return m_component_size;
+}
 
-USING_DAEMON_NAMESPACE
-
-struct Count       : ComponentField<DAEsize>            {};
-struct TestPadding : ComponentField<Array<DAEsize, 10>> {};
-
-DAEMON_DEFINE_COMPONENT(Counter,
-    Count,        // Actual count variable
-    TestPadding); // Test padding to demonstrate views 
-
-// Declaring a simple tag component named "TestTagComponent"
-DAEMON_DEFINE_TAG_COMPONENT(TestTag);

@@ -162,6 +162,7 @@
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\ECS\Group.hpp" />
+    <ClInclude Include="Source\Include\ECS\TagComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\ComponentTable.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterSystem.hpp" />
@@ -292,6 +293,7 @@
     <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
     <None Include="Source\Src\ECS\Group.inl" />
+    <None Include="Source\Src\ECS\TagComponent.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />

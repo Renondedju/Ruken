@@ -29,9 +29,9 @@
 
 USING_DAEMON_NAMESPACE
 
-struct CounterSystem final : daemon::System<CounterComponent>
+struct CounterSystem final : daemon::System<CounterComponent, TestTagComponent>
 {
-    using StartView  = CounterComponent::Item::MakeView<Count, TestPadding>;
+    using StartView  = CounterComponent::Item::MakeView<Count>;
     using UpdateView = CounterComponent::Item::MakeView<Count const> const;
 
     /**

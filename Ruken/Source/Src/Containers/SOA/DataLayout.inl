@@ -75,5 +75,8 @@ template <template <typename> class TContainer, typename ... TLayoutTypes>
 constexpr RkSize DataLayout<TContainer, TLayoutTypes...>::Size(
     ContainerType const& in_container) noexcept
 {
-    return std::get<0>(in_container).size();
+    if constexpr (sizeof...(TLayoutTypes) > 0)
+        return std::get<0>(in_container).size();
+    else
+        return 0;
 }
