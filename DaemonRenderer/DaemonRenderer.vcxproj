@@ -265,6 +265,7 @@
     <ClInclude Include="Source\Include\Meta\IndexSequence\PartitionIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Renderer.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
@@ -393,6 +394,7 @@
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Renderer.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
