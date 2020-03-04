@@ -1,4 +1,4 @@
-/**
+/*
  *  MIT License
  *
  *  Copyright (c) 2019 Basile Combet, Philippe Yi
@@ -24,27 +24,47 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include <Vulkan/vulkan.h>
 
-#include <map>
+#include "Config.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+class PhysicalDevice
+{
+    private:
 
-template<typename TK, typename TV>
-using Map = std::pmr::map<TK, TV>;
+        #pragma region Members
 
-template<typename TK, typename TV>
-using Multimap = std::pmr::multimap<TK, TV>;
-#else
+        VkPhysicalDevice m_physical_device;
 
-template<typename TK, typename TV>
-using Map = std::map<TK, TV>;
+        #pragma endregion
 
-template<typename TK, typename TV>
-using Multimap = std::multimap<TK, TV>;
+    public:
 
-#endif
+        #pragma region Constructors and Destructor
+
+        PhysicalDevice();
+
+        PhysicalDevice(PhysicalDevice const&    in_copy) = delete;
+        PhysicalDevice(PhysicalDevice&&         in_move) = delete;
+
+        ~PhysicalDevice() noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        PhysicalDevice& operator=(PhysicalDevice const& in_copy) = delete;
+        PhysicalDevice& operator=(PhysicalDevice&&      in_move) = delete;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+
+
+        #pragma endregion 
+};
 
 END_DAEMON_NAMESPACE

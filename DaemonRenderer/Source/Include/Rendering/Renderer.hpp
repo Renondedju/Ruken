@@ -28,6 +28,10 @@
 
 #include "Config.hpp"
 
+#include "Instance.hpp"
+#include "PhysicalDevice.hpp"
+#include "LogicalDevice.hpp"
+
 #include "Containers/Vector.hpp"
 
 #include "Debug/Logging/Logger.hpp"
@@ -42,20 +46,26 @@ class Renderer
 
         Logger* m_logger;
 
-        VkInstance                  m_instance;
-        VkDebugUtilsMessengerEXT    m_messenger;
+        VkInstance          m_instance;
+        VkPhysicalDevice    m_physical_device;
+        VkDevice            m_logical_device;
 
-        Vector<DAEchar const*> m_required_extensions;
-        Vector<DAEchar const*> m_required_layers;
+        Vector<DAEchar const*> m_required_instance_extensions;
+        Vector<DAEchar const*> m_required_validation_layers;
+        Vector<DAEchar const*> m_required_device_extensions;
 
         #pragma endregion
 
         #pragma region Methods
+        
+        DAEvoid CreateInstance() noexcept;
+        DAEvoid PickPhysicalDevice() noexcept;
+        DAEvoid CreateLogicalDevice() noexcept;
 
         DAEvoid CheckInstanceExtensions() const noexcept;
         DAEvoid CheckValidationLayers() const noexcept;
-        DAEvoid CreateInstance() noexcept;
-        DAEvoid SetupDebugMessenger() noexcept;
+        DAEbool CheckDeviceExtensions(VkPhysicalDevice in_physical_device) const noexcept;
+        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const noexcept;
 
         #pragma endregion
 
@@ -63,7 +73,7 @@ class Renderer
 
         #pragma region Constructors and Destructor
 
-        Renderer() noexcept;
+        Renderer();
 
         Renderer(Renderer const&    in_copy) = delete;
         Renderer(Renderer&&         in_move) = delete;
@@ -88,11 +98,6 @@ class Renderer
 
         #pragma endregion
 };
-
-VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT         in_message_severity,
-                                             VkDebugUtilsMessageTypeFlagsEXT                in_message_type,
-                                             VkDebugUtilsMessengerCallbackDataEXT const*    in_callback_data,
-                                             DAEvoid*                                       in_user_data);
 
 /* TODO Needs to be removed when Kernel is done TODO */
 

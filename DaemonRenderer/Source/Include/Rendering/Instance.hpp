@@ -1,4 +1,4 @@
-/**
+/*
  *  MIT License
  *
  *  Copyright (c) 2019 Basile Combet, Philippe Yi
@@ -24,27 +24,47 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include <Vulkan/vulkan.h>
 
-#include <map>
+#include "Config.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+class Instance
+{
+    private:
 
-template<typename TK, typename TV>
-using Map = std::pmr::map<TK, TV>;
+        #pragma region Members
 
-template<typename TK, typename TV>
-using Multimap = std::pmr::multimap<TK, TV>;
-#else
+        VkInstance m_instance;
 
-template<typename TK, typename TV>
-using Map = std::map<TK, TV>;
+        #pragma endregion
 
-template<typename TK, typename TV>
-using Multimap = std::multimap<TK, TV>;
+    public:
 
-#endif
+        #pragma region Constructors and Destructor
+
+        Instance();
+
+        Instance(Instance const&    in_copy) = delete;
+        Instance(Instance&&         in_move) = delete;
+
+        ~Instance() noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Instance& operator=(Instance const& in_copy) = delete;
+        Instance& operator=(Instance&&      in_move) = delete;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+
+
+        #pragma endregion 
+};
 
 END_DAEMON_NAMESPACE

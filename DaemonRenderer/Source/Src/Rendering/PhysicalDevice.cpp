@@ -1,4 +1,4 @@
-/**
+/*
  *  MIT License
  *
  *  Copyright (c) 2019 Basile Combet, Philippe Yi
@@ -22,29 +22,20 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Rendering/PhysicalDevice.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-#include <map>
+#pragma region Constructor and Destructor
 
-BEGIN_DAEMON_NAMESPACE
+PhysicalDevice::PhysicalDevice() : m_physical_device { nullptr }
+{
 
-#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
+}
 
-template<typename TK, typename TV>
-using Map = std::pmr::map<TK, TV>;
+PhysicalDevice::~PhysicalDevice() noexcept
+{
 
-template<typename TK, typename TV>
-using Multimap = std::pmr::multimap<TK, TV>;
-#else
+}
 
-template<typename TK, typename TV>
-using Map = std::map<TK, TV>;
-
-template<typename TK, typename TV>
-using Multimap = std::multimap<TK, TV>;
-
-#endif
-
-END_DAEMON_NAMESPACE
+#pragma endregion
