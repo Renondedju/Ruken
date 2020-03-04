@@ -24,7 +24,11 @@
 
 #pragma once
 
+#include <Vulkan/vulkan.h>
+
 #include "Config.hpp"
+
+#include "Containers/Vector.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -36,13 +40,22 @@ class Renderer
 
         #pragma region Members
 
+        Logger* m_logger;
 
+        VkInstance                  m_instance;
+        VkDebugUtilsMessengerEXT    m_messenger;
+
+        Vector<DAEchar const*> m_required_extensions;
+        Vector<DAEchar const*> m_required_layers;
 
         #pragma endregion
 
         #pragma region Methods
 
-        
+        DAEvoid CheckInstanceExtensions() const noexcept;
+        DAEvoid CheckValidationLayers() const noexcept;
+        DAEvoid CreateInstance() noexcept;
+        DAEvoid SetupDebugMessenger() noexcept;
 
         #pragma endregion
 
@@ -68,9 +81,23 @@ class Renderer
 
         #pragma region Methods
 
-
+        /**
+         * \return This module's logger.
+         */
+        [[nodiscard]] Logger const* GetLogger() const noexcept;
 
         #pragma endregion
 };
+
+VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT         in_message_severity,
+                                             VkDebugUtilsMessageTypeFlagsEXT                in_message_type,
+                                             VkDebugUtilsMessengerCallbackDataEXT const*    in_callback_data,
+                                             DAEvoid*                                       in_user_data);
+
+/* TODO Needs to be removed when Kernel is done TODO */
+
+extern Renderer* GRenderer;
+
+/* TODO Needs to be removed when Kernel is done TODO */
 
 END_DAEMON_NAMESPACE

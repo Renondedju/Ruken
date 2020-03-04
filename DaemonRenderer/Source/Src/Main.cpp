@@ -29,6 +29,8 @@
 #include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentSystem.hpp"
 
+#include "Rendering/Renderer.hpp"
+
 #include "Windowing/WindowManager.hpp"
 
 #include "Debug/Logging/Handlers/StreamHandler.hpp"
@@ -77,17 +79,15 @@ int main()
 
     Logger root_logger("ROOT", ELogLevel::Debug, nullptr);
 
-    GRootLogger = &root_logger;
-
-    WindowManager window_manager;
-
-    GWindowManager = &window_manager;
-
     ConsoleFormatter formatter;
 
     StreamHandler stream(&formatter, std::cout);
 
     root_logger.AddHandler(&stream);
+
+    GRootLogger = &root_logger;
+
+    WindowManager window_manager;
 
     window_manager.Initialize();
 
@@ -95,9 +95,15 @@ int main()
 
     window_manager.CreateWindow(std::move(params));
 
-    while (!window_manager.GetMainWindow()->ShouldClose())
+    GWindowManager = &window_manager;
+
+    Renderer renderer;
+
+    GRenderer = &renderer;
+
+    while (!GWindowManager->GetMainWindow()->ShouldClose())
     {
-        window_manager.Update();
+        GWindowManager->Update();
     }
 
     /* TODO Needs to be removed when Kernel is done TODO */
