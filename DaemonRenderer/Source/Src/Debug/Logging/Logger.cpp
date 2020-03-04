@@ -22,18 +22,23 @@
  *  SOFTWARE.
  */
 
-#include <utility>
-
-
 #include "Debug/Logging/Logger.hpp"
+
+/* TODO Needs to be removed when Kernel is done TODO */
+
+DAEMON_NAMESPACE::Logger* DAEMON_NAMESPACE::GRootLogger = nullptr;
+
+/* TODO Needs to be removed when Kernel is done TODO */
 
 USING_DAEMON_NAMESPACE
 
-Logger::Logger(DAEchar   const* in_name,
+#pragma region Constructor and Destructor
+
+Logger::Logger(String           in_name,
                ELogLevel const  in_level,
                Logger*          in_parent,
                bool      const  in_propagate) noexcept :
-    m_name      { in_name },
+    m_name      { std::move(in_name) },
     m_level     { in_level },
     m_parent    { in_parent },
     propagate   { in_propagate }
@@ -49,7 +54,11 @@ Logger::~Logger() noexcept
     }
 }
 
-DAEvoid Logger::Log(ELogLevel const in_level, String in_message) const noexcept
+#pragma endregion
+
+#pragma region Methods
+
+DAEvoid Logger::Log(ELogLevel const in_level, String&& in_message) const noexcept
 {
     if (IsEnabledFor(in_level))
 	{
@@ -86,16 +95,16 @@ ELogLevel Logger::GetEffectiveLevel() const noexcept
 	return m_level != ELogLevel::NotSet ? m_level : m_parent ? m_parent->GetEffectiveLevel() : m_level;
 }
 
-Logger* Logger::AddChild(DAEchar const* in_name)
+Logger* Logger::AddChild(String in_name)
 {
-    auto const& logger = new Logger(in_name, m_level, this, propagate);
+    auto const& logger = new Logger(std::move(in_name), m_level, this, propagate);
 
     m_children.push_front(logger);
 
     return logger;
 }
 
-DAEbool Logger::RemoveChild(DAEchar const* in_name)
+DAEbool Logger::RemoveChild(String const& in_name)
 {
     for (auto const& child : m_children)
     {
@@ -129,7 +138,7 @@ DAEbool Logger::RemoveChild(Logger const* in_logger)
     return false;
 }
 
-Logger* Logger::GetChild(DAEchar const* in_name) const noexcept
+Logger* Logger::GetChild(String const& in_name) const noexcept
 {
     for (auto const& child : m_children)
     {
@@ -222,3 +231,5 @@ DAEbool Logger::HasHandlers() const noexcept
 
     return !m_handlers.empty();
 }
+
+#pragma endregion

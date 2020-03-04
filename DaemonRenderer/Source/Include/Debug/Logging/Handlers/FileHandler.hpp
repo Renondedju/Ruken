@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <iostream>
+#include <fstream>
 
 #include "LogHandler.hpp"
 
@@ -32,8 +32,6 @@ BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief This class sends logging output to a disk file.
- *
- * \note It inherits the output functionality from StreamHandler.
  */
 class FileHandler final : public LogHandler
 {
@@ -68,7 +66,7 @@ class FileHandler final : public LogHandler
         FileHandler(FileHandler const&  in_copy) = delete;
         FileHandler(FileHandler&&       in_move) = delete;
 
-        ~FileHandler();
+        ~FileHandler() noexcept = default;
 
         #pragma endregion
 

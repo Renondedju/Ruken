@@ -73,7 +73,7 @@ class LogHandler
         LogHandler(LogHandler const&    in_copy) = delete;
         LogHandler(LogHandler&&         in_move) = delete;
 
-        virtual ~LogHandler() = default;
+        virtual ~LogHandler() noexcept = default;
 
         #pragma endregion
 

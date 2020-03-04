@@ -26,6 +26,8 @@
 
 USING_DAEMON_NAMESPACE
 
+#pragma region Constructor
+
 LogHandler::LogHandler(LogFormatter const*  in_formatter,
                        ELogLevel    const   in_level) noexcept :
     m_level     { in_level },
@@ -33,6 +35,10 @@ LogHandler::LogHandler(LogFormatter const*  in_formatter,
 {
     
 }
+
+#pragma endregion
+
+#pragma region Methods
 
 DAEvoid LogHandler::SetLevel(ELogLevel const in_level) noexcept
 {

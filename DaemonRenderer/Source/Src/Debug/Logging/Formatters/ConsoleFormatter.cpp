@@ -24,7 +24,11 @@
 
 #include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
+USING_DAEMON_NAMESPACE
+
 #ifdef DAEMON_OS_WINDOWS
+
+#include "Utility/WindowsOS.hpp"
 
 #define DAEMON_FOREGROUND_GREY      (FOREGROUND_INTENSITY)
 #define DAEMON_FOREGROUND_RED       (FOREGROUND_INTENSITY | FOREGROUND_RED)
@@ -66,7 +70,28 @@
 
 #endif
 
-USING_DAEMON_NAMESPACE
+#pragma region Constructor
+
+#ifdef DAEMON_OS_WINDOWS
+
+ConsoleFormatter::ConsoleFormatter() noexcept : LogFormatter(),
+    m_handle { GetStdHandle(STD_OUTPUT_HANDLE) }
+{
+    
+}
+
+#else
+
+ConsoleFormatter::ConsoleFormatter() : LogFormatter()
+{
+
+}
+
+#endif
+
+#pragma endregion
+
+#pragma region Methods
 
 String ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 {
@@ -113,19 +138,4 @@ String ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
     return LogFormatter::ComputeLabel(in_record);
 }
 
-#ifdef DAEMON_OS_WINDOWS
-
-ConsoleFormatter::ConsoleFormatter() noexcept : LogFormatter(),
-    m_handle { GetStdHandle(STD_OUTPUT_HANDLE) }
-{
-    
-}
-
-#else
-
-ConsoleFormatter::ConsoleFormatter() : LogFormatter()
-{
-
-}
-
-#endif
+#pragma endregion
