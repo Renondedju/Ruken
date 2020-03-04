@@ -44,11 +44,9 @@ class LogFormatter
         #pragma region Methods
 
         /**
-         * \brief 
+         * \param in_record The record to compute a label for.
          *
-         * \param in_record
-         *
-         * \return 
+         * \return The resulting label.
          */
         [[nodiscard]] virtual String ComputeLabel(LogRecord const& in_record) const noexcept;
 

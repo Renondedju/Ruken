@@ -26,12 +26,6 @@
 
 #include "LogFormatter.hpp"
 
-#ifdef DAEMON_OS_WINDOWS
-
-#include "Utility/WindowsOS.hpp"
-
-#endif
-
 BEGIN_DAEMON_NAMESPACE
 
 /**
@@ -43,22 +37,16 @@ class ConsoleFormatter final : public LogFormatter
 
         #pragma region Members
 
-        #ifdef DAEMON_OS_WINDOWS
-
-        HANDLE m_handle;
-
-        #endif
+        DAEvoid* m_handle;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief 
+         * \param in_record The record to compute a label for.
          *
-         * \param in_record 
-         *
-         * \return 
+         * \return The resulting label.
          */
         [[nodiscard]] String ComputeLabel(LogRecord const& in_record) const noexcept override;
 

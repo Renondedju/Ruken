@@ -71,41 +71,36 @@ DAEMON_DEFINE_COMPONENT(EComponentsTable, Position);
 DAEMON_DEFINE_COMPONENT(EComponentsTable, Counter);
 DAEMON_DEFINE_COMPONENT(EComponentsTable, Life);
 
-/** TODO This should be removed after Debug Kernel is setup TODO */
-
-BEGIN_DAEMON_NAMESPACE
-
-struct GlobalServices
-{
-    Logger root_logger;
-    WindowManager window_manager;
-
-    GlobalServices() : root_logger { Logger("ROOT", ELogLevel::Debug, nullptr) } {}
-};
-
-END_DAEMON_NAMESPACE
-
-static GlobalServices Services = GlobalServices();
-
-/** TODO This should be removed after Debug Kernel is setup TODO */
-
 int main()
 {
+    /* TODO Needs to be removed when Kernel is done TODO */
+
+    Logger root_logger("ROOT", ELogLevel::Debug, nullptr);
+
+    GRootLogger = &root_logger;
+
+    WindowManager window_manager;
+
+    GWindowManager = &window_manager;
+
     ConsoleFormatter formatter;
-    StreamHandler    stream   (&formatter, std::cout);
 
-    Services.root_logger.AddHandler(&stream);
+    StreamHandler stream(&formatter, std::cout);
 
-    Services.window_manager.Initialize();
+    root_logger.AddHandler(&stream);
+
+    window_manager.Initialize();
 
     WindowParameters params;
 
-    Services.window_manager.CreateWindow(std::move(params));
+    window_manager.CreateWindow(std::move(params));
 
-    while (!Services.window_manager.GetMainWindow()->ShouldClose())
+    while (!window_manager.GetMainWindow()->ShouldClose())
     {
-        Services.window_manager.Update();
+        window_manager.Update();
     }
+
+    /* TODO Needs to be removed when Kernel is done TODO */
 
     EntityAdmin admin;
 
@@ -121,12 +116,6 @@ int main()
 
     query.SetupInclusionQuery<LifeComponent, PositionComponent>();
     query.SetupExclusionQuery<CounterComponent>();
-
-    Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent>()))                                     .c_str());
-    Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent, CounterComponent>()))                   .c_str());
-    Services.root_logger.Info(std::to_string(query.Match(Archetype<LifeComponent, PositionComponent>()))                  .c_str());
-    Services.root_logger.Info(std::to_string(query.Match(Archetype<PositionComponent, LifeComponent>()))                  .c_str());
-    Services.root_logger.Info(std::to_string(query.Match(Archetype<PositionComponent, LifeComponent, CounterComponent>())).c_str());
 
     return EXIT_SUCCESS;
 }

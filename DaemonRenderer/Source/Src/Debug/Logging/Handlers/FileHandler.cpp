@@ -22,16 +22,11 @@
  *  SOFTWARE.
  */
 
-#include <fstream>
-
 #include "Debug/Logging/Handlers/FileHandler.hpp"
 
 USING_DAEMON_NAMESPACE
 
-DAEvoid FileHandler::Emit(LogRecord const& in_record)
-{
-    m_stream << m_formatter->Format(in_record);
-}
+#pragma region Constructor
 
 FileHandler::FileHandler(LogFormatter       const*  in_formatter,
                          String             const&  in_path,
@@ -42,9 +37,13 @@ FileHandler::FileHandler(LogFormatter       const*  in_formatter,
     
 }
 
-FileHandler::~FileHandler()
+#pragma endregion
+
+#pragma region Methods
+
+DAEvoid FileHandler::Emit(LogRecord const& in_record)
 {
-    Flush();
+    m_stream << m_formatter->Format(in_record);
 }
 
 DAEvoid FileHandler::Flush()

@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <iostream>
+#include <ostream>
 
 #include "LogHandler.hpp"
 
@@ -61,13 +61,13 @@ class StreamHandler final : public LogHandler
         #pragma region Contructors and Destructor
 
         explicit StreamHandler(LogFormatter const*  in_formatter,
-                               std::ostream&        in_stream,
+                               std::ostream const&  in_stream,
                                ELogLevel            in_level = ELogLevel::NotSet) noexcept;
 
         StreamHandler(StreamHandler const&  in_copy) = delete;
         StreamHandler(StreamHandler&&       in_move) = delete;
 
-        ~StreamHandler();
+        ~StreamHandler() noexcept = default;
 
         #pragma endregion
 

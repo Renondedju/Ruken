@@ -26,6 +26,8 @@
 
 USING_DAEMON_NAMESPACE
 
+#pragma region Methods
+
 String LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 {
     switch (in_record.level)
@@ -60,3 +62,5 @@ String LogFormatter::FormatStack(LogRecord const& in_record) const noexcept
 {
     return in_record.message;
 }
+
+#pragma endregion

@@ -26,22 +26,23 @@
 
 USING_DAEMON_NAMESPACE
 
-DAEvoid StreamHandler::Emit(LogRecord const& in_record)
-{
-    m_stream << m_formatter->Format(in_record);
-}
+#pragma region Constructor
 
 StreamHandler::StreamHandler(LogFormatter const*    in_formatter,
-                             std::ostream&          in_stream,
+                             std::ostream const&    in_stream,
                              ELogLevel    const     in_level) noexcept : LogHandler(in_formatter, in_level),
     m_stream { in_stream.rdbuf() }
 {
 
 }
 
-StreamHandler::~StreamHandler()
+#pragma endregion
+
+#pragma region Methods
+
+DAEvoid StreamHandler::Emit(LogRecord const& in_record)
 {
-    Flush();
+    m_stream << m_formatter->Format(in_record);
 }
 
 DAEvoid StreamHandler::Flush()
