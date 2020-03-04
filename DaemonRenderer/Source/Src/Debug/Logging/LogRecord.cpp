@@ -22,12 +22,11 @@
  *  SOFTWARE.
  */
 
-#include <utility>
-
-
 #include "Debug/Logging/LogRecord.hpp"
 
 USING_DAEMON_NAMESPACE
+
+#pragma region Constructor
 
 LogRecord::LogRecord(String          in_logger_name,
                      ELogLevel const in_level,
@@ -44,6 +43,10 @@ LogRecord::LogRecord(String          in_logger_name,
 {
 
 }
+
+#pragma endregion
+
+#pragma region Operators
 
 DAEbool LogRecord::operator==(LogRecord const& in_other) const noexcept
 {
@@ -64,3 +67,5 @@ DAEbool LogRecord::operator!=(LogRecord const& in_other) const noexcept
            line_number   != in_other.line_number ||
            function_name != in_other.function_name;
 }
+
+#pragma endregion

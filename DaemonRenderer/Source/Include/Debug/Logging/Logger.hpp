@@ -62,25 +62,6 @@ class Logger
 
         #pragma endregion
 
-        #pragma region Constructor
-
-        /**
-         * \brief Creates a new logger with the specified parameters.
-         *
-         * \param in_name The name of the new logger.
-         * \param in_level The level of the new logger.
-         * \param in_parent The logger who created the new logger.
-         * \param in_propagate Whether or not messages are passed to the parent.
-         *
-         * \note This constructor should only be used by the root logger or to create it.
-         */
-        explicit Logger(DAEchar const*  in_name,
-                        ELogLevel       in_level,
-                        Logger*         in_parent,
-                        bool            in_propagate = true) noexcept;
-
-        #pragma endregion
-
         #pragma region Methods
 
         /**
@@ -89,7 +70,7 @@ class Logger
          * \param in_level The level to log.
          * \param in_message The message to log.
          */
-        DAEvoid Log(ELogLevel in_level, String in_message) const noexcept;
+        DAEvoid Log(ELogLevel in_level, String&& in_message) const noexcept;
 
         /**
          * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a false value of 'propagate' is found).
@@ -122,6 +103,11 @@ class Logger
         #pragma region Constructors and Destructor
 
         Logger() = delete;
+
+        explicit Logger(String      in_name,
+                        ELogLevel   in_level,
+                        Logger*     in_parent,
+                        bool        in_propagate = true) noexcept;
 
         Logger(Logger const&    in_copy) = delete;
         Logger(Logger&&         in_move) = delete;
@@ -177,7 +163,7 @@ class Logger
          *
          * \note The logger is created with this logger's parameters.
          */
-        Logger* AddChild(DAEchar const* in_name);
+        Logger* AddChild(String in_name);
 
         /**
          * \brief Deletes the logger with the specified name.
@@ -186,7 +172,7 @@ class Logger
          *
          * \return True if the logger could be removed, else False.
          */
-        DAEbool RemoveChild(DAEchar const* in_name);
+        DAEbool RemoveChild(String const& in_name);
 
         /**
          * \brief Deletes the specified logger.
@@ -204,7 +190,7 @@ class Logger
          *
          * \return A pointer to the logger if it was found, else nullptr.
          */
-        Logger* GetChild(DAEchar const* in_name) const noexcept;
+        Logger* GetChild(String const& in_name) const noexcept;
 
         /**
          * \brief Logs a message with level 'Debug' on this logger.
@@ -317,9 +303,12 @@ class Logger
         [[nodiscard]] DAEbool HasHandlers() const noexcept;
 
         #pragma endregion
-
-        /** TODO This should be removed after Debug Kernel is setup TODO */
-        friend struct GlobalServices;
 };
+
+/* TODO Needs to be removed when Kernel is done TODO */
+
+extern Logger* GRootLogger;
+
+/* TODO Needs to be removed when Kernel is done TODO */
 
 END_DAEMON_NAMESPACE
