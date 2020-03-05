@@ -35,10 +35,19 @@
 BEGIN_DAEMON_NAMESPACE
 
 class Instance;
+class Surface;
 
 struct QueueFamilyIndices
 {
     std::optional<DAEuint32> graphics_family;
+    std::optional<DAEuint32> present_family;
+};
+
+struct SurfaceDetails
+{
+    VkSurfaceCapabilitiesKHR    capabilities;
+    Vector<VkSurfaceFormatKHR>  formats;
+    Vector<VkPresentModeKHR>    present_modes;
 };
 
 class PhysicalDevice
@@ -47,10 +56,13 @@ class PhysicalDevice
 
         #pragma region Members
 
+        Surface const* m_surface;
+
         VkPhysicalDevice            m_handle;
         VkPhysicalDeviceProperties  m_properties;
         VkPhysicalDeviceFeatures    m_features;
-        QueueFamilyIndices          m_queue_indices;
+        QueueFamilyIndices          m_queue_families;
+        SurfaceDetails              m_surface_details;
 
         Vector<DAEchar const*> m_required_extensions;
         Vector<DAEchar const*> m_required_layers;
@@ -72,6 +84,21 @@ class PhysicalDevice
         /**
          * \return 
          */
+        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const noexcept;
+
+        /**
+         * \return 
+         */
+        QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice in_physical_device) const noexcept;
+
+        /**
+         *
+         */
+        SurfaceDetails QuerySwapchainDetails(VkPhysicalDevice in_physical_device) const;
+
+        /**
+         * \return 
+         */
         DAEbool PickPhysicalDevice(VkInstance in_instance) noexcept;
 
         #pragma endregion
@@ -82,7 +109,8 @@ class PhysicalDevice
 
         PhysicalDevice() = delete;
 
-        explicit PhysicalDevice(Instance const* in_instance);
+        explicit PhysicalDevice(Instance const* in_instance,
+                                Surface  const* in_surface);
 
         PhysicalDevice(PhysicalDevice const&    in_copy) = delete;
         PhysicalDevice(PhysicalDevice&&         in_move) = delete;
@@ -113,16 +141,6 @@ class PhysicalDevice
         /**
          * \return 
          */
-        static DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) noexcept;
-
-        /**
-         * \return 
-         */
-        static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice in_physical_device) noexcept;
-
-        /**
-         * \return 
-         */
         [[nodiscard]] VkPhysicalDevice GetHandle() const noexcept;
 
         /**
@@ -138,7 +156,12 @@ class PhysicalDevice
         /**
          * \return 
          */
-        [[nodiscard]] QueueFamilyIndices GetQueueIndices() const noexcept;
+        [[nodiscard]] QueueFamilyIndices GetQueueFamilies() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] SurfaceDetails GetSurfaceDetails() const noexcept;
 
         /**
          * \return 

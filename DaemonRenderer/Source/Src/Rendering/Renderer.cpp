@@ -39,23 +39,34 @@ USING_DAEMON_NAMESPACE
 Renderer::Renderer() :
     m_logger            { GRootLogger->AddChild("Rendering") },
     m_instance          { nullptr },
+    m_surface           { nullptr },
     m_physical_device   { nullptr },
     m_logical_device    { nullptr }
 {
     GRenderer = this;
 
     if ((m_instance        = std::make_unique<Instance>      (this))                   ->GetHandle() != nullptr &&
-        (m_physical_device = std::make_unique<PhysicalDevice>(m_instance       .get()))->GetHandle() != nullptr &&
-        (m_logical_device  = std::make_unique<LogicalDevice> (m_physical_device.get()))->GetHandle() != nullptr )
+        (m_surface         = std::make_unique<Surface>       (m_instance       .get()))->GetHandle() != nullptr &&
+        (m_physical_device = std::make_unique<PhysicalDevice>(m_instance       .get(), 
+                                                              m_surface        .get()))->GetHandle() != nullptr &&
+        (m_logical_device  = std::make_unique<LogicalDevice> (m_physical_device.get()))->GetHandle() != nullptr &&
+        (m_swapchain       = std::make_unique<Swapchain>     (m_surface        .get(),
+                                                              m_physical_device.get(),
+                                                              m_logical_device .get()))->GetHandle() != nullptr)
     {
         m_logger->Info("Renderer successfully initialized.");
     }
+
+    else
+        m_logger->Fatal("Failed to initialize Renderer!");
 }
 
 Renderer::~Renderer() noexcept
 {
+    m_swapchain      .reset();
     m_logical_device .reset();
     m_physical_device.reset();
+    m_surface        .reset();
     m_instance       .reset();
 
     m_logger->Info("Renderer successfully shut down.");

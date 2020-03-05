@@ -28,41 +28,19 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-#include "Containers/Vector.hpp"
-
 BEGIN_DAEMON_NAMESPACE
 
-class Renderer;
+class Instance;
 
-class Instance
+class Surface
 {
     private:
 
         #pragma region Members
 
-        VkInstance m_handle;
+        Instance const* m_instance;
 
-        Vector<DAEchar const*> m_required_extensions;
-        Vector<DAEchar const*> m_required_layers;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] DAEbool CheckInstanceExtensions() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] DAEbool CheckValidationLayers() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] DAEbool SetupInstance() noexcept;
+        VkSurfaceKHR m_handle;
 
         #pragma endregion
 
@@ -70,21 +48,21 @@ class Instance
 
         #pragma region Constructors and Destructor
 
-        Instance() = delete;
+        Surface() = delete;
 
-        explicit Instance(Renderer* in_renderer);
+        explicit Surface(Instance const* in_instance);
 
-        Instance(Instance const&    in_copy) = delete;
-        Instance(Instance&&         in_move) = delete;
+        Surface(Instance const&    in_copy) = delete;
+        Surface(Instance&&         in_move) = delete;
 
-        ~Instance() noexcept;
+        ~Surface() noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        Instance& operator=(Instance const& in_copy) = delete;
-        Instance& operator=(Instance&&      in_move) = delete;
+        Surface& operator=(Surface const& in_copy) = delete;
+        Surface& operator=(Surface&&      in_move) = delete;
 
         #pragma endregion
 
@@ -93,27 +71,7 @@ class Instance
         /**
          * \return 
          */
-        static Vector<VkExtensionProperties> GetSupportedExtensions(DAEchar const* in_layer_name = nullptr) noexcept;
-
-        /**
-         * \return 
-         */
-        static Vector<VkLayerProperties> GetSupportedLayers() noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] VkInstance GetHandle() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] Vector<DAEchar const*> const& GetRequiredExtensions() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] Vector<DAEchar const*> const& GetRequiredLayers() const noexcept;
+        [[nodiscard]] VkSurfaceKHR GetHandle() const noexcept;
 
         #pragma endregion
 };

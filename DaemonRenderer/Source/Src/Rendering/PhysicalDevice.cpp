@@ -31,14 +31,22 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-PhysicalDevice::PhysicalDevice(Instance const* in_instance) : m_handle { nullptr }
+PhysicalDevice::PhysicalDevice(Instance const* in_instance,
+                               Surface  const* in_surface) :
+    m_surface       { in_surface },
+    m_handle        { nullptr },
+    m_properties    {},
+    m_features      {}
 {
+    m_required_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
     if (PickPhysicalDevice(in_instance->GetHandle()))
     {
         vkGetPhysicalDeviceProperties(m_handle, &m_properties);
         vkGetPhysicalDeviceFeatures  (m_handle, &m_features);
 
-        m_queue_indices = FindQueueFamilies(m_handle);
+        m_queue_families    = FindQueueFamilies    (m_handle);
+        m_surface_details = QuerySwapchainDetails(m_handle);
 
         GRenderer->GetLogger()->Info(String("Suitable GPU found : ") + m_properties.deviceName);
     }
@@ -75,6 +83,82 @@ DAEbool PhysicalDevice::CheckDeviceLayers(VkPhysicalDevice in_physical_device) c
     }
 
     return required_layers.empty();
+}
+
+DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_device) const noexcept
+{
+    QueueFamilyIndices const indices = FindQueueFamilies    (in_physical_device);
+    SurfaceDetails   const details = QuerySwapchainDetails(in_physical_device);
+
+    if (!indices.graphics_family.has_value() || !indices.present_family.has_value())
+        return 0u;
+
+    if (details.formats.empty() || details.present_modes.empty())
+        return 0u;
+
+    VkPhysicalDeviceProperties properties;
+    VkPhysicalDeviceFeatures   features;
+
+    vkGetPhysicalDeviceProperties(in_physical_device, &properties);
+    vkGetPhysicalDeviceFeatures  (in_physical_device, &features);
+
+    if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        return 1000u;
+
+    return 0u;
+}
+
+QueueFamilyIndices PhysicalDevice::FindQueueFamilies(VkPhysicalDevice in_physical_device) const noexcept
+{
+    QueueFamilyIndices indices;
+    DAEuint32          count;
+
+    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, nullptr);
+
+    Vector<VkQueueFamilyProperties> queue_families(count);
+
+    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, queue_families.data());
+
+    VkBool32 present_support = false;
+
+    for (DAEuint32 i = 0u; i < count; ++i)
+    {
+        if (!indices.present_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphics_family = i;
+        }
+
+        vkGetPhysicalDeviceSurfaceSupportKHR(in_physical_device, i, m_surface->GetHandle(), &present_support);
+
+        if (!indices.present_family.has_value() && present_support)
+        {
+            indices.present_family = i;
+        }
+    }
+
+    return indices;
+}
+
+SurfaceDetails PhysicalDevice::QuerySwapchainDetails(VkPhysicalDevice in_physical_device) const
+{
+    DAEuint32        count;
+    SurfaceDetails details;
+
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(in_physical_device, m_surface->GetHandle(), &details.capabilities);
+
+    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface->GetHandle(), &count, nullptr);
+
+    details.formats.resize(count);
+
+    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface->GetHandle(), &count, details.formats.data());
+
+    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface->GetHandle(), &count, nullptr);
+
+    details.present_modes.resize(count);
+
+    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface->GetHandle(), &count, details.present_modes.data());
+
+    return details;
 }
 
 DAEbool PhysicalDevice::PickPhysicalDevice(VkInstance in_instance) noexcept
@@ -140,48 +224,6 @@ Vector<VkLayerProperties> PhysicalDevice::GetSupportedLayers(VkPhysicalDevice in
     return supported_layers;
 }
 
-DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_device) noexcept
-{
-    VkPhysicalDeviceProperties properties;
-    VkPhysicalDeviceFeatures   features;
-
-    vkGetPhysicalDeviceProperties(in_physical_device, &properties);
-    vkGetPhysicalDeviceFeatures  (in_physical_device, &features);
-
-    if (!FindQueueFamilies(in_physical_device).graphics_family.has_value())
-        return 0u;
-
-    if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-    {
-        return 1000u;
-    }
-
-    return 0u;
-}
-
-QueueFamilyIndices PhysicalDevice::FindQueueFamilies(VkPhysicalDevice in_physical_device) noexcept
-{
-    QueueFamilyIndices indices;
-    DAEuint32          count;
-
-    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, nullptr);
-
-    Vector<VkQueueFamilyProperties> queue_families(count);
-
-    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, queue_families.data());
-
-    for (DAEuint32 i = 0u; i < count; ++i)
-    {
-        if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-        {
-            indices.graphics_family = i;
-            break;
-        }
-    }
-
-    return indices;
-}
-
 VkPhysicalDevice PhysicalDevice::GetHandle() const noexcept
 {
     return m_handle;
@@ -205,9 +247,14 @@ VkPhysicalDeviceFeatures PhysicalDevice::GetFeatures() const noexcept
     return features;
 }
 
-QueueFamilyIndices PhysicalDevice::GetQueueIndices() const noexcept
+QueueFamilyIndices PhysicalDevice::GetQueueFamilies() const noexcept
 {
-    return m_queue_indices;
+    return m_queue_families;
+}
+
+SurfaceDetails PhysicalDevice::GetSurfaceDetails() const noexcept
+{
+    return m_surface_details;
 }
 
 Vector<DAEchar const*> const& PhysicalDevice::GetRequiredExtensions() const noexcept

@@ -27,8 +27,10 @@
 #include "Config.hpp"
 
 #include "Instance.hpp"
+#include "Surface.hpp"
 #include "PhysicalDevice.hpp"
 #include "LogicalDevice.hpp"
+#include "Swapchain.hpp"
 
 #include "Containers/SmartPtr.hpp"
 
@@ -45,8 +47,10 @@ class Renderer
         Logger* m_logger;
 
         UniquePtr<Instance>         m_instance;
+        UniquePtr<Surface>          m_surface;
         UniquePtr<PhysicalDevice>   m_physical_device;
         UniquePtr<LogicalDevice>    m_logical_device;
+        UniquePtr<Swapchain>        m_swapchain;
 
         #pragma endregion
 

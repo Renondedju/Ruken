@@ -22,65 +22,44 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Rendering/Renderer.hpp"
 
-#include <Vulkan/vulkan.h>
+#include "Windowing/WindowManager.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
+#pragma region Constructor and Destructor
 
-class PhysicalDevice;
-
-class LogicalDevice
+Surface::Surface(Instance const* in_instance) :
+    m_instance  { in_instance },
+    m_handle    { nullptr }
 {
-    private:
+    if (glfwCreateWindowSurface(m_instance->GetHandle(), GWindowManager->GetMainWindow()->GetHandle(), nullptr, &m_handle) == VK_SUCCESS)
+    {
+        GRenderer->GetLogger()->Info("Window surface created successfully.");
+    }
 
-        #pragma region Members
+    else
+        GRenderer->GetLogger()->Fatal("Failed to create window surface!");
+}
 
-        VkDevice m_handle;
+Surface::~Surface() noexcept
+{
+    if (m_handle)
+    {
+        vkDestroySurfaceKHR(m_instance->GetHandle(), m_handle, nullptr);
 
-        VkQueue m_graphics_queue;
-        VkQueue m_present_queue;
+        GRenderer->GetLogger()->Info("Window surface destroyed.");
+    }
+}
 
-        #pragma endregion
+#pragma endregion
 
-        #pragma region Methods
+#pragma region Methods
 
+VkSurfaceKHR Surface::GetHandle() const noexcept
+{
+    return m_handle;
+}
 
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructors and Destructor
-
-        LogicalDevice() = delete;
-
-        explicit LogicalDevice(PhysicalDevice const* in_physical_device);
-
-        LogicalDevice(LogicalDevice const&  in_copy) = delete;
-        LogicalDevice(LogicalDevice&&       in_move) = delete;
-
-        ~LogicalDevice() noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogicalDevice& operator=(LogicalDevice const&   in_copy) = delete;
-        LogicalDevice& operator=(LogicalDevice&&        in_move) = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] VkDevice GetHandle() const noexcept;
-
-        #pragma endregion 
-};
-
-END_DAEMON_NAMESPACE
+#pragma endregion

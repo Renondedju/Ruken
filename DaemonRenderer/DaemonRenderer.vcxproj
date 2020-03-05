@@ -269,6 +269,8 @@
     <ClInclude Include="Source\Include\Rendering\LogicalDevice.hpp" />
     <ClInclude Include="Source\Include\Rendering\PhysicalDevice.hpp" />
     <ClInclude Include="Source\Include\Rendering\Renderer.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Surface.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Swapchain.hpp" />
     <ClInclude Include="Source\Include\Rendering\Utilities\Debug.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
@@ -402,6 +404,8 @@
     <ClCompile Include="Source\Src\Rendering\LogicalDevice.cpp" />
     <ClCompile Include="Source\Src\Rendering\PhysicalDevice.cpp" />
     <ClCompile Include="Source\Src\Rendering\Renderer.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Surface.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Swapchain.cpp" />
     <ClCompile Include="Source\Src\Rendering\Utilities\Debug.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
