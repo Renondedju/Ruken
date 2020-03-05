@@ -26,6 +26,10 @@
 
 #include "Rendering/Utilities/Debug.hpp"
 
+#include "Containers/String.hpp"
+
+#include "Debug/Logging/Logger.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Function Pointers

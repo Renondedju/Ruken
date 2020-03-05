@@ -24,11 +24,22 @@
 
 #pragma once
 
+#include <optional>
+
 #include <Vulkan/vulkan.h>
 
-#include "Config.hpp"
+#include "Types/FundamentalTypes.hpp"
+
+#include "Containers/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+class Instance;
+
+struct QueueFamilyIndices
+{
+    std::optional<DAEuint32> graphics_family;
+};
 
 class PhysicalDevice
 {
@@ -36,7 +47,32 @@ class PhysicalDevice
 
         #pragma region Members
 
-        VkPhysicalDevice m_physical_device;
+        VkPhysicalDevice            m_handle;
+        VkPhysicalDeviceProperties  m_properties;
+        VkPhysicalDeviceFeatures    m_features;
+        QueueFamilyIndices          m_queue_indices;
+
+        Vector<DAEchar const*> m_required_extensions;
+        Vector<DAEchar const*> m_required_layers;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \return 
+         */
+        DAEbool CheckDeviceExtensions(VkPhysicalDevice in_physical_device) const noexcept;
+
+        /**
+         * \return 
+         */
+        DAEbool CheckDeviceLayers(VkPhysicalDevice in_physical_device) const noexcept;
+
+        /**
+         * \return 
+         */
+        DAEbool PickPhysicalDevice(VkInstance in_instance) noexcept;
 
         #pragma endregion
 
@@ -44,12 +80,14 @@ class PhysicalDevice
 
         #pragma region Constructors and Destructor
 
-        PhysicalDevice();
+        PhysicalDevice() = delete;
+
+        explicit PhysicalDevice(Instance const* in_instance);
 
         PhysicalDevice(PhysicalDevice const&    in_copy) = delete;
         PhysicalDevice(PhysicalDevice&&         in_move) = delete;
 
-        ~PhysicalDevice() noexcept;
+        ~PhysicalDevice() noexcept = default;
 
         #pragma endregion
 
@@ -62,7 +100,55 @@ class PhysicalDevice
 
         #pragma region Methods
 
+        /**
+         *
+         */
+        static Vector<VkExtensionProperties> GetSupportedExtensions(VkPhysicalDevice in_physical_device, DAEchar const* in_layer_name = nullptr) noexcept;
 
+        /**
+         *
+         */
+        static Vector<VkLayerProperties> GetSupportedLayers(VkPhysicalDevice in_physical_device) noexcept;
+
+        /**
+         * \return 
+         */
+        static DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) noexcept;
+
+        /**
+         * \return 
+         */
+        static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice in_physical_device) noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] VkPhysicalDevice GetHandle() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] VkPhysicalDeviceProperties GetProperties() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] VkPhysicalDeviceFeatures GetFeatures() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] QueueFamilyIndices GetQueueIndices() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] Vector<DAEchar const*> const& GetRequiredExtensions() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] Vector<DAEchar const*> const& GetRequiredLayers() const noexcept;
 
         #pragma endregion 
 };

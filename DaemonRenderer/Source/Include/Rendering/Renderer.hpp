@@ -24,15 +24,13 @@
 
 #pragma once
 
-#include <Vulkan/vulkan.h>
-
 #include "Config.hpp"
 
 #include "Instance.hpp"
 #include "PhysicalDevice.hpp"
 #include "LogicalDevice.hpp"
 
-#include "Containers/Vector.hpp"
+#include "Containers/SmartPtr.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -46,26 +44,9 @@ class Renderer
 
         Logger* m_logger;
 
-        VkInstance          m_instance;
-        VkPhysicalDevice    m_physical_device;
-        VkDevice            m_logical_device;
-
-        Vector<DAEchar const*> m_required_instance_extensions;
-        Vector<DAEchar const*> m_required_validation_layers;
-        Vector<DAEchar const*> m_required_device_extensions;
-
-        #pragma endregion
-
-        #pragma region Methods
-        
-        DAEvoid CreateInstance() noexcept;
-        DAEvoid PickPhysicalDevice() noexcept;
-        DAEvoid CreateLogicalDevice() noexcept;
-
-        DAEvoid CheckInstanceExtensions() const noexcept;
-        DAEvoid CheckValidationLayers() const noexcept;
-        DAEbool CheckDeviceExtensions(VkPhysicalDevice in_physical_device) const noexcept;
-        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const noexcept;
+        UniquePtr<Instance>         m_instance;
+        UniquePtr<PhysicalDevice>   m_physical_device;
+        UniquePtr<LogicalDevice>    m_logical_device;
 
         #pragma endregion
 
@@ -94,7 +75,7 @@ class Renderer
         /**
          * \return This module's logger.
          */
-        [[nodiscard]] Logger const* GetLogger() const noexcept;
+        [[nodiscard]] Logger* GetLogger() const noexcept;
 
         #pragma endregion
 };

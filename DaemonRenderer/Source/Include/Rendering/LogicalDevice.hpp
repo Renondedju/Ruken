@@ -30,13 +30,23 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class PhysicalDevice;
+
 class LogicalDevice
 {
     private:
 
         #pragma region Members
 
-        VkDevice m_logical_device;
+        VkDevice m_handle;
+
+        VkQueue m_graphics_queue;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+
 
         #pragma endregion
 
@@ -44,7 +54,9 @@ class LogicalDevice
 
         #pragma region Constructors and Destructor
 
-        LogicalDevice();
+        LogicalDevice() = delete;
+
+        explicit LogicalDevice(PhysicalDevice const* in_physical_device);
 
         LogicalDevice(LogicalDevice const&  in_copy) = delete;
         LogicalDevice(LogicalDevice&&       in_move) = delete;
@@ -62,7 +74,10 @@ class LogicalDevice
 
         #pragma region Methods
 
-
+        /**
+         * \return 
+         */
+        [[nodiscard]] VkDevice GetHandle() const noexcept;
 
         #pragma endregion 
 };

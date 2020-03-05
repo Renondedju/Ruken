@@ -99,8 +99,6 @@ int main()
 
     Renderer renderer;
 
-    GRenderer = &renderer;
-
     while (!GWindowManager->GetMainWindow()->ShouldClose())
     {
         GWindowManager->Update();

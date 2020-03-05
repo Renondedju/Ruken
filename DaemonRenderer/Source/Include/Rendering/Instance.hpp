@@ -26,9 +26,13 @@
 
 #include <Vulkan/vulkan.h>
 
-#include "Config.hpp"
+#include "Types/FundamentalTypes.hpp"
+
+#include "Containers/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+class Renderer;
 
 class Instance
 {
@@ -36,7 +40,29 @@ class Instance
 
         #pragma region Members
 
-        VkInstance m_instance;
+        VkInstance m_handle;
+
+        Vector<DAEchar const*> m_required_extensions;
+        Vector<DAEchar const*> m_required_layers;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] DAEbool CheckInstanceExtensions() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] DAEbool CheckValidationLayers() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] DAEbool SetupInstance() noexcept;
 
         #pragma endregion
 
@@ -44,7 +70,9 @@ class Instance
 
         #pragma region Constructors and Destructor
 
-        Instance();
+        Instance() = delete;
+
+        explicit Instance(Renderer* in_renderer);
 
         Instance(Instance const&    in_copy) = delete;
         Instance(Instance&&         in_move) = delete;
@@ -62,7 +90,30 @@ class Instance
 
         #pragma region Methods
 
+        /**
+         * \return 
+         */
+        static Vector<VkExtensionProperties> GetSupportedExtensions(DAEchar const* in_layer_name = nullptr) noexcept;
 
+        /**
+         * \return 
+         */
+        static Vector<VkLayerProperties> GetSupportedLayers() noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] VkInstance GetHandle() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] Vector<DAEchar const*> const& GetRequiredExtensions() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] Vector<DAEchar const*> const& GetRequiredLayers() const noexcept;
 
         #pragma endregion 
 };
