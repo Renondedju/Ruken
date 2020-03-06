@@ -40,7 +40,9 @@ class Swapchain
 
         #pragma region Members
 
-        LogicalDevice const* m_logical_device;
+        Surface        const* m_surface;
+        PhysicalDevice const* m_physical_device;
+        LogicalDevice  const* m_logical_device;
 
         VkSwapchainKHR                  m_handle;
         DAEuint32                       m_image_count;
@@ -49,6 +51,9 @@ class Swapchain
         VkSurfaceTransformFlagBitsKHR   m_pre_transform;
         VkCompositeAlphaFlagBitsKHR     m_composite_alpha;
         VkPresentModeKHR                m_present_mode;
+
+        Vector<VkImage>     m_images;
+        Vector<VkImageView> m_image_views;
 
         #pragma endregion
 
@@ -84,6 +89,21 @@ class Swapchain
          */
         DAEvoid SelectPresentMode(Vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
 
+        /**
+         * \brief 
+         */
+        DAEbool CreateSwapchain();
+
+        /**
+         * \brief 
+         */
+        DAEbool CreateImageViews();
+
+        /**
+         * \brief 
+         */
+        DAEvoid ResizeSwapchain(DAEint32 in_width, DAEint32 in_height);
+
         #pragma endregion
 
     public:
@@ -92,7 +112,9 @@ class Swapchain
 
         Swapchain() = delete;
 
-        explicit Swapchain(Surface const* in_surface, PhysicalDevice const* in_physical_device, LogicalDevice const* in_logical_device);
+        explicit Swapchain(Surface        const* in_surface,
+                           PhysicalDevice const* in_physical_device,
+                           LogicalDevice  const* in_logical_device);
 
         Swapchain(Swapchain const&    in_copy) = delete;
         Swapchain(Swapchain&&         in_move) = delete;

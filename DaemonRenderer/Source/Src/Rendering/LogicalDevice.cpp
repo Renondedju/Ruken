@@ -33,16 +33,49 @@ USING_DAEMON_NAMESPACE
 LogicalDevice::LogicalDevice(PhysicalDevice const* in_physical_device) :
     m_handle            { nullptr },
     m_graphics_queue    { nullptr },
-    m_present_queue     { nullptr }
+    m_present_queue     { nullptr },
+    m_compute_queue     { nullptr },
+    m_transfer_queue    { nullptr }
 {
-    VkPhysicalDeviceFeatures device_features = in_physical_device->GetFeatures     ();
-    QueueFamilyIndices       queue_families  = in_physical_device->GetQueueFamilies();
+    if (CreateLogicalDevice(in_physical_device))
+    {
+        QueueFamilyIndices const queue_families = in_physical_device->GetQueueFamilies();
+
+        vkGetDeviceQueue(m_handle, queue_families.graphics_family.value(), 0u, &m_graphics_queue);
+        vkGetDeviceQueue(m_handle, queue_families.present_family .value(), 0u, &m_present_queue);
+        vkGetDeviceQueue(m_handle, queue_families.compute_family .value(), 0u, &m_compute_queue);
+        vkGetDeviceQueue(m_handle, queue_families.transfer_family.value(), 0u, &m_transfer_queue);
+
+        GRenderer->GetLogger()->Info("Logical device created successfully.");
+    }
+
+    else
+        GRenderer->GetLogger()->Fatal("Failed to create logical device!");
+}
+
+LogicalDevice::~LogicalDevice() noexcept
+{
+    vkDestroyDevice(m_handle, nullptr);
+
+    GRenderer->GetLogger()->Info("Logical device destroyed.");
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+DAEbool LogicalDevice::CreateLogicalDevice(PhysicalDevice const* in_physical_device) noexcept
+{
+    VkPhysicalDeviceFeatures const device_features = in_physical_device->GetFeatures     ();
+    QueueFamilyIndices       const queue_families  = in_physical_device->GetQueueFamilies();
 
     float priority = 1.0f;
 
     std::set<DAEuint32> unique_queue_families = {
         queue_families.graphics_family.value(),
-        queue_families.present_family .value()
+        queue_families.present_family .value(),
+        queue_families.compute_family .value(),
+        queue_families.transfer_family.value()
     };
 
     Vector<VkDeviceQueueCreateInfo> queue_infos;
@@ -62,6 +95,7 @@ LogicalDevice::LogicalDevice(PhysicalDevice const* in_physical_device) :
     }
 
     Vector<DAEchar const*> const& required_extensions = in_physical_device->GetRequiredExtensions();
+    Vector<DAEchar const*> const& required_layers     = in_physical_device->GetRequiredLayers    ();
 
     VkDeviceCreateInfo device_info;
 
@@ -70,34 +104,14 @@ LogicalDevice::LogicalDevice(PhysicalDevice const* in_physical_device) :
     device_info.flags                   = 0u;
     device_info.queueCreateInfoCount    = static_cast<DAEuint32>(queue_infos.size());
     device_info.pQueueCreateInfos       = queue_infos.data();
-    device_info.enabledLayerCount       = 0u;
-    device_info.ppEnabledLayerNames     = nullptr;
+    device_info.enabledLayerCount       = static_cast<DAEuint32>(required_layers.size());
+    device_info.ppEnabledLayerNames     = required_layers.data();
     device_info.enabledExtensionCount   = static_cast<DAEuint32>(required_extensions.size());
     device_info.ppEnabledExtensionNames = required_extensions.data();
     device_info.pEnabledFeatures        = &device_features;
 
-    if (vkCreateDevice(in_physical_device->GetHandle(), &device_info, nullptr, &m_handle) == VK_SUCCESS)
-    {
-        GRenderer->GetLogger()->Info("Logical device created successfully.");
-
-        vkGetDeviceQueue(m_handle, queue_families.graphics_family.value(), 0u, &m_graphics_queue);
-        vkGetDeviceQueue(m_handle, queue_families.present_family .value(), 0u, &m_present_queue);
-    }
-
-    else
-        GRenderer->GetLogger()->Fatal("Failed to create logical device!");
+    return vkCreateDevice(in_physical_device->GetHandle(), &device_info, nullptr, &m_handle) == VK_SUCCESS;
 }
-
-LogicalDevice::~LogicalDevice() noexcept
-{
-    vkDestroyDevice(m_handle, nullptr);
-
-    GRenderer->GetLogger()->Info("Logical device destroyed.");
-}
-
-#pragma endregion
-
-#pragma region Methods
 
 VkDevice LogicalDevice::GetHandle() const noexcept
 {

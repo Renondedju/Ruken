@@ -41,11 +41,13 @@ struct QueueFamilyIndices
 {
     std::optional<DAEuint32> graphics_family;
     std::optional<DAEuint32> present_family;
+    std::optional<DAEuint32> compute_family;
+    std::optional<DAEuint32> transfer_family;
 };
 
 struct SurfaceDetails
 {
-    VkSurfaceCapabilitiesKHR    capabilities;
+    VkSurfaceCapabilitiesKHR    capabilities = {};
     Vector<VkSurfaceFormatKHR>  formats;
     Vector<VkPresentModeKHR>    present_modes;
 };
@@ -84,7 +86,7 @@ class PhysicalDevice
         /**
          * \return 
          */
-        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const noexcept;
+        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const;
 
         /**
          * \return 

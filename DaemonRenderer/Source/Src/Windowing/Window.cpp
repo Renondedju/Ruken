@@ -35,7 +35,7 @@ DAEvoid Window::WindowPosCallback(GLFWwindow* in_window, DAEint32 const in_x_pos
 {
     if (Window* window = GetWindowUserPointer(in_window))
     {
-        window->on_moved.Invoke({ in_x_pos, in_y_pos });
+        window->on_moved.Invoke(in_x_pos, in_y_pos);
     }
 }
 
@@ -43,7 +43,7 @@ DAEvoid Window::WindowSizeCallback(GLFWwindow* in_window, DAEint32 const in_widt
 {
     if (Window* window = GetWindowUserPointer(in_window))
     {
-        window->on_resized.Invoke({ in_width, in_height });
+        window->on_resized.Invoke(in_width, in_height);
     }
 }
 

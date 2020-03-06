@@ -45,7 +45,7 @@ PhysicalDevice::PhysicalDevice(Instance const* in_instance,
         vkGetPhysicalDeviceProperties(m_handle, &m_properties);
         vkGetPhysicalDeviceFeatures  (m_handle, &m_features);
 
-        m_queue_families    = FindQueueFamilies    (m_handle);
+        m_queue_families  = FindQueueFamilies    (m_handle);
         m_surface_details = QuerySwapchainDetails(m_handle);
 
         GRenderer->GetLogger()->Info(String("Suitable GPU found : ") + m_properties.deviceName);
@@ -61,7 +61,7 @@ PhysicalDevice::PhysicalDevice(Instance const* in_instance,
 
 DAEbool PhysicalDevice::CheckDeviceExtensions(VkPhysicalDevice in_physical_device) const noexcept
 {
-    std::set<String> required_extensions(m_required_extensions.cbegin(), m_required_extensions.cend());
+    Set<String> required_extensions(m_required_extensions.cbegin(), m_required_extensions.cend());
 
     // Removes the matching extensions.
     for (auto const& extension : GetSupportedExtensions(in_physical_device))
@@ -74,7 +74,7 @@ DAEbool PhysicalDevice::CheckDeviceExtensions(VkPhysicalDevice in_physical_devic
 
 DAEbool PhysicalDevice::CheckDeviceLayers(VkPhysicalDevice in_physical_device) const noexcept
 {
-    std::set<String> required_layers(m_required_layers.cbegin(), m_required_layers.cend());
+    Set<String> required_layers(m_required_layers.cbegin(), m_required_layers.cend());
 
     // Removes the matching layers.
     for (auto const& layer : GetSupportedLayers(in_physical_device))
@@ -85,10 +85,10 @@ DAEbool PhysicalDevice::CheckDeviceLayers(VkPhysicalDevice in_physical_device) c
     return required_layers.empty();
 }
 
-DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_device) const noexcept
+DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_device) const
 {
     QueueFamilyIndices const indices = FindQueueFamilies    (in_physical_device);
-    SurfaceDetails   const details = QuerySwapchainDetails(in_physical_device);
+    SurfaceDetails     const details = QuerySwapchainDetails(in_physical_device);
 
     if (!indices.graphics_family.has_value() || !indices.present_family.has_value())
         return 0u;
@@ -119,20 +119,57 @@ QueueFamilyIndices PhysicalDevice::FindQueueFamilies(VkPhysicalDevice in_physica
 
     vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, queue_families.data());
 
-    VkBool32 present_support = false;
+    VkBool32 present_support = VK_FALSE;
 
     for (DAEuint32 i = 0u; i < count; ++i)
     {
+        vkGetPhysicalDeviceSurfaceSupportKHR(in_physical_device, i, m_surface->GetHandle(), &present_support);
+
+        // A queue supporting both drawing and presentation gives improved performance.
+        if (present_support == VK_TRUE && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphics_family = i;
+            indices.present_family  = i;
+            break;
+        }
+
         if (!indices.present_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             indices.graphics_family = i;
         }
 
-        vkGetPhysicalDeviceSurfaceSupportKHR(in_physical_device, i, m_surface->GetHandle(), &present_support);
-
         if (!indices.present_family.has_value() && present_support)
         {
             indices.present_family = i;
+        }
+    }
+
+    for (DAEuint32 i = 0u; i < count; ++i)
+    {
+        if (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT && (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)
+        {
+            indices.compute_family = i;
+            break;
+        }
+
+        if (!indices.compute_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
+        {
+            indices.compute_family = i;
+        }
+    }
+
+    for (DAEuint32 i = 0u; i < count; ++i)
+    {
+        if (queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT && (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0 &&
+                                                                    (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT)  == 0)
+        {
+            indices.transfer_family = i;
+            break;
+        }
+
+        if (!indices.transfer_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
+        {
+            indices.transfer_family = i;
         }
     }
 

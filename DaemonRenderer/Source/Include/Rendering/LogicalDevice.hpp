@@ -26,7 +26,7 @@
 
 #include <Vulkan/vulkan.h>
 
-#include "Config.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -38,16 +38,17 @@ class LogicalDevice
 
         #pragma region Members
 
-        VkDevice m_handle;
-
-        VkQueue m_graphics_queue;
-        VkQueue m_present_queue;
+        VkDevice    m_handle;
+        VkQueue     m_graphics_queue;
+        VkQueue     m_present_queue;
+        VkQueue     m_compute_queue;
+        VkQueue     m_transfer_queue;
 
         #pragma endregion
 
         #pragma region Methods
 
-
+        DAEbool CreateLogicalDevice(PhysicalDevice const* in_physical_device) noexcept;
 
         #pragma endregion
 

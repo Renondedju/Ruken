@@ -159,12 +159,12 @@ class Window
         /**
          * \brief This is called when the window is moved.
          */
-        Event<Position2D> on_moved;
+        Event<DAEint32, DAEint32> on_moved;
 
         /**
          * \brief This is called when the window is resized.
          */
-        Event<Extent2D> on_resized;
+        Event<DAEint32, DAEint32> on_resized;
 
         /**
          * \brief This is called when the user attempts to close the window.

@@ -89,15 +89,18 @@ Instance::Instance(Renderer* in_renderer) : m_handle { nullptr }
 
 Instance::~Instance() noexcept
 {
-    #ifdef DAEMON_DEBUG
+    if (m_handle)
+    {
+        #ifdef DAEMON_DEBUG
 
-    Debug::FreeDebugMessenger(m_handle);
-    
-    #endif
+        Debug::FreeDebugMessenger(m_handle);
+        
+        #endif
 
-    vkDestroyInstance(m_handle, nullptr);
+        vkDestroyInstance(m_handle, nullptr);
 
-    GRenderer->GetLogger()->Info("Instance destroyed.");
+        GRenderer->GetLogger()->Info("Instance destroyed.");
+    }
 }
 
 #pragma endregion
@@ -106,7 +109,7 @@ Instance::~Instance() noexcept
 
 DAEbool Instance::CheckInstanceExtensions() const noexcept
 {
-    std::set<String> required_extensions(m_required_extensions.cbegin(), m_required_extensions.cend());
+    Set<String> required_extensions(m_required_extensions.cbegin(), m_required_extensions.cend());
 
     // Removes the matching extensions.
     for (auto const& extension : GetSupportedExtensions())
@@ -130,8 +133,7 @@ DAEbool Instance::CheckInstanceExtensions() const noexcept
 
 DAEbool Instance::CheckValidationLayers() const noexcept
 {
-    // Checks if all the required layers are supported.
-    std::set<String> required_layers(m_required_layers.cbegin(), m_required_layers.cend());
+    Set<String> required_layers(m_required_layers.cbegin(), m_required_layers.cend());
 
     // Removes the matching layers.
     for (auto const& layer : GetSupportedLayers())

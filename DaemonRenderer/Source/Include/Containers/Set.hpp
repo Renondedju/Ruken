@@ -32,13 +32,13 @@ BEGIN_DAEMON_NAMESPACE
 
 #if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
 
-template<typename TK, typename TV>
-using Set = std::pmr::set<TK, TV>;
+template<typename TK>
+using Set = std::pmr::set<TK>;
 
 #else
 
-template<typename TK, typename TV>
-using Set = std::set<TK, TV>;
+template<typename TK>
+using Set = std::set<TK>;
 
 #endif
 

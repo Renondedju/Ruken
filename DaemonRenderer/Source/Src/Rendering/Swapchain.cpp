@@ -24,6 +24,8 @@
 
 #include "Rendering/Renderer.hpp"
 
+#include "Windowing/WindowManager.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
@@ -31,6 +33,8 @@ USING_DAEMON_NAMESPACE
 Swapchain::Swapchain(Surface        const*  in_surface,
                      PhysicalDevice const*  in_physical_device,
                      LogicalDevice  const*  in_logical_device) :
+    m_surface           { in_surface },
+    m_physical_device   { in_physical_device },
     m_logical_device    { in_logical_device },
     m_handle            { nullptr },
     m_image_count       { 0u },
@@ -40,8 +44,7 @@ Swapchain::Swapchain(Surface        const*  in_surface,
     m_composite_alpha   {},
     m_present_mode      {}
 {
-    SurfaceDetails     const surface_details = in_physical_device->GetSurfaceDetails();
-    QueueFamilyIndices const queue_families  = in_physical_device->GetQueueFamilies ();
+    SurfaceDetails const surface_details = m_physical_device->GetSurfaceDetails();
 
     SelectImageCount    (surface_details.capabilities);
     SelectSurfaceFormat (surface_details.formats);
@@ -50,46 +53,10 @@ Swapchain::Swapchain(Surface        const*  in_surface,
     SelectCompositeAlpha(surface_details.capabilities);
     SelectPresentMode   (surface_details.present_modes);
 
-    VkSwapchainCreateInfoKHR swapchain_info;
-
-    swapchain_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    swapchain_info.pNext            = nullptr;
-    swapchain_info.flags            = 0u;
-    swapchain_info.surface          = in_surface->GetHandle();
-    swapchain_info.minImageCount    = m_image_count;
-    swapchain_info.imageFormat      = m_surface_format.format;
-    swapchain_info.imageColorSpace  = m_surface_format.colorSpace;
-    swapchain_info.imageExtent      = m_image_extent;
-    swapchain_info.imageArrayLayers = 1u;
-    swapchain_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-    if (queue_families.graphics_family != queue_families.present_family)
+    if (CreateSwapchain() && CreateImageViews())
     {
-        DAEuint32 indices[] = {
-            queue_families.graphics_family.value(),
-            queue_families.present_family .value()
-        };
+        GWindowManager->GetMainWindow()->on_resized.Subscribe( [this] (DAEint32 const in_width, DAEint32 const in_height) { ResizeSwapchain(in_width, in_height); });
 
-        swapchain_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
-        swapchain_info.queueFamilyIndexCount = 2u;
-        swapchain_info.pQueueFamilyIndices   = indices;
-    }
-
-    else
-    {
-        swapchain_info.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
-        swapchain_info.queueFamilyIndexCount = 0u;
-        swapchain_info.pQueueFamilyIndices   = nullptr;
-    }
-
-    swapchain_info.preTransform   = m_pre_transform;
-    swapchain_info.compositeAlpha = m_composite_alpha;
-    swapchain_info.presentMode    = m_present_mode;
-    swapchain_info.clipped        = VK_TRUE;
-    swapchain_info.oldSwapchain   = m_handle;
-
-    if (vkCreateSwapchainKHR(in_logical_device->GetHandle(), &swapchain_info, nullptr, &m_handle) == VK_SUCCESS)
-    {
         GRenderer->GetLogger()->Info("Swapchain created successfully.");
     }
 
@@ -99,6 +66,11 @@ Swapchain::Swapchain(Surface        const*  in_surface,
 
 Swapchain::~Swapchain() noexcept
 {
+    for (auto const& image_view : m_image_views)
+    {
+        vkDestroyImageView(m_logical_device->GetHandle(), image_view, nullptr);
+    }
+
     vkDestroySwapchainKHR(m_logical_device->GetHandle(), m_handle, nullptr);
 
     GRenderer->GetLogger()->Info("Swapchain destroyed.");
@@ -200,6 +172,94 @@ DAEvoid Swapchain::SelectPresentMode(Vector<VkPresentModeKHR> const& in_availabl
         if (available_present_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
             m_present_mode = available_present_mode;
     }
+}
+
+DAEbool Swapchain::CreateSwapchain()
+{
+    QueueFamilyIndices const queue_families  = m_physical_device->GetQueueFamilies ();
+
+    VkSwapchainCreateInfoKHR swapchain_info;
+
+    swapchain_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchain_info.pNext            = nullptr;
+    swapchain_info.flags            = 0u;
+    swapchain_info.surface          = m_surface->GetHandle();
+    swapchain_info.minImageCount    = m_image_count;
+    swapchain_info.imageFormat      = m_surface_format.format;
+    swapchain_info.imageColorSpace  = m_surface_format.colorSpace;
+    swapchain_info.imageExtent      = m_image_extent;
+    swapchain_info.imageArrayLayers = 1u;
+    swapchain_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    if (queue_families.graphics_family != queue_families.present_family)
+    {
+        DAEuint32 indices[] = {
+            queue_families.graphics_family.value(),
+            queue_families.present_family .value()
+        };
+
+        swapchain_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+        swapchain_info.queueFamilyIndexCount = 2u;
+        swapchain_info.pQueueFamilyIndices   = indices;
+    }
+
+    else
+    {
+        swapchain_info.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
+        swapchain_info.queueFamilyIndexCount = 0u;
+        swapchain_info.pQueueFamilyIndices   = nullptr;
+    }
+
+    swapchain_info.preTransform   = m_pre_transform;
+    swapchain_info.compositeAlpha = m_composite_alpha;
+    swapchain_info.presentMode    = m_present_mode;
+    swapchain_info.clipped        = VK_TRUE;
+    swapchain_info.oldSwapchain   = m_handle;
+
+    return vkCreateSwapchainKHR(m_logical_device->GetHandle(), &swapchain_info, nullptr, &m_handle) == VK_SUCCESS;
+}
+
+DAEbool Swapchain::CreateImageViews()
+{
+    vkGetSwapchainImagesKHR(m_logical_device->GetHandle(), m_handle, &m_image_count, nullptr);
+
+    m_images     .resize(m_image_count);
+    m_image_views.resize(m_image_count);
+
+    vkGetSwapchainImagesKHR(m_logical_device->GetHandle(), m_handle, &m_image_count, m_images.data());
+
+    for (DAEuint32 i = 0u; i < m_image_count; ++i)
+    {
+        VkImageViewCreateInfo  image_view_info;
+
+        image_view_info.sType    = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        image_view_info.pNext    = nullptr;
+        image_view_info.flags    = 0u;
+        image_view_info.image    = m_images[i];
+        image_view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        image_view_info.format   = m_surface_format.format;
+
+        image_view_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        image_view_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        image_view_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        image_view_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+        image_view_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        image_view_info.subresourceRange.baseMipLevel   = 0u;
+        image_view_info.subresourceRange.levelCount     = 1u;
+        image_view_info.subresourceRange.baseArrayLayer = 0u;
+        image_view_info.subresourceRange.layerCount     = 1u;
+
+        if (vkCreateImageView(m_logical_device->GetHandle(), &image_view_info, nullptr, &m_image_views[i]) != VK_SUCCESS)
+            return false;
+    }
+
+    return true;
+}
+
+DAEvoid Swapchain::ResizeSwapchain(DAEint32 in_width, DAEint32 in_height)
+{
+    /* TODO TODO */
 }
 
 VkSwapchainKHR Swapchain::GetHandle() const noexcept
