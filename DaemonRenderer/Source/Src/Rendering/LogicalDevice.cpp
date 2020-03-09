@@ -37,7 +37,7 @@ LogicalDevice::LogicalDevice(PhysicalDevice const* in_physical_device) :
     m_compute_queue     { nullptr },
     m_transfer_queue    { nullptr }
 {
-    if (CreateLogicalDevice(in_physical_device))
+    if (SetupLogicalDevice(in_physical_device))
     {
         QueueFamilyIndices const queue_families = in_physical_device->GetQueueFamilies();
 
@@ -55,23 +55,26 @@ LogicalDevice::LogicalDevice(PhysicalDevice const* in_physical_device) :
 
 LogicalDevice::~LogicalDevice() noexcept
 {
-    vkDestroyDevice(m_handle, nullptr);
+    if (m_handle)
+    {
+        vkDestroyDevice(m_handle, nullptr);
 
-    GRenderer->GetLogger()->Info("Logical device destroyed.");
+        GRenderer->GetLogger()->Info("Logical device destroyed.");
+    }
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEbool LogicalDevice::CreateLogicalDevice(PhysicalDevice const* in_physical_device) noexcept
+DAEbool LogicalDevice::SetupLogicalDevice(PhysicalDevice const* in_physical_device)
 {
-    VkPhysicalDeviceFeatures const device_features = in_physical_device->GetFeatures     ();
-    QueueFamilyIndices       const queue_families  = in_physical_device->GetQueueFamilies();
+    VkPhysicalDeviceFeatures const  device_features     = in_physical_device->GetFeatures          ();
+    QueueFamilyIndices       const  queue_families      = in_physical_device->GetQueueFamilies     ();
+    Vector<DAEchar const*>   const& required_extensions = in_physical_device->GetRequiredExtensions();
+    Vector<DAEchar const*>   const& required_layers     = in_physical_device->GetRequiredLayers    ();
 
-    float priority = 1.0f;
-
-    std::set<DAEuint32> unique_queue_families = {
+    Set<DAEuint32> unique_queue_families = {
         queue_families.graphics_family.value(),
         queue_families.present_family .value(),
         queue_families.compute_family .value(),
@@ -79,6 +82,8 @@ DAEbool LogicalDevice::CreateLogicalDevice(PhysicalDevice const* in_physical_dev
     };
 
     Vector<VkDeviceQueueCreateInfo> queue_infos;
+
+    float priority = 1.0f;
 
     for (DAEuint32 unique_queue_family : unique_queue_families)
     {
@@ -93,9 +98,6 @@ DAEbool LogicalDevice::CreateLogicalDevice(PhysicalDevice const* in_physical_dev
 
         queue_infos.push_back(queue_info);
     }
-
-    Vector<DAEchar const*> const& required_extensions = in_physical_device->GetRequiredExtensions();
-    Vector<DAEchar const*> const& required_layers     = in_physical_device->GetRequiredLayers    ();
 
     VkDeviceCreateInfo device_info;
 

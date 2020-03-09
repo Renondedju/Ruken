@@ -32,6 +32,13 @@ BEGIN_DAEMON_NAMESPACE
 
 class PhysicalDevice;
 
+/**
+ * \brief This class wraps a VkDevice object.
+ *
+ * A logical device represents an instance of physical device implementation with its own state and resources independent of other logical devices.
+ *
+ * \note Vulkan separates the concept of physical and logical devices.
+ */
 class LogicalDevice
 {
     private:
@@ -48,7 +55,12 @@ class LogicalDevice
 
         #pragma region Methods
 
-        DAEbool CreateLogicalDevice(PhysicalDevice const* in_physical_device) noexcept;
+        /**
+         * \param in_physical_device The pointer to the selected physical device.
+         *
+         * \return True if a new device instance could be created, else False.
+         */
+        DAEbool SetupLogicalDevice(PhysicalDevice const* in_physical_device);
 
         #pragma endregion
 
@@ -77,7 +89,7 @@ class LogicalDevice
         #pragma region Methods
 
         /**
-         * \return 
+         * \return The opaque handle to the device object.
          */
         [[nodiscard]] VkDevice GetHandle() const noexcept;
 
