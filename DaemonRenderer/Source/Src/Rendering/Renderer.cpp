@@ -45,9 +45,9 @@ Renderer::Renderer() :
 {
     GRenderer = this;
 
-    if ((m_instance        = std::make_unique<Instance>      (this))                   ->GetHandle() != nullptr &&
+    if ((m_instance        = std::make_unique<Instance>      ())                       ->GetHandle() != nullptr &&
         (m_surface         = std::make_unique<Surface>       (m_instance       .get()))->GetHandle() != nullptr &&
-        (m_physical_device = std::make_unique<PhysicalDevice>(m_instance       .get(), 
+        (m_physical_device = std::make_unique<PhysicalDevice>(m_instance       .get(),
                                                               m_surface        .get()))->GetHandle() != nullptr &&
         (m_logical_device  = std::make_unique<LogicalDevice> (m_physical_device.get()))->GetHandle() != nullptr &&
         (m_swapchain       = std::make_unique<Swapchain>     (m_surface        .get(),

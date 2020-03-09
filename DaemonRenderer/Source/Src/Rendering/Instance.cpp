@@ -40,10 +40,10 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-Instance::Instance(Renderer* in_renderer) : m_handle { nullptr }
+Instance::Instance() :
+    m_handle                { nullptr },
+    m_required_extensions   { VK_KHR_SURFACE_EXTENSION_NAME }
 {
-    m_required_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-
     #ifdef DAEMON_OS_WINDOWS
 
     m_required_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
@@ -72,7 +72,7 @@ Instance::Instance(Renderer* in_renderer) : m_handle { nullptr }
                                        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT    |
                                        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                                        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-                                       in_renderer))
+                                       GRenderer))
         {
             GRenderer->GetLogger()->Info("Debug messenger set up successfully.");
         }

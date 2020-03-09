@@ -34,6 +34,12 @@ BEGIN_DAEMON_NAMESPACE
 
 class Renderer;
 
+/**
+ * \brief This class wraps a VkInstance object.
+ *
+ * \note There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
+ *       Creating a VkInstance object initializes the Vulkan library and allows the application to pass information about itself to the implementation.
+ */
 class Instance
 {
     private:
@@ -50,17 +56,17 @@ class Instance
         #pragma region Methods
 
         /**
-         * \return 
+         * \return True if the required extensions are supported, else False.
          */
         [[nodiscard]] DAEbool CheckInstanceExtensions() const noexcept;
 
         /**
-         * \return 
+         * \return True if the required validation layers are supported, else False.
          */
         [[nodiscard]] DAEbool CheckValidationLayers() const noexcept;
 
         /**
-         * \return 
+         * \return True if a new Vulkan instance could be created, else False.
          */
         [[nodiscard]] DAEbool SetupInstance() noexcept;
 
@@ -70,9 +76,7 @@ class Instance
 
         #pragma region Constructors and Destructor
 
-        Instance() = delete;
-
-        explicit Instance(Renderer* in_renderer);
+        Instance();
 
         Instance(Instance const&    in_copy) = delete;
         Instance(Instance&&         in_move) = delete;
@@ -91,27 +95,32 @@ class Instance
         #pragma region Methods
 
         /**
-         * \return 
+         * \return A list of the supported global extension properties.
+         *
+         * \param in_layer_name Name of the layer to retrieve extensions from.
+         *
+         * \note When 'in_layer_name' parameter is NULL, only extensions provided by the Vulkan implementation or by implicitly enabled layers are returned.
+         *       When 'in_layer_name' is the name of a layer, the instance extensions provided by that layer are returned.
          */
         static Vector<VkExtensionProperties> GetSupportedExtensions(DAEchar const* in_layer_name = nullptr) noexcept;
 
         /**
-         * \return 
+         * \return A list of the supported global layer properties.
          */
         static Vector<VkLayerProperties> GetSupportedLayers() noexcept;
 
         /**
-         * \return 
+         * \return The opaque handle to the instance object.
          */
         [[nodiscard]] VkInstance GetHandle() const noexcept;
 
         /**
-         * \return 
+         * \return A list of the required instance extensions.
          */
         [[nodiscard]] Vector<DAEchar const*> const& GetRequiredExtensions() const noexcept;
 
         /**
-         * \return 
+         * \return A list of the required validation layers.
          */
         [[nodiscard]] Vector<DAEchar const*> const& GetRequiredLayers() const noexcept;
 
