@@ -26,21 +26,23 @@
 
 #include <Vulkan/vulkan.h>
 
-#include "Types/FundamentalTypes.hpp"
+#include "Config.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class Instance;
 
+/**
+ * \brief This class wraps a VkSurfaceKHR object.
+ */
 class Surface
 {
     private:
 
         #pragma region Members
 
-        Instance const* m_instance;
-
-        VkSurfaceKHR m_handle;
+        VkSurfaceKHR    m_handle;
+        VkInstance      m_instance;
 
         #pragma endregion
 
@@ -50,10 +52,10 @@ class Surface
 
         Surface() = delete;
 
-        explicit Surface(Instance const* in_instance);
+        explicit Surface(Instance const* in_instance) noexcept;
 
-        Surface(Instance const&    in_copy) = delete;
-        Surface(Instance&&         in_move) = delete;
+        Surface(Surface const&  in_copy) = delete;
+        Surface(Surface&&       in_move) = delete;
 
         ~Surface() noexcept;
 
@@ -61,15 +63,15 @@ class Surface
 
         #pragma region Operators
 
-        Surface& operator=(Surface const& in_copy) = delete;
-        Surface& operator=(Surface&&      in_move) = delete;
+        Surface& operator=(Surface const&   in_copy) = delete;
+        Surface& operator=(Surface&&        in_move) = delete;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \return 
+         * \return The opaque handle to the surface object.
          */
         [[nodiscard]] VkSurfaceKHR GetHandle() const noexcept;
 

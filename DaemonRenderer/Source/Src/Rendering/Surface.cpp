@@ -30,11 +30,11 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-Surface::Surface(Instance const* in_instance) :
-    m_instance  { in_instance },
-    m_handle    { nullptr }
+Surface::Surface(Instance const* in_instance) noexcept :
+    m_handle    { nullptr },
+    m_instance  { in_instance->GetHandle() }
 {
-    if (glfwCreateWindowSurface(m_instance->GetHandle(), GWindowManager->GetMainWindow()->GetHandle(), nullptr, &m_handle) == VK_SUCCESS)
+    if (glfwCreateWindowSurface(m_instance, GWindowManager->GetMainWindow()->GetHandle(), nullptr, &m_handle) == VK_SUCCESS)
     {
         GRenderer->GetLogger()->Info("Window surface created successfully.");
     }
@@ -47,7 +47,7 @@ Surface::~Surface() noexcept
 {
     if (m_handle)
     {
-        vkDestroySurfaceKHR(m_instance->GetHandle(), m_handle, nullptr);
+        vkDestroySurfaceKHR(m_instance, m_handle, nullptr);
 
         GRenderer->GetLogger()->Info("Window surface destroyed.");
     }
