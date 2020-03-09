@@ -47,20 +47,27 @@ struct QueueFamilyIndices
 
 struct SurfaceDetails
 {
-    VkSurfaceCapabilitiesKHR    capabilities = {};
+    VkSurfaceCapabilitiesKHR capabilities = {};
+
     Vector<VkSurfaceFormatKHR>  formats;
     Vector<VkPresentModeKHR>    present_modes;
 };
 
+/**
+ * \brief This class wraps a VkPhysicalDevice object.
+ *
+ * A physical device usually represents a single complete implementation of Vulkan (excluding instance-level functionality) available to the host, of which there are a finite number.
+ *
+ * \note Vulkan separates the concept of physical and logical devices.
+ */
 class PhysicalDevice
 {
     private:
 
         #pragma region Members
 
-        Surface const* m_surface;
-
         VkPhysicalDevice            m_handle;
+        VkSurfaceKHR                m_surface;
         VkPhysicalDeviceProperties  m_properties;
         VkPhysicalDeviceFeatures    m_features;
         QueueFamilyIndices          m_queue_families;
@@ -74,34 +81,48 @@ class PhysicalDevice
         #pragma region Methods
 
         /**
-         * \return 
+         * \param in_physical_device The physical device that will be queried.
+         *
+         * \return True if the required extensions are supported, else False.
          */
         DAEbool CheckDeviceExtensions(VkPhysicalDevice in_physical_device) const noexcept;
 
         /**
-         * \return 
+         * \param in_physical_device The physical device that will be queried.
+         *
+         * \return True if the required validation layers are supported, else False.
+         *
+         * \note In order to maintain compatibility with implementations released prior to device-layer deprecation, applications should still enumerate and enable device layers.
          */
         DAEbool CheckDeviceLayers(VkPhysicalDevice in_physical_device) const noexcept;
 
         /**
-         * \return 
-         */
-        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const;
-
-        /**
-         * \return 
+         * \param in_physical_device The physical device that will be queried.
+         *
+         * \return The indices of the required queues available on the specified physical device.
          */
         QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice in_physical_device) const noexcept;
 
         /**
+         * \param in_physical_device The physical device that will be queried.
          *
+         * \return The properties of the surface when used by the specified physical device.
          */
-        SurfaceDetails QuerySwapchainDetails(VkPhysicalDevice in_physical_device) const;
+        SurfaceDetails QuerySurfaceDetails(VkPhysicalDevice in_physical_device) const;
 
         /**
-         * \return 
+         * \param in_physical_device The physical device that will be queried.
+         *
+         * \return The score given to the specified physical device.
          */
-        DAEbool PickPhysicalDevice(VkInstance in_instance) noexcept;
+        DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_physical_device) const;
+
+        /**
+         * \param in_instance The Vulkan instance to retrieve the physical devices from.
+         *
+         * \return True if a graphics card in the system that supports the features we need could be found, else False.
+         */
+        DAEbool SetupPhysicalDevice(VkInstance in_instance) noexcept;
 
         #pragma endregion
 
@@ -131,47 +152,57 @@ class PhysicalDevice
         #pragma region Methods
 
         /**
+         * \param in_physical_device The physical device that will be queried.
+         * \param in_layer_name      Name of the layer to retrieve extensions from.
          *
+         * \return A list of properties of available physical device extensions.
+         *
+         * \note When 'in_layer_name' parameter is NULL, only extensions provided by the Vulkan implementation or by implicitly enabled layers are returned.
+         *       When 'in_layer_name' is the name of a layer, the device extensions provided by that layer are returned.
          */
         static Vector<VkExtensionProperties> GetSupportedExtensions(VkPhysicalDevice in_physical_device, DAEchar const* in_layer_name = nullptr) noexcept;
 
         /**
+         * \param in_physical_device The physical device that will be queried.
          *
+         * \return A list of properties of available physical device layers.
          */
         static Vector<VkLayerProperties> GetSupportedLayers(VkPhysicalDevice in_physical_device) noexcept;
 
         /**
-         * \return 
+         * \return The opaque handle to the physical device object.
          */
         [[nodiscard]] VkPhysicalDevice GetHandle() const noexcept;
 
         /**
-         * \return 
+         * \return The physical device properties.
          */
         [[nodiscard]] VkPhysicalDeviceProperties GetProperties() const noexcept;
 
         /**
-         * \return 
+         * \return The fine-grained features supported by the physical device.
          */
         [[nodiscard]] VkPhysicalDeviceFeatures GetFeatures() const noexcept;
 
         /**
-         * \return 
+         * \return The indices of the required queues available on the physical device.
          */
         [[nodiscard]] QueueFamilyIndices GetQueueFamilies() const noexcept;
 
         /**
-         * \return 
+         * \return The properties of the surface when used by the physical device.
          */
         [[nodiscard]] SurfaceDetails GetSurfaceDetails() const noexcept;
 
         /**
-         * \return 
+         * \return The list of the required device extensions.
          */
         [[nodiscard]] Vector<DAEchar const*> const& GetRequiredExtensions() const noexcept;
 
         /**
-         * \return 
+         * \return The list of the required device validation layers.
+         *
+         * \note In order to maintain compatibility with implementations released prior to device-layer deprecation, applications should still enumerate and enable device layers.
          */
         [[nodiscard]] Vector<DAEchar const*> const& GetRequiredLayers() const noexcept;
 

@@ -95,9 +95,9 @@ class Instance
         #pragma region Methods
 
         /**
-         * \return A list of the supported global extension properties.
-         *
          * \param in_layer_name Name of the layer to retrieve extensions from.
+         *
+         * \return A list of the supported global extension properties.
          *
          * \note When 'in_layer_name' parameter is NULL, only extensions provided by the Vulkan implementation or by implicitly enabled layers are returned.
          *       When 'in_layer_name' is the name of a layer, the instance extensions provided by that layer are returned.
@@ -115,12 +115,12 @@ class Instance
         [[nodiscard]] VkInstance GetHandle() const noexcept;
 
         /**
-         * \return A list of the required instance extensions.
+         * \return The list of the required instance extensions.
          */
         [[nodiscard]] Vector<DAEchar const*> const& GetRequiredExtensions() const noexcept;
 
         /**
-         * \return A list of the required validation layers.
+         * \return The list of the required validation layers.
          */
         [[nodiscard]] Vector<DAEchar const*> const& GetRequiredLayers() const noexcept;
 

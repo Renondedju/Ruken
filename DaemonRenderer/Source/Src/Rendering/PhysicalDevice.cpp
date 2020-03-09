@@ -33,20 +33,19 @@ USING_DAEMON_NAMESPACE
 
 PhysicalDevice::PhysicalDevice(Instance const* in_instance,
                                Surface  const* in_surface) :
-    m_surface       { in_surface },
-    m_handle        { nullptr },
-    m_properties    {},
-    m_features      {}
+    m_handle                { nullptr },
+    m_surface               { in_surface->GetHandle() },
+    m_properties            {},
+    m_features              {},
+    m_required_extensions   { VK_KHR_SWAPCHAIN_EXTENSION_NAME }
 {
-    m_required_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-
-    if (PickPhysicalDevice(in_instance->GetHandle()))
+    if (SetupPhysicalDevice(in_instance->GetHandle()))
     {
         vkGetPhysicalDeviceProperties(m_handle, &m_properties);
         vkGetPhysicalDeviceFeatures  (m_handle, &m_features);
 
-        m_queue_families  = FindQueueFamilies    (m_handle);
-        m_surface_details = QuerySwapchainDetails(m_handle);
+        m_queue_families  = FindQueueFamilies  (m_handle);
+        m_surface_details = QuerySurfaceDetails(m_handle);
 
         GRenderer->GetLogger()->Info(String("Suitable GPU found : ") + m_properties.deviceName);
     }
@@ -85,13 +84,120 @@ DAEbool PhysicalDevice::CheckDeviceLayers(VkPhysicalDevice in_physical_device) c
     return required_layers.empty();
 }
 
+QueueFamilyIndices PhysicalDevice::FindQueueFamilies(VkPhysicalDevice in_physical_device) const noexcept
+{
+    QueueFamilyIndices indices;
+    DAEuint32          count;
+
+    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, nullptr);
+
+    Vector<VkQueueFamilyProperties> queue_families(count);
+
+    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, queue_families.data());
+
+    VkBool32 present_support = VK_FALSE;
+
+    // Looks for queues supporting drawing and presentation or a queue supporting both.
+    for (DAEuint32 i = 0u; i < count; ++i)
+    {
+        // Queries if presentation is supported.
+        vkGetPhysicalDeviceSurfaceSupportKHR(in_physical_device, i, m_surface, &present_support);
+
+        // A queue supporting both drawing and presentation gives improved performance.
+        if (present_support == VK_TRUE && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphics_family = i;
+            indices.present_family  = i;
+            break;
+        }
+
+        // The first queue supporting drawing.
+        if (!indices.present_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphics_family = i;
+        }
+
+        // The first queue supporting presentation.
+        if (!indices.present_family.has_value() && present_support)
+        {
+            indices.present_family = i;
+        }
+    }
+
+    // Looks for a queue supporting compute operations.
+    for (DAEuint32 i = 0u; i < count; ++i)
+    {
+        // A dedicated compute queue gives improved performance.
+        if (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT && (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)
+        {
+            indices.compute_family = i;
+            break;
+        }
+
+        // The first queue supporting compute operations.
+        if (!indices.compute_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
+        {
+            indices.compute_family = i;
+        }
+    }
+
+    // Looks for a queue supporting transfer operations.
+    for (DAEuint32 i = 0u; i < count; ++i)
+    {
+        // A dedicated transfer queue gives improved performance.
+        if (queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT && (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0 &&
+                                                                    (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT)  == 0)
+        {
+            indices.transfer_family = i;
+            break;
+        }
+
+        // The first queue supporting transfer operations.
+        if (!indices.transfer_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
+        {
+            indices.transfer_family = i;
+        }
+    }
+
+    return indices;
+}
+
+SurfaceDetails PhysicalDevice::QuerySurfaceDetails(VkPhysicalDevice in_physical_device) const
+{
+    DAEuint32      count;
+    SurfaceDetails details;
+
+    // Queries surface capabilities.
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(in_physical_device, m_surface, &details.capabilities);
+
+    // Queries supported  color formats.
+    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface, &count, nullptr);
+
+    details.formats.resize(count);
+
+    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface, &count, details.formats.data());
+
+    // Queries supported presentation modes.
+    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface, &count, nullptr);
+
+    details.present_modes.resize(count);
+
+    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface, &count, details.present_modes.data());
+
+    return details;
+}
+
 DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_device) const
 {
-    QueueFamilyIndices const indices = FindQueueFamilies    (in_physical_device);
-    SurfaceDetails     const details = QuerySwapchainDetails(in_physical_device);
+    if (!CheckDeviceExtensions(in_physical_device) || !CheckDeviceLayers(in_physical_device))
+        return 0u;
+
+    QueueFamilyIndices const indices = FindQueueFamilies(in_physical_device);
 
     if (!indices.graphics_family.has_value() || !indices.present_family.has_value())
         return 0u;
+
+    SurfaceDetails const details = QuerySurfaceDetails(in_physical_device);
 
     if (details.formats.empty() || details.present_modes.empty())
         return 0u;
@@ -108,106 +214,15 @@ DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_dev
     return 0u;
 }
 
-QueueFamilyIndices PhysicalDevice::FindQueueFamilies(VkPhysicalDevice in_physical_device) const noexcept
-{
-    QueueFamilyIndices indices;
-    DAEuint32          count;
-
-    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, nullptr);
-
-    Vector<VkQueueFamilyProperties> queue_families(count);
-
-    vkGetPhysicalDeviceQueueFamilyProperties(in_physical_device, &count, queue_families.data());
-
-    VkBool32 present_support = VK_FALSE;
-
-    for (DAEuint32 i = 0u; i < count; ++i)
-    {
-        vkGetPhysicalDeviceSurfaceSupportKHR(in_physical_device, i, m_surface->GetHandle(), &present_support);
-
-        // A queue supporting both drawing and presentation gives improved performance.
-        if (present_support == VK_TRUE && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-        {
-            indices.graphics_family = i;
-            indices.present_family  = i;
-            break;
-        }
-
-        if (!indices.present_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-        {
-            indices.graphics_family = i;
-        }
-
-        if (!indices.present_family.has_value() && present_support)
-        {
-            indices.present_family = i;
-        }
-    }
-
-    for (DAEuint32 i = 0u; i < count; ++i)
-    {
-        if (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT && (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)
-        {
-            indices.compute_family = i;
-            break;
-        }
-
-        if (!indices.compute_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
-        {
-            indices.compute_family = i;
-        }
-    }
-
-    for (DAEuint32 i = 0u; i < count; ++i)
-    {
-        if (queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT && (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0 &&
-                                                                    (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT)  == 0)
-        {
-            indices.transfer_family = i;
-            break;
-        }
-
-        if (!indices.transfer_family.has_value() && queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
-        {
-            indices.transfer_family = i;
-        }
-    }
-
-    return indices;
-}
-
-SurfaceDetails PhysicalDevice::QuerySwapchainDetails(VkPhysicalDevice in_physical_device) const
-{
-    DAEuint32        count;
-    SurfaceDetails details;
-
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(in_physical_device, m_surface->GetHandle(), &details.capabilities);
-
-    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface->GetHandle(), &count, nullptr);
-
-    details.formats.resize(count);
-
-    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface->GetHandle(), &count, details.formats.data());
-
-    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface->GetHandle(), &count, nullptr);
-
-    details.present_modes.resize(count);
-
-    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface->GetHandle(), &count, details.present_modes.data());
-
-    return details;
-}
-
-DAEbool PhysicalDevice::PickPhysicalDevice(VkInstance in_instance) noexcept
+DAEbool PhysicalDevice::SetupPhysicalDevice(VkInstance in_instance) noexcept
 {
     DAEuint32 count;
 
+    // Enumerates the physical devices accessible to a Vulkan instance.
     vkEnumeratePhysicalDevices(in_instance, &count, nullptr);
 
     if (count == 0u)
-    {
-        GRenderer->GetLogger()->Fatal("No GPU available");
-    }
+        return false;
 
     std::vector<VkPhysicalDevice> devices(count);
 
@@ -224,8 +239,7 @@ DAEbool PhysicalDevice::PickPhysicalDevice(VkInstance in_instance) noexcept
     // Checks if at least one candidate is suitable (from the best one to the worst one).
     for (auto const& candidate : candidates)
     {
-        if (candidate.first > 0u && CheckDeviceExtensions(candidate.second) &&
-                                    CheckDeviceLayers    (candidate.second))
+        if (candidate.first > 0u)
         {
             m_handle = candidate.second;
             break;
