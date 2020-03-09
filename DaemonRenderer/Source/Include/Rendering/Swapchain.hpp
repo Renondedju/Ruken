@@ -34,17 +34,25 @@ class Surface;
 class PhysicalDevice;
 class LogicalDevice;
 
+/**
+ * \brief This class wraps a VkSwapchainKHR object.
+ *
+ * A swapchain object provides the ability to present rendering results to a surface.
+ *
+ * \note A native window cannot be associated with more than one non-retired swapchain at a time.
+ *       Further, swapchains cannot be created for native windows that have a non-Vulkan graphics API surface associated with them.
+ */
 class Swapchain
 {
     private:
 
         #pragma region Members
 
-        Surface        const* m_surface;
         PhysicalDevice const* m_physical_device;
-        LogicalDevice  const* m_logical_device;
 
         VkSwapchainKHR                  m_handle;
+        VkSurfaceKHR                    m_surface;
+        VkDevice                        m_logical_device;
         DAEuint32                       m_image_count;
         VkSurfaceFormatKHR              m_surface_format;
         VkExtent2D                      m_image_extent;
@@ -60,47 +68,58 @@ class Swapchain
         #pragma region Methods
 
         /**
-         * \brief 
+         * \brief Selects the minimum number of presentable images that the application needs.
+         *
+         *  \note The implementation will either create the swapchain with at least that many images, or it will fail to create the swapchain.
          */
         DAEvoid SelectImageCount(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
-         * \brief 
+         * \brief Selects the format the swapchain image(s) will be created with.
          */
         DAEvoid SelectSurfaceFormat(Vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept;
 
         /**
-         * \brief 
+         * \brief Selects the size (in pixels) of the swapchain image(s).
+         *
+         * \note The behavior is platform-dependent if the image extent does not match the surfaceÅfs 'currentExtent'.
          */
         DAEvoid SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
-         * \brief 
+         * \brief Selects the value describing the transform, relative to the presentation engineÅfs natural orientation, applied to the image content prior to presentation.
+         *
+         * \note If it does not match the 'currentTransform' value, the presentation engine will transform the image content as part of the presentation operation.
          */
         DAEvoid SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
-         * \brief 
+         * \brief Selects the value indicating the alpha compositing mode to use when this surface is composited together with other surfaces on certain window systems.
          */
         DAEvoid SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
-         * \brief 
+         * \brief Selects the presentation mode the swapchain will use.
+         *
+         * \note A swapchainÅfs present mode determines how incoming present requests will be processed and queued internally.
          */
         DAEvoid SelectPresentMode(Vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
 
         /**
-         * \brief 
+         * \return True if a a swapchain could be created, else False.
          */
-        DAEbool CreateSwapchain();
+        DAEbool SetupSwapchain();
 
         /**
-         * \brief 
+         * \return True if the image views for the swapchain's images could be created, else False.
          */
-        DAEbool CreateImageViews();
+        DAEbool SetupImageViews();
 
         /**
-         * \brief 
+         * \brief Recreates the swapchain whenever the window is resized.
+         *
+         * \param in_width  The new width (in pixels) of the window.
+         * \param in_height The new height (in pixels) of the window.
          */
         DAEvoid ResizeSwapchain(DAEint32 in_width, DAEint32 in_height);
 
@@ -116,8 +135,8 @@ class Swapchain
                            PhysicalDevice const* in_physical_device,
                            LogicalDevice  const* in_logical_device);
 
-        Swapchain(Swapchain const&    in_copy) = delete;
-        Swapchain(Swapchain&&         in_move) = delete;
+        Swapchain(Swapchain const&  in_copy) = delete;
+        Swapchain(Swapchain&&       in_move) = delete;
 
         ~Swapchain() noexcept;
 
@@ -125,15 +144,15 @@ class Swapchain
 
         #pragma region Operators
 
-        Swapchain& operator=(Swapchain const& in_copy) = delete;
-        Swapchain& operator=(Swapchain&&      in_move) = delete;
+        Swapchain& operator=(Swapchain const&   in_copy) = delete;
+        Swapchain& operator=(Swapchain&&        in_move) = delete;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \return 
+         * \return The opaque handle to the swapchain object.
          */
         [[nodiscard]] VkSwapchainKHR GetHandle() const noexcept;
 

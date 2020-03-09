@@ -44,8 +44,7 @@ PhysicalDevice::PhysicalDevice(Instance const* in_instance,
         vkGetPhysicalDeviceProperties(m_handle, &m_properties);
         vkGetPhysicalDeviceFeatures  (m_handle, &m_features);
 
-        m_queue_families  = FindQueueFamilies  (m_handle);
-        m_surface_details = QuerySurfaceDetails(m_handle);
+        m_queue_families = FindQueueFamilies(m_handle);
 
         GRenderer->GetLogger()->Info(String("Suitable GPU found : ") + m_properties.deviceName);
     }
@@ -162,31 +161,6 @@ QueueFamilyIndices PhysicalDevice::FindQueueFamilies(VkPhysicalDevice in_physica
     return indices;
 }
 
-SurfaceDetails PhysicalDevice::QuerySurfaceDetails(VkPhysicalDevice in_physical_device) const
-{
-    DAEuint32      count;
-    SurfaceDetails details;
-
-    // Queries surface capabilities.
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(in_physical_device, m_surface, &details.capabilities);
-
-    // Queries supported  color formats.
-    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface, &count, nullptr);
-
-    details.formats.resize(count);
-
-    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, m_surface, &count, details.formats.data());
-
-    // Queries supported presentation modes.
-    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface, &count, nullptr);
-
-    details.present_modes.resize(count);
-
-    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, m_surface, &count, details.present_modes.data());
-
-    return details;
-}
-
 DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_device) const
 {
     if (!CheckDeviceExtensions(in_physical_device) || !CheckDeviceLayers(in_physical_device))
@@ -197,7 +171,7 @@ DAEuint32 PhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_physical_dev
     if (!indices.graphics_family.has_value() || !indices.present_family.has_value())
         return 0u;
 
-    SurfaceDetails const details = QuerySurfaceDetails(in_physical_device);
+    SurfaceDetails const details = QuerySurfaceDetails(in_physical_device, m_surface);
 
     if (details.formats.empty() || details.present_modes.empty())
         return 0u;
@@ -275,6 +249,31 @@ Vector<VkLayerProperties> PhysicalDevice::GetSupportedLayers(VkPhysicalDevice in
     return supported_layers;
 }
 
+SurfaceDetails PhysicalDevice::QuerySurfaceDetails(VkPhysicalDevice in_physical_device, VkSurfaceKHR in_surface)
+{
+    DAEuint32      count;
+    SurfaceDetails details;
+
+    // Queries surface capabilities.
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(in_physical_device, in_surface, &details.capabilities);
+
+    // Queries supported  color formats.
+    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, in_surface, &count, nullptr);
+
+    details.formats.resize(count);
+
+    vkGetPhysicalDeviceSurfaceFormatsKHR(in_physical_device, in_surface, &count, details.formats.data());
+
+    // Queries supported presentation modes.
+    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, in_surface, &count, nullptr);
+
+    details.present_modes.resize(count);
+
+    vkGetPhysicalDeviceSurfacePresentModesKHR(in_physical_device, in_surface, &count, details.present_modes.data());
+
+    return details;
+}
+
 VkPhysicalDevice PhysicalDevice::GetHandle() const noexcept
 {
     return m_handle;
@@ -303,9 +302,9 @@ QueueFamilyIndices PhysicalDevice::GetQueueFamilies() const noexcept
     return m_queue_families;
 }
 
-SurfaceDetails PhysicalDevice::GetSurfaceDetails() const noexcept
+SurfaceDetails PhysicalDevice::GetSurfaceDetails() const
 {
-    return m_surface_details;
+    return QuerySurfaceDetails(m_handle, m_surface);
 }
 
 Vector<DAEchar const*> const& PhysicalDevice::GetRequiredExtensions() const noexcept

@@ -71,7 +71,6 @@ class PhysicalDevice
         VkPhysicalDeviceProperties  m_properties;
         VkPhysicalDeviceFeatures    m_features;
         QueueFamilyIndices          m_queue_families;
-        SurfaceDetails              m_surface_details;
 
         Vector<DAEchar const*> m_required_extensions;
         Vector<DAEchar const*> m_required_layers;
@@ -102,13 +101,6 @@ class PhysicalDevice
          * \return The indices of the required queues available on the specified physical device.
          */
         QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice in_physical_device) const noexcept;
-
-        /**
-         * \param in_physical_device The physical device that will be queried.
-         *
-         * \return The properties of the surface when used by the specified physical device.
-         */
-        SurfaceDetails QuerySurfaceDetails(VkPhysicalDevice in_physical_device) const;
 
         /**
          * \param in_physical_device The physical device that will be queried.
@@ -170,6 +162,14 @@ class PhysicalDevice
         static Vector<VkLayerProperties> GetSupportedLayers(VkPhysicalDevice in_physical_device) noexcept;
 
         /**
+         * \param in_physical_device The physical device that will be associated with the swapchain.
+         * \param in_surface         The surface that will be associated with the swapchain.
+         *
+         * \return The properties of the surface when used by the specified physical device.
+         */
+        static SurfaceDetails QuerySurfaceDetails(VkPhysicalDevice in_physical_device, VkSurfaceKHR in_surface);
+
+        /**
          * \return The opaque handle to the physical device object.
          */
         [[nodiscard]] VkPhysicalDevice GetHandle() const noexcept;
@@ -192,7 +192,7 @@ class PhysicalDevice
         /**
          * \return The properties of the surface when used by the physical device.
          */
-        [[nodiscard]] SurfaceDetails GetSurfaceDetails() const noexcept;
+        [[nodiscard]] SurfaceDetails GetSurfaceDetails() const;
 
         /**
          * \return The list of the required device extensions.

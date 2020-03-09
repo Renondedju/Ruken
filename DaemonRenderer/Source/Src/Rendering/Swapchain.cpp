@@ -33,10 +33,10 @@ USING_DAEMON_NAMESPACE
 Swapchain::Swapchain(Surface        const*  in_surface,
                      PhysicalDevice const*  in_physical_device,
                      LogicalDevice  const*  in_logical_device) :
-    m_surface           { in_surface },
     m_physical_device   { in_physical_device },
-    m_logical_device    { in_logical_device },
     m_handle            { nullptr },
+    m_surface           { in_surface       ->GetHandle() },
+    m_logical_device    { in_logical_device->GetHandle() },
     m_image_count       { 0u },
     m_surface_format    {},
     m_image_extent      {},
@@ -44,16 +44,7 @@ Swapchain::Swapchain(Surface        const*  in_surface,
     m_composite_alpha   {},
     m_present_mode      {}
 {
-    SurfaceDetails const surface_details = m_physical_device->GetSurfaceDetails();
-
-    SelectImageCount    (surface_details.capabilities);
-    SelectSurfaceFormat (surface_details.formats);
-    SelectImageExtent   (surface_details.capabilities);
-    SelectPreTransform  (surface_details.capabilities);
-    SelectCompositeAlpha(surface_details.capabilities);
-    SelectPresentMode   (surface_details.present_modes);
-
-    if (CreateSwapchain() && CreateImageViews())
+    if (SetupSwapchain() && SetupImageViews())
     {
         GWindowManager->GetMainWindow()->on_resized.Subscribe( [this] (DAEint32 const in_width, DAEint32 const in_height) { ResizeSwapchain(in_width, in_height); });
 
@@ -66,14 +57,20 @@ Swapchain::Swapchain(Surface        const*  in_surface,
 
 Swapchain::~Swapchain() noexcept
 {
-    for (auto const& image_view : m_image_views)
+    if (m_handle)
     {
-        vkDestroyImageView(m_logical_device->GetHandle(), image_view, nullptr);
+        for (auto const& image_view : m_image_views)
+        {
+            if (image_view)
+            {
+                vkDestroyImageView(m_logical_device, image_view, nullptr);
+            }
+        }
+
+        vkDestroySwapchainKHR(m_logical_device, m_handle, nullptr);
+
+        GRenderer->GetLogger()->Info("Swapchain destroyed.");
     }
-
-    vkDestroySwapchainKHR(m_logical_device->GetHandle(), m_handle, nullptr);
-
-    GRenderer->GetLogger()->Info("Swapchain destroyed.");
 }
 
 #pragma endregion
@@ -108,8 +105,7 @@ DAEvoid Swapchain::SelectSurfaceFormat(Vector<VkSurfaceFormatKHR> const& in_avai
         if (available_format.format == VK_FORMAT_B8G8R8A8_UNORM)
             m_surface_format = available_format;
 
-        if (available_format.format     == VK_FORMAT_B8G8R8A8_UNORM &&
-            available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        if (available_format.format == VK_FORMAT_B8G8R8A8_UNORM && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {
             m_surface_format = available_format;
             break;
@@ -122,7 +118,6 @@ DAEvoid Swapchain::SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabili
     if (in_capabilities.currentExtent.width != UINT32_MAX)
     {
         m_image_extent = in_capabilities.currentExtent;
-        return;
     }
 
     //m_image_extent.width  = Clamp(m_image_extent.width,  in_capabilities.minImageExtent.width,  in_capabilities.maxImageExtent.width);
@@ -132,7 +127,10 @@ DAEvoid Swapchain::SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabili
 DAEvoid Swapchain::SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
 {
     if (in_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
+    {
         m_pre_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    }
+
     else
         m_pre_transform = in_capabilities.currentTransform;
 }
@@ -158,32 +156,39 @@ DAEvoid Swapchain::SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in_capab
 
 DAEvoid Swapchain::SelectPresentMode(Vector<VkPresentModeKHR> const& in_available_present_modes) noexcept
 {
-    /** TODO Checking for v-sync TODO */
     m_present_mode = VK_PRESENT_MODE_FIFO_KHR;
 
     for (auto const& available_present_mode : in_available_present_modes)
     {
+        if (available_present_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+            m_present_mode = available_present_mode;
+
         if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
         {
             m_present_mode = available_present_mode;
             return;
         }
-
-        if (available_present_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
-            m_present_mode = available_present_mode;
     }
 }
 
-DAEbool Swapchain::CreateSwapchain()
+DAEbool Swapchain::SetupSwapchain()
 {
+    SurfaceDetails     const surface_details = m_physical_device->GetSurfaceDetails();
     QueueFamilyIndices const queue_families  = m_physical_device->GetQueueFamilies ();
+
+    SelectImageCount    (surface_details.capabilities);
+    SelectSurfaceFormat (surface_details.formats);
+    SelectImageExtent   (surface_details.capabilities);
+    SelectPreTransform  (surface_details.capabilities);
+    SelectCompositeAlpha(surface_details.capabilities);
+    SelectPresentMode   (surface_details.present_modes);
 
     VkSwapchainCreateInfoKHR swapchain_info;
 
     swapchain_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapchain_info.pNext            = nullptr;
     swapchain_info.flags            = 0u;
-    swapchain_info.surface          = m_surface->GetHandle();
+    swapchain_info.surface          = m_surface;
     swapchain_info.minImageCount    = m_image_count;
     swapchain_info.imageFormat      = m_surface_format.format;
     swapchain_info.imageColorSpace  = m_surface_format.colorSpace;
@@ -214,20 +219,22 @@ DAEbool Swapchain::CreateSwapchain()
     swapchain_info.compositeAlpha = m_composite_alpha;
     swapchain_info.presentMode    = m_present_mode;
     swapchain_info.clipped        = VK_TRUE;
-    swapchain_info.oldSwapchain   = m_handle;
+    swapchain_info.oldSwapchain   = nullptr;
 
-    return vkCreateSwapchainKHR(m_logical_device->GetHandle(), &swapchain_info, nullptr, &m_handle) == VK_SUCCESS;
+    return vkCreateSwapchainKHR(m_logical_device, &swapchain_info, nullptr, &m_handle) == VK_SUCCESS;
 }
 
-DAEbool Swapchain::CreateImageViews()
+DAEbool Swapchain::SetupImageViews()
 {
-    vkGetSwapchainImagesKHR(m_logical_device->GetHandle(), m_handle, &m_image_count, nullptr);
+    // Obtains the array of presentable images associated with the swapchain.
+    vkGetSwapchainImagesKHR(m_logical_device, m_handle, &m_image_count, nullptr);
 
     m_images     .resize(m_image_count);
     m_image_views.resize(m_image_count);
 
-    vkGetSwapchainImagesKHR(m_logical_device->GetHandle(), m_handle, &m_image_count, m_images.data());
+    vkGetSwapchainImagesKHR(m_logical_device, m_handle, &m_image_count, m_images.data());
 
+    // Create an image view from each presentable image.
     for (DAEuint32 i = 0u; i < m_image_count; ++i)
     {
         VkImageViewCreateInfo  image_view_info;
@@ -250,16 +257,41 @@ DAEbool Swapchain::CreateImageViews()
         image_view_info.subresourceRange.baseArrayLayer = 0u;
         image_view_info.subresourceRange.layerCount     = 1u;
 
-        if (vkCreateImageView(m_logical_device->GetHandle(), &image_view_info, nullptr, &m_image_views[i]) != VK_SUCCESS)
+        if (vkCreateImageView(m_logical_device, &image_view_info, nullptr, &m_image_views[i]) != VK_SUCCESS)
             return false;
     }
 
     return true;
 }
 
-DAEvoid Swapchain::ResizeSwapchain(DAEint32 in_width, DAEint32 in_height)
+DAEvoid Swapchain::ResizeSwapchain(DAEint32 const in_width, DAEint32 const in_height)
 {
-    /* TODO TODO */
+    // Waits for the device to become idle.
+    vkDeviceWaitIdle(m_logical_device);
+
+    if (m_handle)
+    {
+        for (auto const& image_view : m_image_views)
+        {
+            if (image_view)
+            {
+                vkDestroyImageView(m_logical_device, image_view, nullptr);
+            }
+        }
+
+        vkDestroySwapchainKHR(m_logical_device, m_handle, nullptr);
+    }
+
+    m_image_extent.width  = in_width;
+    m_image_extent.height = in_height;
+
+    if (SetupSwapchain() && SetupImageViews())
+    {
+        GRenderer->GetLogger()->Info("Swapchain successfully resized.");
+    }
+
+    else
+        GRenderer->GetLogger()->Fatal("Failed to resize swapchain!");
 }
 
 VkSwapchainKHR Swapchain::GetHandle() const noexcept
