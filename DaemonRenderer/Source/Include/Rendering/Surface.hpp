@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <Vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 
 #include "Config.hpp"
 

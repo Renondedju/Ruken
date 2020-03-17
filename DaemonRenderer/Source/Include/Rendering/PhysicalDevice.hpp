@@ -26,7 +26,7 @@
 
 #include <optional>
 
-#include <Vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 
 #include "Types/FundamentalTypes.hpp"
 

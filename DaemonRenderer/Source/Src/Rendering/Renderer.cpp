@@ -54,7 +54,7 @@ Renderer::Renderer() :
                                                               m_physical_device.get(),
                                                               m_logical_device .get()))->GetHandle() != nullptr)
     {
-        m_logger->Info("Renderer successfully initialized.");
+        m_logger->Info("Renderer initialized successfully.");
     }
 
     else
@@ -69,38 +69,12 @@ Renderer::~Renderer() noexcept
     m_surface        .reset();
     m_instance       .reset();
 
-    m_logger->Info("Renderer successfully shut down.");
+    m_logger->Info("Renderer shut down.");
 }
 
 #pragma endregion
 
 #pragma region Methods
-
-/*
-DAEvoid Renderer::CreateLogicalDevice() noexcept
-{
-    VkDeviceCreateInfo device_info;
-
-    device_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    device_info.pNext                   = nullptr;
-    device_info.flags                   = 0u;
-    device_info.queueCreateInfoCount    = 0u;
-    device_info.pQueueCreateInfos       = nullptr;
-    device_info.enabledLayerCount       = 0u;
-    device_info.ppEnabledLayerNames     = nullptr;
-    device_info.enabledExtensionCount   = 0u;
-    device_info.ppEnabledExtensionNames = nullptr;
-    device_info.pEnabledFeatures        = nullptr;
-
-    if (vkCreateDevice(m_handle, &device_info, nullptr, &m_handle) == VK_SUCCESS)
-    {
-        m_logger->Info("Device created successfully.");
-    }
-
-    else
-        m_logger->Fatal("Failed to create device!");
-}
-*/
 
 Logger* Renderer::GetLogger() const noexcept
 {

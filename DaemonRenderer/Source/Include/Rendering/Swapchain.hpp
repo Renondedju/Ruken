@@ -24,9 +24,11 @@
 
 #pragma once
 
-#include <Vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 
 #include "Types/FundamentalTypes.hpp"
+
+#include "Containers/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
