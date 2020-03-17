@@ -92,7 +92,7 @@ Position2D const& Screen::GetPosition() const noexcept
     return m_position;
 }
 
-Area2D const& Screen::GetWorkArea() const noexcept
+Rect2D const& Screen::GetWorkArea() const noexcept
 {
     return m_work_area;
 }

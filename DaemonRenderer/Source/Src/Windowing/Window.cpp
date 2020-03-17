@@ -92,6 +92,7 @@ Window* Window::GetWindowUserPointer(GLFWwindow* in_window) noexcept
 
 DAEvoid Window::SetupWindow(WindowParameters&& in_parameters) noexcept
 {
+    glfwWindowHint(GLFW_CLIENT_API,              GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE,               in_parameters.resizable);
     glfwWindowHint(GLFW_VISIBLE,                 in_parameters.visible);
     glfwWindowHint(GLFW_DECORATED,               in_parameters.decorated);

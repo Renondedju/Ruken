@@ -52,7 +52,7 @@ struct Scale2D
     DAEfloat y = 0.0f;
 };
 
-struct Area2D
+struct Rect2D
 {
     Position2D  position;
     Extent2D    extent;

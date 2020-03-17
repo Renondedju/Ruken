@@ -64,7 +64,7 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries;$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
@@ -104,7 +104,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries;$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -160,6 +160,13 @@
     <ClInclude Include="Source\Include\Meta\IndexSequence\PartitionIndexSequence.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Instance.hpp" />
+    <ClInclude Include="Source\Include\Rendering\LogicalDevice.hpp" />
+    <ClInclude Include="Source\Include\Rendering\PhysicalDevice.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Renderer.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Surface.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Swapchain.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Utilities\Debug.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
@@ -291,6 +298,13 @@
     <ClCompile Include="Source\Src\Kernel.cpp" />
     <ClCompile Include="Source\Src\KernelProxy.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Instance.cpp" />
+    <ClCompile Include="Source\Src\Rendering\LogicalDevice.cpp" />
+    <ClCompile Include="Source\Src\Rendering\PhysicalDevice.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Renderer.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Surface.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Swapchain.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Utilities\Debug.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />

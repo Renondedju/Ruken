@@ -156,11 +156,15 @@ class Window
 
         #pragma region Events
 
-        /** \brief Called when the window is moved. */
-        Event<Position2D> on_moved;
+        /**
+         * \brief This is called when the window is moved.
+         */
+        Event<DAEuint32, DAEuint32> on_moved;
 
-        /** \brief Called when the window is resized. */
-        Event<Extent2D> on_resized;
+        /**
+         * \brief This is called when the window is resized.
+         */
+        Event<DAEuint32, DAEuint32> on_resized;
 
         /** \brief Called when the user attempts to close the window. */
         Event<> on_closed;
@@ -177,11 +181,15 @@ class Window
         /** \brief Called when the window is maximized or restored. */
         Event<DAEbool> on_maximized;
 
-        /** \brief Called when the framebuffer of the specified window is resized. */
-        Event<Extent2D> on_framebuffer_resized;
+        /**
+         * \brief This is called when the framebuffer of the specified window is resized.
+         */
+        Event<DAEuint32, DAEuint32> on_framebuffer_resized;
 
-        /** \brief Called when the content scale of the specified window changes. */
-        Event<Scale2D> on_content_rescaled;
+        /**
+         * \brief This is called when the content scale of the specified window changes.
+         */
+        Event<DAEfloat, DAEfloat> on_content_rescaled;
 
         #pragma endregion
 
