@@ -43,6 +43,7 @@ USING_DAEMON_NAMESPACE
 
 Instance::Instance() :
     m_handle                { nullptr },
+    m_api_version           { 0u },
     m_required_extensions   { VK_KHR_SURFACE_EXTENSION_NAME }
 {
     #ifdef DAEMON_OS_WINDOWS
@@ -59,7 +60,10 @@ Instance::Instance() :
 
     #endif
 
-    if (CheckInstanceExtensions() && CheckValidationLayers() && SetupInstance())
+    if (CheckInstanceVersion   () &&
+        CheckInstanceExtensions() &&
+        CheckValidationLayers  () &&
+        SetupInstance          () )
     {
         GRenderer->GetLogger()->Info("Instance created successfully.");
 
@@ -107,6 +111,13 @@ Instance::~Instance() noexcept
 #pragma endregion
 
 #pragma region Methods
+
+DAEbool Instance::CheckInstanceVersion() noexcept
+{
+    vkEnumerateInstanceVersion(&m_api_version);
+
+    return m_api_version >= VK_API_VERSION_1_2;
+}
 
 DAEbool Instance::CheckInstanceExtensions() const noexcept
 {
@@ -174,10 +185,6 @@ DAEbool Instance::SetupInstance() noexcept
     validation_features.disabledValidationFeatureCount = 0u;
     validation_features.pDisabledValidationFeatures    = nullptr;
 
-    DAEuint32 api_version;
-
-    vkEnumerateInstanceVersion(&api_version);
-
     VkApplicationInfo app_info;
 
     app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -186,7 +193,7 @@ DAEbool Instance::SetupInstance() noexcept
     app_info.applicationVersion = 0u;
     app_info.pEngineName        = DAEMON_PROJECT_NAME;
     app_info.engineVersion      = 0u;
-    app_info.apiVersion         = api_version;
+    app_info.apiVersion         = m_api_version;
 
     VkInstanceCreateInfo instance_info;
 

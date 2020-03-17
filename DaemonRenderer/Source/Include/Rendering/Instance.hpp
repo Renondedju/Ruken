@@ -32,8 +32,6 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class Renderer;
-
 /**
  * \brief This class wraps a VkInstance object.
  *
@@ -46,7 +44,8 @@ class Instance
 
         #pragma region Members
 
-        VkInstance m_handle;
+        VkInstance  m_handle;
+        DAEuint32   m_api_version;
 
         Vector<DAEchar const*> m_required_extensions;
         Vector<DAEchar const*> m_required_layers;
@@ -54,6 +53,11 @@ class Instance
         #pragma endregion
 
         #pragma region Methods
+
+        /**
+         * \return True if the api version is older than the required one, else False.
+         */
+        [[nodiscard]] DAEbool CheckInstanceVersion() noexcept;
 
         /**
          * \return True if the required extensions are supported, else False.
