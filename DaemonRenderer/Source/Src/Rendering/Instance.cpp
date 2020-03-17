@@ -30,10 +30,11 @@
 
 #include "Utility/WindowsOS.hpp"
 
-#include <Vulkan/vulkan_win32.h>
+#include <vulkan/vulkan_win32.h>
 
 #endif
 
+#include "Containers/Array.hpp"
 #include "Containers/Set.hpp"
 
 USING_DAEMON_NAMESPACE
@@ -157,6 +158,26 @@ DAEbool Instance::CheckValidationLayers() const noexcept
 
 DAEbool Instance::SetupInstance() noexcept
 {
+    Array<VkValidationFeatureEnableEXT, 3u> enabled_validation_features =
+    {
+        VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT,
+        VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT,
+        VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT
+    };
+
+    VkValidationFeaturesEXT validation_features;
+
+    validation_features.sType                          = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+    validation_features.pNext                          = nullptr;
+    validation_features.enabledValidationFeatureCount  = static_cast<DAEuint32>(enabled_validation_features.size());
+    validation_features.pEnabledValidationFeatures     = enabled_validation_features.data();
+    validation_features.disabledValidationFeatureCount = 0u;
+    validation_features.pDisabledValidationFeatures    = nullptr;
+
+    DAEuint32 api_version;
+
+    vkEnumerateInstanceVersion(&api_version);
+
     VkApplicationInfo app_info;
 
     app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -165,12 +186,12 @@ DAEbool Instance::SetupInstance() noexcept
     app_info.applicationVersion = 0u;
     app_info.pEngineName        = DAEMON_PROJECT_NAME;
     app_info.engineVersion      = 0u;
-    app_info.apiVersion         = VK_API_VERSION_1_2;
+    app_info.apiVersion         = api_version;
 
     VkInstanceCreateInfo instance_info;
 
     instance_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instance_info.pNext                   = nullptr;
+    instance_info.pNext                   = &validation_features;
     instance_info.flags                   = 0;
     instance_info.pApplicationInfo        = &app_info;
     instance_info.enabledLayerCount       = static_cast<DAEuint32>(m_required_layers.size());

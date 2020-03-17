@@ -37,8 +37,8 @@ class Renderer;
 /**
  * \brief This class wraps a VkInstance object.
  *
- * \note There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
- *       Creating a VkInstance object initializes the Vulkan library and allows the application to pass information about itself to the implementation.
+ * \note There is no global state in Vulkan and all per-application state is stored in a VkInstance object. Creating a VkInstance object
+ *       initializes the Vulkan library and allows the application to pass information about itself to the implementation.
  */
 class Instance
 {

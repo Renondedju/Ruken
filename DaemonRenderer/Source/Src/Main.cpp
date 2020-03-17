@@ -77,7 +77,7 @@ int main()
 {
     /* TODO Needs to be removed when Kernel is done TODO */
 
-    Logger root_logger("ROOT", ELogLevel::Debug, nullptr);
+    Logger root_logger("ROOT", ELogLevel::Warning, nullptr);
 
     ConsoleFormatter formatter;
 
