@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 #pragma once
 
-#define DAEMON_COPYRIGHT_STR "Copyright (c) 2019 Basile Combet, Philippe Yi"
+#define DAEMON_COPYRIGHT_STR "Copyright (c) 2019-2020 Basile Combet, Philippe Yi"
 #define DAEMON_LICENSE_STR   "MIT License"
 #define DAEMON_PROJECT_NAME  "Daemon Renderer"
 #define DAEMON_URL           "https://github.com/Renondedju/Daemon"
