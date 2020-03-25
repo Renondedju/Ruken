@@ -33,6 +33,8 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class Logger;
+
 /**
  * \brief Manages the connected screens and the created windows.
  */
@@ -42,7 +44,7 @@ class WindowManager final: public Service<WindowManager>, Unique
 
         #pragma region Members
 
-        Logger* m_logger = nullptr;
+        Logger* m_logger;
 
         std::vector<Window> m_windows;
         std::vector<Screen> m_screens;
@@ -122,7 +124,7 @@ class WindowManager final: public Service<WindowManager>, Unique
         /**
          * \return A pointer to the newly created window.
          */
-        Window* CreateWindow(WindowParameters&& in_parameters);
+        Window* CreateWindow(WindowParams&& in_parameters);
 
         /**
          * \param in_window The window to destroy.

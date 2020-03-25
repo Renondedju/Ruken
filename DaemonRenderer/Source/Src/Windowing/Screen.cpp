@@ -36,7 +36,7 @@ Screen::Screen(GLFWmonitor* in_handle):
     m_name          { glfwGetMonitorName(m_handle) }
 {
     // Retrieves the size, in millimeters, of the display area of the monitor.
-    glfwGetMonitorPhysicalSize(m_handle, &m_physical_size.width, &m_physical_size.height);
+    glfwGetMonitorPhysicalSize(m_handle, reinterpret_cast<DAEint*>(&m_physical_size.width), reinterpret_cast<DAEint*>(&m_physical_size.height));
 
     // Retrieves the ratio between the current DPI and the platform's default DPI.
     glfwGetMonitorContentScale(m_handle, &m_content_scale.x, &m_content_scale.y);
@@ -45,7 +45,7 @@ Screen::Screen(GLFWmonitor* in_handle):
     glfwGetMonitorPos(m_handle, &m_position.x, &m_position.y);
 
     // Retrieves the work area defined as the area of the monitor not occluded by the operating system task bar where present.
-    glfwGetMonitorWorkarea(m_handle, &m_work_area.position.x, &m_work_area.position.y, &m_work_area.extent.width, &m_work_area.extent.height);
+    glfwGetMonitorWorkarea(m_handle, &m_work_area.offset.x, &m_work_area.offset.y, reinterpret_cast<DAEint*>(&m_work_area.extent.width), reinterpret_cast<DAEint*>(&m_work_area.extent.height));
 
     // Retrieves all video modes supported by the monitor.
     DAEint32 count;
@@ -77,22 +77,22 @@ std::string const& Screen::GetName() const noexcept
     return m_name;
 }
 
-Extent2D const& Screen::GetPhysicalSize() const noexcept
+VkExtent2D const& Screen::GetPhysicalSize() const noexcept
 {
     return m_physical_size;
 }
 
-Scale2D const& Screen::GetContentScale() const noexcept
+Vector2f const& Screen::GetContentScale() const noexcept
 {
     return m_content_scale;
 }
 
-Position2D const& Screen::GetPosition() const noexcept
+VkOffset2D const& Screen::GetPosition() const noexcept
 {
     return m_position;
 }
 
-Rect2D const& Screen::GetWorkArea() const noexcept
+VkRect2D const& Screen::GetWorkArea() const noexcept
 {
     return m_work_area;
 }

@@ -26,17 +26,13 @@
 
 #include "Config.hpp"
 
-#include "Instance.hpp"
-#include "Surface.hpp"
-#include "PhysicalDevice.hpp"
-#include "LogicalDevice.hpp"
-#include "Swapchain.hpp"
-
 #include "Containers/SmartPtr.hpp"
 
-#include "Debug/Logging/Logger.hpp"
-
 BEGIN_DAEMON_NAMESPACE
+
+class Logger;
+class Instance;
+class Device;
 
 class Renderer
 {
@@ -44,13 +40,9 @@ class Renderer
 
         #pragma region Members
 
-        Logger* m_logger;
-
-        UniquePtr<Instance>         m_instance;
-        UniquePtr<Surface>          m_surface;
-        UniquePtr<PhysicalDevice>   m_physical_device;
-        UniquePtr<LogicalDevice>    m_logical_device;
-        UniquePtr<Swapchain>        m_swapchain;
+        Logger*     m_logger;
+        Instance*   m_instance;
+        Device*     m_device;
 
         #pragma endregion
 
@@ -77,9 +69,19 @@ class Renderer
         #pragma region Methods
 
         /**
-         * \return This module's logger.
+         * \return 
          */
         [[nodiscard]] Logger* GetLogger() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] Instance* GetInstance() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]] Device* GetDevice() const noexcept;
 
         #pragma endregion
 };

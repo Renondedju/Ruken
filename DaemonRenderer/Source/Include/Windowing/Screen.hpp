@@ -24,11 +24,35 @@
 
 #pragma once
 
+#include "Vulkan/Vulkan.hpp"
 #include <vector>
 
 #include "Utility.hpp"
 
+#include "Vector/Vector.hpp"
+
+#include "Containers/String.hpp"
+#include "Containers/Vector.hpp"
+
 BEGIN_DAEMON_NAMESPACE
+
+struct VideoMode
+{
+    DAEint32 width;
+    DAEint32 height;
+    DAEint32 red_bits;
+    DAEint32 green_bits;
+    DAEint32 blue_bits;
+    DAEint32 refresh_rate;
+};
+
+struct GammaRamp
+{
+    DAEuint16*  red;
+    DAEuint16*  green;
+    DAEuint16*  blue;
+    DAEuint32   size;
+};
 
 /**
  * \brief This class manages a currently connected monitor.
@@ -44,8 +68,12 @@ class Screen
 
         #pragma region Members
 
-        Extent2D               m_physical_size;
-        Scale2D                m_content_scale;
+        GLFWmonitor*        m_handle;
+        std::string            m_name;
+        VkExtent2D          m_physical_size;
+        Vector2f            m_content_scale;
+        VkOffset2D          m_position;
+        VkRect2D            m_work_area;
         std::vector<VideoMode> m_video_modes;
         Area2D                 m_work_area;
         Position2D             m_position;
@@ -87,21 +115,18 @@ class Screen
         /**
          * \return The size, in millimeters, of the display area of the monitor.
          */
-        [[nodiscard]]
-        Extent2D const& GetPhysicalSize() const noexcept;
+        [[nodiscard]] VkExtent2D const& GetPhysicalSize() const noexcept;
 
         /**
          * \brief The content scale is the ratio between the current DPI and the platform's default DPI.
          * \return The content scale of the monitor.
          */
-        [[nodiscard]]
-        Scale2D const& GetContentScale() const noexcept;
+        [[nodiscard]] Vector2f const& GetContentScale() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the monitor.
          */
-        [[nodiscard]]
-        Position2D const& GetPosition() const noexcept;
+        [[nodiscard]] VkOffset2D const& GetPosition() const noexcept;
 
         /**
          * \brief The work area is defined as the area of the monitor not occluded by the operating system task bar where present.
@@ -109,8 +134,7 @@ class Screen
          *         the work area of the specified monitor along with the work area size in screen coordinates.
          * \note If no task bar exists then the work area is the monitor resolution in screen coordinates.
          */
-        [[nodiscard]]
-        Area2D const& GetWorkArea() const noexcept;
+        [[nodiscard]] VkRect2D const& GetWorkArea() const noexcept;
 
         /**
          * \return The current video mode of the specified monitor.

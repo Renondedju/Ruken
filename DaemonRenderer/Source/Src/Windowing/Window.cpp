@@ -24,12 +24,34 @@
 
 #include "Windowing/WindowManager.hpp"
 
+#include "Rendering/Renderer.hpp"
+
+#include "Vulkan/Instance.hpp"
+#include "Vulkan/PhysicalDevice.hpp"
+
 USING_DAEMON_NAMESPACE
+
+#pragma region Constructor and Destructor
+
+Window::Window() noexcept :
+    m_handle    { nullptr },
+    m_surface   { nullptr }
+{
+
+}
 
 Window::~Window() noexcept
 {
+    vkDestroySurfaceKHR(GRenderer->GetInstance()->GetHandle(), m_surface, nullptr);
+
     glfwDestroyWindow(m_handle);
 }
+
+#pragma endregion
+
+#pragma region Methods
+
+#pragma region Callbacks
 
 DAEvoid Window::WindowPosCallback(GLFWwindow* in_window, DAEint32 const in_x_pos, DAEint32 const in_y_pos) noexcept
 {
@@ -85,14 +107,19 @@ DAEvoid Window::WindowContentScaleCallback(GLFWwindow* in_window, DAEfloat const
         window->on_content_rescaled.Invoke({ in_x_scale, in_y_scale });
 }
 
+#pragma endregion
+
 Window* Window::GetWindowUserPointer(GLFWwindow* in_window) noexcept
 {
     return static_cast<Window*>(glfwGetWindowUserPointer(in_window));
 }
 
-DAEvoid Window::SetupWindow(WindowParameters&& in_parameters) noexcept
+DAEvoid Window::SetupWindow(WindowParams&& in_parameters) noexcept
 {
-    glfwWindowHint(GLFW_CLIENT_API,              GLFW_NO_API);
+    // 
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    // 
     glfwWindowHint(GLFW_RESIZABLE,               in_parameters.resizable);
     glfwWindowHint(GLFW_VISIBLE,                 in_parameters.visible);
     glfwWindowHint(GLFW_DECORATED,               in_parameters.decorated);
@@ -132,7 +159,7 @@ DAEvoid Window::SetupCallbacks() const noexcept
     glfwSetWindowContentScaleCallback(m_handle, &WindowContentScaleCallback);
 }
 
-DAEvoid Window::Initialize(WindowParameters&& in_parameters) noexcept
+DAEvoid Window::Initialize(WindowParams&& in_parameters) noexcept
 {
     m_name = std::move(in_parameters.name);
 
@@ -141,6 +168,11 @@ DAEvoid Window::Initialize(WindowParameters&& in_parameters) noexcept
     glfwSetWindowUserPointer(m_handle, this);
 
     SetupCallbacks();
+
+    if (glfwCreateWindowSurface(GRenderer->GetInstance()->GetHandle(), m_handle, nullptr, &m_surface) == VK_SUCCESS)
+    {
+        // TODO : Create RenderContext here.
+    }
 }
 
 DAEvoid Window::SetClosed(DAEbool const in_should_close) const noexcept
@@ -155,12 +187,12 @@ DAEvoid Window::SetName(std::string&& in_name) noexcept
     glfwSetWindowTitle(m_handle, m_name.c_str());
 }
 
-DAEvoid Window::SetPosition(Position2D&& in_position) const noexcept
+DAEvoid Window::SetPosition(VkOffset2D&& in_position) const noexcept
 {
     glfwSetWindowPos(m_handle, in_position.x, in_position.y);
 }
 
-DAEvoid Window::SetSizeLimits(Extent2D&& in_min, Extent2D&& in_max) const noexcept
+DAEvoid Window::SetSizeLimits(VkExtent2D&& in_min, VkExtent2D&& in_max) const noexcept
 {
     glfwSetWindowSizeLimits(m_handle, in_min.width, in_min.height, in_max.width, in_max.height);
 }
@@ -170,7 +202,7 @@ DAEvoid Window::SetAspectRatio(DAEint32 const in_numerator, DAEint32 const in_de
     glfwSetWindowAspectRatio(m_handle, in_numerator, in_denominator);
 }
 
-DAEvoid Window::SetSize(Extent2D&& in_size) const noexcept
+DAEvoid Window::SetSize(VkExtent2D&& in_size) const noexcept
 {
     glfwSetWindowSize(m_handle, in_size.width, in_size.height);
 }
@@ -238,12 +270,17 @@ GLFWwindow* Window::GetHandle() const noexcept
     return m_handle;
 }
 
+VkSurfaceKHR Window::GetSurface() const noexcept
+{
+    return m_surface;
+}
+
 std::string const& Window::GetName() const noexcept
 {
     return m_name;
 }
 
-WindowParameters Window::GetParameters() const noexcept
+WindowParams Window::GetParameters() const noexcept
 {
     return
     {
@@ -265,45 +302,45 @@ WindowParameters Window::GetParameters() const noexcept
     };
 }
 
-Position2D Window::GetPosition() const noexcept
+VkOffset2D Window::GetPosition() const noexcept
 {
-    Position2D position;
+    VkOffset2D position;
 
     glfwGetWindowPos(m_handle, &position.x, &position.y);
 
     return position;
 }
 
-Extent2D Window::GetSize() const noexcept
+VkExtent2D Window::GetSize() const noexcept
 {
-    Extent2D size;
+    VkExtent2D size;
 
-    glfwGetWindowSize(m_handle, &size.width, &size.height);
+    glfwGetWindowSize(m_handle, reinterpret_cast<DAEint*>(&size.width), reinterpret_cast<DAEint*>(&size.height));
 
     return size;
 }
 
-Extent2D Window::GetFramebufferSize() const noexcept
+VkExtent2D Window::GetFramebufferSize() const noexcept
 {
-    Extent2D size;
+    VkExtent2D size;
 
-    glfwGetFramebufferSize(m_handle, &size.width, &size.height);
+    glfwGetFramebufferSize(m_handle, reinterpret_cast<DAEint*>(&size.width), reinterpret_cast<DAEint*>(&size.height));
 
     return size;
 }
 
-Square2D Window::GetFrameSize() const noexcept
+VkRect2D Window::GetFrameSize() const noexcept
 {
-    Square2D frame;
+    VkRect2D frame;
 
-    glfwGetWindowFrameSize(m_handle, &frame.left, &frame.top, &frame.right, &frame.bottom);
+    glfwGetWindowFrameSize(m_handle, &frame.offset.x, &frame.offset.y, reinterpret_cast<DAEint*>(&frame.extent.width), reinterpret_cast<DAEint*>(&frame.extent.height));
 
     return frame;
 }
 
-Scale2D Window::GetContentScale() const noexcept
+Vector2f Window::GetContentScale() const noexcept
 {
-    Scale2D scale;
+    Vector2f scale;
 
     glfwGetWindowContentScale(m_handle, &scale.x, &scale.y);
 

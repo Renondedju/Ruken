@@ -24,7 +24,14 @@
 
 #pragma once
 
-#include "Utility.hpp"
+#include "Vulkan/Vulkan.hpp"
+
+#include "WindowParams.hpp"
+
+#include "Vector/Vector.hpp"
+
+#include "Containers/SmartPtr.hpp"
+#include "Containers/Vector.hpp"
 
 #include "Functional/Event.hpp"
 
@@ -44,14 +51,15 @@ class Window
 
         #pragma region Members
 
-        GLFWwindow* m_handle;
-        std::string m_name;
+        std::string      m_name;
+        GLFWwindow*     m_handle;
+        VkSurfaceKHR    m_surface;
 
         #pragma endregion
 
         #pragma region Constructor
 
-        explicit Window() = default;
+        Window() noexcept;
 
         #pragma endregion
 
@@ -143,7 +151,7 @@ class Window
          *
          * \param in_parameters The parameters to use.
          */
-        DAEvoid SetupWindow(WindowParameters&& in_parameters) noexcept;
+        DAEvoid SetupWindow(WindowParams&& in_parameters) noexcept;
 
         /**
          * \brief Sets the callbacks for the newly created window.
@@ -206,7 +214,7 @@ class Window
         /**
          * \brief Initializes the windows
          */
-        DAEvoid Initialize(WindowParameters&& in_parameters) noexcept;
+        DAEvoid Initialize(WindowParams&& in_parameters) noexcept;
 
         /**
          * \return The value of the close flag of the window.
@@ -232,7 +240,7 @@ class Window
          * \param in_position The coordinates of the upper-left corner of the content area.
          * \note If the window is a full screen window, this function does nothing.
          */
-        DAEvoid SetPosition(Position2D&& in_position) const noexcept;
+        DAEvoid SetPosition(VkOffset2D&& in_position) const noexcept;
 
         /**
          * \brief Sets the size limits of the content area of the window.
@@ -243,7 +251,7 @@ class Window
          * \note If the window is full screen, the size limits only take effect once it is made windowed.
          *       If the window is not resizable, this function does nothing.
          */
-        DAEvoid SetSizeLimits(Extent2D&& in_min, Extent2D&& in_max) const noexcept;
+        DAEvoid SetSizeLimits(VkExtent2D&& in_min, VkExtent2D&& in_max) const noexcept;
 
         /**
          * \brief Sets the required aspect ratio of the content area of the window.
@@ -262,7 +270,7 @@ class Window
          * \note For full screen windows, this function updates the resolution of its desired video mode
          *       and switches to the video mode closest to it, without affecting the window's context.
          */
-        DAEvoid SetSize(Extent2D&& in_size) const noexcept;
+        DAEvoid SetSize(VkExtent2D&& in_size) const noexcept;
 
         /**
          * \brief Sets the opacity of the window, including any decorations.
@@ -334,47 +342,43 @@ class Window
         // --- Getters
 
         /**
+         * \return The UTF-8 encoded window title.
+         */
+        [[nodiscard]] String const& GetName() const noexcept;
+
+        /**
          * \return Opaque window object.
          */
         [[nodiscard]]
         GLFWwindow* GetHandle() const noexcept;
 
-        /**
-         * \return The UTF-8 encoded window title.
-         */
-        [[nodiscard]]
-        std::string const& GetName() const noexcept;
+        [[nodiscard]] VkSurfaceKHR GetSurface() const noexcept;
 
         /**
          * \return The window's current parameters.
          */
-        [[nodiscard]]
-        WindowParameters GetParameters() const noexcept;
+        [[nodiscard]] WindowParams GetParameters() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the content area of the window.
          */
-        [[nodiscard]]
-        Position2D GetPosition() const noexcept;
+        [[nodiscard]] VkOffset2D GetPosition() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of the content area of the window.
          */
-        [[nodiscard]]
-        Extent2D GetSize() const noexcept;
+        [[nodiscard]] VkExtent2D GetSize() const noexcept;
 
         /**
          * \return The size, in pixels, of the framebuffer of the window.
          */
-        [[nodiscard]]
-        Extent2D GetFramebufferSize() const noexcept;
+        [[nodiscard]] VkExtent2D GetFramebufferSize() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of each edge of the frame of the window.
          * \note This size includes the title bar, if the window has one.
          */
-        [[nodiscard]]
-        Square2D GetFrameSize() const noexcept;
+        [[nodiscard]] VkRect2D GetFrameSize() const noexcept;
 
         /**
          * \brief The content scale is the ratio between the current DPI and the platform's default DPI.
@@ -382,8 +386,7 @@ class Window
          * \note On systems where each monitors can have its own content scale,
          *       the window content scale will depend on which monitor the system considers the window to be on.
          */
-        [[nodiscard]]
-        Scale2D GetContentScale() const noexcept;
+        [[nodiscard]] Vector2f GetContentScale() const noexcept;
 
         /**
          * \brief The opacity (or alpha) value is a positive finite number between zero and one,

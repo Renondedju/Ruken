@@ -24,6 +24,9 @@
 
 #include "Rendering/Renderer.hpp"
 
+#include "Vulkan/Instance.hpp"
+#include "Vulkan/Device.hpp"
+
 #include "Debug/Logging/Logger.hpp"
 
 /* TODO Needs to be removed when Kernel is done TODO */
@@ -37,22 +40,21 @@ USING_DAEMON_NAMESPACE
 #pragma region Constructor
 
 Renderer::Renderer() :
-    m_logger            { GRootLogger->AddChild("Rendering") },
-    m_instance          { nullptr },
-    m_surface           { nullptr },
-    m_physical_device   { nullptr },
-    m_logical_device    { nullptr }
+    m_logger    { GRootLogger->AddChild("Rendering") },
+    m_instance  { nullptr },
+    m_device    { nullptr }
 {
+    m_logger->SetLevel(ELogLevel::Debug);
+
+    m_logger->propagate = true;
+
+    /* TODO Needs to be removed when Kernel is done TODO */
+
     GRenderer = this;
 
-    if ((m_instance        = std::make_unique<Instance>      ())                       ->GetHandle() != nullptr &&
-        (m_surface         = std::make_unique<Surface>       (m_instance       .get()))->GetHandle() != nullptr &&
-        (m_physical_device = std::make_unique<PhysicalDevice>(m_instance       .get(),
-                                                              m_surface        .get()))->GetHandle() != nullptr &&
-        (m_logical_device  = std::make_unique<LogicalDevice> (m_physical_device.get()))->GetHandle() != nullptr &&
-        (m_swapchain       = std::make_unique<Swapchain>     (m_surface        .get(),
-                                                              m_physical_device.get(),
-                                                              m_logical_device .get()))->GetHandle() != nullptr)
+    /* TODO Needs to be removed when Kernel is done TODO */
+
+    if (Instance::Create(&m_instance) && Device::Create(m_instance, &m_device))
     {
         m_logger->Info("Renderer initialized successfully.");
     }
@@ -63,11 +65,8 @@ Renderer::Renderer() :
 
 Renderer::~Renderer() noexcept
 {
-    m_swapchain      .reset();
-    m_logical_device .reset();
-    m_physical_device.reset();
-    m_surface        .reset();
-    m_instance       .reset();
+    Device  ::Destroy(m_device);
+    Instance::Destroy(m_instance);
 
     m_logger->Info("Renderer shut down.");
 }
@@ -79,6 +78,16 @@ Renderer::~Renderer() noexcept
 Logger* Renderer::GetLogger() const noexcept
 {
     return m_logger;
+}
+
+Instance* Renderer::GetInstance() const noexcept
+{
+    return m_instance;
+}
+
+Device* Renderer::GetDevice() const noexcept
+{
+    return m_device;
 }
 
 #pragma endregion

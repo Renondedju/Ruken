@@ -26,6 +26,21 @@
 
 USING_DAEMON_NAMESPACE
 
+WindowManager::WindowManager() noexcept :
+    m_logger { GRootLogger->AddChild("Windowing") }
+{
+
+}
+
+WindowManager::~WindowManager() noexcept
+{
+    m_windows.clear();
+
+    glfwTerminate();
+
+    m_logger->Info("GLFW terminated");
+}
+
 DAEvoid WindowManager::ErrorCallback(DAEint32 const  in_error_code,
                                      DAEchar  const* in_description)
 {
@@ -52,7 +67,7 @@ DAEvoid WindowManager::ErrorCallback(DAEint32 const  in_error_code,
             break;
     }
 
-    // GWindowManager->m_logger->Error(message + " : " + in_description);
+    GWindowManager->m_logger->Error(message + " : " + in_description);
 }
 
 DAEvoid WindowManager::MonitorCallback(GLFWmonitor*   in_monitor,
@@ -60,14 +75,14 @@ DAEvoid WindowManager::MonitorCallback(GLFWmonitor*   in_monitor,
 {
     if (in_event == GLFW_CONNECTED)
     {
-        // GWindowManager->m_logger->Error(std::string("Screen connected : ") + glfwGetMonitorName(in_monitor));
+        GWindowManager->m_logger->Error(String("Screen connected : ") + glfwGetMonitorName(in_monitor));
 
         //AddScreen(in_monitor);
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
-        // GWindowManager->m_logger->Error(std::string("Screen disconnected : ") + glfwGetMonitorName(in_monitor));
+        GWindowManager->m_logger->Error(String("Screen disconnected : ") + glfwGetMonitorName(in_monitor));
 
         //RemoveScreen(in_monitor);
     }
@@ -78,12 +93,12 @@ DAEvoid WindowManager::JoystickCallback(DAEint32 const in_jid,
 {
     if (in_event == GLFW_CONNECTED)
     {
-        // GWindowManager->m_logger->Error(std::string("New joystick connected : ") + glfwGetJoystickName(in_jid));
+        GWindowManager->m_logger->Error(String("New joystick connected : ") + glfwGetJoystickName(in_jid));
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
-        // GWindowManager->m_logger->Error(std::string("Joystick disconnected : ") + glfwGetJoystickName(in_jid));
+        GWindowManager->m_logger->Error(String("Joystick disconnected : ") + glfwGetJoystickName(in_jid));
     }
 }
 
@@ -118,14 +133,7 @@ DAEvoid WindowManager::DiscoverScreens()
         AddScreen(monitors[i]);
     }
 
-    // m_logger->Info("Available screen count : " + std::to_string(count));
-}
-
-WindowManager::~WindowManager() noexcept
-{
-    glfwTerminate();
-
-    // m_logger->Info("GLFW terminated");
+    m_logger->Info("Available screen count : " + std::to_string(count));
 }
 
 DAEbool WindowManager::Initialize()
@@ -137,7 +145,7 @@ DAEbool WindowManager::Initialize()
         glfwSetMonitorCallback (&MonitorCallback);
         glfwSetJoystickCallback(&JoystickCallback);
 
-        // m_logger->Info("GLFW initialized");
+        m_logger->Info("GLFW initialized");
 
         // Setup screens.
         DiscoverScreens();
@@ -155,7 +163,7 @@ DAEvoid WindowManager::Update() noexcept
     glfwPollEvents();
 }
 
-Window* WindowManager::CreateWindow(WindowParameters&& in_parameters)
+Window* WindowManager::CreateWindow(WindowParams&& in_parameters)
 {
     m_windows.emplace_back(Window()).Initialize(std::move(in_parameters));
 
