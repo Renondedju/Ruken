@@ -66,7 +66,7 @@ RenderDocHook::RenderDocHook():
     }
 
 #else
-    #pragma message("Render Doc Hook not supported for this platform")
+    #pragma message("Render Doc Hook not support this platform")
 #endif
 }
 
