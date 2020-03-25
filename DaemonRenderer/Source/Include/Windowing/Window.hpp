@@ -45,7 +45,7 @@ class Window
         #pragma region Members
 
         GLFWwindow* m_handle;
-        String      m_name;
+        std::string      m_name;
 
         #pragma endregion
 
@@ -243,7 +243,7 @@ class Window
          *
          * \param in_name The UTF-8 encoded window title.
          */
-        DAEvoid SetName(String&& in_name) noexcept;
+        DAEvoid SetName(std::string&& in_name) noexcept;
 
         /**
          * \brief Sets the position, in screen coordinates, of the upper-left corner of the content area of the window.
@@ -359,7 +359,7 @@ class Window
         /**
          * \return The UTF-8 encoded window title.
          */
-        [[nodiscard]] String const& GetName() const noexcept;
+        [[nodiscard]] std::string const& GetName() const noexcept;
 
         /**
          * \return The window's current parameters.

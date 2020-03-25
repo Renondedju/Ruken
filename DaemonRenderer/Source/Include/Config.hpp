@@ -142,17 +142,6 @@ namespace DAEMON_NAMESPACE {}
 #endif
 
 // ------------------------------
-//       Standard containers
-
-//#define DAEMON_CONTAINERS_USE_PMR_ALLOCATORS
-
-#if defined(DAEMON_CONTAINERS_USE_PMR_ALLOCATORS)
-    #define DAEMON_CONTAINERS_ALLOCATORS_STR "PMR"
-#else
-    #define DAEMON_CONTAINERS_ALLOCATORS_STR "default"
-#endif
-
-// ------------------------------
 //       Resource management
 
 #if defined(DAEMON_CONFIG_DEBUG) || defined(DAEMON_CONFIG_RELEASE)

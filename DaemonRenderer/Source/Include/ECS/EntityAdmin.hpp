@@ -24,10 +24,10 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include <vector>
+#include <unordered_map>
 
-#include "Containers/Vector.hpp"
-#include "Containers/UnorderedMap.hpp"
+#include "Config.hpp"
 
 #include "ECS/EntityID.hpp"
 #include "ECS/Archetype.hpp"
@@ -42,8 +42,8 @@ class EntityAdmin
 
         #pragma region Members
 
-        Vector      <ComponentSystemBase*>                 m_systems;
-        UnorderedMap<ArchetypeFingerprint, ArchetypeBase*> m_archetypes;
+        std::vector       <ComponentSystemBase*>                 m_systems;
+        std::unordered_map<ArchetypeFingerprint, ArchetypeBase*> m_archetypes;
         
         #pragma endregion 
 

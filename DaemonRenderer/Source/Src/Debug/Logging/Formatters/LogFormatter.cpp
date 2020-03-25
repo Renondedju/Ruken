@@ -28,7 +28,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-String LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
+std::string LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 {
     switch (in_record.level)
     {
@@ -43,22 +43,22 @@ String LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
     return "";
 }
 
-String LogFormatter::Format(LogRecord const& in_record) const noexcept
+std::string LogFormatter::Format(LogRecord const& in_record) const noexcept
 {
     return ComputeLabel(in_record) + " : " + in_record.logger_name + " : " + in_record.message + "\n";
 }
 
-String LogFormatter::FormatTime(LogRecord const& in_record) const noexcept
+std::string LogFormatter::FormatTime(LogRecord const& in_record) const noexcept
 {
     return in_record.message;
 }
 
-String LogFormatter::FormatException(LogRecord const& in_record) const noexcept
+std::string LogFormatter::FormatException(LogRecord const& in_record) const noexcept
 {
     return in_record.message;
 }
 
-String LogFormatter::FormatStack(LogRecord const& in_record) const noexcept
+std::string LogFormatter::FormatStack(LogRecord const& in_record) const noexcept
 {
     return in_record.message;
 }

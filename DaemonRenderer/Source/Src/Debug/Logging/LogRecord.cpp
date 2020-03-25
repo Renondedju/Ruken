@@ -28,12 +28,12 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-LogRecord::LogRecord(String          in_logger_name,
+LogRecord::LogRecord(std::string          in_logger_name,
                      ELogLevel const in_level,
-                     String          in_message,
-                     String          in_filename,
+                     std::string          in_message,
+                     std::string          in_filename,
                      DAEint32  const in_line_number,
-                     String          in_function_name) noexcept :
+                     std::string          in_function_name) noexcept :
     logger_name     {std::move(in_logger_name)},
     level           { in_level },
     message         {std::move(in_message)},

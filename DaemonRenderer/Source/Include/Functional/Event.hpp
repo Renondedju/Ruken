@@ -24,10 +24,10 @@
 
 #pragma once
 
+#include <vector>
 #include <functional>
 
 #include "Config.hpp"
-#include "Containers/Vector.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -45,7 +45,7 @@ class Event
 
         #pragma region Members
 
-        Vector<Function> m_subscribers;
+        std::vector<Function> m_subscribers;
 
         #pragma endregion 
 
@@ -53,10 +53,10 @@ class Event
 
         #pragma region Constructors
 
-        Event()                            = default;
-        Event(Event const& in_copy)        = default;
-        Event(Event&& in_move) noexcept    = default;
-        ~Event()                        = default;
+        Event()                     = default;
+        Event(Event const& in_copy) = default;
+        Event(Event&&      in_move) = default;
+        ~Event()                    = default;
         
         #pragma endregion
 

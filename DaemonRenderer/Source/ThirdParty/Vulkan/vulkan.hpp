@@ -6037,7 +6037,7 @@ namespace VULKAN_HPP_NAMESPACE
       case PerformanceValueTypeINTEL::eUint64 : return "Uint64";
       case PerformanceValueTypeINTEL::eFloat : return "Float";
       case PerformanceValueTypeINTEL::eBool : return "Bool";
-      case PerformanceValueTypeINTEL::eString : return "String";
+      case PerformanceValueTypeINTEL::eString : return "std::string";
       default: return "invalid";
     }
   }

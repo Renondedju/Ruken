@@ -24,11 +24,12 @@
 
 #pragma once
 
+#include <vector>
+
 #include "Config.hpp"
 
 #include "Meta/IndexPack.hpp"
 #include "ECS/ComponentItemView.hpp"
-#include "Containers/Vector.hpp"
 #include "Containers/SOA/DataLayoutItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -38,18 +39,18 @@ BEGIN_DAEMON_NAMESPACE
  * \tparam TTypes Item types
  */
 template <typename... TTypes>
-class ComponentItem : public DataLayoutItem<Vector, TTypes...>
+class ComponentItem : public DataLayoutItem<std::vector, TTypes...>
 {
     public:
 
         // Default constructor
         ComponentItem(TTypes&&... in_data) noexcept:
-            DataLayoutItem<Vector, TTypes...>(std::forward<TTypes>(in_data)...)
+            DataLayoutItem<std::vector, TTypes...>(std::forward<TTypes>(in_data)...)
         {}
 
         // Exposing constructors
-        using DataLayoutItem<Vector, TTypes...>::DataLayoutItem;
-        using DataLayoutItem<Vector, TTypes...>::operator=;
+        using DataLayoutItem<std::vector, TTypes...>::DataLayoutItem;
+        using DataLayoutItem<std::vector, TTypes...>::operator=;
 
         // View constructors
         template <DAEsize... TItems>

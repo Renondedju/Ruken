@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "Utility.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -42,13 +44,13 @@ class Screen
 
         #pragma region Members
 
-        GLFWmonitor*        m_handle;
-        String              m_name;
-        Extent2D            m_physical_size;
-        Scale2D             m_content_scale;
-        Position2D          m_position;
-        Area2D              m_work_area;
-        Vector<VideoMode>   m_video_modes;
+        GLFWmonitor*           m_handle;
+        std::string            m_name;
+        Extent2D               m_physical_size;
+        Scale2D                m_content_scale;
+        Position2D             m_position;
+        Area2D                 m_work_area;
+        std::vector<VideoMode> m_video_modes;
 
         #pragma endregion
 
@@ -83,29 +85,34 @@ class Screen
         /**
          * \return The opaque monitor object.
          */
-        [[nodiscard]] GLFWmonitor* GetHandle() const noexcept;
+        [[nodiscard]]
+        GLFWmonitor* GetHandle() const noexcept;
 
         /**
          * \return The human-readable of the monitor.
          */
-        [[nodiscard]] String const& GetName() const noexcept;
+        [[nodiscard]]
+        std::string const& GetName() const noexcept;
 
         /**
          * \return The size, in millimeters, of the display area of the monitor.
          */
-        [[nodiscard]] Extent2D const& GetPhysicalSize() const noexcept;
+        [[nodiscard]]
+        Extent2D const& GetPhysicalSize() const noexcept;
 
         /**
          * \brief The content scale is the ratio between the current DPI and the platform's default DPI.
          *
          * \return The content scale of the monitor.
          */
-        [[nodiscard]] Scale2D const& GetContentScale() const noexcept;
+        [[nodiscard]]
+        Scale2D const& GetContentScale() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the monitor.
          */
-        [[nodiscard]] Position2D const& GetPosition() const noexcept;
+        [[nodiscard]]
+        Position2D const& GetPosition() const noexcept;
 
         /**
          * \brief The work area is defined as the area of the monitor not occluded by the operating system task bar where present.
@@ -114,26 +121,30 @@ class Screen
          *
          * \note If no task bar exists then the work area is the monitor resolution in screen coordinates.
          */
-        [[nodiscard]] Area2D const& GetWorkArea() const noexcept;
+        [[nodiscard]]
+        Area2D const& GetWorkArea() const noexcept;
 
         /**
          * \return The current video mode of the specified monitor.
          *
          * \note If you have created a full screen window for that monitor, the return value will depend on whether that window is iconified.
          */
-        [[nodiscard]] VideoMode const& GetCurrentVideoMode() const noexcept;
+        [[nodiscard]]
+        VideoMode const& GetCurrentVideoMode() const noexcept;
 
         /**
          * \return The array of all video modes supported by the monitor.
          *
          * \note The returned array is sorted in ascending order, first by color bit depth (the sum of all channel depths) and then by resolution area (the product of width and height).
          */
-        [[nodiscard]] Vector<VideoMode> const& GetVideoModes() const noexcept;
+        [[nodiscard]]
+        std::vector<VideoMode> const& GetVideoModes() const noexcept;
 
         /**
          * \return The current gamma ramp of the monitor.
          */
-        [[nodiscard]] GammaRamp const& GetGammaRamp() const noexcept;
+        [[nodiscard]]
+        GammaRamp const& GetGammaRamp() const noexcept;
 
         /**
          * \brief This function generates an appropriately sized gamma ramp from the specified exponent and then sets it.

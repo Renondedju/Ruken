@@ -29,7 +29,7 @@ USING_DAEMON_NAMESPACE
 #pragma region Constructor
 
 FileHandler::FileHandler(LogFormatter       const*  in_formatter,
-                         String             const&  in_path,
+                         std::string             const&  in_path,
                          std::ios::openmode const   in_mode,
                          ELogLevel          const   in_level) noexcept : LogHandler(in_formatter, in_level),
     m_stream { in_path, in_mode }

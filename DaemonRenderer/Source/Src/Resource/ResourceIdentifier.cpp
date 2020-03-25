@@ -26,7 +26,7 @@
 
 USING_DAEMON_NAMESPACE
 
-ResourceIdentifier::ResourceIdentifier(String const& in_name) noexcept:
+ResourceIdentifier::ResourceIdentifier(std::string const& in_name) noexcept:
     name {in_name}
 {}
 
@@ -37,10 +37,10 @@ ResourceIdentifier::ResourceIdentifier(ResourceIdentifier const& in_copy) noexce
 
 ResourceIdentifier::ResourceIdentifier(ResourceIdentifier&& in_move) noexcept
 {
-    name = std::forward<String>(in_move.name);
+    name = std::forward<std::string>(in_move.name);
 }
 
-ResourceIdentifier::operator String() const noexcept
+ResourceIdentifier::operator std::string() const noexcept
 {
     return name;
 }
@@ -54,7 +54,7 @@ ResourceIdentifier& ResourceIdentifier::operator=(ResourceIdentifier const& in_c
 
 ResourceIdentifier& ResourceIdentifier::operator=(ResourceIdentifier&& in_move) noexcept
 {
-    name = std::forward<String>(in_move.name);
+    name = std::forward<std::string>(in_move.name);
 
     return *this;
 }

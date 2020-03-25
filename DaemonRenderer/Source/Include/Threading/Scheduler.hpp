@@ -24,16 +24,16 @@
 
 #pragma once
 
+#include <atomic>
+#include <vector>
+#include <functional>
+
 #include "Config.hpp"
 
-#include "Containers/Vector.hpp"
 #include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "Threading/Worker.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
-
-#include <functional>
-#include <atomic>
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -48,7 +48,7 @@ class Scheduler : Unique
 
         #pragma region Memebers
 
-        Vector<Worker>             m_workers;
+        std::vector<Worker>      m_workers;
         std::atomic_bool         m_running;
         ThreadSafeLockQueue<Job> m_job_queue;
 

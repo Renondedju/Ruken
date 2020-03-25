@@ -44,8 +44,8 @@ class WindowManager
 
         Logger* m_logger = nullptr;
 
-        Vector<Window> m_windows;
-        Vector<Screen> m_screens;
+        std::vector<Window> m_windows;
+        std::vector<Screen> m_screens;
 
         #pragma endregion
 
@@ -155,12 +155,12 @@ class WindowManager
         /**
          * \return The array of all windows.
          */
-        [[nodiscard]] Vector<Window> const& GetWindows() const noexcept;
+        [[nodiscard]] std::vector<Window> const& GetWindows() const noexcept;
 
         /**
          * \return The array of all screens.
          */
-        [[nodiscard]] Vector<Screen> const& GetScreens() const noexcept;
+        [[nodiscard]] std::vector<Screen> const& GetScreens() const noexcept;
 
         #pragma endregion
 };

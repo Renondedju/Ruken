@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include "Containers/String.hpp"
-#include "Containers/ForwardList.hpp"
+#include <string>
+#include <forward_list>
 
 #include "Filters/LogFilter.hpp"
 
@@ -52,13 +52,13 @@ class Logger
 
         #pragma region Members
 
-        String      m_name;
+        std::string m_name;
         ELogLevel   m_level;
         Logger*     m_parent;
 
-        ForwardList<Logger*>        m_children;
-        ForwardList<LogFilter*>     m_filters;
-        ForwardList<LogHandler*>    m_handlers;
+        std::forward_list<Logger*>     m_children;
+        std::forward_list<LogFilter*>  m_filters;
+        std::forward_list<LogHandler*> m_handlers;
 
         #pragma endregion
 
@@ -70,7 +70,7 @@ class Logger
          * \param in_level The level to log.
          * \param in_message The message to log.
          */
-        DAEvoid Log(ELogLevel in_level, String&& in_message) const noexcept;
+        DAEvoid Log(ELogLevel in_level, std::string&& in_message) const noexcept;
 
         /**
          * \brief Handles a record by passing it to all handlers associated with this logger and its ancestors (until a false value of 'propagate' is found).
@@ -104,7 +104,7 @@ class Logger
 
         Logger() = delete;
 
-        explicit Logger(String      in_name,
+        explicit Logger(std::string in_name,
                         ELogLevel   in_level,
                         Logger*     in_parent,
                         bool        in_propagate = true) noexcept;
@@ -163,7 +163,7 @@ class Logger
          *
          * \note The logger is created with this logger's parameters.
          */
-        Logger* AddChild(String in_name);
+        Logger* AddChild(std::string in_name);
 
         /**
          * \brief Deletes the logger with the specified name.
@@ -172,7 +172,7 @@ class Logger
          *
          * \return True if the logger could be removed, else False.
          */
-        DAEbool RemoveChild(String const& in_name);
+        DAEbool RemoveChild(std::string const& in_name);
 
         /**
          * \brief Deletes the specified logger.
@@ -190,42 +190,42 @@ class Logger
          *
          * \return A pointer to the logger if it was found, else nullptr.
          */
-        Logger* GetChild(String const& in_name) const noexcept;
+        Logger* GetChild(std::string const& in_name) const noexcept;
 
         /**
          * \brief Logs a message with level 'Debug' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Debug(String in_message) const noexcept;
+        DAEvoid Debug(std::string in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Info' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Info(String in_message) const noexcept;
+        DAEvoid Info(std::string in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Warning' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Warning(String in_message) const noexcept;
+        DAEvoid Warning(std::string in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Error' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Error(String in_message) const noexcept;
+        DAEvoid Error(std::string in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Fatal' on this logger.
          *
          * \param in_message The message to log.
          */
-        DAEvoid Fatal(String in_message) const noexcept;
+        DAEvoid Fatal(std::string in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Error' on this logger.
@@ -236,7 +236,7 @@ class Logger
          *
          * \note This method should only be called from an exception handler.
          */
-        DAEvoid Exception(String in_message) const noexcept;
+        DAEvoid Exception(std::string in_message) const noexcept;
 
         /**
          * \brief Adds the specified filter to this logger.

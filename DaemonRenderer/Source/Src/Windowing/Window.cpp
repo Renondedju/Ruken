@@ -167,7 +167,7 @@ DAEvoid Window::SetClosed(DAEbool const in_should_close) const noexcept
     glfwSetWindowShouldClose(m_handle, in_should_close);
 }
 
-DAEvoid Window::SetName(String&& in_name) noexcept
+DAEvoid Window::SetName(std::string&& in_name) noexcept
 {
     m_name = std::move(in_name);
 
@@ -257,7 +257,7 @@ GLFWwindow* Window::GetHandle() const noexcept
     return m_handle;
 }
 
-String const& Window::GetName() const noexcept
+std::string const& Window::GetName() const noexcept
 {
     return m_name;
 }

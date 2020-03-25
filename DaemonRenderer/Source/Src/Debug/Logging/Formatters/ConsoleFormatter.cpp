@@ -93,7 +93,7 @@ ConsoleFormatter::ConsoleFormatter() : LogFormatter()
 
 #pragma region Methods
 
-String ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
+std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 {
     switch (in_record.level)
     {

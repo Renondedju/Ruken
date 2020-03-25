@@ -35,7 +35,7 @@ USING_DAEMON_NAMESPACE
 DAEvoid WindowManager::ErrorCallback(DAEint32 const  in_error_code,
                                      DAEchar  const* in_description)
 {
-    String message;
+    std::string message;
 
     switch (in_error_code)
     {
@@ -66,14 +66,14 @@ DAEvoid WindowManager::MonitorCallback(GLFWmonitor*   in_monitor,
 {
     if (in_event == GLFW_CONNECTED)
     {
-        // GWindowManager->m_logger->Error(String("Screen connected : ") + glfwGetMonitorName(in_monitor));
+        // GWindowManager->m_logger->Error(std::string("Screen connected : ") + glfwGetMonitorName(in_monitor));
 
         GWindowManager->AddScreen(in_monitor);
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
-        // GWindowManager->m_logger->Error(String("Screen disconnected : ") + glfwGetMonitorName(in_monitor));
+        // GWindowManager->m_logger->Error(std::string("Screen disconnected : ") + glfwGetMonitorName(in_monitor));
 
         GWindowManager->RemoveScreen(in_monitor);
     }
@@ -84,12 +84,12 @@ DAEvoid WindowManager::JoystickCallback(DAEint32 const in_jid,
 {
     if (in_event == GLFW_CONNECTED)
     {
-        // GWindowManager->m_logger->Error(String("New joystick connected : ") + glfwGetJoystickName(in_jid));
+        // GWindowManager->m_logger->Error(std::string("New joystick connected : ") + glfwGetJoystickName(in_jid));
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
-        // GWindowManager->m_logger->Error(String("Joystick disconnected : ") + glfwGetJoystickName(in_jid));
+        // GWindowManager->m_logger->Error(std::string("Joystick disconnected : ") + glfwGetJoystickName(in_jid));
     }
 }
 
@@ -200,12 +200,12 @@ Logger* WindowManager::GetLogger() const noexcept
     return m_logger;
 }
 
-Vector<Window> const& WindowManager::GetWindows() const noexcept
+std::vector<Window> const& WindowManager::GetWindows() const noexcept
 {
     return m_windows;
 }
 
-Vector<Screen> const& WindowManager::GetScreens() const noexcept
+std::vector<Screen> const& WindowManager::GetScreens() const noexcept
 {
     return m_screens;
 }

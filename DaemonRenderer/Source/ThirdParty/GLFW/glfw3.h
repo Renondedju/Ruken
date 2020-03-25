@@ -2434,7 +2434,7 @@ GLFWAPI void glfwDefaultWindowHints(void);
  *  hints, once set, retain their values until changed by a call to this
  *  function or @ref glfwDefaultWindowHints, or until the library is terminated.
  *
- *  Only integer value hints can be set with this function.  String value hints
+ *  Only integer value hints can be set with this function.  std::string value hints
  *  are set with @ref glfwWindowHintString.
  *
  *  This function does not check whether the specified hint values are valid.

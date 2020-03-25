@@ -24,11 +24,11 @@
 
 #pragma once
 
+#include <string>
 #include <exception>
 
 #include "Config.hpp"
 
-#include "Containers/String.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceLoadingFailureCode.hpp"
 
@@ -47,7 +47,7 @@ struct ResourceProcessingFailure final : std::exception
      * \brief Long description of the exception.
      * This will be logged by the resource manager
      */
-    String description;
+    std::string description;
 
     /**
      * \brief Resource validity after the exception.
@@ -84,10 +84,10 @@ struct ResourceProcessingFailure final : std::exception
     #pragma region Operators
 
     /**
-     * \brief String representation
+     * \brief std::string representation
      */
     [[nodiscard]]
-    explicit operator String() const noexcept;
+    explicit operator std::string() const noexcept;
 
     ResourceProcessingFailure& operator=(ResourceProcessingFailure const& in_copy) noexcept = default;
     ResourceProcessingFailure& operator=(ResourceProcessingFailure&&      in_move) noexcept = default;

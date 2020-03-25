@@ -55,7 +55,7 @@ enum class EResourceProcessingFailureCode : DAEuint8
 };
 
 [[nodiscard]]
-inline String EnumToString(EResourceProcessingFailureCode const in_code)
+inline std::string EnumToString(EResourceProcessingFailureCode const in_code)
 {
     switch (in_code)
     {

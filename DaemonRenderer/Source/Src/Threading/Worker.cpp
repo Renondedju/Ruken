@@ -39,12 +39,12 @@ Worker::Worker() noexcept:
     m_label  {"Unlabeled"}
 {}
 
-String const& Worker::Label() const noexcept
+std::string const& Worker::Label() const noexcept
 {
     return m_label;
 }
 
-String& Worker::Label() noexcept
+std::string& Worker::Label() noexcept
 {
     return m_label;
 }
@@ -59,7 +59,7 @@ Worker::Worker() noexcept:
     m_thread {}
 {}
 
-String Worker::Label() const noexcept
+std::string Worker::Label() const noexcept
 {
     return "";
 }

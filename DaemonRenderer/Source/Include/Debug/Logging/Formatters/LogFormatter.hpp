@@ -48,7 +48,7 @@ class LogFormatter
          *
          * \return The resulting label.
          */
-        [[nodiscard]] virtual String ComputeLabel(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual std::string ComputeLabel(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 
@@ -77,28 +77,28 @@ class LogFormatter
          *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual String Format(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual std::string Format(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual String FormatTime(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual std::string FormatTime(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual String FormatException(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual std::string FormatException(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
          *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual String FormatStack(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] virtual std::string FormatStack(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 };
