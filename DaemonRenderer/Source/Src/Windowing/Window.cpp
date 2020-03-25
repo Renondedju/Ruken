@@ -34,73 +34,55 @@ Window::~Window() noexcept
 DAEvoid Window::WindowPosCallback(GLFWwindow* in_window, DAEint32 const in_x_pos, DAEint32 const in_y_pos) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_moved.Invoke({ in_x_pos, in_y_pos });
-    }
 }
 
 DAEvoid Window::WindowSizeCallback(GLFWwindow* in_window, DAEint32 const in_width, DAEint32 const in_height) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_resized.Invoke({ in_width, in_height });
-    }
 }
 
 DAEvoid Window::WindowCloseCallback(GLFWwindow* in_window) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_closed.Invoke();
-    }
 }
 
 DAEvoid Window::WindowRefreshCallback(GLFWwindow* in_window) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_refreshed.Invoke();
-    }
 }
 
 DAEvoid Window::WindowFocusCallback(GLFWwindow* in_window, DAEint32 const in_focused) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_focused.Invoke(in_focused);
-    }
 }
 
 DAEvoid Window::WindowIconifyCallback(GLFWwindow* in_window, DAEint32 const in_iconified) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_iconified.Invoke(in_iconified);
-    }
 }
 
 DAEvoid Window::WindowMaximizeCallback(GLFWwindow* in_window, DAEint32 const in_maximized) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_maximized.Invoke(in_maximized);
-    }
 }
 
 DAEvoid Window::FramebufferSizeCallback(GLFWwindow* in_window, DAEint32 const in_width, DAEint32 const in_height) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_framebuffer_resized.Invoke({ in_width, in_height });
-    }
 }
 
 DAEvoid Window::WindowContentScaleCallback(GLFWwindow* in_window, DAEfloat const in_x_scale, DAEfloat const in_y_scale) noexcept
 {
     if (Window* window = GetWindowUserPointer(in_window))
-    {
         window->on_content_rescaled.Invoke({ in_x_scale, in_y_scale });
-    }
 }
 
 Window* Window::GetWindowUserPointer(GLFWwindow* in_window) noexcept
@@ -131,9 +113,7 @@ DAEvoid Window::SetupWindow(WindowParameters&& in_parameters) noexcept
     }
 
     else
-    {
         m_handle = glfwCreateWindow(in_parameters.size.width, in_parameters.size.height, m_name.c_str(), nullptr, nullptr);
-    }
 
     glfwSetWindowOpacity(m_handle, in_parameters.opacity);
 }

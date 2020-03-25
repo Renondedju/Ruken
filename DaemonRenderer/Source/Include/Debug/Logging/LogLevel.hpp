@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE

@@ -32,26 +32,19 @@ DAEMON_NAMESPACE::Logger* DAEMON_NAMESPACE::GRootLogger = nullptr;
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
-Logger::Logger(std::string      in_name,
-               ELogLevel const  in_level,
-               Logger*          in_parent,
-               bool      const  in_propagate) noexcept :
-    m_name      { std::move(in_name) },
-    m_level     { in_level },
-    m_parent    { in_parent },
-    propagate   { in_propagate }
-{
-    
-}
+Logger::Logger(std::string in_name, ELogLevel const in_level, Logger* in_parent, DAEbool const in_propagate) noexcept:
+    m_name    {std::move(in_name)},
+    m_level   {in_level},
+    m_parent  {in_parent},
+    propagate {in_propagate}
+{}
 
 Logger::~Logger() noexcept
 {
     for (auto const& child : m_children)
-    {
         delete child;
-    }
 }
 
 #pragma endregion
@@ -61,17 +54,13 @@ Logger::~Logger() noexcept
 DAEvoid Logger::Log(ELogLevel const in_level, std::string&& in_message) const noexcept
 {
     if (IsEnabledFor(in_level))
-	{
         Handle(LogRecord(m_name, in_level, std::move(in_message)));
-	}
 }
 
 DAEvoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
 {
     if (propagate && m_parent)
-    {
         m_parent->ForceHandle(in_record);
-    }
 
     for (auto const& handler : m_handlers)
     {
@@ -143,9 +132,7 @@ Logger* Logger::GetChild(std::string const& in_name) const noexcept
     for (auto const& child : m_children)
     {
         if (child->m_name == in_name)
-        {
             return child;
-        }
     }
 
     return nullptr;
@@ -196,9 +183,7 @@ DAEbool Logger::Filter(LogRecord const& in_record) const noexcept
     for (auto const& filter : m_filters)
     {
         if (filter && !filter->Filter(in_record))
-        {
             return false;
-        }
     }
 
     return true;
@@ -217,17 +202,13 @@ DAEvoid Logger::RemoveHandler(LogHandler* in_handler) noexcept
 DAEvoid Logger::Handle(LogRecord const& in_record) const noexcept
 {
     if (Filter(in_record))
-    {
         ForceHandle(in_record);
-    }
 }
 
 DAEbool Logger::HasHandlers() const noexcept
 {
     if (propagate && m_parent)
-    {
         return !m_handlers.empty() || m_parent->HasHandlers();
-    }
 
     return !m_handlers.empty();
 }

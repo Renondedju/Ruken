@@ -26,9 +26,14 @@
 
 USING_DAEMON_NAMESPACE
 
-Screen::Screen(GLFWmonitor* in_handle) :
-    m_handle { in_handle },
-    m_name   { glfwGetMonitorName(m_handle) }
+Screen::Screen(GLFWmonitor* in_handle):
+    m_physical_size {},
+    m_content_scale {},
+    m_video_modes   {},
+    m_work_area     {},
+    m_position      {},
+    m_handle        { in_handle },
+    m_name          { glfwGetMonitorName(m_handle) }
 {
     // Retrieves the size, in millimeters, of the display area of the monitor.
     glfwGetMonitorPhysicalSize(m_handle, &m_physical_size.width, &m_physical_size.height);

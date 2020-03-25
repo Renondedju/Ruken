@@ -26,7 +26,8 @@
 
 #include <fstream>
 
-#include "LogHandler.hpp"
+#include "Config.hpp"
+#include "Debug/Logging/Handlers/LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -47,7 +48,6 @@ class FileHandler final : public LogHandler
 
         /**
          * \brief Outputs the record to the file.
-         *
          * \param in_record The record to emit.
          */
         DAEvoid Emit(LogRecord const& in_record) override;
@@ -56,24 +56,16 @@ class FileHandler final : public LogHandler
 
     public:
 
-        #pragma region Contructors and Destructor
+        #pragma region Contructors
 
-        explicit FileHandler(LogFormatter const*    in_formatter,
-                             std::string       const&    in_path,
-                             std::ios::openmode     in_mode,
-                             ELogLevel              in_level = ELogLevel::NotSet) noexcept;
+        explicit FileHandler(LogFormatter const* in_formatter,
+                             std::string  const& in_path,
+                             std::ios::openmode  in_mode,
+                             ELogLevel           in_level = ELogLevel::NotSet) noexcept;
 
         FileHandler(FileHandler const&  in_copy) = delete;
         FileHandler(FileHandler&&       in_move) = delete;
-
-        ~FileHandler() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        FileHandler& operator=(FileHandler const& in_other) = delete;
-        FileHandler& operator=(FileHandler&&      in_other) = delete;
+        ~FileHandler()                           = default;
 
         #pragma endregion
 
@@ -83,6 +75,13 @@ class FileHandler final : public LogHandler
          * \brief Flushes the stream.
          */
         DAEvoid Flush() override;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        FileHandler& operator=(FileHandler const& in_other) = delete;
+        FileHandler& operator=(FileHandler&&      in_other) = delete;
 
         #pragma endregion
 };

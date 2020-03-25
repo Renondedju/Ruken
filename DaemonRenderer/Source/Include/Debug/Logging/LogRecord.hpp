@@ -26,7 +26,8 @@
 
 #include <string>
 
-#include "LogLevel.hpp"
+#include "Config.hpp"
+#include "Debug/Logging/LogLevel.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -39,18 +40,16 @@ struct LogRecord
 {
     #pragma region Members
 
-    std::string logger_name;
-    ELogLevel   level;
-    std::string message;
-    std::string filename;
-    DAEint32    line_number;
     std::string function_name;
+    std::string logger_name;
+    DAEint32    line_number;
+    std::string filename;
+    std::string message;
+    ELogLevel   level;
 
     #pragma endregion
 
-    #pragma region Constructors and Destructor
-
-    LogRecord() = delete;
+    #pragma region Constructors
 
     LogRecord(std::string in_logger_name,
               ELogLevel   in_level,
@@ -59,17 +58,16 @@ struct LogRecord
               DAEint32    in_line_number   = -1,
               std::string in_function_name = "") noexcept;
 
-    LogRecord(LogRecord const&  in_copy) noexcept = default;
-    LogRecord(LogRecord&&       in_move) noexcept = default;
-
-    ~LogRecord() = default;
+    LogRecord (LogRecord const&  in_copy) = default;
+    LogRecord (LogRecord&&       in_move) = default;
+    ~LogRecord()                          = default;
 
     #pragma endregion
 
     #pragma region Operators
 
-    LogRecord& operator=(LogRecord const&   in_copy) noexcept = default;
-    LogRecord& operator=(LogRecord&&        in_move) noexcept = default;
+    LogRecord& operator=(LogRecord const&   in_copy) = default;
+    LogRecord& operator=(LogRecord&&        in_move) = default;
 
     DAEbool operator==(LogRecord const& in_other) const noexcept;
     DAEbool operator!=(LogRecord const& in_other) const noexcept;

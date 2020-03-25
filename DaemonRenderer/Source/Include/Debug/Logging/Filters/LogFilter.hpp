@@ -24,34 +24,25 @@
 
 #pragma once
 
-#include "../LogRecord.hpp"
+#include "Config.hpp"
+#include "Debug/Logging/LogRecord.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief This class provides a finer grained facility for determining which log records to output.
- *
  * \note Filters objects can be used by Handlers and Loggers for more sophisticated filtering than is provided by levels.
  */
 class LogFilter
 {
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        LogFilter() = default;
-
-        LogFilter(LogFilter const&  in_copy) noexcept = default;
-        LogFilter(LogFilter&&       in_move) noexcept = default;
-
-        virtual ~LogFilter() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogFilter& operator=(LogFilter const&   in_copy) noexcept = default;
-        LogFilter& operator=(LogFilter&&        in_move) noexcept = default;
+        LogFilter()                         = default;
+        LogFilter(LogFilter const& in_copy) = default;
+        LogFilter(LogFilter&&      in_move) = default;
+        virtual ~LogFilter()                = default;
 
         #pragma endregion
 
@@ -59,10 +50,17 @@ class LogFilter
 
         /**
          * \param in_record The record to filter.
-         *
          * \return True if the specified record is to be logged, else False.
          */
-        [[nodiscard]] virtual DAEbool Filter(LogRecord const& in_record) const = 0;
+        [[nodiscard]]
+        virtual DAEbool Filter(LogRecord const& in_record) const = 0;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogFilter& operator=(LogFilter const& in_copy) = default;
+        LogFilter& operator=(LogFilter&&      in_move) = default;
 
         #pragma endregion
 };

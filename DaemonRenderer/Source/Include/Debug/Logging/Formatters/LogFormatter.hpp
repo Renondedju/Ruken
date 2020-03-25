@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include "../LogRecord.hpp"
+#include "Config.hpp"
+#include "Debug/Logging/LogRecord.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -35,9 +36,9 @@ class LogFormatter
 {
     protected:
 
-        #pragma region Default Constructor
+        #pragma region Constructor
 
-        LogFormatter() noexcept = default;
+        LogFormatter() = default;
 
         #pragma endregion
 
@@ -45,28 +46,20 @@ class LogFormatter
 
         /**
          * \param in_record The record to compute a label for.
-         *
          * \return The resulting label.
          */
-        [[nodiscard]] virtual std::string ComputeLabel(LogRecord const& in_record) const noexcept;
+        [[nodiscard]]
+        virtual std::string ComputeLabel(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         LogFormatter(LogFormatter const&    in_copy) = delete;
         LogFormatter(LogFormatter&&         in_move) = delete;
-
-        virtual ~LogFormatter() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogFormatter& operator=(LogFormatter const& in_copy) = delete;
-        LogFormatter& operator=(LogFormatter&&      in_move) = delete;
+        virtual ~LogFormatter()                      = default;
 
         #pragma endregion
 
@@ -74,31 +67,38 @@ class LogFormatter
 
         /**
          * \param in_record The record to format.
-         *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual std::string Format(LogRecord const& in_record) const noexcept;
+        [[nodiscard]]
+        virtual std::string Format(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
-         *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual std::string FormatTime(LogRecord const& in_record) const noexcept;
+        [[nodiscard]]
+        virtual std::string FormatTime(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
-         *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual std::string FormatException(LogRecord const& in_record) const noexcept;
+        [[nodiscard]]
+        virtual std::string FormatException(LogRecord const& in_record) const noexcept;
 
         /**
          * \param in_record The record to format.
-         *
          * \return The resulting string.
          */
-        [[nodiscard]] virtual std::string FormatStack(LogRecord const& in_record) const noexcept;
+        [[nodiscard]]
+        virtual std::string FormatStack(LogRecord const& in_record) const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LogFormatter& operator=(LogFormatter const& in_copy) = delete;
+        LogFormatter& operator=(LogFormatter&&      in_move) = delete;
 
         #pragma endregion
 };

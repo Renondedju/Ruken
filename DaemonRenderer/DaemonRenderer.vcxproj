@@ -270,7 +270,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\Debug\Logging\Formatters\ConsoleFormatter.cpp" />
-    <ClCompile Include="Source\Src\Debug\Logging\Formatters\FileFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\FileHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\LogHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\StreamHandler.cpp" />

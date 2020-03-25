@@ -44,17 +44,17 @@ class Screen
 
         #pragma region Members
 
-        GLFWmonitor*           m_handle;
-        std::string            m_name;
         Extent2D               m_physical_size;
         Scale2D                m_content_scale;
-        Position2D             m_position;
-        Area2D                 m_work_area;
         std::vector<VideoMode> m_video_modes;
+        Area2D                 m_work_area;
+        Position2D             m_position;
+        GLFWmonitor*           m_handle;
+        std::string            m_name;
 
         #pragma endregion
 
-        #pragma region Default Constructor
+        #pragma region Constructors
 
         explicit Screen(GLFWmonitor* in_handle);
 
@@ -62,21 +62,11 @@ class Screen
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        Screen() = delete;
-
-        Screen(Screen const&    in_other) noexcept = delete;
-        Screen(Screen&&         in_other) noexcept = default;
-
-        ~Screen() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Screen& operator=(Screen const& in_other) noexcept = delete;
-        Screen& operator=(Screen&&      in_other) noexcept = default;
+        Screen(Screen const&    in_other) = delete;
+        Screen(Screen&&         in_other) = default;
+        ~Screen()                         = default;
 
         #pragma endregion
 
@@ -102,7 +92,6 @@ class Screen
 
         /**
          * \brief The content scale is the ratio between the current DPI and the platform's default DPI.
-         *
          * \return The content scale of the monitor.
          */
         [[nodiscard]]
@@ -116,9 +105,8 @@ class Screen
 
         /**
          * \brief The work area is defined as the area of the monitor not occluded by the operating system task bar where present.
-         *
-         * \return The position, in screen coordinates, of the upper-left corner of the work area of the specified monitor along with the work area size in screen coordinates.
-         *
+         * \return The position, in screen coordinates, of the upper-left corner of
+         *         the work area of the specified monitor along with the work area size in screen coordinates.
          * \note If no task bar exists then the work area is the monitor resolution in screen coordinates.
          */
         [[nodiscard]]
@@ -126,16 +114,17 @@ class Screen
 
         /**
          * \return The current video mode of the specified monitor.
-         *
-         * \note If you have created a full screen window for that monitor, the return value will depend on whether that window is iconified.
+         * \note If you have created a full screen window for that monitor,
+         *       the return value will depend on whether that window is iconified.
          */
         [[nodiscard]]
         VideoMode const& GetCurrentVideoMode() const noexcept;
 
         /**
          * \return The array of all video modes supported by the monitor.
-         *
-         * \note The returned array is sorted in ascending order, first by color bit depth (the sum of all channel depths) and then by resolution area (the product of width and height).
+         * \note The returned array is sorted in ascending order,
+         *       first by color bit depth (the sum of all channel depths)
+         *       and then by resolution area (the product of width and height).
          */
         [[nodiscard]]
         std::vector<VideoMode> const& GetVideoModes() const noexcept;
@@ -148,19 +137,23 @@ class Screen
 
         /**
          * \brief This function generates an appropriately sized gamma ramp from the specified exponent and then sets it.
-         *
          * \param in_gamma The new exponent.
-         *
          * \note The value must be a finite number greater than zero.
          */
         DAEvoid SetGamma(DAEfloat in_gamma) const noexcept;
 
         /**
          * \brief Sets the current gamma ramp for the monitor.
-         *
          * \param in_gamma_ramp The new gamma ramp.
          */
         DAEvoid SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Screen& operator=(Screen const& in_other) = delete;
+        Screen& operator=(Screen&&      in_other) = default;
 
         #pragma endregion
 };

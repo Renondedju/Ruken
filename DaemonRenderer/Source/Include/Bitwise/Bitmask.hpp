@@ -137,8 +137,8 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
 
         #pragma region Operators
 
-        Bitmask& operator= (Bitmask const& in_copy) noexcept = default;
-        Bitmask& operator= (Bitmask&&      in_move) noexcept = default;
+        Bitmask& operator= (Bitmask const& in_copy) = default;
+        Bitmask& operator= (Bitmask&&      in_move) = default;
 
         [[nodiscard]] constexpr Bitmask operator-(TEnumType const& in_bit) const noexcept;
         [[nodiscard]] constexpr Bitmask operator+(TEnumType const& in_bit) const noexcept;

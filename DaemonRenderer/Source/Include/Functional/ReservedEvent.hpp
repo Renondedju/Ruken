@@ -50,17 +50,17 @@ class ReservedEvent : public Event<TArgs...>
 
         #pragma region Constructors
 
-        ReservedEvent()                                    = default;
-        ReservedEvent(ReservedEvent const& in_copy)        = default;
-        ReservedEvent(ReservedEvent&& in_move) noexcept    = default;
-        ~ReservedEvent()                                = default;
+        ReservedEvent()                             = default;
+        ReservedEvent(ReservedEvent const& in_copy) = default;
+        ReservedEvent(ReservedEvent&&      in_move) = default;
+        ~ReservedEvent()                            = default;
         
         #pragma endregion
 
         #pragma region Operators
 
-        ReservedEvent& operator=(ReservedEvent const& in_copy) noexcept = default;
-        ReservedEvent& operator=(ReservedEvent&&      in_move) noexcept = default;
+        ReservedEvent& operator=(ReservedEvent const& in_copy) = default;
+        ReservedEvent& operator=(ReservedEvent&&      in_move) = default;
 
         #pragma endregion
 };

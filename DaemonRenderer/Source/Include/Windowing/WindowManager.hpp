@@ -34,7 +34,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class manages the connected screens and the created windows.
+ * \brief Manages the connected screens and the created windows.
  */
 class WindowManager
 {
@@ -77,14 +77,12 @@ class WindowManager
 
         /**
          * \brief Creates a screen object managing the specified monitor.
-         *
          * \param in_monitor The monitor to add.
          */
         DAEvoid AddScreen(GLFWmonitor* in_monitor);
 
         /**
          * \brief Destroys the screen object managing the specified monitor.
-         *
          * \param in_monitor The monitor to remove.
          */
         DAEvoid RemoveScreen(GLFWmonitor* in_monitor) noexcept;
@@ -98,21 +96,12 @@ class WindowManager
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        WindowManager() noexcept = default;
-
+        WindowManager()                               = default;
         WindowManager(WindowManager const&  in_other) = delete;
         WindowManager(WindowManager&&       in_other) = delete;
-
         ~WindowManager() noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        WindowManager& operator=(WindowManager const&   in_other) = delete;
-        WindowManager& operator=(WindowManager&&        in_other) = delete;
 
         #pragma endregion
 
@@ -120,7 +109,6 @@ class WindowManager
 
         /**
          * \brief Initializes the GLFW library, setups the callbacks and discovers the available screens.
-         *
          * \return True if the module could be initialized, else False.
          */
         DAEbool Initialize();
@@ -137,7 +125,6 @@ class WindowManager
 
         /**
          * \param in_window The window to destroy.
-         *
          * \return True if the window could be destroyed, else False.
          */
         DAEbool DestroyWindow(Window* in_window) noexcept;
@@ -145,22 +132,33 @@ class WindowManager
         /**
          * \return A pointer to the main window.
          */
-        [[nodiscard]] Window* GetMainWindow() noexcept;
+        [[nodiscard]]
+        Window* GetMainWindow() noexcept;
 
         /**
          * \return This module's logger.
          */
-        [[nodiscard]] Logger* GetLogger() const noexcept;
+        [[nodiscard]]
+        Logger* GetLogger() const noexcept;
 
         /**
          * \return The array of all windows.
          */
-        [[nodiscard]] std::vector<Window> const& GetWindows() const noexcept;
+        [[nodiscard]]
+        std::vector<Window> const& GetWindows() const noexcept;
 
         /**
          * \return The array of all screens.
          */
-        [[nodiscard]] std::vector<Screen> const& GetScreens() const noexcept;
+        [[nodiscard]]
+        std::vector<Screen> const& GetScreens() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        WindowManager& operator=(WindowManager const&   in_other) = delete;
+        WindowManager& operator=(WindowManager&&        in_other) = delete;
 
         #pragma endregion
 };

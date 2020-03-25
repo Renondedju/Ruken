@@ -52,9 +52,9 @@ class RenderDocHook
         #pragma region Constructors
 
         RenderDocHook();
-        RenderDocHook(RenderDocHook const& in_other)    = default;
-        RenderDocHook(RenderDocHook&& in_other)            = default;
-        ~RenderDocHook()                                = default;
+        RenderDocHook(RenderDocHook const& in_other) = default;
+        RenderDocHook(RenderDocHook&&      in_other) = default;
+        ~RenderDocHook()                             = default;
 
         #pragma endregion
 
@@ -298,8 +298,8 @@ class RenderDocHook
 
         #pragma region Operators
 
-        RenderDocHook& operator=(RenderDocHook const& in_other)    = default;
-        RenderDocHook& operator=(RenderDocHook&& in_other)        = default;
+        RenderDocHook& operator=(RenderDocHook const& in_other) = default;
+        RenderDocHook& operator=(RenderDocHook&&      in_other) = default;
 
         #pragma endregion
 };

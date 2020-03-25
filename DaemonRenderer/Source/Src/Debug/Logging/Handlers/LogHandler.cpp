@@ -28,13 +28,11 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-LogHandler::LogHandler(LogFormatter const*  in_formatter,
-                       ELogLevel    const   in_level) noexcept :
-    m_level     { in_level },
-    m_formatter { in_formatter }
-{
-    
-}
+LogHandler::LogHandler(LogFormatter const* in_formatter,
+                       ELogLevel    const  in_level) noexcept :
+    m_level     {in_level},
+    m_formatter {in_formatter}
+{}
 
 #pragma endregion
 
@@ -65,9 +63,7 @@ DAEbool LogHandler::Filter(LogRecord const& in_record) const noexcept
     for (auto const& filter : m_filters)
     {
         if (filter && !filter->Filter(in_record))
-        {
             return false;
-        }
     }
 
     return true;
@@ -76,17 +72,13 @@ DAEbool LogHandler::Filter(LogRecord const& in_record) const noexcept
 DAEvoid LogHandler::Handle(LogRecord const& in_record) noexcept
 {
     if (Filter(in_record))
-    {
         Emit(in_record);
-    }
 }
 
 DAEvoid LogHandler::HandleError(LogRecord const& in_record) noexcept
 {
     if (Filter(in_record))
-    {
         Emit(in_record);
-    }
 }
 
 std::string LogHandler::Format(LogRecord const& in_record) const noexcept

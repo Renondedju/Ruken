@@ -26,7 +26,8 @@
 
 #include <ostream>
 
-#include "LogHandler.hpp"
+#include "Config.hpp"
+#include "Debug/Logging/Handlers/LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -46,10 +47,9 @@ class StreamHandler final : public LogHandler
         #pragma region Methods
 
         /**
-         * \brief If a formatter is specified, it is used to format the record. The record is then written to the stream with a terminator.
-         *
+         * \brief If a formatter is specified, it is used to format the record.
+         *        The record is then written to the stream with a terminator.
          * \param in_record The record to emit.
-         *
          * \note If exception information is present, it is formatted and appended to the stream.
          */
         DAEvoid Emit(LogRecord const& in_record) override;
@@ -58,23 +58,21 @@ class StreamHandler final : public LogHandler
 
     public:
 
-        #pragma region Contructors and Destructor
+        #pragma region Contructors
 
-        explicit StreamHandler(LogFormatter const*  in_formatter,
-                               std::ostream const&  in_stream,
-                               ELogLevel            in_level = ELogLevel::NotSet) noexcept;
+        /**
+         * \brief Initializes the handler
+         * \param in_formatter Formatter to use
+         * \param in_stream Stream to output the logs into
+         * \param in_level Log level of the handler
+         */
+        explicit StreamHandler(LogFormatter const* in_formatter,
+                               std::ostream const& in_stream,
+                               ELogLevel           in_level = ELogLevel::NotSet) noexcept;
 
         StreamHandler(StreamHandler const&  in_copy) = delete;
         StreamHandler(StreamHandler&&       in_move) = delete;
-
-        ~StreamHandler() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        StreamHandler& operator=(StreamHandler const& in_other) = delete;
-        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
+        ~StreamHandler()                             = default;
 
         #pragma endregion
 
@@ -84,6 +82,13 @@ class StreamHandler final : public LogHandler
          * \brief Flushes the stream.
          */
         DAEvoid Flush() override;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        StreamHandler& operator=(StreamHandler const& in_other) = delete;
+        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
 
         #pragma endregion
 };

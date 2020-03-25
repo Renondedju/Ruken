@@ -135,7 +135,7 @@ namespace DAEMON_NAMESPACE {}
 // ------------------------------
 //            Threading
 
-#if defined(DAEMON_CONFIG_DEBUG) || defined(DAEMON_CONFIG_RELEASE)
+#if defined(DAEMON_CONFIG_DEBUG)
     #define DAEMON_THREADING_ENABLE_THREAD_LABELS
 #else
     #define DAEMON_THREADING_DISABLE_THREAD_LABELS
@@ -144,7 +144,7 @@ namespace DAEMON_NAMESPACE {}
 // ------------------------------
 //       Resource management
 
-#if defined(DAEMON_CONFIG_DEBUG) || defined(DAEMON_CONFIG_RELEASE)
+#if defined(DAEMON_CONFIG_DEBUG)
     #define DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
 #endif
 

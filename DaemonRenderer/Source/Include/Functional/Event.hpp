@@ -100,8 +100,8 @@ class Event
         Event& operator+=(Function const& in_function) noexcept;
         Event& operator+=(Function&&      in_function) noexcept;
 
-        Event& operator=(Event const& in_copy) noexcept = default;
-        Event& operator=(Event&&      in_move) noexcept = default;
+        Event& operator=(Event const& in_copy) = default;
+        Event& operator=(Event&&      in_move) = default;
 
         #pragma endregion
 

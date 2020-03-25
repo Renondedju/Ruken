@@ -28,10 +28,11 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-StreamHandler::StreamHandler(LogFormatter const*    in_formatter,
-                             std::ostream const&    in_stream,
-                             ELogLevel    const     in_level) noexcept : LogHandler(in_formatter, in_level),
-    m_stream { in_stream.rdbuf() }
+StreamHandler::StreamHandler(LogFormatter const* in_formatter,
+                             std::ostream const& in_stream,
+                             ELogLevel    const  in_level) noexcept:
+    LogHandler {in_formatter, in_level},
+    m_stream   {in_stream.rdbuf()}
 {
 
 }

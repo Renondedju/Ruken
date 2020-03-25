@@ -74,18 +74,16 @@ USING_DAEMON_NAMESPACE
 
 #ifdef DAEMON_OS_WINDOWS
 
-ConsoleFormatter::ConsoleFormatter() noexcept : LogFormatter(),
-    m_handle { GetStdHandle(STD_OUTPUT_HANDLE) }
-{
-    
-}
+ConsoleFormatter::ConsoleFormatter() noexcept:
+    LogFormatter {},
+    m_handle     {GetStdHandle(STD_OUTPUT_HANDLE)}
+{}
 
 #else
 
-ConsoleFormatter::ConsoleFormatter() : LogFormatter()
-{
-
-}
+ConsoleFormatter::ConsoleFormatter() noexcept:
+    LogFormatter {}
+{}
 
 #endif
 
@@ -125,12 +123,12 @@ std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noe
 
         #else
 
-        case ELogLevel::NotSet:     return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Debug:      return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Info:       return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Warning:    return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Error:      return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Fatal:      return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::NotSet:  return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::Debug:   return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::Info:    return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::Warning: return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::Error:   return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::Fatal:   return "" + LogFormatter::ComputeLabel(in_record);
 
         #endif
     }
