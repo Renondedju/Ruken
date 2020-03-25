@@ -27,9 +27,9 @@
 #include "Config.hpp"
 
 #include <mutex>
+#include <queue>
 #include <atomic>
 
-#include "Containers/Queue.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "Threading/Synchronized.hpp"
 #include "Threading/SynchronizedAccess.hpp"
@@ -47,12 +47,12 @@ class ThreadSafeLockQueue
 
         #pragma region Memebers
 
-        std::condition_variable        m_empty_notification;
-        std::condition_variable        m_push_notification;
-        std::atomic_bool            m_unlock_all;
-        std::mutex                    m_empty_mutex;
-        std::mutex                    m_push_mutex;
-        Synchronized<Queue<TType>>    m_queue;
+        std::condition_variable         m_empty_notification;
+        std::condition_variable         m_push_notification;
+        std::atomic_bool                m_unlock_all;
+        std::mutex                      m_empty_mutex;
+        std::mutex                      m_push_mutex;
+        Synchronized<std::queue<TType>> m_queue;
     
         #pragma endregion 
 

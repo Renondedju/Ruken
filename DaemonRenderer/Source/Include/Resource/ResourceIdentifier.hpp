@@ -24,8 +24,9 @@
 
 #pragma once
 
+#include <string>
+
 #include "Config.hpp"
-#include "Containers/String.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -40,13 +41,13 @@ struct ResourceIdentifier
 {
     #pragma region Variables
 
-    String name;
+    std::string name;
 
     #pragma endregion
 
     #pragma region Constructors
 
-    ResourceIdentifier(String const& in_name)              noexcept;
+    ResourceIdentifier(std::string const& in_name)              noexcept;
     ResourceIdentifier(ResourceIdentifier const& in_copy) noexcept;
     ResourceIdentifier(ResourceIdentifier&&         in_move) noexcept;
     ~ResourceIdentifier() = default;
@@ -57,9 +58,9 @@ struct ResourceIdentifier
 
     /**
     * \brief Converts the ResourceIdentifier to a string representation
-    * \return String representation
+    * \return std::string representation
     */
-    explicit operator String() const noexcept;
+    explicit operator std::string() const noexcept;
 
     ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) noexcept;
     ResourceIdentifier& operator=(ResourceIdentifier&&        in_move) noexcept;

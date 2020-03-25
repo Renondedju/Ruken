@@ -25,12 +25,12 @@
 #pragma once
 
 #include <thread>
+#include <string>
 
 #include "Config.hpp"
 
 #include "Types/NonCopyable.hpp"
 #include "Types/FundamentalTypes.hpp"
-#include "Containers/String.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -43,7 +43,7 @@ class Worker : NonCopyable
         std::thread m_thread;
 
         #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
-            String m_label;
+            std::string m_label;
         #endif
 
         #pragma endregion
@@ -70,10 +70,10 @@ class Worker : NonCopyable
          * \return Worker's label
          */
         [[nodiscard]]
-        String const& Label() const noexcept;
+        std::string const& Label() const noexcept;
         
         [[nodiscard]]
-        String&          Label() noexcept;
+        std::string&          Label() noexcept;
 
         #else
 
@@ -82,7 +82,7 @@ class Worker : NonCopyable
          * \return Worker's label
          */
         [[nodiscard]]
-        String Label() const noexcept;
+        std::string Label() const noexcept;
 
         #endif
 

@@ -24,10 +24,9 @@
 
 #pragma once
 
-#include "Containers/ForwardList.hpp"
+#include <forward_list>
 
 #include "../Filters/LogFilter.hpp"
-
 #include "../Formatters/LogFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -47,7 +46,7 @@ class LogHandler
 
         LogFormatter const* m_formatter;
 
-        ForwardList<LogFilter const*> m_filters;
+        std::forward_list<LogFilter const*> m_filters;
 
         #pragma endregion
 
@@ -150,7 +149,7 @@ class LogHandler
          *
          * \return The resulting string.
          */
-        [[nodiscard]] String Format(LogRecord const& in_record) const noexcept;
+        [[nodiscard]] std::string Format(LogRecord const& in_record) const noexcept;
 
         /**
          * \brief Ensures all logging output has been flushed.

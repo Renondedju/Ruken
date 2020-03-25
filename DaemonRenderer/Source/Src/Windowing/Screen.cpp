@@ -67,7 +67,7 @@ GLFWmonitor* Screen::GetHandle() const noexcept
     return m_handle;
 }
 
-String const& Screen::GetName() const noexcept
+std::string const& Screen::GetName() const noexcept
 {
     return m_name;
 }
@@ -97,7 +97,7 @@ VideoMode const& Screen::GetCurrentVideoMode() const noexcept
     return *reinterpret_cast<VideoMode const*>(glfwGetVideoMode(m_handle));
 }
 
-Vector<VideoMode> const& Screen::GetVideoModes() const noexcept
+std::vector<VideoMode> const& Screen::GetVideoModes() const noexcept
 {
     return m_video_modes;
 }

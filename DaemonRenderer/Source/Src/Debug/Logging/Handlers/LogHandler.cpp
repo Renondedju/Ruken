@@ -89,7 +89,7 @@ DAEvoid LogHandler::HandleError(LogRecord const& in_record) noexcept
     }
 }
 
-String LogHandler::Format(LogRecord const& in_record) const noexcept
+std::string LogHandler::Format(LogRecord const& in_record) const noexcept
 {
     return m_formatter->Format(in_record);
 }

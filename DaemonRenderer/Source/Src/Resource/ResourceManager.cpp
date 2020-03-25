@@ -53,7 +53,7 @@ DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceL
 
         DAEMON_DEBUG_RELEASE
         {
-            std::cout << static_cast<String>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<String>(failure) << std::endl;
+            std::cout << static_cast<std::string>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<std::string>(failure) << std::endl;
         }
 
         --m_current_operation_count;
@@ -96,7 +96,7 @@ DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
 
         DAEMON_DEBUG_RELEASE
         {
-            std::cout << static_cast<String>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<String>(failure) << std::endl;
+            std::cout << static_cast<std::string>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<std::string>(failure) << std::endl;
         }
         --m_current_operation_count;
 

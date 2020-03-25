@@ -24,17 +24,14 @@
 
 #pragma once
 
-#include "Config.hpp"
-
 #define GLFW_EXPOSE_NATIVE_WIN32
 
+#include <string>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
-
-#include "Containers/String.hpp"
-#include "Containers/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -93,7 +90,7 @@ struct WindowParameters
     /**
      * \brief The UTF-8 encoded window title.
      */
-    String name = "NONE";
+    std::string name = "NONE";
 
     /**
      * \brief The position, in screen coordinates, of the upper-left corner of the content area of the window.

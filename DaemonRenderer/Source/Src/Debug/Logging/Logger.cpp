@@ -34,7 +34,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-Logger::Logger(String           in_name,
+Logger::Logger(std::string      in_name,
                ELogLevel const  in_level,
                Logger*          in_parent,
                bool      const  in_propagate) noexcept :
@@ -58,7 +58,7 @@ Logger::~Logger() noexcept
 
 #pragma region Methods
 
-DAEvoid Logger::Log(ELogLevel const in_level, String&& in_message) const noexcept
+DAEvoid Logger::Log(ELogLevel const in_level, std::string&& in_message) const noexcept
 {
     if (IsEnabledFor(in_level))
 	{
@@ -95,7 +95,7 @@ ELogLevel Logger::GetEffectiveLevel() const noexcept
 	return m_level != ELogLevel::NotSet ? m_level : m_parent ? m_parent->GetEffectiveLevel() : m_level;
 }
 
-Logger* Logger::AddChild(String in_name)
+Logger* Logger::AddChild(std::string in_name)
 {
     auto const& logger = new Logger(std::move(in_name), m_level, this, propagate);
 
@@ -104,7 +104,7 @@ Logger* Logger::AddChild(String in_name)
     return logger;
 }
 
-DAEbool Logger::RemoveChild(String const& in_name)
+DAEbool Logger::RemoveChild(std::string const& in_name)
 {
     for (auto const& child : m_children)
     {
@@ -138,7 +138,7 @@ DAEbool Logger::RemoveChild(Logger const* in_logger)
     return false;
 }
 
-Logger* Logger::GetChild(String const& in_name) const noexcept
+Logger* Logger::GetChild(std::string const& in_name) const noexcept
 {
     for (auto const& child : m_children)
     {
@@ -151,32 +151,32 @@ Logger* Logger::GetChild(String const& in_name) const noexcept
     return nullptr;
 }
 
-DAEvoid Logger::Debug(String in_message) const noexcept
+DAEvoid Logger::Debug(std::string in_message) const noexcept
 {
     Log(ELogLevel::Debug, std::move(in_message));
 }
 
-DAEvoid Logger::Info(String in_message) const noexcept
+DAEvoid Logger::Info(std::string in_message) const noexcept
 {
     Log(ELogLevel::Info, std::move(in_message));
 }
 
-DAEvoid Logger::Warning(String in_message) const noexcept
+DAEvoid Logger::Warning(std::string in_message) const noexcept
 {
     Log(ELogLevel::Warning, std::move(in_message));
 }
 
-DAEvoid Logger::Error(String in_message) const noexcept
+DAEvoid Logger::Error(std::string in_message) const noexcept
 {
     Log(ELogLevel::Error, std::move(in_message));
 }
 
-DAEvoid Logger::Fatal(String in_message) const noexcept
+DAEvoid Logger::Fatal(std::string in_message) const noexcept
 {
     Log(ELogLevel::Fatal, std::move(in_message));
 }
 
-DAEvoid Logger::Exception(String in_message) const noexcept
+DAEvoid Logger::Exception(std::string in_message) const noexcept
 {
     Log(ELogLevel::Error, std::move(in_message));
 }

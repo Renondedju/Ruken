@@ -33,7 +33,7 @@ ResourceProcessingFailure::ResourceProcessingFailure(EResourceProcessingFailureC
     code                {in_code}
 {}
 
-ResourceProcessingFailure::operator String() const noexcept
+ResourceProcessingFailure::operator std::string() const noexcept
 {
     return EnumToString(code) + ": " + description;
 }

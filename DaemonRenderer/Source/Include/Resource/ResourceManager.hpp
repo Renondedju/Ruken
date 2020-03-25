@@ -25,11 +25,11 @@
 #pragma once
 
 #include <atomic>
+#include <unordered_map>
 
 #include "Config.hpp"
 
 #include "Types/FundamentalTypes.hpp"
-#include "Containers/UnorderedMap.hpp"
 
 #include "Threading/Scheduler.hpp"
 #include "Threading/Synchronized.hpp"
@@ -50,7 +50,7 @@ class ResourceManager
         #pragma region Variables
 
         // Synchronized map of all the resource manifests
-        Synchronized<UnorderedMap<ResourceIdentifier, struct ResourceManifest*>> m_manifests;
+        Synchronized<std::unordered_map<ResourceIdentifier, struct ResourceManifest*>> m_manifests;
 
         // Integrated garbage collection mode of the resource manager. 
         EGCCollectionMode m_collection_mode;

@@ -48,7 +48,7 @@ class ConsoleFormatter final : public LogFormatter
          *
          * \return The resulting label.
          */
-        [[nodiscard]] String ComputeLabel(LogRecord const& in_record) const noexcept override;
+        [[nodiscard]] std::string ComputeLabel(LogRecord const& in_record) const noexcept override;
 
         #pragma endregion
 
