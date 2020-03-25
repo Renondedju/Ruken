@@ -173,7 +173,6 @@ class SizedBitmask
         constexpr SizedBitmask& operator+=(SizedBitmask const& in_bitmask)       noexcept;
         constexpr SizedBitmask& operator-=(SizedBitmask const& in_bitmask)       noexcept;
 
-
         #pragma endregion
 };
 
