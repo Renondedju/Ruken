@@ -60,7 +60,7 @@ class Synchronized
 {
     // Allows the exclusive access to m_mutex
     template<class, EAccessMode> friend class SynchronizedAccess;
-    template<class, DAEbool>     friend class BaseSynchronizedAccess;
+    template<class, EAccessMode> friend class BaseSynchronizedAccess;
 
     public:
         
@@ -93,7 +93,7 @@ class Synchronized
         Synchronized()                            noexcept;
         Synchronized(Synchronized const& in_copy) noexcept;
         Synchronized(Synchronized&&      in_move) noexcept;
-        ~Synchronized()                           noexcept = default;
+        ~Synchronized() = default;
 
         #pragma endregion
 
@@ -106,12 +106,12 @@ class Synchronized
         [[nodiscard]]
         TType const& Unsafe() const noexcept;
         [[nodiscard]]
-        TType&         Unsafe()        noexcept;
+        TType&       Unsafe()       noexcept;
 
         #pragma region Operators
 
-        Synchronized& operator=(Synchronized const& in_copy) noexcept = default;
-        Synchronized& operator=(Synchronized&&      in_move) noexcept = default;
+        Synchronized& operator=(Synchronized const& in_copy) = delete;
+        Synchronized& operator=(Synchronized&&      in_move) = delete;
 
         #pragma endregion
 };
