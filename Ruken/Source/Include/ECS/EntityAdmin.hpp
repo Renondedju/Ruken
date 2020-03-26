@@ -25,6 +25,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <unordered_map>
 
 #include "Build/Namespace.hpp"
@@ -46,8 +47,8 @@ class EntityAdmin
 
         #pragma region Members
 
-        std::vector       <ComponentSystemBase*>                 m_systems;
-        std::unordered_map<ArchetypeFingerprint, ArchetypeBase*> m_archetypes;
+        std::vector       <std::unique_ptr<SystemBase>>                      m_systems;
+        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes;
         
         #pragma endregion 
 

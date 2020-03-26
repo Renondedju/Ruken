@@ -25,7 +25,7 @@
 template <typename TSystem>
 RkVoid EntityAdmin::CreateSystem() noexcept
 {
-    UniquePtr<TSystem> system = std::make_unique<TSystem>();
+    std::unique_ptr<TSystem> system = std::make_unique<TSystem>();
     system->m_admin = this;
 
     m_systems.emplace_back(std::move(system));
@@ -37,7 +37,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
 
     // Creating the actual instance
-    UniquePtr<Archetype> new_archetype = std::make_unique<Archetype>();
+    std::unique_ptr<Archetype> new_archetype = std::make_unique<Archetype>();
     *new_archetype = Archetype::CreateArchetype<TComponents...>();
 
     // We need to get the pointer before moving it
@@ -45,7 +45,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
     m_archetypes[targeted_fingerprint] = std::move(new_archetype);
 
     // Setup
-    for (UniquePtr<SystemBase>& system: m_systems)
+    for (std::unique_ptr<SystemBase>& system: m_systems)
         if (system->GetQuery().Match(*archetype_ptr))
             system->AddReferenceGroup(*archetype_ptr);
 

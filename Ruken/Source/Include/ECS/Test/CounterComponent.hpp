@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Containers/Array.hpp"
+#include <array>
 
 #include "ECS/Component.hpp"
 #include "ECS/TagComponent.hpp"
@@ -33,8 +33,8 @@
 
 USING_DAEMON_NAMESPACE
 
-struct Count       : ComponentField<DAEsize>            {};
-struct TestPadding : ComponentField<Array<DAEsize, 10>> {};
+struct Count       : ComponentField<DAEsize>                 {};
+struct TestPadding : ComponentField<std::array<DAEsize, 10>> {};
 
 DAEMON_DEFINE_COMPONENT(Counter,
     Count,        // Actual count variable

@@ -24,8 +24,9 @@
 
 #pragma once
 
+#include <tuple>
+
 #include "Config.hpp"
-#include "Containers/Tuple.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -40,15 +41,15 @@ template <class TType, class TTuple>
 struct TupleIndex;
 
 template <class TType, class... TTypes>
-struct TupleIndex<TType, Tuple<TType, TTypes...>>
+struct TupleIndex<TType, std::tuple<TType, TTypes...>>
 {
     static constexpr DAEsize value = 0;
 };
 
 template <class TType, class TFirst, class... TTypes>
-struct TupleIndex<TType, Tuple<TFirst, TTypes...>>
+struct TupleIndex<TType, std::tuple<TFirst, TTypes...>>
 {
-    static constexpr DAEsize value = 1 + TupleIndex<TType, Tuple<TTypes...>>::value;
+    static constexpr DAEsize value = 1 + TupleIndex<TType, std::tuple<TTypes...>>::value;
 };
 
 /**

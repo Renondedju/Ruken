@@ -24,14 +24,13 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include <vector>
+
+#include "Config.hpp"
 
 #include "ECS/Group.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
-
-#include "Containers/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -59,8 +58,8 @@ class System : public SystemBase
         // This vector stores every group we wish to read/write
         // You really should not try to edit the vector itself yourself.
         // Instead, use it for iteration purposes only !
-        Vector<Group<TComponents...>> m_groups;
-        EntityAdmin*                  m_admin;
+        std::vector<Group<TComponents...>> m_groups;
+        EntityAdmin*                       m_admin;
 
         #pragma endregion
 

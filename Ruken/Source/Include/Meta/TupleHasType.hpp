@@ -24,10 +24,10 @@
 
 #pragma once
 
+#include <tuple>
 #include <type_traits>
 
 #include "Config.hpp"
-#include "Containers/Tuple.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -40,6 +40,6 @@ template <typename TType, typename TTuple>
 struct TupleHasType;
 
 template <typename TType, typename... TTypes>
-struct TupleHasType<TType, Tuple<TTypes...>> : std::disjunction<std::is_same<TType, TTypes>...> {};
+struct TupleHasType<TType, std::tuple<TTypes...>> : std::disjunction<std::is_same<TType, TTypes>...> {};
 
 END_DAEMON_NAMESPACE

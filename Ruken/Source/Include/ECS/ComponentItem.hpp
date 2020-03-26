@@ -24,15 +24,14 @@
 
 #pragma once
 
+#include <tuple>
 #include <vector>
 
 #include "Build/Namespace.hpp"
 
-#include "ECS/ComponentItemView.hpp"
-
 #include "Meta/IndexPack.hpp"
 #include "Meta/TupleIndex.hpp"
-
+#include "ECS/ComponentItemView.hpp"
 #include "Containers/SOA/DataLayoutItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -47,28 +46,18 @@ class ComponentItem : public DataLayoutItem<std::vector, typename TMembers::Type
     private:
 
         template <typename TMember>
-        using VariableIndex = TupleIndex<std::remove_const_t<TMember>, Tuple<TMembers...>>;
+        using VariableIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<TMembers...>>;
 
     public:
 
         // Default constructor
         ComponentItem(typename TMembers::Type&&... in_data) noexcept:
-            DataLayoutItem<Vector, typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
+            DataLayoutItem<std::vector, typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
         {}
 
-        // View constructors
-        template <DAEsize... TItems>
-        using MakeView = ComponentItemView<IndexPack<TItems...>, SelectType<TItems, TTypes...>...>;
-
-    private:
-
-        template <DAEsize... TItems>
-        constexpr static MakeView<TItems...> MakeFullViewHelper(std::index_sequence<TItems...>);
-
-    public:
         // Exposing parent constructors
-        using DataLayoutItem<Vector, typename TMembers::Type...>::DataLayoutItem;
-        using DataLayoutItem<Vector, typename TMembers::Type...>::operator=;
+        using DataLayoutItem<std::vector, typename TMembers::Type...>::DataLayoutItem;
+        using DataLayoutItem<std::vector, typename TMembers::Type...>::operator=;
 
         // View constructors
         template <typename... TSelectedVariables>

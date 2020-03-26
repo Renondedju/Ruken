@@ -24,8 +24,9 @@
 
 #pragma once
 
+#include <tuple>
+
 #include "Config.hpp"
-#include "Containers/Tuple.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -47,8 +48,8 @@ class Group
 
         #pragma region Members
 
-        Archetype&             m_archetype;
-        Tuple<TComponents&...> m_components;
+        Archetype&                  m_archetype;
+        std::tuple<TComponents&...> m_components;
 
         #pragma endregion
 

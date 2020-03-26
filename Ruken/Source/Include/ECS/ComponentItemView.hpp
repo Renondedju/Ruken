@@ -54,7 +54,7 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutVie
          * \tparam TMember Member to look for
          */
         template <typename TMember>
-        using MemberIndex = TupleIndex<std::remove_const_t<TMember>, Tuple<std::remove_const_t<TMembers>...>>;
+        using MemberIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<std::remove_const_t<TMembers>...>>;
 
         /**
          * \brief Checks if a given member exists in this view,
@@ -62,7 +62,7 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutVie
          * \tparam TMember Member to look for
          */
         template <typename TMember>
-        using MemberExists = std::enable_if_t<TupleHasType<TMember, Tuple<std::remove_const_t<TMembers>...>>::value, DAEbool>;
+        using MemberExists = std::enable_if_t<TupleHasType<TMember, std::tuple<std::remove_const_t<TMembers>...>>::value, DAEbool>;
 
     public:
 
