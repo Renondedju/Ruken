@@ -160,12 +160,11 @@ RkVoid ResourceManager::Cleanup() noexcept
     ManifestsWriteAccess access(m_manifests);
 
     // The resources will be unloaded one by one, even if the resource manager gets deleted in the process
-    for (auto& [identifier, manifest] : access.Get())
+    for (auto& pair : access.Get())
     {
-        m_scheduler_reference.ScheduleTask([manifest, this] {
-            InvalidateResource(manifest);
-
-            delete manifest;
+        m_scheduler_reference.ScheduleTask([&] {
+            InvalidateResource(pair.second);
+            delete pair.second;
         });
     }
 

@@ -36,12 +36,15 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+template <typename TType>
+using ComponentVector = std::vector<TType, std::allocator<TType>>;
+
 /**
  * \brief This class describes the memory layout of your component to the ECS
  * \tparam TMembers Variable types
  */
 template <typename... TMembers>
-class ComponentItem : public DataLayoutItem<std::vector, typename TMembers::Type...>
+class ComponentItem : public DataLayoutItem<ComponentVector, typename TMembers::Type...>
 {
     private:
 
@@ -52,12 +55,12 @@ class ComponentItem : public DataLayoutItem<std::vector, typename TMembers::Type
 
         // Default constructor
         ComponentItem(typename TMembers::Type&&... in_data) noexcept:
-            DataLayoutItem<std::vector, typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
+            DataLayoutItem<ComponentVector, typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
         {}
 
         // Exposing parent constructors
-        using DataLayoutItem<std::vector, typename TMembers::Type...>::DataLayoutItem;
-        using DataLayoutItem<std::vector, typename TMembers::Type...>::operator=;
+        using DataLayoutItem<ComponentVector, typename TMembers::Type...>::DataLayoutItem;
+        using DataLayoutItem<ComponentVector, typename TMembers::Type...>::operator=;
 
         // View constructors
         template <typename... TSelectedVariables>

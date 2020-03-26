@@ -49,6 +49,11 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutVie
 {
     private:
 
+        // Helpers for the Fetch method
+        // These helpers represents the most basic forms of this class (via inheritance)
+        using BaseTuple      = std::tuple<CopyConst<TMembers, typename TMembers::Type&>...>;
+        using BaseConstTuple = std::tuple<typename TMembers::Type const&...>;
+
         /**
          * \brief Returns the index of a member inside of the view
          * \tparam TMember Member to look for
@@ -77,7 +82,7 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutVie
          * \return Member reference
          */
         template<typename TMember, MemberExists<TMember> = true>
-        auto&       Fetch()       { return std::get<MemberIndex<TMember>::value>(*this); }
+        auto&       Fetch()       { return std::get<MemberIndex<TMember>::value>(static_cast<BaseTuple&>(*this)); }
 
         /**
          * \brief Returns a constant reference onto a given member stored in the view.
@@ -86,7 +91,7 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutVie
          * \return Member constant reference
          */
         template<typename TMember, MemberExists<TMember> = true>
-        auto const& Fetch() const { return std::get<MemberIndex<TMember>::value>(*this); }
+        auto const& Fetch() const { return std::get<MemberIndex<TMember>::value>(static_cast<BaseConstTuple const&>(*this)); }
 };
 
 END_DAEMON_NAMESPACE

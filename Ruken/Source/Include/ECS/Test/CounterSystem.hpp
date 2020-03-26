@@ -29,7 +29,7 @@
 
 USING_DAEMON_NAMESPACE
 
-struct CounterSystem final : daemon::System<CounterComponent, TestTagComponent>
+struct CounterSystem final : System<CounterComponent, TestTagComponent>
 {
     using StartView  = CounterComponent::Item::MakeView<Count>;
     using UpdateView = CounterComponent::Item::MakeView<Count const> const;
@@ -59,7 +59,7 @@ struct CounterSystem final : daemon::System<CounterComponent, TestTagComponent>
      * \brief Called every frame
      * \param in_delta_time Time passed in seconds since the last frame
      */
-    DAEvoid OnUpdate(DAEfloat in_delta_time) noexcept override
+    DAEvoid OnUpdate([[maybe_unused]] DAEfloat in_delta_time) noexcept override
     {
         DAEsize total = 0;
 
