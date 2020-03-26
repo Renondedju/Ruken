@@ -28,7 +28,6 @@
 
 #include "Config.hpp"
 #include "Threading/EAccessMode.hpp"
-#include "Threading/BaseSynchronizedAccess.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -44,24 +43,49 @@ class Synchronized;
  * \tparam TMode Access mode 
  */
 template<class TData, EAccessMode TMode>
-class SynchronizedAccess final : public BaseSynchronizedAccess<TData, true>
+class SynchronizedAccess
 {
+    private:
+
+        #pragma region Members
+
+        Synchronized<TData>& m_synchronized;
+
+        #pragma endregion
+
     public:
     
         #pragma region Constructors
 
         SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
-        SynchronizedAccess()                                     noexcept = delete;
-        SynchronizedAccess(SynchronizedAccess const& in_copy)     noexcept = default;
-        SynchronizedAccess(SynchronizedAccess&&         in_move)     noexcept = default;
-        ~SynchronizedAccess()                                     noexcept = default;
+
+        SynchronizedAccess(SynchronizedAccess const& in_copy) = default;
+        SynchronizedAccess(SynchronizedAccess&&      in_move) = default;
+        ~SynchronizedAccess()                                 = default;
 
         #pragma endregion
 
+        #pragma region Methods
+
+        /**
+         * \brief Synchronized getters
+         * \return Synchronized's object content
+         */
+        [[nodiscard]] TData&       Get()       noexcept;
+        [[nodiscard]] TData const& Get() const noexcept;
+
+        #pragma endregion 
+
         #pragma region Operators
 
-        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
-        SynchronizedAccess& operator=(SynchronizedAccess&&        in_move) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) = delete;
+        SynchronizedAccess& operator=(SynchronizedAccess&&      in_move) = delete;
+
+        [[nodiscard]] TData&       operator* ()       noexcept;
+        [[nodiscard]] TData const& operator* () const noexcept;
+
+        [[nodiscard]] TData*       operator->()       noexcept;
+        [[nodiscard]] TData const* operator->() const noexcept;
 
         #pragma endregion
 };
@@ -73,12 +97,13 @@ class SynchronizedAccess final : public BaseSynchronizedAccess<TData, true>
  * \tparam TData Synchronized object's type
  */
 template<class TData>
-class SynchronizedAccess<TData, EAccessMode::Read> final : public BaseSynchronizedAccess<TData, false>
+class SynchronizedAccess<TData, EAccessMode::Read>
 {
     private:
 
-        #pragma region Variables
+        #pragma region Members
 
+        Synchronized<TData>&                m_synchronized;
         std::shared_lock<std::shared_mutex> m_lock;
 
         #pragma endregion 
@@ -88,10 +113,10 @@ class SynchronizedAccess<TData, EAccessMode::Read> final : public BaseSynchroniz
         #pragma region Constructors
 
         SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
-        SynchronizedAccess()                                     noexcept = delete;
-        SynchronizedAccess(SynchronizedAccess const& in_copy)     noexcept = default;
-        SynchronizedAccess(SynchronizedAccess&&         in_move)     noexcept = default;
-        ~SynchronizedAccess()                                     noexcept = default;
+
+        SynchronizedAccess(SynchronizedAccess const& in_copy)  = delete;
+        SynchronizedAccess(SynchronizedAccess&&      in_move)  = default;
+        ~SynchronizedAccess()                                  = default;
 
         #pragma endregion
 
@@ -99,12 +124,22 @@ class SynchronizedAccess<TData, EAccessMode::Read> final : public BaseSynchroniz
 
         std::shared_lock<std::shared_mutex>& GetLock() noexcept;
 
+         /**
+         * \brief Synchronized getter
+         * \return Synchronized's object content
+         */
+        [[nodiscard]]
+        TData const& Get() const noexcept;
+
         #pragma endregion
 
         #pragma region Operators
 
-        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
-        SynchronizedAccess& operator=(SynchronizedAccess&&        in_move) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) = delete;
+        SynchronizedAccess& operator=(SynchronizedAccess&&      in_move) = delete;
+
+        [[nodiscard]] TData const& operator* () const noexcept;
+        [[nodiscard]] TData const* operator->() const noexcept;
 
         #pragma endregion
 };
@@ -116,12 +151,13 @@ class SynchronizedAccess<TData, EAccessMode::Read> final : public BaseSynchroniz
  * \tparam TData Synchronized object's type
  */
 template<class TData>
-class SynchronizedAccess<TData, EAccessMode::Write> final : public BaseSynchronizedAccess<TData, true>
+class SynchronizedAccess<TData, EAccessMode::Write>
 {
     private:
 
-        #pragma region Variables
+        #pragma region Members
 
+        Synchronized<TData>&                m_synchronized;
         std::unique_lock<std::shared_mutex> m_lock;
 
         #pragma endregion 
@@ -131,10 +167,10 @@ class SynchronizedAccess<TData, EAccessMode::Write> final : public BaseSynchroni
         #pragma region Constructors
 
         SynchronizedAccess(Synchronized<TData>& in_synchronized) noexcept;
-        SynchronizedAccess()                                     noexcept = delete;
-        SynchronizedAccess(SynchronizedAccess const& in_copy)     noexcept = default;
-        SynchronizedAccess(SynchronizedAccess&&         in_move)     noexcept = default;
-        ~SynchronizedAccess()                                     noexcept = default;
+
+        SynchronizedAccess(SynchronizedAccess const& in_copy) = delete;
+        SynchronizedAccess(SynchronizedAccess&&      in_move) = default;
+        ~SynchronizedAccess()                                 = default;
 
         #pragma endregion
 
@@ -142,12 +178,25 @@ class SynchronizedAccess<TData, EAccessMode::Write> final : public BaseSynchroni
 
         std::unique_lock<std::shared_mutex>& GetLock() noexcept;
 
+        /**
+         * \brief Synchronized getters
+         * \return Synchronized's object content
+         */
+        [[nodiscard]] TData&       Get()       noexcept;
+        [[nodiscard]] TData const& Get() const noexcept;
+
         #pragma endregion
 
         #pragma region Operators
 
-        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) noexcept = default;
-        SynchronizedAccess& operator=(SynchronizedAccess&&        in_move) noexcept = default;
+        SynchronizedAccess& operator=(SynchronizedAccess const& in_copy) = delete;
+        SynchronizedAccess& operator=(SynchronizedAccess&&      in_move) = delete;
+
+        [[nodiscard]] TData&       operator* ()       noexcept;
+        [[nodiscard]] TData const& operator* () const noexcept;
+
+        [[nodiscard]] TData*       operator->()       noexcept;
+        [[nodiscard]] TData const* operator->() const noexcept;
 
         #pragma endregion
 };

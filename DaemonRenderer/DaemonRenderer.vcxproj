@@ -181,7 +181,6 @@
     <ClInclude Include="source\include\resource\ResourceIdentifier.hpp" />
     <ClInclude Include="source\include\resource\ResourceManager.hpp" />
     <ClInclude Include="source\include\resource\ResourceManifest.hpp" />
-    <ClInclude Include="Source\Include\Threading\BaseSynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\EAccessMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
@@ -260,7 +259,6 @@
     <None Include="Source\Src\Functional\Method.inl" />
     <None Include="Source\Src\Resource\Handle.inl" />
     <None Include="Source\Src\Resource\ResourceManager.inl" />
-    <None Include="Source\Src\Threading\BaseSynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
     <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />

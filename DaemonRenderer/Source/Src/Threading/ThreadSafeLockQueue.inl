@@ -100,7 +100,7 @@ template<typename TType>
 DAEvoid ThreadSafeLockQueue<TType>::Clear() noexcept
 {
     QueueWriteAccess access(m_queue);
-    decltype(m_queue)::UnderlyingType().swap(access.Get());
+    typename decltype(m_queue)::UnderlyingType().swap(access.Get());
 
     m_empty_notification.notify_all();
 }
