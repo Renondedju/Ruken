@@ -22,39 +22,44 @@
  *  SOFTWARE.
  */
 
-#include "Windowing/WindowManager.hpp"
+#include "Windowing/Screen.hpp"
 
 USING_DAEMON_NAMESPACE
 
+#pragma region Constructors
+
 Screen::Screen(GLFWmonitor* in_handle):
-    m_physical_size {},
-    m_content_scale {},
-    m_video_modes   {},
-    m_work_area     {},
+    m_handle        {in_handle},
+    m_name          {glfwGetMonitorName(m_handle)},
     m_position      {},
-    m_handle        { in_handle },
-    m_name          { glfwGetMonitorName(m_handle) }
+    m_work_area     {},
+    m_physical_size {}
 {
+    // Retrieves the position, in screen coordinates, of the upper-left corner of the monitor.
+    glfwGetMonitorPos(m_handle, &m_position.x, &m_position.y);
+
+    // Retrieves the position, in screen coordinates, of the upper-left corner of the work area of the
+    // specified monitor along with the work area size in screen coordinates.
+    glfwGetMonitorWorkarea(m_handle, &m_work_area.offset.x,
+                                     &m_work_area.offset.y,
+                                     reinterpret_cast<DAEint32*>(&m_work_area.extent.width),
+                                     reinterpret_cast<DAEint32*>(&m_work_area.extent.height));
+
     // Retrieves the size, in millimeters, of the display area of the monitor.
-    glfwGetMonitorPhysicalSize(m_handle, reinterpret_cast<DAEint*>(&m_physical_size.width), reinterpret_cast<DAEint*>(&m_physical_size.height));
+    glfwGetMonitorPhysicalSize(m_handle, reinterpret_cast<DAEint32*>(&m_physical_size.width), 
+                                         reinterpret_cast<DAEint32*>(&m_physical_size.height));
 
     // Retrieves the ratio between the current DPI and the platform's default DPI.
     glfwGetMonitorContentScale(m_handle, &m_content_scale.x, &m_content_scale.y);
 
-    // Retrieves the position, in screen coordinates, of the upper-left corner of the monitor.
-    glfwGetMonitorPos(m_handle, &m_position.x, &m_position.y);
-
-    // Retrieves the work area defined as the area of the monitor not occluded by the operating system task bar where present.
-    glfwGetMonitorWorkarea(m_handle, &m_work_area.offset.x, &m_work_area.offset.y, reinterpret_cast<DAEint*>(&m_work_area.extent.width), reinterpret_cast<DAEint*>(&m_work_area.extent.height));
-
     // Retrieves all video modes supported by the monitor.
     DAEint32 count;
 
-    GLFWvidmode const* modes = glfwGetVideoModes(m_handle, &count);
+    auto const modes = glfwGetVideoModes(m_handle, &count);
 
     m_video_modes.reserve(count);
 
-    for (DAEint32 i = 0; i < count; ++i)
+    for (auto i = 0; i < count; ++i)
     {
         m_video_modes.emplace_back(VideoMode {
             modes[i].width,
@@ -67,6 +72,10 @@ Screen::Screen(GLFWmonitor* in_handle):
     }
 }
 
+#pragma endregion
+
+#pragma region Methods
+
 GLFWmonitor* Screen::GetHandle() const noexcept
 {
     return m_handle;
@@ -75,16 +84,6 @@ GLFWmonitor* Screen::GetHandle() const noexcept
 std::string const& Screen::GetName() const noexcept
 {
     return m_name;
-}
-
-VkExtent2D const& Screen::GetPhysicalSize() const noexcept
-{
-    return m_physical_size;
-}
-
-Vector2f const& Screen::GetContentScale() const noexcept
-{
-    return m_content_scale;
 }
 
 VkOffset2D const& Screen::GetPosition() const noexcept
@@ -97,7 +96,17 @@ VkRect2D const& Screen::GetWorkArea() const noexcept
     return m_work_area;
 }
 
-VideoMode const& Screen::GetCurrentVideoMode() const noexcept
+VkExtent2D const& Screen::GetPhysicalSize() const noexcept
+{
+    return m_physical_size;
+}
+
+Vector2f const& Screen::GetContentScale() const noexcept
+{
+    return m_content_scale;
+}
+
+VideoMode Screen::GetCurrentVideoMode() const noexcept
 {
     return *reinterpret_cast<VideoMode const*>(glfwGetVideoMode(m_handle));
 }
@@ -107,7 +116,7 @@ std::vector<VideoMode> const& Screen::GetVideoModes() const noexcept
     return m_video_modes;
 }
 
-GammaRamp const& Screen::GetGammaRamp() const noexcept
+GammaRamp Screen::GetGammaRamp() const noexcept
 {
     return *reinterpret_cast<GammaRamp const*>(glfwGetGammaRamp(m_handle));
 }
@@ -121,3 +130,5 @@ DAEvoid Screen::SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept
 {
     glfwSetGammaRamp(m_handle, reinterpret_cast<GLFWgammaramp const*>(&in_gamma_ramp));
 }
+
+#pragma endregion

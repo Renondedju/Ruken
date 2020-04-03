@@ -22,19 +22,47 @@
  *  SOFTWARE.
  */
 
+#include "Vulkan/Device.hpp"
 #include "Vulkan/Semaphore.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
+Semaphore::Semaphore(Device const& in_device, VkSemaphoreType const in_type) noexcept:
+    m_device {in_device},
+    m_handle {nullptr}
+{
+    VkSemaphoreTypeCreateInfo semaphore_type_create_info = {};
 
+    semaphore_type_create_info.sType         = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+    semaphore_type_create_info.semaphoreType = in_type;
+    semaphore_type_create_info.initialValue  = 0ull;
+
+    VkSemaphoreCreateInfo semaphore_create_info = {};
+
+    semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semaphore_create_info.pNext = &semaphore_type_create_info;
+
+    vkCreateSemaphore(m_device.GetHandle(), &semaphore_create_info, nullptr, &m_handle);
+}
+
+Semaphore::~Semaphore() noexcept
+{
+    if (m_handle)
+        vkDestroySemaphore(m_device.GetHandle(), m_handle, nullptr);
+}
 
 #pragma endregion
 
 #pragma region Methods
 
-VkSemaphore Semaphore::GetHandle() const noexcept
+Device const& Semaphore::GetDevice() const noexcept
+{
+    return m_device;
+}
+
+VkSemaphore const& Semaphore::GetHandle() const noexcept
 {
     return m_handle;
 }

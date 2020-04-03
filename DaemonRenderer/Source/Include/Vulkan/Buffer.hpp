@@ -24,7 +24,9 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include <vector>
+
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -36,9 +38,12 @@ class Buffer
 
         #pragma region Members
 
-        Device*         m_device;
-        VkBuffer        m_handle;
-        VmaAllocation   m_allocation;
+        Device const&       m_device;
+        VkBuffer            m_handle;
+        VmaAllocation       m_allocation;
+        VmaAllocationInfo   m_allocation_info;
+        DAEbool             m_is_mapped;
+        DAEbool             m_is_persistent;
 
         #pragma endregion
 
@@ -46,33 +51,70 @@ class Buffer
 
         #pragma region Constructors and Destructor
 
-        Buffer() = delete;
+        explicit Buffer(Device                  const& in_device,
+                        VkBufferCreateInfo      const& in_buffer_create_info,
+                        VmaAllocationCreateInfo const& in_allocation_create_info) noexcept;
 
-        explicit Buffer(Device*         in_device,
-                        VkBuffer        in_handle,
-                        VmaAllocation   in_allocation) noexcept;
+        explicit Buffer(Device const&               in_device,
+                        VkDeviceSize                in_size,
+                        VkBufferUsageFlags          in_buffer_usage,
+                        VmaAllocationCreateFlags    in_flags,
+                        VmaMemoryUsage              in_memory_usage) noexcept;
 
-        Buffer(Buffer const&    in_copy) noexcept = delete;
-        Buffer(Buffer&&         in_move) noexcept = default;
+        explicit Buffer(Device const&                   in_device,
+                        VkDeviceSize                    in_size,
+                        VkBufferUsageFlags              in_buffer_usage,
+                        VmaAllocationCreateFlags        in_flags,
+                        VmaMemoryUsage                  in_memory_usage,
+                        std::vector<DAEuint32> const&   in_queue_family_indices) noexcept;
 
-        ~Buffer() = default;
+        Buffer(Buffer const&    in_copy) = delete;
+        Buffer(Buffer&&         in_move) noexcept;
 
-        #pragma endregion
-
-        #pragma region Operators
-
-        Buffer& operator=(Buffer const& in_copy) noexcept = delete;
-        Buffer& operator=(Buffer&&      in_move) noexcept = default;
+        ~Buffer() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]] Device* GetDevice() const noexcept;
+        DAEvoid* Map() noexcept;
 
-        [[nodiscard]] VkBuffer GetHandle() const noexcept;
+        DAEvoid UnMap() noexcept;
 
-        [[nodiscard]] VmaAllocation GetAllocation() const noexcept;
+        DAEvoid Flush() const noexcept;
+
+        DAEvoid Update(DAEvoid const* in_data, VkDeviceSize in_offset, VkDeviceSize in_size) noexcept;
+
+        [[nodiscard]]
+        DAEbool IsMappable() const noexcept;
+
+        [[nodiscard]]
+        Device const& GetDevice() const noexcept;
+
+        [[nodiscard]]
+        VkBuffer const& GetHandle() const noexcept;
+
+        [[nodiscard]]
+        VmaAllocation const& GetAllocation() const noexcept;
+
+        [[nodiscard]]
+        VkDeviceMemory const& GetMemory() const noexcept;
+
+        [[nodiscard]]
+        VkDeviceSize const& GetOffset() const noexcept;
+
+        [[nodiscard]]
+        VkDeviceSize const& GetSize() const noexcept;
+
+        [[nodiscard]]
+        DAEvoid* GetMappedData() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Buffer& operator=(Buffer const& in_copy) = delete;
+        Buffer& operator=(Buffer&&      in_move) = delete;
 
         #pragma endregion
 };

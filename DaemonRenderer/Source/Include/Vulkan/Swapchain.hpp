@@ -24,23 +24,22 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include <vector>
 
-#include "Containers/Vector.hpp"
+#include "Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class Image;
 class Device;
 class Window;
+class Instance;
+class Semaphore;
 
 /**
- * \brief This class wraps a VkSwapchainKHR object.
- *
- * A swapchain object provides the ability to present rendering results to a surface.
- *
- * \note A native window cannot be associated with more than one non-retired swapchain at a time.
- *       Further, swapchains cannot be created for native windows that have a non-Vulkan graphics API surface associated with them.
+ * \brief A swapchain object provides the ability to present rendering results to a surface.
+ * \note  A native window cannot be associated with more than one non-retired swapchain at a time.
+ *        Further, swapchains cannot be created for native windows that have a non-Vulkan graphics API surface associated with them.
  */
 class Swapchain
 {
@@ -48,9 +47,9 @@ class Swapchain
 
         #pragma region Members
 
-        Window* m_window;
-        Device* m_device;
-
+        Instance const&                 m_instance;
+        Device   const&                 m_device;
+        VkSurfaceKHR                    m_surface;
         VkSwapchainKHR                  m_handle;
         DAEuint32                       m_image_count;
         VkSurfaceFormatKHR              m_surface_format;
@@ -58,8 +57,7 @@ class Swapchain
         VkSurfaceTransformFlagBitsKHR   m_pre_transform;
         VkCompositeAlphaFlagBitsKHR     m_composite_alpha;
         VkPresentModeKHR                m_present_mode;
-
-        Vector<Image*> m_images;
+        std::vector<Image>              m_images;
 
         #pragma endregion
 
@@ -75,7 +73,7 @@ class Swapchain
         /**
          * \brief Selects the format the swapchain image(s) will be created with.
          */
-        DAEvoid SelectSurfaceFormat(Vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept;
+        DAEvoid SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept;
 
         /**
          * \brief Selects the size (in pixels) of the swapchain image(s).
@@ -101,7 +99,9 @@ class Swapchain
          *
          * \note A swapchainÅfs present mode determines how incoming present requests will be processed and queued internally.
          */
-        DAEvoid SelectPresentMode(Vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
+        DAEvoid SelectPresentMode(std::vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
+
+        DAEbool SetupSurface(Instance const& in_instance, Window const& in_window);
 
         /**
          * \return True if a a swapchain could be created, else False.
@@ -116,21 +116,14 @@ class Swapchain
 
         #pragma region Constructors and Destructor
 
-        Swapchain() = delete;
-
-        explicit Swapchain(Device* in_device, Window* in_window);
+        explicit Swapchain(Instance const&  in_instance,
+                           Device   const&  in_device,
+                           Window   const&  in_window);
 
         Swapchain(Swapchain const&  in_copy) = delete;
         Swapchain(Swapchain&&       in_move) = delete;
 
         ~Swapchain() noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Swapchain& operator=(Swapchain const&   in_copy) = delete;
-        Swapchain& operator=(Swapchain&&        in_move) = delete;
 
         #pragma endregion
 
@@ -142,18 +135,30 @@ class Swapchain
          * \param in_width  The new width (in pixels) of the window.
          * \param in_height The new height (in pixels) of the window.
          */
-        DAEvoid ResizeSwapchain(DAEint32 in_width, DAEint32 in_height);
+        [[nodiscard]]
+        DAEbool ResizeSwapchain(DAEint32 in_width, DAEint32 in_height);
 
-        DAEbool AcquireNextImage(DAEuint32* out_image_index) const noexcept;
+        [[nodiscard]]
+        DAEbool AcquireNextImage(Semaphore const& in_semaphore, DAEuint32& out_image_index) const noexcept;
 
         /**
          * \return The opaque handle to the swapchain object.
          */
-        [[nodiscard]] VkSwapchainKHR GetHandle() const noexcept;
+        [[nodiscard]]
+        VkSwapchainKHR GetHandle() const noexcept;
 
-        [[nodiscard]] DAEuint32 GetImageCount() const noexcept;
+        [[nodiscard]]
+        DAEuint32 GetImageCount() const noexcept;
 
-        Vector<Image*> const& GetImages() const noexcept;
+        [[nodiscard]]
+        std::vector<Image> const& GetImages() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Swapchain& operator=(Swapchain const&   in_copy) = delete;
+        Swapchain& operator=(Swapchain&&        in_move) = delete;
 
         #pragma endregion
 };

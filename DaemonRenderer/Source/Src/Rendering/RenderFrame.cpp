@@ -22,18 +22,17 @@
  *  SOFTWARE.
  */
 
-#include <memory>
-
 #include "Rendering/RenderFrame.hpp"
-#include "Rendering/RenderTarget.hpp"
+
+#include "Vulkan/Fence.hpp"
+#include "Vulkan/Semaphore.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-RenderFrame::RenderFrame(Device* in_device, std::unique_ptr<RenderTarget>&& in_render_target) noexcept :
-    m_device        { in_device },
-    m_render_target { std::move(in_render_target) }
+RenderFrame::RenderFrame(Device const& in_device) noexcept:
+    m_device {in_device}
 {
 
 }
@@ -42,9 +41,14 @@ RenderFrame::RenderFrame(Device* in_device, std::unique_ptr<RenderTarget>&& in_r
 
 #pragma region Methods
 
-DAEvoid RenderFrame::UpdateRenderTarget(std::unique_ptr<RenderTarget>&& in_render_target)
+Semaphore const& RenderFrame::GetImageAvailableSemaphore() const noexcept
 {
-    m_render_target = std::move(in_render_target);
+    return *m_image_available_semaphore;
+}
+
+Semaphore const& RenderFrame::GetRenderFinishedSemaphore() const noexcept
+{
+    return *m_render_finished_semaphore;
 }
 
 #pragma endregion

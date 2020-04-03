@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -36,12 +36,8 @@ class Semaphore
 
         #pragma region Members
 
-        Device*     m_device;
-        VkSemaphore m_handle;
-
-        #pragma endregion
-
-        #pragma region Methods
+        Device const&   m_device;
+        VkSemaphore     m_handle;
 
         #pragma endregion
 
@@ -49,14 +45,22 @@ class Semaphore
 
         #pragma region Constructors and Destructor
 
-        Semaphore() = delete;
-
-        explicit Semaphore(Device* in_device, VkSemaphore in_handle) noexcept;
+        explicit Semaphore(Device const& in_device, VkSemaphoreType in_type = VK_SEMAPHORE_TYPE_BINARY) noexcept;
 
         Semaphore(Semaphore const&  in_copy) = delete;
-        Semaphore(Semaphore&&       in_move) = delete;
+        Semaphore(Semaphore&&       in_move) = default;
 
-        ~Semaphore() = default;
+        ~Semaphore() noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        [[nodiscard]]
+        Device const& GetDevice() const noexcept;
+
+        [[nodiscard]]
+        VkSemaphore const& GetHandle() const noexcept;
 
         #pragma endregion
 
@@ -64,12 +68,6 @@ class Semaphore
 
         Semaphore& operator=(Semaphore const&   in_copy) = delete;
         Semaphore& operator=(Semaphore&&        in_move) = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        [[nodiscard]] VkSemaphore GetHandle() const noexcept;
 
         #pragma endregion
 };

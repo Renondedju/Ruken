@@ -94,9 +94,7 @@ class CommandBuffer
 
         DAEvoid Reset(VkCommandBufferResetFlags in_reset_flags = 0u) const noexcept;
 
-
-
-        [[nodiscard]] VkCommandBuffer GetHandle() const noexcept;
+        [[nodiscard]] VkCommandBuffer const& GetHandle() const noexcept;
 
         #pragma endregion
 };

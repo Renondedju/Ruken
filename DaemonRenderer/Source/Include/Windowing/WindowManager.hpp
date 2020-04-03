@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include "Screen.hpp"
-#include "Window.hpp"
+#include "Windowing/Screen.hpp"
+#include "Windowing/Window.hpp"
 
 #include "Core/Service.hpp"
 #include "Types/Unique.hpp"
@@ -41,51 +41,41 @@ class Logger;
 class WindowManager final: public Service<WindowManager>, Unique
 {
     private:
-
+    
         #pragma region Members
 
         Logger* m_logger;
 
-        std::vector<Window> m_windows;
-        std::vector<Screen> m_screens;
+        std::vector<std::unique_ptr<Window>> m_windows;
+        std::vector<std::unique_ptr<Screen>> m_screens;
 
         #pragma endregion
 
         #pragma region Methods
 
+        #pragma region Callbacks
+
         /**
-         * \brief This is called with an error code and a human-readable description each time a GLFW error occurs.
-         *
          * \param in_error_code  An error code.
          * \param in_description A UTF-8 encoded string describing the error.
          */
         static DAEvoid ErrorCallback(DAEint32 in_error_code, DAEchar const* in_description);
 
         /**
-         * \brief This is called when a monitor is connected to or disconnected from the system.
-         *
          * \param in_monitor The monitor that was connected or disconnected.
          * \param in_event   One of 'GLFW_CONNECTED' or 'GLFW_DISCONNECTED'.
          */
         static DAEvoid MonitorCallback(GLFWmonitor* in_monitor, DAEint32 in_event);
 
-        /**
-         * \brief This is called when a joystick is connected to or disconnected from the system.
-         *
-         * \param in_jid   The joystick that was connected or disconnected.
-         * \param in_event One of 'GLFW_CONNECTED' or 'GLFW_DISCONNECTED'.
-         */
-        static DAEvoid JoystickCallback(DAEint32 in_jid, DAEint32 in_event) noexcept;
+        #pragma endregion
 
         /**
          * \brief Creates a screen object managing the specified monitor.
-         * \param in_monitor The monitor to add.
          */
         DAEvoid AddScreen(GLFWmonitor* in_monitor);
 
         /**
          * \brief Destroys the screen object managing the specified monitor.
-         * \param in_monitor The monitor to remove.
          */
         DAEvoid RemoveScreen(GLFWmonitor* in_monitor) noexcept;
 
@@ -98,7 +88,12 @@ class WindowManager final: public Service<WindowManager>, Unique
 
     public:
 
-        #pragma region Constructors
+        #pragma region Events
+
+        Event<Window&> on_window_created;
+        Event<Window&> on_window_destroyed;
+        Event<Screen&> on_screen_created;
+        Event<Screen&> on_screen_destroyed;
 
         using Service<WindowManager>::Service;
         
@@ -108,13 +103,24 @@ class WindowManager final: public Service<WindowManager>, Unique
 
         #pragma endregion
 
-        #pragma region Methods
+        #pragma region Constructors and Destructor
 
         /**
          * \brief Initializes the GLFW library, setups the callbacks and discovers the available screens.
-         * \return True if the module could be initialized, else False.
          */
-        DAEbool Initialize();
+        WindowManager();
+
+        WindowManager(WindowManager const&  in_copy) = delete;
+        WindowManager(WindowManager&&       in_move) = delete;
+
+        /**
+         * \brief Destroys every managed window and terminates the GLFW library.
+         */
+        ~WindowManager() noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
 
         /**
          * \brief Processes all pending events.
@@ -122,21 +128,14 @@ class WindowManager final: public Service<WindowManager>, Unique
         DAEvoid Update() noexcept;
 
         /**
-         * \return A pointer to the newly created window.
+         * \return A pointer to the window created with the specified parameters.
          */
-        Window* CreateWindow(WindowParams&& in_parameters);
+        Window& CreateWindow(WindowParams const& in_params);
 
         /**
-         * \param in_window The window to destroy.
          * \return True if the window could be destroyed, else False.
          */
-        DAEbool DestroyWindow(Window* in_window) noexcept;
-
-        /**
-         * \return A pointer to the main window.
-         */
-        [[nodiscard]]
-        Window* GetMainWindow() noexcept;
+        DAEbool DestroyWindow(Window const* in_window) noexcept;
 
         /**
          * \return This module's logger.
@@ -145,23 +144,29 @@ class WindowManager final: public Service<WindowManager>, Unique
         Logger* GetLogger() const noexcept;
 
         /**
-         * \return The array of all windows.
+         * \return A pointer to the requested window.
          */
         [[nodiscard]]
-        std::vector<Window> const& GetWindows() const noexcept;
+        Window& GetWindow(DAEuint32 in_index) noexcept;
 
         /**
-         * \return The array of all screens.
+         * \return A pointer to the main window.
          */
         [[nodiscard]]
-        std::vector<Screen> const& GetScreens() const noexcept;
+        Window& GetMainWindow() noexcept;
+
+        /**
+         * \return A pointer to the requested screen.
+         */
+        [[nodiscard]]
+        Screen& GetScreen(DAEuint32 in_index) noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        WindowManager& operator=(WindowManager const& in_other) = delete;
-        WindowManager& operator=(WindowManager&&      in_other) = delete;
+        WindowManager& operator=(WindowManager const&   in_copy) = delete;
+        WindowManager& operator=(WindowManager&&        in_move) = delete;
 
         #pragma endregion
 };

@@ -32,4 +32,3 @@
 
 #include <volk/volk.h>
 #include <vma/vk_mem_alloc.h>
-#include <glfw/glfw3.h>

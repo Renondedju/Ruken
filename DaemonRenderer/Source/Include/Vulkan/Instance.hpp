@@ -24,9 +24,10 @@
 
 #pragma once
 
-#include "Vulkan/Vulkan.hpp"
+#include <memory>
+#include <vector>
 
-#include "Containers/Vector.hpp"
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -34,10 +35,8 @@ class Logger;
 class PhysicalDevice;
 
 /**
- * \brief This class wraps a VkInstance object.
- *
- * \note There is no global state in Vulkan and all per-application state is stored in a VkInstance object. Creating a VkInstance object
- *       initializes the Vulkan library and allows the application to pass information about itself to the implementation.
+ * \brief There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
+ *        Creating a VkInstance object initializes the Vulkan library and allows the application to pass information about itself to the implementation.
  */
 class Instance
 {
@@ -49,20 +48,19 @@ class Instance
 
         VkInstance m_handle;
 
-        Vector<PhysicalDevice*> m_physical_devices;
+        std::vector<PhysicalDevice> m_physical_devices;
 
         #pragma endregion
 
         #pragma region Constructor
 
-        Instance() noexcept;
 
         #pragma endregion
         
         #pragma region Methods
 
         /**
-         * \return True if the api version is equal or newer than the required one, else False.
+         * \return True if the API version is equal or higher than the required one, else False.
          */
         static DAEbool CheckInstanceVersion() noexcept;
 
@@ -87,6 +85,8 @@ class Instance
 
         #pragma region Constructors and Destructor
 
+        Instance() noexcept;
+
         Instance(Instance const&    in_copy) = delete;
         Instance(Instance&&         in_move) = delete;
 
@@ -94,25 +94,31 @@ class Instance
 
         #pragma endregion
 
-        #pragma region Operators
-
-        Instance& operator=(Instance const& in_copy) = delete;
-        Instance& operator=(Instance&&      in_move) = delete;
-
-        #pragma endregion
-
         #pragma region Methods
 
-        static DAEbool Create(Instance** out_instance);
-
-        static DAEvoid Destroy(Instance* in_instance);
+        /**
+         * \return 
+         */
+        static DAEbool Create(std::unique_ptr<Instance>& out_instance);
 
         /**
          * \return The opaque handle to the instance object.
          */
-        [[nodiscard]] VkInstance GetHandle() const noexcept;
+        [[nodiscard]]
+        VkInstance const& GetHandle() const noexcept;
 
-        Vector<PhysicalDevice*> const& GetPhysicalDevices() const noexcept;
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        std::vector<PhysicalDevice> const& GetPhysicalDevices() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Instance& operator=(Instance const& in_copy) = delete;
+        Instance& operator=(Instance&&      in_move) = delete;
 
         #pragma endregion
 };

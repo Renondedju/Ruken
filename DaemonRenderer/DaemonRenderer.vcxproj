@@ -166,10 +166,7 @@
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
-    <ClInclude Include="Source\Include\Rendering\RenderSystem.hpp" />
-    <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Buffer.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\BufferView.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\DescriptorPool.hpp" />
@@ -310,11 +307,9 @@
     <ClCompile Include="Source\Src\Vulkan\Semaphore.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderFrame.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
-    <ClCompile Include="Source\Src\Rendering\RenderTarget.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Framebuffer.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Pipeline.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Buffer.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\BufferView.cpp" />
     <ClCompile Include="Source\Src\Vulkan\DescriptorPool.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Image.cpp" />
     <ClCompile Include="Source\Src\Vulkan\ImageView.cpp" />

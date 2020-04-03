@@ -29,7 +29,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-CommandPool::CommandPool(Device* in_device, DAEuint32 const in_queue_family_index) noexcept :
+CommandPool::CommandPool(Device const& in_device, DAEuint32 const in_queue_family_index) noexcept :
     m_device                { in_device },
     m_handle                { nullptr },
     m_queue_family_index    { in_queue_family_index }
@@ -41,7 +41,7 @@ CommandPool::~CommandPool()
 {
     if (m_handle)
     {
-        vkDestroyCommandPool(m_device->GetHandle(), m_handle, nullptr);
+        vkDestroyCommandPool(m_device.GetHandle(), m_handle, nullptr);
     }
 }
 
@@ -51,7 +51,6 @@ CommandPool::~CommandPool()
 
 DAEbool CommandPool::Create(Device* in_device, VkCommandPoolCreateInfo const& in_create_info, CommandPool** out_command_pool)
 {
-    *out_command_pool = new CommandPool(in_device, in_create_info.queueFamilyIndex);
 
     return vkCreateCommandPool(in_device->GetHandle(), &in_create_info, nullptr, &(*out_command_pool)->m_handle) == VK_SUCCESS;
 }
@@ -60,25 +59,25 @@ DAEbool CommandPool::AllocateCommandBuffers(VkCommandBufferAllocateInfo& in_allo
 {
     in_allocate_infos.commandPool = m_handle;
 
-    return vkAllocateCommandBuffers(m_device->GetHandle(), &in_allocate_infos, out_command_buffers) == VK_SUCCESS;
+    return vkAllocateCommandBuffers(m_device.GetHandle(), &in_allocate_infos, out_command_buffers) == VK_SUCCESS;
 }
 
 DAEvoid CommandPool::FreeCommandBuffers(DAEuint32 in_count, VkCommandBuffer* in_command_buffers) const noexcept
 {
-    vkFreeCommandBuffers(m_device->GetHandle(), m_handle, in_count, in_command_buffers);
+    vkFreeCommandBuffers(m_device.GetHandle(), m_handle, in_count, in_command_buffers);
 }
 
 DAEvoid CommandPool::Trim(VkCommandPoolTrimFlags const in_trim_flags) const noexcept
 {
-    vkTrimCommandPool(m_device->GetHandle(), m_handle, in_trim_flags);
+    vkTrimCommandPool(m_device.GetHandle(), m_handle, in_trim_flags);
 }
 
-Device* CommandPool::GetDevice() const noexcept
+Device const& CommandPool::GetDevice() const noexcept
 {
     return m_device;
 }
 
-VkCommandPool CommandPool::GetHandle() const noexcept
+VkCommandPool const& CommandPool::GetHandle() const noexcept
 {
     return m_handle;
 }

@@ -24,15 +24,18 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include <memory>
+#include <vector>
 
-#include "Containers/SmartPtr.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class Logger;
+class Window;
 class Instance;
 class Device;
+class RenderContext;
 
 class Renderer
 {
@@ -40,9 +43,16 @@ class Renderer
 
         #pragma region Members
 
-        Logger*     m_logger;
-        Instance*   m_instance;
-        Device*     m_device;
+        Logger*                                     m_logger;
+        std::unique_ptr<Instance>                   m_instance;
+        std::unique_ptr<Device>                     m_device;
+        std::vector<std::unique_ptr<RenderContext>> m_render_contexts;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        DAEvoid MakeContext(Window& in_window);
 
         #pragma endregion
 
@@ -59,29 +69,23 @@ class Renderer
 
         #pragma endregion
 
+        #pragma region Methods
+
+        [[nodiscard]]
+        Logger* GetLogger() const noexcept;
+
+        [[nodiscard]]
+        Instance const& GetInstance() const noexcept;
+
+        [[nodiscard]]
+        Device const& GetDevice() const noexcept;
+
+        #pragma endregion
+
         #pragma region Operators
 
         Renderer& operator=(Renderer const& in_copy) = delete;
         Renderer& operator=(Renderer&&      in_move) = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] Logger* GetLogger() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] Instance* GetInstance() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] Device* GetDevice() const noexcept;
 
         #pragma endregion
 };

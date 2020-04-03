@@ -24,7 +24,9 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Vulkan.hpp"
+
+BEGIN_DAEMON_NAMESPACE
 
 class Pipeline
 {
@@ -62,3 +64,5 @@ class Pipeline
 
     #pragma endregion
 };
+
+END_DAEMON_NAMESPACE

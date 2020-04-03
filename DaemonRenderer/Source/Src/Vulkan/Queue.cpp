@@ -23,24 +23,28 @@
  */
 
 #include "Vulkan/Queue.hpp"
+#include "Vulkan/Device.hpp"
+#include "Vulkan/CommandBuffer.hpp"
+#include "Vulkan/PhysicalDevice.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-Queue::Queue(Device*            in_device,
-             VkQueue            in_handle,
-             DAEuint32    const in_queue_family_index,
-             DAEuint32    const in_index,
-             VkQueueFlags const in_flags) noexcept :
-    m_device        { in_device },
-    m_handle        { in_handle },
-    m_family_index  { in_queue_family_index },
-    m_index         { in_index },
-    m_flags         { in_flags }
+Queue::Queue(Device       const&    in_device,
+             VkQueue      const&    in_handle,
+             DAEuint32    const     in_family_index,
+             DAEuint32    const     in_index,
+             VkQueueFlags const     in_flags) noexcept:
+    m_device        {in_device},
+    m_handle        {in_handle},
+    m_family_index  {in_family_index},
+    m_index         {in_index},
+    m_flags         {in_flags}
 {
 
 }
+
 #pragma endregion
 
 #pragma region Methods
@@ -83,9 +87,25 @@ DAEbool Queue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
     return vkQueuePresentKHR(m_handle, &in_present_info) == VK_SUCCESS;
 }
 
-DAEbool Queue::Submit(DAEuint32 const in_submit_count, VkSubmitInfo const& in_submit_infos, VkFence in_fence) const noexcept
+DAEbool Queue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence) const noexcept
 {
-    return vkQueueSubmit(m_handle, in_submit_count, &in_submit_infos, in_fence) == VK_SUCCESS;
+    return vkQueueSubmit(m_handle, 1u, &in_submit_info, in_fence) == VK_SUCCESS;
+}
+
+DAEbool Queue::Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence) const noexcept
+{
+    return vkQueueSubmit(m_handle, static_cast<DAEuint32>(in_submit_infos.size()), in_submit_infos.data(), in_fence) == VK_SUCCESS;
+}
+
+DAEbool Queue::Submit(CommandBuffer const& in_command_buffer, VkFence in_fence) const noexcept
+{
+    VkSubmitInfo submit_info = {};
+
+    submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.commandBufferCount   = 1u;
+    submit_info.pCommandBuffers      = &in_command_buffer.GetHandle();
+
+    return vkQueueSubmit(m_handle, 1u, &submit_info, in_fence) == VK_SUCCESS;
 }
 
 DAEvoid Queue::WaitIdle() const noexcept
@@ -93,12 +113,12 @@ DAEvoid Queue::WaitIdle() const noexcept
     vkQueueWaitIdle(m_handle);
 }
 
-Device* Queue::GetDevice() const noexcept
+Device const& Queue::GetDevice() const noexcept
 {
     return m_device;
 }
 
-VkQueue Queue::GetHandle() const noexcept
+VkQueue const& Queue::GetHandle() const noexcept
 {
     return m_handle;
 }
@@ -116,6 +136,15 @@ DAEuint32 Queue::GetIndex() const noexcept
 VkQueueFlags Queue::GetFlags() const noexcept
 {
     return m_flags;
+}
+
+DAEbool Queue::IsPresentationSupported(VkSurfaceKHR const& in_surface) const noexcept
+{
+    VkBool32 presentation_support;
+
+    vkGetPhysicalDeviceSurfaceSupportKHR(m_device.GetPhysicalDevice().GetHandle(), m_family_index, in_surface, &presentation_support);
+
+    return presentation_support;
 }
 
 #pragma endregion

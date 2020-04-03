@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -36,12 +36,8 @@ class Fence
 
         #pragma region Members
 
-        Device* m_device;
-        VkFence m_handle;
-
-        #pragma endregion
-
-        #pragma region Methods
+        Device const&   m_device;
+        VkFence         m_handle;
 
         #pragma endregion
 
@@ -49,14 +45,29 @@ class Fence
 
         #pragma region Constructors and Destructor
 
-        Fence() = delete;
-
-        explicit Fence(Device* in_device, VkFence in_handle) noexcept;
+        explicit Fence(Device const& in_device) noexcept;
 
         Fence(Fence const&  in_copy) = delete;
-        Fence(Fence&&       in_move) = delete;
+        Fence(Fence&&       in_move) = default;
 
         ~Fence() noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        DAEvoid Reset() const noexcept;
+
+        DAEvoid Wait() const noexcept;
+
+        [[nodiscard]]
+        DAEbool IsSignaled() const noexcept;
+
+        [[nodiscard]]
+        Device const& GetDevice() const noexcept;
+
+        [[nodiscard]]
+        VkFence const& GetHandle() const noexcept;
 
         #pragma endregion
 
@@ -64,14 +75,6 @@ class Fence
 
         Fence& operator=(Fence const&   in_copy) = delete;
         Fence& operator=(Fence&&        in_move) = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        DAEvoid Wait() const noexcept;
-
-        [[nodiscard]] VkFence GetHandle() const noexcept;
 
         #pragma endregion
 };

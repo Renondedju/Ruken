@@ -29,31 +29,48 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-Fence::Fence(Device* in_device, VkFence in_handle) noexcept :
-    m_device { in_device },
-    m_handle { in_handle }
+Fence::Fence(Device const& in_device) noexcept:
+    m_device {in_device},
+    m_handle {nullptr}
 {
+    VkFenceCreateInfo create_info = {};
 
+    create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+    vkCreateFence(m_device.GetHandle(), &create_info, nullptr, &m_handle);
 }
 
 Fence::~Fence() noexcept
 {
     if (m_handle)
-    {
-        vkDestroyFence(m_device->GetHandle(), m_handle, nullptr);
-    }
+        vkDestroyFence(m_device.GetHandle(), m_handle, nullptr);
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid Fence::Wait() const noexcept
+DAEvoid Fence::Reset() const noexcept
 {
-    vkWaitForFences(m_device->GetHandle(), 1u, &m_handle, VK_TRUE, ~0u);
+    vkResetFences(m_device.GetHandle(), 1u, &m_handle);
 }
 
-VkFence Fence::GetHandle() const noexcept
+DAEvoid Fence::Wait() const noexcept
+{
+    vkWaitForFences(m_device.GetHandle(), 1u, &m_handle, VK_TRUE, ~0u);
+}
+
+DAEbool Fence::IsSignaled() const noexcept
+{
+    return vkGetFenceStatus(m_device.GetHandle(), m_handle) == VK_SUCCESS;
+}
+
+Device const& Fence::GetDevice() const noexcept
+{
+    return m_device;
+}
+
+VkFence const& Fence::GetHandle() const noexcept
 {
     return m_handle;
 }

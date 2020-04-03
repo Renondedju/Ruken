@@ -24,20 +24,18 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include <vector>
 
-#include "Containers/Vector.hpp"
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class Instance;
 
 /**
- * \brief This class wraps a VkPhysicalDevice object.
- *
- * A physical device usually represents a single complete implementation of Vulkan (excluding instance-level functionality) available to the host, of which there are a finite number.
- *
- * \note Vulkan separates the concept of physical and logical devices.
+ * \brief A physical device usually represents a single complete implementation of Vulkan
+ *        (excluding instance-level functionality) available to the host, of which there are a finite number.
+ * \note  Vulkan separates the concept of physical and logical devices.
  */
 class PhysicalDevice
 {
@@ -45,9 +43,12 @@ class PhysicalDevice
 
         #pragma region Members
 
-        Instance* m_instance;
-
-        VkPhysicalDevice m_handle;
+        Instance const&                         m_instance;
+        VkPhysicalDevice                        m_handle;
+        VkPhysicalDeviceProperties              m_properties;
+        VkPhysicalDeviceMemoryProperties        m_memory_properties;
+        VkPhysicalDeviceFeatures                m_features;
+        std::vector<VkQueueFamilyProperties>    m_queue_family_properties;
 
         #pragma endregion
 
@@ -55,39 +56,43 @@ class PhysicalDevice
 
         #pragma region Constructors and Destructor
 
-        PhysicalDevice() = delete;
+        explicit PhysicalDevice(Instance const& in_instance, VkPhysicalDevice in_handle);
 
-        explicit PhysicalDevice(Instance* in_instance, VkPhysicalDevice in_handle) noexcept;
+        PhysicalDevice(PhysicalDevice const&    in_copy) = delete;
+        PhysicalDevice(PhysicalDevice&&         in_move) = default;
 
-        PhysicalDevice(PhysicalDevice const&    in_copy) noexcept = delete;
-        PhysicalDevice(PhysicalDevice&&         in_move) noexcept = default;
-
-        ~PhysicalDevice() noexcept = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        PhysicalDevice& operator=(PhysicalDevice const& in_copy) noexcept = delete;
-        PhysicalDevice& operator=(PhysicalDevice&&      in_move) noexcept = default;
+        ~PhysicalDevice() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]] Instance* GetInstance() const noexcept;
+        [[nodiscard]]
+        Instance const& GetInstance() const noexcept;
 
-        [[nodiscard]] VkPhysicalDevice GetHandle() const noexcept;
+        [[nodiscard]]
+        VkPhysicalDevice const& GetHandle() const noexcept;
 
-        [[nodiscard]] VkPhysicalDeviceProperties GetProperties() const noexcept;
+        [[nodiscard]]
+        VkPhysicalDeviceProperties const& GetProperties() const noexcept;
 
-        [[nodiscard]] VkPhysicalDeviceFeatures GetFeatures() const noexcept;
+        [[nodiscard]]
+        VkPhysicalDeviceMemoryProperties const& GetMemoryProperties() const noexcept;
 
-        [[nodiscard]] VkPhysicalDeviceMemoryProperties GetMemoryProperties() const noexcept;
+        [[nodiscard]]
+        VkPhysicalDeviceFeatures const& GetFeatures() const noexcept;
 
-        [[nodiscard]] Vector<VkQueueFamilyProperties> GetQueueFamilyProperties() const noexcept;
+        [[nodiscard]]
+        std::vector<VkQueueFamilyProperties> const& GetQueueFamilyProperties() const noexcept;
 
-        #pragma endregion 
+        #pragma endregion
+
+        #pragma region Operators
+
+        PhysicalDevice& operator=(PhysicalDevice const& in_copy) = delete;
+        PhysicalDevice& operator=(PhysicalDevice&&      in_move) = delete;
+
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

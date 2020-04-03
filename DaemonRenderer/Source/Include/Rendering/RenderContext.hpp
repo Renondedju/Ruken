@@ -29,13 +29,14 @@
 
 #include "Types/FundamentalTypes.hpp"
 
+#include "Vulkan/Swapchain.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
 class Queue;
 class Device;
 class Window;
 class Semaphore;
-class Swapchain;
 class RenderFrame;
 class CommandBuffer;
 
@@ -45,21 +46,18 @@ class RenderContext
 
         #pragma region Members
 
-        Device*     m_device;
-        Window*     m_window;
-        Queue*      m_queue;
-        DAEuint32   m_active_frame_index;
-        DAEbool     m_is_frame_active;
-
-        std::unique_ptr<Swapchain> m_swapchain;
-
-        std::vector<std::unique_ptr<RenderFrame>> m_frames;
+        Device const&                               m_device;
+        Queue  const&                               m_queue;
+        DAEuint32                                   m_active_frame_index;
+        DAEbool                                     m_is_frame_active;
+        std::unique_ptr<Swapchain>                  m_swapchain;
+        std::vector<std::unique_ptr<RenderFrame>>   m_frames;
 
         #pragma endregion
 
         #pragma region Methods
 
-        DAEvoid ResizeSwapchain(DAEuint32 in_width, DAEuint32 in_height) noexcept;
+        DAEvoid OnFramebufferResized(DAEuint32 in_width, DAEuint32 in_height) noexcept;
 
         #pragma endregion
 
@@ -67,15 +65,14 @@ class RenderContext
 
         #pragma region Constructors and Destructor
 
-        RenderContext() = delete;
-
-        explicit RenderContext(Device* in_device,
-                               Window* in_window);
+        explicit RenderContext(Instance const&  in_instance,
+                               Device   const&  in_device,
+                               Window&          in_window);
 
         RenderContext(RenderContext const&  in_copy) = delete;
         RenderContext(RenderContext&&       in_move) = delete;
 
-        ~RenderContext() noexcept = default;
+        ~RenderContext() = default;
 
         #pragma endregion
 
@@ -90,11 +87,13 @@ class RenderContext
 
         DAEbool BeginFrame() noexcept;
 
-        DAEvoid EndFrame(Queue* in_queue, VkPipelineStageFlags in_stage, CommandBuffer const& in_command_buffer) noexcept;
+        DAEvoid EndFrame() noexcept;
 
-        [[nodiscard]] std::vector<std::unique_ptr<RenderFrame>> const& GetFrames() const noexcept;
+        [[nodiscard]]
+        std::vector<std::unique_ptr<RenderFrame>> const& GetFrames() const noexcept;
 
-        [[nodiscard]] std::unique_ptr<RenderFrame> const& GetActiveFrame() const noexcept;
+        [[nodiscard]]
+        RenderFrame const& GetActiveFrame() const noexcept;
 
         #pragma endregion
 };

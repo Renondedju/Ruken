@@ -24,50 +24,46 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include <vector>
 
-#include "Containers/Vector.hpp"
-
+#include "Vulkan/Vulkan.hpp"
 #include "Vector/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class Device;
+class CommandBuffer;
 
 class Queue
 {
+    friend class Device;
+
     private:
 
         #pragma region Members
 
-        Device* m_device;
-
+        Device const&   m_device;
         VkQueue         m_handle;
         DAEuint32       m_family_index;
         DAEuint32       m_index;
         VkQueueFlags    m_flags;
+        DAEbool         m_used;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors
+        #pragma region Constructors and Destructor
 
-        Queue() = delete;
+        explicit Queue(Device const&    in_device,
+                       VkQueue const&   in_handle,
+                       DAEuint32        in_family_index,
+                       DAEuint32        in_index,
+                       VkQueueFlags     in_flags) noexcept;
 
-        explicit Queue(Device* in_device, VkQueue in_handle, DAEuint32 in_family_index, DAEuint32 in_index, VkQueueFlags in_flags) noexcept;
-
-        Queue(Queue const&  in_copy) noexcept = delete;
-        Queue(Queue&&       in_move) noexcept = default;
+        Queue(Queue const&  in_copy) = delete;
+        Queue(Queue&&       in_move) = default;
 
         ~Queue() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Queue& operator=(Queue const&   in_copy) noexcept = delete;
-        Queue& operator=(Queue&&        in_move) noexcept = default;
 
         #pragma endregion
 
@@ -75,7 +71,6 @@ class Queue
 
         /**
          * \brief Opens a queue debug label region.
-         *
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
@@ -88,7 +83,6 @@ class Queue
 
         /**
          * \brief Inserts a label into a queue.
-         *
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
@@ -96,19 +90,24 @@ class Queue
 
         /**
          * \brief 
-         *
          * \param in_present_info 
          */
+        [[nodiscard]]
         DAEbool Present(VkPresentInfoKHR const& in_present_info) const noexcept;
 
         /**
          * \brief
-         *
-         * \param in_submit_count 
-         * \param in_submit_infos 
-         * \param in_fence        
+         * \param in_submit_info 
+         * \param in_fence       
          */
-        DAEbool Submit(DAEuint32 in_submit_count, VkSubmitInfo const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
+        [[nodiscard]]
+        DAEbool Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence = nullptr) const noexcept;
+
+        [[nodiscard]]
+        DAEbool Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
+
+        [[nodiscard]]
+        DAEbool Submit(CommandBuffer const& in_command_buffer, VkFence in_fence = nullptr) const noexcept;
 
         /**
          * \brief 
@@ -118,27 +117,42 @@ class Queue
         /**
          * \return 
          */
-        [[nodiscard]] Device* GetDevice() const noexcept;
+        [[nodiscard]]
+        Device const& GetDevice() const noexcept;
 
         /**
          * \return 
          */
-        [[nodiscard]] VkQueue GetHandle() const noexcept;
+        [[nodiscard]]
+        VkQueue const& GetHandle() const noexcept;
 
         /**
          * \return 
          */
-        [[nodiscard]] DAEuint32 GetFamilyIndex() const noexcept;
+        [[nodiscard]]
+        DAEuint32 GetFamilyIndex() const noexcept;
 
         /**
          * \return 
          */
-        [[nodiscard]] DAEuint32 GetIndex() const noexcept;
+        [[nodiscard]]
+        DAEuint32 GetIndex() const noexcept;
 
         /**
          * \return 
          */
-        [[nodiscard]] VkQueueFlags GetFlags() const noexcept;
+        [[nodiscard]]
+        VkQueueFlags GetFlags() const noexcept;
+
+        [[nodiscard]]
+        DAEbool IsPresentationSupported(VkSurfaceKHR const& in_surface) const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Queue& operator=(Queue const&   in_copy) = delete;
+        Queue& operator=(Queue&&        in_move) = delete;
 
         #pragma endregion
 };

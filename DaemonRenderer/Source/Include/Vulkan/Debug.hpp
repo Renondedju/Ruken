@@ -24,16 +24,15 @@
 
 #pragma once
 
+#include <string>
+
 #include "Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class Logger;
 
-/**
- * \brief 
- */
-class __declspec(novtable) Debug
+class Debug
 {
     private:
 
@@ -48,14 +47,11 @@ class __declspec(novtable) Debug
         #pragma region Methods
 
         /**
-         * \brief Creates a debug messenger object.
-         *
          * \param in_instance         The instance the messenger will be used with.
          * \param in_message_severity The bitmask specifying which severity of event(s) will cause this callback to be called.
          * \param in_message_type     The bitmask specifying which type of event(s) will cause this callback to be called.
          * \param in_logger           The logger the callbacks will be sent to.
-         *
-         * \return True if the object could be created, else False.
+         * \return True if the debug messenger could be created, else False.
          */
         static DAEbool SetupDebugMessenger(VkInstance                           in_instance,
                                            VkDebugUtilsMessageSeverityFlagsEXT  in_message_severity,
@@ -64,19 +60,16 @@ class __declspec(novtable) Debug
 
         /**
          * \brief Destroys the debug messenger object.
-         *
          * \param in_instance The instance where the callback was created.
          */
         static DAEvoid FreeDebugMessenger(VkInstance in_instance) noexcept;
 
         /**
          * \brief Application-defined debug messenger callback function.
-         *
          * \param in_message_severity Bitmask specifying which severities of events caused a debug messenger callback.
          * \param in_message_type     Bitmask specifying which types of events caused a debug messenger callback.
          * \param in_callback_data    Structure specifying parameters returned to the callback.
          * \param in_user_data        User data provided when the debug messenger was created.
-         *
          * \return Always 'VK_FALSE' because we don't want the API to abort.
          */
         static DAEuint32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT       in_message_severity,
@@ -110,12 +103,7 @@ class __declspec(novtable) Debug
                                     DAEsize         in_tag_size,
                                     DAEvoid const*  in_tag) noexcept;
 
-        /**
-         * \param in_object 
-         * 
-         * \return 
-         */
-        static DAEchar const* ToString(VkObjectType in_object) noexcept;
+        static std::string ToString(VkObjectType in_object) noexcept;
 
         #pragma endregion
 };

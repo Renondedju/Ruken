@@ -26,8 +26,6 @@
 
 #include "Vulkan.hpp"
 
-#include "Containers/Vector.hpp"
-
 BEGIN_DAEMON_NAMESPACE
 
 class Device;
@@ -38,8 +36,7 @@ class CommandPool
 
         #pragma region Members
 
-        Device* m_device;
-
+        Device const&   m_device;
         VkCommandPool   m_handle;
         DAEuint32       m_queue_family_index;
 
@@ -47,8 +44,8 @@ class CommandPool
 
         #pragma region Constructor
 
-        explicit CommandPool(Device*    in_device,
-                             DAEuint32  in_queue_family_index) noexcept;
+        explicit CommandPool(Device const&  in_device,
+                             DAEuint32      in_queue_family_index) noexcept;
 
         #pragma endregion
 
@@ -87,14 +84,14 @@ class CommandPool
          */
         DAEvoid Trim(VkCommandPoolTrimFlags in_trim_flags = 0u) const noexcept;
 
-        Device* GetDevice() const noexcept;
+        Device const& GetDevice() const noexcept;
 
         /**
          * \brief
          *
          * \return 
          */
-        [[nodiscard]] VkCommandPool GetHandle() const noexcept;
+        [[nodiscard]] VkCommandPool const& GetHandle() const noexcept;
 
 
         DAEuint32 GetQueueFamilyIndex() const noexcept;

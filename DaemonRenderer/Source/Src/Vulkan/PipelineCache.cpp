@@ -22,8 +22,10 @@
  *  SOFTWARE.
  */
 
-#include "Rendering/Renderer.hpp"
+#include "Vulkan/Device.hpp"
 #include "Vulkan/PipelineCache.hpp"
+
+#include "Rendering/Renderer.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -31,9 +33,9 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-PipelineCache::PipelineCache(VkDevice in_device) :
-    m_handle { nullptr },
-    m_device { in_device }
+PipelineCache::PipelineCache(Device const& in_device) :
+    m_device {in_device},
+    m_handle {nullptr}
 {
     VkPipelineCacheCreateInfo pipeline_cache_info = {};
     
@@ -41,7 +43,7 @@ PipelineCache::PipelineCache(VkDevice in_device) :
     pipeline_cache_info.initialDataSize = 0u;
     pipeline_cache_info.pInitialData    = nullptr;
 
-    if (vkCreatePipelineCache(m_device, &pipeline_cache_info, nullptr, &m_handle) == VK_SUCCESS)
+    if (vkCreatePipelineCache(m_device.GetHandle(), &pipeline_cache_info, nullptr, &m_handle) == VK_SUCCESS)
     {
         GRenderer->GetLogger()->Info("Pipeline cache created successfully.");
     }
@@ -57,13 +59,13 @@ PipelineCache::~PipelineCache()
     {
         DAEsize size;
 
-        vkGetPipelineCacheData(m_device, m_handle, &size, nullptr);
+        vkGetPipelineCacheData(m_device.GetHandle(), m_handle, &size, nullptr);
 
         void* data = new char[size * 8];
 
-        vkGetPipelineCacheData(m_device, m_handle, &size, data);
+        vkGetPipelineCacheData(m_device.GetHandle(), m_handle, &size, data);
 
-        vkDestroyPipelineCache(m_device, m_handle, nullptr);
+        vkDestroyPipelineCache(m_device.GetHandle(), m_handle, nullptr);
 
         GRenderer->GetLogger()->Info("Pipeline cache destroyed.");
     }
@@ -73,7 +75,7 @@ PipelineCache::~PipelineCache()
 
 #pragma region Methods
 
-VkPipelineCache PipelineCache::GetHandle() const noexcept
+VkPipelineCache const& PipelineCache::GetHandle() const noexcept
 {
     return m_handle;
 }

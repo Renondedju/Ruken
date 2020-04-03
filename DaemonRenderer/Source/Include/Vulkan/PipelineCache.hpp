@@ -28,20 +28,16 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class Device;
+
 class PipelineCache
 {
     private:
 
         #pragma region Members
 
+        Device const&   m_device;
         VkPipelineCache m_handle;
-        VkDevice        m_device;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
 
         #pragma endregion
 
@@ -49,9 +45,7 @@ class PipelineCache
 
         #pragma region Constructors and Destructor
 
-        PipelineCache() = delete;
-
-        explicit PipelineCache(VkDevice in_device);
+        explicit PipelineCache(Device const& in_device);
 
         PipelineCache(PipelineCache const&  in_copy) = delete;
         PipelineCache(PipelineCache&&       in_move) = delete;
@@ -60,16 +54,17 @@ class PipelineCache
 
         #pragma endregion
 
+        #pragma region Methods
+
+        [[nodiscard]]
+        VkPipelineCache const& GetHandle() const noexcept;
+
+        #pragma endregion
+
         #pragma region Operators
 
         PipelineCache& operator=(PipelineCache const&   in_copy) = delete;
         PipelineCache& operator=(PipelineCache&&        in_move) = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        VkPipelineCache GetHandle() const noexcept;
 
         #pragma endregion
 };

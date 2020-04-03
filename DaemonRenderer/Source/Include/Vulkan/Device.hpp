@@ -24,12 +24,10 @@
 
 #pragma once
 
-#include "Vulkan/Vulkan.hpp"
-
 #include <thread>
+#include <vector>
 
-#include "Containers/Vector.hpp"
-#include "Containers/UnorderedMap.hpp"
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -37,19 +35,13 @@ class Image;
 class Queue;
 class Buffer;
 class Instance;
-class CommandPool;
 class PipelineCache;
 class PhysicalDevice;
 
-typedef Vector<Queue*> QueueFamily;
-typedef UnorderedMap<Queue*, CommandPool*> QueueCommandPools;
-
 /**
- * \brief This class wraps a VkDevice object.
- *
- * A logical device represents an instance of physical device implementation with its own state and resources independent of other logical devices.
- *
- * \note Vulkan separates the concept of physical and logical devices.
+ * \brief A logical device represents an instance of physical device implementation
+ *        with its own state and resources independent of other logical devices.
+ * \note  Vulkan separates the concept of physical and logical devices.
  */
 class Device
 {
@@ -57,52 +49,29 @@ class Device
 
         #pragma region Members
 
-        PhysicalDevice* m_physical_device;
-        VkDevice        m_handle;
-        VmaAllocator    m_memory_allocator;
-        PipelineCache*  m_pipeline_cache;
-
-        Vector<QueueFamily> m_queues;
-
-        UnorderedMap<std::thread::id, QueueCommandPools> m_command_pools;
+        PhysicalDevice const&           m_physical_device;
+        VkDevice                        m_handle;
+        VmaAllocator                    m_allocator;
+        std::unique_ptr<PipelineCache>  m_pipeline_cache;
+        std::vector<std::vector<Queue>> m_queues;
 
         #pragma endregion
 
         #pragma region Constructor
 
-        explicit Device(PhysicalDevice* in_physical_device);
 
         #pragma endregion
 
         #pragma region Methods
 
-        /**
-         * \param in_physical_device 
-         * 
-         * \return 
-         */
-        static DAEbool CheckDeviceExtensions(PhysicalDevice* in_physical_device) noexcept;
+        static DAEbool CheckDeviceExtensions(PhysicalDevice const& in_physical_device) noexcept;
 
-        /**
-         * \param in_physical_device 
-         * 
-         * \return 
-         */
-        static DAEuint32 RateDeviceSuitability(PhysicalDevice* in_physical_device) noexcept;
+        static DAEuint32 RateDeviceSuitability(PhysicalDevice const& in_physical_device) noexcept;
 
-        /**
-         * \return True if a new device instance could be created, else False.
-         */
-        DAEbool SetupDevice() noexcept;
+        DAEbool SetupDevice();
 
-        /**
-         * \return 
-         */
         DAEbool SetupMemoryAllocator() noexcept;
 
-        /**
-         * \brief 
-         */
         DAEvoid SetupQueues();
 
         #pragma endregion
@@ -111,12 +80,38 @@ class Device
 
         #pragma region Constructors and Destructor
 
-        Device() = delete;
+        explicit Device(PhysicalDevice const& in_physical_devices);
 
         Device(Device const&    in_copy) = delete;
         Device(Device&&         in_move) = delete;
 
         ~Device() noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        static DAEbool Create(Instance const& in_instance, std::unique_ptr<Device>& out_device);
+
+        DAEvoid WaitIdle() const noexcept;
+
+        [[nodiscard]]
+        PhysicalDevice const& GetPhysicalDevice() const noexcept;
+
+        [[nodiscard]]
+        VkDevice const& GetHandle() const noexcept;
+
+        [[nodiscard]]
+        VmaAllocator const& GetAllocator() const noexcept;
+
+        [[nodiscard]]
+        PipelineCache const& GetPipelineCache() const noexcept;
+
+        [[nodiscard]]
+        Queue const& GetQueueByFlags(VkQueueFlags in_flags) const;
+
+        [[nodiscard]]
+        Queue const& GetPresentQueue(VkSurfaceKHR const& in_surface) const;
 
         #pragma endregion
 
@@ -126,105 +121,6 @@ class Device
         Device& operator=(Device&&      in_move) = delete;
 
         #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \param in_instance 
-         * \param out_device  
-         * 
-         * \return 
-         */
-        static DAEbool Create(Instance* in_instance, Device** out_device);
-
-        /**
-         * \brief 
-         *
-         * \param in_device 
-         */
-        static DAEvoid Destroy(Device* in_device);
-
-        /**
-         * \param out_buffer 
-         * 
-         * \return 
-         */
-        DAEbool CreateBuffer(Buffer** out_buffer);
-
-        /**
-         * \brief 
-         *
-         * \param in_buffer 
-         */
-        DAEvoid DestroyBuffer(Buffer* in_buffer) const noexcept;
-
-        /**
-         * \param out_image 
-         * 
-         * \return 
-         */
-        DAEbool CreateImage(Image** out_image);
-
-        /**
-         * \brief 
-         *
-         * \param in_image 
-         */
-        DAEvoid DestroyImage(Image* in_image) const noexcept;
-
-        /**
-         * \brief 
-         */
-        [[nodiscard]] DAEvoid WaitIdle() const noexcept;
-
-        /**
-         * \return The opaque handle to the device object.
-         */
-        [[nodiscard]] PhysicalDevice* GetPhysicalDevice() const noexcept;
-
-        /**
-         * \return The opaque handle to the device object.
-         */
-        [[nodiscard]] VkDevice GetHandle() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] PipelineCache* GetPipelineCache() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]] Vector<QueueFamily> const& GetQueueFamilies() const noexcept;
-
-        /**
-         * \brief 
-         *
-         * \param in_queue_family_index 
-         * \param in_queue_in_index     
-         * 
-         * \return 
-         */
-        [[nodiscard]] Queue* GetQueue(DAEuint32 in_queue_family_index, DAEuint32 in_queue_in_index) const noexcept;
-
-        /**
-         * \brief 
-         *
-         * \param in_queue_flags    
-         * \param in_queue_in_index 
-         * 
-         * \return 
-         */
-        [[nodiscard]] Queue* GetQueueByFlags(VkQueueFlags in_queue_flags, DAEuint32 in_queue_in_index) const noexcept;
-
-        /**
-         * \param in_queue 
-         * 
-         * \return 
-         */
-        [[nodiscard]] CommandPool* GetCommandPool(Queue* in_queue);
-
-        #pragma endregion 
 };
 
 END_DAEMON_NAMESPACE

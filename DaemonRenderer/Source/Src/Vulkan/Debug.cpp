@@ -24,13 +24,15 @@
 
 #include "Vulkan/Debug.hpp"
 
-#include "Containers/String.hpp"
-
 #include "Debug/Logging/Logger.hpp"
 
 USING_DAEMON_NAMESPACE
 
+#pragma region Static Variables
+
 VkDebugUtilsMessengerEXT Debug::m_debug_messenger = nullptr;
+
+#pragma endregion
 
 #pragma region Methods
 
@@ -40,9 +42,7 @@ DAEbool Debug::SetupDebugMessenger(VkInstance                                   
                                    Logger*                                      in_logger) noexcept
 {
     if (m_debug_messenger)
-    {
-        FreeDebugMessenger(in_instance);
-    }
+        return false;
 
     VkDebugUtilsMessengerCreateInfoEXT debug_messenger_info = {};
 
@@ -57,7 +57,8 @@ DAEbool Debug::SetupDebugMessenger(VkInstance                                   
 
 DAEvoid Debug::FreeDebugMessenger(VkInstance in_instance) noexcept
 {
-    vkDestroyDebugUtilsMessengerEXT(in_instance, m_debug_messenger, nullptr);
+    if (m_debug_messenger)
+        vkDestroyDebugUtilsMessengerEXT(in_instance, m_debug_messenger, nullptr);
 }
 
 DAEuint32 Debug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const     in_message_severity,
@@ -65,27 +66,20 @@ DAEuint32 Debug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const     
                               VkDebugUtilsMessengerCallbackDataEXT    const*    in_callback_data,
                               DAEvoid*                                          in_user_data)
 {
-    String message;
+    std::string message;
 
     // Checks which types of events caused the debug callback.
     if (in_message_type & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
-    {
         message += "GENERAL";
-    }
-
     else
     {
         if (in_message_type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
-        {
             message += "VALIDATION";
-        }
 
         if (in_message_type & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
         {
             if (in_message_type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
-            {
                 message += "|";
-            }
 
             message += "PERFORMANCE";
         }
@@ -108,7 +102,7 @@ DAEuint32 Debug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const     
         for (DAEuint32 index = 0u; index < in_callback_data->objectCount; ++index)
         {
             sprintf_s(tmp, "\tObject[%d] - %s, Handle = %p, Name = %s\n", index,
-                                                                          ToString(in_callback_data->pObjects[index].objectType),
+                                                                          ToString(in_callback_data->pObjects[index].objectType).c_str(),
                                                                           reinterpret_cast<DAEvoid*>(in_callback_data->pObjects[index].objectHandle),
                                                                           in_callback_data->pObjects[index].pObjectName);
 
@@ -210,54 +204,53 @@ DAEvoid Debug::SetObjectTag(VkDevice            in_device,
     vkSetDebugUtilsObjectTagEXT(in_device, &tag_info);
 }
 
-DAEchar const* Debug::ToString(VkObjectType const in_object) noexcept
+std::string Debug::ToString(VkObjectType const in_object) noexcept
 {
     switch (in_object)
     {
-    #define OBJECT(object) case VK_OBJECT_TYPE_##object: return #object;
-            OBJECT(UNKNOWN);
-            OBJECT(INSTANCE);
-            OBJECT(PHYSICAL_DEVICE);
-            OBJECT(DEVICE);
-            OBJECT(QUEUE);
-            OBJECT(SEMAPHORE);
-            OBJECT(COMMAND_BUFFER);
-            OBJECT(FENCE);
-            OBJECT(DEVICE_MEMORY);
-            OBJECT(BUFFER);
-            OBJECT(IMAGE);
-            OBJECT(EVENT);
-            OBJECT(QUERY_POOL);
-            OBJECT(BUFFER_VIEW);
-            OBJECT(IMAGE_VIEW);
-            OBJECT(SHADER_MODULE);
-            OBJECT(PIPELINE_CACHE);
-            OBJECT(PIPELINE_LAYOUT);
-            OBJECT(RENDER_PASS);
-            OBJECT(PIPELINE);
-            OBJECT(DESCRIPTOR_SET_LAYOUT);
-            OBJECT(SAMPLER);
-            OBJECT(DESCRIPTOR_POOL);
-            OBJECT(DESCRIPTOR_SET);
-            OBJECT(FRAMEBUFFER);
-            OBJECT(COMMAND_POOL);
-            OBJECT(SAMPLER_YCBCR_CONVERSION);
-            OBJECT(DESCRIPTOR_UPDATE_TEMPLATE);
-            OBJECT(SURFACE_KHR);
-            OBJECT(SWAPCHAIN_KHR);
-            OBJECT(DISPLAY_KHR);
-            OBJECT(DISPLAY_MODE_KHR);
-            OBJECT(DEBUG_REPORT_CALLBACK_EXT);
-            OBJECT(OBJECT_TABLE_NVX);
-            OBJECT(INDIRECT_COMMANDS_LAYOUT_NVX);
-            OBJECT(DEBUG_UTILS_MESSENGER_EXT);
-            OBJECT(VALIDATION_CACHE_EXT);
-            OBJECT(ACCELERATION_STRUCTURE_NV);
-            OBJECT(PERFORMANCE_CONFIGURATION_INTEL);
-    #undef  OBJECT
-    }
+        case VK_OBJECT_TYPE_UNKNOWN:                            return "UNKNOWN";
+        case VK_OBJECT_TYPE_INSTANCE:                           return "INSTANCE";
+        case VK_OBJECT_TYPE_PHYSICAL_DEVICE:                    return "PHYSICAL_DEVICE";
+        case VK_OBJECT_TYPE_DEVICE:                             return "DEVICE";
+        case VK_OBJECT_TYPE_QUEUE:                              return "QUEUE";
+        case VK_OBJECT_TYPE_SEMAPHORE:                          return "SEMAPHORE";
+        case VK_OBJECT_TYPE_COMMAND_BUFFER:                     return "COMMAND_BUFFER";
+        case VK_OBJECT_TYPE_FENCE:                              return "FENCE";
+        case VK_OBJECT_TYPE_DEVICE_MEMORY:                      return "DEVICE_MEMORY";
+        case VK_OBJECT_TYPE_BUFFER:                             return "BUFFER";
+        case VK_OBJECT_TYPE_IMAGE:                              return "IMAGE";
+        case VK_OBJECT_TYPE_EVENT:                              return "EVENT";
+        case VK_OBJECT_TYPE_QUERY_POOL:                         return "QUERY_POOL";
+        case VK_OBJECT_TYPE_BUFFER_VIEW:                        return "BUFFER_VIEW";
+        case VK_OBJECT_TYPE_IMAGE_VIEW:                         return "IMAGE_VIEW";
+        case VK_OBJECT_TYPE_SHADER_MODULE:                      return "SHADER_MODULE";
+        case VK_OBJECT_TYPE_PIPELINE_CACHE:                     return "PIPELINE_CACHE";
+        case VK_OBJECT_TYPE_PIPELINE_LAYOUT:                    return "PIPELINE_LAYOUT";
+        case VK_OBJECT_TYPE_RENDER_PASS:                        return "RENDER_PASS";
+        case VK_OBJECT_TYPE_PIPELINE:                           return "PIPELINE";
+        case VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT:              return "DESCRIPTOR_SET_LAYOUT";
+        case VK_OBJECT_TYPE_SAMPLER:                            return "SAMPLER";
+        case VK_OBJECT_TYPE_DESCRIPTOR_POOL:                    return "DESCRIPTOR_POOL";
+        case VK_OBJECT_TYPE_DESCRIPTOR_SET:                     return "DESCRIPTOR_SET";
+        case VK_OBJECT_TYPE_FRAMEBUFFER:                        return "FRAMEBUFFER";
+        case VK_OBJECT_TYPE_COMMAND_POOL:                       return "COMMAND_POOL";
+        case VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION:           return "SAMPLER_YCBCR_CONVERSION";
+        case VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE:         return "DESCRIPTOR_UPDATE_TEMPLATE";
+        case VK_OBJECT_TYPE_SURFACE_KHR:                        return "SURFACE_KHR";
+        case VK_OBJECT_TYPE_SWAPCHAIN_KHR:                      return "SWAPCHAIN_KHR";
+        case VK_OBJECT_TYPE_DISPLAY_KHR:                        return "DISPLAY_KHR";
+        case VK_OBJECT_TYPE_DISPLAY_MODE_KHR:                   return "DISPLAY_NODE_KHR";
+        case VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT:          return "DEBUG_REPORT_CALLBACK_EXT";
+        case VK_OBJECT_TYPE_OBJECT_TABLE_NVX:                   return "OBJECT_TABLE_NVX";
+        case VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX:       return "INDIRECT_COMMANDS_LAYOUT_NVX";
+        case VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT:          return "DEBUG_UTILS_MESSENGER_EXT";
+        case VK_OBJECT_TYPE_VALIDATION_CACHE_EXT:               return "VALIDATION_CACHE_EXT";
+        case VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_NV:          return "ACCELERATION_STRUCTURE_NV";
+        case VK_OBJECT_TYPE_PERFORMANCE_CONFIGURATION_INTEL:    return "PERFORMANCE_CONFIGURATION_INTEL";
 
-    return "UNKNOWN_OBJECT_TYPE";
+        default:
+            return "UNKNOWN_OBJECT_TYPE";
+    }
 }
 
 #pragma endregion

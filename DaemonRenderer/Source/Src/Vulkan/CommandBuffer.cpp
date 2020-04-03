@@ -22,13 +22,18 @@
  *  SOFTWARE.
  */
 
-#include "Rendering/CommandBuffer.hpp"
+#include "Vulkan/CommandBuffer.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
 CommandBuffer::CommandBuffer(VkCommandBuffer in_handle) noexcept : m_handle { in_handle }
+{
+
+}
+
+CommandBuffer::~CommandBuffer()
 {
 
 }
@@ -90,7 +95,7 @@ DAEvoid CommandBuffer::Reset(VkCommandBufferResetFlags const in_reset_flags) con
     vkResetCommandBuffer(m_handle, in_reset_flags);
 }
 
-VkCommandBuffer CommandBuffer::GetHandle() const noexcept
+VkCommandBuffer const& CommandBuffer::GetHandle() const noexcept
 {
     return m_handle;
 }

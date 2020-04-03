@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Vulkan.hpp"
 
 class DescriptorPool
 {

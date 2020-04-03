@@ -23,9 +23,15 @@
  */
 
 #include "Rendering/Renderer.hpp"
+#include "Rendering/RenderFrame.hpp"
+#include "Rendering/RenderContext.hpp"
 
-#include "Vulkan/Instance.hpp"
+#include "Vulkan/Fence.hpp"
 #include "Vulkan/Device.hpp"
+#include "Vulkan/Instance.hpp"
+#include "Vulkan/Semaphore.hpp"
+
+#include "Windowing/WindowManager.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -37,25 +43,28 @@ DAEMON_NAMESPACE::Renderer* DAEMON_NAMESPACE::GRenderer = nullptr;
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
+#pragma region Constructor and Destructor
 
-Renderer::Renderer() :
-    m_logger    { GRootLogger->AddChild("Rendering") },
-    m_instance  { nullptr },
-    m_device    { nullptr }
+Renderer::Renderer():
+    m_logger {GRootLogger->AddChild("Rendering")}
 {
-    m_logger->SetLevel(ELogLevel::Debug);
-
-    m_logger->propagate = true;
-
     /* TODO Needs to be removed when Kernel is done TODO */
 
     GRenderer = this;
 
     /* TODO Needs to be removed when Kernel is done TODO */
 
-    if (Instance::Create(&m_instance) && Device::Create(m_instance, &m_device))
+    m_logger->SetLevel(ELogLevel::Debug);
+
+    m_logger->propagate = true;
+
+    if (Instance::Create(m_instance) && Device::Create(*m_instance, m_device))
     {
+        GWindowManager->on_window_created += [this] (Window& in_window)
+        {
+            MakeContext(in_window);
+        };
+
         m_logger->Info("Renderer initialized successfully.");
     }
 
@@ -65,8 +74,9 @@ Renderer::Renderer() :
 
 Renderer::~Renderer() noexcept
 {
-    Device  ::Destroy(m_device);
-    Instance::Destroy(m_instance);
+    m_render_contexts.clear();
+    m_device         .reset();
+    m_instance       .reset();
 
     m_logger->Info("Renderer shut down.");
 }
@@ -75,19 +85,24 @@ Renderer::~Renderer() noexcept
 
 #pragma region Methods
 
+DAEvoid Renderer::MakeContext(Window& in_window)
+{
+    m_render_contexts.push_back(std::make_unique<RenderContext>(*m_instance, *m_device, in_window));
+}
+
 Logger* Renderer::GetLogger() const noexcept
 {
     return m_logger;
 }
 
-Instance* Renderer::GetInstance() const noexcept
+Instance const& Renderer::GetInstance() const noexcept
 {
-    return m_instance;
+    return *m_instance;
 }
 
-Device* Renderer::GetDevice() const noexcept
+Device const& Renderer::GetDevice() const noexcept
 {
-    return m_device;
+    return *m_device;
 }
 
 #pragma endregion

@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -32,7 +34,6 @@ class Fence;
 class Device;
 class Semaphore;
 class CommandPool;
-class RenderTarget;
 class CommandBuffer;
 
 class RenderFrame
@@ -41,9 +42,8 @@ class RenderFrame
 
         #pragma region Members
 
-        Device*         m_device;
+        Device const& m_device;
 
-        std::unique_ptr<RenderTarget>   m_render_target;
         std::unique_ptr<Fence>          m_fence;
         std::unique_ptr<Semaphore>      m_image_available_semaphore;
         std::unique_ptr<Semaphore>      m_render_finished_semaphore;
@@ -60,7 +60,7 @@ class RenderFrame
 
         RenderFrame() = delete;
 
-        explicit RenderFrame(Device* in_device, std::unique_ptr<RenderTarget>&& in_render_target) noexcept;
+        explicit RenderFrame(Device const& in_device) noexcept;
 
         RenderFrame(RenderFrame const&  in_copy) = delete;
         RenderFrame(RenderFrame&&       in_move) = delete;
@@ -77,14 +77,6 @@ class RenderFrame
         #pragma endregion
 
         #pragma region Methods
-
-        DAEvoid UpdateRenderTarget(std::unique_ptr<RenderTarget>&& in_render_target);
-
-        CommandBuffer const& GetCommandBuffer() const noexcept;
-
-        RenderTarget const& GetRenderTarget() const noexcept;
-
-        Fence const& GetFence() const noexcept;
 
         Semaphore const& GetImageAvailableSemaphore() const noexcept;
 

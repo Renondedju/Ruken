@@ -22,13 +22,13 @@
  *  SOFTWARE.
  */
 
+#include <set>
+
+#include "Vulkan/Debug.hpp"
 #include "Vulkan/Instance.hpp"
 #include "Vulkan/PhysicalDevice.hpp"
-#include "Vulkan/Debug.hpp"
 
 #include "Rendering/Renderer.hpp"
-
-#include "Containers/Set.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -36,7 +36,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Static Variables
 
-static Vector<DAEchar const*> RequiredExtensions =
+static std::vector<DAEchar const*> RequiredExtensions =
 {
     #ifdef DAEMON_OS_WINDOWS
 
@@ -48,7 +48,7 @@ static Vector<DAEchar const*> RequiredExtensions =
     VK_EXT_DEBUG_UTILS_EXTENSION_NAME
 };
 
-static Vector<DAEchar const*> RequiredValidationLayers =
+static std::vector<DAEchar const*> RequiredValidationLayers =
 {
     #ifdef DAEMON_DEBUG
 
@@ -57,7 +57,7 @@ static Vector<DAEchar const*> RequiredValidationLayers =
     #endif
 };
 
-static Vector<VkValidationFeatureEnableEXT> EnabledValidationFeatures =
+static std::vector<VkValidationFeatureEnableEXT> EnabledValidationFeatures =
 {
     #ifdef DAEMON_DEBUG
 
@@ -66,7 +66,7 @@ static Vector<VkValidationFeatureEnableEXT> EnabledValidationFeatures =
     #endif
 };
 
-static Vector<VkValidationFeatureDisableEXT> DisabledValidationFeatures =
+static std::vector<VkValidationFeatureDisableEXT> DisabledValidationFeatures =
 {
 
 };
@@ -75,9 +75,9 @@ static Vector<VkValidationFeatureDisableEXT> DisabledValidationFeatures =
 
 #pragma region Constructor and Destructor
 
-Instance::Instance() noexcept :
-    m_logger    { GRenderer->GetLogger()->AddChild("Vulkan") },
-    m_handle    { nullptr }
+Instance::Instance() noexcept:
+    m_logger    {GRenderer->GetLogger()->AddChild("Vulkan")},
+    m_handle    {nullptr}
 {
     m_logger->propagate = true;
 
@@ -85,7 +85,10 @@ Instance::Instance() noexcept :
 
     if (volkInitialize() == VK_SUCCESS)
     {
-        if (CheckInstanceVersion() && CheckInstanceExtensions() && CheckValidationLayers() && SetupInstance())
+        if (CheckInstanceVersion   () &&
+            CheckInstanceExtensions() &&
+            CheckValidationLayers  () &&
+            SetupInstance          () )
         {
             volkLoadInstanceOnly(m_handle);
 
@@ -149,26 +152,22 @@ DAEbool Instance::CheckInstanceExtensions() noexcept
     // Returns the number of global extension properties.
     vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr);
 
-    Vector<VkExtensionProperties> supported_extensions(count);
+    std::vector<VkExtensionProperties> supported_extensions(count);
 
     // Returns the global extension properties.
     vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data());
 
-    Set<String> required_extensions(RequiredExtensions.cbegin(), RequiredExtensions.cend());
+    std::set<std::string> required_extensions(RequiredExtensions.cbegin(), RequiredExtensions.cend());
 
     // Removes the matching extensions.
     for (auto const& extension : supported_extensions)
-    {
         required_extensions.erase(extension.extensionName);
-    }
 
     // In case some extensions could not be found, enumerates them.
     if (!required_extensions.empty())
     {
         for (auto const& extension : required_extensions)
-        {
             GRenderer->GetLogger()->Error("Missing instance extension : " + extension + "!");
-        }
 
         return false;
     }
@@ -183,26 +182,22 @@ DAEbool Instance::CheckValidationLayers() noexcept
     // Returns the number of layer properties available.
     vkEnumerateInstanceLayerProperties(&count, nullptr);
 
-    Vector<VkLayerProperties> supported_layers(count);
+    std::vector<VkLayerProperties> supported_layers(count);
 
     // Returns the global layer properties
     vkEnumerateInstanceLayerProperties(&count, supported_layers.data());
 
-    Set<String> required_layers(RequiredValidationLayers.cbegin(), RequiredValidationLayers.cend());
+    std::set<std::string> required_layers(RequiredValidationLayers.cbegin(), RequiredValidationLayers.cend());
 
     // Removes the matching layers.
     for (auto const& layer : supported_layers)
-    {
         required_layers.erase(layer.layerName);
-    }
 
     // In case some layers could not be found, enumerates them.
     if (!required_layers.empty())
     {
         for (auto const& layer : required_layers)
-        {
             GRenderer->GetLogger()->Error("Missing validation layer : " + layer + "!");
-        }
 
         return false;
     }
@@ -240,7 +235,7 @@ DAEbool Instance::SetupInstance() noexcept
     app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.pApplicationName   = DAEMON_PROJECT_NAME;
     app_info.applicationVersion = VK_API_VERSION_1_0;
-    app_info.apiVersion         = VK_API_VERSION_1_2;
+    app_info.apiVersion         = VK_API_VERSION_1_1;
 
     VkInstanceCreateInfo instance_create_info = {};
 
@@ -255,53 +250,38 @@ DAEbool Instance::SetupInstance() noexcept
     return vkCreateInstance(&instance_create_info, nullptr, &m_handle) == VK_SUCCESS;
 }
 
-DAEbool Instance::Create(Instance** out_instance)
+DAEbool Instance::Create(std::unique_ptr<Instance>& out_instance)
 {
-    auto instance =  new Instance();
+    out_instance = std::make_unique<Instance>();
 
     DAEuint32 count = 0u;
 
     // Returns the number of physical devices accessible to this Vulkan instance.
-    vkEnumeratePhysicalDevices(instance->GetHandle(), &count, nullptr);
+    vkEnumeratePhysicalDevices(out_instance->GetHandle(), &count, nullptr);
 
     if (count == 0u)
     {
         GRenderer->GetLogger()->Error("No GPU available!");
-
         return false;
     }
 
-    Vector<VkPhysicalDevice> physical_devices(count);
+    std::vector<VkPhysicalDevice> physical_devices(count);
 
     // Returns the physical devices accessible to this Vulkan instance.
-    vkEnumeratePhysicalDevices(instance->GetHandle(), &count, physical_devices.data());
+    vkEnumeratePhysicalDevices(out_instance->GetHandle(), &count, physical_devices.data());
 
     for (auto const& physical_device : physical_devices)
-    {
-        instance->m_physical_devices.push_back(new PhysicalDevice(instance, physical_device));
-    }
+        out_instance->m_physical_devices.emplace_back(PhysicalDevice(*out_instance, physical_device));
 
-    *out_instance = instance;
-
-    return instance->GetHandle() != nullptr;
+    return out_instance->GetHandle() != nullptr;
 }
 
-DAEvoid Instance::Destroy(Instance* in_instance)
-{
-    for (auto const& physical_device : in_instance->m_physical_devices)
-    {
-        delete physical_device;
-    }
-
-    delete in_instance;
-}
-
-VkInstance Instance::GetHandle() const noexcept
+VkInstance const& Instance::GetHandle() const noexcept
 {
     return m_handle;
 }
 
-Vector<PhysicalDevice*> const& Instance::GetPhysicalDevices() const noexcept
+std::vector<PhysicalDevice> const& Instance::GetPhysicalDevices() const noexcept
 {
     return m_physical_devices;
 }

@@ -28,65 +28,58 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-PhysicalDevice::PhysicalDevice(Instance* in_instance, VkPhysicalDevice in_handle) noexcept :
-    m_instance  { in_instance },
-    m_handle    { in_handle }
+PhysicalDevice::PhysicalDevice(Instance const& in_instance, VkPhysicalDevice in_handle):
+    m_instance          {in_instance},
+    m_handle            {in_handle},
+    m_properties        {},
+    m_memory_properties {},
+    m_features          {}
 {
+    vkGetPhysicalDeviceProperties      (m_handle, &m_properties);
+    vkGetPhysicalDeviceMemoryProperties(m_handle, &m_memory_properties);
+    vkGetPhysicalDeviceFeatures        (m_handle, &m_features);
 
+    DAEuint32 count = 0u;
+
+    vkGetPhysicalDeviceQueueFamilyProperties(m_handle, &count, nullptr);
+
+    m_queue_family_properties.resize(count);
+
+    vkGetPhysicalDeviceQueueFamilyProperties(m_handle, &count, m_queue_family_properties.data());
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-Instance* PhysicalDevice::GetInstance() const noexcept
+Instance const& PhysicalDevice::GetInstance() const noexcept
 {
     return m_instance;
 }
 
-VkPhysicalDevice PhysicalDevice::GetHandle() const noexcept
+VkPhysicalDevice const& PhysicalDevice::GetHandle() const noexcept
 {
     return m_handle;
 }
 
-VkPhysicalDeviceProperties PhysicalDevice::GetProperties() const noexcept
+VkPhysicalDeviceProperties const& PhysicalDevice::GetProperties() const noexcept
 {
-    VkPhysicalDeviceProperties properties;
-
-    vkGetPhysicalDeviceProperties(m_handle, &properties);
-
-    return properties;
+    return m_properties;
 }
 
-VkPhysicalDeviceFeatures PhysicalDevice::GetFeatures() const noexcept
+VkPhysicalDeviceMemoryProperties const& PhysicalDevice::GetMemoryProperties() const noexcept
 {
-    VkPhysicalDeviceFeatures features;
-
-    vkGetPhysicalDeviceFeatures(m_handle, &features);
-
-    return features;
+    return m_memory_properties;
 }
 
-VkPhysicalDeviceMemoryProperties PhysicalDevice::GetMemoryProperties() const noexcept
+VkPhysicalDeviceFeatures const& PhysicalDevice::GetFeatures() const noexcept
 {
-    VkPhysicalDeviceMemoryProperties memory_properties;
-
-    vkGetPhysicalDeviceMemoryProperties(m_handle, &memory_properties);
-
-    return memory_properties;
+    return m_features;
 }
 
-Vector<VkQueueFamilyProperties> PhysicalDevice::GetQueueFamilyProperties() const noexcept
+std::vector<VkQueueFamilyProperties> const& PhysicalDevice::GetQueueFamilyProperties() const noexcept
 {
-    DAEuint32 count = 0u;
-
-    vkGetPhysicalDeviceQueueFamilyProperties(m_handle, &count, nullptr);
-
-    Vector<VkQueueFamilyProperties> queue_family_properties(count);
-
-    vkGetPhysicalDeviceQueueFamilyProperties(m_handle, &count, queue_family_properties.data());
-
-    return queue_family_properties;
+    return m_queue_family_properties;
 }
 
 #pragma endregion

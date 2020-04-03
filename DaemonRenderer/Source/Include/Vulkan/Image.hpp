@@ -24,9 +24,13 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include <vector>
+
+#include "Vulkan/Vulkan.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+class Device;
 
 class Image
 {
@@ -34,9 +38,11 @@ class Image
 
         #pragma region Members
 
-        VkImage         m_handle;
-        VmaAllocation   m_allocation;
-        VkFormat        m_format;
+        Device const&       m_device;
+        VkImage             m_handle;
+        VmaAllocation       m_allocation;
+        VmaAllocationInfo   m_allocation_info;
+        DAEbool             m_is_mapped;
 
         #pragma endregion
 
@@ -44,32 +50,72 @@ class Image
 
         #pragma region Constructors and Destructor
 
-        Image() = delete;
+        explicit Image(Device const&    in_device,
+                       VkImage          in_handle) noexcept;
 
-        explicit Image(VkImage              in_handle,
-                       VmaAllocation        in_allocation) noexcept;
+        explicit Image(Device                  const& in_device,
+                       VkImageCreateInfo       const& in_image_create_info,
+                       VmaAllocationCreateInfo const& in_allocation_create_info) noexcept;
 
-        Image(Image const&  in_copy) noexcept = delete;
-        Image(Image&&       in_move) noexcept = default;
+        explicit Image(Device const&            in_device,
+                       VkImageType              in_image_type,
+                       VkFormat                 in_format,
+                       VkExtent3D               in_extent,
+                       DAEuint32                in_mip_levels,
+                       DAEuint32                in_array_layers,
+                       VkImageTiling            in_tiling,
+                       VkSampleCountFlagBits    in_sample_count,
+                       VkImageUsageFlags        in_image_usage,
+                       VmaAllocationCreateFlags in_flags,
+                       VmaMemoryUsage           in_memory_usage) noexcept;
 
-        ~Image() = default;
+        explicit Image(Device const&                    in_device,
+                       VkImageType                      in_image_type,
+                       VkFormat                         in_format,
+                       VkExtent3D                       in_extent,
+                       DAEuint32                        in_mip_levels,
+                       DAEuint32                        in_array_layers,
+                       VkImageTiling                    in_tiling,
+                       VkSampleCountFlagBits            in_sample_count,
+                       VkImageUsageFlags                in_image_usage,
+                       VmaAllocationCreateFlags         in_flags,
+                       VmaMemoryUsage                   in_memory_usage,
+                       std::vector<DAEuint32> const&    in_queue_family_indices) noexcept;
 
-        #pragma endregion
+        Image(Image const&  in_copy) = delete;
+        Image(Image&&       in_move) noexcept;
 
-        #pragma region Operators
-
-        Image& operator=(Image const&   in_copy) noexcept = delete;
-        Image& operator=(Image&&        in_move) noexcept = default;
+        ~Image() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]] VkImage GetHandle() const noexcept;
+        DAEvoid* Map() noexcept;
 
-        [[nodiscard]] VmaAllocation GetAllocation() const noexcept;
+        DAEvoid UnMap() noexcept;
 
-        [[nodiscard]] VkFormat GetFormat() const noexcept;
+        [[nodiscard]]
+        Device const& GetDevice() const noexcept;
+
+        [[nodiscard]]
+        VkImage const& GetHandle() const noexcept;
+
+        [[nodiscard]]
+        VmaAllocation const& GetAllocation() const noexcept;
+
+        [[nodiscard]]
+        VkDeviceMemory const& GetMemory() const noexcept;
+
+        [[nodiscard]]
+        DAEvoid* GetMappedData() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Image& operator=(Image const&   in_copy) = delete;
+        Image& operator=(Image&&        in_move) = delete;
 
         #pragma endregion
 };
