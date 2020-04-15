@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,41 +24,45 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include "Vulkan/Utilities/Loader.hpp"
+
+BEGIN_DAEMON_NAMESPACE
 
 class DescriptorPool
 {
     private:
 
-    #pragma region Members
+        #pragma region Members
 
-    #pragma endregion
+        
 
-    #pragma region Methods
-
-    #pragma endregion
+        #pragma endregion
 
     public:
 
-    #pragma region Constructors and Destructor
+        #pragma region Constructors and Destructor
 
-    DescriptorPool() = default;
+        DescriptorPool() = default;
 
-    DescriptorPool(DescriptorPool const& in_copy) = delete;
-    DescriptorPool(DescriptorPool&& in_move)      = delete;
+        DescriptorPool(DescriptorPool const&    in_copy) = delete;
+        DescriptorPool(DescriptorPool&&         in_move) = delete;
 
-    ~DescriptorPool() = default;
+        ~DescriptorPool() = default;
 
-    #pragma endregion
+        #pragma endregion
 
-    #pragma region Operators
+        #pragma region Methods
 
-    DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-    DescriptorPool& operator=(DescriptorPool&& in_move)      = delete;
+        
 
-    #pragma endregion
+        #pragma endregion
 
-    #pragma region Methods
+        #pragma region Operators
 
-    #pragma endregion
+        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
+        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
+
+        #pragma endregion
 };
+
+END_DAEMON_NAMESPACE

@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,27 @@
  *  SOFTWARE.
  */
 
-#include "Rendering/Renderer.hpp"
-#include "Rendering/RenderFrame.hpp"
 #include "Rendering/RenderContext.hpp"
-
-#include "Vulkan/Fence.hpp"
-#include "Vulkan/Queue.hpp"
-#include "Vulkan/Device.hpp"
-#include "Vulkan/Semaphore.hpp"
-#include "Vulkan/Swapchain.hpp"
-#include "Vulkan/CommandBuffer.hpp"
 
 #include "Windowing/Window.hpp"
 
-#include "Debug/Logging/Logger.hpp"
+#include "Vulkan/Core/Device.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructor
 
-RenderContext::RenderContext(Instance const&    in_instance,
-                             Device   const&    in_device,
-                             Window&            in_window):
-    m_device                {in_device},
-    m_queue                 {in_device.GetQueueByFlags(VK_QUEUE_GRAPHICS_BIT)},
-    m_active_frame_index    {0u},
-    m_is_frame_active       {false},
-    m_swapchain             {std::make_unique<Swapchain>(in_instance, in_device, in_window)}
+RenderContext::RenderContext(Device const&  in_device,
+                             Window&        in_window):
+    m_swapchain {std::make_unique<Swapchain>(in_device, in_window)}
 {
-    if (!m_swapchain)
-        return;
+    for (DAEuint32 i = 0; i < 2u; ++i)
+        m_render_frames.emplace_back();
 
-    in_window.on_framebuffer_resized += [this](DAEuint32 const in_width, DAEuint32 const in_height)
+    in_window.on_framebuffer_resized += [this] (DAEint32 const in_width, DAEint32 const in_height)
     {
-        OnFramebufferResized(in_width, in_height);
+        if (m_swapchain)
+            m_swapchain->Resize(in_width, in_height);
     };
 }
 
@@ -63,47 +50,28 @@ RenderContext::RenderContext(Instance const&    in_instance,
 
 #pragma region Methods
 
-DAEvoid RenderContext::OnFramebufferResized(DAEuint32 const in_width,
-                                            DAEuint32 const in_height) noexcept
-{
-    if (m_swapchain->ResizeSwapchain(in_width, in_height))
-    {
-
-    }
-}
-
 DAEbool RenderContext::BeginFrame() noexcept
 {
     if (m_is_frame_active)
-    {
-        GRenderer->GetLogger()->Error("Frame is still active, please call EndFrame().");
         return false;
-    }
 
-    m_is_frame_active = m_swapchain->AcquireNextImage(m_frames[m_active_frame_index]->GetImageAvailableSemaphore(), m_active_frame_index);
+    m_frame_index = m_frame_index + 1 % m_render_frames.size();
 
-    return m_is_frame_active;
+    auto& active_frame = m_render_frames[m_frame_index];
+
+    active_frame.Reset();
+
+    return true;
 }
 
 DAEvoid RenderContext::EndFrame() noexcept
 {
     if (!m_is_frame_active)
-    {
-        GRenderer->GetLogger()->Error("Frame is not active, please call BeginFrame().");
         return;
-    }
+
+
 
     m_is_frame_active = false;
-}
-
-RenderFrame const& RenderContext::GetActiveFrame() const noexcept
-{
-    if (!m_is_frame_active)
-    {
-        // TODO : ERROR!
-    }
-
-    return *m_frames[m_active_frame_index];
 }
 
 #pragma endregion

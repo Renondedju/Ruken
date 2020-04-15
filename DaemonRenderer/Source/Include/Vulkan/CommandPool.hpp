@@ -24,7 +24,10 @@
 
 #pragma once
 
-#include "Vulkan.hpp"
+#include <thread>
+#include <unordered_map>
+
+#include "Vulkan/Core/CommandBuffer.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -34,18 +37,25 @@ class CommandPool
 {
     private:
 
+        struct CommandPoolData
+        {
+            DAEuint32     index     {0u};
+            VkCommandPool handle    {nullptr};
+
+            std::vector<CommandBuffer> command_buffers;
+        };
+
         #pragma region Members
 
-        Device const&   m_device;
-        VkCommandPool   m_handle;
-        DAEuint32       m_queue_family_index;
+        DAEuint32 m_queue_family_index {UINT_MAX};
+
+        std::unordered_map<std::thread::id, CommandPoolData> m_handles;
 
         #pragma endregion
 
         #pragma region Constructor
 
-        explicit CommandPool(Device const&  in_device,
-                             DAEuint32      in_queue_family_index) noexcept;
+        
 
         #pragma endregion
 
@@ -53,48 +63,31 @@ class CommandPool
 
         #pragma region Constructors and Destructor
 
-        CommandPool() = delete;
+        explicit CommandPool(DAEuint32 in_queue_family_index);
 
-        CommandPool(CommandPool const&  in_copy) noexcept = delete;
-        CommandPool(CommandPool&&       in_move) noexcept;
+        CommandPool(CommandPool const&  in_copy) = delete;
+        CommandPool(CommandPool&&       in_move) = delete;
 
-        ~CommandPool();
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        CommandPool& operator=(CommandPool const&   in_copy) noexcept = delete;
-        CommandPool& operator=(CommandPool&&        in_move) noexcept = default;
+        ~CommandPool() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
-        static DAEbool Create(Device* in_device, VkCommandPoolCreateInfo const& in_create_info, CommandPool** out_command_pool);
+        [[nodiscard]]
+        CommandBuffer& RequestCommandBuffer();
 
-        [[nodiscard]] DAEbool AllocateCommandBuffers(VkCommandBufferAllocateInfo& in_allocate_infos, VkCommandBuffer* out_command_buffers) const;
+        DAEvoid Reset();
 
-        DAEvoid FreeCommandBuffers(DAEuint32 in_count, VkCommandBuffer* in_command_buffers) const noexcept;
-
-        /**
-         * \brief 
-         *
-         * \param in_trim_flags 
-         */
-        DAEvoid Trim(VkCommandPoolTrimFlags in_trim_flags = 0u) const noexcept;
-
-        Device const& GetDevice() const noexcept;
-
-        /**
-         * \brief
-         *
-         * \return 
-         */
-        [[nodiscard]] VkCommandPool const& GetHandle() const noexcept;
-
-
+        [[nodiscard]]
         DAEuint32 GetQueueFamilyIndex() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        CommandPool& operator=(CommandPool const&   in_copy) = delete;
+        CommandPool& operator=(CommandPool&&        in_move) = delete;
 
         #pragma endregion
 };

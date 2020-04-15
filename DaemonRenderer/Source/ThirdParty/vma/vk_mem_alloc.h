@@ -1867,6 +1867,8 @@ Features deliberately excluded from the scope of this library:
 
 */
 
+#pragma warning (push, 0)
+
 /*
 Define this macro to 0/1 to disable/enable support for recording functionality,
 available through VmaAllocatorCreateInfo::pRecordSettings.
@@ -18455,5 +18457,7 @@ VMA_CALL_PRE void VMA_CALL_POST vmaDestroyImage(
             &allocation);
     }
 }
+
+#pragma warning (pop)
 
 #endif // #ifdef VMA_IMPLEMENTATION

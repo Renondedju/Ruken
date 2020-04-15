@@ -23,63 +23,79 @@
  */
 
 #include "Vulkan/CommandPool.hpp"
-#include "Vulkan/Device.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-CommandPool::CommandPool(Device const& in_device, DAEuint32 const in_queue_family_index) noexcept :
-    m_device                { in_device },
-    m_handle                { nullptr },
-    m_queue_family_index    { in_queue_family_index }
+CommandPool::CommandPool(DAEuint32 const in_queue_family_index):
+    m_queue_family_index {in_queue_family_index}
 {
+    VkCommandPoolCreateInfo command_pool_create_info = {};
 
+    command_pool_create_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    command_pool_create_info.flags            = 0u;
+    command_pool_create_info.queueFamilyIndex = in_queue_family_index;
+
+    // TODO : add for-loop to create a command pool for each available thread.
+    {
+        CommandPoolData data;
+
+        if (vkCreateCommandPool(Loader::GetLoadedDevice(), &command_pool_create_info, nullptr, &data.handle) != VK_SUCCESS)
+            throw std::exception("Failed to create a command pool!");
+
+        m_handles.emplace(std::this_thread::get_id(), std::move(data));
+    }
 }
 
-CommandPool::~CommandPool()
+CommandPool::~CommandPool() noexcept
 {
-    if (m_handle)
-    {
-        vkDestroyCommandPool(m_device.GetHandle(), m_handle, nullptr);
-    }
+    for (auto const& handle : m_handles)
+        vkDestroyCommandPool(Loader::GetLoadedDevice(), handle.second.handle, nullptr);
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEbool CommandPool::Create(Device* in_device, VkCommandPoolCreateInfo const& in_create_info, CommandPool** out_command_pool)
+CommandBuffer& CommandPool::RequestCommandBuffer()
 {
+    auto const it = m_handles.find(std::this_thread::get_id());
 
-    return vkCreateCommandPool(in_device->GetHandle(), &in_create_info, nullptr, &(*out_command_pool)->m_handle) == VK_SUCCESS;
+    if (it == m_handles.cend())
+        throw std::exception("Requesting command buffer from an unregistered thread!");
+
+    auto const& command_pool = it->second;
+
+    if (command_pool.index == m_handles.size())
+    {
+        VkCommandBufferAllocateInfo command_buffer_allocate_info = {};
+
+        command_buffer_allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        command_buffer_allocate_info.commandPool        = command_pool.handle;
+        command_buffer_allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        command_buffer_allocate_info.commandBufferCount = 1u;
+
+        VkCommandBuffer handle;
+
+        if (vkAllocateCommandBuffers(Loader::GetLoadedDevice(), &command_buffer_allocate_info, &handle) != VK_SUCCESS)
+            throw std::exception("Failed to allocate a command buffer!");
+
+        it->second.command_buffers.emplace_back(handle);
+    }
+
+    return it->second.command_buffers[it->second.index++];
 }
 
-DAEbool CommandPool::AllocateCommandBuffers(VkCommandBufferAllocateInfo& in_allocate_infos, VkCommandBuffer* out_command_buffers) const
+DAEvoid CommandPool::Reset()
 {
-    in_allocate_infos.commandPool = m_handle;
+    for (auto& handle : m_handles)
+    {
+        handle.second.index = 0u;
 
-    return vkAllocateCommandBuffers(m_device.GetHandle(), &in_allocate_infos, out_command_buffers) == VK_SUCCESS;
-}
-
-DAEvoid CommandPool::FreeCommandBuffers(DAEuint32 in_count, VkCommandBuffer* in_command_buffers) const noexcept
-{
-    vkFreeCommandBuffers(m_device.GetHandle(), m_handle, in_count, in_command_buffers);
-}
-
-DAEvoid CommandPool::Trim(VkCommandPoolTrimFlags const in_trim_flags) const noexcept
-{
-    vkTrimCommandPool(m_device.GetHandle(), m_handle, in_trim_flags);
-}
-
-Device const& CommandPool::GetDevice() const noexcept
-{
-    return m_device;
-}
-
-VkCommandPool const& CommandPool::GetHandle() const noexcept
-{
-    return m_handle;
+        if (vkResetCommandPool(Loader::GetLoadedDevice(), handle.second.handle, 0u) != VK_SUCCESS)
+            throw std::exception("Failed to reset a command pool!");
+    }
 }
 
 DAEuint32 CommandPool::GetQueueFamilyIndex() const noexcept

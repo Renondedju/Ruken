@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,15 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
-#include "Vulkan/Vulkan.hpp"
+#include "Vulkan/FencePool.hpp"
+#include "Vulkan/CommandPool.hpp"
+#include "Vulkan/SemaphorePool.hpp"
+
+#include "Rendering/RenderView.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-class Fence;
-class Device;
-class Semaphore;
-class CommandPool;
-class CommandBuffer;
 
 class RenderFrame
 {
@@ -42,15 +41,17 @@ class RenderFrame
 
         #pragma region Members
 
-        Device const& m_device;
+        std::unique_ptr<FencePool>      m_fence_pool;
+        std::unique_ptr<SemaphorePool>  m_semaphore_pool;
+        std::unique_ptr<CommandPool>    m_command_pool;
 
-        std::unique_ptr<Fence>          m_fence;
-        std::unique_ptr<Semaphore>      m_image_available_semaphore;
-        std::unique_ptr<Semaphore>      m_render_finished_semaphore;
+        std::vector<RenderView> m_render_views;
 
         #pragma endregion
 
         #pragma region Methods
+
+        
 
         #pragma endregion
 
@@ -58,14 +59,30 @@ class RenderFrame
 
         #pragma region Constructors and Destructor
 
-        RenderFrame() = delete;
-
-        explicit RenderFrame(Device const& in_device) noexcept;
+        RenderFrame() noexcept;
 
         RenderFrame(RenderFrame const&  in_copy) = delete;
-        RenderFrame(RenderFrame&&       in_move) = delete;
+        RenderFrame(RenderFrame&&       in_move) noexcept;
 
         ~RenderFrame() = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        DAEvoid Reset() noexcept;
+
+        [[nodiscard]]
+        Fence& RequestFence() const noexcept;
+
+        [[nodiscard]]
+        Semaphore& RequestSemaphore() const noexcept;
+
+        [[nodiscard]]
+        TimelineSemaphore& RequestTimelineSemaphore() const noexcept;
+
+        [[nodiscard]]
+        CommandBuffer& RequestCommandBuffer() const noexcept;
 
         #pragma endregion
 
@@ -73,14 +90,6 @@ class RenderFrame
 
         RenderFrame& operator=(RenderFrame const&   in_copy) = delete;
         RenderFrame& operator=(RenderFrame&&        in_move) = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        Semaphore const& GetImageAvailableSemaphore() const noexcept;
-
-        Semaphore const& GetRenderFinishedSemaphore() const noexcept;
 
         #pragma endregion
 };

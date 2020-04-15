@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,20 +25,12 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include "Types/FundamentalTypes.hpp"
+#include "Rendering/RenderFrame.hpp"
 
-#include "Vulkan/Swapchain.hpp"
+#include "Vulkan/Core/Swapchain.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-class Queue;
-class Device;
-class Window;
-class Semaphore;
-class RenderFrame;
-class CommandBuffer;
 
 class RenderContext
 {
@@ -46,18 +38,18 @@ class RenderContext
 
         #pragma region Members
 
-        Device const&                               m_device;
-        Queue  const&                               m_queue;
-        DAEuint32                                   m_active_frame_index;
-        DAEbool                                     m_is_frame_active;
-        std::unique_ptr<Swapchain>                  m_swapchain;
-        std::vector<std::unique_ptr<RenderFrame>>   m_frames;
+        DAEint32    m_frame_index       {-1};
+        DAEbool     m_is_frame_active   {false};
+
+        std::unique_ptr<Swapchain> m_swapchain;
+
+        std::vector<RenderFrame> m_render_frames;
 
         #pragma endregion
 
         #pragma region Methods
 
-        DAEvoid OnFramebufferResized(DAEuint32 in_width, DAEuint32 in_height) noexcept;
+
 
         #pragma endregion
 
@@ -65,8 +57,7 @@ class RenderContext
 
         #pragma region Constructors and Destructor
 
-        explicit RenderContext(Instance const&  in_instance,
-                               Device   const&  in_device,
+        explicit RenderContext(Device const&    in_device,
                                Window&          in_window);
 
         RenderContext(RenderContext const&  in_copy) = delete;
@@ -88,12 +79,6 @@ class RenderContext
         DAEbool BeginFrame() noexcept;
 
         DAEvoid EndFrame() noexcept;
-
-        [[nodiscard]]
-        std::vector<std::unique_ptr<RenderFrame>> const& GetFrames() const noexcept;
-
-        [[nodiscard]]
-        RenderFrame const& GetActiveFrame() const noexcept;
 
         #pragma endregion
 };

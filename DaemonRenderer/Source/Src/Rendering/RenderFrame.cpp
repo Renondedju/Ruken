@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,22 @@
 
 #include "Rendering/RenderFrame.hpp"
 
-#include "Vulkan/Fence.hpp"
-#include "Vulkan/Semaphore.hpp"
-
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructor
 
-RenderFrame::RenderFrame(Device const& in_device) noexcept:
-    m_device {in_device}
+RenderFrame::RenderFrame() noexcept:
+    m_fence_pool        {std::make_unique<FencePool>    ()},
+    m_semaphore_pool    {std::make_unique<SemaphorePool>()}
+{
+
+}
+
+RenderFrame::RenderFrame(RenderFrame&& in_move) noexcept:
+    m_fence_pool        {std::move(in_move.m_fence_pool)},
+    m_semaphore_pool    {std::move(in_move.m_semaphore_pool)},
+    m_command_pool      {std::move(in_move.m_command_pool)},
+    m_render_views      {std::move(in_move.m_render_views)}
 {
 
 }
@@ -41,14 +48,33 @@ RenderFrame::RenderFrame(Device const& in_device) noexcept:
 
 #pragma region Methods
 
-Semaphore const& RenderFrame::GetImageAvailableSemaphore() const noexcept
+DAEvoid RenderFrame::Reset() noexcept
 {
-    return *m_image_available_semaphore;
+    m_fence_pool    ->Reset();
+    m_semaphore_pool->Reset();
+    m_command_pool  ->Reset();
+
+    m_render_views.clear();
 }
 
-Semaphore const& RenderFrame::GetRenderFinishedSemaphore() const noexcept
+Fence& RenderFrame::RequestFence() const noexcept
 {
-    return *m_render_finished_semaphore;
+    return m_fence_pool->RequestFence();
+}
+
+Semaphore& RenderFrame::RequestSemaphore() const noexcept
+{
+    return m_semaphore_pool->RequestSemaphore();
+}
+
+TimelineSemaphore& RenderFrame::RequestTimelineSemaphore() const noexcept
+{
+    return m_semaphore_pool->RequestTimelineSemaphore();
+}
+
+CommandBuffer& RenderFrame::RequestCommandBuffer() const noexcept
+{
+    return m_command_pool->RequestCommandBuffer();
 }
 
 #pragma endregion
