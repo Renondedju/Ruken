@@ -41,7 +41,7 @@ Fence::Fence() noexcept
 }
 
 Fence::Fence(Fence&& in_move) noexcept:
-    m_handle {std::move(in_move.m_handle)}
+    m_handle {in_move.m_handle}
 {
     in_move.m_handle = nullptr;
 }

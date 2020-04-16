@@ -47,9 +47,11 @@ Image::Image(Image&& in_move) noexcept:
     m_allocation_info   {in_move.m_allocation_info},
     m_is_mapped         {in_move.m_is_mapped}
 {
-    in_move.m_handle     = nullptr;
-    in_move.m_allocation = nullptr;
-    in_move.m_is_mapped  = false;
+    in_move.m_handle          = nullptr;
+    in_move.m_allocator       = nullptr;
+    in_move.m_allocation      = nullptr;
+    in_move.m_allocation_info = {};
+    in_move.m_is_mapped       = false;
 }
 
 Image::~Image() noexcept

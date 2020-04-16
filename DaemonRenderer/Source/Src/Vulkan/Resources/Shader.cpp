@@ -22,50 +22,59 @@
  *  SOFTWARE.
  */
 
+#include <fstream>
+
 #include <glslang/Public/ShaderLang.h>
 
 #include "Vulkan/Resources/Shader.hpp"
 
 #include "Vulkan/Utilities/Debug.hpp"
 
-#include "Resource/ResourceManager.hpp"
+#include "Resource/ResourceProcessingFailure.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
+#pragma warning (disable : 4100)
+
 DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-    (void)in_manager;
-    (void)in_descriptor;
-
     auto const& descriptor = reinterpret_cast<ShaderLoadingDescriptor const&>(in_descriptor);
 
-    m_filename = descriptor.filename;
+    std::ifstream stream(descriptor.filename);
+
+    if (!glslang::InitializeProcess())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
+
+
+
+    glslang::FinalizeProcess();
 
     VkShaderModuleCreateInfo shader_module_create_info = {};
 
     shader_module_create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shader_module_create_info.codeSize = 0ull;
-    shader_module_create_info.pCode    = nullptr;
+    shader_module_create_info.codeSize = m_code.size() * sizeof(DAEuint32);
+    shader_module_create_info.pCode    = m_code.data();
 
-    VK_CHECK(vkCreateShaderModule(Loader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle));
+    if (!VK_CHECK(vkCreateShaderModule(Loader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle)))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 }
 
 DAEvoid Shader::Reload(ResourceManager& in_manager)
 {
-    (void)in_manager;
+
 }
 
 DAEvoid Shader::Unload(ResourceManager& in_manager) noexcept
 {
-    (void)in_manager;
+    m_code.clear();
 
-    if (!m_handle)
-        return;
-
-    vkDestroyShaderModule(Loader::GetLoadedDevice(), m_handle, nullptr);
+    if (m_handle)
+        vkDestroyShaderModule(Loader::GetLoadedDevice(), m_handle, nullptr);
 }
+
+#pragma warning (default : 4100)
 
 VkShaderModule const& Shader::GetHandle() const noexcept
 {

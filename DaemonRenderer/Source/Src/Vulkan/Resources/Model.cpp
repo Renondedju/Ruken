@@ -28,26 +28,44 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
-
-#pragma endregion
-
 #pragma region Methods
+
+#pragma warning (disable : 4100)
 
 DAEvoid Model::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-    (void)in_manager;
-    (void)in_descriptor;
+    auto const& descriptor = reinterpret_cast<ModelLoadingDescriptor const&>(in_descriptor);
+
+    ResourceIdentifier const identifier("");
+
+    Mesh new_mesh;
+    Material new_material;
+
+    m_meshes   .emplace_back(in_manager.ReferenceResource(identifier, &new_mesh));
+    m_materials.emplace_back(in_manager.ReferenceResource(identifier, &new_material));
 }
 
 DAEvoid Model::Reload(ResourceManager& in_manager)
 {
-    (void)in_manager;
+
 }
 
 DAEvoid Model::Unload(ResourceManager& in_manager) noexcept
 {
-    (void)in_manager;
+    for (auto const& mesh : m_meshes)
+    {
+
+    }
+
+    for (auto const& material : m_materials)
+    {
+        
+    }
+
+    m_meshes   .clear();
+    m_materials.clear();
 }
+
+#pragma warning (default : 4100)
 
 #pragma endregion

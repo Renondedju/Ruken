@@ -22,12 +22,17 @@
  *  SOFTWARE.
  */
 
-#define VMA_IMPLEMENTATION
-
 #include <map>
 #include <set>
 
+#pragma warning (push, 0)
+
+#define VMA_IMPLEMENTATION
+
 #include "Vulkan/Core/Device.hpp"
+
+#pragma warning (pop)
+
 #include "Vulkan/Core/Instance.hpp"
 
 #include "Vulkan/Utilities/Debug.hpp"
@@ -252,9 +257,9 @@ DAEvoid Device::WaitIdle() const noexcept
 Image Device::CreateImage(VkImageCreateInfo       const& in_image_create_info,
                           VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
-    VkImage             image;
-    VmaAllocation       allocation;
-    VmaAllocationInfo   allocation_info;
+    VkImage             image           = nullptr;
+    VmaAllocation       allocation      = nullptr;
+    VmaAllocationInfo   allocation_info = {};
 
     vmaCreateImage(m_allocator, &in_image_create_info, &in_allocation_create_info, &image, &allocation, &allocation_info);
 
@@ -264,9 +269,9 @@ Image Device::CreateImage(VkImageCreateInfo       const& in_image_create_info,
 Buffer Device::CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
                             VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
-    VkBuffer            buffer;
-    VmaAllocation       allocation;
-    VmaAllocationInfo   allocation_info;
+    VkBuffer            buffer          = nullptr;
+    VmaAllocation       allocation      = nullptr;
+    VmaAllocationInfo   allocation_info = {};
 
     vmaCreateBuffer(m_allocator, &in_buffer_create_info, &in_allocation_create_info, &buffer, &allocation, &allocation_info);
 

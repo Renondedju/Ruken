@@ -32,8 +32,6 @@
 #include "Vulkan/Core/PipelineCache.hpp"
 #include "Vulkan/Core/PhysicalDevice.hpp"
 
-#include <vma/vk_mem_alloc.h>
-
 BEGIN_DAEMON_NAMESPACE
 
 class Instance;

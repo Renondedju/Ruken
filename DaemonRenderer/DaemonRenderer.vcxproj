@@ -190,6 +190,7 @@
     <ClInclude Include="Source\Include\Vulkan\Resources\Material.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Mesh.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Model.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Resources\Texture.hpp" />
     <ClInclude Include="Source\Include\Vulkan\SemaphorePool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Shader.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\TimelineSemaphore.hpp" />
@@ -313,6 +314,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Core\ServiceBase.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceProvider.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Resources\Texture.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Model.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Material.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Mesh.cpp" />

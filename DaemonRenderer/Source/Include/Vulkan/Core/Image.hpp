@@ -48,6 +48,8 @@ class Image
 
         #pragma region Constructors and Destructor
 
+        Image() = default;
+
         explicit Image(VkImage              in_handle,
                        VmaAllocator         in_allocator,
                        VmaAllocation        in_allocation,

@@ -49,6 +49,8 @@ class Buffer
 
         #pragma region Constructors and Destructor
 
+        Buffer() = default;
+
         explicit Buffer(VkBuffer            in_handle,
                         VmaAllocator        in_allocator,
                         VmaAllocation       in_allocation,

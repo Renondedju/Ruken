@@ -24,11 +24,26 @@
 
 #pragma once
 
-#include "Resource/IResource.hpp"
+#include <string>
+#include <vector>
 
-#include "Vulkan/Utilities/Loader.hpp"
+#include "Resource/Handle.hpp"
+
+#include "Vulkan/Resources/Mesh.hpp"
+#include "Vulkan/Resources/Material.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+class ModelLoadingDescriptor final : public ResourceLoadingDescriptor
+{
+    public:
+
+        #pragma region Members
+
+        std::string path;
+
+        #pragma endregion
+};
 
 class Model final : public IResource
 {
@@ -36,7 +51,8 @@ class Model final : public IResource
 
         #pragma region Members
 
-        
+        std::vector<Handle<Mesh>>       m_meshes;
+        std::vector<Handle<Material>>   m_materials;
 
         #pragma endregion
 
@@ -46,8 +62,8 @@ class Model final : public IResource
 
         Model() = default;
 
-        Model(Model const&  in_copy) = default;
-        Model(Model&&       in_move) = default;
+        Model(Model const&  in_copy) = delete;
+        Model(Model&&       in_move) = delete;
 
         ~Model() = default;
 
@@ -65,8 +81,8 @@ class Model final : public IResource
 
         #pragma region Operators
 
-        Model& operator=(Model const&   in_copy) = default;
-        Model& operator=(Model&&        in_move) = default;
+        Model& operator=(Model const&   in_copy) = delete;
+        Model& operator=(Model&&        in_move) = delete;
 
         #pragma endregion
 };

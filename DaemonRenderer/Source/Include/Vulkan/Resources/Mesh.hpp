@@ -24,17 +24,50 @@
 
 #pragma once
 
-#include "Resource/IResource.hpp"
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "Vulkan/Utilities/Loader.hpp"
+#include "Resource/IResource.hpp"
+#include "Resource/ResourceLoadingDescriptor.hpp"
+
+#include "Vulkan/Core/Buffer.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+struct Vertex
+{
+    
+};
+
+class MeshLoadingDescriptor final : public ResourceLoadingDescriptor
+{
+    public:
+
+        #pragma region Members
+
+        std::string path;
+
+        #pragma endregion
+};
 
 class Mesh final : public IResource
 {
     private:
 
         #pragma region Members
+
+        std::unique_ptr<Buffer> m_vertex_buffer;
+        std::unique_ptr<Buffer> m_index_buffer;
+
+        DAEuint32 m_vertex_count    {0u};
+        DAEuint32 m_index_count     {0u};
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        
 
         #pragma endregion
 
@@ -44,8 +77,11 @@ class Mesh final : public IResource
 
         Mesh() = default;
 
-        Mesh(Mesh const&    in_copy) = default;
-        Mesh(Mesh&&         in_move) = default;
+        explicit Mesh(std::vector<Vertex>    const& in_vertices,
+                      std::vector<DAEuint32> const& in_indices) noexcept;
+
+        Mesh(Mesh const&    in_copy) = delete;
+        Mesh(Mesh&&         in_move) = delete;
 
         ~Mesh() = default;
 
@@ -53,18 +89,30 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        DAEvoid Reload(class ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
+
+        [[nodiscard]]
+        Buffer const& GetVertexBuffer() const noexcept;
+
+        [[nodiscard]]
+        Buffer const& GetIndexBuffer() const noexcept;
+
+        [[nodiscard]]
+        DAEuint32 GetVertexCount() const noexcept;
+
+        [[nodiscard]]
+        DAEuint32 GetIndexCount() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        Mesh& operator=(Mesh const& in_copy) = default;
-        Mesh& operator=(Mesh&&      in_move) = default;
+        Mesh& operator=(Mesh const& in_copy) = delete;
+        Mesh& operator=(Mesh&&      in_move) = delete;
 
         #pragma endregion
 };

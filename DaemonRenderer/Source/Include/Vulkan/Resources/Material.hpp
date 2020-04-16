@@ -24,19 +24,35 @@
 
 #pragma once
 
-#include "Resource/IResource.hpp"
+#include <string>
+#include <vector>
 
-#include "Vulkan/Utilities/Loader.hpp"
+#include "Vulkan/Resources/Shader.hpp"
+#include "Vulkan/Resources/Texture.hpp"
+
+#include "Resource/Handle.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class Material : public IResource
+class MaterialLoadingDescriptor final : public ResourceLoadingDescriptor
+{
+    public:
+
+        #pragma region Members
+
+        std::string path;
+
+        #pragma endregion
+};
+
+class Material final : public IResource
 {
     private:
 
         #pragma region Members
 
-        
+        std::vector<Handle<Shader>>     m_shaders;
+        std::vector<Handle<Texture>>    m_textures;
 
         #pragma endregion
 
@@ -46,8 +62,8 @@ class Material : public IResource
 
         Material() = default;
 
-        Material(Material const&    in_copy) = default;
-        Material(Material&&         in_move) = default;
+        Material(Material const&    in_copy) = delete;
+        Material(Material&&         in_move) = delete;
 
         ~Material() = default;
 
@@ -55,18 +71,18 @@ class Material : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        DAEvoid Reload(class ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
 
         #pragma endregion
 
         #pragma region Operators
 
-        Material& operator=(Material const& in_copy) = default;
-        Material& operator=(Material&&      in_move) = default;
+        Material& operator=(Material const& in_copy) = delete;
+        Material& operator=(Material&&      in_move) = delete;
 
         #pragma endregion
 };

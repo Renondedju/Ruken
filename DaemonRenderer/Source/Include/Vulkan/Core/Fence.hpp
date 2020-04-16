@@ -28,8 +28,6 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class Device;
-
 class Fence
 {
     private:
@@ -61,9 +59,6 @@ class Fence
 
         [[nodiscard]]
         DAEbool IsSignaled() const noexcept;
-
-        [[nodiscard]]
-        Device const& GetDevice() const noexcept;
 
         [[nodiscard]]
         VkFence const& GetHandle() const noexcept;

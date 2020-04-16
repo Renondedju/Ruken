@@ -33,11 +33,15 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class ShaderLoadingDescriptor : public ResourceLoadingDescriptor
+class ShaderLoadingDescriptor final : public ResourceLoadingDescriptor
 {
     public:
 
+        #pragma region Members
+
         std::string filename;
+
+        #pragma endregion
 };
 
 class Shader final : public IResource
@@ -47,7 +51,8 @@ class Shader final : public IResource
         #pragma region Members
 
         VkShaderModule m_handle {nullptr};
-        std::string    m_filename;
+
+        std::vector<DAEuint32> m_code;
 
         #pragma endregion
 
@@ -72,11 +77,11 @@ class Shader final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        DAEvoid Reload(class ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VkShaderModule const& GetHandle() const noexcept;

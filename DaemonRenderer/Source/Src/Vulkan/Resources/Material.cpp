@@ -22,32 +22,37 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/Resources/Material.hpp"
-
 #include "Resource/ResourceManager.hpp"
+
+#include "Vulkan/Resources/Material.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
+
+
 
 #pragma endregion
 
 #pragma region Methods
 
+#pragma warning (disable : 4100)
+
 DAEvoid Material::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-    (void)in_manager;
-    (void)in_descriptor;
+
 }
 
 DAEvoid Material::Reload(ResourceManager& in_manager)
 {
-    (void)in_manager;
+
 }
 
 DAEvoid Material::Unload(ResourceManager& in_manager) noexcept
 {
-    (void)in_manager;
+
 }
+
+#pragma warning (default : 4100)
 
 #pragma endregion

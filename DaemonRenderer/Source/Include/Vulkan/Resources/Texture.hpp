@@ -24,40 +24,77 @@
 
 #pragma once
 
-#include "Vulkan/Core/Semaphore.hpp"
+#include <memory>
+#include <string>
+
+#include "Resource/IResource.hpp"
+#include "Resource/ResourceLoadingDescriptor.hpp"
+
+#include "Vulkan/Core/Image.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class TimelineSemaphore final : public Semaphore
+class TextureLoadingDescriptor final : public ResourceLoadingDescriptor
 {
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Members
 
-        TimelineSemaphore() noexcept;
+        std::string path;
 
-        TimelineSemaphore(TimelineSemaphore const&  in_copy) = delete;
-        TimelineSemaphore(TimelineSemaphore&&       in_move) noexcept;
+        #pragma endregion
+};
 
-        ~TimelineSemaphore() = default;
+class Texture final : public IResource
+{
+    private:
+
+        #pragma region Members
+
+        std::unique_ptr<Image> m_image;
 
         #pragma endregion
 
         #pragma region Methods
 
-        DAEvoid Signal(DAEuint64 in_value) const noexcept;
+        DAEvoid UploadData(DAEvoid const*   in_pixels,
+                           DAEuint32        in_width,
+                           DAEuint32        in_height) noexcept;
 
-        DAEvoid Wait(DAEuint64 in_value) const noexcept;
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors and Destructor
+
+        Texture() = default;
+
+        explicit Texture(std::string const& in_filename) noexcept;
+
+        Texture(Texture const&  in_copy) = delete;
+        Texture(Texture&&       in_move) noexcept;
+
+        ~Texture() = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+
+        DAEvoid Reload(class ResourceManager& in_manager) override;
+
+        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
-        DAEuint64 GetValue() const noexcept;
+        Image const& GetImage() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        TimelineSemaphore& operator=(TimelineSemaphore const&   in_copy) = delete;
-        TimelineSemaphore& operator=(TimelineSemaphore&&        in_move) = delete;
+        Texture& operator=(Texture const&   in_copy) = delete;
+        Texture& operator=(Texture&&        in_move) = delete;
 
         #pragma endregion
 };
