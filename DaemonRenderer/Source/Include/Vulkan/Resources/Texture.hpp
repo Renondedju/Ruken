@@ -59,7 +59,7 @@ class Texture final : public IResource
 
         DAEvoid UploadData(DAEvoid const*   in_pixels,
                            DAEuint32        in_width,
-                           DAEuint32        in_height) noexcept;
+                           DAEuint32        in_height);
 
         #pragma endregion
 
@@ -69,7 +69,7 @@ class Texture final : public IResource
 
         Texture() = default;
 
-        explicit Texture(std::string const& in_filename) noexcept;
+        explicit Texture(std::string const& in_filename);
 
         Texture(Texture const&  in_copy) = delete;
         Texture(Texture&&       in_move) noexcept;

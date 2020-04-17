@@ -22,9 +22,13 @@
  *  SOFTWARE.
  */
 
+#pragma warning (push, 0)
+
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb/stb_image.h>
+
+#pragma warning (pop)
 
 #include "Vulkan/Resources/Texture.hpp"
 
@@ -33,12 +37,13 @@
 #include "Resource/ResourceManager.hpp"
 
 #include "Rendering/RenderSystem.hpp"
+#include "Resource/ResourceProcessingFailure.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-Texture::Texture(std::string const& in_filename) noexcept
+Texture::Texture(std::string const& in_filename)
 {
     DAEint32 width  = 0;
     DAEint32 height = 0;
@@ -61,17 +66,32 @@ Texture::Texture(Texture&& in_move) noexcept:
 
 DAEvoid Texture::UploadData(DAEvoid   const*    in_pixels,
                             DAEuint32 const     in_width,
-                            DAEuint32 const     in_height) noexcept
+                            DAEuint32 const     in_height)
 {
     auto const& device = GRenderSystem->GetDevice();
 
-    VkBufferCreateInfo buffer_create_info = {};
+    VmaAllocationCreateInfo allocation_create_info = {};
+    VkBufferCreateInfo      buffer_create_info     = {};
+    VkImageCreateInfo       image_create_info      = {};
+
+    // Creates the staging buffer.
+    allocation_create_info.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
+    allocation_create_info.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
     buffer_create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     buffer_create_info.size  = in_width * in_height * sizeof(DAEuint32);
     buffer_create_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-    VkImageCreateInfo image_create_info = {};
+    auto staging_buffer = device.CreateBuffer(buffer_create_info, allocation_create_info);
+
+    if (!staging_buffer.has_value())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
+
+    memcpy(staging_buffer->GetMappedData(), in_pixels, in_width * in_height * sizeof(DAEuint32));
+
+    // Creates the image.
+    allocation_create_info.flags = 0u;
+    allocation_create_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
     image_create_info.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     image_create_info.imageType     = VK_IMAGE_TYPE_2D;
@@ -85,31 +105,14 @@ DAEvoid Texture::UploadData(DAEvoid   const*    in_pixels,
     image_create_info.tiling        = VK_IMAGE_TILING_OPTIMAL;
     image_create_info.usage         = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-    try
-    {
-        VmaAllocationCreateInfo allocation_create_info = {};
+    auto image = device.CreateImage(image_create_info, allocation_create_info);
 
-        // 
-        allocation_create_info.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
-        allocation_create_info.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+    if (!image.has_value())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 
-        Buffer const staging_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+    m_image = std::make_unique<Image>(std::move(image.value()));
 
-        memcpy(staging_buffer.GetMappedData(), in_pixels, in_width * in_height * sizeof(DAEuint32));
-
-        // 
-        allocation_create_info.flags = 0u;
-        allocation_create_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-
-        m_image = std::make_unique<Image>(GRenderSystem->GetDevice().CreateImage(image_create_info, allocation_create_info));
-
-        // TODO : Upload data to GPU.
-    }
-
-    catch (std::exception const& e)
-    {
-        return;
-    }
+    // TODO : Upload data to GPU.
 }
 
 #pragma warning (disable : 4100)

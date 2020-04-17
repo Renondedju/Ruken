@@ -24,7 +24,7 @@
 
 #include "Vulkan/Core/ImageView.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -35,7 +35,7 @@ ImageView::ImageView(Image                 const& in_image,
     m_image {in_image},
     m_info  {in_image_view_create_info}
 {
-    VK_CHECK(vkCreateImageView(Loader::GetLoadedDevice(), &in_image_view_create_info, nullptr, &m_handle));
+    VK_CHECK(vkCreateImageView(VulkanLoader::GetLoadedDevice(), &in_image_view_create_info, nullptr, &m_handle));
 }
 
 ImageView::ImageView(ImageView&& in_move) noexcept:
@@ -51,7 +51,7 @@ ImageView::~ImageView() noexcept
     if (!m_handle)
         return;
 
-    vkDestroyImageView(Loader::GetLoadedDevice(), m_handle, nullptr);
+    vkDestroyImageView(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
 }
 
 #pragma endregion

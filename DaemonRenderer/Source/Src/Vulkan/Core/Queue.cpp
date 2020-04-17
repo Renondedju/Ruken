@@ -26,7 +26,7 @@
 #include "Vulkan/Core/CommandBuffer.hpp"
 #include "Vulkan/Core/PhysicalDevice.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 

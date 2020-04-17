@@ -67,7 +67,8 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        
+        DAEvoid UploadData(std::vector<Vertex>    const& in_vertices,
+                           std::vector<DAEuint32> const& in_indices);
 
         #pragma endregion
 
@@ -77,8 +78,7 @@ class Mesh final : public IResource
 
         Mesh() = default;
 
-        explicit Mesh(std::vector<Vertex>    const& in_vertices,
-                      std::vector<DAEuint32> const& in_indices) noexcept;
+        explicit Mesh(std::vector<Vertex> const& in_vertices, std::vector<DAEuint32> const& in_indices);
 
         Mesh(Mesh const&    in_copy) = delete;
         Mesh(Mesh&&         in_move) = delete;

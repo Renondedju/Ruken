@@ -28,7 +28,7 @@
 
 #include "Vulkan/Resources/Shader.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 #include "Resource/ResourceProcessingFailure.hpp"
 
@@ -57,7 +57,7 @@ DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor cons
     shader_module_create_info.codeSize = m_code.size() * sizeof(DAEuint32);
     shader_module_create_info.pCode    = m_code.data();
 
-    if (!VK_CHECK(vkCreateShaderModule(Loader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle)))
+    if (!VK_CHECK(vkCreateShaderModule(VulkanLoader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle)))
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 }
 
@@ -71,7 +71,7 @@ DAEvoid Shader::Unload(ResourceManager& in_manager) noexcept
     m_code.clear();
 
     if (m_handle)
-        vkDestroyShaderModule(Loader::GetLoadedDevice(), m_handle, nullptr);
+        vkDestroyShaderModule(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
 }
 
 #pragma warning (default : 4100)

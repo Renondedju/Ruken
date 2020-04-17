@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,43 +24,49 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Types/FundamentalTypes.hpp"
+
+#if defined(DAEMON_OS_WINDOWS)
+    #define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
+#include <volk/volk.h>
 
 BEGIN_DAEMON_NAMESPACE
 
-class DescriptorPool
+class VulkanLoader
 {
-    private:
-
-        #pragma region Members
-
-        
-
-        #pragma endregion
-
     public:
-
-        #pragma region Constructors and Destructor
-
-        DescriptorPool() = default;
-
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
-
-        ~DescriptorPool() = default;
-
-        #pragma endregion
 
         #pragma region Methods
 
-        
+        /**
+         * \brief 
+         * \note  Call this function before creating the Vulkan instance.
+         */
+        static DAEvoid Initialize();
 
-        #pragma endregion
+        /**
+         * \brief Loads global function pointers using application-created 'VkInstance'.
+         * \note  Call this function after creating the Vulkan instance.
+         */
+        static DAEvoid LoadInstance(VkInstance in_instance) noexcept;
 
-        #pragma region Operators
+        /**
+         * \brief Loads global function pointers using application-created 'VkDevice'.
+         * \note  Call this function after creating the Vulkan device.
+         */
+        static DAEvoid LoadDevice(VkDevice in_device) noexcept;
 
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
+        /**
+         * \return The last 'VkInstance' for which global function pointers have been loaded.
+         */
+        static VkInstance GetLoadedInstance() noexcept;
+
+        /**
+         * \return The last 'VkDevice' for which global function pointers have been loaded.
+         */
+        static VkDevice GetLoadedDevice() noexcept;
 
         #pragma endregion
 };

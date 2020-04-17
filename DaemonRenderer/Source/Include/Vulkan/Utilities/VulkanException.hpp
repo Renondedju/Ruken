@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,49 +24,39 @@
 
 #pragma once
 
-#include "Types/FundamentalTypes.hpp"
+#include <exception>
 
-#if defined(DAEMON_OS_WINDOWS)
-    #define VK_USE_PLATFORM_WIN32_KHR
-#endif
-
-#include <volk/volk.h>
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class Loader
+class VulkanException final : public std::exception
 {
     public:
 
+        #pragma region Members
+
+        #pragma endregion
+
+        #pragma region Constructors and Destructor
+
+        explicit VulkanException(DAEchar const* in_message) noexcept;
+
+        VulkanException(VulkanException const&  in_copy) = default;
+        VulkanException(VulkanException&&       in_move) = default;
+
+        ~VulkanException() = default;
+
+        #pragma endregion
+
         #pragma region Methods
 
-        /**
-         * \return True if Vulkan could be loaded, else False.
-         * \note   Call this function before creating the Vulkan instance.
-         */
-        static DAEbool Initialize();
+        #pragma endregion
 
-        /**
-         * \brief Loads global function pointers using application-created 'VkInstance'.
-         * \note  Call this function after creating the Vulkan instance.
-         */
-        static DAEvoid LoadInstance(VkInstance in_instance);
+        #pragma region Operators
 
-        /**
-         * \brief Loads global function pointers using application-created 'VkDevice'.
-         * \note  Call this function after creating the Vulkan device.
-         */
-        static DAEvoid LoadDevice(VkDevice in_device);
-
-        /**
-         * \return The last 'VkInstance' for which global function pointers have been loaded.
-         */
-        static VkInstance GetLoadedInstance() noexcept;
-
-        /**
-         * \return The last 'VkDevice' for which global function pointers have been loaded.
-         */
-        static VkDevice GetLoadedDevice() noexcept;
+        VulkanException& operator=(VulkanException const&   in_copy) = default;
+        VulkanException& operator=(VulkanException&&        in_move) = default;
 
         #pragma endregion
 };

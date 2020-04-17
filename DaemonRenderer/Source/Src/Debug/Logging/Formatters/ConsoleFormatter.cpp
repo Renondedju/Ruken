@@ -124,7 +124,7 @@ std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noe
         #else
 
         case ELogLevel::NotSet:  return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Debug:   return "" + LogFormatter::ComputeLabel(in_record);
+        case ELogLevel::VulkanDebug:   return "" + LogFormatter::ComputeLabel(in_record);
         case ELogLevel::Info:    return "" + LogFormatter::ComputeLabel(in_record);
         case ELogLevel::Warning: return "" + LogFormatter::ComputeLabel(in_record);
         case ELogLevel::Error:   return "" + LogFormatter::ComputeLabel(in_record);

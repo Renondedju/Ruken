@@ -194,9 +194,9 @@
     <ClInclude Include="Source\Include\Vulkan\SemaphorePool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Shader.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\TimelineSemaphore.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Utilities\Loader.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanLoader.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\Swapchain.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Utilities\Debug.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDebug.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
     <ClInclude Include="Source\Include\Threading\ThreadSafeLockQueue.hpp" />
@@ -265,6 +265,7 @@
     <ClInclude Include="Source\Include\Windowing\WindowManager.hpp" />
     <ClInclude Include="Source\Src\Meta\ReferenceWrapper.inl" />
     <ClInclude Include="Source\Include\Vulkan\Core\Fence.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanException.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -332,7 +333,8 @@
     <ClCompile Include="Source\Src\Vulkan\DescriptorPool.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\Image.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\ImageView.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Utilities\Loader.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanException.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanLoader.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\PipelineCache.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\CommandBuffer.cpp" />
     <ClCompile Include="Source\Src\Vulkan\CommandPool.cpp" />
@@ -358,7 +360,7 @@
     <ClCompile Include="Source\Src\Vulkan\Core\PhysicalDevice.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderSystem.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\Swapchain.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Utilities\Debug.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanDebug.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />

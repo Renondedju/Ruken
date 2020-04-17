@@ -37,7 +37,7 @@ Fence::Fence() noexcept
     create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    vkCreateFence(Loader::GetLoadedDevice(), &create_info, nullptr, &m_handle);
+    vkCreateFence(VulkanLoader::GetLoadedDevice(), &create_info, nullptr, &m_handle);
 }
 
 Fence::Fence(Fence&& in_move) noexcept:
@@ -51,7 +51,7 @@ Fence::~Fence() noexcept
     if (!m_handle)
         return;
 
-    vkDestroyFence(Loader::GetLoadedDevice(), m_handle, nullptr);
+    vkDestroyFence(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
 }
 
 #pragma endregion
@@ -60,17 +60,17 @@ Fence::~Fence() noexcept
 
 DAEvoid Fence::Reset() const noexcept
 {
-    vkResetFences(Loader::GetLoadedDevice(), 1u, &m_handle);
+    vkResetFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle);
 }
 
 DAEvoid Fence::Wait() const noexcept
 {
-    vkWaitForFences(Loader::GetLoadedDevice(), 1u, &m_handle, VK_TRUE, UINT64_MAX);
+    vkWaitForFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle, VK_TRUE, UINT64_MAX);
 }
 
 DAEbool Fence::IsSignaled() const noexcept
 {
-    return vkGetFenceStatus(Loader::GetLoadedDevice(), m_handle) == VK_SUCCESS;
+    return vkGetFenceStatus(VulkanLoader::GetLoadedDevice(), m_handle) == VK_SUCCESS;
 }
 
 VkFence const& Fence::GetHandle() const noexcept

@@ -22,20 +22,20 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Static Members
 
-Logger*                     Debug::m_logger             {nullptr};
-VkDebugUtilsMessengerEXT    Debug::m_debug_messenger    {nullptr};
+Logger*                     VulkanDebug::m_logger             {nullptr};
+VkDebugUtilsMessengerEXT    VulkanDebug::m_debug_messenger    {nullptr};
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid Debug::Initialize(Logger& in_parent_logger) noexcept
+DAEvoid VulkanDebug::Initialize(Logger& in_parent_logger)
 {
     if (m_logger)
         return;
@@ -45,7 +45,7 @@ DAEvoid Debug::Initialize(Logger& in_parent_logger) noexcept
     m_logger->SetLevel(ELogLevel::Info);
 }
 
-DAEbool Debug::CheckResult(VkResult const in_result, std::string const& in_function) noexcept
+DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string const& in_function) noexcept
 {
     auto const message = in_function + " : " + ToString(in_result);
 
@@ -59,7 +59,7 @@ DAEbool Debug::CheckResult(VkResult const in_result, std::string const& in_funct
     return in_result >= 0;
 }
 
-DAEvoid Debug::CreateDebugMessenger(VkInstance                                  in_instance,
+DAEvoid VulkanDebug::CreateDebugMessenger(VkInstance                                  in_instance,
                                     VkDebugUtilsMessageSeverityFlagsEXT const   in_message_severity,
                                     VkDebugUtilsMessageTypeFlagsEXT     const   in_message_type) noexcept
 {
@@ -77,13 +77,13 @@ DAEvoid Debug::CreateDebugMessenger(VkInstance                                  
         m_logger->Error("Failed to create debug messenger.");
 }
 
-DAEvoid Debug::DestroyDebugMessenger(VkInstance in_instance) noexcept
+DAEvoid VulkanDebug::DestroyDebugMessenger(VkInstance in_instance) noexcept
 {
     if (m_debug_messenger)
         vkDestroyDebugUtilsMessengerEXT(in_instance, m_debug_messenger, nullptr);
 }
 
-VkBool32 Debug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const  in_message_severity,
+VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const  in_message_severity,
                               VkDebugUtilsMessageTypeFlagsEXT        const  in_message_type,
                               VkDebugUtilsMessengerCallbackDataEXT   const* in_callback_data,
                               DAEvoid*                                      in_user_data)
@@ -192,7 +192,7 @@ VkBool32 Debug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const  in_m
     return VK_FALSE;
 }
 
-DAEvoid Debug::SetObjectName(VkDevice               in_device,
+DAEvoid VulkanDebug::SetObjectName(VkDevice               in_device,
                              VkObjectType const     in_object_type,
                              DAEuint64    const     in_object_handle,
                              std::string  const&    in_object_name) noexcept
@@ -207,7 +207,7 @@ DAEvoid Debug::SetObjectName(VkDevice               in_device,
     vkSetDebugUtilsObjectNameEXT(in_device, &object_info);
 }
 
-DAEvoid Debug::SetObjectTag(VkDevice            in_device,
+DAEvoid VulkanDebug::SetObjectTag(VkDevice            in_device,
                             VkObjectType const  in_object_type,
                             DAEuint64    const  in_object_handle,
                             DAEuint64    const  in_tag_name,
@@ -226,7 +226,7 @@ DAEvoid Debug::SetObjectTag(VkDevice            in_device,
     vkSetDebugUtilsObjectTagEXT(in_device, &tag_info);
 }
 
-std::string Debug::ToString(VkResult const in_result) noexcept
+std::string VulkanDebug::ToString(VkResult const in_result) noexcept
 {
     switch (in_result)
     {
@@ -275,7 +275,7 @@ std::string Debug::ToString(VkResult const in_result) noexcept
     }
 }
 
-std::string Debug::ToString(VkObjectType const in_object) noexcept
+std::string VulkanDebug::ToString(VkObjectType const in_object) noexcept
 {
     switch (in_object)
     {
@@ -324,12 +324,12 @@ std::string Debug::ToString(VkObjectType const in_object) noexcept
     }
 }
 
-Logger& Debug::GetLogger() noexcept
+Logger& VulkanDebug::GetLogger() noexcept
 {
     return *m_logger;
 }
 
-VkDebugUtilsMessengerEXT const& Debug::GetDebugMessenger() noexcept
+VkDebugUtilsMessengerEXT const& VulkanDebug::GetDebugMessenger() noexcept
 {
     return m_debug_messenger;
 }

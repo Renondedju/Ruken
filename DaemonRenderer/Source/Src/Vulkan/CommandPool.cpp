@@ -41,7 +41,7 @@ CommandPool::CommandPool(DAEuint32 const in_queue_family_index):
     {
         CommandPoolData data;
 
-        if (vkCreateCommandPool(Loader::GetLoadedDevice(), &command_pool_create_info, nullptr, &data.handle) != VK_SUCCESS)
+        if (vkCreateCommandPool(VulkanLoader::GetLoadedDevice(), &command_pool_create_info, nullptr, &data.handle) != VK_SUCCESS)
             throw std::exception("Failed to create a command pool!");
 
         m_handles.emplace(std::this_thread::get_id(), std::move(data));
@@ -51,7 +51,7 @@ CommandPool::CommandPool(DAEuint32 const in_queue_family_index):
 CommandPool::~CommandPool() noexcept
 {
     for (auto const& handle : m_handles)
-        vkDestroyCommandPool(Loader::GetLoadedDevice(), handle.second.handle, nullptr);
+        vkDestroyCommandPool(VulkanLoader::GetLoadedDevice(), handle.second.handle, nullptr);
 }
 
 #pragma endregion
@@ -78,7 +78,7 @@ CommandBuffer& CommandPool::RequestCommandBuffer()
 
         VkCommandBuffer handle;
 
-        if (vkAllocateCommandBuffers(Loader::GetLoadedDevice(), &command_buffer_allocate_info, &handle) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, &handle) != VK_SUCCESS)
             throw std::exception("Failed to allocate a command buffer!");
 
         it->second.command_buffers.emplace_back(handle);
@@ -93,7 +93,7 @@ DAEvoid CommandPool::Reset()
     {
         handle.second.index = 0u;
 
-        if (vkResetCommandPool(Loader::GetLoadedDevice(), handle.second.handle, 0u) != VK_SUCCESS)
+        if (vkResetCommandPool(VulkanLoader::GetLoadedDevice(), handle.second.handle, 0u) != VK_SUCCESS)
             throw std::exception("Failed to reset a command pool!");
     }
 }

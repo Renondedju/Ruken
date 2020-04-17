@@ -36,7 +36,7 @@ Semaphore::Semaphore() noexcept
 
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-    vkCreateSemaphore(Loader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
+    vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
 }
 
 Semaphore::Semaphore(Semaphore&& in_move) noexcept:
@@ -50,7 +50,7 @@ Semaphore::~Semaphore() noexcept
     if (!m_handle)
         return;
 
-    vkDestroySemaphore(Loader::GetLoadedDevice(), m_handle, nullptr);
+    vkDestroySemaphore(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
 }
 
 #pragma endregion

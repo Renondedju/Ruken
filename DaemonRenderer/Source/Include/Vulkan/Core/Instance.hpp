@@ -26,12 +26,11 @@
 
 #include <vector>
 
-#include "Vulkan/Utilities/Loader.hpp"
+#include "Vulkan/Core/PhysicalDevice.hpp"
+
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-class Logger;
-class PhysicalDevice;
 
 /**
  * \brief There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
@@ -78,7 +77,7 @@ class Instance
 
         #pragma region Constructors and Destructor
 
-        Instance() = default;
+        Instance();
 
         Instance(Instance const&    in_copy) = delete;
         Instance(Instance&&         in_move) = delete;
@@ -88,12 +87,6 @@ class Instance
         #pragma endregion
 
         #pragma region Methods
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        DAEbool Initialize(Logger& in_parent_logger);
 
         /**
          * \return 

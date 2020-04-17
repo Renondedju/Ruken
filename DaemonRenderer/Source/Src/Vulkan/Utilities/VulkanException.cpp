@@ -22,45 +22,16 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/Core/BufferView.hpp"
-
-#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanException.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructors and Destructor
+#pragma region Constructor
 
-BufferView::BufferView(Buffer                 const& in_buffer,
-                       VkBufferViewCreateInfo const& in_buffer_view_create_info) noexcept:
-    m_buffer    {in_buffer},
-    m_info      {in_buffer_view_create_info}
+VulkanException::VulkanException(DAEchar const* in_message) noexcept:
+    std::exception(in_message)
 {
-    VK_CHECK(vkCreateBufferView(VulkanLoader::GetLoadedDevice(), &in_buffer_view_create_info, nullptr, &m_handle));
-}
 
-BufferView::BufferView(BufferView&& in_move) noexcept:
-    m_buffer    {in_move.m_buffer},
-    m_handle    {in_move.m_handle},
-    m_info      {in_move.m_info}
-{
-    in_move.m_handle = nullptr;
-}
-
-BufferView::~BufferView() noexcept
-{
-    if (!m_handle)
-        return;
-
-    vkDestroyBufferView(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
-}
-
-#pragma endregion
-
-#pragma region Methods
-
-VkBufferView const& BufferView::GetHandle() const noexcept
-{
-    return m_handle;
 }
 
 #pragma endregion

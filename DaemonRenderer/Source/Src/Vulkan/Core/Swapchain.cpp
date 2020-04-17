@@ -26,7 +26,7 @@
 #include "Vulkan/Core/Device.hpp"
 #include "Vulkan/Core/Swapchain.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 #include "Windowing/Window.hpp"
 
@@ -51,10 +51,10 @@ Swapchain::Swapchain(Device const& in_device,
 Swapchain::~Swapchain() noexcept
 {
     if (m_handle)
-        vkDestroySwapchainKHR(Loader::GetLoadedDevice(), m_handle, nullptr);
+        vkDestroySwapchainKHR(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
 
     if (m_surface)
-        vkDestroySurfaceKHR(Loader::GetLoadedInstance(), m_surface, nullptr);
+        vkDestroySurfaceKHR(VulkanLoader::GetLoadedInstance(), m_surface, nullptr);
 }
 
 #pragma endregion
@@ -154,9 +154,9 @@ DAEvoid Swapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& in_ava
 
 DAEbool Swapchain::CreateSurface(Device const& in_device, Window const& in_window) noexcept
 {
-    if (VK_CHECK(glfwCreateWindowSurface(Loader::GetLoadedInstance(), in_window.GetHandle(), nullptr, &m_surface)))
+    if (VK_CHECK(glfwCreateWindowSurface(VulkanLoader::GetLoadedInstance(), in_window.GetHandle(), nullptr, &m_surface)))
     {
-        m_present_queue = &in_device.RequestPresentQueue(m_surface);
+        m_present_queue = in_device.RequestPresentQueue(m_surface).value();
 
         return m_present_queue != nullptr;
     }
@@ -207,22 +207,22 @@ DAEbool Swapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
     swapchain_info.clipped          = VK_TRUE;
     swapchain_info.oldSwapchain     = in_old_swapchain;
 
-    return VK_CHECK(vkCreateSwapchainKHR(Loader::GetLoadedDevice(), &swapchain_info, nullptr, &m_handle));
+    return VK_CHECK(vkCreateSwapchainKHR(VulkanLoader::GetLoadedDevice(), &swapchain_info, nullptr, &m_handle));
 }
 
 DAEvoid Swapchain::SetupImages()
 {
     // Obtains the number of presentable images associated with the swapchain.
-    VK_CHECK(vkGetSwapchainImagesKHR(Loader::GetLoadedDevice(), m_handle, &m_image_count, nullptr));
+    VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr));
 
     m_images.resize(m_image_count);
 
     // Obtains the array of presentable images associated with the swapchain.
-    VK_CHECK(vkGetSwapchainImagesKHR(Loader::GetLoadedDevice(), m_handle, &m_image_count, m_images.data()));
+    VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, m_images.data()));
 
     for (DAEuint32 i = 0; i < m_image_count; ++i)
     {
-        Debug::SetObjectName(Loader::GetLoadedDevice(),
+        VulkanDebug::SetObjectName(VulkanLoader::GetLoadedDevice(),
                              VK_OBJECT_TYPE_IMAGE,
                              reinterpret_cast<DAEuint64>(m_images[i]),
                              "SwapchainImage_" + std::to_string(i));

@@ -29,6 +29,9 @@
 #include "Vulkan/Core/Device.hpp"
 #include "Vulkan/Core/Instance.hpp"
 
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanException.hpp"
+
 /* TODO Needs to be removed when Kernel is done TODO */
 
 DAEMON_NAMESPACE::RenderSystem* DAEMON_NAMESPACE::GRenderSystem = nullptr;
@@ -36,12 +39,6 @@ DAEMON_NAMESPACE::RenderSystem* DAEMON_NAMESPACE::GRenderSystem = nullptr;
 /* TODO Needs to be removed when Kernel is done TODO */
 
 USING_DAEMON_NAMESPACE
-
-#pragma region Static Members
-
-
-
-#pragma endregion
 
 #pragma region Constructor and Destructor
 
@@ -54,19 +51,24 @@ RenderSystem::RenderSystem():
 
     m_logger->SetLevel(ELogLevel::Info);
 
-    if ((m_instance = std::make_unique<Instance>())->Initialize(*m_logger) &&
-        (m_device   = std::make_unique<Device>  ())->Initialize(*m_instance))
+    try
     {
-        GWindowManager->on_window_created += [this] (Window& in_window)
-        {
-            MakeContext(in_window);
-        };
+        VulkanDebug ::Initialize(*m_logger);
+        VulkanLoader::Initialize();
 
-        m_logger->Info("RenderSystem initialized successfully.");
+        m_instance = std::make_unique<Instance>();
+        m_device   = std::make_unique<Device>  (*m_instance);
     }
 
-    else
-        m_logger->Fatal("Failed to initialize RenderSystem!");
+    catch (VulkanException const& exception)
+    {
+        m_logger->Fatal(exception.what());
+    }
+
+    GWindowManager->on_window_created += [this] (Window& in_window)
+    {
+        MakeContext(in_window);
+    };
 }
 
 RenderSystem::~RenderSystem() noexcept

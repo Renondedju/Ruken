@@ -24,7 +24,7 @@
 
 #include "Vulkan/Core/PipelineCache.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -38,7 +38,7 @@ PipelineCache::PipelineCache()
     pipeline_cache_info.initialDataSize = 0u;
     pipeline_cache_info.pInitialData    = nullptr;
 
-    VK_CHECK(vkCreatePipelineCache(Loader::GetLoadedDevice(), &pipeline_cache_info, nullptr, &m_handle));
+    VK_CHECK(vkCreatePipelineCache(VulkanLoader::GetLoadedDevice(), &pipeline_cache_info, nullptr, &m_handle));
 }
 
 PipelineCache::~PipelineCache()
@@ -46,7 +46,7 @@ PipelineCache::~PipelineCache()
     if (!m_handle)
         return;
 
-    vkDestroyPipelineCache(Loader::GetLoadedDevice(), m_handle, nullptr);
+    vkDestroyPipelineCache(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
 }
 
 #pragma endregion

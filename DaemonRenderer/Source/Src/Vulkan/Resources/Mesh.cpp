@@ -24,22 +24,32 @@
 
 #include <fstream>
 
-#include "Resource/ResourceManager.hpp"
-
 #include "Vulkan/Resources/Mesh.hpp"
+
+#include "Vulkan/Core/Device.hpp"
 
 #include "Rendering/RenderSystem.hpp"
 
-#include "Vulkan/Core/Device.hpp"
+#include "Resource/ResourceManager.hpp"
+#include "Resource/ResourceProcessingFailure.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructors
 
-Mesh::Mesh(std::vector<Vertex>    const& in_vertices,
-           std::vector<DAEuint32> const& in_indices) noexcept:
+Mesh::Mesh(std::vector<Vertex> const& in_vertices, std::vector<DAEuint32> const& in_indices):
     m_vertex_count  {static_cast<DAEuint32>(in_vertices.size())},
     m_index_count   {static_cast<DAEuint32>(in_indices .size())}
+{
+    UploadData(in_vertices, in_indices);
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+DAEvoid Mesh::UploadData(std::vector<Vertex>    const& in_vertices,
+                         std::vector<DAEuint32> const& in_indices)
 {
     auto const& device = GRenderSystem->GetDevice();
 
@@ -58,12 +68,18 @@ Mesh::Mesh(std::vector<Vertex>    const& in_vertices,
     buffer_create_info.size  = vertex_buffer_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-    Buffer const staging_vertex_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+    auto const staging_vertex_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+
+    if (!staging_vertex_buffer.has_value())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 
     // Creates the staging index buffer.
     buffer_create_info.size = index_buffer_size;
 
-    Buffer const staging_index_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+    auto const staging_index_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+
+    if (!staging_index_buffer.has_value())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 
     // Creates the actual buffers.
     allocation_create_info.flags = 0u;
@@ -73,24 +89,29 @@ Mesh::Mesh(std::vector<Vertex>    const& in_vertices,
     buffer_create_info.size  = vertex_buffer_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
-    m_vertex_buffer = std::make_unique<Buffer>(device.CreateBuffer(buffer_create_info, allocation_create_info));
+    auto vertex_buffer = device.CreateBuffer(buffer_create_info, allocation_create_info);
+
+    if (!vertex_buffer.has_value())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 
     // Creates the index buffer.
     buffer_create_info.size  = index_buffer_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 
-    m_index_buffer = std::make_unique<Buffer>(device.CreateBuffer(buffer_create_info, allocation_create_info));
+    auto index_buffer = device.CreateBuffer(buffer_create_info, allocation_create_info);
+
+    if (!index_buffer.has_value())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
 
     // Copies the data to the staging buffers.
-    memcpy(staging_vertex_buffer.GetMappedData(), in_vertices.data(), vertex_buffer_size);
-    memcpy(staging_index_buffer .GetMappedData(), in_indices .data(), index_buffer_size);
+    memcpy(staging_vertex_buffer->GetMappedData(), in_vertices.data(), vertex_buffer_size);
+    memcpy(staging_index_buffer ->GetMappedData(), in_indices .data(), index_buffer_size);
+
+    m_vertex_buffer = std::make_unique<Buffer>(std::move(vertex_buffer.value()));
+    m_index_buffer  = std::make_unique<Buffer>(std::move(index_buffer .value()));
 
     // TODO : Uploads the data on the GPU.
 }
-
-#pragma endregion
-
-#pragma region Methods
 
 #pragma warning (disable : 4100)
 
@@ -124,12 +145,12 @@ DAEvoid Mesh::Reload(ResourceManager& in_manager)
 
 DAEvoid Mesh::Unload(ResourceManager& in_manager) noexcept
 {
-    auto const& device = GRenderSystem->GetDevice();
-
     std::ofstream stream("", std::ios::out | std::ios::binary);
 
     if (stream.is_open())
     {
+        auto const& device = GRenderSystem->GetDevice();
+
         VkBufferCreateInfo      buffer_create_info     = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
         VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -141,19 +162,25 @@ DAEvoid Mesh::Unload(ResourceManager& in_manager) noexcept
         buffer_create_info.size  = m_vertex_buffer->GetSize();
         buffer_create_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-        Buffer const staging_vertex_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+        auto const staging_vertex_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+
+        if (!staging_vertex_buffer.has_value())
+            return;
 
         // Creates the staging index buffer.
         buffer_create_info.size = m_index_buffer->GetSize();
 
-        Buffer const staging_index_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+        auto const staging_index_buffer(device.CreateBuffer(buffer_create_info, allocation_create_info));
+
+        if (!staging_index_buffer.has_value())
+            return;
 
         // TODO : Copies data from GPU.
 
         try
         {
-            stream.write(static_cast<DAEchar const*>(staging_vertex_buffer.GetMappedData()), staging_vertex_buffer.GetSize());
-            stream.write(static_cast<DAEchar const*>(staging_vertex_buffer.GetMappedData()), staging_vertex_buffer.GetSize());
+            stream.write(static_cast<DAEchar const*>(staging_vertex_buffer->GetMappedData()), staging_vertex_buffer->GetSize());
+            stream.write(static_cast<DAEchar const*>(staging_vertex_buffer->GetMappedData()), staging_vertex_buffer->GetSize());
         }
         
         catch (std::exception const& e)

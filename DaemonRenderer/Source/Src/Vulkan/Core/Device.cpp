@@ -35,7 +35,8 @@
 
 #include "Vulkan/Core/Instance.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanException.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -48,7 +49,25 @@ static std::vector<DAEchar const*> RequiredExtensions =
 
 #pragma endregion
 
-#pragma region Destructor
+#pragma region Constructor and Destructor
+
+Device::Device(Instance const& in_instance)
+{
+    if (!PickPhysicalDevice(in_instance.GetPhysicalDevices()))
+        throw VulkanException("No suitable GPU!");
+
+    if (!CreateDevice())
+        throw VulkanException("Failed to create device!");
+
+    VulkanLoader::LoadDevice(m_handle);
+
+    if (!CreateMemoryAllocator())
+        throw VulkanException("Failed to create device memory allocator!");
+
+    SetupQueues();
+
+    m_pipeline_cache = std::make_unique<PipelineCache>();
+}
 
 Device::~Device() noexcept
 {
@@ -68,18 +87,19 @@ Device::~Device() noexcept
 
 #pragma region Methods
 
-DAEbool Device::CheckDeviceExtensions(PhysicalDevice const& in_physical_device) noexcept
+DAEbool Device::CheckDeviceExtensions(VkPhysicalDevice in_physical_device) noexcept
 {
-    DAEuint32 count;
+    DAEuint32 count = 0u;
 
     // Returns the number of available physical device extensions.
-    if (!VK_CHECK(vkEnumerateDeviceExtensionProperties(in_physical_device.GetHandle(), nullptr, &count, nullptr)))
+    if (!VK_CHECK(vkEnumerateDeviceExtensionProperties(in_physical_device, nullptr, &count, nullptr)))
         return false;
 
     std::vector<VkExtensionProperties> supported_extensions(count);
 
     // Returns the available physical device extensions.
-    vkEnumerateDeviceExtensionProperties(in_physical_device.GetHandle(), nullptr, &count, supported_extensions.data());
+    if (!VK_CHECK(vkEnumerateDeviceExtensionProperties(in_physical_device, nullptr, &count, supported_extensions.data())))
+        return false;
 
     std::set<std::string> required_extensions(RequiredExtensions.cbegin(), RequiredExtensions.cend());
 
@@ -97,12 +117,10 @@ DAEbool Device::CheckDeviceExtensions(PhysicalDevice const& in_physical_device) 
 
 DAEuint32 Device::RateDeviceSuitability(PhysicalDevice const& in_physical_device) noexcept
 {
-    if (!CheckDeviceExtensions(in_physical_device))
+    if (!CheckDeviceExtensions(in_physical_device.GetHandle()))
         return 0u;
 
-    VkPhysicalDeviceProperties properties;
-
-    vkGetPhysicalDeviceProperties(in_physical_device.GetHandle(), &properties);
+    auto const& properties = in_physical_device.GetProperties();
 
     if (properties.apiVersion < VK_API_VERSION_1_2)
         return 0u;
@@ -113,12 +131,12 @@ DAEuint32 Device::RateDeviceSuitability(PhysicalDevice const& in_physical_device
     return 0u;
 }
 
-DAEbool Device::PickPhysicalDevice(Instance const& in_instance) noexcept
+DAEbool Device::PickPhysicalDevice(std::vector<PhysicalDevice> const& in_physical_devices) noexcept
 {
     // Uses an ordered map to automatically sort candidates by increasing score.
     std::multimap<DAEuint32, PhysicalDevice const*> candidates;
 
-    for (auto const& physical_device : in_instance.GetPhysicalDevices())
+    for (auto const& physical_device : in_physical_devices)
         candidates.insert(std::make_pair(RateDeviceSuitability(physical_device), &physical_device));
 
     // Checks if at least one candidate is suitable (from the best one to the worst one).
@@ -128,13 +146,9 @@ DAEbool Device::PickPhysicalDevice(Instance const& in_instance) noexcept
         {
             m_physical_device = candidate.second;
 
-            Debug::GetLogger().Info(std::string("Selected GPU : ") + m_physical_device->GetProperties().deviceName);
-
             return true;
         }
     }
-
-    Debug::GetLogger().Error("No suitable GPU!");
 
     return false;
 }
@@ -210,12 +224,12 @@ DAEvoid Device::SetupQueues()
 
     m_queues.resize(queue_family_properties.size());
 
-    VkQueue queue;
-
     for (DAEuint32 i = 0; i < static_cast<DAEuint32>(queue_family_properties.size()); ++i)
     {
         for (DAEuint32 j = 0; j < queue_family_properties[i].queueCount; ++j)
         {
+            VkQueue queue = nullptr;
+
             vkGetDeviceQueue(m_handle, i, j, &queue);
 
             if (queue)
@@ -224,58 +238,95 @@ DAEvoid Device::SetupQueues()
     }
 }
 
-DAEbool Device::Initialize(Instance const& in_instance)
-{
-    if (!PickPhysicalDevice(in_instance) || !CreateDevice())
-    {
-        Debug::GetLogger().Fatal("Failed to create device!");
-
-        return false;
-    }
-
-    Loader::LoadDevice(m_handle);
-
-    if (!CreateMemoryAllocator())
-    {
-        Debug::GetLogger().Fatal("Failed to create device memory allocator!");
-
-        return false;
-    }
-
-    SetupQueues();
-
-    m_pipeline_cache = std::make_unique<PipelineCache>();
-
-    return true;
-}
-
 DAEvoid Device::WaitIdle() const noexcept
 {
-    vkDeviceWaitIdle(m_handle);
+    VK_CHECK(vkDeviceWaitIdle(m_handle));
 }
 
-Image Device::CreateImage(VkImageCreateInfo       const& in_image_create_info,
-                          VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
+std::optional<Image> Device::CreateImage(VkImageCreateInfo       const& in_image_create_info,
+                                         VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
-    VkImage             image           = nullptr;
-    VmaAllocation       allocation      = nullptr;
-    VmaAllocationInfo   allocation_info = {};
+    VkImage           image           = nullptr;
+    VmaAllocation     allocation      = nullptr;
+    VmaAllocationInfo allocation_info = {};
 
-    vmaCreateImage(m_allocator, &in_image_create_info, &in_allocation_create_info, &image, &allocation, &allocation_info);
+    if (VK_CHECK(vmaCreateImage(m_allocator, &in_image_create_info, &in_allocation_create_info, &image, &allocation, &allocation_info)))
+        return Image(image, m_allocator, allocation, allocation_info);
 
-    return Image(image, m_allocator, allocation, allocation_info);
+    return std::nullopt;
 }
 
-Buffer Device::CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
-                            VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
+std::optional<Buffer> Device::CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
+                                           VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
-    VkBuffer            buffer          = nullptr;
-    VmaAllocation       allocation      = nullptr;
-    VmaAllocationInfo   allocation_info = {};
+    VkBuffer          buffer          = nullptr;
+    VmaAllocation     allocation      = nullptr;
+    VmaAllocationInfo allocation_info = {};
 
-    vmaCreateBuffer(m_allocator, &in_buffer_create_info, &in_allocation_create_info, &buffer, &allocation, &allocation_info);
+    if (VK_CHECK(vmaCreateBuffer(m_allocator, &in_buffer_create_info, &in_allocation_create_info, &buffer, &allocation, &allocation_info)))
+    {
+        DAEbool const is_persistent = (in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT) == 0;
 
-    return Buffer(buffer, m_allocator, allocation, allocation_info, (in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT) == 0);
+        return Buffer(buffer, m_allocator, allocation, allocation_info, is_persistent);
+    }
+
+    return std::nullopt;
+}
+
+std::optional<Queue const*> Device::RequestGraphicsQueue() const noexcept
+{
+    for (auto const& queue_family : m_queues)
+    {
+        for (auto const& queue : queue_family)
+        {
+            if (queue.GetFlags() & VK_QUEUE_GRAPHICS_BIT)
+                return &queue;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<Queue const*> Device::RequestComputeQueue() const noexcept
+{
+    for (auto const& queue_family : m_queues)
+    {
+        for (auto const& queue : queue_family)
+        {
+            if (queue.GetFlags() & VK_QUEUE_COMPUTE_BIT)
+                return &queue;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<Queue const*> Device::RequestTransferQueue() const noexcept
+{
+    for (auto const& queue_family : m_queues)
+    {
+        for (auto const& queue : queue_family)
+        {
+            if (queue.GetFlags() & VK_QUEUE_TRANSFER_BIT)
+                return &queue;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<Queue const*> Device::RequestPresentQueue(VkSurfaceKHR const& in_surface) const noexcept
+{
+    for (auto const& queue_family : m_queues)
+    {
+        for (auto const& queue : queue_family)
+        {
+            if (queue.IsPresentationSupported(in_surface))
+                return &queue;
+        }
+    }
+
+    return std::nullopt;
 }
 
 PhysicalDevice const* Device::GetPhysicalDevice() const noexcept
@@ -291,62 +342,6 @@ VkDevice const& Device::GetHandle() const noexcept
 PipelineCache& Device::GetPipelineCache() const noexcept
 {
     return *m_pipeline_cache;
-}
-
-Queue const& Device::RequestGraphicsQueue() const
-{
-    for (auto const& queue_family : m_queues)
-    {
-        for (auto const& queue : queue_family)
-        {
-            if (queue.GetFlags() & VK_QUEUE_GRAPHICS_BIT)
-                return queue;
-        }
-    }
-
-    throw std::runtime_error("Queue not found!");
-}
-
-Queue const& Device::RequestComputeQueue() const
-{
-    for (auto const& queue_family : m_queues)
-    {
-        for (auto const& queue : queue_family)
-        {
-            if (queue.GetFlags() & VK_QUEUE_COMPUTE_BIT)
-                return queue;
-        }
-    }
-
-    throw std::runtime_error("Queue not found!");
-}
-
-Queue const& Device::RequestTransferQueue() const
-{
-    for (auto const& queue_family : m_queues)
-    {
-        for (auto const& queue : queue_family)
-        {
-            if (queue.GetFlags() & VK_QUEUE_TRANSFER_BIT)
-                return queue;
-        }
-    }
-
-    throw std::runtime_error("Queue not found!");
-}
-
-Queue const& Device::RequestPresentQueue(VkSurfaceKHR const& in_surface) const
-{
-    for (auto const& queue_family : m_queues)
-    {
-        for (auto const& queue : queue_family)
-        {
-            if (queue.IsPresentationSupported(in_surface))
-                return queue;
-        }
-    }
-
-    throw std::runtime_error("Queue not found!");
 }
 
 #pragma endregion

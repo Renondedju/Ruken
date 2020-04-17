@@ -22,48 +22,39 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/Utilities/Debug.hpp"
-#include "Vulkan/Utilities/Loader.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Vulkan/Utilities/VulkanException.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-DAEbool Loader::Initialize()
+DAEvoid VulkanLoader::Initialize()
 {
     if (!VK_CHECK(volkInitialize()))
-    {
-        Debug::GetLogger().Fatal("Failed to load Vulkan!");
-
-        return false;
-    }
+        throw VulkanException("Failed to load Vulkan!");
 
     if (volkGetInstanceVersion() < VK_API_VERSION_1_2)
-    {
-        Debug::GetLogger().Fatal("Vulkan 1.2 is not supported!");
-
-        return false;
-    }
-
-    return true;
+        throw VulkanException("Vulkan 1.2 is not supported!");
 }
 
-DAEvoid Loader::LoadInstance(VkInstance in_instance)
+DAEvoid VulkanLoader::LoadInstance(VkInstance in_instance) noexcept
 {
     volkLoadInstanceOnly(in_instance);
 }
 
-DAEvoid Loader::LoadDevice(VkDevice in_device)
+DAEvoid VulkanLoader::LoadDevice(VkDevice in_device) noexcept
 {
     volkLoadDevice(in_device);
 }
 
-VkInstance Loader::GetLoadedInstance() noexcept
+VkInstance VulkanLoader::GetLoadedInstance() noexcept
 {
     return volkGetLoadedInstance();
 }
 
-VkDevice Loader::GetLoadedDevice() noexcept
+VkDevice VulkanLoader::GetLoadedDevice() noexcept
 {
     return volkGetLoadedDevice();
 }

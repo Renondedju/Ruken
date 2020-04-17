@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "Vulkan/Core/Image.hpp"
@@ -33,8 +34,6 @@
 #include "Vulkan/Core/PhysicalDevice.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-class Instance;
 
 /**
  * \brief A logical device represents an instance of physical device implementation
@@ -62,7 +61,7 @@ class Device
         /**
          * \return 
          */
-        static DAEbool CheckDeviceExtensions(PhysicalDevice const& in_physical_device) noexcept;
+        static DAEbool CheckDeviceExtensions(VkPhysicalDevice in_physical_device) noexcept;
 
         /**
          * \return 
@@ -72,7 +71,7 @@ class Device
         /**
          * \return 
          */
-        DAEbool PickPhysicalDevice(Instance const& in_instance) noexcept;
+        DAEbool PickPhysicalDevice(std::vector<PhysicalDevice> const& in_physical_devices) noexcept;
 
         /**
          * \return 
@@ -95,7 +94,7 @@ class Device
 
         #pragma region Constructors and Destructor
 
-        Device() = default;
+        explicit Device(class Instance const& in_instance);
 
         Device(Device const&    in_copy) = delete;
         Device(Device&&         in_move) = delete;
@@ -107,22 +106,47 @@ class Device
         #pragma region Methods
 
         /**
-         * \return 
-         */
-        DAEbool Initialize(Instance const& in_instance);
-
-        /**
          * \brief 
          */
         DAEvoid WaitIdle() const noexcept;
 
+        /**
+         * \return 
+         */
         [[nodiscard]]
-        Image CreateImage(VkImageCreateInfo       const& in_image_create_info,
-                          VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
+        std::optional<Image> CreateImage(VkImageCreateInfo       const& in_image_create_info,
+                                         VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
 
+        /**
+         * \return 
+         */
         [[nodiscard]]
-        Buffer CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
-                            VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
+        std::optional<Buffer> CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
+                                           VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        std::optional<Queue const*> RequestGraphicsQueue() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        std::optional<Queue const*> RequestComputeQueue() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        std::optional<Queue const*> RequestTransferQueue() const noexcept;
+
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        std::optional<Queue const*> RequestPresentQueue(VkSurfaceKHR const& in_surface) const noexcept;
 
         /**
          * \return 
@@ -136,32 +160,11 @@ class Device
         [[nodiscard]]
         VkDevice const& GetHandle() const noexcept;
 
+        /**
+         * \return 
+         */
         [[nodiscard]]
         PipelineCache& GetPipelineCache() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        Queue const& RequestGraphicsQueue() const;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        Queue const& RequestComputeQueue() const;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        Queue const& RequestTransferQueue() const;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        Queue const& RequestPresentQueue(VkSurfaceKHR const& in_surface) const;
 
         #pragma endregion
 

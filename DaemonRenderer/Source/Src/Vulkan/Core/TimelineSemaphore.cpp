@@ -43,7 +43,7 @@ TimelineSemaphore::TimelineSemaphore() noexcept
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     semaphore_create_info.pNext = &semaphore_type_create_info;
 
-    vkCreateSemaphore(Loader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
+    vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
 }
 
 TimelineSemaphore::TimelineSemaphore(TimelineSemaphore&& in_move) noexcept: Semaphore(std::move(in_move))
@@ -63,7 +63,7 @@ DAEvoid TimelineSemaphore::Signal(DAEuint64 const in_value) const noexcept
     signal_info.semaphore = m_handle;
     signal_info.value     = in_value;
 
-    vkSignalSemaphore(Loader::GetLoadedDevice(), &signal_info);
+    vkSignalSemaphore(VulkanLoader::GetLoadedDevice(), &signal_info);
 }
 
 DAEvoid TimelineSemaphore::Wait(DAEuint64 const in_value) const noexcept
@@ -75,14 +75,14 @@ DAEvoid TimelineSemaphore::Wait(DAEuint64 const in_value) const noexcept
     wait_info.pSemaphores    = &m_handle;
     wait_info.pValues        = &in_value;
 
-    vkWaitSemaphores(Loader::GetLoadedDevice(), &wait_info, std::numeric_limits<DAEuint64>::max());
+    vkWaitSemaphores(VulkanLoader::GetLoadedDevice(), &wait_info, std::numeric_limits<DAEuint64>::max());
 }
 
 DAEuint64 TimelineSemaphore::GetValue() const noexcept
 {
     DAEuint64 value;
 
-    vkGetSemaphoreCounterValue(Loader::GetLoadedDevice(), m_handle, &value);
+    vkGetSemaphoreCounterValue(VulkanLoader::GetLoadedDevice(), m_handle, &value);
 
     return value;
 }

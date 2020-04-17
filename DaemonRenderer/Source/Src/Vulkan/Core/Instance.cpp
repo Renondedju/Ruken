@@ -25,9 +25,9 @@
 #include <set>
 
 #include "Vulkan/Core/Instance.hpp"
-#include "Vulkan/Core/PhysicalDevice.hpp"
 
-#include "Vulkan/Utilities/Debug.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanException.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -71,7 +71,30 @@ static std::vector<VkValidationFeatureDisableEXT> DisabledValidationFeatures =
 
 #pragma endregion
 
-#pragma region Destructor
+#pragma region Constructor and Destructor
+
+Instance::Instance()
+{
+    if (!CreateInstance())
+        throw VulkanException("Failed to create a Vulkan instance!");
+
+    VulkanLoader::LoadInstance(m_handle);
+
+    if (!EnumeratePhysicalDevices())
+        throw VulkanException("No GPU available!");
+
+    #ifdef DAEMON_DEBUG
+
+    VulkanDebug::CreateDebugMessenger(m_handle,
+                                      VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT    |
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
+
+    #endif
+}
 
 Instance::~Instance() noexcept
 {
@@ -79,7 +102,7 @@ Instance::~Instance() noexcept
     {
         #ifdef DAEMON_DEBUG
 
-        Debug::DestroyDebugMessenger(m_handle);
+        VulkanDebug::DestroyDebugMessenger(m_handle);
 
         #endif
 
@@ -95,7 +118,7 @@ Instance::~Instance() noexcept
 
 DAEbool Instance::CheckInstanceExtensions() noexcept
 {
-    DAEuint32 count;
+    DAEuint32 count = 0u;
 
     // Returns the number of global extension properties.
     if (!VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr)))
@@ -104,7 +127,8 @@ DAEbool Instance::CheckInstanceExtensions() noexcept
     std::vector<VkExtensionProperties> supported_extensions(count);
 
     // Returns the global extension properties.
-    vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data());
+    if (!VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data())))
+        return false;
 
     std::set<std::string> required_extensions(RequiredExtensions.cbegin(), RequiredExtensions.cend());
 
@@ -119,14 +143,14 @@ DAEbool Instance::CheckInstanceExtensions() noexcept
 
     // In case some extensions could not be found, enumerates them.
     for (auto const& extension : required_extensions)
-        Debug::GetLogger().Error("Missing instance extension : " + extension + "!");
+        VulkanDebug::GetLogger().Error("Missing instance extension : " + extension + "!");
 
     return false;
 }
 
 DAEbool Instance::CheckValidationLayers() noexcept
 {
-    DAEuint32 count;
+    DAEuint32 count = 0u;
 
     // Returns the number of layer properties available.
     if (!VK_CHECK(vkEnumerateInstanceLayerProperties(&count, nullptr)))
@@ -135,7 +159,8 @@ DAEbool Instance::CheckValidationLayers() noexcept
     std::vector<VkLayerProperties> supported_layers(count);
 
     // Returns the global layer properties
-    vkEnumerateInstanceLayerProperties(&count, supported_layers.data());
+    if (!VK_CHECK(vkEnumerateInstanceLayerProperties(&count, supported_layers.data())))
+        return false;
 
     std::set<std::string> required_layers(RequiredValidationLayers.cbegin(), RequiredValidationLayers.cend());
 
@@ -150,7 +175,7 @@ DAEbool Instance::CheckValidationLayers() noexcept
 
     // In case some layers could not be found, enumerates them.
     for (auto const& layer : required_layers)
-        Debug::GetLogger().Error("Missing validation layer : " + layer + "!");
+        VulkanDebug::GetLogger().Error("Missing validation layer : " + layer + "!");
 
     return false;
 }
@@ -180,7 +205,7 @@ DAEbool Instance::CreateInstance() noexcept
     debug_messenger_create_info.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT    |
                                                   VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                                                   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    debug_messenger_create_info.pfnUserCallback = Debug::DebugCallback;
+    debug_messenger_create_info.pfnUserCallback = VulkanDebug::DebugCallback;
 
     VkApplicationInfo app_info = {};
 
@@ -204,57 +229,20 @@ DAEbool Instance::CreateInstance() noexcept
 
 DAEbool Instance::EnumeratePhysicalDevices()
 {
-    DAEuint32 count;
+    DAEuint32 count = 0u;
 
     // Returns the number of physical devices accessible to this Vulkan instance.
     if (!VK_CHECK(vkEnumeratePhysicalDevices(m_handle, &count, nullptr)) || count == 0u)
-    {
-        Debug::GetLogger().Fatal("No GPU available!");
-        
         return false;
-    }
 
     std::vector<VkPhysicalDevice> physical_devices(count);
 
     // Returns the physical devices accessible to this Vulkan instance.
-    vkEnumeratePhysicalDevices(m_handle, &count, physical_devices.data());
+    if (!VK_CHECK(vkEnumeratePhysicalDevices(m_handle, &count, physical_devices.data())))
+        return false;
 
     for (auto const& physical_device : physical_devices)
         m_physical_devices.emplace_back(physical_device);
-
-    return true;
-}
-
-DAEbool Instance::Initialize(Logger& in_parent_logger)
-{
-    Debug::Initialize(in_parent_logger);
-
-    if (!Loader::Initialize())
-        return false;
-
-    if (!CreateInstance())
-    {
-        Debug::GetLogger().Fatal("Failed to create a Vulkan instance!");
-
-        return false;
-    }
-
-    Loader::LoadInstance(m_handle);
-
-    if (!EnumeratePhysicalDevices())
-        return false;
-
-    #ifdef DAEMON_DEBUG
-
-    Debug::CreateDebugMessenger(m_handle,
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-                                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT    |
-                                VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
-
-    #endif
 
     return true;
 }

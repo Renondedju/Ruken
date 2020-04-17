@@ -26,13 +26,13 @@
 
 #include <string>
 
-#include "Vulkan/Utilities/Loader.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class Debug
+class VulkanDebug
 {
     private:
 
@@ -50,7 +50,7 @@ class Debug
         /**
          * \brief 
          */
-        static DAEvoid Initialize(Logger& in_parent_logger) noexcept;
+        static DAEvoid Initialize(Logger& in_parent_logger);
 
         /**
          * \return True if the result is an error value, else False.
@@ -132,6 +132,6 @@ class Debug
         #pragma endregion
 };
 
-#define VK_CHECK(result) Debug::CheckResult(result, #result)
+#define VK_CHECK(result) VulkanDebug::CheckResult(result, #result)
 
 END_DAEMON_NAMESPACE
