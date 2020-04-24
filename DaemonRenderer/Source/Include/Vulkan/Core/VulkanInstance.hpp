@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,49 +24,64 @@
 
 #pragma once
 
-#include <thread>
-#include <unordered_map>
+#include <vector>
 
-#include "Vulkan/Core/VulkanCommandPool.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class CommandPool
+/**
+ * \brief There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
+ *        Creating a VkInstance object initializes the Vulkan library and allows the application to
+ *        pass information about itself to the implementation.
+ */
+class VulkanInstance
 {
     private:
 
         #pragma region Members
 
-        std::unordered_map<std::thread::id, VulkanCommandPool> m_command_pools;
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructor
-
-        explicit CommandPool(DAEuint32 in_queue_family_index) noexcept;
-
-        CommandPool(CommandPool const&  in_copy) = delete;
-        CommandPool(CommandPool&&       in_move) = default;
-
-        ~CommandPool() = default;
+        VkInstance m_handle {nullptr};
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]]
-        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) noexcept;
+        static DAEvoid CheckInstanceExtensions() noexcept;
 
-        DAEvoid Reset();
+        static DAEvoid CheckValidationLayers() noexcept;
+
+        DAEvoid CreateInstance() noexcept;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors and Destructor
+
+        VulkanInstance();
+
+        VulkanInstance(VulkanInstance const&    in_copy) = delete;
+        VulkanInstance(VulkanInstance&&         in_move) = delete;
+
+        ~VulkanInstance() noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        VkInstance const& GetHandle() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        CommandPool& operator=(CommandPool const&   in_copy) = delete;
-        CommandPool& operator=(CommandPool&&        in_move) = delete;
+        VulkanInstance& operator=(VulkanInstance const& in_copy) = delete;
+        VulkanInstance& operator=(VulkanInstance&&      in_move) = delete;
 
         #pragma endregion
 };

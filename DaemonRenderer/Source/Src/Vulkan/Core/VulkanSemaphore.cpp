@@ -22,26 +22,44 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#include <memory>
+
+#include "Vulkan/Core/VulkanSemaphore.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Methods
+#pragma region Constructors and Destructor
 
-VulkanFence& FencePool::RequestFence()
+VulkanSemaphore::VulkanSemaphore() noexcept
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    VkSemaphoreCreateInfo semaphore_create_info = {};
 
-    return m_fences[m_index++];
+    semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
 }
 
-DAEvoid FencePool::Reset() noexcept
+VulkanSemaphore::VulkanSemaphore(VulkanSemaphore&& in_move) noexcept:
+    m_handle {std::move(in_move.m_handle)}
 {
-    for (auto const& fence : m_fences)
-        fence.Reset();
+    in_move.m_handle = nullptr;
+}
 
-    m_index = 0u;
+VulkanSemaphore::~VulkanSemaphore() noexcept
+{
+    if (!m_handle)
+        return;
+
+    vkDestroySemaphore(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+VkSemaphore const& VulkanSemaphore::GetHandle() const noexcept
+{
+    return m_handle;
 }
 
 #pragma endregion

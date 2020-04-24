@@ -22,26 +22,60 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#include <memory>
+
+#include "Vulkan/Core/VulkanFence.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Methods
+#pragma region Constructors and Destructor
 
-VulkanFence& FencePool::RequestFence()
+VulkanFence::VulkanFence() noexcept
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    VkFenceCreateInfo create_info = {};
 
-    return m_fences[m_index++];
+    create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    vkCreateFence(VulkanLoader::GetLoadedDevice(), &create_info, nullptr, &m_handle);
 }
 
-DAEvoid FencePool::Reset() noexcept
+VulkanFence::VulkanFence(VulkanFence&& in_move) noexcept:
+    m_handle {in_move.m_handle}
 {
-    for (auto const& fence : m_fences)
-        fence.Reset();
+    in_move.m_handle = nullptr;
+}
 
-    m_index = 0u;
+VulkanFence::~VulkanFence() noexcept
+{
+    if (!m_handle)
+        return;
+
+    vkDestroyFence(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+DAEvoid VulkanFence::Reset() const noexcept
+{
+    vkResetFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle);
+}
+
+DAEvoid VulkanFence::Wait() const noexcept
+{
+    vkWaitForFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle, VK_TRUE, UINT64_MAX);
+}
+
+DAEbool VulkanFence::IsSignaled() const noexcept
+{
+    return vkGetFenceStatus(VulkanLoader::GetLoadedDevice(), m_handle) == VK_SUCCESS;
+}
+
+VkFence const& VulkanFence::GetHandle() const noexcept
+{
+    return m_handle;
 }
 
 #pragma endregion

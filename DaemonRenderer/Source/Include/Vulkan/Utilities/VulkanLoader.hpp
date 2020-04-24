@@ -28,6 +28,8 @@
 
 #if defined(DAEMON_OS_WINDOWS)
     #define VK_USE_PLATFORM_WIN32_KHR
+#else
+    #error Unknown Platform
 #endif
 
 #include <volk/volk.h>
@@ -41,7 +43,7 @@ class VulkanLoader
         #pragma region Methods
 
         /**
-         * \brief 
+         * \brief Initializes the volk library by loading the Vulkan DLL.
          * \note  Call this function before creating the Vulkan instance.
          */
         static DAEvoid Initialize();

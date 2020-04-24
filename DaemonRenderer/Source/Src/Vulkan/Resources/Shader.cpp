@@ -28,9 +28,9 @@
 
 #include "Vulkan/Resources/Shader.hpp"
 
-#include "Vulkan/Utilities/VulkanDebug.hpp"
-
 #include "Resource/ResourceProcessingFailure.hpp"
+
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -40,45 +40,52 @@ USING_DAEMON_NAMESPACE
 
 DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-    auto const& descriptor = reinterpret_cast<ShaderLoadingDescriptor const&>(in_descriptor);
-
-    std::ifstream stream(descriptor.filename);
+    m_loading_descriptor = reinterpret_cast<ShaderLoadingDescriptor const&>(in_descriptor);
 
     if (!glslang::InitializeProcess())
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
 
 
     glslang::FinalizeProcess();
 
-    VkShaderModuleCreateInfo shader_module_create_info = {};
+    std::vector<DAEuint32> code;
 
-    shader_module_create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shader_module_create_info.codeSize = m_code.size() * sizeof(DAEuint32);
-    shader_module_create_info.pCode    = m_code.data();
+    m_module = std::make_unique<VulkanShaderModule>(code);
 
-    if (!VK_CHECK(vkCreateShaderModule(VulkanLoader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle)))
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other, false, "");
+    if (!m_module)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 }
 
 DAEvoid Shader::Reload(ResourceManager& in_manager)
 {
+    if (!glslang::InitializeProcess())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
+
+
+    glslang::FinalizeProcess();
+
+    std::vector<DAEuint32> code;
+
+    m_module = std::make_unique<VulkanShaderModule>(code);
+
+    if (!m_module)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+
+    VulkanDebug::SetObjectName(VK_OBJECT_TYPE_SHADER_MODULE, reinterpret_cast<DAEuint64>(m_module->GetHandle()), "");
 }
 
 DAEvoid Shader::Unload(ResourceManager& in_manager) noexcept
 {
-    m_code.clear();
-
-    if (m_handle)
-        vkDestroyShaderModule(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
+    m_module.reset();
 }
 
 #pragma warning (default : 4100)
 
-VkShaderModule const& Shader::GetHandle() const noexcept
+VulkanShaderModule const& Shader::GetModule() const noexcept
 {
-    return m_handle;
+    return *m_module;
 }
 
 #pragma endregion

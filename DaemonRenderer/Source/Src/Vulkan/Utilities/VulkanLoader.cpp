@@ -22,9 +22,8 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
-#include "Vulkan/Utilities/VulkanException.hpp"
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -32,11 +31,13 @@ USING_DAEMON_NAMESPACE
 
 DAEvoid VulkanLoader::Initialize()
 {
-    if (!VK_CHECK(volkInitialize()))
-        throw VulkanException("Failed to load Vulkan!");
+    VK_CHECK(volkInitialize());
 
     if (volkGetInstanceVersion() < VK_API_VERSION_1_2)
-        throw VulkanException("Vulkan 1.2 is not supported!");
+    {
+        VulkanDebug::GetLogger().Fatal("Vulkan 1.2 is not supported!");
+        exit(1);
+    }
 }
 
 DAEvoid VulkanLoader::LoadInstance(VkInstance in_instance) noexcept

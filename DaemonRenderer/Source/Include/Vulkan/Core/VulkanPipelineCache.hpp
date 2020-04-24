@@ -22,26 +22,48 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
-#pragma region Methods
+BEGIN_DAEMON_NAMESPACE
 
-VulkanFence& FencePool::RequestFence()
+class VulkanPipelineCache
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    private:
 
-    return m_fences[m_index++];
-}
+        #pragma region Members
 
-DAEvoid FencePool::Reset() noexcept
-{
-    for (auto const& fence : m_fences)
-        fence.Reset();
+        VkPipelineCache m_handle {nullptr};
 
-    m_index = 0u;
-}
+        #pragma endregion
 
-#pragma endregion
+    public:
+
+        #pragma region Constructors and Destructor
+
+        VulkanPipelineCache();
+
+        VulkanPipelineCache(VulkanPipelineCache const&  in_copy) = delete;
+        VulkanPipelineCache(VulkanPipelineCache&&       in_move) = delete;
+
+        ~VulkanPipelineCache();
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        [[nodiscard]]
+        VkPipelineCache const& GetHandle() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        VulkanPipelineCache& operator=(VulkanPipelineCache const&   in_copy) = delete;
+        VulkanPipelineCache& operator=(VulkanPipelineCache&&        in_move) = delete;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

@@ -57,24 +57,24 @@ DAEvoid RenderFrame::Reset() noexcept
     m_render_views.clear();
 }
 
-Fence& RenderFrame::RequestFence() const noexcept
+VulkanFence& RenderFrame::RequestFence() const noexcept
 {
     return m_fence_pool->RequestFence();
 }
 
-Semaphore& RenderFrame::RequestSemaphore() const noexcept
+VulkanSemaphore& RenderFrame::RequestSemaphore() const noexcept
 {
     return m_semaphore_pool->RequestSemaphore();
 }
 
-TimelineSemaphore& RenderFrame::RequestTimelineSemaphore() const noexcept
+VulkanTimelineSemaphore& RenderFrame::RequestTimelineSemaphore() const noexcept
 {
     return m_semaphore_pool->RequestTimelineSemaphore();
 }
 
-CommandBuffer& RenderFrame::RequestCommandBuffer() const noexcept
+VulkanCommandBuffer* RenderFrame::RequestCommandBuffer(VkCommandBufferLevel const in_level) const noexcept
 {
-    return m_command_pool->RequestCommandBuffer();
+    return m_command_pool->RequestCommandBuffer(in_level);
 }
 
 #pragma endregion

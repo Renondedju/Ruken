@@ -20,13 +20,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -91,6 +91,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -105,6 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <OmitFramePointers>false</OmitFramePointers>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -172,30 +174,28 @@
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderView.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Buffer.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\BufferView.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\CommandBuffer.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\DescriptorPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\FencePool.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Image.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\ImageView.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Instance.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Device.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\PhysicalDevice.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\PipelineCache.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Queue.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanImage.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanInstance.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanDevice.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanPhysicalDevice.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanPipelineCache.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanQueue.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderSystem.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Semaphore.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanSemaphore.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Material.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Mesh.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Resources\Model.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Texture.hpp" />
     <ClInclude Include="Source\Include\Vulkan\SemaphorePool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Shader.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\TimelineSemaphore.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanTimelineSemaphore.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanLoader.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Swapchain.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanSwapchain.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDebug.hpp" />
     <ClInclude Include="Source\Include\Threading\ESynchronizationMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Scheduler.hpp" />
@@ -264,8 +264,9 @@
     <ClInclude Include="Source\Include\Windowing\Window.hpp" />
     <ClInclude Include="Source\Include\Windowing\WindowManager.hpp" />
     <ClInclude Include="Source\Src\Meta\ReferenceWrapper.inl" />
-    <ClInclude Include="Source\Include\Vulkan\Core\Fence.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanException.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanFence.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDeviceAllocator.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Core\VulkanShaderModule.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -315,30 +316,29 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Core\ServiceBase.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceProvider.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanCommandPool.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanShaderModule.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanDeviceAllocator.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Texture.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Resources\Model.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Material.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Mesh.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\BufferView.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderView.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderTechnique.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\TimelineSemaphore.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanTimelineSemaphore.cpp" />
     <ClCompile Include="Source\Src\Vulkan\FencePool.cpp" />
     <ClCompile Include="Source\Src\Vulkan\SemaphorePool.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Fence.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Semaphore.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanFence.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanSemaphore.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderFrame.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Buffer.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanBuffer.cpp" />
     <ClCompile Include="Source\Src\Vulkan\DescriptorPool.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Image.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\ImageView.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanException.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanImage.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanLoader.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\PipelineCache.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\CommandBuffer.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanPipelineCache.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanCommandBuffer.cpp" />
     <ClCompile Include="Source\Src\Vulkan\CommandPool.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Queue.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanQueue.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Shader.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Formatters\ConsoleFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\FileHandler.cpp" />
@@ -355,11 +355,11 @@
     <ClCompile Include="Source\Src\Kernel.cpp" />
     <ClCompile Include="Source\Src\KernelProxy.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Instance.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Device.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\PhysicalDevice.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanInstance.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanDevice.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanPhysicalDevice.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderSystem.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\Core\Swapchain.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Core\VulkanSwapchain.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanDebug.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />

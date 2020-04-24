@@ -55,16 +55,12 @@ class VulkanDebug
         /**
          * \return True if the result is an error value, else False.
          */
-        static DAEbool CheckResult(VkResult in_result, std::string const& in_function) noexcept;
+        static DAEvoid CheckResult(VkResult in_result, std::string const& in_function) noexcept;
 
         /**
          * \param in_instance         The instance the messenger will be used with.
-         * \param in_message_severity The bitmask specifying which severity of event(s) will cause this callback to be called.
-         * \param in_message_type     The bitmask specifying which type of event(s) will cause this callback to be called.
          */
-        static DAEvoid CreateDebugMessenger(VkInstance                          in_instance,
-                                            VkDebugUtilsMessageSeverityFlagsEXT in_message_severity,
-                                            VkDebugUtilsMessageTypeFlagsEXT     in_message_type) noexcept;
+        static DAEvoid CreateDebugMessenger(VkInstance                          in_instance) noexcept;
 
         /**
          * \param in_instance The instance where the callback was created.
@@ -84,26 +80,22 @@ class VulkanDebug
                                       DAEvoid*                                      in_user_data);
 
         /**
-         * \param in_device        The device that created the object.
          * \param in_object_type   The type of the object to be named.
          * \param in_object_handle The object to be named.
          * \param in_object_name   The name to apply to object.
          */
-        static DAEvoid SetObjectName(VkDevice           in_device,
-                                     VkObjectType       in_object_type,
+        static DAEvoid SetObjectName(VkObjectType       in_object_type,
                                      DAEuint64          in_object_handle,
                                      std::string const& in_object_name) noexcept;
 
         /**
-         * \param in_device        The device that created the object.
          * \param in_object_type   The type of the object to be tagged.
          * \param in_object_handle The object to be tagged.
          * \param in_tag_name      The numerical identifier of the tag.
          * \param in_tag_size      The number of bytes of data to attach to the object.
          * \param in_tag           The data to be associated with the object.
          */
-        static DAEvoid SetObjectTag(VkDevice        in_device,
-                                    VkObjectType    in_object_type,
+        static DAEvoid SetObjectTag(VkObjectType    in_object_type,
                                     DAEuint64       in_object_handle,
                                     DAEuint64       in_tag_name,
                                     DAEsize         in_tag_size,

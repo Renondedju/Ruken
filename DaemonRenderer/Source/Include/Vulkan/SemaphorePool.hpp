@@ -26,8 +26,8 @@
 
 #include <vector>
 
-#include "Vulkan/Core/Semaphore.hpp"
-#include "Vulkan/Core/TimelineSemaphore.hpp"
+#include "Vulkan/Core/VulkanSemaphore.hpp"
+#include "Vulkan/Core/VulkanTimelineSemaphore.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -40,8 +40,8 @@ class SemaphorePool
         DAEuint32 m_semaphore_index             {0u};
         DAEuint32 m_timeline_semaphore_index    {0u};
 
-        std::vector<Semaphore>          m_semaphores;
-        std::vector<TimelineSemaphore>  m_timeline_semaphores;
+        std::vector<VulkanSemaphore>          m_semaphores;
+        std::vector<VulkanTimelineSemaphore>  m_timeline_semaphores;
 
         #pragma endregion
 
@@ -61,10 +61,10 @@ class SemaphorePool
         #pragma region Methods
 
         [[nodiscard]]
-        Semaphore& RequestSemaphore();
+        VulkanSemaphore& RequestSemaphore();
 
         [[nodiscard]]
-        TimelineSemaphore& RequestTimelineSemaphore();
+        VulkanTimelineSemaphore& RequestTimelineSemaphore();
 
         DAEvoid Reset();
 

@@ -33,10 +33,6 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class Window;
-class Instance;
-class Device;
-
 class RenderSystem
 {
     private:
@@ -45,8 +41,10 @@ class RenderSystem
 
         Logger* m_logger;
 
-        std::unique_ptr<Instance>   m_instance;
-        std::unique_ptr<Device>     m_device;
+        std::unique_ptr<class VulkanInstance>           m_instance;
+        std::unique_ptr<class VulkanPhysicalDevice>     m_physical_device;
+        std::unique_ptr<class VulkanDevice>             m_device;
+        std::unique_ptr<class VulkanDeviceAllocator>    m_device_allocator;
         
         std::vector<std::unique_ptr<RenderContext>> m_render_contexts;
 
@@ -54,7 +52,7 @@ class RenderSystem
 
         #pragma region Methods
 
-        DAEvoid MakeContext(Window& in_window);
+        DAEvoid MakeContext(class Window& in_window);
 
         #pragma endregion
 
@@ -79,10 +77,16 @@ class RenderSystem
         Logger& GetLogger() const noexcept;
 
         [[nodiscard]]
-        Instance const& GetInstance() const noexcept;
+        VulkanInstance& GetInstance() const noexcept;
 
         [[nodiscard]]
-        Device const& GetDevice() const noexcept;
+        VulkanPhysicalDevice& GetPhysicalDevice() const noexcept;
+
+        [[nodiscard]]
+        VulkanDevice& GetDevice() const noexcept;
+
+        [[nodiscard]]
+        VulkanDeviceAllocator& GetDeviceAllocator() const noexcept;
 
         #pragma endregion
 

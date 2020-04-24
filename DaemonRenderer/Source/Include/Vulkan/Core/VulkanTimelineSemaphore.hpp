@@ -22,26 +22,44 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include "Vulkan/Core/VulkanSemaphore.hpp"
 
-#pragma region Methods
+BEGIN_DAEMON_NAMESPACE
 
-VulkanFence& FencePool::RequestFence()
+class VulkanTimelineSemaphore final : public VulkanSemaphore
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    public:
 
-    return m_fences[m_index++];
-}
+        #pragma region Constructors and Destructor
 
-DAEvoid FencePool::Reset() noexcept
-{
-    for (auto const& fence : m_fences)
-        fence.Reset();
+        VulkanTimelineSemaphore() noexcept;
 
-    m_index = 0u;
-}
+        VulkanTimelineSemaphore(VulkanTimelineSemaphore const&  in_copy) = delete;
+        VulkanTimelineSemaphore(VulkanTimelineSemaphore&&       in_move) noexcept;
 
-#pragma endregion
+        ~VulkanTimelineSemaphore() = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        DAEvoid Signal(DAEuint64 in_value) const noexcept;
+
+        DAEvoid Wait(DAEuint64 in_value) const noexcept;
+
+        [[nodiscard]]
+        DAEuint64 GetValue() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        VulkanTimelineSemaphore& operator=(VulkanTimelineSemaphore const&   in_copy) = delete;
+        VulkanTimelineSemaphore& operator=(VulkanTimelineSemaphore&&        in_move) = delete;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

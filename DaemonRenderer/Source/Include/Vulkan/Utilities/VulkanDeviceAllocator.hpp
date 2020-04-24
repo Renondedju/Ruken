@@ -24,49 +24,58 @@
 
 #pragma once
 
-#include <thread>
-#include <unordered_map>
+#include <optional>
 
-#include "Vulkan/Core/VulkanCommandPool.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
+
+#include "Vulkan/Core/VulkanImage.hpp"
+#include "Vulkan/Core/VulkanBuffer.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class CommandPool
+class VulkanDeviceAllocator
 {
     private:
 
         #pragma region Members
 
-        std::unordered_map<std::thread::id, VulkanCommandPool> m_command_pools;
+        VmaAllocator m_handle {nullptr};
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructor
+        #pragma region Constructors and Destructor
 
-        explicit CommandPool(DAEuint32 in_queue_family_index) noexcept;
+        explicit VulkanDeviceAllocator(class VulkanPhysicalDevice const& in_physical_device,
+                                       class VulkanDevice         const& in_device) noexcept;
 
-        CommandPool(CommandPool const&  in_copy) = delete;
-        CommandPool(CommandPool&&       in_move) = default;
+        VulkanDeviceAllocator(VulkanDeviceAllocator const&  in_copy) = delete;
+        VulkanDeviceAllocator(VulkanDeviceAllocator&&       in_move) = delete;
 
-        ~CommandPool() = default;
+        ~VulkanDeviceAllocator() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
         [[nodiscard]]
-        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) noexcept;
+        std::optional<VulkanImage> CreateImage(VkImageCreateInfo       const& in_image_create_info,
+                                         VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
 
-        DAEvoid Reset();
+        /**
+         * \return 
+         */
+        [[nodiscard]]
+        std::optional<VulkanBuffer> CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
+                                           VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        CommandPool& operator=(CommandPool const&   in_copy) = delete;
-        CommandPool& operator=(CommandPool&&        in_move) = delete;
+        VulkanDeviceAllocator& operator=(VulkanDeviceAllocator const&   in_copy) = delete;
+        VulkanDeviceAllocator& operator=(VulkanDeviceAllocator&&        in_move) = delete;
 
         #pragma endregion
 };

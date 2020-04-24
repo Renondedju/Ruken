@@ -28,7 +28,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-Semaphore& SemaphorePool::RequestSemaphore()
+VulkanSemaphore& SemaphorePool::RequestSemaphore()
 {
     while (m_semaphore_index >= m_semaphores.size())
         m_semaphores.emplace_back();
@@ -36,7 +36,7 @@ Semaphore& SemaphorePool::RequestSemaphore()
     return m_semaphores[m_semaphore_index++];
 }
 
-TimelineSemaphore& SemaphorePool::RequestTimelineSemaphore()
+VulkanTimelineSemaphore& SemaphorePool::RequestTimelineSemaphore()
 {
     while (m_timeline_semaphore_index >= m_timeline_semaphores.size())
         m_timeline_semaphores.emplace_back();

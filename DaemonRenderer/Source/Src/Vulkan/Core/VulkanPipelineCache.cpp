@@ -22,26 +22,40 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#include "Vulkan/Core/VulkanPipelineCache.hpp"
+
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Methods
+#pragma region Constructor and Destructor
 
-VulkanFence& FencePool::RequestFence()
+VulkanPipelineCache::VulkanPipelineCache()
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    VkPipelineCacheCreateInfo pipeline_cache_info = {};
+    
+    pipeline_cache_info.sType           = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    pipeline_cache_info.initialDataSize = 0u;
+    pipeline_cache_info.pInitialData    = nullptr;
 
-    return m_fences[m_index++];
+    VK_CHECK(vkCreatePipelineCache(VulkanLoader::GetLoadedDevice(), &pipeline_cache_info, nullptr, &m_handle));
 }
 
-DAEvoid FencePool::Reset() noexcept
+VulkanPipelineCache::~VulkanPipelineCache()
 {
-    for (auto const& fence : m_fences)
-        fence.Reset();
+    if (!m_handle)
+        return;
 
-    m_index = 0u;
+    vkDestroyPipelineCache(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+VkPipelineCache const& VulkanPipelineCache::GetHandle() const noexcept
+{
+    return m_handle;
 }
 
 #pragma endregion

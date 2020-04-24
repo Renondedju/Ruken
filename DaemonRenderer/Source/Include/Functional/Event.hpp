@@ -95,7 +95,7 @@ class Event
         /**
          * \brief Equivalent of the Subscribe() method
          * \param in_function Function to subscribe
-         * \return Instance of the event
+         * \return VulkanInstance of the event
          */
         Event& operator+=(Function const& in_function) noexcept;
         Event& operator+=(Function&&      in_function) noexcept;

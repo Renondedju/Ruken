@@ -24,49 +24,70 @@
 
 #pragma once
 
-#include <thread>
-#include <unordered_map>
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
-#include "Vulkan/Core/VulkanCommandPool.hpp"
+#include <vma/vk_mem_alloc.h>
 
 BEGIN_DAEMON_NAMESPACE
 
-class CommandPool
+class VulkanImage
 {
     private:
 
         #pragma region Members
 
-        std::unordered_map<std::thread::id, VulkanCommandPool> m_command_pools;
+        VkImage             m_handle            {nullptr};
+        VmaAllocator        m_allocator         {nullptr};
+        VmaAllocation       m_allocation        {nullptr};
+        VmaAllocationInfo   m_allocation_info   {};
+        DAEbool             m_is_mapped         {false};
+        VkExtent3D          m_extent            {};
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructor
+        #pragma region Constructors and Destructor
 
-        explicit CommandPool(DAEuint32 in_queue_family_index) noexcept;
+        explicit VulkanImage(VkImage            in_handle,
+                             VmaAllocator       in_allocator,
+                             VmaAllocation      in_allocation,
+                             VmaAllocationInfo  in_allocation_info) noexcept;
 
-        CommandPool(CommandPool const&  in_copy) = delete;
-        CommandPool(CommandPool&&       in_move) = default;
+        VulkanImage(VulkanImage const&  in_copy) = delete;
+        VulkanImage(VulkanImage&&       in_move) noexcept;
 
-        ~CommandPool() = default;
+        ~VulkanImage() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]]
-        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) noexcept;
+        DAEvoid* Map() noexcept;
 
-        DAEvoid Reset();
+        DAEvoid UnMap() noexcept;
+
+        [[nodiscard]]
+        VkImage const& GetHandle() const noexcept;
+
+        [[nodiscard]]
+        VmaAllocation const& GetAllocation() const noexcept;
+
+        [[nodiscard]]
+        VkDeviceMemory const& GetMemory() const noexcept;
+
+        [[nodiscard]]
+        DAEvoid* GetMappedData() const noexcept;
+
+        [[nodiscard]]
+        VkExtent3D const& GetExtent() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        CommandPool& operator=(CommandPool const&   in_copy) = delete;
-        CommandPool& operator=(CommandPool&&        in_move) = delete;
+        VulkanImage& operator=(VulkanImage const&   in_copy) = delete;
+        VulkanImage& operator=(VulkanImage&&        in_move) = delete;
 
         #pragma endregion
 };

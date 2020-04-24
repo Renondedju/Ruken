@@ -24,20 +24,26 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
+#include <optional>
+
+#include "Vector/Vector.hpp"
 
 #include "Resource/IResource.hpp"
 #include "Resource/ResourceLoadingDescriptor.hpp"
 
-#include "Vulkan/Core/Buffer.hpp"
+#include "Vulkan/Core/VulkanBuffer.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
+class VulkanCommandBuffer;
+
 struct Vertex
 {
-    
+    Vector3f position;
+    Vector3f normal;
+    Vector2f uv;
 };
 
 class MeshLoadingDescriptor final : public ResourceLoadingDescriptor
@@ -57,18 +63,23 @@ class Mesh final : public IResource
 
         #pragma region Members
 
-        std::unique_ptr<Buffer> m_vertex_buffer;
-        std::unique_ptr<Buffer> m_index_buffer;
+        MeshLoadingDescriptor m_loading_descriptor;
 
-        DAEuint32 m_vertex_count    {0u};
-        DAEuint32 m_index_count     {0u};
+        std::unique_ptr<VulkanBuffer> m_vertex_buffer;
+        std::unique_ptr<VulkanBuffer> m_index_buffer;
 
         #pragma endregion
 
         #pragma region Methods
 
+        static std::optional<VulkanBuffer> CreateStagingBuffer  (DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateVertexBuffer   (DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateIndexBuffer    (DAEuint64 in_size) noexcept;
+
         DAEvoid UploadData(std::vector<Vertex>    const& in_vertices,
-                           std::vector<DAEuint32> const& in_indices);
+                           std::vector<DAEuint32> const& in_indices) const;
+
+        DAEvoid CopyBuffers(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_vertex_buffer, VulkanBuffer const& in_index_buffer) const noexcept;
 
         #pragma endregion
 
@@ -77,8 +88,6 @@ class Mesh final : public IResource
         #pragma region Constructors and Destructor
 
         Mesh() = default;
-
-        explicit Mesh(std::vector<Vertex> const& in_vertices, std::vector<DAEuint32> const& in_indices);
 
         Mesh(Mesh const&    in_copy) = delete;
         Mesh(Mesh&&         in_move) = delete;
@@ -89,23 +98,17 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(class ResourceManager& in_manager) override;
+        DAEvoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
-
-        [[nodiscard]]
-        Buffer const& GetVertexBuffer() const noexcept;
+        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
-        Buffer const& GetIndexBuffer() const noexcept;
+        VulkanBuffer const& GetVertexBuffer() const noexcept;
 
         [[nodiscard]]
-        DAEuint32 GetVertexCount() const noexcept;
-
-        [[nodiscard]]
-        DAEuint32 GetIndexCount() const noexcept;
+        VulkanBuffer const& GetIndexBuffer() const noexcept;
 
         #pragma endregion
 

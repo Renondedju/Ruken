@@ -28,9 +28,14 @@
 
 #include "Rendering/RenderFrame.hpp"
 
-#include "Vulkan/Core/Swapchain.hpp"
+#include "Vulkan/Core/VulkanSwapchain.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+class Window;
+class VulkanDevice;
+class VulkanSwapchain;
+class VulkanPhysicalDevice;
 
 class RenderContext
 {
@@ -41,7 +46,7 @@ class RenderContext
         DAEint32    m_frame_index       {-1};
         DAEbool     m_is_frame_active   {false};
 
-        std::unique_ptr<Swapchain> m_swapchain;
+        std::unique_ptr<VulkanSwapchain> m_swapchain;
 
         std::vector<RenderFrame> m_render_frames;
 
@@ -57,7 +62,8 @@ class RenderContext
 
         #pragma region Constructors and Destructor
 
-        explicit RenderContext(Device const&    in_device,
+        explicit RenderContext(VulkanPhysicalDevice& in_physical_device,
+                               VulkanDevice&    in_device,
                                Window&          in_window);
 
         RenderContext(RenderContext const&  in_copy) = delete;

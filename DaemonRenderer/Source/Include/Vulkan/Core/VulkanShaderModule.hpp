@@ -22,26 +22,49 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#pragma once
 
-USING_DAEMON_NAMESPACE
+#include <vector>
 
-#pragma region Methods
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
-VulkanFence& FencePool::RequestFence()
+BEGIN_DAEMON_NAMESPACE
+
+class VulkanShaderModule
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    private:
 
-    return m_fences[m_index++];
-}
+        #pragma region Members
 
-DAEvoid FencePool::Reset() noexcept
-{
-    for (auto const& fence : m_fences)
-        fence.Reset();
+        VkShaderModule m_handle {nullptr};
 
-    m_index = 0u;
-}
+        #pragma endregion
 
-#pragma endregion
+    public:
+
+        #pragma region Constructors and Destructor
+
+        explicit VulkanShaderModule(std::vector<DAEuint32> const& in_code) noexcept;
+
+        VulkanShaderModule(VulkanShaderModule const&    in_copy) = delete;
+        VulkanShaderModule(VulkanShaderModule&&         in_move) = delete;
+
+        ~VulkanShaderModule() noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        VkShaderModule const& GetHandle() const noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        VulkanShaderModule& operator=(VulkanShaderModule const& in_copy) = delete;
+        VulkanShaderModule& operator=(VulkanShaderModule&&      in_move) = delete;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

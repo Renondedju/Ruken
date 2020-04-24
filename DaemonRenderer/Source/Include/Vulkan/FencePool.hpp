@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "Vulkan/Core/Fence.hpp"
+#include "Vulkan/Core/VulkanFence.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -38,7 +38,7 @@ class FencePool
 
         DAEuint32 m_index {0u};
 
-        std::vector<Fence> m_fences;
+        std::vector<VulkanFence> m_fences;
 
         #pragma endregion
 
@@ -58,7 +58,7 @@ class FencePool
         #pragma region Methods
 
         [[nodiscard]]
-        Fence& RequestFence();
+        VulkanFence& RequestFence();
 
         DAEvoid Reset() noexcept;
 

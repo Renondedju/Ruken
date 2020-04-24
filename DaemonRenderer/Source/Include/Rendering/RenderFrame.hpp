@@ -28,8 +28,8 @@
 #include <vector>
 
 #include "Vulkan/FencePool.hpp"
-#include "Vulkan/CommandPool.hpp"
 #include "Vulkan/SemaphorePool.hpp"
+#include "Vulkan/CommandPool.hpp"
 
 #include "Rendering/RenderView.hpp"
 
@@ -73,16 +73,16 @@ class RenderFrame
         DAEvoid Reset() noexcept;
 
         [[nodiscard]]
-        Fence& RequestFence() const noexcept;
+        VulkanFence& RequestFence() const noexcept;
 
         [[nodiscard]]
-        Semaphore& RequestSemaphore() const noexcept;
+        VulkanSemaphore& RequestSemaphore() const noexcept;
 
         [[nodiscard]]
-        TimelineSemaphore& RequestTimelineSemaphore() const noexcept;
+        VulkanTimelineSemaphore& RequestTimelineSemaphore() const noexcept;
 
         [[nodiscard]]
-        CommandBuffer& RequestCommandBuffer() const noexcept;
+        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) const noexcept;
 
         #pragma endregion
 

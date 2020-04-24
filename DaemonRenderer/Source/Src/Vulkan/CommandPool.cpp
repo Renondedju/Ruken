@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,83 +24,35 @@
 
 #include "Vulkan/CommandPool.hpp"
 
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructor
 
-CommandPool::CommandPool(DAEuint32 const in_queue_family_index):
-    m_queue_family_index {in_queue_family_index}
+CommandPool::CommandPool(DAEuint32 const in_queue_family_index) noexcept
 {
-    VkCommandPoolCreateInfo command_pool_create_info = {};
-
-    command_pool_create_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    command_pool_create_info.flags            = 0u;
-    command_pool_create_info.queueFamilyIndex = in_queue_family_index;
-
-    // TODO : add for-loop to create a command pool for each available thread.
-    {
-        CommandPoolData data;
-
-        if (vkCreateCommandPool(VulkanLoader::GetLoadedDevice(), &command_pool_create_info, nullptr, &data.handle) != VK_SUCCESS)
-            throw std::exception("Failed to create a command pool!");
-
-        m_handles.emplace(std::this_thread::get_id(), std::move(data));
-    }
-}
-
-CommandPool::~CommandPool() noexcept
-{
-    for (auto const& handle : m_handles)
-        vkDestroyCommandPool(VulkanLoader::GetLoadedDevice(), handle.second.handle, nullptr);
+    m_command_pools.emplace(std::this_thread::get_id(), VulkanCommandPool(in_queue_family_index));
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-CommandBuffer& CommandPool::RequestCommandBuffer()
+VulkanCommandBuffer* CommandPool::RequestCommandBuffer(VkCommandBufferLevel const in_level) noexcept
 {
-    auto const it = m_handles.find(std::this_thread::get_id());
+    auto const it = m_command_pools.find(std::this_thread::get_id());
 
-    if (it == m_handles.cend())
-        throw std::exception("Requesting command buffer from an unregistered thread!");
+    if (it == m_command_pools.cend())
+        return nullptr;
 
-    auto const& command_pool = it->second;
-
-    if (command_pool.index == m_handles.size())
-    {
-        VkCommandBufferAllocateInfo command_buffer_allocate_info = {};
-
-        command_buffer_allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        command_buffer_allocate_info.commandPool        = command_pool.handle;
-        command_buffer_allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        command_buffer_allocate_info.commandBufferCount = 1u;
-
-        VkCommandBuffer handle;
-
-        if (vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, &handle) != VK_SUCCESS)
-            throw std::exception("Failed to allocate a command buffer!");
-
-        it->second.command_buffers.emplace_back(handle);
-    }
-
-    return it->second.command_buffers[it->second.index++];
+    return it->second.RequestCommandBuffer(in_level);
 }
 
 DAEvoid CommandPool::Reset()
 {
-    for (auto& handle : m_handles)
-    {
-        handle.second.index = 0u;
-
-        if (vkResetCommandPool(VulkanLoader::GetLoadedDevice(), handle.second.handle, 0u) != VK_SUCCESS)
-            throw std::exception("Failed to reset a command pool!");
-    }
-}
-
-DAEuint32 CommandPool::GetQueueFamilyIndex() const noexcept
-{
-    return m_queue_family_index;
+    for (auto& command_pool : m_command_pools)
+        command_pool.second.Reset();
 }
 
 #pragma endregion

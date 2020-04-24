@@ -29,7 +29,7 @@
 #include "Resource/IResource.hpp"
 #include "Resource/ResourceLoadingDescriptor.hpp"
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Vulkan/Core/VulkanShaderModule.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -39,7 +39,7 @@ class ShaderLoadingDescriptor final : public ResourceLoadingDescriptor
 
         #pragma region Members
 
-        std::string filename;
+        std::string path;
 
         #pragma endregion
 };
@@ -50,9 +50,9 @@ class Shader final : public IResource
 
         #pragma region Members
 
-        VkShaderModule m_handle {nullptr};
+        ShaderLoadingDescriptor m_loading_descriptor;
 
-        std::vector<DAEuint32> m_code;
+        std::unique_ptr<VulkanShaderModule> m_module;
 
         #pragma endregion
 
@@ -77,14 +77,14 @@ class Shader final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(class ResourceManager& in_manager) override;
+        DAEvoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
-        VkShaderModule const& GetHandle() const noexcept;
+        VulkanShaderModule const& GetModule() const noexcept;
 
         #pragma endregion
 

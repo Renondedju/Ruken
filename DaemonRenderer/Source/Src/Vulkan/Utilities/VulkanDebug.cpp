@@ -45,7 +45,7 @@ DAEvoid VulkanDebug::Initialize(Logger& in_parent_logger)
     m_logger->SetLevel(ELogLevel::Info);
 }
 
-DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string const& in_function) noexcept
+DAEvoid VulkanDebug::CheckResult(VkResult const in_result, std::string const& in_function) noexcept
 {
     auto const message = in_function + " : " + ToString(in_result);
 
@@ -54,14 +54,13 @@ DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string const& in
     else if (in_result > 0)
         m_logger->Warning(message);
     else
-        m_logger->Error(message);
-
-    return in_result >= 0;
+    {
+        m_logger->Fatal(message);
+        exit(1);
+    }
 }
 
-DAEvoid VulkanDebug::CreateDebugMessenger(VkInstance                                  in_instance,
-                                    VkDebugUtilsMessageSeverityFlagsEXT const   in_message_severity,
-                                    VkDebugUtilsMessageTypeFlagsEXT     const   in_message_type) noexcept
+DAEvoid VulkanDebug::CreateDebugMessenger(VkInstance in_instance) noexcept
 {
     if (m_debug_messenger)
         return;
@@ -69,12 +68,15 @@ DAEvoid VulkanDebug::CreateDebugMessenger(VkInstance                            
     VkDebugUtilsMessengerCreateInfoEXT debug_messenger_info = {};
 
     debug_messenger_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    debug_messenger_info.messageSeverity = in_message_severity;
-    debug_messenger_info.messageType     = in_message_type;
+    debug_messenger_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                           VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                           VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    debug_messenger_info.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT    |
+                                           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     debug_messenger_info.pfnUserCallback = DebugCallback;
 
-    if (!VK_CHECK(vkCreateDebugUtilsMessengerEXT(in_instance, &debug_messenger_info, nullptr, &m_debug_messenger)))
-        m_logger->Error("Failed to create debug messenger.");
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT(in_instance, &debug_messenger_info, nullptr, &m_debug_messenger));
 }
 
 DAEvoid VulkanDebug::DestroyDebugMessenger(VkInstance in_instance) noexcept
@@ -192,10 +194,9 @@ VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const
     return VK_FALSE;
 }
 
-DAEvoid VulkanDebug::SetObjectName(VkDevice               in_device,
-                             VkObjectType const     in_object_type,
-                             DAEuint64    const     in_object_handle,
-                             std::string  const&    in_object_name) noexcept
+DAEvoid VulkanDebug::SetObjectName(VkObjectType const     in_object_type,
+                                   DAEuint64    const     in_object_handle,
+                                   std::string  const&    in_object_name) noexcept
 {
     VkDebugUtilsObjectNameInfoEXT object_info = {};
 
@@ -204,15 +205,14 @@ DAEvoid VulkanDebug::SetObjectName(VkDevice               in_device,
     object_info.objectHandle = in_object_handle;
     object_info.pObjectName  = in_object_name.c_str();
 
-    vkSetDebugUtilsObjectNameEXT(in_device, &object_info);
+    vkSetDebugUtilsObjectNameEXT(VulkanLoader::GetLoadedDevice(), &object_info);
 }
 
-DAEvoid VulkanDebug::SetObjectTag(VkDevice            in_device,
-                            VkObjectType const  in_object_type,
-                            DAEuint64    const  in_object_handle,
-                            DAEuint64    const  in_tag_name,
-                            DAEsize      const  in_tag_size,
-                            DAEvoid      const* in_tag) noexcept
+DAEvoid VulkanDebug::SetObjectTag(VkObjectType const  in_object_type,
+                                  DAEuint64    const  in_object_handle,
+                                  DAEuint64    const  in_tag_name,
+                                  DAEsize      const  in_tag_size,
+                                  DAEvoid      const* in_tag) noexcept
 {
     VkDebugUtilsObjectTagInfoEXT tag_info = {};
 
@@ -223,7 +223,7 @@ DAEvoid VulkanDebug::SetObjectTag(VkDevice            in_device,
     tag_info.tagSize      = in_tag_size;
     tag_info.pTag         = in_tag;
 
-    vkSetDebugUtilsObjectTagEXT(in_device, &tag_info);
+    vkSetDebugUtilsObjectTagEXT(VulkanLoader::GetLoadedDevice(), &tag_info);
 }
 
 std::string VulkanDebug::ToString(VkResult const in_result) noexcept

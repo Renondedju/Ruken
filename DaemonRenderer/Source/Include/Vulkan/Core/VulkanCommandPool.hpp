@@ -24,49 +24,57 @@
 
 #pragma once
 
-#include <thread>
-#include <unordered_map>
+#include <vector>
+#include <optional>
 
-#include "Vulkan/Core/VulkanCommandPool.hpp"
+#include "Vulkan/Core/VulkanCommandBuffer.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class CommandPool
+class VulkanCommandPool
 {
     private:
 
         #pragma region Members
 
-        std::unordered_map<std::thread::id, VulkanCommandPool> m_command_pools;
+        VkCommandPool   m_handle            {nullptr};
+        DAEuint32       m_primary_index     {0u};
+        DAEuint32       m_secondary_index   {0u};
+
+        std::vector<VulkanCommandBuffer> m_primary_command_buffers;
+        std::vector<VulkanCommandBuffer> m_secondary_command_buffers;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructor
+        #pragma region Constructors and Destructor
 
-        explicit CommandPool(DAEuint32 in_queue_family_index) noexcept;
+        explicit VulkanCommandPool(DAEuint32 in_queue_family_index, VkCommandPoolCreateFlags in_flags = 0u);
 
-        CommandPool(CommandPool const&  in_copy) = delete;
-        CommandPool(CommandPool&&       in_move) = default;
+        VulkanCommandPool(VulkanCommandPool const&  in_copy) = delete;
+        VulkanCommandPool(VulkanCommandPool&&       in_move) noexcept;
 
-        ~CommandPool() = default;
+        ~VulkanCommandPool() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
         [[nodiscard]]
-        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) noexcept;
+        std::optional<VulkanCommandBuffer> AllocateCommandBuffer(VkCommandBufferLevel in_level) const noexcept;
 
-        DAEvoid Reset();
+        [[nodiscard]]
+        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level);
+
+        DAEvoid Reset(VkCommandPoolResetFlags in_flags = 0u) noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        CommandPool& operator=(CommandPool const&   in_copy) = delete;
-        CommandPool& operator=(CommandPool&&        in_move) = delete;
+        VulkanCommandPool& operator=(VulkanCommandPool const&   in_copy) = delete;
+        VulkanCommandPool& operator=(VulkanCommandPool&&        in_move) = delete;
 
         #pragma endregion
 };

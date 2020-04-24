@@ -22,26 +22,40 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/FencePool.hpp"
+#include "spirv_cross/spirv_cross.hpp"
+
+#include "Vulkan/Core/VulkanShaderModule.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Methods
+#pragma region Constructor and Destructor
 
-VulkanFence& FencePool::RequestFence()
+VulkanShaderModule::VulkanShaderModule(std::vector<DAEuint32> const& in_code) noexcept
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    VkShaderModuleCreateInfo shader_module_create_info = {};
 
-    return m_fences[m_index++];
+    shader_module_create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shader_module_create_info.codeSize = in_code.size() * sizeof(DAEuint32);
+    shader_module_create_info.pCode    = in_code.data();
+
+    vkCreateShaderModule(VulkanLoader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle);
 }
 
-DAEvoid FencePool::Reset() noexcept
+VulkanShaderModule::~VulkanShaderModule() noexcept
 {
-    for (auto const& fence : m_fences)
-        fence.Reset();
+    if (!m_handle)
+        return;
 
-    m_index = 0u;
+    vkDestroyShaderModule(VulkanLoader::GetLoadedDevice(), m_handle, nullptr);
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+VkShaderModule const& VulkanShaderModule::GetHandle() const noexcept
+{
+    return m_handle;
 }
 
 #pragma endregion

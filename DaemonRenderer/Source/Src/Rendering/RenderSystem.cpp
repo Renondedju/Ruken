@@ -26,11 +26,12 @@
 
 #include "Windowing/WindowManager.hpp"
 
-#include "Vulkan/Core/Device.hpp"
-#include "Vulkan/Core/Instance.hpp"
+#include "Vulkan/Core/VulkanDevice.hpp"
+#include "Vulkan/Core/VulkanInstance.hpp"
+#include "Vulkan/Core/VulkanPhysicalDevice.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
-#include "Vulkan/Utilities/VulkanException.hpp"
+#include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
 
 /* TODO Needs to be removed when Kernel is done TODO */
 
@@ -51,19 +52,14 @@ RenderSystem::RenderSystem():
 
     m_logger->SetLevel(ELogLevel::Info);
 
-    try
-    {
-        VulkanDebug ::Initialize(*m_logger);
-        VulkanLoader::Initialize();
+    VulkanDebug ::Initialize(*m_logger);
+    VulkanLoader::Initialize();
 
-        m_instance = std::make_unique<Instance>();
-        m_device   = std::make_unique<Device>  (*m_instance);
-    }
-
-    catch (VulkanException const& exception)
-    {
-        m_logger->Fatal(exception.what());
-    }
+    m_instance         = std::make_unique<VulkanInstance>       ();
+    m_physical_device  = std::make_unique<VulkanPhysicalDevice> (*m_instance);
+    m_device           = std::make_unique<VulkanDevice>         (*m_physical_device);
+    m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device,
+                                                                 *m_device);
 
     GWindowManager->on_window_created += [this] (Window& in_window)
     {
@@ -73,10 +69,14 @@ RenderSystem::RenderSystem():
 
 RenderSystem::~RenderSystem() noexcept
 {
+    m_device->WaitIdle();
+
     m_render_contexts.clear();
 
-    m_device  .reset();
-    m_instance.reset();
+    m_device_allocator.reset();
+    m_device          .reset();
+    m_physical_device .reset();
+    m_instance        .reset();
 }
 
 #pragma endregion
@@ -85,7 +85,7 @@ RenderSystem::~RenderSystem() noexcept
 
 DAEvoid RenderSystem::MakeContext(Window& in_window)
 {
-    m_render_contexts.push_back(std::make_unique<RenderContext>(*m_device, in_window));
+    m_render_contexts.push_back(std::make_unique<RenderContext>(*m_physical_device, *m_device, in_window));
 }
 
 DAEvoid RenderSystem::OnUpdate() noexcept
@@ -106,14 +106,24 @@ Logger& RenderSystem::GetLogger() const noexcept
     return *m_logger;
 }
 
-Instance const& RenderSystem::GetInstance() const noexcept
+VulkanInstance& RenderSystem::GetInstance() const noexcept
 {
     return *m_instance;
 }
 
-Device const& RenderSystem::GetDevice() const noexcept
+VulkanPhysicalDevice& RenderSystem::GetPhysicalDevice() const noexcept
+{
+    return *m_physical_device;
+}
+
+VulkanDevice& RenderSystem::GetDevice() const noexcept
 {
     return *m_device;
+}
+
+VulkanDeviceAllocator& RenderSystem::GetDeviceAllocator() const noexcept
+{
+    return *m_device_allocator;
 }
 
 #pragma endregion

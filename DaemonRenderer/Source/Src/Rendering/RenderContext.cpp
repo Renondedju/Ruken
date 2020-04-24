@@ -26,15 +26,16 @@
 
 #include "Windowing/Window.hpp"
 
-#include "Vulkan/Core/Device.hpp"
+#include "Vulkan/Core/VulkanSwapchain.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-RenderContext::RenderContext(Device const&  in_device,
+RenderContext::RenderContext(VulkanPhysicalDevice& in_physical_device,
+                             VulkanDevice&  in_device,
                              Window&        in_window):
-    m_swapchain {std::make_unique<Swapchain>(in_device, in_window)}
+    m_swapchain {std::make_unique<VulkanSwapchain>(in_physical_device, in_device, in_window)}
 {
     for (DAEuint32 i = 0; i < 2u; ++i)
         m_render_frames.emplace_back();
