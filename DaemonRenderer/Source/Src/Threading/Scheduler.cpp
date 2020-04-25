@@ -23,6 +23,7 @@
  */
 
 #include "Threading/Scheduler.hpp"
+#include "Core/ServiceProvider.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -32,6 +33,10 @@ Scheduler::Scheduler(ServiceProvider& in_service_provider, DAEuint16 const in_wo
     m_running   {true},
     m_job_queue {}
 {
+    m_logger = m_service_provider.LocateService<Logger>()->AddChild("scheduler");
+    if (m_logger)
+        m_logger->Info("Spawning " + std::to_string(m_workers.size()) + " workers");
+
     DAEuint16 index = 0;
     for (Worker& worker : m_workers)
     {

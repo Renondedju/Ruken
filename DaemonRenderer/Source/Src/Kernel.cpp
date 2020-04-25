@@ -41,6 +41,12 @@ DAEvoid Kernel::SetupServices() noexcept
     m_service_provider.ProvideService<ResourceManager>();
 }
 
+DAEvoid Kernel::DestroyServices() noexcept
+{
+    m_service_provider.DestroyService<WindowManager>();
+    m_service_provider.DestroyService<ResourceManager>();
+}
+
 Kernel::Kernel():
     m_service_provider   {},
     // Setting up the logger before any other services to make sure that others can use it to output
@@ -66,7 +72,9 @@ DAEint Kernel::Run() noexcept
         RequestShutdown(0);
     }
 
-    m_logger.Info("Cleaning up");
+    DestroyServices();
+
+    m_logger.Info("Cleanup done, exiting application");
 
     system("pause");
 

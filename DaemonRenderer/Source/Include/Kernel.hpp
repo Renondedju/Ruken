@@ -66,7 +66,8 @@ class Kernel
 
         #pragma region Methods
 
-        DAEvoid SetupServices() noexcept;
+        DAEvoid SetupServices  () noexcept;
+        DAEvoid DestroyServices() noexcept;
 
         #pragma endregion
 

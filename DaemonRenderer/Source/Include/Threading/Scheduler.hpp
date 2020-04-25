@@ -31,8 +31,11 @@
 #include "Config.hpp"
 
 #include "Core/Service.hpp"
+#include "Debug/Logging/Logger.hpp"
+
 #include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
+
 #include "Threading/Worker.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
 
@@ -52,6 +55,8 @@ class Scheduler final: public Service<Scheduler>, Unique
         std::vector<Worker>      m_workers;
         std::atomic_bool         m_running;
         ThreadSafeLockQueue<Job> m_job_queue;
+
+        Logger* m_logger;
 
         #pragma endregion
 

@@ -34,6 +34,13 @@ TService* ServiceProvider::ProvideService(TArgs&&... in_args) noexcept(std::is_n
 }
 
 template <typename TService>
+DAEvoid ServiceProvider::DestroyService() noexcept
+{
+    delete m_services[TService::ServiceID()];
+    m_services.erase(TService::ServiceID());
+}
+
+template <typename TService>
 TService* ServiceProvider::LocateService() noexcept
 {
     static_assert(std::is_base_of_v<Service<TService>, TService>, "The located service should inherit from Service<TService>");

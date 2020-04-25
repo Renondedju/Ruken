@@ -72,7 +72,16 @@ class ServiceProvider
          */
         template <typename TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, DAEbool> = true>
         TService* ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>);
-        
+
+        /**
+         * \brief Forces the destruction of a service prematurely.
+         *        This is useful to enforce a given destruction order.
+         * \note Any left over services will be cleaned up anyway in the destructor of the provider but the destruction order is not guaranteed 
+         * \tparam TService Service type
+         */
+        template <typename TService>
+        DAEvoid DestroyService() noexcept;
+
         /**
          * \brief Locates a service. This service could be unavailable or unprovided yet, if this is the case, a nullptr will be returned
          * \tparam TService Service type, must inherit from the Service class
