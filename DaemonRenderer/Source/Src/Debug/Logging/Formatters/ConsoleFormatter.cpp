@@ -106,7 +106,7 @@ std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noe
             break;
 
         case ELogLevel::Info:
-            SetConsoleTextAttribute(m_handle, DAEMON_FOREGROUND_GREEN);
+            SetConsoleTextAttribute(m_handle, DAEMON_FOREGROUND_WHITE);
             break;
 
         case ELogLevel::Warning:

@@ -27,8 +27,8 @@
 #include "Screen.hpp"
 #include "Window.hpp"
 
-#undef CreateWindow
-
+#include "Core/Service.hpp"
+#include "Types/Unique.hpp"
 #include "Debug/Logging/Logger.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -36,7 +36,7 @@ BEGIN_DAEMON_NAMESPACE
 /**
  * \brief Manages the connected screens and the created windows.
  */
-class WindowManager
+class WindowManager final: public Service<WindowManager>, Unique
 {
     private:
 
@@ -98,9 +98,10 @@ class WindowManager
 
         #pragma region Constructors
 
-        WindowManager()                               = default;
-        WindowManager(WindowManager const&  in_other) = delete;
-        WindowManager(WindowManager&&       in_other) = delete;
+        using Service<WindowManager>::Service;
+        
+        WindowManager(WindowManager const& in_other) = delete;
+        WindowManager(WindowManager&&      in_other) = delete;
         ~WindowManager() noexcept;
 
         #pragma endregion
@@ -157,16 +158,10 @@ class WindowManager
 
         #pragma region Operators
 
-        WindowManager& operator=(WindowManager const&   in_other) = delete;
-        WindowManager& operator=(WindowManager&&        in_other) = delete;
+        WindowManager& operator=(WindowManager const& in_other) = delete;
+        WindowManager& operator=(WindowManager&&      in_other) = delete;
 
         #pragma endregion
 };
-
-/* TODO Needs to be removed when Kernel is done TODO */
-
-extern WindowManager* GWindowManager;
-
-/* TODO Needs to be removed when Kernel is done TODO */
 
 END_DAEMON_NAMESPACE

@@ -45,7 +45,7 @@ std::string LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcep
 
 std::string LogFormatter::Format(LogRecord const& in_record) const noexcept
 {
-    return ComputeLabel(in_record) + " : " + in_record.logger_name + " : " + in_record.message + "\n";
+    return ComputeLabel(in_record) + ' ' + in_record.message + "\n";
 }
 
 std::string LogFormatter::FormatTime(LogRecord const& in_record) const noexcept

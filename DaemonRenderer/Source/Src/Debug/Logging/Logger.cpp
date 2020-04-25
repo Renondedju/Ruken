@@ -24,21 +24,16 @@
 
 #include "Debug/Logging/Logger.hpp"
 
-/* TODO Needs to be removed when Kernel is done TODO */
-
-DAEMON_NAMESPACE::Logger* DAEMON_NAMESPACE::GRootLogger = nullptr;
-
-/* TODO Needs to be removed when Kernel is done TODO */
-
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructors
 
-Logger::Logger(std::string in_name, ELogLevel const in_level, Logger* in_parent, DAEbool const in_propagate) noexcept:
-    m_name    {std::move(in_name)},
-    m_level   {in_level},
-    m_parent  {in_parent},
-    propagate {in_propagate}
+Logger::Logger(ServiceProvider& in_service_provider, std::string in_name, ELogLevel const in_level, Logger* in_parent, DAEbool const in_propagate) noexcept:
+    Service<Logger> {in_service_provider},
+    m_name          {std::move(in_name)},
+    m_level         {in_level},
+    m_parent        {in_parent},
+    propagate       {in_propagate}
 {}
 
 Logger::~Logger() noexcept
@@ -86,7 +81,7 @@ ELogLevel Logger::GetEffectiveLevel() const noexcept
 
 Logger* Logger::AddChild(std::string in_name)
 {
-    auto const& logger = new Logger(std::move(in_name), m_level, this, propagate);
+    auto const& logger = new Logger(m_service_provider, std::move(in_name), m_level, this, propagate);
 
     m_children.push_front(logger);
 

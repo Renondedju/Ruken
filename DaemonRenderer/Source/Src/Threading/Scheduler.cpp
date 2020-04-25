@@ -26,9 +26,10 @@
 
 USING_DAEMON_NAMESPACE
 
-Scheduler::Scheduler(DAEuint16 const in_workers_count):
+Scheduler::Scheduler(ServiceProvider& in_service_provider, DAEuint16 const in_workers_count):
+    Service<Scheduler> {in_service_provider},
     m_workers   {in_workers_count == 0u ? std::thread::hardware_concurrency() - 1 : in_workers_count},
-    m_running    {true},
+    m_running   {true},
     m_job_queue {}
 {
     DAEuint16 index = 0;
