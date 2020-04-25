@@ -27,6 +27,7 @@
 #include "Kernel.hpp"
 #include "Config.hpp"
 #include "Build.hpp"
+#include "KernelProxy.hpp"
 
 #include "Threading/Scheduler.hpp"
 #include "Windowing/WindowManager.hpp"
@@ -36,6 +37,8 @@ USING_DAEMON_NAMESPACE
 
 DAEvoid Kernel::SetupServices() noexcept
 {
+    m_service_provider.ProvideService<KernelProxy>(*this);
+
     m_service_provider.ProvideService<Scheduler>();
     m_service_provider.ProvideService<WindowManager>();
     m_service_provider.ProvideService<ResourceManager>();
