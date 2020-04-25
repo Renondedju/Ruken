@@ -117,6 +117,9 @@
     <ClInclude Include="Source\Include\Containers\SOA\DataLayout.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayoutItem.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayoutView.hpp" />
+    <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
+    <ClInclude Include="Source\Include\Core\Service.hpp" />
+    <ClInclude Include="Source\Include\Core\ServiceBase.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\ConsoleFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\FileFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\LogLevel.hpp" />
@@ -146,6 +149,8 @@
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
+    <ClInclude Include="Source\Include\Kernel.hpp" />
+    <ClInclude Include="Source\Include\KernelProxy.hpp" />
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
@@ -247,6 +252,8 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
+    <None Include="Source\Src\Core\ServiceProvider.inl" />
+    <None Include="Source\Src\Core\Service.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />
     <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
     <None Include="Source\Src\ECS\Component.inl" />
@@ -267,6 +274,8 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Core\ServiceBase.cpp" />
+    <ClCompile Include="Source\Src\Core\ServiceProvider.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Formatters\ConsoleFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\FileHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\LogHandler.cpp" />
@@ -279,6 +288,8 @@
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
+    <ClCompile Include="Source\Src\Kernel.cpp" />
+    <ClCompile Include="Source\Src\KernelProxy.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceIdentifier.cpp" />

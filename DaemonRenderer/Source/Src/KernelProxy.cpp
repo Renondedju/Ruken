@@ -22,11 +22,16 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "KernelProxy.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-#define DAEMON_BUILD_VERSION "0.0.0-dev"
-#define DAEMON_BUILD_STAMP   __DATE__ " " __TIME__
+KernelProxy::KernelProxy(ServiceProvider& in_service_provider, Kernel& in_kernel) noexcept:
+    Service<KernelProxy> {in_service_provider},
+    m_kernel_reference   {in_kernel}
+{}
 
-#define DAEMON_BUILD_INFO DAEMON_PROJECT_NAME " " DAEMON_BUILD_VERSION " (" DAEMON_OS_STR "-" DAEMON_PLATFORM_STR " " DAEMON_CONFIG_STR " > " DAEMON_COMPILER_STR ")"
+Kernel& KernelProxy::GetKernelReference() const noexcept
+{
+    return m_kernel_reference;
+}

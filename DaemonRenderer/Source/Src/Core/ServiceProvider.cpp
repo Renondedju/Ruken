@@ -22,11 +22,12 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Core/ServiceProvider.hpp"
 
-#include "Config.hpp"
+USING_DAEMON_NAMESPACE
 
-#define DAEMON_BUILD_VERSION "0.0.0-dev"
-#define DAEMON_BUILD_STAMP   __DATE__ " " __TIME__
-
-#define DAEMON_BUILD_INFO DAEMON_PROJECT_NAME " " DAEMON_BUILD_VERSION " (" DAEMON_OS_STR "-" DAEMON_PLATFORM_STR " " DAEMON_CONFIG_STR " > " DAEMON_COMPILER_STR ")"
+ServiceProvider::~ServiceProvider() noexcept
+{
+    for (auto service: m_services)
+        delete service.second;
+}

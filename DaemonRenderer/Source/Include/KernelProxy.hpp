@@ -25,8 +25,52 @@
 #pragma once
 
 #include "Config.hpp"
+#include "Core/Service.hpp"
+#include "Types/Unique.hpp"
 
-#define DAEMON_BUILD_VERSION "0.0.0-dev"
-#define DAEMON_BUILD_STAMP   __DATE__ " " __TIME__
+BEGIN_DAEMON_NAMESPACE
 
-#define DAEMON_BUILD_INFO DAEMON_PROJECT_NAME " " DAEMON_BUILD_VERSION " (" DAEMON_OS_STR "-" DAEMON_PLATFORM_STR " " DAEMON_CONFIG_STR " > " DAEMON_COMPILER_STR ")"
+class Kernel;
+class ServiceProvider;
+
+/**
+ * \brief The kernel proxy is a simple class allowing access to the main Kernel class
+ *        via the ServiceProvider
+ */
+class KernelProxy final: public Service<KernelProxy>, Unique
+{
+    private:
+
+        #pragma region Members
+
+        Kernel& m_kernel_reference;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors
+
+        KernelProxy(ServiceProvider& in_service_provider, Kernel& in_kernel) noexcept;
+
+        KernelProxy(KernelProxy const& in_copy) = delete;
+        KernelProxy(KernelProxy&&      in_move) = delete;
+        ~KernelProxy()                          = default;
+
+        #pragma endregion
+
+        /**
+         * \brief Returns the kernel reference
+         * \return Kernel reference
+         */
+        Kernel& GetKernelReference() const noexcept;
+
+        #pragma region Operators
+        
+        KernelProxy& operator=(KernelProxy const& in_copy) = delete;
+        KernelProxy& operator=(KernelProxy&&      in_move) = delete;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

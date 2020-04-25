@@ -22,11 +22,16 @@
  *  SOFTWARE.
  */
 
-#pragma once
+template <typename TCrtp>
+Service<TCrtp>::Service(ServiceProvider& in_service_provider) noexcept:
+    m_service_provider {in_service_provider}
+{}
 
-#include "Config.hpp"
-
-#define DAEMON_BUILD_VERSION "0.0.0-dev"
-#define DAEMON_BUILD_STAMP   __DATE__ " " __TIME__
-
-#define DAEMON_BUILD_INFO DAEMON_PROJECT_NAME " " DAEMON_BUILD_VERSION " (" DAEMON_OS_STR "-" DAEMON_PLATFORM_STR " " DAEMON_CONFIG_STR " > " DAEMON_COMPILER_STR ")"
+template <typename TCrtp>
+DAEsize Service<TCrtp>::ServiceID() noexcept
+{
+    // Generating the ID once
+    static DAEsize id = GetNextId();
+    
+    return id;
+}

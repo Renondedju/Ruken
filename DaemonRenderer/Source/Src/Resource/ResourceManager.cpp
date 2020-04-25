@@ -24,6 +24,7 @@
 
 #include <iostream>
 
+#include "Core/ServiceProvider.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Resource/ResourceLoadingDescriptor.hpp"
 #include "Resource/ResourceProcessingFailure.hpp"
@@ -51,10 +52,7 @@ DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceL
     {
         in_manifest->status.store(failure.resource_validity ? EResourceStatus::Loaded : EResourceStatus::Invalid, std::memory_order_release);
 
-        DAEMON_DEBUG_RELEASE
-        {
-            std::cout << static_cast<std::string>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<std::string>(failure) << std::endl;
-        }
+        std::cout << static_cast<std::string>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<std::string>(failure) << std::endl;
 
         --m_current_operation_count;
 
@@ -94,10 +92,7 @@ DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
     {
         in_manifest->status.store(failure.resource_validity ? EResourceStatus::Loaded : EResourceStatus::Invalid, std::memory_order_release);
 
-        DAEMON_DEBUG_RELEASE
-        {
-            std::cout << static_cast<std::string>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<std::string>(failure) << std::endl;
-        }
+        std::cout << static_cast<std::string>(in_manifest->GetIdentifier()) << " failed to load. What: " << static_cast<std::string>(failure) << std::endl;
         --m_current_operation_count;
 
         // If some resource tells us that there is not enough memory,
@@ -177,10 +172,11 @@ DAEvoid ResourceManager::Cleanup() noexcept
     access->clear();
 }
 
-ResourceManager::ResourceManager(Scheduler& in_scheduler) noexcept:
-    m_manifests                  {},
-    m_collection_mode          {EGCCollectionMode::Automatic},
-    m_scheduler_reference      {in_scheduler},
+ResourceManager::ResourceManager(ServiceProvider& in_service_provider) noexcept:
+    Service<ResourceManager>  {in_service_provider},
+    m_manifests               {},
+    m_collection_mode         {EGCCollectionMode::Automatic},
+    m_scheduler_reference     {*m_service_provider.LocateService<Scheduler>()},
     m_current_operation_count {0}
 {}
 

@@ -30,8 +30,12 @@
 
 #include "Config.hpp"
 
+#include "Core/Service.hpp"
+#include "Debug/Logging/Logger.hpp"
+
 #include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
+
 #include "Threading/Worker.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
 
@@ -40,17 +44,19 @@ BEGIN_DAEMON_NAMESPACE
 /**
  * \brief This class is responsible for the repartition of different tasks between workers
  */
-class Scheduler : Unique
+class Scheduler final: public Service<Scheduler>, Unique
 {
     public: using Job = std::function<DAEvoid()>;
 
     private:
 
-        #pragma region Memebers
+        #pragma region Members
 
         std::vector<Worker>      m_workers;
         std::atomic_bool         m_running;
         ThreadSafeLockQueue<Job> m_job_queue;
+
+        Logger* m_logger;
 
         #pragma endregion
 
@@ -69,11 +75,12 @@ class Scheduler : Unique
 
         /**
          * \brief Scheduler constructor
+         * \param in_service_provider Service provider
          * \param in_workers_count Number of managed workers
          */
-        Scheduler(DAEuint16 in_workers_count = 0u);
+        Scheduler(ServiceProvider& in_service_provider, DAEuint16 in_workers_count = 0u);
 
-        Scheduler(Scheduler const& in_copy)        = delete;
+        Scheduler(Scheduler const& in_copy)     = delete;
         Scheduler(Scheduler&& in_move) noexcept = delete;
         ~Scheduler();
 

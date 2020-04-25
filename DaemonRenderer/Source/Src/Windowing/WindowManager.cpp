@@ -24,12 +24,6 @@
 
 #include "Windowing/WindowManager.hpp"
 
-/* TODO Needs to be removed when Kernel is done TODO */
-
-DAEMON_NAMESPACE::WindowManager* DAEMON_NAMESPACE::GWindowManager = nullptr;
-
-/* TODO Needs to be removed when Kernel is done TODO */
-
 USING_DAEMON_NAMESPACE
 
 DAEvoid WindowManager::ErrorCallback(DAEint32 const  in_error_code,
@@ -68,14 +62,14 @@ DAEvoid WindowManager::MonitorCallback(GLFWmonitor*   in_monitor,
     {
         // GWindowManager->m_logger->Error(std::string("Screen connected : ") + glfwGetMonitorName(in_monitor));
 
-        GWindowManager->AddScreen(in_monitor);
+        //AddScreen(in_monitor);
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
         // GWindowManager->m_logger->Error(std::string("Screen disconnected : ") + glfwGetMonitorName(in_monitor));
 
-        GWindowManager->RemoveScreen(in_monitor);
+        //RemoveScreen(in_monitor);
     }
 }
 
@@ -147,12 +141,6 @@ DAEbool WindowManager::Initialize()
 
         // Setup screens.
         DiscoverScreens();
-
-        /* TODO Needs to be removed when Kernel is done TODO */
-
-        GWindowManager = this;
-
-        /* TODO Needs to be removed when Kernel is done TODO */
 
         return true;
     }

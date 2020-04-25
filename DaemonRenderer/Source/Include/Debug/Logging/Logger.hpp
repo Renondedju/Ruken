@@ -28,7 +28,7 @@
 #include <forward_list>
 
 #include "Config.hpp"
-
+#include "Core/Service.hpp"
 #include "Debug/Logging/Filters/LogFilter.hpp"
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
@@ -45,7 +45,7 @@ BEGIN_DAEMON_NAMESPACE
  *
  * \warning Loggers should NEVER be instantiated directly, but always through the root logger's method "AddChild()".
  */
-class Logger
+class Logger final: public Service<Logger>
 {
     private:
 
@@ -100,7 +100,11 @@ class Logger
 
         #pragma region Constructors
 
-        explicit Logger(std::string in_name, ELogLevel in_level, Logger* in_parent, DAEbool in_propagate = true) noexcept;
+        explicit Logger(ServiceProvider& in_service_provider, 
+                        std::string      in_name,
+                        ELogLevel        in_level,
+                        Logger*          in_parent,
+                        DAEbool          in_propagate = true) noexcept;
 
         Logger(Logger const& in_copy) = delete;
         Logger(Logger&&      in_move) = delete;

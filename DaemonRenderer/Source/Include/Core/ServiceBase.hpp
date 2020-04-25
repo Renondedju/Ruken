@@ -25,8 +25,41 @@
 #pragma once
 
 #include "Config.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-#define DAEMON_BUILD_VERSION "0.0.0-dev"
-#define DAEMON_BUILD_STAMP   __DATE__ " " __TIME__
+BEGIN_DAEMON_NAMESPACE
 
-#define DAEMON_BUILD_INFO DAEMON_PROJECT_NAME " " DAEMON_BUILD_VERSION " (" DAEMON_OS_STR "-" DAEMON_PLATFORM_STR " " DAEMON_CONFIG_STR " > " DAEMON_COMPILER_STR ")"
+class ServiceBase
+{
+    protected:
+
+        #pragma region Methods
+
+        /**
+         * \brief Returns the next service ID
+         * \return Service ID
+         */
+        static DAEsize GetNextId() noexcept;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors
+
+        ServiceBase()                           = default;
+        ServiceBase(ServiceBase const& in_copy) = default;
+        ServiceBase(ServiceBase&&      in_move) = default;
+        virtual ~ServiceBase()                  = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+        
+        ServiceBase& operator=(ServiceBase const& in_copy) = default;
+        ServiceBase& operator=(ServiceBase&&      in_move) = default;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

@@ -22,100 +22,13 @@
  *  SOFTWARE.
  */
 
-#include <Vector/Vector.hpp>
-
-#include "ECS/Component.hpp"
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/ComponentItem.hpp"
-#include "ECS/ComponentSystem.hpp"
-
-#include "Windowing/WindowManager.hpp"
-
-#include "Debug/Logging/Handlers/StreamHandler.hpp"
-
-#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
+#include "Kernel.hpp"
 
 USING_DAEMON_NAMESPACE
 
-/**
- * \brief This table keeps track of every available component in the ECS
- *        it is also used to create and maintain every component ID,
- *        see the Component class for more info.
- */
-enum class EComponentsTable
-{
-    Position,
-    Counter,
-    Life,
-};
-
-struct PositionComponentItem : public ComponentItem<Vector3f>
-{
-    enum class EMembers
-    { Position };
-};
-
-struct LifeComponentItem : public ComponentItem<DAEfloat, DAEfloat>
-{
-    enum class EMembers
-    { Life, MaxLife };
-};
-
-struct CounterComponentItem : public ComponentItem<DAEfloat> 
-{
-    enum class EMembers
-    { Counter };
-};
-
-DAEMON_DEFINE_COMPONENT(EComponentsTable, Position);
-DAEMON_DEFINE_COMPONENT(EComponentsTable, Counter);
-DAEMON_DEFINE_COMPONENT(EComponentsTable, Life);
-
 int main()
 {
-    /* TODO Needs to be removed when Kernel is done TODO */
+    Kernel kernel;
 
-    Logger root_logger("ROOT", ELogLevel::Debug, nullptr);
-
-    GRootLogger = &root_logger;
-
-    WindowManager window_manager;
-
-    GWindowManager = &window_manager;
-
-    ConsoleFormatter formatter;
-
-    StreamHandler stream(&formatter, std::cout);
-
-    root_logger.AddHandler(&stream);
-
-    window_manager.Initialize();
-
-    WindowParameters params;
-
-    window_manager.CreateWindow(std::move(params));
-
-    while (!window_manager.GetMainWindow()->ShouldClose())
-    {
-        window_manager.Update();
-    }
-
-    /* TODO Needs to be removed when Kernel is done TODO */
-
-    EntityAdmin admin;
-
-    admin.CreateEntity<LifeComponent>();
-    admin.CreateEntity<LifeComponent>();
-    admin.CreateEntity<LifeComponent, CounterComponent>();
-    admin.CreateEntity<LifeComponent, PositionComponent>();
-    admin.CreateEntity<PositionComponent, LifeComponent>();
-    admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
-    admin.CreateEntity<PositionComponent, LifeComponent, CounterComponent>();
-
-    ComponentQuery query;
-
-    query.SetupInclusionQuery<LifeComponent, PositionComponent>();
-    query.SetupExclusionQuery<CounterComponent>();
-
-    return EXIT_SUCCESS;
+    return kernel.Run();
 }

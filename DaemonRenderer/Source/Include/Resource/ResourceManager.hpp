@@ -29,6 +29,8 @@
 
 #include "Config.hpp"
 
+#include "Core/Service.hpp"
+#include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #include "Threading/Scheduler.hpp"
@@ -43,7 +45,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class ResourceManager
+class ResourceManager : public Service<ResourceManager>, Unique
 {
     private:
 
@@ -125,10 +127,10 @@ class ResourceManager
 
         #pragma region Constructors
 
-        // Copy and move constructors/operators are not supported yet
-        ResourceManager (Scheduler& in_scheduler) noexcept;
+        ResourceManager (ServiceProvider& in_service_provider) noexcept;
+
         ResourceManager (ResourceManager const& in_copy) = delete;
-        ResourceManager (ResourceManager&& in_move)         = delete;
+        ResourceManager (ResourceManager&&      in_move) = delete;
         ~ResourceManager() noexcept;
 
         #pragma endregion
@@ -235,8 +237,8 @@ class ResourceManager
 
         #pragma region Operators
 
-        ResourceManager& operator=(ResourceManager const& in_copy)    = delete;
-        ResourceManager& operator=(ResourceManager&& in_move)         = delete;
+        ResourceManager& operator=(ResourceManager const& in_copy) = delete;
+        ResourceManager& operator=(ResourceManager&&      in_move) = delete;
 
         #pragma endregion
 };
