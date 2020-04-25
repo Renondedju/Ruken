@@ -22,16 +22,15 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
-System<TComponents...>::System(EntityAdmin& in_admin) noexcept:
-    m_groups {},
-    m_admin  {in_admin}
-{
-    m_query.SetupInclusionQuery<TComponents...>();
-}
+#pragma once
 
-template <typename ... TComponents>
-DAEvoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
+#include "ECS/ExclusiveComponent.hpp"
+
+USING_DAEMON_NAMESPACE
+
+struct TestExclusiveComponent final: public ExclusiveComponent<0>
 {
-    m_groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
-}
+    DAEsize data1;
+    DAEsize data2;
+    DAEsize data3;
+};

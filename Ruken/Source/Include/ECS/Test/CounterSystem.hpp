@@ -25,12 +25,16 @@
 #pragma once
 
 #include "ECS/System.hpp"
+
 #include "ECS/Test/CounterComponent.hpp"
+#include "ECS/Test/TestExclusiveComponent.hpp"
 
 USING_DAEMON_NAMESPACE
 
 struct CounterSystem final : System<CounterComponent, TestTagComponent>
 {
+    using System<CounterComponent, TestTagComponent>::System;
+
     using StartView  = CounterComponent::Item::MakeView<Count>;
     using UpdateView = CounterComponent::Item::MakeView<Count const> const;
 
@@ -42,6 +46,12 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
     DAEvoid OnStart() noexcept override
     {
         DAEsize count = 0;
+
+        TestExclusiveComponent* test = m_admin.GetExclusiveComponent<TestExclusiveComponent>();
+
+        test->data1 = 1;
+        test->data2 = 2;
+        test->data3 = 3;
 
         // Iterating over every entity
         for (auto && group: m_groups)
@@ -57,9 +67,9 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
 
     /**
      * \brief Called every frame
-     * \param in_delta_time Time passed in seconds since the last frame
+     * \param in_time_step Time passed in seconds since the last frame
      */
-    DAEvoid OnUpdate([[maybe_unused]] DAEfloat in_delta_time) noexcept override
+    DAEvoid OnUpdate([[maybe_unused]] DAEfloat in_time_step) noexcept override
     {
         DAEsize total = 0;
 

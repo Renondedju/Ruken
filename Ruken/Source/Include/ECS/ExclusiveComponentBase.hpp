@@ -22,16 +22,35 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
-System<TComponents...>::System(EntityAdmin& in_admin) noexcept:
-    m_groups {},
-    m_admin  {in_admin}
-{
-    m_query.SetupInclusionQuery<TComponents...>();
-}
+#pragma once
 
-template <typename ... TComponents>
-DAEvoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
+#include "Config.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+/**
+ * \brief Exclusive component base, this class is just
+ *        used to store exclusive components in the EntityAdmin
+ */
+class ExclusiveComponentBase
 {
-    m_groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
-}
+    public:
+
+        #pragma region Constructors
+
+        ExclusiveComponentBase()                                      = default;
+        ExclusiveComponentBase(ExclusiveComponentBase const& in_copy) = default;
+        ExclusiveComponentBase(ExclusiveComponentBase&&      in_move) = default;
+        virtual ~ExclusiveComponentBase()                             = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        ExclusiveComponentBase& operator=(ExclusiveComponentBase const& in_copy) = default;
+        ExclusiveComponentBase& operator=(ExclusiveComponentBase&&      in_move) = default;
+
+        #pragma endregion
+};
+
+END_DAEMON_NAMESPACE

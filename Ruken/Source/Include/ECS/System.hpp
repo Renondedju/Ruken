@@ -48,9 +48,6 @@ class EntityAdmin;
 template <typename... TComponents>
 class System : public SystemBase
 {
-    // Allows to set m_admin
-    friend EntityAdmin;
-
     protected:
 
         #pragma region Members
@@ -59,7 +56,7 @@ class System : public SystemBase
         // You really should not try to edit the vector itself yourself.
         // Instead, use it for iteration purposes only !
         std::vector<Group<TComponents...>> m_groups;
-        EntityAdmin*                       m_admin;
+        EntityAdmin&                       m_admin;
 
         #pragma endregion
 
@@ -67,7 +64,8 @@ class System : public SystemBase
 
         #pragma region Constructors
 
-        System() noexcept;
+        System(EntityAdmin&  in_admin) noexcept;
+
         System(System const& in_copy) = default;
         System(System&&      in_move) = default;
         virtual ~System()             = default;
@@ -88,8 +86,8 @@ class System : public SystemBase
 
         #pragma region Operators
 
-        System& operator=(System const& in_copy) = default;
-        System& operator=(System&&      in_move) = default;
+        System& operator=(System const& in_copy) = delete;
+        System& operator=(System&&      in_move) = delete;
 
         #pragma endregion
 };

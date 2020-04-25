@@ -25,10 +25,25 @@
 template <typename TSystem>
 RkVoid EntityAdmin::CreateSystem() noexcept
 {
-    std::unique_ptr<TSystem> system = std::make_unique<TSystem>();
-    system->m_admin = this;
+    std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
 
     m_systems.emplace_back(std::move(system));
+}
+
+template <typename TComponent>
+DAEvoid EntityAdmin::CreateExclusiveComponent() noexcept
+{
+    m_exclusive_components.try_emplace(TComponent::id, std::make_unique<TComponent>());
+}
+
+template <typename TComponent>
+TComponent* EntityAdmin::GetExclusiveComponent() noexcept
+{
+    auto search = m_exclusive_components.find(TComponent::id);
+    if (search != m_exclusive_components.end())
+        return static_cast<TComponent*>(&(*search->second));
+
+    return nullptr;
 }
 
 template <typename... TComponents>

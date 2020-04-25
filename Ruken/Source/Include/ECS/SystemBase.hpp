@@ -85,9 +85,9 @@ class SystemBase
 
         /**
          * \brief Called every frame
-         * \param in_delta_time Time passed in seconds since the last frame
+         * \param in_time_step Time passed in seconds since the last frame
          */
-        virtual DAEvoid OnUpdate(DAEfloat in_delta_time) noexcept;
+        virtual DAEvoid OnUpdate(DAEfloat in_time_step) noexcept;
 
         /**
          * \brief Called once at the end of a simulation

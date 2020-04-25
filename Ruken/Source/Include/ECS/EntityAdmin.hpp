@@ -33,6 +33,7 @@
 #include "ECS/EntityID.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
+#include "ECS/ExclusiveComponentBase.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -49,6 +50,7 @@ class EntityAdmin
 
         std::vector       <std::unique_ptr<SystemBase>>                      m_systems;
         std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes;
+        std::unordered_map<DAEsize, std::unique_ptr<ExclusiveComponentBase>> m_exclusive_components;
         
         #pragma endregion 
 
@@ -76,9 +78,13 @@ class EntityAdmin
 
         #pragma region Methods
 
+        // --- Simulation manipulation
+
         DAEvoid StartSimulation () noexcept;
         DAEvoid UpdateSimulation() noexcept;
         DAEvoid EndSimulation   () noexcept;
+
+        // --- Entity / Systems lifetime manipulation
 
         /**
          * \brief Creates a system and adds it to the world
@@ -86,6 +92,22 @@ class EntityAdmin
          */
         template <typename TSystem>
         DAEvoid CreateSystem() noexcept;
+
+        /**
+         * \brief Attempts the creation of an exclusive component
+         *        If the component already existed, this method won't have any effects
+         * \tparam TComponent Component class to add
+         */
+        template <typename TComponent>
+        DAEvoid CreateExclusiveComponent() noexcept;
+
+        /**
+         * \brief Fetches an exclusive component
+         * \tparam TComponent Exclusive component type to fetch
+         * \return The component or nullptr if no component of this type has been found
+         */
+        template <typename TComponent>
+        [[nodiscard]] TComponent* GetExclusiveComponent() noexcept;
 
         /**
          * \brief Creates a new entity with given components

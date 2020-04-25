@@ -97,7 +97,6 @@ class TagComponent final : public ComponentBase
 /**
  * \brief Shorthand to declare a tag component named "<in_component_name>Component"
  * \param in_component_name Name of the component as defined in the component table
- * \param ... Fields of the component. Theses must inherit from the ComponentField class
  */
 #define DAEMON_DEFINE_TAG_COMPONENT(in_component_name, ...)\
     using DAEMON_GLUE(in_component_name, Component) = TagComponent<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name)>

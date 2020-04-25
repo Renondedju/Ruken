@@ -157,6 +157,7 @@
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
+    <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\SystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Source\Include\ECS\Test\CounterComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\ComponentTable.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterSystem.hpp" />
+    <ClInclude Include="Source\Include\ECS\Test\TestExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
@@ -281,6 +283,7 @@
     <None Include=".vscode\ipch\e571e583f658dfef\mmap_address.bin" />
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
+    <None Include="Source\Include\ECS\ExclusiveComponentBase.hpp" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
