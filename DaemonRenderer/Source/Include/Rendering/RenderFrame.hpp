@@ -32,6 +32,7 @@
 #include "Vulkan/CommandPool.hpp"
 
 #include "Rendering/RenderView.hpp"
+#include "Rendering/RenderTarget.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -44,6 +45,7 @@ class RenderFrame
         std::unique_ptr<FencePool>      m_fence_pool;
         std::unique_ptr<SemaphorePool>  m_semaphore_pool;
         std::unique_ptr<CommandPool>    m_command_pool;
+        std::unique_ptr<RenderTarget> m_render_target;
 
         std::vector<RenderView> m_render_views;
 
@@ -83,6 +85,9 @@ class RenderFrame
 
         [[nodiscard]]
         VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) const noexcept;
+
+        [[nodiscard]]
+        RenderTarget const& GetRenderTarget() const noexcept;
 
         #pragma endregion
 

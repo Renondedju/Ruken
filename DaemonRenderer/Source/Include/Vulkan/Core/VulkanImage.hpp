@@ -49,6 +49,8 @@ class VulkanImage
 
         #pragma region Constructors and Destructor
 
+        explicit VulkanImage(VkImage in_handle) noexcept;
+
         explicit VulkanImage(VkImage            in_handle,
                              VmaAllocator       in_allocator,
                              VmaAllocation      in_allocation,

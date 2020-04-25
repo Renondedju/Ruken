@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -41,15 +39,19 @@ class VulkanInstance
 
         #pragma region Members
 
+        static std::vector<DAEchar const*>                  m_required_extensions;
+        static std::vector<DAEchar const*>                  m_required_validation_layers;
+        static std::vector<VkValidationFeatureEnableEXT>    m_enabled_validation_features;
+        static std::vector<VkValidationFeatureDisableEXT>   m_disabled_validation_features;
+
         VkInstance m_handle {nullptr};
 
         #pragma endregion
 
         #pragma region Methods
 
-        static DAEvoid CheckInstanceExtensions() noexcept;
-
-        static DAEvoid CheckValidationLayers() noexcept;
+        static DAEvoid CheckInstanceExtensions  () noexcept;
+        static DAEvoid CheckValidationLayers    () noexcept;
 
         DAEvoid CreateInstance() noexcept;
 
@@ -59,7 +61,7 @@ class VulkanInstance
 
         #pragma region Constructors and Destructor
 
-        VulkanInstance();
+        VulkanInstance() noexcept;
 
         VulkanInstance(VulkanInstance const&    in_copy) = delete;
         VulkanInstance(VulkanInstance&&         in_move) = delete;
@@ -70,9 +72,15 @@ class VulkanInstance
 
         #pragma region Methods
 
-        /**
-         * \return 
-         */
+        [[nodiscard]]
+        static std::vector<DAEchar const*> const& GetRequiredExtensions() noexcept;
+        [[nodiscard]]
+        static std::vector<DAEchar const*>  const& GetRequiredValidationLayers() noexcept;
+        [[nodiscard]]
+        static std::vector<VkValidationFeatureEnableEXT> const& GetEnabledValidationFeatures() noexcept;
+        [[nodiscard]]
+        static std::vector<VkValidationFeatureDisableEXT> const& GetDisabledValidationFeatures() noexcept;
+
         [[nodiscard]]
         VkInstance const& GetHandle() const noexcept;
 

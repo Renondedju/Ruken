@@ -49,13 +49,13 @@ class VulkanBuffer
 
         #pragma region Constructors and Destructor
 
-        VulkanBuffer() = default;
+        explicit VulkanBuffer(VkBuffer in_handle) noexcept;
 
-        explicit VulkanBuffer(VkBuffer            in_handle,
-                        VmaAllocator        in_allocator,
-                        VmaAllocation       in_allocation,
-                        VmaAllocationInfo   in_allocation_info,
-                        DAEbool             in_persistent) noexcept;
+        explicit VulkanBuffer(VkBuffer          in_handle,
+                              VmaAllocator      in_allocator,
+                              VmaAllocation     in_allocation,
+                              VmaAllocationInfo in_allocation_info,
+                              DAEbool           in_persistent) noexcept;
 
         VulkanBuffer(VulkanBuffer const&    in_copy) = delete;
         VulkanBuffer(VulkanBuffer&&         in_move) noexcept;

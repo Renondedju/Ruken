@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <mutex>
 #include <vector>
 
 #include "Vector/Vector.hpp"
@@ -42,9 +43,9 @@ class VulkanQueue
 
         VkPhysicalDevice    m_physical_device   {nullptr};
         VkQueue             m_handle            {nullptr};
-        DAEuint32           m_family_index      {UINT_MAX};
-        DAEuint32           m_index             {UINT_MAX};
-        VkQueueFlags        m_flags             {0u};
+        DAEuint32           m_queue_family      {UINT_MAX};
+
+        mutable std::mutex m_mutex;
 
         #pragma endregion
 
@@ -54,14 +55,12 @@ class VulkanQueue
 
         explicit VulkanQueue(VkPhysicalDevice   in_physical_device,
                              VkQueue            in_handle,
-                             DAEuint32          in_family_index,
-                             DAEuint32          in_index,
-                             VkQueueFlags       in_flags) noexcept;
+                             DAEuint32          in_queue_family) noexcept;
 
         VulkanQueue(VulkanQueue const&  in_copy) = delete;
-        VulkanQueue(VulkanQueue&&       in_move) = default;
+        VulkanQueue(VulkanQueue&&       in_move) noexcept;
 
-        ~VulkanQueue() = default;
+        ~VulkanQueue() noexcept;
 
         #pragma endregion
 
@@ -86,52 +85,20 @@ class VulkanQueue
          */
         DAEvoid InsertLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept; 
 
-        /**
-         * \brief 
-         * \param in_present_info 
-         */
-        DAEvoid Present(VkPresentInfoKHR const& in_present_info) const noexcept;
-
-        /**
-         * \brief
-         * \param in_submit_info 
-         * \param in_fence       
-         */
         DAEvoid Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence = nullptr) const noexcept;
 
         DAEvoid Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
 
         DAEvoid Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence = nullptr) const noexcept;
 
-        /**
-         * \brief 
-         */
+        DAEvoid Present(VkPresentInfoKHR const& in_present_info) const noexcept;
+
         DAEvoid WaitIdle() const noexcept;
 
-        /**
-         * \return 
-         */
         [[nodiscard]]
         VkQueue const& GetHandle() const noexcept;
-
-        /**
-         * \return 
-         */
         [[nodiscard]]
-        DAEuint32 GetFamilyIndex() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        DAEuint32 GetIndex() const noexcept;
-
-        /**
-         * \return 
-         */
-        [[nodiscard]]
-        VkQueueFlags GetFlags() const noexcept;
-
+        DAEuint32 GetQueueFamily() const noexcept;
         [[nodiscard]]
         DAEbool IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept;
 

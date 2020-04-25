@@ -23,6 +23,7 @@
  */
 
 #include <set>
+#include <vector>
 
 #include "Vulkan/Core/VulkanInstance.hpp"
 
@@ -30,9 +31,9 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Static Variables
+#pragma region Static Members
 
-static std::vector<DAEchar const*> RequiredExtensions =
+std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
 {
     #ifdef DAEMON_OS_WINDOWS
 
@@ -44,18 +45,18 @@ static std::vector<DAEchar const*> RequiredExtensions =
     VK_EXT_DEBUG_UTILS_EXTENSION_NAME
 };
 
-static std::vector<DAEchar const*> RequiredValidationLayers =
+std::vector<DAEchar const*> VulkanInstance::m_required_validation_layers =
 {
-    #ifdef DAEMON_DEBUG
+    #ifdef DAEMON_CONFIG_DEBUG
 
     "VK_LAYER_KHRONOS_validation"
 
     #endif
 };
 
-static std::vector<VkValidationFeatureEnableEXT> EnabledValidationFeatures =
+std::vector<VkValidationFeatureEnableEXT> VulkanInstance::m_enabled_validation_features =
 {
-    #ifdef DAEMON_DEBUG
+    #ifdef DAEMON_CONFIG_DEBUG
 
     VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
     VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT
@@ -63,7 +64,7 @@ static std::vector<VkValidationFeatureEnableEXT> EnabledValidationFeatures =
     #endif
 };
 
-static std::vector<VkValidationFeatureDisableEXT> DisabledValidationFeatures =
+std::vector<VkValidationFeatureDisableEXT> VulkanInstance::m_disabled_validation_features =
 {
 
 };
@@ -72,13 +73,12 @@ static std::vector<VkValidationFeatureDisableEXT> DisabledValidationFeatures =
 
 #pragma region Constructor and Destructor
 
-VulkanInstance::VulkanInstance()
+VulkanInstance::VulkanInstance() noexcept
 {
     CheckInstanceExtensions();
     CheckValidationLayers  ();
     CreateInstance         ();
 
-    VulkanLoader::LoadInstance        (m_handle);
     VulkanDebug ::CreateDebugMessenger(m_handle);
 }
 
@@ -98,17 +98,18 @@ VulkanInstance::~VulkanInstance() noexcept
 
 DAEvoid VulkanInstance::CheckInstanceExtensions() noexcept
 {
-    DAEuint32 count = 0u;
+    auto count = 0u;
 
     // Returns the number of global extension properties.
-    VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr));
+    VK_ASSERT(vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr));
 
     std::vector<VkExtensionProperties> supported_extensions(count);
 
     // Returns the global extension properties.
-    VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data()));
+    VK_ASSERT(vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data()));
 
-    std::set<std::string> required_extensions(RequiredExtensions.cbegin(), RequiredExtensions.cend());
+    std::set<std::string> required_extensions(m_required_extensions.cbegin(),
+                                              m_required_extensions.cend  ());
 
     // Removes the matching extensions.
     for (auto const& extension : supported_extensions)
@@ -128,17 +129,18 @@ DAEvoid VulkanInstance::CheckInstanceExtensions() noexcept
 
 DAEvoid VulkanInstance::CheckValidationLayers() noexcept
 {
-    DAEuint32 count = 0u;
+    auto count = 0u;
 
     // Returns the number of layer properties available.
-    VK_CHECK(vkEnumerateInstanceLayerProperties(&count, nullptr));
+    VK_ASSERT(vkEnumerateInstanceLayerProperties(&count, nullptr));
 
     std::vector<VkLayerProperties> supported_layers(count);
 
     // Returns the global layer properties
-    VK_CHECK(vkEnumerateInstanceLayerProperties(&count, supported_layers.data()));
+    VK_ASSERT(vkEnumerateInstanceLayerProperties(&count, supported_layers.data()));
 
-    std::set<std::string> required_layers(RequiredValidationLayers.cbegin(), RequiredValidationLayers.cend());
+    std::set<std::string> required_layers(m_required_validation_layers.cbegin(),
+                                          m_required_validation_layers.cend  ());
 
     // Removes the matching layers.
     for (auto const& layer : supported_layers)
@@ -162,10 +164,10 @@ DAEvoid VulkanInstance::CreateInstance() noexcept
     VkValidationFeaturesEXT validation_features = {};
 
     validation_features.sType                          = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    validation_features.enabledValidationFeatureCount  = static_cast<DAEuint32>(EnabledValidationFeatures.size());
-    validation_features.pEnabledValidationFeatures     = EnabledValidationFeatures.data();
-    validation_features.disabledValidationFeatureCount = static_cast<DAEuint32>(DisabledValidationFeatures.size());
-    validation_features.pDisabledValidationFeatures    = DisabledValidationFeatures.data();
+    validation_features.enabledValidationFeatureCount  = static_cast<DAEuint32>(m_enabled_validation_features.size());
+    validation_features.pEnabledValidationFeatures     = m_enabled_validation_features.data();
+    validation_features.disabledValidationFeatureCount = static_cast<DAEuint32>(m_disabled_validation_features.size());
+    validation_features.pDisabledValidationFeatures    = m_disabled_validation_features.data();
 
     // This struct allows us to get debug callbacks during instance creation/destruction.
     VkDebugUtilsMessengerCreateInfoEXT debug_messenger_create_info = {};
@@ -192,12 +194,34 @@ DAEvoid VulkanInstance::CreateInstance() noexcept
     instance_create_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instance_create_info.pNext                   = &debug_messenger_create_info;
     instance_create_info.pApplicationInfo        = &app_info;
-    instance_create_info.enabledLayerCount       = static_cast<DAEuint32>(RequiredValidationLayers.size());
-    instance_create_info.ppEnabledLayerNames     = RequiredValidationLayers.data();
-    instance_create_info.enabledExtensionCount   = static_cast<DAEuint32>(RequiredExtensions.size());
-    instance_create_info.ppEnabledExtensionNames = RequiredExtensions.data();
+    instance_create_info.enabledLayerCount       = static_cast<DAEuint32>(m_required_validation_layers.size());
+    instance_create_info.ppEnabledLayerNames     = m_required_validation_layers.data();
+    instance_create_info.enabledExtensionCount   = static_cast<DAEuint32>(m_required_extensions.size());
+    instance_create_info.ppEnabledExtensionNames = m_required_extensions.data();
 
-    VK_CHECK(vkCreateInstance(&instance_create_info, nullptr, &m_handle));
+    VK_ASSERT(vkCreateInstance(&instance_create_info, nullptr, &m_handle));
+
+    VulkanLoader::LoadInstance(m_handle);
+}
+
+std::vector<DAEchar const*> const& VulkanInstance::GetRequiredExtensions() noexcept
+{
+    return m_required_extensions;
+}
+
+std::vector<DAEchar const*> const& VulkanInstance::GetRequiredValidationLayers() noexcept
+{
+    return m_required_validation_layers;
+}
+
+std::vector<VkValidationFeatureEnableEXT> const& VulkanInstance::GetEnabledValidationFeatures() noexcept
+{
+    return m_enabled_validation_features;
+}
+
+std::vector<VkValidationFeatureDisableEXT> const& VulkanInstance::GetDisabledValidationFeatures() noexcept
+{
+    return m_disabled_validation_features;
 }
 
 VkInstance const& VulkanInstance::GetHandle() const noexcept

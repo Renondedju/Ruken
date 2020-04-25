@@ -30,11 +30,17 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructors and Destructor
 
+VulkanBuffer::VulkanBuffer(VkBuffer in_handle) noexcept:
+    m_handle {in_handle}
+{
+
+}
+
 VulkanBuffer::VulkanBuffer(VkBuffer             in_handle,
-               VmaAllocator         in_allocator,
-               VmaAllocation        in_allocation,
-               VmaAllocationInfo    in_allocation_info,
-               DAEbool const        in_persistent) noexcept:
+                           VmaAllocator         in_allocator,
+                           VmaAllocation        in_allocation,
+                           VmaAllocationInfo    in_allocation_info,
+                           DAEbool const        in_persistent) noexcept:
     m_handle            {in_handle},
     m_allocator         {in_allocator},
     m_allocation        {in_allocation},
@@ -62,12 +68,12 @@ VulkanBuffer::VulkanBuffer(VulkanBuffer&& in_move) noexcept:
 
 VulkanBuffer::~VulkanBuffer() noexcept
 {
-    if (m_handle && m_allocator && m_allocation)
-    {
-        UnMap();
+    if (!m_handle || !m_allocator || !m_allocation)
+        return;
 
-        vmaDestroyBuffer(m_allocator, m_handle, m_allocation);
-    }
+    UnMap();
+
+    vmaDestroyBuffer(m_allocator, m_handle, m_allocation);
 }
 
 #pragma endregion

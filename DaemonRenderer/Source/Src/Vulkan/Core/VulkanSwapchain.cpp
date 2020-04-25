@@ -31,6 +31,9 @@
 
 #include "Windowing/Window.hpp"
 
+#include "Rendering/RenderFrame.hpp"
+#include "Rendering/RenderSystem.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
@@ -39,9 +42,8 @@ VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& in_physical_device, Vulka
     m_physical_device   {in_physical_device.GetHandle()},
     m_image_extent      {in_window.GetFramebufferSize()}
 {
-    CreateSurface  (in_device, in_window);
-    CreateSwapchain();
-    SetupImages    ();
+    if (CreateSurface(in_device, in_window) && CreateSwapchain())
+        CreateImages();
 }
 
 VulkanSwapchain::~VulkanSwapchain() noexcept
@@ -148,14 +150,25 @@ DAEvoid VulkanSwapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& 
     }
 }
 
-DAEvoid VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept
+DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept
 {
-    VK_CHECK(glfwCreateWindowSurface(VulkanLoader::GetLoadedInstance(), in_window.GetHandle(), nullptr, &m_surface));
+    if (glfwCreateWindowSurface(VulkanLoader::GetLoadedInstance(), in_window.GetHandle(), nullptr, &m_surface) == VK_SUCCESS)
+    {
+        m_queue = in_device.GetPresentQueue(m_surface);
 
-    m_queue = in_device.GetPresentQueue(m_surface);
+        if (m_queue)
+            return true;
+
+        VulkanDebug::GetLogger().Error("No queue supports presentation to the surface!");
+    }
+
+    else
+        VulkanDebug::GetLogger().Error("Failed to create surface!");
+
+    return false;
 }
 
-DAEvoid VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
+DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
 {
     VkSurfaceCapabilitiesKHR capabilities;
 
@@ -191,29 +204,35 @@ DAEvoid VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexce
     swapchain_info.imageColorSpace  = m_surface_format.colorSpace;
     swapchain_info.imageExtent      = m_image_extent;
     swapchain_info.imageArrayLayers = 1u;
-    swapchain_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchain_info.imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     swapchain_info.preTransform     = capabilities.currentTransform;
     swapchain_info.compositeAlpha   = m_composite_alpha;
     swapchain_info.presentMode      = m_present_mode;
     swapchain_info.clipped          = VK_TRUE;
     swapchain_info.oldSwapchain     = in_old_swapchain;
 
-    return VK_CHECK(vkCreateSwapchainKHR(VulkanLoader::GetLoadedDevice(), &swapchain_info, nullptr, &m_handle));
+   return vkCreateSwapchainKHR(VulkanLoader::GetLoadedDevice(), &swapchain_info, nullptr, &m_handle) == VK_SUCCESS;
 }
 
-DAEvoid VulkanSwapchain::SetupImages()
+DAEvoid VulkanSwapchain::CreateImages()
 {
     // Obtains the number of presentable images associated with the swapchain.
-    VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr));
+    if (vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr) != VK_SUCCESS)
+    {
+        VulkanDebug::GetLogger().Error("Failed to create swapchain images!");
+        return;
+    }
 
-    m_images.resize(m_image_count);
+    std::vector<VkImage> images(m_image_count);
 
     // Obtains the array of presentable images associated with the swapchain.
-    VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, m_images.data()));
+    vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, images.data());
 
     for (DAEuint32 i = 0; i < m_image_count; ++i)
     {
-        VulkanDebug::SetObjectName(VK_OBJECT_TYPE_IMAGE, reinterpret_cast<DAEuint64>(m_images[i]), "SwapchainImage_" + std::to_string(i));
+        m_images.emplace_back(images[i]);
+
+        VulkanDebug::SetObjectName(VK_OBJECT_TYPE_IMAGE, reinterpret_cast<DAEuint64>(images[i]), "SwapchainImage_" + std::to_string(i));
     }
 }
 
@@ -225,23 +244,85 @@ DAEvoid VulkanSwapchain::Resize(DAEint32 const in_width, DAEint32 const in_heigh
     m_image_extent.width  = in_width;
     m_image_extent.height = in_height;
 
-    CreateSwapchain(m_handle);
-    SetupImages();
+    m_images.clear();
+
+    if (CreateSwapchain(m_handle))
+        CreateImages();
 }
 
-VkSwapchainKHR VulkanSwapchain::GetHandle() const noexcept
+DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
 {
-    return m_handle;
+    auto& device = GRenderSystem->GetDevice();
+    auto& image_available_semaphore = in_frame.RequestSemaphore();
+    auto& transfer_finished_semaphore = in_frame.RequestSemaphore();
+
+    DAEuint32 image_index = 0u;
+
+    if (vkAcquireNextImageKHR(VulkanLoader::GetLoadedDevice(), m_handle, UINT64_MAX, image_available_semaphore.GetHandle(), nullptr, &image_index) != VK_SUCCESS)
+    {
+        VulkanDebug::GetLogger().Error("");
+        return;
+    }
+
+    auto* command_buffer = in_frame.RequestCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+    VkImageMemoryBarrier memory_barrier = {};
+
+    memory_barrier.sType                       = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    memory_barrier.srcAccessMask               = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    memory_barrier.dstAccessMask               = VK_ACCESS_TRANSFER_READ_BIT;
+    memory_barrier.oldLayout                   = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    memory_barrier.newLayout                   = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    memory_barrier.srcQueueFamilyIndex         = device.GetGraphicsFamily();
+    memory_barrier.dstQueueFamilyIndex         = device.GetTransferFamily();
+    memory_barrier.image                       = in_frame.GetRenderTarget().GetImage().GetHandle();
+    memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    memory_barrier.subresourceRange.levelCount = 1u;
+    memory_barrier.subresourceRange.layerCount = 1u;
+
+    command_buffer->InsertMemoryBarrier(memory_barrier);
+
+    // command_buffer->CopyImage();
+
+    memory_barrier.srcAccessMask       = VK_ACCESS_TRANSFER_READ_BIT;
+    memory_barrier.dstAccessMask       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    memory_barrier.newLayout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    memory_barrier.srcQueueFamilyIndex = device.GetTransferFamily();
+    memory_barrier.dstQueueFamilyIndex = device.GetGraphicsFamily();
+
+    command_buffer->InsertMemoryBarrier(memory_barrier);
+
+    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+    VkSubmitInfo submit_info = {};
+
+    submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.waitSemaphoreCount   = 1u;
+    submit_info.pWaitSemaphores      = &image_available_semaphore.GetHandle();
+    submit_info.pWaitDstStageMask    = &wait_stage;
+    submit_info.commandBufferCount   = 1u;
+    submit_info.pCommandBuffers      = &command_buffer->GetHandle();
+    submit_info.signalSemaphoreCount = 1u;
+    submit_info.pSignalSemaphores    = &transfer_finished_semaphore.GetHandle();
+
+    device.GetTransferQueue().Submit(submit_info);
+
+    VkPresentInfoKHR present_info = {};
+
+    present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1u;
+    present_info.pWaitSemaphores    = &transfer_finished_semaphore.GetHandle();
+    present_info.swapchainCount     = 1u;
+    present_info.pSwapchains        = &m_handle;
+    present_info.pImageIndices      = &image_index;
+
+    m_queue->Present(present_info);
 }
 
-DAEuint32 VulkanSwapchain::GetImageCount() const noexcept
+DAEbool VulkanSwapchain::IsValid() const noexcept
 {
-    return m_image_count;
-}
-
-std::vector<VkImage> const& VulkanSwapchain::GetImages() const noexcept
-{
-    return m_images;
+    return m_surface && m_queue && m_handle && !m_images.empty();
 }
 
 #pragma endregion

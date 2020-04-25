@@ -104,10 +104,9 @@ DAEvoid Mesh::UploadData(std::vector<Vertex>    const& in_vertices,
     if (!staging_vertex_buffer || !staging_index_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
-    auto* queue         = device.GetTransferQueue();
-    auto command_buffer = device.AllocateCommandBuffer(queue->GetFamilyIndex(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    auto command_buffer = device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    if (!staging_vertex_buffer || !staging_index_buffer || !queue || !command_buffer)
+    if (!staging_vertex_buffer || !staging_index_buffer || !command_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
     memcpy(staging_vertex_buffer->GetMappedData(), in_vertices.data(), vertex_buffer_size);
@@ -119,11 +118,11 @@ DAEvoid Mesh::UploadData(std::vector<Vertex>    const& in_vertices,
 
     submit_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.commandBufferCount = 1u;
-    submit_info.pCommandBuffers    = &command_buffer->GetHandle();
+    submit_info.pCommandBuffers    = &(*command_buffer).GetHandle();
 
     VulkanFence const fence;
 
-    queue->Submit(submit_info, fence.GetHandle());
+    device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
 
     fence.Wait();
 }

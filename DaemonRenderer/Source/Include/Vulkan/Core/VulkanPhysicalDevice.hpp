@@ -25,10 +25,34 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 BEGIN_DAEMON_NAMESPACE
+
+class VulkanInstance;
+
+struct QueueFamilyIndices
+{
+    #pragma region Members
+
+    std::optional<DAEuint32> graphics;
+    std::optional<DAEuint32> compute;
+    std::optional<DAEuint32> transfer;
+
+    #pragma endregion
+
+    #pragma region Methods
+
+    [[nodiscard]]
+    constexpr DAEbool IsComplete() const noexcept
+    {
+        return graphics.has_value() && compute.has_value() && transfer.has_value();
+    }
+
+    #pragma endregion
+};
 
 /**
  * \brief A physical device usually represents a single complete implementation of Vulkan
@@ -41,10 +65,13 @@ class VulkanPhysicalDevice
 
         #pragma region Members
 
+        static std::vector<DAEchar const*> m_required_extensions;
+
         VkPhysicalDevice                    m_handle            {nullptr};
         VkPhysicalDeviceProperties          m_properties        {};
         VkPhysicalDeviceMemoryProperties    m_memory_properties {};
         VkPhysicalDeviceFeatures            m_features          {};
+        QueueFamilyIndices                  m_queue_families    {};
 
         std::vector<VkQueueFamilyProperties> m_queue_family_properties;
 
@@ -52,13 +79,13 @@ class VulkanPhysicalDevice
 
         #pragma region Methods
 
-        static DAEbool CheckDeviceExtensions(VkPhysicalDevice in_handle) noexcept;
+        static DAEbool      CheckDeviceExtensions   (VkPhysicalDevice in_handle) noexcept;
+        static DAEbool      CheckQueueFamilies      (VkPhysicalDevice in_handle) noexcept;
+        static DAEuint32    RateDeviceSuitability   (VkPhysicalDevice in_handle) noexcept;
 
-        static DAEbool CheckQueueFamilies(VkPhysicalDevice in_handle) noexcept;
-
-        static DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_handle) noexcept;
-
-        DAEvoid PickPhysicalDevice(class VulkanInstance const& in_instance) noexcept;
+        DAEvoid PickPhysicalDevice  (VulkanInstance const& in_instance) noexcept;
+        DAEvoid SetupPhysicalDevice () noexcept;
+        DAEvoid SetupQueueFamilies  () noexcept;
 
         #pragma endregion
 
@@ -66,10 +93,10 @@ class VulkanPhysicalDevice
 
         #pragma region Constructors and Destructor
 
-        explicit VulkanPhysicalDevice(class VulkanInstance const& in_instance);
+        explicit VulkanPhysicalDevice(VulkanInstance const& in_instance) noexcept;
 
         VulkanPhysicalDevice(VulkanPhysicalDevice const&    in_copy) = delete;
-        VulkanPhysicalDevice(VulkanPhysicalDevice&&         in_move) = default;
+        VulkanPhysicalDevice(VulkanPhysicalDevice&&         in_move) = delete;
 
         ~VulkanPhysicalDevice() = default;
 
@@ -77,35 +104,19 @@ class VulkanPhysicalDevice
 
         #pragma region Methods
 
+        [[nodiscard]]
         static std::vector<DAEchar const*> const& GetRequiredExtensions() noexcept;
 
-        /**
-         * \return 
-         */
         [[nodiscard]]
         VkPhysicalDevice const& GetHandle() const noexcept;
-
-        /**
-         * \return 
-         */
         [[nodiscard]]
         VkPhysicalDeviceProperties const& GetProperties() const noexcept;
-
-        /**
-         * \return 
-         */
         [[nodiscard]]
         VkPhysicalDeviceMemoryProperties const& GetMemoryProperties() const noexcept;
-
-        /**
-         * \return 
-         */
         [[nodiscard]]
         VkPhysicalDeviceFeatures const& GetFeatures() const noexcept;
-
-        /**
-         * \return 
-         */
+        [[nodiscard]]
+        QueueFamilyIndices const& GetQueueFamilies() const noexcept;
         [[nodiscard]]
         std::vector<VkQueueFamilyProperties> const& GetQueueFamilyProperties() const noexcept;
 

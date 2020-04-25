@@ -31,19 +31,54 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+
+
 class CommandPool
 {
     private:
 
+        struct CommandPoolData
+        {
+            #pragma region Members
+
+            DAEuint32 primary_index     {0u};
+            DAEuint32 secondary_index   {0u};
+
+            std::unique_ptr<VulkanCommandPool> pool;
+
+            std::vector<VulkanCommandBuffer> primary_command_buffers;
+            std::vector<VulkanCommandBuffer> second_command_buffers;
+
+            #pragma endregion
+
+            #pragma region Constructors and Destructor
+
+            CommandPoolData() = default;
+
+            CommandPoolData(CommandPoolData const&  in_copy) = delete;
+            CommandPoolData(CommandPoolData&&       in_move) = default;
+
+            ~CommandPoolData() = default;
+
+            #pragma endregion
+
+            #pragma region Operators
+
+            CommandPoolData& operator=(CommandPoolData const&   in_copy) = delete;
+            CommandPoolData& operator=(CommandPoolData&&        in_move) = delete;
+
+            #pragma endregion
+        };
+
         #pragma region Members
 
-        std::unordered_map<std::thread::id, VulkanCommandPool> m_command_pools;
+        std::unordered_map<std::thread::id, CommandPoolData> m_command_pools;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructor
+        #pragma region Constructors and Destructor
 
         explicit CommandPool(DAEuint32 in_queue_family_index) noexcept;
 

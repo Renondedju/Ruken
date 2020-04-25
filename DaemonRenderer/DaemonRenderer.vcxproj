@@ -20,13 +20,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -267,6 +267,7 @@
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanFence.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDeviceAllocator.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanShaderModule.hpp" />
+    <ClInclude Include="Source\Src\Rendering\RenderTarget.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -316,6 +317,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Core\ServiceBase.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceProvider.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderTarget.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanCommandPool.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanShaderModule.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanDeviceAllocator.cpp" />

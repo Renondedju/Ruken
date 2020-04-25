@@ -30,20 +30,34 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
+#pragma region Constructors and Destructor
 
 VulkanQueue::VulkanQueue(VkPhysicalDevice   in_physical_device,
                          VkQueue            in_handle,
-                         DAEuint32    const in_family_index,
-                         DAEuint32    const in_index,
-                         VkQueueFlags const in_flags) noexcept:
+                         DAEuint32 const    in_queue_family) noexcept:
     m_physical_device   {in_physical_device},
     m_handle            {in_handle},
-    m_family_index      {in_family_index},
-    m_index             {in_index},
-    m_flags             {in_flags}
+    m_queue_family      {in_queue_family}
 {
 
+}
+
+VulkanQueue::VulkanQueue(VulkanQueue&& in_move) noexcept:
+    m_physical_device   {in_move.m_physical_device},
+    m_handle            {in_move.m_handle},
+    m_queue_family      {in_move.m_queue_family}
+{
+    in_move.m_physical_device = nullptr;
+    in_move.m_handle          = nullptr;
+    in_move.m_queue_family    = UINT32_MAX;
+}
+
+VulkanQueue::~VulkanQueue() noexcept
+{
+    if (!m_handle)
+        return;
+
+    WaitIdle();
 }
 
 #pragma endregion
@@ -83,23 +97,24 @@ DAEvoid VulkanQueue::InsertLabel(DAEchar const* in_label_name, Vector4f const& i
     vkQueueInsertDebugUtilsLabelEXT(m_handle, &label_info);
 }
 
-DAEvoid VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
-{
-    VK_CHECK(vkQueuePresentKHR(m_handle, &in_present_info));
-}
-
 DAEvoid VulkanQueue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence) const noexcept
 {
+    std::lock_guard lock(m_mutex);
+
     VK_CHECK(vkQueueSubmit(m_handle, 1u, &in_submit_info, in_fence));
 }
 
 DAEvoid VulkanQueue::Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence) const noexcept
 {
+    std::lock_guard lock(m_mutex);
+
     VK_CHECK(vkQueueSubmit(m_handle, static_cast<DAEuint32>(in_submit_infos.size()), in_submit_infos.data(), in_fence));
 }
 
 DAEvoid VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence) const noexcept
 {
+    std::lock_guard lock(m_mutex);
+
     VkSubmitInfo submit_info = {};
 
     submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -109,9 +124,18 @@ DAEvoid VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFenc
     VK_CHECK(vkQueueSubmit(m_handle, 1u, &submit_info, in_fence));
 }
 
+DAEvoid VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
+{
+    std::lock_guard lock(m_mutex);
+
+    VK_CHECK(vkQueuePresentKHR(m_handle, &in_present_info));
+}
+
 DAEvoid VulkanQueue::WaitIdle() const noexcept
 {
-     VK_CHECK(vkQueueWaitIdle(m_handle));
+    std::lock_guard lock(m_mutex);
+
+    VK_CHECK(vkQueueWaitIdle(m_handle));
 }
 
 VkQueue const& VulkanQueue::GetHandle() const noexcept
@@ -119,26 +143,16 @@ VkQueue const& VulkanQueue::GetHandle() const noexcept
     return m_handle;
 }
 
-DAEuint32 VulkanQueue::GetFamilyIndex() const noexcept
+DAEuint32 VulkanQueue::GetQueueFamily() const noexcept
 {
-    return m_family_index;
-}
-
-DAEuint32 VulkanQueue::GetIndex() const noexcept
-{
-    return m_index;
-}
-
-VkQueueFlags VulkanQueue::GetFlags() const noexcept
-{
-    return m_flags;
+    return m_queue_family;
 }
 
 DAEbool VulkanQueue::IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept
 {
     VkBool32 presentation_support = VK_FALSE;
 
-    VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(m_physical_device, m_family_index, in_surface, &presentation_support));
+    vkGetPhysicalDeviceSurfaceSupportKHR(m_physical_device, m_queue_family, in_surface, &presentation_support);
 
     return presentation_support;
 }

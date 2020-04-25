@@ -77,4 +77,9 @@ VulkanCommandBuffer* RenderFrame::RequestCommandBuffer(VkCommandBufferLevel cons
     return m_command_pool->RequestCommandBuffer(in_level);
 }
 
+RenderTarget const& RenderFrame::GetRenderTarget() const noexcept
+{
+    return *m_render_target;
+}
+
 #pragma endregion

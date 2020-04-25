@@ -30,23 +30,19 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructors and Destructor
 
-VulkanCommandPool::VulkanCommandPool(DAEuint32 const in_queue_family_index, VkCommandPoolCreateFlags const in_flags)
+VulkanCommandPool::VulkanCommandPool(DAEuint32 const in_queue_family, VkCommandPoolCreateFlags const in_flags) noexcept
 {
     VkCommandPoolCreateInfo command_pool_create_info = {};
 
     command_pool_create_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     command_pool_create_info.flags            = in_flags;
-    command_pool_create_info.queueFamilyIndex = in_queue_family_index;
+    command_pool_create_info.queueFamilyIndex = in_queue_family;
 
-    VK_CHECK(vkCreateCommandPool(VulkanLoader::GetLoadedDevice(), &command_pool_create_info, nullptr, &m_handle));
+    VK_ASSERT(vkCreateCommandPool(VulkanLoader::GetLoadedDevice(), &command_pool_create_info, nullptr, &m_handle));
 }
 
 VulkanCommandPool::VulkanCommandPool(VulkanCommandPool&& in_move) noexcept:
-    m_handle                    {in_move.m_handle},
-    m_primary_index             {in_move.m_primary_index},
-    m_secondary_index           {in_move.m_secondary_index},
-    m_primary_command_buffers   {std::move(in_move.m_primary_command_buffers)},
-    m_secondary_command_buffers {std::move(in_move.m_secondary_command_buffers)}
+    m_handle {in_move.m_handle}
 {
     in_move.m_handle = nullptr;
 }
@@ -79,46 +75,31 @@ std::optional<VulkanCommandBuffer> VulkanCommandPool::AllocateCommandBuffer(VkCo
     return VulkanCommandBuffer(command_buffer, m_handle);
 }
 
-VulkanCommandBuffer* VulkanCommandPool::RequestCommandBuffer(VkCommandBufferLevel const in_level)
+std::vector<VulkanCommandBuffer> VulkanCommandPool::AllocateCommandBuffers(DAEuint32            const in_count,
+                                                                           VkCommandBufferLevel const in_level) const noexcept
 {
-    if (in_level == VK_COMMAND_BUFFER_LEVEL_PRIMARY && m_primary_index < m_primary_command_buffers.size())
-        return &m_primary_command_buffers[m_primary_index++];
-    if (in_level == VK_COMMAND_BUFFER_LEVEL_SECONDARY && m_secondary_index < m_secondary_command_buffers.size())
-        return &m_secondary_command_buffers[m_primary_index++];
+    std::vector<VulkanCommandBuffer> command_buffers;
 
-    VkCommandBuffer             command_buffer               = nullptr;
     VkCommandBufferAllocateInfo command_buffer_allocate_info = {};
 
     command_buffer_allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     command_buffer_allocate_info.commandPool        = m_handle;
     command_buffer_allocate_info.level              = in_level;
-    command_buffer_allocate_info.commandBufferCount = 1u;
+    command_buffer_allocate_info.commandBufferCount = in_count;
 
-    if (vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, &command_buffer) != VK_SUCCESS)
-        return nullptr;
+    std::vector<VkCommandBuffer> handles(in_count);
 
-    if (in_level == VK_COMMAND_BUFFER_LEVEL_PRIMARY)
-    {
-        m_primary_index++;
+    if (vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, handles.data()) != VK_SUCCESS)
+        return command_buffers;
 
-        return &m_primary_command_buffers.emplace_back(command_buffer, nullptr);
-    }
+    for (auto const& handle : handles)
+        command_buffers.emplace_back(handle, m_handle);
 
-    if (in_level == VK_COMMAND_BUFFER_LEVEL_SECONDARY)
-    {
-        m_secondary_index++;
-
-        return &m_secondary_command_buffers.emplace_back(command_buffer, nullptr);
-    }
-
-    return nullptr;
+    return command_buffers;
 }
 
-DAEvoid VulkanCommandPool::Reset(VkCommandPoolResetFlags const in_flags) noexcept
+DAEvoid VulkanCommandPool::Reset(VkCommandPoolResetFlags const in_flags) const noexcept
 {
-    m_primary_index   = 0u;
-    m_secondary_index = 0u;
-
     VK_CHECK(vkResetCommandPool(VulkanLoader::GetLoadedDevice(), m_handle, in_flags));
 }
 

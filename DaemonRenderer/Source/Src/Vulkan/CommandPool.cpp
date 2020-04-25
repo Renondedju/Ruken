@@ -32,7 +32,15 @@ USING_DAEMON_NAMESPACE
 
 CommandPool::CommandPool(DAEuint32 const in_queue_family_index) noexcept
 {
-    m_command_pools.emplace(std::this_thread::get_id(), VulkanCommandPool(in_queue_family_index));
+    CommandPoolData command_pool = {
+        0u,
+        0u,
+        std::make_unique<VulkanCommandPool>(in_queue_family_index),
+        {},
+        {}
+    };
+
+    m_command_pools.emplace(std::this_thread::get_id(), std::move(command_pool));
 }
 
 #pragma endregion
@@ -41,18 +49,46 @@ CommandPool::CommandPool(DAEuint32 const in_queue_family_index) noexcept
 
 VulkanCommandBuffer* CommandPool::RequestCommandBuffer(VkCommandBufferLevel const in_level) noexcept
 {
-    auto const it = m_command_pools.find(std::this_thread::get_id());
+    auto& command_pool = m_command_pools.at(std::this_thread::get_id());
 
-    if (it == m_command_pools.cend())
-        return nullptr;
+    if (in_level == VK_COMMAND_BUFFER_LEVEL_PRIMARY)
+    {
+        if (command_pool.primary_index < command_pool.primary_command_buffers.size())
+            return &command_pool.primary_command_buffers[command_pool.primary_index++];
 
-    return it->second.RequestCommandBuffer(in_level);
+        if (auto command_buffer = command_pool.pool->AllocateCommandBuffer(in_level))
+        {
+            command_pool.primary_index++;
+
+            return &command_pool.primary_command_buffers.emplace_back(std::move(*command_buffer));
+        }
+    }
+
+    else
+    {
+        if (command_pool.secondary_index < command_pool.second_command_buffers.size())
+            return &command_pool.second_command_buffers[command_pool.secondary_index++];
+
+        if (auto command_buffer = command_pool.pool->AllocateCommandBuffer(in_level))
+        {
+            command_pool.secondary_index++;
+
+            return &command_pool.second_command_buffers.emplace_back(std::move(*command_buffer));
+        }
+    }
+
+    return nullptr;
 }
 
 DAEvoid CommandPool::Reset()
 {
     for (auto& command_pool : m_command_pools)
-        command_pool.second.Reset();
+    {
+        command_pool.second.primary_index   = 0u;
+        command_pool.second.secondary_index = 0u;
+
+        command_pool.second.pool->Reset();
+    }
 }
 
 #pragma endregion

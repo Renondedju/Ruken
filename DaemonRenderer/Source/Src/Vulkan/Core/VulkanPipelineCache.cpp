@@ -30,7 +30,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-VulkanPipelineCache::VulkanPipelineCache()
+VulkanPipelineCache::VulkanPipelineCache() noexcept
 {
     VkPipelineCacheCreateInfo pipeline_cache_info = {};
     
@@ -41,7 +41,7 @@ VulkanPipelineCache::VulkanPipelineCache()
     VK_CHECK(vkCreatePipelineCache(VulkanLoader::GetLoadedDevice(), &pipeline_cache_info, nullptr, &m_handle));
 }
 
-VulkanPipelineCache::~VulkanPipelineCache()
+VulkanPipelineCache::~VulkanPipelineCache() noexcept
 {
     if (!m_handle)
         return;

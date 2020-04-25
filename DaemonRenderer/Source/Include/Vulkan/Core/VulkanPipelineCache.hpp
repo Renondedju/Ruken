@@ -42,12 +42,12 @@ class VulkanPipelineCache
 
         #pragma region Constructors and Destructor
 
-        VulkanPipelineCache();
+        VulkanPipelineCache() noexcept;
 
         VulkanPipelineCache(VulkanPipelineCache const&  in_copy) = delete;
         VulkanPipelineCache(VulkanPipelineCache&&       in_move) = delete;
 
-        ~VulkanPipelineCache();
+        ~VulkanPipelineCache() noexcept;
 
         #pragma endregion
 

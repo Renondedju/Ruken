@@ -26,13 +26,13 @@
 
 #include <vector>
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
-
+#include "Vulkan/Core/VulkanImage.hpp"
 #include "Vulkan/Core/VulkanQueue.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 class Window;
+class RenderFrame;
 class VulkanDevice;
 class VulkanInstance;
 class VulkanPhysicalDevice;
@@ -51,6 +51,7 @@ class VulkanSwapchain
         VkPhysicalDevice                m_physical_device   {nullptr};
         VkSurfaceKHR                    m_surface           {nullptr};
         VkSwapchainKHR                  m_handle            {nullptr};
+        VulkanQueue const*              m_queue             {nullptr};
         DAEuint32                       m_image_count       {0u};
         VkSurfaceFormatKHR              m_surface_format    {};
         VkExtent2D                      m_image_extent      {};
@@ -58,9 +59,7 @@ class VulkanSwapchain
         VkCompositeAlphaFlagBitsKHR     m_composite_alpha   {VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR};
         VkPresentModeKHR                m_present_mode      {VK_PRESENT_MODE_FIFO_KHR};
 
-        std::vector<VkImage> m_images;
-
-        VulkanQueue* m_queue {nullptr};
+        std::vector<VulkanImage> m_images;
 
         #pragma endregion
 
@@ -104,15 +103,11 @@ class VulkanSwapchain
          */
         DAEvoid SelectPresentMode(std::vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
 
-        DAEvoid CreateSurface(VulkanDevice& in_device,
-                              Window& in_window) noexcept;
+        DAEbool CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept;
 
-        /**
-         * \return True if a a swapchain could be created, else False.
-         */
-        DAEvoid CreateSwapchain(VkSwapchainKHR in_old_swapchain = nullptr) noexcept;
+        DAEbool CreateSwapchain(VkSwapchainKHR in_old_swapchain = nullptr) noexcept;
 
-        DAEvoid SetupImages();
+        DAEvoid CreateImages();
 
         #pragma endregion
 
@@ -139,17 +134,10 @@ class VulkanSwapchain
          */
         DAEvoid Resize(DAEint32 in_width, DAEint32 in_height);
 
-        /**
-         * \return The opaque handle to the swapchain object.
-         */
-        [[nodiscard]]
-        VkSwapchainKHR GetHandle() const noexcept;
+        DAEvoid Present(RenderFrame& in_frame) const noexcept;
 
         [[nodiscard]]
-        DAEuint32 GetImageCount() const noexcept;
-
-        [[nodiscard]]
-        std::vector<VkImage> const& GetImages() const noexcept;
+        DAEbool IsValid() const noexcept;
 
         #pragma endregion
 

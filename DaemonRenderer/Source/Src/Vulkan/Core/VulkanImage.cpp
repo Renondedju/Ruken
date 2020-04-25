@@ -28,10 +28,16 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructors and Destructor
 
+VulkanImage::VulkanImage(VkImage in_handle) noexcept:
+    m_handle {in_handle}
+{
+
+}
+
 VulkanImage::VulkanImage(VkImage            in_handle,
-             VmaAllocator       in_allocator,
-             VmaAllocation      in_allocation,
-             VmaAllocationInfo  in_allocation_info) noexcept:
+                         VmaAllocator       in_allocator,
+                         VmaAllocation      in_allocation,
+                         VmaAllocationInfo  in_allocation_info) noexcept:
     m_handle            {in_handle},
     m_allocator         {in_allocator},
     m_allocation        {in_allocation},

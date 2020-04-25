@@ -55,7 +55,9 @@ class VulkanDebug
         /**
          * \return True if the result is an error value, else False.
          */
-        static DAEvoid CheckResult(VkResult in_result, std::string const& in_function) noexcept;
+        static DAEbool CheckResult(VkResult in_result, std::string const& in_function) noexcept;
+
+        static DAEvoid AssertResult(VkResult in_result, std::string const& in_function) noexcept;
 
         /**
          * \param in_instance         The instance the messenger will be used with.
@@ -124,6 +126,16 @@ class VulkanDebug
         #pragma endregion
 };
 
-#define VK_CHECK(result) VulkanDebug::CheckResult(result, #result)
+#ifdef DAEMON_CONFIG_DEBUG
+
+#define VK_CHECK(result)  VulkanDebug::CheckResult (result, #result)
+#define VK_ASSERT(result) VulkanDebug::AssertResult(result, #result)
+
+#else
+
+#define VK_CHECK(result)  result
+#define VK_ASSERT(result) result
+
+#endif
 
 END_DAEMON_NAMESPACE

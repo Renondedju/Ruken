@@ -45,7 +45,21 @@ DAEvoid VulkanDebug::Initialize(Logger& in_parent_logger)
     m_logger->SetLevel(ELogLevel::Info);
 }
 
-DAEvoid VulkanDebug::CheckResult(VkResult const in_result, std::string const& in_function) noexcept
+DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string const& in_function) noexcept
+{
+    auto const message = in_function + " : " + ToString(in_result);
+
+    if (in_result == VK_SUCCESS)
+        m_logger->Debug(message);
+    else if (in_result > 0)
+        m_logger->Warning(message);
+    else
+        m_logger->Error(message);
+
+    return in_result >= 0;
+}
+
+DAEvoid VulkanDebug::AssertResult(VkResult const in_result, std::string const& in_function) noexcept
 {
     auto const message = in_function + " : " + ToString(in_result);
 
@@ -56,6 +70,7 @@ DAEvoid VulkanDebug::CheckResult(VkResult const in_result, std::string const& in
     else
     {
         m_logger->Fatal(message);
+        
         exit(1);
     }
 }

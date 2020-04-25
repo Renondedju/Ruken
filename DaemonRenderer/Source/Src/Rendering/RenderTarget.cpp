@@ -22,58 +22,19 @@
  *  SOFTWARE.
  */
 
-#include "Rendering/RenderContext.hpp"
-
-#include "Windowing/Window.hpp"
-
-#include "Vulkan/Core/VulkanSwapchain.hpp"
+#include "Rendering/RenderTarget.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
-
-RenderContext::RenderContext(VulkanPhysicalDevice& in_physical_device,
-                             VulkanDevice&  in_device,
-                             Window&        in_window):
-    m_swapchain {std::make_unique<VulkanSwapchain>(in_physical_device, in_device, in_window)}
-{
-    for (DAEuint32 i = 0; i < 2u; ++i)
-        m_render_frames.emplace_back();
-
-    in_window.on_framebuffer_resized += [this] (DAEint32 const in_width, DAEint32 const in_height)
-    {
-        if (m_swapchain)
-            m_swapchain->Resize(in_width, in_height);
-    };
-}
+#pragma region Constructor and Destructor
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEbool RenderContext::BeginFrame() noexcept
+VulkanImage const& RenderTarget::GetImage() const noexcept
 {
-    if (m_is_frame_active)
-        return false;
-
-    m_frame_index = m_frame_index + 1 % m_render_frames.size();
-
-    auto& active_frame = m_render_frames[m_frame_index];
-
-    active_frame.Reset();
-
-    return true;
-}
-
-DAEvoid RenderContext::EndFrame() noexcept
-{
-    if (!m_is_frame_active)
-        return;
-
-    if (m_swapchain->IsValid())
-        m_swapchain->Present(m_render_frames[m_frame_index]);
-
-    m_is_frame_active = false;
+    return *m_image;
 }
 
 #pragma endregion

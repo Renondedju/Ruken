@@ -36,11 +36,10 @@
 
 #include "Resource/ResourceProcessingFailure.hpp"
 
-#include "Vulkan/CommandPool.hpp"
-
 #include "Vulkan/Core/VulkanFence.hpp"
-#include "Vulkan/Core/VulkanDevice.hpp"
 #include "Vulkan/Core/VulkanQueue.hpp"
+#include "Vulkan/Core/VulkanDevice.hpp"
+#include "Vulkan/Core/VulkanCommandPool.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
@@ -92,11 +91,10 @@ DAEvoid Texture::UploadData(DAEvoid const* in_data, DAEuint64 const in_size) con
 {
     auto& device = GRenderSystem->GetDevice();
 
-    auto  buffer         = CreateBuffer(in_size);
-    auto* queue          = device.GetTransferQueue();
-    auto  command_buffer = device.AllocateCommandBuffer(queue->GetFamilyIndex(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    auto buffer         = CreateBuffer(in_size);
+    auto command_buffer = device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    if (!buffer || !queue || !command_buffer)
+    if (!buffer || !command_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
     memcpy(buffer->GetMappedData(), in_data, in_size);
@@ -107,11 +105,11 @@ DAEvoid Texture::UploadData(DAEvoid const* in_data, DAEuint64 const in_size) con
 
     submit_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.commandBufferCount = 1u;
-    submit_info.pCommandBuffers    = &command_buffer->GetHandle();
+    submit_info.pCommandBuffers    = &(*command_buffer).GetHandle();
 
     VulkanFence const fence;
 
-    queue->Submit(submit_info, fence.GetHandle());
+    device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
 
     fence.Wait();
 }

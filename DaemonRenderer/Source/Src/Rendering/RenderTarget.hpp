@@ -24,20 +24,19 @@
 
 #pragma once
 
-#include <vector>
-#include <optional>
+#include <memory>
 
-#include "Vulkan/Core/VulkanCommandBuffer.hpp"
+#include "Vulkan/Core/VulkanImage.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class VulkanCommandPool
+class RenderTarget
 {
     private:
 
         #pragma region Members
 
-        VkCommandPool m_handle {nullptr};
+        std::unique_ptr<VulkanImage> m_image;
 
         #pragma endregion
 
@@ -45,30 +44,26 @@ class VulkanCommandPool
 
         #pragma region Constructors and Destructor
 
-        explicit VulkanCommandPool(DAEuint32 in_queue_family, VkCommandPoolCreateFlags in_flags = 0u) noexcept;
+        RenderTarget() = default;
 
-        VulkanCommandPool(VulkanCommandPool const&  in_copy) = delete;
-        VulkanCommandPool(VulkanCommandPool&&       in_move) noexcept;
+        RenderTarget(RenderTarget const&    in_copy) = delete;
+        RenderTarget(RenderTarget&&         in_move) = delete;
 
-        ~VulkanCommandPool() noexcept;
+        ~RenderTarget() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         [[nodiscard]]
-        std::optional<VulkanCommandBuffer> AllocateCommandBuffer(VkCommandBufferLevel in_level) const noexcept;
-        [[nodiscard]]
-        std::vector<VulkanCommandBuffer> AllocateCommandBuffers(DAEuint32 in_count, VkCommandBufferLevel in_level) const noexcept;
-
-        DAEvoid Reset(VkCommandPoolResetFlags in_flags = 0u) const noexcept;
+        VulkanImage const& GetImage() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        VulkanCommandPool& operator=(VulkanCommandPool const&   in_copy) = delete;
-        VulkanCommandPool& operator=(VulkanCommandPool&&        in_move) = delete;
+        RenderTarget& operator=(RenderTarget const& in_copy) = delete;
+        RenderTarget& operator=(RenderTarget&&      in_move) = delete;
 
         #pragma endregion
 };
