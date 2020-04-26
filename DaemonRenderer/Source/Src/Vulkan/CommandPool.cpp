@@ -24,23 +24,28 @@
 
 #include "Vulkan/CommandPool.hpp"
 
+#include "Threading/Scheduler.hpp"
+
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-CommandPool::CommandPool(DAEuint32 const in_queue_family_index) noexcept
+CommandPool::CommandPool(Scheduler& in_scheduler, DAEuint32 const in_queue_family_index) noexcept
 {
-    CommandPoolData command_pool = {
+    for (auto const& worker : in_scheduler.GetWorkers())
+    {
+        CommandPoolData command_pool = {
         0u,
         0u,
         std::make_unique<VulkanCommandPool>(in_queue_family_index),
         {},
         {}
-    };
+        };
 
-    m_command_pools.emplace(std::this_thread::get_id(), std::move(command_pool));
+        m_command_pools.emplace(worker.ID(), std::move(command_pool));
+    }
 }
 
 #pragma endregion

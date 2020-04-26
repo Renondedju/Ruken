@@ -28,16 +28,18 @@
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 
+#include "Threading/Scheduler.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-VulkanDevice::VulkanDevice(VulkanPhysicalDevice const& in_physical_device) noexcept:
+VulkanDevice::VulkanDevice(Scheduler const& in_scheduler, VulkanPhysicalDevice const& in_physical_device) noexcept:
     m_queue_families {in_physical_device.GetQueueFamilies()}
 {
     CreateDevice      (in_physical_device);
     CreateQueues      (in_physical_device);
-    CreateCommandPools();
+    CreateCommandPools(in_scheduler);
 
     m_pipeline_cache = std::make_unique<VulkanPipelineCache>();
 }
@@ -113,7 +115,7 @@ DAEvoid VulkanDevice::CreateQueues(VulkanPhysicalDevice const& in_physical_devic
     }
 }
 
-DAEvoid VulkanDevice::CreateCommandPools() noexcept
+DAEvoid VulkanDevice::CreateCommandPools(Scheduler const& in_scheduler) noexcept
 {
     std::set<DAEuint32> const unique_queue_families = {
         m_queue_families.graphics.value(),
@@ -122,7 +124,8 @@ DAEvoid VulkanDevice::CreateCommandPools() noexcept
     };
 
     for (auto const& queue_family : unique_queue_families)
-        m_command_pools[queue_family].emplace(std::this_thread::get_id(), VulkanCommandPool(VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
+        for (auto const& worker : in_scheduler.GetWorkers())
+            m_command_pools[queue_family].emplace(worker.ID(), VulkanCommandPool(VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
 }
 
 DAEvoid VulkanDevice::WaitIdle() const noexcept

@@ -35,6 +35,8 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class Scheduler;
+
 /**
  * \brief A logical device represents an instance of physical device implementation
  *        with its own state and resources independent of other logical devices.
@@ -61,7 +63,7 @@ class VulkanDevice
 
         DAEvoid CreateDevice        (VulkanPhysicalDevice const& in_physical_device) noexcept;
         DAEvoid CreateQueues        (VulkanPhysicalDevice const& in_physical_device) noexcept;
-        DAEvoid CreateCommandPools  () noexcept;
+        DAEvoid CreateCommandPools  (Scheduler const& in_scheduler) noexcept;
 
         #pragma endregion
 
@@ -69,7 +71,7 @@ class VulkanDevice
 
         #pragma region Constructors and Destructor
 
-        explicit VulkanDevice(VulkanPhysicalDevice const& in_physical_device) noexcept;
+        explicit VulkanDevice(Scheduler const& in_scheduler, VulkanPhysicalDevice const& in_physical_device) noexcept;
 
         VulkanDevice(VulkanDevice const&    in_copy) = delete;
         VulkanDevice(VulkanDevice&&         in_move) = delete;

@@ -23,6 +23,7 @@
  */
 
 #include "Rendering/RenderContext.hpp"
+#include "Rendering/Renderer.hpp"
 
 #include "Windowing/Window.hpp"
 
@@ -32,13 +33,13 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-RenderContext::RenderContext(VulkanPhysicalDevice& in_physical_device,
-                             VulkanDevice&  in_device,
-                             Window&        in_window):
-    m_swapchain {std::make_unique<VulkanSwapchain>(in_physical_device, in_device, in_window)}
+RenderContext::RenderContext(Renderer& in_renderer,
+                               Scheduler& in_scheduler,
+                               Window&          in_window):
+    m_swapchain {std::make_unique<VulkanSwapchain>(in_renderer.GetPhysicalDevice(), in_renderer.GetDevice(), in_window)}
 {
     for (DAEuint32 i = 0; i < 2u; ++i)
-        m_render_frames.emplace_back();
+        m_render_frames.emplace_back(in_scheduler);
 
     in_window.on_framebuffer_resized += [this] (DAEint32 const in_width, DAEint32 const in_height)
     {

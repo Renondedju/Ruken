@@ -28,11 +28,11 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-RenderFrame::RenderFrame() noexcept:
+RenderFrame::RenderFrame(Scheduler& in_scheduler) noexcept:
     m_fence_pool        {std::make_unique<FencePool>    ()},
     m_semaphore_pool    {std::make_unique<SemaphorePool>()}
 {
-
+    m_command_pool = std::make_unique<CommandPool>(in_scheduler, 0u);
 }
 
 RenderFrame::RenderFrame(RenderFrame&& in_move) noexcept:

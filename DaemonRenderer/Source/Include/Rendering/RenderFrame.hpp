@@ -36,6 +36,8 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class Scheduler;
+
 class RenderFrame
 {
     private:
@@ -61,7 +63,7 @@ class RenderFrame
 
         #pragma region Constructors and Destructor
 
-        RenderFrame() noexcept;
+        RenderFrame(Scheduler& in_scheduler) noexcept;
 
         RenderFrame(RenderFrame const&  in_copy) = delete;
         RenderFrame(RenderFrame&&       in_move) noexcept;

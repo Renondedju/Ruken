@@ -29,6 +29,7 @@
 
 #include "Core/Service.hpp"
 
+#include "Threading/Scheduler.hpp"
 #include "Rendering/RenderContext.hpp"
 
 #include "Debug/Logging/Logger.hpp"
@@ -42,6 +43,7 @@ class Renderer final : public Service<Renderer>
         #pragma region Members
 
         Logger* m_logger;
+        Scheduler& m_scheduler;
 
         std::unique_ptr<class VulkanInstance>           m_instance;
         std::unique_ptr<class VulkanPhysicalDevice>     m_physical_device;

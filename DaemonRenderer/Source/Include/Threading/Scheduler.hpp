@@ -106,6 +106,8 @@ class Scheduler final: public Service<Scheduler>, Unique
          */
         DAEvoid Shutdown() noexcept;
 
+        std::vector<Worker> const& GetWorkers() const noexcept;
+
         #pragma endregion 
 
         #pragma region Operators

@@ -40,7 +40,8 @@ USING_DAEMON_NAMESPACE
 #pragma region Constructor and Destructor
 
 Renderer::Renderer(ServiceProvider& in_service_provider): Service<Renderer>(in_service_provider),
-    m_logger {in_service_provider.LocateService<Logger>()->AddChild("Rendering")}
+    m_logger {in_service_provider.LocateService<Logger>()->AddChild("Rendering")},
+    m_scheduler {*in_service_provider.LocateService<Scheduler>()}
 {
     m_logger->SetLevel(ELogLevel::Info);
 
@@ -49,7 +50,8 @@ Renderer::Renderer(ServiceProvider& in_service_provider): Service<Renderer>(in_s
 
     m_instance         = std::make_unique<VulkanInstance>       ();
     m_physical_device  = std::make_unique<VulkanPhysicalDevice> (*m_instance);
-    m_device           = std::make_unique<VulkanDevice>         (*m_physical_device);
+    m_device           = std::make_unique<VulkanDevice>         (m_scheduler,
+                                                                 *m_physical_device);
     m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device,
                                                                  *m_device);
 }
@@ -72,7 +74,7 @@ Renderer::~Renderer() noexcept
 
 DAEvoid Renderer::MakeContext(Window& in_window)
 {
-    m_render_contexts.push_back(std::make_unique<RenderContext>(*m_physical_device, *m_device, in_window));
+    m_render_contexts.push_back(std::make_unique<RenderContext>(*this, m_scheduler, in_window));
 }
 
 DAEvoid Renderer::OnUpdate() noexcept

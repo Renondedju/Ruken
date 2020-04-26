@@ -33,9 +33,9 @@
 BEGIN_DAEMON_NAMESPACE
 
 class Window;
-class VulkanDevice;
+class Scheduler;
+class Renderer;
 class VulkanSwapchain;
-class VulkanPhysicalDevice;
 
 class RenderContext
 {
@@ -62,8 +62,8 @@ class RenderContext
 
         #pragma region Constructors and Destructor
 
-        explicit RenderContext(VulkanPhysicalDevice& in_physical_device,
-                               VulkanDevice&    in_device,
+        explicit RenderContext(Renderer& in_renderer,
+                               Scheduler& in_scheduler,
                                Window&          in_window);
 
         RenderContext(RenderContext const&  in_copy) = delete;

@@ -79,6 +79,11 @@ DAEvoid Scheduler::Shutdown() noexcept
         worker.Detach();
 }
 
+std::vector<Worker> const& Scheduler::GetWorkers() const noexcept
+{
+    return m_workers;
+}
+
 DAEvoid Scheduler::WorkersJob() noexcept
 {
     Job current_job;

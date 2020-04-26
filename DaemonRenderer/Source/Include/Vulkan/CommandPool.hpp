@@ -31,7 +31,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-
+class Scheduler;
 
 class CommandPool
 {
@@ -80,7 +80,7 @@ class CommandPool
 
         #pragma region Constructors and Destructor
 
-        explicit CommandPool(DAEuint32 in_queue_family_index) noexcept;
+        explicit CommandPool(Scheduler& in_scheduler, DAEuint32 in_queue_family_index) noexcept;
 
         CommandPool(CommandPool const&  in_copy) = delete;
         CommandPool(CommandPool&&       in_move) = default;
