@@ -186,7 +186,7 @@
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanPhysicalDevice.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanPipelineCache.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanQueue.hpp" />
-    <ClInclude Include="Source\Include\Rendering\RenderSystem.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Renderer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanSemaphore.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Material.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Mesh.hpp" />
@@ -267,7 +267,7 @@
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanFence.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDeviceAllocator.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanShaderModule.hpp" />
-    <ClInclude Include="Source\Src\Rendering\RenderTarget.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -360,7 +360,7 @@
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanInstance.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanDevice.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanPhysicalDevice.cpp" />
-    <ClCompile Include="Source\Src\Rendering\RenderSystem.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Renderer.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanSwapchain.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanDebug.cpp" />
     <ClCompile Include="Source\Src\Resource\Exceptions\ResourceProcessingFailure.cpp" />

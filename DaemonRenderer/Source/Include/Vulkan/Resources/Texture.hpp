@@ -37,6 +37,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 class VulkanCommandBuffer;
+class VulkanDeviceAllocator;
 
 class TextureLoadingDescriptor final : public ResourceLoadingDescriptor
 {
@@ -63,11 +64,11 @@ class Texture final : public IResource
 
         #pragma region Methods
 
-        static std::optional<VulkanImage> CreateImage(DAEuint32 in_width, DAEuint32 in_height) noexcept;
+        static std::optional<VulkanImage> CreateImage(VulkanDeviceAllocator& in_allocator, DAEuint32 in_width, DAEuint32 in_height) noexcept;
 
-        static std::optional<VulkanBuffer> CreateBuffer(DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
 
-        DAEvoid UploadData(DAEvoid const* in_data, DAEuint64 in_size) const;
+        DAEvoid UploadData(Renderer& in_renderer, DAEvoid const* in_data, DAEuint64 in_size) const;
 
         DAEvoid CopyBufferToImage(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_buffer) const noexcept;
 
@@ -88,11 +89,11 @@ class Texture final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
 
         [[nodiscard]]
         VulkanImage const& GetImage() const noexcept;

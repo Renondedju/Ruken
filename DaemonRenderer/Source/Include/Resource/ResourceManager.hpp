@@ -43,6 +43,8 @@
 #include "Resource/Enums/EGCCollectionMode.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"
 
+#include "Rendering/Renderer.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
 class ResourceManager : public Service<ResourceManager>, Unique
@@ -57,7 +59,9 @@ class ResourceManager : public Service<ResourceManager>, Unique
         // Integrated garbage collection mode of the resource manager. 
         EGCCollectionMode m_collection_mode;
 
+        Renderer& m_renderer_reference;
         Scheduler& m_scheduler_reference;
+        
 
         // The actual number of resource being processed
         std::atomic<DAEuint64> m_current_operation_count;

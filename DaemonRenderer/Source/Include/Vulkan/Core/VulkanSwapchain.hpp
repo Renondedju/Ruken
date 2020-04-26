@@ -48,6 +48,8 @@ class VulkanSwapchain
 
         #pragma region Members
 
+        VulkanDevice& m_device;
+
         VkPhysicalDevice                m_physical_device   {nullptr};
         VkSurfaceKHR                    m_surface           {nullptr};
         VkSwapchainKHR                  m_handle            {nullptr};

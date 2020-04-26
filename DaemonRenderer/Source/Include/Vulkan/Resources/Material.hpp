@@ -71,11 +71,11 @@ class Material final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(class ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(class ResourceManager& in_manager) override;
+        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
 
-        DAEvoid Unload(class ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
 
         #pragma endregion
 

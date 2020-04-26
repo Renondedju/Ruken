@@ -32,13 +32,14 @@
 #include "Windowing/Window.hpp"
 
 #include "Rendering/RenderFrame.hpp"
-#include "Rendering/RenderSystem.hpp"
+#include "Rendering/Renderer.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
 VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& in_physical_device, VulkanDevice& in_device, Window& in_window):
+    m_device            {in_device},
     m_physical_device   {in_physical_device.GetHandle()},
     m_image_extent      {in_window.GetFramebufferSize()}
 {
@@ -252,7 +253,6 @@ DAEvoid VulkanSwapchain::Resize(DAEint32 const in_width, DAEint32 const in_heigh
 
 DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
 {
-    auto& device = GRenderSystem->GetDevice();
     auto& image_available_semaphore = in_frame.RequestSemaphore();
     auto& transfer_finished_semaphore = in_frame.RequestSemaphore();
 
@@ -273,8 +273,8 @@ DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
     memory_barrier.dstAccessMask               = VK_ACCESS_TRANSFER_READ_BIT;
     memory_barrier.oldLayout                   = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     memory_barrier.newLayout                   = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    memory_barrier.srcQueueFamilyIndex         = device.GetGraphicsFamily();
-    memory_barrier.dstQueueFamilyIndex         = device.GetTransferFamily();
+    memory_barrier.srcQueueFamilyIndex         = m_device.GetGraphicsFamily();
+    memory_barrier.dstQueueFamilyIndex         = m_device.GetTransferFamily();
     memory_barrier.image                       = in_frame.GetRenderTarget().GetImage().GetHandle();
     memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     memory_barrier.subresourceRange.levelCount = 1u;
@@ -288,8 +288,8 @@ DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
     memory_barrier.dstAccessMask       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
     memory_barrier.newLayout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    memory_barrier.srcQueueFamilyIndex = device.GetTransferFamily();
-    memory_barrier.dstQueueFamilyIndex = device.GetGraphicsFamily();
+    memory_barrier.srcQueueFamilyIndex = m_device.GetTransferFamily();
+    memory_barrier.dstQueueFamilyIndex = m_device.GetGraphicsFamily();
 
     command_buffer->InsertMemoryBarrier(memory_barrier);
 
@@ -306,7 +306,7 @@ DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
     submit_info.signalSemaphoreCount = 1u;
     submit_info.pSignalSemaphores    = &transfer_finished_semaphore.GetHandle();
 
-    device.GetTransferQueue().Submit(submit_info);
+    m_device.GetTransferQueue().Submit(submit_info);
 
     VkPresentInfoKHR present_info = {};
 

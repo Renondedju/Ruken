@@ -38,6 +38,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 class VulkanCommandBuffer;
+class VulkanDeviceAllocator;
 
 struct Vertex
 {
@@ -72,11 +73,12 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        static std::optional<VulkanBuffer> CreateStagingBuffer  (DAEuint64 in_size) noexcept;
-        static std::optional<VulkanBuffer> CreateVertexBuffer   (DAEuint64 in_size) noexcept;
-        static std::optional<VulkanBuffer> CreateIndexBuffer    (DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateStagingBuffer  (VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateVertexBuffer   (VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateIndexBuffer    (VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
 
-        DAEvoid UploadData(std::vector<Vertex>    const& in_vertices,
+        DAEvoid UploadData(Renderer& in_renderer,
+                           std::vector<Vertex>    const& in_vertices,
                            std::vector<DAEuint32> const& in_indices) const;
 
         DAEvoid CopyBuffers(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_vertex_buffer, VulkanBuffer const& in_index_buffer) const noexcept;
@@ -98,11 +100,11 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
 
         [[nodiscard]]
         VulkanBuffer const& GetVertexBuffer() const noexcept;

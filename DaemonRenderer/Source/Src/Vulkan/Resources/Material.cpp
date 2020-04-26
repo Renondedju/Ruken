@@ -38,17 +38,17 @@ USING_DAEMON_NAMESPACE
 
 #pragma warning (disable : 4100)
 
-DAEvoid Material::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Material::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
 {
 
 }
 
-DAEvoid Material::Reload(ResourceManager& in_manager)
+DAEvoid Material::Reload(ResourceManager& in_manager, Renderer& in_renderer)
 {
 
 }
 
-DAEvoid Material::Unload(ResourceManager& in_manager) noexcept
+DAEvoid Material::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
 {
 
 }

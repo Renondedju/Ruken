@@ -38,7 +38,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma warning (disable : 4100)
 
-DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Shader::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<ShaderLoadingDescriptor const&>(in_descriptor);
 
@@ -57,7 +57,7 @@ DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor cons
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 }
 
-DAEvoid Shader::Reload(ResourceManager& in_manager)
+DAEvoid Shader::Reload(ResourceManager& in_manager, Renderer& in_renderer)
 {
     if (!glslang::InitializeProcess())
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
@@ -76,7 +76,7 @@ DAEvoid Shader::Reload(ResourceManager& in_manager)
     VulkanDebug::SetObjectName(VK_OBJECT_TYPE_SHADER_MODULE, reinterpret_cast<DAEuint64>(m_module->GetHandle()), "");
 }
 
-DAEvoid Shader::Unload(ResourceManager& in_manager) noexcept
+DAEvoid Shader::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
 {
     m_module.reset();
 }

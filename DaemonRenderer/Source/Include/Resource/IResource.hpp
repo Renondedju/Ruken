@@ -59,7 +59,7 @@ class IResource
          * \param in_manager Resource manager instance. This is useful to request dependencies or resolve assets name/path.
          * \param in_descriptor Resource loading descriptor. This structure can be inherited to pass custom parameters to the loader
          */
-        virtual DAEvoid Load(class ResourceManager& in_manager, class ResourceLoadingDescriptor const& in_descriptor) = 0;
+        virtual DAEvoid Load(class ResourceManager& in_manager, class Renderer& in_renderer, class ResourceLoadingDescriptor const& in_descriptor) = 0;
         
         /**
          * \brief Reloads the resource
@@ -72,7 +72,7 @@ class IResource
          * 
          * \param in_manager Resource manager instance. This is useful to request dependencies or resolve assets name/path.
          */
-        virtual DAEvoid Reload(class ResourceManager& in_manager) = 0;
+        virtual DAEvoid Reload(class ResourceManager& in_manager, class Renderer& in_renderer) = 0;
         
         /**
          * \brief Unloads the resource
@@ -82,7 +82,7 @@ class IResource
          * 
          * \param in_manager Resource manager instance. This is useful to request dependencies or resolve assets name/path.
          */
-        virtual DAEvoid Unload(class ResourceManager& in_manager) noexcept = 0;
+        virtual DAEvoid Unload(class ResourceManager& in_manager, class Renderer& in_renderer) noexcept = 0;
 
         #pragma endregion
 

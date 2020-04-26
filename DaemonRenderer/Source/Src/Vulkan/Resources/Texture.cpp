@@ -32,7 +32,7 @@
 
 #include "Vulkan/Resources/Texture.hpp"
 
-#include "Rendering/RenderSystem.hpp"
+#include "Rendering/Renderer.hpp"
 
 #include "Resource/ResourceProcessingFailure.hpp"
 
@@ -48,7 +48,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-std::optional<VulkanImage> Texture::CreateImage(DAEuint32 const in_width, DAEuint32 const in_height) noexcept
+std::optional<VulkanImage> Texture::CreateImage(VulkanDeviceAllocator& in_allocator, DAEuint32 const in_width, DAEuint32 const in_height) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -68,10 +68,10 @@ std::optional<VulkanImage> Texture::CreateImage(DAEuint32 const in_width, DAEuin
     image_create_info.tiling        = VK_IMAGE_TILING_OPTIMAL;
     image_create_info.usage         = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-    return GRenderSystem->GetDeviceAllocator().CreateImage(image_create_info, allocation_create_info);
+    return in_allocator.CreateImage(image_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Texture::CreateBuffer(VkDeviceSize const in_size) noexcept
+std::optional<VulkanBuffer> Texture::CreateBuffer(VulkanDeviceAllocator& in_allocator, VkDeviceSize const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -84,14 +84,15 @@ std::optional<VulkanBuffer> Texture::CreateBuffer(VkDeviceSize const in_size) no
     buffer_create_info.size  = in_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-    return GRenderSystem->GetDeviceAllocator().CreateBuffer(buffer_create_info, allocation_create_info);
+    return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-DAEvoid Texture::UploadData(DAEvoid const* in_data, DAEuint64 const in_size) const
+DAEvoid Texture::UploadData(Renderer& in_renderer, DAEvoid const* in_data, DAEuint64 const in_size) const
 {
-    auto& device = GRenderSystem->GetDevice();
+    auto& device = in_renderer.GetDevice();
+    auto& allocator = in_renderer.GetDeviceAllocator();
 
-    auto buffer         = CreateBuffer(in_size);
+    auto buffer         = CreateBuffer(allocator, in_size);
     auto command_buffer = device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
     if (!buffer || !command_buffer)
@@ -156,7 +157,7 @@ DAEvoid Texture::CopyBufferToImage(VulkanCommandBuffer const& in_command_buffer,
 
 #pragma warning (disable : 4100)
 
-DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Texture::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<TextureLoadingDescriptor const&>(in_descriptor);
 
@@ -166,15 +167,15 @@ DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor con
 
     auto* pixels = stbi_load(m_loading_descriptor.path.c_str(), &width, &height, &comp, STBI_rgb_alpha);
 
-    m_image = std::make_unique<VulkanImage>(std::move(CreateImage(width, height).value()));
+    m_image = std::make_unique<VulkanImage>(std::move(CreateImage(in_renderer.GetDeviceAllocator(), width, height).value()));
 
     if (!m_image)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
-    UploadData(pixels, width * height * comp);
+    UploadData(in_renderer, pixels, width * height * comp);
 }
 
-DAEvoid Texture::Reload(ResourceManager& in_manager)
+DAEvoid Texture::Reload(ResourceManager& in_manager, Renderer& in_renderer)
 {
     auto width  = 0;
     auto height = 0;
@@ -182,10 +183,10 @@ DAEvoid Texture::Reload(ResourceManager& in_manager)
 
     auto* pixels = stbi_load(m_loading_descriptor.path.c_str(), &width, &height, &comp, STBI_rgb_alpha);
 
-    UploadData(pixels, width * height * comp);
+    UploadData(in_renderer, pixels, width * height * comp);
 }
 
-DAEvoid Texture::Unload(ResourceManager& in_manager) noexcept
+DAEvoid Texture::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
 {
     m_image.reset();
 }

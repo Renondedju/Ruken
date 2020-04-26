@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-#include "Rendering/RenderSystem.hpp"
+#include "Rendering/Renderer.hpp"
 
 #include "Windowing/WindowManager.hpp"
 
@@ -33,22 +33,15 @@
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
 
-/* TODO Needs to be removed when Kernel is done TODO */
-
-DAEMON_NAMESPACE::RenderSystem* DAEMON_NAMESPACE::GRenderSystem = nullptr;
-
-/* TODO Needs to be removed when Kernel is done TODO */
+#include "Core/ServiceProvider.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-RenderSystem::RenderSystem()
+Renderer::Renderer(ServiceProvider& in_service_provider): Service<Renderer>(in_service_provider),
+    m_logger {in_service_provider.LocateService<Logger>()->AddChild("Rendering")}
 {
-    /* TODO Needs to be removed when Kernel is done TODO */
-    GRenderSystem = this;
-    /* TODO Needs to be removed when Kernel is done TODO */
-
     m_logger->SetLevel(ELogLevel::Info);
 
     VulkanDebug ::Initialize(*m_logger);
@@ -61,7 +54,7 @@ RenderSystem::RenderSystem()
                                                                  *m_device);
 }
 
-RenderSystem::~RenderSystem() noexcept
+Renderer::~Renderer() noexcept
 {
     m_device->WaitIdle();
 
@@ -77,12 +70,12 @@ RenderSystem::~RenderSystem() noexcept
 
 #pragma region Methods
 
-DAEvoid RenderSystem::MakeContext(Window& in_window)
+DAEvoid Renderer::MakeContext(Window& in_window)
 {
     m_render_contexts.push_back(std::make_unique<RenderContext>(*m_physical_device, *m_device, in_window));
 }
 
-DAEvoid RenderSystem::OnUpdate() noexcept
+DAEvoid Renderer::OnUpdate() noexcept
 {
     for (auto const& render_context : m_render_contexts)
     {
@@ -95,27 +88,27 @@ DAEvoid RenderSystem::OnUpdate() noexcept
     }
 }
 
-Logger& RenderSystem::GetLogger() const noexcept
+Logger& Renderer::GetLogger() const noexcept
 {
     return *m_logger;
 }
 
-VulkanInstance& RenderSystem::GetInstance() const noexcept
+VulkanInstance& Renderer::GetInstance() const noexcept
 {
     return *m_instance;
 }
 
-VulkanPhysicalDevice& RenderSystem::GetPhysicalDevice() const noexcept
+VulkanPhysicalDevice& Renderer::GetPhysicalDevice() const noexcept
 {
     return *m_physical_device;
 }
 
-VulkanDevice& RenderSystem::GetDevice() const noexcept
+VulkanDevice& Renderer::GetDevice() const noexcept
 {
     return *m_device;
 }
 
-VulkanDeviceAllocator& RenderSystem::GetDeviceAllocator() const noexcept
+VulkanDeviceAllocator& Renderer::GetDeviceAllocator() const noexcept
 {
     return *m_device_allocator;
 }

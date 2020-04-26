@@ -27,13 +27,15 @@
 #include <memory>
 #include <vector>
 
+#include "Core/Service.hpp"
+
 #include "Rendering/RenderContext.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class RenderSystem
+class Renderer final : public Service<Renderer>
 {
     private:
 
@@ -60,12 +62,12 @@ class RenderSystem
 
         #pragma region Constructors and Destructor
 
-        RenderSystem();
+        Renderer(ServiceProvider& in_service_provider);
 
-        RenderSystem(RenderSystem const&    in_copy) = delete;
-        RenderSystem(RenderSystem&&         in_move) = delete;
+        Renderer(Renderer const&    in_copy) = delete;
+        Renderer(Renderer&&         in_move) = delete;
 
-        ~RenderSystem() noexcept;
+        ~Renderer() noexcept;
 
         #pragma endregion
 
@@ -92,16 +94,10 @@ class RenderSystem
 
         #pragma region Operators
 
-        RenderSystem& operator=(RenderSystem const& in_copy) = delete;
-        RenderSystem& operator=(RenderSystem&&      in_move) = delete;
+        Renderer& operator=(Renderer const& in_copy) = delete;
+        Renderer& operator=(Renderer&&      in_move) = delete;
 
         #pragma endregion
 };
-
-/* TODO Needs to be removed when Kernel is done TODO */
-
-extern RenderSystem* GRenderSystem;
-
-/* TODO Needs to be removed when Kernel is done TODO */
 
 END_DAEMON_NAMESPACE

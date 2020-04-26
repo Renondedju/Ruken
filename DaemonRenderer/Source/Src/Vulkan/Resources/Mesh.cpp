@@ -32,8 +32,9 @@
 
 #include "Vulkan/Resources/Mesh.hpp"
 
-#include "Rendering/RenderSystem.hpp"
+#include "Rendering/Renderer.hpp"
 
+#include "Resource/ResourceManager.hpp"
 #include "Resource/ResourceProcessingFailure.hpp"
 
 #include "Vulkan/Core/VulkanDevice.hpp"
@@ -45,7 +46,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -58,10 +59,10 @@ std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(DAEuint64 const in_size) n
     buffer_create_info.size  = in_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-    return GRenderSystem->GetDeviceAllocator().CreateBuffer(buffer_create_info, allocation_create_info);
+    return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -73,10 +74,10 @@ std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(DAEuint64 const in_size) no
     buffer_create_info.size  = in_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-    return GRenderSystem->GetDeviceAllocator().CreateBuffer(buffer_create_info, allocation_create_info);
+    return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -88,18 +89,20 @@ std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(DAEuint64 const in_size) noe
     buffer_create_info.size  = in_size;
     buffer_create_info.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-    return GRenderSystem->GetDeviceAllocator().CreateBuffer(buffer_create_info, allocation_create_info);
+    return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-DAEvoid Mesh::UploadData(std::vector<Vertex>    const& in_vertices,
+DAEvoid Mesh::UploadData(Renderer& in_renderer,
+                         std::vector<Vertex>    const& in_vertices,
                          std::vector<DAEuint32> const& in_indices) const
 {
-    auto& device = GRenderSystem->GetDevice();
+    auto& device = in_renderer.GetDevice();
+    auto& allocator = in_renderer.GetDeviceAllocator();
     auto const vertex_buffer_size = sizeof(Vertex)    * in_vertices.size();
     auto const index_buffer_size  = sizeof(DAEuint32) * in_indices .size();
 
-    auto const staging_vertex_buffer = CreateStagingBuffer(vertex_buffer_size);
-    auto const staging_index_buffer  = CreateStagingBuffer(index_buffer_size);
+    auto const staging_vertex_buffer = CreateStagingBuffer(allocator, vertex_buffer_size);
+    auto const staging_index_buffer  = CreateStagingBuffer(allocator, index_buffer_size);
 
     if (!staging_vertex_buffer || !staging_index_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
@@ -146,7 +149,7 @@ DAEvoid Mesh::CopyBuffers(VulkanCommandBuffer const& in_command_buffer, VulkanBu
 
 #pragma warning (disable : 4100)
 
-DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Mesh::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<MeshLoadingDescriptor const&>(in_descriptor);
 
@@ -207,19 +210,19 @@ DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const&
         }
     }*/
 
-    m_vertex_buffer = std::make_unique<VulkanBuffer>(CreateVertexBuffer(vertices.size()).value());
-    m_index_buffer  = std::make_unique<VulkanBuffer>(CreateIndexBuffer (indices .size()).value());
+    m_vertex_buffer = std::make_unique<VulkanBuffer>(CreateVertexBuffer(in_renderer.GetDeviceAllocator(), vertices.size()).value());
+    m_index_buffer  = std::make_unique<VulkanBuffer>(CreateIndexBuffer (in_renderer.GetDeviceAllocator(), indices .size()).value());
 
     if (!m_vertex_buffer || !m_index_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
-    UploadData(vertices, indices);
+    UploadData(in_renderer, vertices, indices);
 
     VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<DAEuint64>(m_vertex_buffer->GetHandle()), "");
     VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<DAEuint64>(m_index_buffer ->GetHandle()), "");
 }
 
-DAEvoid Mesh::Reload(ResourceManager& in_manager)
+DAEvoid Mesh::Reload(ResourceManager& in_manager, Renderer& in_renderer)
 {
     tinyobj::attrib_t attribute;
 
@@ -237,10 +240,10 @@ DAEvoid Mesh::Reload(ResourceManager& in_manager)
 
 
 
-    UploadData(vertices, indices);
+    UploadData(in_renderer, vertices, indices);
 }
 
-DAEvoid Mesh::Unload(ResourceManager& in_manager) noexcept
+DAEvoid Mesh::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
 {
     m_vertex_buffer.reset();
     m_index_buffer .reset();
