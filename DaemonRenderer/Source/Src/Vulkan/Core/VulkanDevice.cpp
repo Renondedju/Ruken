@@ -124,8 +124,12 @@ DAEvoid VulkanDevice::CreateCommandPools(Scheduler const& in_scheduler) noexcept
     };
 
     for (auto const& queue_family : unique_queue_families)
+    {
         for (auto const& worker : in_scheduler.GetWorkers())
             m_command_pools[queue_family].emplace(worker.ID(), VulkanCommandPool(VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
+
+        m_command_pools[queue_family].emplace(std::this_thread::get_id(), VulkanCommandPool(VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
+    }
 }
 
 DAEvoid VulkanDevice::WaitIdle() const noexcept
