@@ -38,7 +38,7 @@ class Logger;
 /**
  * \brief Manages the connected screens and the created windows.
  */
-class WindowManager final: public Service<WindowManager>, Unique
+class WindowManager final: public Service<WindowManager>
 {
     private:
     
@@ -95,27 +95,16 @@ class WindowManager final: public Service<WindowManager>, Unique
         Event<Screen&> on_screen_created;
         Event<Screen&> on_screen_destroyed;
 
-        using Service<WindowManager>::Service;
-        
-        WindowManager(WindowManager const& in_other) = delete;
-        WindowManager(WindowManager&&      in_other) = delete;
-        ~WindowManager() noexcept;
-
         #pragma endregion
 
         #pragma region Constructors and Destructor
 
-        /**
-         * \brief Initializes the GLFW library, setups the callbacks and discovers the available screens.
-         */
-        WindowManager();
+        using Service<WindowManager>::Service;
 
-        WindowManager(WindowManager const&  in_copy) = delete;
-        WindowManager(WindowManager&&       in_move) = delete;
-
-        /**
-         * \brief Destroys every managed window and terminates the GLFW library.
-         */
+        WindowManager(ServiceProvider& in_service_provider);
+        
+        WindowManager(WindowManager const& in_other) = delete;
+        WindowManager(WindowManager&&      in_other) = delete;
         ~WindowManager() noexcept;
 
         #pragma endregion

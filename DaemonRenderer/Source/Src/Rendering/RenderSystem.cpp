@@ -43,8 +43,7 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-RenderSystem::RenderSystem():
-    m_logger {GRootLogger->AddChild("Rendering")}
+RenderSystem::RenderSystem()
 {
     /* TODO Needs to be removed when Kernel is done TODO */
     GRenderSystem = this;
@@ -60,11 +59,6 @@ RenderSystem::RenderSystem():
     m_device           = std::make_unique<VulkanDevice>         (*m_physical_device);
     m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device,
                                                                  *m_device);
-
-    GWindowManager->on_window_created += [this] (Window& in_window)
-    {
-        MakeContext(in_window);
-    };
 }
 
 RenderSystem::~RenderSystem() noexcept

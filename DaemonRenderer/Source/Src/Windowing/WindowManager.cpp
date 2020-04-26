@@ -28,15 +28,8 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-WindowManager::WindowManager():
-    m_logger {GRootLogger->AddChild("Windowing")}
+WindowManager::WindowManager(ServiceProvider& in_service_provider): Service<WindowManager> {in_service_provider}
 {
-    /* TODO Needs to be removed when Kernel is done TODO */
-
-    GWindowManager = this;
-
-    /* TODO Needs to be removed when Kernel is done TODO */
-
     glfwSetErrorCallback(&ErrorCallback);
 
     if (glfwInit())
@@ -118,24 +111,16 @@ DAEvoid WindowManager::ErrorCallback(DAEint32 const in_error_code, DAEchar const
             message = "GLFW_UNKNOWN_ERROR_CODE";
             break;
     }
-
-    GWindowManager->m_logger->Error(message + " : " + in_description);
 }
 
 DAEvoid WindowManager::MonitorCallback(GLFWmonitor* in_monitor, DAEint32 const in_event)
 {
     if (in_event == GLFW_CONNECTED)
     {
-        GWindowManager->AddScreen(in_monitor);
-
-        GWindowManager->m_logger->Error(std::string("Screen disconnected : ").append(glfwGetMonitorName(in_monitor)));
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
-        GWindowManager->RemoveScreen(in_monitor);
-
-        GWindowManager->m_logger->Error(std::string("Screen disconnected : ").append(glfwGetMonitorName(in_monitor)));
     }
 }
 
