@@ -28,29 +28,25 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructors
-
-
-
-#pragma endregion
-
 #pragma region Methods
 
 #pragma warning (disable : 4100)
 
-DAEvoid Material::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Material::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
+    m_loading_descriptor = reinterpret_cast<MaterialLoadingDescriptor const&>(in_descriptor);
 
+    // NotImplementedException
 }
 
-DAEvoid Material::Reload(ResourceManager& in_manager, Renderer& in_renderer)
+DAEvoid Material::Reload(ResourceManager& in_manager)
 {
-
+    // NotImplementedException
 }
 
-DAEvoid Material::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
+DAEvoid Material::Unload(ResourceManager& in_manager) noexcept
 {
-
+    m_loading_descriptor.reset();
 }
 
 #pragma warning (default : 4100)

@@ -189,11 +189,17 @@
     <ClInclude Include="Source\Include\Rendering\Renderer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanSemaphore.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Material.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Resources\MaterialLoadingDescriptor.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Mesh.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Resources\MeshLoadingDescriptor.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Resources\ShaderLoadingDescriptor.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Texture.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Resources\TextureLoadingDescriptor.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Resources\Vertex.hpp" />
     <ClInclude Include="Source\Include\Vulkan\SemaphorePool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Resources\Shader.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanTimelineSemaphore.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanConfig.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanLoader.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanSwapchain.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDebug.hpp" />
@@ -315,6 +321,11 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Vulkan\Resources\Vertex.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Resources\MeshLoadingDescriptor.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Resources\ShaderLoadingDescriptor.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Resources\TextureLoadingDescriptor.cpp" />
+    <ClCompile Include="Source\Src\Vulkan\Resources\MaterialLoadingDescriptor.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceBase.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceProvider.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderTarget.cpp" />

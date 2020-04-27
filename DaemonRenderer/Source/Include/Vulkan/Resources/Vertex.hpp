@@ -24,43 +24,39 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+#include "Config.hpp"
+
+#include "Vector/Vector.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class DescriptorPool
+struct Vertex
 {
-    private:
+    public:
 
         #pragma region Members
 
-        
+        Vector3f position;
+        Vector3f normal;
+        Vector2f uv;
 
         #pragma endregion
-
-    public:
 
         #pragma region Constructors and Destructor
 
-        DescriptorPool() = default;
+        Vertex() = default;
 
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
+        Vertex(Vertex const&    in_copy) = default;
+        Vertex(Vertex&&         in_move) = default;
 
-        ~DescriptorPool() = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
+        ~Vertex() = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
+        Vertex& operator=(Vertex const& in_copy) = default;
+        Vertex& operator=(Vertex&&      in_move) = default;
 
         #pragma endregion
 };

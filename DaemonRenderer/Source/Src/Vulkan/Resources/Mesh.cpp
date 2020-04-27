@@ -34,19 +34,15 @@
 
 #include "Rendering/Renderer.hpp"
 
-#include "Resource/ResourceManager.hpp"
 #include "Resource/ResourceProcessingFailure.hpp"
 
-#include "Vulkan/Core/VulkanDevice.hpp"
-
 #include "Vulkan/Utilities/VulkanDebug.hpp"
-#include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator const& in_allocator, DAEuint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -62,7 +58,7 @@ std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator& in_
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator const& in_allocator, DAEuint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -77,7 +73,7 @@ std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator& in_a
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator const& in_allocator, DAEuint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -92,30 +88,43 @@ std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator& in_al
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-DAEvoid Mesh::UploadData(Renderer& in_renderer,
+DAEvoid Mesh::UploadData(VulkanDevice           const& in_device,
+                         VulkanDeviceAllocator  const& in_allocator,
                          std::vector<Vertex>    const& in_vertices,
                          std::vector<DAEuint32> const& in_indices) const
 {
-    auto& device = in_renderer.GetDevice();
-    auto& allocator = in_renderer.GetDeviceAllocator();
     auto const vertex_buffer_size = sizeof(Vertex)    * in_vertices.size();
     auto const index_buffer_size  = sizeof(DAEuint32) * in_indices .size();
 
-    auto const staging_vertex_buffer = CreateStagingBuffer(allocator, vertex_buffer_size);
-    auto const staging_index_buffer  = CreateStagingBuffer(allocator, index_buffer_size);
+    auto const staging_vertex_buffer = CreateStagingBuffer(in_allocator, vertex_buffer_size);
+    auto const staging_index_buffer  = CreateStagingBuffer(in_allocator, index_buffer_size);
 
     if (!staging_vertex_buffer || !staging_index_buffer)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate staging buffers!");
 
-    auto command_buffer = device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    auto const command_buffer = in_device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    if (!staging_vertex_buffer || !staging_index_buffer || !command_buffer)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+    if (!command_buffer)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate command buffer!");
+
+    VulkanFence const fence;
 
     memcpy(staging_vertex_buffer->GetMappedData(), in_vertices.data(), vertex_buffer_size);
     memcpy(staging_index_buffer ->GetMappedData(), in_indices .data(), index_buffer_size);
 
-    CopyBuffers(*command_buffer, *staging_vertex_buffer, *staging_index_buffer);
+    command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    {
+        VkBufferCopy region = {};
+
+        region.size = m_vertex_buffer->GetSize();
+
+        command_buffer->CopyBuffer(*staging_vertex_buffer, *m_vertex_buffer, region);
+
+        region.size = m_index_buffer->GetSize();
+
+        command_buffer->CopyBuffer(*staging_index_buffer, *m_index_buffer, region);
+    }
+    command_buffer->End();
 
     VkSubmitInfo submit_info = {};
 
@@ -123,35 +132,22 @@ DAEvoid Mesh::UploadData(Renderer& in_renderer,
     submit_info.commandBufferCount = 1u;
     submit_info.pCommandBuffers    = &(*command_buffer).GetHandle();
 
-    VulkanFence const fence;
-
-    device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
+    in_device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
 
     fence.Wait();
 }
 
-DAEvoid Mesh::CopyBuffers(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_vertex_buffer, VulkanBuffer const& in_index_buffer) const noexcept
-{
-    in_command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-    VkBufferCopy region = {};
-
-    region.size = m_vertex_buffer->GetSize();
-
-    in_command_buffer.CopyBuffer(in_vertex_buffer, *m_vertex_buffer, region);
-
-    region.size = m_index_buffer->GetSize();
-
-    in_command_buffer.CopyBuffer(in_index_buffer, *m_index_buffer, region);
-
-    in_command_buffer.End();
-}
-
 #pragma warning (disable : 4100)
 
-DAEvoid Mesh::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<MeshLoadingDescriptor const&>(in_descriptor);
+
+    if (!m_loading_descriptor)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::RequirementsNotSatisfied, "Invalid mesh loading descriptor!");
+
+    auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
+    auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
 
     tinyobj::attrib_t attribute;
 
@@ -161,69 +157,34 @@ DAEvoid Mesh::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceL
     std::string warning;
     std::string error;
 
-    if (!LoadObj(&attribute, &shapes, &materials, &warning, &error, m_loading_descriptor.path.c_str()))
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+    if (!LoadObj(&attribute, &shapes, &materials, &warning, &error, m_loading_descriptor->path))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::CorruptedResource, "Failed to load the .obj file!");
 
-    std::vector<Vertex> vertices;
+    std::vector<Vertex>    vertices;
     std::vector<DAEuint32> indices;
 
-    /*std::vector<std::unordered_map<Vertex, DAEuint32>> unique_vertices_per_material(materials.size());
+    // TODO : Load vertices and indices data.
 
-    for (auto const& shape : shapes)
-    {
-        for (DAEsize i = 0; i < shape.mesh.num_face_vertices.size(); ++i)
-        {
-            DAEuint8 count       = shape.mesh.num_face_vertices[i];
-            DAEint32 material_id = shape.mesh.material_ids     [i];
-
-            auto& unique_vertices = unique_vertices_per_material[material_id + 1];
-
-            std::vector<Vertex>    vertices;
-            std::vector<DAEuint32> indices;
-
-            for (DAEuint8 j = 0; j < count; ++j)
-            {
-                auto const& index = shape.mesh.indices[j];
-
-                Vertex vertex = {
-                    Vector3f(attribute.vertices[3 * index.vertex_index + 0],
-                             attribute.vertices[3 * index.vertex_index + 1],
-                             attribute.vertices[3 * index.vertex_index + 2]),
-                    Vector3f(attribute.normals[3 * index.normal_index + 0],
-                             attribute.normals[3 * index.normal_index + 1],
-                             attribute.normals[3 * index.normal_index + 2]),
-                    Vector2f(0.0f + attribute.texcoords[2 * index.texcoord_index + 0],
-                             1.0f - attribute.texcoords[2 * index.texcoord_index + 1])
-                };
-
-                if (unique_vertices.count(vertex) == 0)
-                {
-                    unique_vertices[vertex] = static_cast<DAEuint32>(vertices.size());
-
-                    vertices.emplace_back(vertex);
-                }
-
-                indices.emplace_back(unique_vertices[vertex]);
-            }
-
-            UploadData(vertices, indices);
-        }
-    }*/
-
-    m_vertex_buffer = std::make_unique<VulkanBuffer>(CreateVertexBuffer(in_renderer.GetDeviceAllocator(), vertices.size()).value());
-    m_index_buffer  = std::make_unique<VulkanBuffer>(CreateIndexBuffer (in_renderer.GetDeviceAllocator(), indices .size()).value());
+    m_vertex_buffer = CreateVertexBuffer(allocator, sizeof(Vertex)    * vertices.size());
+    m_index_buffer  = CreateIndexBuffer (allocator, sizeof(DAEuint32) * indices .size());
 
     if (!m_vertex_buffer || !m_index_buffer)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate the buffers!");
 
-    UploadData(in_renderer, vertices, indices);
+    UploadData(device, allocator, vertices, indices);
 
     VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<DAEuint64>(m_vertex_buffer->GetHandle()), "");
     VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<DAEuint64>(m_index_buffer ->GetHandle()), "");
 }
 
-DAEvoid Mesh::Reload(ResourceManager& in_manager, Renderer& in_renderer)
+DAEvoid Mesh::Reload(ResourceManager& in_manager)
 {
+    if (!m_loading_descriptor || !m_vertex_buffer || !m_index_buffer)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::CorruptedResource, "Trying to reload an invalid mesh!");
+
+    auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
+    auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
+
     tinyobj::attrib_t attribute;
 
     std::vector<tinyobj::shape_t>    shapes;
@@ -232,21 +193,28 @@ DAEvoid Mesh::Reload(ResourceManager& in_manager, Renderer& in_renderer)
     std::string warning;
     std::string error;
 
-    if (!LoadObj(&attribute, &shapes, &materials, &warning, &error, m_loading_descriptor.path.c_str()))
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+    if (!LoadObj(&attribute, &shapes, &materials, &warning, &error, m_loading_descriptor->path))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::CorruptedResource, "Failed to load the .obj file!");
 
-    std::vector<Vertex> vertices;
+    std::vector<Vertex>    vertices;
     std::vector<DAEuint32> indices;
 
+    // TODO : Load vertices and indices data.
 
+    if (m_vertex_buffer->GetSize() != sizeof(Vertex) * vertices.size())
+        m_vertex_buffer = CreateVertexBuffer(allocator, sizeof(Vertex) * vertices.size());
 
-    UploadData(in_renderer, vertices, indices);
+    if (m_index_buffer->GetSize() != sizeof(DAEuint32) * indices.size())
+        m_index_buffer = CreateVertexBuffer(allocator, sizeof(DAEuint32) * indices.size());
+
+    UploadData(device, allocator, vertices, indices);
 }
 
-DAEvoid Mesh::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
+DAEvoid Mesh::Unload(ResourceManager& in_manager) noexcept
 {
-    m_vertex_buffer.reset();
-    m_index_buffer .reset();
+    m_loading_descriptor.reset();
+    m_vertex_buffer     .reset();
+    m_index_buffer      .reset();
 }
 
 #pragma warning (default : 4100)

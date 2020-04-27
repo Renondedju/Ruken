@@ -22,47 +22,4 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
-#include "Vulkan/Utilities/VulkanConfig.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-class DescriptorPool
-{
-    private:
-
-        #pragma region Members
-
-        
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructors and Destructor
-
-        DescriptorPool() = default;
-
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
-
-        ~DescriptorPool() = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+#include "Vulkan/Resources/Vertex.hpp"

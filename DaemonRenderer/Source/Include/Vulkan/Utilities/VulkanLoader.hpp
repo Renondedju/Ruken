@@ -24,15 +24,7 @@
 
 #pragma once
 
-#include "Types/FundamentalTypes.hpp"
-
-#if defined(DAEMON_OS_WINDOWS)
-    #define VK_USE_PLATFORM_WIN32_KHR
-#else
-    #error Unknown Platform
-#endif
-
-#include <volk/volk.h>
+#include "VulkanConfig.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 

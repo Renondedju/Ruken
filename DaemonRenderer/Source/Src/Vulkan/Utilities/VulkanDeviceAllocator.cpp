@@ -22,9 +22,14 @@
  *  SOFTWARE.
  */
 
+#pragma warning (push, 0)
+
 #define VMA_IMPLEMENTATION
 
 #include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
+
+#pragma warning (pop)
+
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"

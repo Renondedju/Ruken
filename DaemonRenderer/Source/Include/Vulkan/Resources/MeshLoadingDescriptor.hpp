@@ -24,43 +24,47 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+#include <functional>
+
+#include "Types/FundamentalTypes.hpp"
+
+#include "Resource/ResourceLoadingDescriptor.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class DescriptorPool
+class Renderer;
+
+struct MeshLoadingDescriptor final : ResourceLoadingDescriptor
 {
-    private:
+    public:
 
         #pragma region Members
 
-        
+        std::reference_wrapper<Renderer const> renderer;
+
+        DAEchar const* path;
 
         #pragma endregion
 
-    public:
-
         #pragma region Constructors and Destructor
 
-        DescriptorPool() = default;
+        explicit MeshLoadingDescriptor(Renderer const& in_renderer, DAEchar const* in_path) noexcept;
 
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
+        MeshLoadingDescriptor(MeshLoadingDescriptor const&  in_copy) = default;
+        MeshLoadingDescriptor(MeshLoadingDescriptor&&       in_move) = default;
 
-        ~DescriptorPool() = default;
+        ~MeshLoadingDescriptor() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
-        
-
         #pragma endregion
 
         #pragma region Operators
 
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
+        MeshLoadingDescriptor& operator=(MeshLoadingDescriptor const&   in_copy) = default;
+        MeshLoadingDescriptor& operator=(MeshLoadingDescriptor&&        in_move) = default;
 
         #pragma endregion
 };

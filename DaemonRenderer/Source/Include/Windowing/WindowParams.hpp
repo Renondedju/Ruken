@@ -26,7 +26,7 @@
 
 #include <string>
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Vulkan/Utilities/VulkanConfig.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 

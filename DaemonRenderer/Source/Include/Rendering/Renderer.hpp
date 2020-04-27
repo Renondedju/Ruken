@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include "Core/Service.hpp"
@@ -34,6 +33,12 @@
 
 #include "Debug/Logging/Logger.hpp"
 
+#include "Vulkan/Core/VulkanDevice.hpp"
+#include "Vulkan/Core/VulkanInstance.hpp"
+#include "Vulkan/Core/VulkanPhysicalDevice.hpp"
+
+#include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
 class Renderer final : public Service<Renderer>
@@ -42,13 +47,13 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Members
 
-        Logger* m_logger;
-        Scheduler& m_scheduler;
+        Logger*     m_logger;
+        Scheduler*  m_scheduler;
 
-        std::unique_ptr<class VulkanInstance>           m_instance;
-        std::unique_ptr<class VulkanPhysicalDevice>     m_physical_device;
-        std::unique_ptr<class VulkanDevice>             m_device;
-        std::unique_ptr<class VulkanDeviceAllocator>    m_device_allocator;
+        std::unique_ptr<VulkanInstance>         m_instance;
+        std::unique_ptr<VulkanPhysicalDevice>   m_physical_device;
+        std::unique_ptr<VulkanDevice>           m_device;
+        std::unique_ptr<VulkanDeviceAllocator>  m_device_allocator;
         
         std::vector<std::unique_ptr<RenderContext>> m_render_contexts;
 
@@ -64,7 +69,7 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Constructors and Destructor
 
-        Renderer(ServiceProvider& in_service_provider);
+        explicit Renderer(ServiceProvider& in_service_provider) noexcept;
 
         Renderer(Renderer const&    in_copy) = delete;
         Renderer(Renderer&&         in_move) = delete;

@@ -24,39 +24,21 @@
 
 #pragma once
 
-#include <string>
 #include <vector>
 #include <optional>
 
-#include "Vector/Vector.hpp"
-
 #include "Resource/IResource.hpp"
-#include "Resource/ResourceLoadingDescriptor.hpp"
 
 #include "Vulkan/Core/VulkanBuffer.hpp"
 
+#include "Vulkan/Resources/Vertex.hpp"
+#include "Vulkan/Resources/MeshLoadingDescriptor.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
+class VulkanDevice;
 class VulkanCommandBuffer;
 class VulkanDeviceAllocator;
-
-struct Vertex
-{
-    Vector3f position;
-    Vector3f normal;
-    Vector2f uv;
-};
-
-class MeshLoadingDescriptor final : public ResourceLoadingDescriptor
-{
-    public:
-
-        #pragma region Members
-
-        std::string path;
-
-        #pragma endregion
-};
 
 class Mesh final : public IResource
 {
@@ -64,24 +46,22 @@ class Mesh final : public IResource
 
         #pragma region Members
 
-        MeshLoadingDescriptor m_loading_descriptor;
-
-        std::unique_ptr<VulkanBuffer> m_vertex_buffer;
-        std::unique_ptr<VulkanBuffer> m_index_buffer;
+        std::optional<MeshLoadingDescriptor>    m_loading_descriptor;
+        std::optional<VulkanBuffer>             m_vertex_buffer;
+        std::optional<VulkanBuffer>             m_index_buffer;
 
         #pragma endregion
 
         #pragma region Methods
 
-        static std::optional<VulkanBuffer> CreateStagingBuffer  (VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
-        static std::optional<VulkanBuffer> CreateVertexBuffer   (VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
-        static std::optional<VulkanBuffer> CreateIndexBuffer    (VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateStagingBuffer  (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateVertexBuffer   (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateIndexBuffer    (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
 
-        DAEvoid UploadData(Renderer& in_renderer,
+        DAEvoid UploadData(VulkanDevice           const& in_device,
+                           VulkanDeviceAllocator  const& in_allocator,
                            std::vector<Vertex>    const& in_vertices,
                            std::vector<DAEuint32> const& in_indices) const;
-
-        DAEvoid CopyBuffers(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_vertex_buffer, VulkanBuffer const& in_index_buffer) const noexcept;
 
         #pragma endregion
 
@@ -100,11 +80,11 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
+        DAEvoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VulkanBuffer const& GetVertexBuffer() const noexcept;

@@ -24,26 +24,13 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include <optional>
 
-#include "Vulkan/Resources/Shader.hpp"
-#include "Vulkan/Resources/Texture.hpp"
+#include "Resource/IResource.hpp"
 
-#include "Resource/Handle.hpp"
+#include "Vulkan/Resources/MaterialLoadingDescriptor.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-class MaterialLoadingDescriptor final : public ResourceLoadingDescriptor
-{
-    public:
-
-        #pragma region Members
-
-        std::string path;
-
-        #pragma endregion
-};
 
 class Material final : public IResource
 {
@@ -51,8 +38,7 @@ class Material final : public IResource
 
         #pragma region Members
 
-        std::vector<Handle<Shader>>     m_shaders;
-        std::vector<Handle<Texture>>    m_textures;
+        std::optional<MaterialLoadingDescriptor> m_loading_descriptor;
 
         #pragma endregion
 
@@ -71,11 +57,11 @@ class Material final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
+        DAEvoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
 
         #pragma endregion
 

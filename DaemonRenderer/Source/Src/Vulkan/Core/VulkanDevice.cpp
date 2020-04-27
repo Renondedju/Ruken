@@ -27,6 +27,7 @@
 #include "Vulkan/Core/VulkanDevice.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 #include "Threading/Scheduler.hpp"
 

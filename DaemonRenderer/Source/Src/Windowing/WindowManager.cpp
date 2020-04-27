@@ -30,7 +30,9 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-WindowManager::WindowManager(ServiceProvider& in_service_provider): Service<WindowManager> {in_service_provider}, m_logger {in_service_provider.LocateService<Logger>()->AddChild("Windowing")}
+WindowManager::WindowManager(ServiceProvider& in_service_provider):
+    Service<WindowManager>  {in_service_provider},
+    m_logger                {in_service_provider.LocateService<Logger>()->AddChild("Windowing")}
 {
     glfwSetErrorCallback(&ErrorCallback);
 

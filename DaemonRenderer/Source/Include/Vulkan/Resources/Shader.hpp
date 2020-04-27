@@ -24,25 +24,15 @@
 
 #pragma once
 
-#include <string>
+#include <optional>
 
 #include "Resource/IResource.hpp"
-#include "Resource/ResourceLoadingDescriptor.hpp"
 
 #include "Vulkan/Core/VulkanShaderModule.hpp"
 
+#include "Vulkan/Resources/ShaderLoadingDescriptor.hpp"
+
 BEGIN_DAEMON_NAMESPACE
-
-class ShaderLoadingDescriptor final : public ResourceLoadingDescriptor
-{
-    public:
-
-        #pragma region Members
-
-        std::string path;
-
-        #pragma endregion
-};
 
 class Shader final : public IResource
 {
@@ -50,15 +40,8 @@ class Shader final : public IResource
 
         #pragma region Members
 
-        ShaderLoadingDescriptor m_loading_descriptor;
-
-        std::unique_ptr<VulkanShaderModule> m_module;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
+        std::optional<ShaderLoadingDescriptor>  m_loading_descriptor;
+        std::optional<VulkanShaderModule>       m_module;
 
         #pragma endregion
 
@@ -68,8 +51,8 @@ class Shader final : public IResource
 
         Shader() = default;
 
-        Shader(Shader const&    in_copy) = default;
-        Shader(Shader&&         in_move) = default;
+        Shader(Shader const&    in_copy) = delete;
+        Shader(Shader&&         in_move) = delete;
 
         ~Shader() = default;
 
@@ -77,11 +60,11 @@ class Shader final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
+        DAEvoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VulkanShaderModule const& GetModule() const noexcept;
@@ -90,8 +73,8 @@ class Shader final : public IResource
 
         #pragma region Operators
 
-        Shader& operator=(Shader const& in_copy) = default;
-        Shader& operator=(Shader&&      in_move) = default;
+        Shader& operator=(Shader const& in_copy) = delete;
+        Shader& operator=(Shader&&      in_move) = delete;
 
         #pragma endregion
 };

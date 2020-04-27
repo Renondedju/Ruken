@@ -24,43 +24,41 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+#include "Types/FundamentalTypes.hpp"
+
+#include "Resource/ResourceLoadingDescriptor.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class DescriptorPool
+struct ShaderLoadingDescriptor final : ResourceLoadingDescriptor
 {
-    private:
+    public:
 
         #pragma region Members
 
-        
+        DAEchar const* path;
 
         #pragma endregion
 
-    public:
-
         #pragma region Constructors and Destructor
 
-        DescriptorPool() = default;
+        explicit ShaderLoadingDescriptor(DAEchar const* in_path) noexcept;
 
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
+        ShaderLoadingDescriptor(ShaderLoadingDescriptor const&  in_copy) = default;
+        ShaderLoadingDescriptor(ShaderLoadingDescriptor&&       in_move) = default;
 
-        ~DescriptorPool() = default;
+        ~ShaderLoadingDescriptor() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
-        
-
         #pragma endregion
 
         #pragma region Operators
 
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
+        ShaderLoadingDescriptor& operator=(ShaderLoadingDescriptor const&   in_copy) = default;
+        ShaderLoadingDescriptor& operator=(ShaderLoadingDescriptor&&        in_move) = default;
 
         #pragma endregion
 };

@@ -24,33 +24,30 @@
 
 #include "Rendering/Renderer.hpp"
 
+#include "Core/ServiceProvider.hpp"
+
 #include "Windowing/WindowManager.hpp"
 
-#include "Vulkan/Core/VulkanDevice.hpp"
-#include "Vulkan/Core/VulkanInstance.hpp"
-#include "Vulkan/Core/VulkanPhysicalDevice.hpp"
-
 #include "Vulkan/Utilities/VulkanDebug.hpp"
-#include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
-
-#include "Core/ServiceProvider.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor
 
-Renderer::Renderer(ServiceProvider& in_service_provider): Service<Renderer>(in_service_provider),
-    m_logger {in_service_provider.LocateService<Logger>()->AddChild("Rendering")},
-    m_scheduler {*in_service_provider.LocateService<Scheduler>()}
+Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
+    Service<Renderer>   {in_service_provider},
+    m_logger            {in_service_provider.LocateService<Logger>   ()->AddChild("Rendering")},
+    m_scheduler         {in_service_provider.LocateService<Scheduler>()}
 {
-    m_logger->SetLevel(ELogLevel::Info);
+    m_logger->SetLevel(ELogLevel::Debug);
 
     VulkanDebug ::Initialize(*m_logger);
     VulkanLoader::Initialize();
 
     m_instance         = std::make_unique<VulkanInstance>       ();
     m_physical_device  = std::make_unique<VulkanPhysicalDevice> (*m_instance);
-    m_device           = std::make_unique<VulkanDevice>         (m_scheduler,
+    m_device           = std::make_unique<VulkanDevice>         (*m_scheduler,
                                                                  *m_physical_device);
     m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device,
                                                                  *m_device);
@@ -74,7 +71,7 @@ Renderer::~Renderer() noexcept
 
 DAEvoid Renderer::MakeContext(Window& in_window)
 {
-    m_render_contexts.push_back(std::make_unique<RenderContext>(*this, m_scheduler, in_window));
+    m_render_contexts.push_back(std::make_unique<RenderContext>(*this, *m_scheduler, in_window));
 }
 
 DAEvoid Renderer::OnUpdate() noexcept

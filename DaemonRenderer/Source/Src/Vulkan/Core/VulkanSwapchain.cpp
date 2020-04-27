@@ -28,6 +28,7 @@
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 #include "Windowing/Window.hpp"
 

@@ -26,6 +26,8 @@
 
 #include "Vulkan/Core/VulkanShaderModule.hpp"
 
+#include "Vulkan/Utilities/VulkanLoader.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructor and Destructor

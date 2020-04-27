@@ -26,7 +26,7 @@
 
 #include <optional>
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Vulkan/Utilities/VulkanConfig.hpp"
 
 #include "Vulkan/Core/VulkanImage.hpp"
 #include "Vulkan/Core/VulkanBuffer.hpp"

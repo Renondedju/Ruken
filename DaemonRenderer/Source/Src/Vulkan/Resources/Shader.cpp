@@ -38,47 +38,21 @@ USING_DAEMON_NAMESPACE
 
 #pragma warning (disable : 4100)
 
-DAEvoid Shader::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<ShaderLoadingDescriptor const&>(in_descriptor);
 
-    if (!glslang::InitializeProcess())
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
-
-
-
-    glslang::FinalizeProcess();
-
-    std::vector<DAEuint32> code;
-
-    m_module = std::make_unique<VulkanShaderModule>(code);
-
-    if (!m_module)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+    // NotImplementedException
 }
 
-DAEvoid Shader::Reload(ResourceManager& in_manager, Renderer& in_renderer)
+DAEvoid Shader::Reload(ResourceManager& in_manager)
 {
-    if (!glslang::InitializeProcess())
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
-
-
-
-    glslang::FinalizeProcess();
-
-    std::vector<DAEuint32> code;
-
-    m_module = std::make_unique<VulkanShaderModule>(code);
-
-    if (!m_module)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
-
-    VulkanDebug::SetObjectName(VK_OBJECT_TYPE_SHADER_MODULE, reinterpret_cast<DAEuint64>(m_module->GetHandle()), "");
+    // NotImplementedException
 }
 
-DAEvoid Shader::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
+DAEvoid Shader::Unload(ResourceManager& in_manager) noexcept
 {
-    m_module.reset();
+    m_loading_descriptor.reset();
 }
 
 #pragma warning (default : 4100)

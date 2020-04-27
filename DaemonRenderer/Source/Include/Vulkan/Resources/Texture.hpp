@@ -24,31 +24,20 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
 #include <optional>
 
 #include "Resource/IResource.hpp"
-#include "Resource/ResourceLoadingDescriptor.hpp"
 
 #include "Vulkan/Core/VulkanImage.hpp"
 #include "Vulkan/Core/VulkanBuffer.hpp"
 
+#include "Vulkan/Resources/TextureLoadingDescriptor.hpp"
+
 BEGIN_DAEMON_NAMESPACE
 
+class VulkanDevice;
 class VulkanCommandBuffer;
 class VulkanDeviceAllocator;
-
-class TextureLoadingDescriptor final : public ResourceLoadingDescriptor
-{
-    public:
-
-        #pragma region Members
-
-        std::string path;
-
-        #pragma endregion
-};
 
 class Texture final : public IResource
 {
@@ -56,21 +45,20 @@ class Texture final : public IResource
 
         #pragma region Members
 
-        TextureLoadingDescriptor m_loading_descriptor;
-
-        std::unique_ptr<VulkanImage> m_image;
+        std::optional<TextureLoadingDescriptor> m_loading_descriptor;
+        std::optional<VulkanImage>              m_image;
 
         #pragma endregion
 
         #pragma region Methods
 
-        static std::optional<VulkanImage> CreateImage(VulkanDeviceAllocator& in_allocator, DAEuint32 in_width, DAEuint32 in_height) noexcept;
+        static std::optional<VulkanImage>   CreateImage         (VulkanDeviceAllocator const& in_allocator, DAEuint32 in_width, DAEuint32 in_height) noexcept;
+        static std::optional<VulkanBuffer>  CreateStagingBuffer (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
 
-        static std::optional<VulkanBuffer> CreateBuffer(VulkanDeviceAllocator& in_allocator, DAEuint64 in_size) noexcept;
-
-        DAEvoid UploadData(Renderer& in_renderer, DAEvoid const* in_data, DAEuint64 in_size) const;
-
-        DAEvoid CopyBufferToImage(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_buffer) const noexcept;
+        DAEvoid UploadData(VulkanDevice          const& in_device,
+                           VulkanDeviceAllocator const& in_allocator,
+                           DAEvoid               const* in_data,
+                           DAEuint64                    in_size) const;
 
         #pragma endregion
 
@@ -81,7 +69,7 @@ class Texture final : public IResource
         Texture() = default;
 
         Texture(Texture const&  in_copy) = delete;
-        Texture(Texture&&       in_move) = default;
+        Texture(Texture&&       in_move) = delete;
 
         ~Texture() = default;
 
@@ -89,11 +77,11 @@ class Texture final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor) override;
+        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager, Renderer& in_renderer) override;
+        DAEvoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept override;
+        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VulkanImage const& GetImage() const noexcept;

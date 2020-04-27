@@ -22,47 +22,17 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Vulkan/Resources/TextureLoadingDescriptor.hpp"
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
+#pragma region Constructor
 
-class DescriptorPool
+TextureLoadingDescriptor::TextureLoadingDescriptor(Renderer const& in_renderer, DAEchar const* in_path) noexcept:
+    renderer    {in_renderer},
+    path        {in_path}
 {
-    private:
+    
+}
 
-        #pragma region Members
-
-        
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructors and Destructor
-
-        DescriptorPool() = default;
-
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
-
-        ~DescriptorPool() = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+#pragma endregion

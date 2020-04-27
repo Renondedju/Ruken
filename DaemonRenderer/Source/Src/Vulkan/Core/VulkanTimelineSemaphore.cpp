@@ -26,6 +26,8 @@
 
 #include "Vulkan/Core/VulkanTimelineSemaphore.hpp"
 
+#include "Vulkan/Utilities/VulkanLoader.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructors

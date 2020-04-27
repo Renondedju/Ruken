@@ -24,43 +24,37 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+#include "Types/FundamentalTypes.hpp"
+
+#include "Resource/ResourceLoadingDescriptor.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-class DescriptorPool
+struct MaterialLoadingDescriptor final : ResourceLoadingDescriptor
 {
-    private:
+    public:
 
         #pragma region Members
 
-        
+        DAEchar const* path;
 
         #pragma endregion
-
-    public:
 
         #pragma region Constructors and Destructor
 
-        DescriptorPool() = default;
+        explicit MaterialLoadingDescriptor(DAEchar const* in_path) noexcept;
 
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
+        MaterialLoadingDescriptor(MaterialLoadingDescriptor const&  in_copy) = default;
+        MaterialLoadingDescriptor(MaterialLoadingDescriptor&&       in_move) = default;
 
-        ~DescriptorPool() = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
+        ~MaterialLoadingDescriptor() = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
+        MaterialLoadingDescriptor& operator=(MaterialLoadingDescriptor const&   in_copy) = default;
+        MaterialLoadingDescriptor& operator=(MaterialLoadingDescriptor&&        in_move) = default;
 
         #pragma endregion
 };

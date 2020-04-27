@@ -24,9 +24,7 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
-
-#include <vma/vk_mem_alloc.h>
+#include "Vulkan/Utilities/VulkanConfig.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -100,7 +98,7 @@ class VulkanBuffer
         #pragma region Operators
 
         VulkanBuffer& operator=(VulkanBuffer const& in_copy) = delete;
-        VulkanBuffer& operator=(VulkanBuffer&&      in_move) = delete;
+        VulkanBuffer& operator=(VulkanBuffer&&      in_move) noexcept;
 
         #pragma endregion
 };

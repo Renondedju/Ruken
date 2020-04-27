@@ -178,7 +178,7 @@ class Logger final: public Service<Logger>
         Logger* GetChild(std::string const& in_name) const noexcept;
 
         /**
-         * \brief Logs a message with level 'VulkanDebug' on this logger.
+         * \brief Logs a message with level 'Debug' on this logger.
          * \param in_message The message to log.
          */
         DAEvoid Debug(std::string in_message) const noexcept;

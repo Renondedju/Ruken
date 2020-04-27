@@ -39,7 +39,7 @@ DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceL
     
     try
     {
-        in_manifest->data.load(std::memory_order_acquire)->Load(*this, m_renderer_reference, in_descriptor);
+        in_manifest->data.load(std::memory_order_acquire)->Load(*this, in_descriptor);
         in_manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
 
         --m_current_operation_count;
@@ -79,7 +79,7 @@ DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
 
     try
     {
-        in_manifest->data.load(std::memory_order_acquire)->Reload(*this, m_renderer_reference);
+        in_manifest->data.load(std::memory_order_acquire)->Reload(*this);
         in_manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
 
         --m_current_operation_count;
@@ -116,7 +116,7 @@ DAEvoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest)
     
     if (in_manifest->status.load(std::memory_order_acquire) == EResourceStatus::Loaded)
     {
-        in_manifest->data.load(std::memory_order_acquire)->Unload(*this, m_renderer_reference);
+        in_manifest->data.load(std::memory_order_acquire)->Unload(*this);
         in_manifest->status.store(EResourceStatus::Invalid, std::memory_order_release);
     }
 
@@ -177,7 +177,6 @@ ResourceManager::ResourceManager(ServiceProvider& in_service_provider) noexcept:
     m_manifests               {},
     m_collection_mode         {EGCCollectionMode::Automatic},
     m_scheduler_reference     {*m_service_provider.LocateService<Scheduler>()},
-    m_renderer_reference      {*m_service_provider.LocateService<Renderer>()},
     m_current_operation_count {0}
 {}
 

@@ -36,19 +36,13 @@
 
 #include "Resource/ResourceProcessingFailure.hpp"
 
-#include "Vulkan/Core/VulkanFence.hpp"
-#include "Vulkan/Core/VulkanQueue.hpp"
-#include "Vulkan/Core/VulkanDevice.hpp"
-#include "Vulkan/Core/VulkanCommandPool.hpp"
-
 #include "Vulkan/Utilities/VulkanDebug.hpp"
-#include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-std::optional<VulkanImage> Texture::CreateImage(VulkanDeviceAllocator& in_allocator, DAEuint32 const in_width, DAEuint32 const in_height) noexcept
+std::optional<VulkanImage> Texture::CreateImage(VulkanDeviceAllocator const& in_allocator, DAEuint32 const in_width, DAEuint32 const in_height) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -71,7 +65,7 @@ std::optional<VulkanImage> Texture::CreateImage(VulkanDeviceAllocator& in_alloca
     return in_allocator.CreateImage(image_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Texture::CreateBuffer(VulkanDeviceAllocator& in_allocator, VkDeviceSize const in_size) noexcept
+std::optional<VulkanBuffer> Texture::CreateStagingBuffer(VulkanDeviceAllocator const& in_allocator, VkDeviceSize const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -87,20 +81,63 @@ std::optional<VulkanBuffer> Texture::CreateBuffer(VulkanDeviceAllocator& in_allo
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-DAEvoid Texture::UploadData(Renderer& in_renderer, DAEvoid const* in_data, DAEuint64 const in_size) const
+DAEvoid Texture::UploadData(VulkanDevice          const&    in_device,
+                            VulkanDeviceAllocator const&    in_allocator,
+                            DAEvoid               const*    in_data,
+                            DAEuint64             const     in_size) const
 {
-    auto& device = in_renderer.GetDevice();
-    auto& allocator = in_renderer.GetDeviceAllocator();
+    auto const staging_buffer = CreateStagingBuffer(in_allocator, in_size);
 
-    auto buffer         = CreateBuffer(allocator, in_size);
-    auto command_buffer = device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    if (!staging_buffer)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate the staging buffer!");
 
-    if (!buffer || !command_buffer)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
+    auto const command_buffer = in_device.GetTransferCommandPool().AllocateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    memcpy(buffer->GetMappedData(), in_data, in_size);
+    if (!command_buffer)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate the command buffer!");
 
-    CopyBufferToImage(*command_buffer, *buffer);
+    VulkanFence const fence;
+
+    memcpy(staging_buffer->GetMappedData(), in_data, in_size);
+
+    command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    {
+        VkImageMemoryBarrier memory_barrier = {};
+
+        memory_barrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memory_barrier.srcAccessMask       = 0u;
+        memory_barrier.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+        memory_barrier.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memory_barrier.srcQueueFamilyIndex = in_device.GetGraphicsFamily();
+        memory_barrier.dstQueueFamilyIndex = in_device.GetTransferFamily();
+        memory_barrier.image               = m_image->GetHandle();
+
+        memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        memory_barrier.subresourceRange.levelCount = 1u;
+        memory_barrier.subresourceRange.layerCount = 1u;
+
+        command_buffer->InsertMemoryBarrier(memory_barrier);
+
+        VkBufferImageCopy region = {};
+
+        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.layerCount = 1u;
+
+        region.imageExtent = m_image->GetExtent();
+
+        command_buffer->CopyBufferToImage(*staging_buffer, *m_image, region);
+
+        memory_barrier.srcAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memory_barrier.dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
+        memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memory_barrier.newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        memory_barrier.srcQueueFamilyIndex = in_device.GetTransferFamily();
+        memory_barrier.dstQueueFamilyIndex = in_device.GetGraphicsFamily();
+
+        command_buffer->InsertMemoryBarrier(memory_barrier);
+    }
+    command_buffer->End();
 
     VkSubmitInfo submit_info = {};
 
@@ -108,87 +145,55 @@ DAEvoid Texture::UploadData(Renderer& in_renderer, DAEvoid const* in_data, DAEui
     submit_info.commandBufferCount = 1u;
     submit_info.pCommandBuffers    = &(*command_buffer).GetHandle();
 
-    VulkanFence const fence;
-
-    device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
+    in_device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
 
     fence.Wait();
 }
 
-DAEvoid Texture::CopyBufferToImage(VulkanCommandBuffer const& in_command_buffer, VulkanBuffer const& in_buffer) const noexcept
-{
-    in_command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-    VkImageMemoryBarrier memory_barrier = {};
-
-    memory_barrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    memory_barrier.srcAccessMask       = 0u;
-    memory_barrier.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
-    memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
-    memory_barrier.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    memory_barrier.image               = m_image->GetHandle();
-
-    memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    memory_barrier.subresourceRange.levelCount = 1u;
-    memory_barrier.subresourceRange.layerCount = 1u;
-
-    in_command_buffer.InsertMemoryBarrier(memory_barrier);
-
-    VkBufferImageCopy region = {};
-
-    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    region.imageSubresource.layerCount = 1u;
-
-    region.imageExtent = m_image->GetExtent();
-
-    in_command_buffer.CopyBufferToImage(in_buffer, *m_image, region);
-
-    memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    memory_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    memory_barrier.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    memory_barrier.newLayout     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-    in_command_buffer.InsertMemoryBarrier(memory_barrier);
-
-    in_command_buffer.End();
-}
-
 #pragma warning (disable : 4100)
 
-DAEvoid Texture::Load(ResourceManager& in_manager, Renderer& in_renderer, ResourceLoadingDescriptor const& in_descriptor)
+DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<TextureLoadingDescriptor const&>(in_descriptor);
+
+    if (!m_loading_descriptor)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::RequirementsNotSatisfied, "Invalid texture loading descriptor!");
+
+    auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
+    auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
 
     auto width  = 0;
     auto height = 0;
     auto comp   = 0;
 
-    auto* pixels = stbi_load(m_loading_descriptor.path.c_str(), &width, &height, &comp, STBI_rgb_alpha);
+    auto* pixels = stbi_load(m_loading_descriptor->path, &width, &height, &comp, STBI_rgb_alpha);
 
-    m_image = std::make_unique<VulkanImage>(std::move(CreateImage(in_renderer.GetDeviceAllocator(), width, height).value()));
+    m_image = CreateImage(allocator, width, height);
 
     if (!m_image)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
-    UploadData(in_renderer, pixels, width * height * comp);
+    UploadData(device, allocator, pixels, width * height * comp);
 }
 
-DAEvoid Texture::Reload(ResourceManager& in_manager, Renderer& in_renderer)
+DAEvoid Texture::Reload(ResourceManager& in_manager)
 {
+    auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
+    auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
+
     auto width  = 0;
     auto height = 0;
     auto comp   = 0;
 
-    auto* pixels = stbi_load(m_loading_descriptor.path.c_str(), &width, &height, &comp, STBI_rgb_alpha);
+    auto* pixels = stbi_load(m_loading_descriptor->path, &width, &height, &comp, STBI_rgb_alpha);
 
-    UploadData(in_renderer, pixels, width * height * comp);
+    UploadData(device, allocator, pixels, width * height * comp);
 }
 
-DAEvoid Texture::Unload(ResourceManager& in_manager, Renderer& in_renderer) noexcept
+DAEvoid Texture::Unload(ResourceManager& in_manager) noexcept
 {
-    m_image.reset();
+    m_loading_descriptor.reset();
+    m_image             .reset();
 }
 
 #pragma warning (default : 4100)

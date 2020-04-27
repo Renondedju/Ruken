@@ -24,45 +24,13 @@
 
 #pragma once
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+#if defined(DAEMON_OS_WINDOWS)
+    #define VK_USE_PLATFORM_WIN32_KHR
+#else
+    #error Unknown Platform
+#endif
 
-class DescriptorPool
-{
-    private:
-
-        #pragma region Members
-
-        
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructors and Destructor
-
-        DescriptorPool() = default;
-
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
-
-        ~DescriptorPool() = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
-
-        #pragma endregion
-};
-
-END_DAEMON_NAMESPACE
+#include <volk/volk.h>
+#include <vma/vk_mem_alloc.h>

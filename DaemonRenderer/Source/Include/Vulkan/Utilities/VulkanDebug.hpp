@@ -26,7 +26,7 @@
 
 #include <string>
 
-#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Vulkan/Utilities/VulkanConfig.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -60,7 +60,7 @@ class VulkanDebug
         static DAEvoid AssertResult(VkResult in_result, std::string const& in_function) noexcept;
 
         /**
-         * \param in_instance         The instance the messenger will be used with.
+         * \param in_instance The instance the messenger will be used with.
          */
         static DAEvoid CreateDebugMessenger(VkInstance                          in_instance) noexcept;
 
