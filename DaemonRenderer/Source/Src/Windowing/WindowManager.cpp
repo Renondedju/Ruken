@@ -24,80 +24,127 @@
 
 #include "Windowing/WindowManager.hpp"
 
+#include "Core/ServiceProvider.hpp"
+
 USING_DAEMON_NAMESPACE
 
-DAEvoid WindowManager::ErrorCallback(DAEint32 const  in_error_code,
-                                     DAEchar  const* in_description)
+#pragma region Constructor and Destructor
+
+WindowManager::WindowManager(ServiceProvider& in_service_provider):
+    Service<WindowManager>  {in_service_provider},
+    m_logger                {in_service_provider.LocateService<Logger>()->AddChild("Windowing")}
+{
+    glfwSetErrorCallback(&ErrorCallback);
+
+    if (glfwInit())
+    {
+        glfwSetMonitorCallback(&MonitorCallback);
+
+        DiscoverScreens();
+
+        m_logger->Info("GLFW initialized successfully.");
+    }
+
+    else
+        m_logger->Fatal("Failed to initialize GLFW!");
+}
+
+WindowManager::~WindowManager() noexcept
+{
+    m_windows.clear();
+    m_screens.clear();
+
+    glfwTerminate();
+
+    m_logger->Info("GLFW terminated.");
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+#pragma region Callbacks
+
+DAEvoid WindowManager::ErrorCallback(DAEint32 const in_error_code, DAEchar const*in_description)
 {
     std::string message;
 
     switch (in_error_code)
     {
-    #define RESULT(res) case GLFW_##res: message = #res; break
-            RESULT(NO_ERROR);
-            RESULT(NOT_INITIALIZED);
-            RESULT(NO_CURRENT_CONTEXT);
-            RESULT(INVALID_ENUM);
-            RESULT(INVALID_VALUE);
-            RESULT(OUT_OF_MEMORY);
-            RESULT(API_UNAVAILABLE);
-            RESULT(VERSION_UNAVAILABLE);
-            RESULT(PLATFORM_ERROR);
-            RESULT(FORMAT_UNAVAILABLE);
-            RESULT(NO_WINDOW_CONTEXT);
-    #undef  RESULT
-    
+        case GLFW_NOT_INITIALIZED:
+            message = "GLFW_NOT_INITIALIZED";
+            break;
+
+        case GLFW_NO_CURRENT_CONTEXT:
+            message = "GLFW_NO_CURRENT_CONTEXT";
+            break;
+
+        case GLFW_INVALID_ENUM:
+            message = "GLFW_INVALID_ENUM";
+            break;
+
+        case GLFW_INVALID_VALUE:
+            message = "GLFW_INVALID_VALUE";
+            break;
+
+        case GLFW_OUT_OF_MEMORY:
+            message = "GLFW_OUT_OF_MEMORY";
+            break;
+
+        case GLFW_API_UNAVAILABLE:
+            message = "GLFW_API_UNAVAILABLE";
+            break;
+
+        case GLFW_VERSION_UNAVAILABLE:
+            message = "GLFW_VERSION_UNAVAILABLE";
+            break;
+
+        case GLFW_PLATFORM_ERROR:
+            message = "GLFW_PLATFORM_ERROR";
+            break;
+
+        case GLFW_FORMAT_UNAVAILABLE:
+            message = "GLFW_FORMAT_UNAVAILABLE";
+            break;
+
+        case GLFW_NO_WINDOW_CONTEXT:
+            message = "GLFW_NO_WINDOW_CONTEXT";
+            break;
+
         default:
             message = "GLFW_UNKNOWN_ERROR_CODE";
             break;
     }
-
-    // GWindowManager->m_logger->Error(message + " : " + in_description);
 }
 
-DAEvoid WindowManager::MonitorCallback(GLFWmonitor*   in_monitor,
-                                       DAEint32 const in_event)
+DAEvoid WindowManager::MonitorCallback(GLFWmonitor* in_monitor, DAEint32 const in_event)
 {
     if (in_event == GLFW_CONNECTED)
     {
-        // GWindowManager->m_logger->Error(std::string("Screen connected : ") + glfwGetMonitorName(in_monitor));
-
-        //AddScreen(in_monitor);
     }
 
     else if (in_event == GLFW_DISCONNECTED)
     {
-        // GWindowManager->m_logger->Error(std::string("Screen disconnected : ") + glfwGetMonitorName(in_monitor));
-
-        //RemoveScreen(in_monitor);
     }
 }
 
-DAEvoid WindowManager::JoystickCallback(DAEint32 const in_jid,
-                                        DAEint32 const in_event) noexcept
-{
-    if (in_event == GLFW_CONNECTED)
-    {
-        // GWindowManager->m_logger->Error(std::string("New joystick connected : ") + glfwGetJoystickName(in_jid));
-    }
-
-    else if (in_event == GLFW_DISCONNECTED)
-    {
-        // GWindowManager->m_logger->Error(std::string("Joystick disconnected : ") + glfwGetJoystickName(in_jid));
-    }
-}
+#pragma endregion
 
 DAEvoid WindowManager::AddScreen(GLFWmonitor* in_monitor)
 {
-    m_screens.emplace_back(Screen(in_monitor));
+    auto& screen = m_screens.emplace_back(std::make_unique<Screen>(in_monitor));
+
+    on_screen_created.Invoke(*screen);
 }
 
 DAEvoid WindowManager::RemoveScreen(GLFWmonitor* in_monitor) noexcept
 {
-    for (auto it = m_screens.cbegin(); it != m_screens.cend(); ++it)
+    for (auto it = m_screens.begin(); it != m_screens.end(); ++it)
     {
-        if (it->m_handle == in_monitor)
+        if (it->get()->GetHandle() == in_monitor)
         {
+            on_screen_destroyed.Invoke(*it->get());
+
             m_screens.erase(it);
 
             return;
@@ -109,45 +156,16 @@ DAEvoid WindowManager::DiscoverScreens()
 {
     DAEint32 count;
 
-    GLFWmonitor** monitors = glfwGetMonitors(&count);
+    auto const monitors = glfwGetMonitors(&count);
 
     m_screens.reserve(count);
 
-    for (DAEint32 i = 0; i < count; ++i)
+    for (auto i = 0; i < count; ++i)
     {
         AddScreen(monitors[i]);
     }
 
-    // m_logger->Info("Available screen count : " + std::to_string(count));
-}
-
-WindowManager::~WindowManager() noexcept
-{
-    glfwTerminate();
-
-    // m_logger->Info("GLFW terminated");
-}
-
-DAEbool WindowManager::Initialize()
-{
-    if (glfwInit())
-    {
-        // Setup callbacks.
-        glfwSetErrorCallback   (&ErrorCallback);
-        glfwSetMonitorCallback (&MonitorCallback);
-        glfwSetJoystickCallback(&JoystickCallback);
-
-        // m_logger->Info("GLFW initialized");
-
-        // Setup screens.
-        DiscoverScreens();
-
-        return true;
-    }
-
-    m_logger->Fatal("Failed to initialize GLFW");
-
-    return false;
+    m_logger->Info("Available screen count : " + std::to_string(count));
 }
 
 DAEvoid WindowManager::Update() noexcept
@@ -155,19 +173,23 @@ DAEvoid WindowManager::Update() noexcept
     glfwPollEvents();
 }
 
-Window* WindowManager::CreateWindow(WindowParameters&& in_parameters)
+Window& WindowManager::CreateWindow(WindowParams const& in_params)
 {
-    m_windows.emplace_back(Window()).Initialize(std::move(in_parameters));
+    auto& window = m_windows.emplace_back(std::make_unique<Window>(in_params));
 
-    return &m_windows.back();
+    on_window_created.Invoke(*window);
+
+    return *window;
 }
 
-DAEbool WindowManager::DestroyWindow(Window* in_window) noexcept
+DAEbool WindowManager::DestroyWindow(Window const* in_window) noexcept
 {
-    for (auto it = m_windows.cbegin(); it != m_windows.cend(); ++it)
+    for (auto it = m_windows.begin(); it != m_windows.end(); ++it)
     {
-        if (it->m_handle == in_window->m_handle)
+        if (it->get()->GetHandle() == in_window->m_handle)
         {
+            on_window_destroyed.Invoke(*it->get());
+
             m_windows.erase(it);
 
             return true;
@@ -177,23 +199,24 @@ DAEbool WindowManager::DestroyWindow(Window* in_window) noexcept
     return false;
 }
 
-Window* WindowManager::GetMainWindow() noexcept
-{
-    /** TODO Temporarily return the first window TODO */
-    return m_windows.empty() ? nullptr : &m_windows.front();
-}
-
 Logger* WindowManager::GetLogger() const noexcept
 {
     return m_logger;
 }
 
-std::vector<Window> const& WindowManager::GetWindows() const noexcept
+Window& WindowManager::GetWindow(DAEuint32 const in_index) noexcept
 {
-    return m_windows;
+    return *m_windows[in_index];
 }
 
-std::vector<Screen> const& WindowManager::GetScreens() const noexcept
+Window& WindowManager::GetMainWindow() noexcept
 {
-    return m_screens;
+    return *m_windows.front();
 }
+
+Screen& WindowManager::GetScreen(DAEuint32 const in_index) noexcept
+{
+    return *m_screens[in_index];
+}
+
+#pragma endregion

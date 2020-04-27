@@ -132,6 +132,9 @@ class Worker : NonCopyable
         [[nodiscard]]
         std::thread& Thread() noexcept;
 
+        [[nodiscard]]
+        std::thread::id ID() const noexcept;
+
         #pragma endregion
 
         #pragma region Operators

@@ -58,7 +58,7 @@ class ResourceManager : public Service<ResourceManager>, Unique
         EGCCollectionMode m_collection_mode;
 
         Scheduler& m_scheduler_reference;
-
+        
         // The actual number of resource being processed
         std::atomic<DAEuint64> m_current_operation_count;
 

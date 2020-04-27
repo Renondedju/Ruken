@@ -29,6 +29,7 @@
 #include "Build.hpp"
 #include "KernelProxy.hpp"
 
+#include "Rendering/Renderer.hpp"
 #include "Threading/Scheduler.hpp"
 #include "Windowing/WindowManager.hpp"
 #include "Resource/ResourceManager.hpp"
@@ -42,10 +43,12 @@ DAEvoid Kernel::SetupServices() noexcept
     m_service_provider.ProvideService<Scheduler>();
     m_service_provider.ProvideService<WindowManager>();
     m_service_provider.ProvideService<ResourceManager>();
+    m_service_provider.ProvideService<Renderer>();
 }
 
 DAEvoid Kernel::DestroyServices() noexcept
 {
+    m_service_provider.DestroyService<Renderer>();
     m_service_provider.DestroyService<WindowManager>();
     m_service_provider.DestroyService<ResourceManager>();
 }
@@ -70,16 +73,23 @@ Kernel::Kernel():
 
 DAEint Kernel::Run() noexcept
 {
+    auto* window_manager = m_service_provider.LocateService<WindowManager>();
+
+    WindowParams const params = {};
+
+    Window& window = window_manager->CreateWindow(params);
+
     while (!m_shutdown_requested.load(std::memory_order_acquire))
     {
-        RequestShutdown(0);
+        window_manager->Update();
+
+        if (window.ShouldClose())
+            RequestShutdown(0);
     }
 
     DestroyServices();
 
     m_logger.Info("Cleanup done, exiting application");
-
-    system("pause");
 
     return m_exit_code;
 }
