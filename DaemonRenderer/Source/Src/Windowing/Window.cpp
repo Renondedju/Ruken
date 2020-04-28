@@ -24,20 +24,52 @@
 
 #include "Windowing/Window.hpp"
 
+#ifdef DAEMON_OS_WINDOWS
+    #define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+
+#include <GLFW/glfw3native.h>
+
+#undef CreateWindow
+
+#include "Debug/Logging/Logger.hpp"
+
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructors and Destructor
+#pragma region Constructors
 
-Window::Window(WindowParams const& in_params) noexcept:
-    m_handle    {nullptr},
+Window::Window(Logger* in_logger, WindowParams const& in_params) noexcept:
+    m_logger    {in_logger},
     m_name      {in_params.name}
 {
-    SetupWindow   (in_params);
+    CreateWindow  (in_params);
     SetupCallbacks();
+}
+
+Window::Window(Window&& in_move) noexcept:
+    m_logger                {in_move.m_logger},
+    m_handle                {in_move.m_handle},
+    m_name                  {std::move(in_move.m_name)},
+    on_closed               {std::move(in_move.on_closed)},
+    on_refreshed            {std::move(in_move.on_refreshed)},
+    on_moved                {std::move(in_move.on_moved)},
+    on_resized              {std::move(in_move.on_resized)},
+    on_focused              {std::move(in_move.on_focused)},
+    on_iconified            {std::move(in_move.on_iconified)},
+    on_maximized            {std::move(in_move.on_maximized)},
+    on_framebuffer_resized  {std::move(in_move.on_framebuffer_resized)},
+    on_content_rescaled     {std::move(in_move.on_content_rescaled)}
+{
+    in_move.m_handle = nullptr;
+
+    glfwSetWindowUserPointer(m_handle, this);
 }
 
 Window::~Window() noexcept
 {
+    if (!m_handle)
+        return;
+
     glfwDestroyWindow(m_handle);
 }
 
@@ -49,55 +81,55 @@ Window::~Window() noexcept
 
 DAEvoid Window::WindowPosCallback(GLFWwindow* in_window, DAEint32 const in_x_pos, DAEint32 const in_y_pos) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_moved.Invoke(in_x_pos, in_y_pos);
 }
 
 DAEvoid Window::WindowSizeCallback(GLFWwindow* in_window, DAEint32 const in_width, DAEint32 const in_height) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_resized.Invoke(in_width, in_height);
 }
 
 DAEvoid Window::WindowCloseCallback(GLFWwindow* in_window) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_closed.Invoke();
 }
 
 DAEvoid Window::WindowRefreshCallback(GLFWwindow* in_window) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_refreshed.Invoke();
 }
 
 DAEvoid Window::WindowFocusCallback(GLFWwindow* in_window, DAEint32 const in_focused) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_focused.Invoke(in_focused);
 }
 
 DAEvoid Window::WindowIconifyCallback(GLFWwindow* in_window, DAEint32 const in_iconified) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_iconified.Invoke(in_iconified);
 }
 
 DAEvoid Window::WindowMaximizeCallback(GLFWwindow* in_window, DAEint32 const in_maximized) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_maximized.Invoke(in_maximized);
 }
 
 DAEvoid Window::FramebufferSizeCallback(GLFWwindow* in_window, DAEint32 const in_width, DAEint32 const in_height) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_framebuffer_resized.Invoke(in_width, in_height);
 }
 
 DAEvoid Window::WindowContentScaleCallback(GLFWwindow* in_window, DAEfloat const in_x_scale, DAEfloat const in_y_scale) noexcept
 {
-    if (auto window = GetWindowUserPointer(in_window))
+    if (auto* window = GetWindowUserPointer(in_window))
         window->on_content_rescaled.Invoke(in_x_scale, in_y_scale);
 }
 
@@ -108,11 +140,13 @@ Window* Window::GetWindowUserPointer(GLFWwindow* in_window) noexcept
     return static_cast<Window*>(glfwGetWindowUserPointer(in_window));
 }
 
-DAEvoid Window::SetupWindow(WindowParams const& in_params) noexcept
+DAEvoid Window::CreateWindow(WindowParams const& in_params) noexcept
 {
     glfwDefaultWindowHints();
-    // This is needed because GLFW default to OpenGL context otherwise.
+
+    // This is needed because GLFW defaults to en OpenGL context otherwise.
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
     // Setups the window creation's hints.
     glfwWindowHint(GLFW_RESIZABLE,               in_params.resizable);
     glfwWindowHint(GLFW_VISIBLE,                 in_params.visible);
@@ -128,8 +162,8 @@ DAEvoid Window::SetupWindow(WindowParams const& in_params) noexcept
 
     if (in_params.fullscreen)
     {
-        auto const monitor    = glfwGetPrimaryMonitor();
-        auto const video_mode = glfwGetVideoMode     (monitor);
+        auto* const        monitor    = glfwGetPrimaryMonitor();
+        auto  const* const video_mode = glfwGetVideoMode     (monitor);
 
         m_handle = glfwCreateWindow(video_mode->width, video_mode->height, m_name.c_str(), monitor, nullptr);
     }
@@ -141,7 +175,7 @@ DAEvoid Window::SetupWindow(WindowParams const& in_params) noexcept
     glfwSetWindowOpacity    (m_handle, in_params.opacity);
 }
 
-DAEvoid Window::SetupCallbacks() const noexcept
+DAEvoid Window::SetupCallbacks() noexcept
 {
     glfwSetWindowPosCallback         (m_handle, &WindowPosCallback);
     glfwSetWindowSizeCallback        (m_handle, &WindowSizeCallback);
@@ -156,24 +190,19 @@ DAEvoid Window::SetupCallbacks() const noexcept
 
 #pragma region Setters
 
-DAEvoid Window::SetShouldClose(DAEbool const in_should_close) const noexcept
-{
-    glfwSetWindowShouldClose(m_handle, in_should_close);
-}
-
-DAEvoid Window::SetName(DAEchar const* in_name)
+DAEvoid Window::SetName(DAEchar const* in_name) noexcept
 {
     m_name = in_name;
 
     glfwSetWindowTitle(m_handle, in_name);
 }
 
-DAEvoid Window::SetPosition(VkOffset2D const& in_position) const noexcept
+DAEvoid Window::SetPosition(Position2D const& in_position) const noexcept
 {
     glfwSetWindowPos(m_handle, in_position.x, in_position.y);
 }
 
-DAEvoid Window::SetSizeLimits(VkExtent2D const& in_min_size, VkExtent2D const& in_max_size) const noexcept
+DAEvoid Window::SetSizeLimits(Extent2D const& in_min_size, Extent2D const& in_max_size) const noexcept
 {
     glfwSetWindowSizeLimits(m_handle, in_min_size.width, in_min_size.height,
                                       in_max_size.width, in_max_size.height);
@@ -184,7 +213,7 @@ DAEvoid Window::SetAspectRatio(DAEint32 const in_numerator, DAEint32 const in_de
     glfwSetWindowAspectRatio(m_handle, in_numerator, in_denominator);
 }
 
-DAEvoid Window::SetSize(VkExtent2D const& in_size) const noexcept
+DAEvoid Window::SetSize(Extent2D const& in_size) const noexcept
 {
     glfwSetWindowSize(m_handle, in_size.width, in_size.height);
 }
@@ -231,8 +260,8 @@ DAEvoid Window::RequestAttention() const noexcept
 
 DAEvoid Window::SetFullscreen(DAEbool const in_fullscreen) const noexcept
 {
-    auto const monitor    = glfwGetPrimaryMonitor();
-    auto const video_mode = glfwGetVideoMode     (monitor);
+    auto* const  monitor    = glfwGetPrimaryMonitor();
+    auto  const* video_mode = glfwGetVideoMode     (monitor);
 
     if (in_fullscreen)
         glfwSetWindowMonitor(m_handle, monitor, 0, 0, video_mode->width, video_mode->height, GLFW_DONT_CARE);
@@ -240,24 +269,24 @@ DAEvoid Window::SetFullscreen(DAEbool const in_fullscreen) const noexcept
         glfwSetWindowMonitor(m_handle, nullptr, 0, 0, video_mode->width, video_mode->height, GLFW_DONT_CARE);
 }
 
-DAEvoid Window::SetResizable(DAEbool const in_resizable) const noexcept
-{
-    glfwSetWindowAttrib(m_handle, GLFW_RESIZABLE, in_resizable);
-}
-
 DAEvoid Window::SetDecorated(DAEbool const in_decorated) const noexcept
 {
     glfwSetWindowAttrib(m_handle, GLFW_DECORATED, in_decorated);
 }
 
-DAEvoid Window::SetAutoIconified(DAEbool const in_auto_iconified) const noexcept
+DAEvoid Window::SetResizable(DAEbool const in_resizable) const noexcept
 {
-    glfwSetWindowAttrib(m_handle, GLFW_AUTO_ICONIFY, in_auto_iconified);
+    glfwSetWindowAttrib(m_handle, GLFW_RESIZABLE, in_resizable);
 }
 
 DAEvoid Window::SetFloating(DAEbool const in_floating) const noexcept
 {
     glfwSetWindowAttrib(m_handle, GLFW_FLOATING, in_floating);
+}
+
+DAEvoid Window::SetAutoIconified(DAEbool const in_auto_iconified) const noexcept
+{
+    glfwSetWindowAttrib(m_handle, GLFW_AUTO_ICONIFY, in_auto_iconified);
 }
 
 DAEvoid Window::SetFocusedOnShow(DAEbool const in_focused_on_show) const noexcept
@@ -284,73 +313,49 @@ DAEbool Window::ShouldClose() const noexcept
     return glfwWindowShouldClose(m_handle) == GLFW_TRUE;
 }
 
-WindowParams Window::GetParameters() const noexcept
+Position2D Window::GetPosition() const noexcept
 {
-    return
-    {
-        m_name,
-        GetPosition(),
-        GetSize(),
-        GetOpacity(),
-        IsFullscreen(),
-        IsFocused(),
-        IsIconified(),
-        IsMaximized(),
-        IsVisible(),
-        IsResizable(),
-        IsDecorated(),
-        IsAutoIconified(),
-        IsFloating(),
-        IsFramebufferTransparent(),
-        IsFocusedOnShow()
-    };
-}
-
-VkOffset2D Window::GetPosition() const noexcept
-{
-    VkOffset2D position;
+    Position2D position = {};
 
     glfwGetWindowPos(m_handle, &position.x, &position.y);
 
     return position;
 }
 
-VkExtent2D Window::GetSize() const noexcept
+Extent2D Window::GetSize() const noexcept
 {
-    VkExtent2D size;
+    Extent2D size = {};
 
-    glfwGetWindowSize(m_handle, reinterpret_cast<DAEint32*>(&size.width),
-                                reinterpret_cast<DAEint32*>(&size.height));
+    glfwGetWindowSize(m_handle, &size.width, &size.height);
 
     return size;
 }
 
-VkExtent2D Window::GetFramebufferSize() const noexcept
+Extent2D Window::GetFramebufferSize() const noexcept
 {
-    VkExtent2D size;
+    Extent2D size = {};
 
-    glfwGetFramebufferSize(m_handle, reinterpret_cast<DAEint32*>(&size.width),
-                                     reinterpret_cast<DAEint32*>(&size.height));
+    glfwGetFramebufferSize(m_handle, &size.width, &size.height);
 
     return size;
 }
 
-VkRect2D Window::GetFrameSize() const noexcept
+Rect2D Window::GetFrameSize() const noexcept
 {
-    VkRect2D frame;
+    Rect2D frame = {};
 
     glfwGetWindowFrameSize(m_handle, 
-                           &frame.offset.x,
-                           &frame.offset.y,
-                           reinterpret_cast<DAEint32*>(&frame.extent.width),
-                           reinterpret_cast<DAEint32*>(&frame.extent.height));
+                           &frame.position.x,
+                           &frame.position.y,
+                           &frame.extent.width,
+                           &frame.extent.height);
 
     return frame;
 }
 
-Vector2f Window::GetContentScale() const noexcept
+Scale2D Window::GetContentScale() const noexcept
 {
-    Vector2f scale;
+    Scale2D scale = {};
 
     glfwGetWindowContentScale(m_handle, &scale.x, &scale.y);
 
@@ -427,6 +432,51 @@ DAEbool Window::IsValid() const noexcept
     return m_handle != nullptr;
 }
 
+#ifdef DAEMON_OS_WINDOWS
+
+HWND Window::GetWin32Window() const noexcept
+{
+    return glfwGetWin32Window(m_handle);
+}
+
+#endif
+
 #pragma endregion
+
+#pragma endregion
+
+#pragma region Operators
+
+Window& Window::operator=(Window&& in_move) noexcept
+{
+    m_logger               = in_move.m_logger;
+    m_handle               = in_move.m_handle;
+    m_name                 = std::move(in_move.m_name);
+    on_closed              = std::move(in_move.on_closed);
+    on_refreshed           = std::move(in_move.on_refreshed);
+    on_moved               = std::move(in_move.on_moved);
+    on_resized             = std::move(in_move.on_resized);
+    on_focused             = std::move(in_move.on_focused);
+    on_iconified           = std::move(in_move.on_iconified);
+    on_maximized           = std::move(in_move.on_maximized);
+    on_framebuffer_resized = std::move(in_move.on_framebuffer_resized);
+    on_content_rescaled    = std::move(in_move.on_content_rescaled);
+
+    in_move.m_handle = nullptr;
+
+    glfwSetWindowUserPointer(m_handle, this);
+
+    return *this;
+}
+
+DAEbool Window::operator==(Window const& in_other) const noexcept
+{
+    return m_handle == in_other.m_handle;
+}
+
+DAEbool Window::operator!=(Window const& in_other) const noexcept
+{
+    return m_handle != in_other.m_handle;
+}
 
 #pragma endregion

@@ -41,9 +41,13 @@ USING_DAEMON_NAMESPACE
 
 VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& in_physical_device, VulkanDevice& in_device, Window& in_window):
     m_device            {in_device},
-    m_physical_device   {in_physical_device.GetHandle()},
-    m_image_extent      {in_window.GetFramebufferSize()}
+    m_physical_device   {in_physical_device.GetHandle()}
 {
+    auto const extent = in_window.GetFramebufferSize();
+
+    m_image_extent.width  = static_cast<DAEuint32>(extent.width);
+    m_image_extent.height = static_cast<DAEuint32>(extent.height);
+
     if (CreateSurface(in_device, in_window) && CreateSwapchain())
         CreateImages();
 }

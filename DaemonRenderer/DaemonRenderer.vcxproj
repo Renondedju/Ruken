@@ -265,7 +265,11 @@
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
+    <ClInclude Include="Source\Include\Windowing\GammaRamp.hpp" />
+    <ClInclude Include="Source\Include\Windowing\Metrics.hpp" />
     <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
+    <ClInclude Include="Source\Include\Windowing\Utilities.hpp" />
+    <ClInclude Include="Source\Include\Windowing\VideoMode.hpp" />
     <ClInclude Include="Source\Include\Windowing\WindowParams.hpp" />
     <ClInclude Include="Source\Include\Windowing\Window.hpp" />
     <ClInclude Include="Source\Include\Windowing\WindowManager.hpp" />
@@ -321,6 +325,7 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Vertex.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\MeshLoadingDescriptor.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\ShaderLoadingDescriptor.cpp" />
