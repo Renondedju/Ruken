@@ -24,40 +24,25 @@
 
 #include "Windowing/Screen.hpp"
 
+#ifdef DAEMON_OS_WINDOWS
+    #define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+
+#include <GLFW/glfw3native.h>
+
+#include "Debug/Logging/Logger.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Constructors
 
-Screen::Screen(GLFWmonitor* in_handle):
-    m_handle        {in_handle},
-    m_name          {glfwGetMonitorName(m_handle)},
-    m_position      {},
-    m_work_area     {},
-    m_physical_size {}
+Screen::Screen(Logger* in_logger, GLFWmonitor* in_handle) noexcept:
+    m_logger    {in_logger},
+    m_handle    {in_handle},
+    m_name      {glfwGetMonitorName(in_handle)}
 {
-    // Retrieves the position, in screen coordinates, of the upper-left corner of the monitor.
-    glfwGetMonitorPos(m_handle, &m_position.x, &m_position.y);
-
-    // Retrieves the position, in screen coordinates, of the upper-left corner of the work area of the
-    // specified monitor along with the work area size in screen coordinates.
-    glfwGetMonitorWorkarea(m_handle, &m_work_area.offset.x,
-                                     &m_work_area.offset.y,
-                                     reinterpret_cast<DAEint32*>(&m_work_area.extent.width),
-                                     reinterpret_cast<DAEint32*>(&m_work_area.extent.height));
-
-    // Retrieves the size, in millimeters, of the display area of the monitor.
-    glfwGetMonitorPhysicalSize(m_handle, reinterpret_cast<DAEint32*>(&m_physical_size.width), 
-                                         reinterpret_cast<DAEint32*>(&m_physical_size.height));
-
-    // Retrieves the ratio between the current DPI and the platform's default DPI.
-    glfwGetMonitorContentScale(m_handle, &m_content_scale.x, &m_content_scale.y);
-
-    // Retrieves all video modes supported by the monitor.
-    DAEint32 count;
-
-    auto const modes = glfwGetVideoModes(m_handle, &count);
-
-    m_video_modes.reserve(count);
+    auto        count = 0;
+    auto const* modes = glfwGetVideoModes(in_handle, &count);
 
     for (auto i = 0; i < count; ++i)
     {
@@ -70,11 +55,27 @@ Screen::Screen(GLFWmonitor* in_handle):
             modes[i].refreshRate
         });
     }
+
+    glfwSetMonitorUserPointer(in_handle, this);
+}
+
+Screen::Screen(Screen&& in_move) noexcept:
+    m_logger        {in_move.m_logger},
+    m_handle        {in_move.m_handle},
+    m_name          {std::move(in_move.m_name)},
+    m_video_modes   {std::move(in_move.m_video_modes)}
+{
+    glfwSetMonitorUserPointer(m_handle, this);
 }
 
 #pragma endregion
 
 #pragma region Methods
+
+Screen* Screen::GetMonitorUserPointer(GLFWmonitor* in_monitor) noexcept
+{
+    return static_cast<Screen*>(glfwGetMonitorUserPointer(in_monitor));
+}
 
 GLFWmonitor* Screen::GetHandle() const noexcept
 {
@@ -86,34 +87,53 @@ std::string const& Screen::GetName() const noexcept
     return m_name;
 }
 
-VkOffset2D const& Screen::GetPosition() const noexcept
+std::vector<VideoMode> const& Screen::GetVideoModes() const noexcept
 {
-    return m_position;
+    return m_video_modes;
 }
 
-VkRect2D const& Screen::GetWorkArea() const noexcept
+Position2D Screen::GetPosition() const noexcept
 {
-    return m_work_area;
+    Position2D position = {}; 
+
+    glfwGetMonitorPos(m_handle, &position.x, &position.y);
+
+    return position;
 }
 
-VkExtent2D const& Screen::GetPhysicalSize() const noexcept
+Rect2D Screen::GetWorkArea() const noexcept
 {
-    return m_physical_size;
+    Rect2D area = {};
+
+    glfwGetMonitorWorkarea(m_handle, &area.position.x,
+                                     &area.position.y,
+                                     &area.extent.width,
+                                     &area.extent.height);
+
+    return area;
 }
 
-Vector2f const& Screen::GetContentScale() const noexcept
+Extent2D Screen::GetPhysicalSize() const noexcept
 {
-    return m_content_scale;
+    Extent2D extent = {};
+
+    glfwGetMonitorPhysicalSize(m_handle, &extent.width, &extent.height);
+
+    return extent;
+}
+
+Scale2D Screen::GetContentScale() const noexcept
+{
+    Scale2D scale = {};
+
+    glfwGetMonitorContentScale(m_handle, &scale.x, &scale.y);
+
+    return scale;
 }
 
 VideoMode Screen::GetCurrentVideoMode() const noexcept
 {
     return *reinterpret_cast<VideoMode const*>(glfwGetVideoMode(m_handle));
-}
-
-std::vector<VideoMode> const& Screen::GetVideoModes() const noexcept
-{
-    return m_video_modes;
 }
 
 GammaRamp Screen::GetGammaRamp() const noexcept
@@ -129,6 +149,46 @@ DAEvoid Screen::SetGamma(DAEfloat const in_gamma) const noexcept
 DAEvoid Screen::SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept
 {
     glfwSetGammaRamp(m_handle, reinterpret_cast<GLFWgammaramp const*>(&in_gamma_ramp));
+}
+
+#ifdef DAEMON_OS_WINDOWS
+
+DAEchar const* Screen::GetWin32Adapter() const noexcept
+{
+    return glfwGetWin32Adapter(m_handle);
+}
+
+DAEchar const* Screen::GetWin32Monitor() const noexcept
+{
+    return glfwGetWin32Monitor(m_handle);
+}
+
+#endif
+
+#pragma endregion
+
+#pragma region Operators
+
+Screen& Screen::operator=(Screen&& in_move) noexcept
+{
+    m_logger      = in_move.m_logger;
+    m_handle      = in_move.m_handle;
+    m_name        = std::move(in_move.m_name);
+    m_video_modes = std::move(in_move.m_video_modes);
+
+    glfwSetMonitorUserPointer(m_handle, this);
+
+    return *this;
+}
+
+DAEbool Screen::operator==(Screen const& in_other) const noexcept
+{
+    return m_handle == in_other.m_handle;
+}
+
+DAEbool Screen::operator!=(Screen const& in_other) const noexcept
+{
+    return m_handle != in_other.m_handle;
 }
 
 #pragma endregion

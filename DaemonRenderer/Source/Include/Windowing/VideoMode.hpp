@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -29,44 +29,39 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This struct contains the parameters used when creating a new window.
- * \note  It can also be retrieved from an existing one.
+ * \brief This describes a single video mode.
  */
-struct WindowParams
+struct VideoMode
 {
     /**
-     * \brief The UTF-8 encoded window title.
+     * \brief The width, in screen coordinates, of the video mode.
      */
-    DAEchar const* name {"NONE"};
+    DAEint32 width {0};
 
     /**
-     * \brief The position, in screen coordinates, of the upper-left corner of the content area of the window.
+     * \brief The height, in screen coordinates, of the video mode.
      */
-    Position2D position {};
+    DAEint32 height {0};
 
     /**
-     * \brief The size, in screen coordinates, of the content area of the window.
+     * \brief The bit depth of the red channel of the video mode.
      */
-    Extent2D size {};
+    DAEint32 red_bits {0};
 
     /**
-     * \brief The opacity (or alpha) value is a positive finite number between 0 and 1.
-     * \note  0 is fully transparent and 1 is fully opaque.
+     * \brief The bit depth of the green channel of the video mode.
      */
-    DAEfloat opacity {1.0f};
+    DAEint32 green_bits {0};
 
-    DAEbool fullscreen              {false};
-    DAEbool resizable               {true};
-    DAEbool visible                 {true};
-    DAEbool decorated               {true};
-    DAEbool focused                 {true};
-    DAEbool auto_iconified          {true};
-    DAEbool floating                {false};
-    DAEbool maximized               {false};
-    DAEbool cursor_centered         {true};
-    DAEbool transparent_framebuffer {false};
-    DAEbool focused_on_show         {true};
-    DAEbool scale_to_monitor        {false};
+    /**
+     * \brief The bit depth of the blue channel of the video mode.
+     */
+    DAEint32 blue_bits {0};
+
+    /**
+     * \brief The refresh rate, in Hz, of the video mode.
+     */
+    DAEint32 refresh_rate {0};
 };
 
 END_DAEMON_NAMESPACE

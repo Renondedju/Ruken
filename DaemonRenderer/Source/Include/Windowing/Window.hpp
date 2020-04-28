@@ -24,17 +24,17 @@
 
 #pragma once
 
-#define GLFW_INCLUDE_NONE
-
-#include <glfw/glfw3.h>
-
-#include "Vector/Vector.hpp"
-
 #include "Functional/Event.hpp"
 
 #include "Windowing/WindowParams.hpp"
 
+#ifdef DAEMON_OS_WINDOWS
+    typedef struct HWND__* HWND;
+#endif
+
 BEGIN_DAEMON_NAMESPACE
+
+class Logger;
 
 /**
  * \brief Manages a GLFW window.
@@ -42,7 +42,7 @@ BEGIN_DAEMON_NAMESPACE
 class Window
 {
     /**
-     * \brief WindowManager is the only class who can create a Window.
+     * \brief WindowManager is the only class able to can create a Window.
      */
     friend class WindowManager;
 
@@ -50,17 +50,15 @@ class Window
 
         #pragma region Members
 
-        GLFWwindow* m_handle;
-        std::string m_name;
+        Logger*     m_logger    {nullptr};
+        GLFWwindow* m_handle    {nullptr};
+        std::string m_name      {};
 
         #pragma endregion
 
         #pragma region Constructors
 
-
-        /**
-         * \brief Creates a window with the specified parameters.
-         */
+        explicit Window(Logger* in_logger, WindowParams const& in_params) noexcept;
 
         #pragma endregion
 
@@ -68,78 +66,22 @@ class Window
 
         #pragma region Callbacks
         
-        /**
-         * \param in_window The window that was moved.
-         * \param in_x_pos  The new x-coordinate, in screen coordinates, of the upper-left corner of the content area of the window.
-         * \param in_y_pos  The new y-coordinate, in screen coordinates, of the upper-left corner of the content area of the window.
-         */
-        static DAEvoid WindowPosCallback(GLFWwindow* in_window, DAEint32 in_x_pos, DAEint32 in_y_pos) noexcept;
-
-        /**
-         * \param in_window The window that was resized.
-         * \param in_width  The new width, in screen coordinates, of the window.
-         * \param in_height The new height, in screen coordinates, of the window.
-         */
-        static DAEvoid WindowSizeCallback(GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
-
-        /**
-         * \param in_window The window that the user attempted to close.
-         */
-        static DAEvoid WindowCloseCallback(GLFWwindow* in_window) noexcept;
-
-        /**
-         * \param in_window The window whose content needs to be refreshed.
-         */
-        static DAEvoid WindowRefreshCallback(GLFWwindow* in_window) noexcept;
-
-        /**
-         * \param in_window  The window that gained or lost input focus.
-         * \param in_focused 'GLFW_TRUE' if the window was given input focus, or 'GLFW_FALSE' if it lost it.
-         */
-        static DAEvoid WindowFocusCallback(GLFWwindow* in_window, DAEint32 in_focused) noexcept;
-
-        /**
-         * \param in_window    The window that was iconified or restored.
-         * \param in_iconified 'GLFW_TRUE' if the window was iconified, or 'GLFW_FALSE' if it was restored.
-         */
-        static DAEvoid WindowIconifyCallback(GLFWwindow* in_window, DAEint32 in_iconified) noexcept;
-
-        /**
-         * \param in_window    The window that was maximized or restored.
-         * \param in_maximized 'GLFW_TRUE' if the window was maximized, or 'GLFW_FALSE' if it was restored.
-         */
-        static DAEvoid WindowMaximizeCallback(GLFWwindow* in_window, DAEint32 in_maximized) noexcept;
-
-        /**
-         * \param in_window The window whose framebuffer was resized.
-         * \param in_width  The new width, in pixels, of the framebuffer.
-         * \param in_height The new height, in pixels, of the framebuffer.
-         */
-        static DAEvoid FramebufferSizeCallback(GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
-
-        /**
-         * \param in_window  The window whose content scale changed.
-         * \param in_x_scale The new x-axis content scale of the window.
-         * \param in_y_scale The new y-axis content scale of the window.
-         */
-        static DAEvoid WindowContentScaleCallback(GLFWwindow* in_window, DAEfloat in_x_scale, DAEfloat in_y_scale) noexcept;
+        static DAEvoid WindowPosCallback            (GLFWwindow* in_window, DAEint32 in_x_pos, DAEint32 in_y_pos) noexcept;
+        static DAEvoid WindowSizeCallback           (GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
+        static DAEvoid WindowCloseCallback          (GLFWwindow* in_window) noexcept;
+        static DAEvoid WindowRefreshCallback        (GLFWwindow* in_window) noexcept;
+        static DAEvoid WindowFocusCallback          (GLFWwindow* in_window, DAEint32 in_focused) noexcept;
+        static DAEvoid WindowIconifyCallback        (GLFWwindow* in_window, DAEint32 in_iconified) noexcept;
+        static DAEvoid WindowMaximizeCallback       (GLFWwindow* in_window, DAEint32 in_maximized) noexcept;
+        static DAEvoid FramebufferSizeCallback      (GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
+        static DAEvoid WindowContentScaleCallback   (GLFWwindow* in_window, DAEfloat in_x_scale, DAEfloat in_y_scale) noexcept;
 
         #pragma endregion
 
-        /**
-         * \return The current value of the user-defined pointer of the specified window.
-         */
         static Window* GetWindowUserPointer(GLFWwindow* in_window) noexcept;
         
-        /**
-         * \brief Creates a window with the specified parameters.
-         */
-        DAEvoid SetupWindow(WindowParams const& in_params) noexcept;
-
-        /**
-         * \brief Sets the callbacks for the newly created window.
-         */
-        DAEvoid SetupCallbacks() const noexcept;
+        DAEvoid CreateWindow    (WindowParams const& in_params) noexcept;
+        DAEvoid SetupCallbacks  () noexcept;
 
         #pragma endregion
 
@@ -147,24 +89,50 @@ class Window
 
         #pragma region Events
 
-        Event<DAEint32, DAEint32>   on_moved;
-        Event<DAEint32, DAEint32>   on_resized;
-        Event<>                     on_closed;
-        Event<>                     on_refreshed;
-        Event<DAEbool>              on_focused;
-        Event<DAEbool>              on_iconified;
-        Event<DAEbool>              on_maximized;
-        Event<DAEint32, DAEint32>   on_framebuffer_resized;
-        Event<DAEfloat, DAEfloat>   on_content_rescaled;
+        Event<> on_closed       {};
+        Event<> on_refreshed    {};
+
+        /**
+         * \brief Event raised with the new coordinates, in screen coordinates, of the upper-left corner of the content area of the window.
+         */
+        Event<DAEint32, DAEint32> on_moved {};
+
+        /**
+         * \brief Event raised with the new extent, in screen coordinates, of the window.
+         */
+        Event<DAEint32, DAEint32> on_resized {};
+
+        /**
+         * \brief Event raised with True if the window was given input focus, or False if it lost it.
+         */
+        Event<DAEbool> on_focused {};
+
+        /**
+         * \brief Event raised with True if the window was iconified, or False if it was restored.
+         */
+        Event<DAEbool> on_iconified {};
+
+        /**
+         * \brief Event raised with True if the window was maximized, or False if it was restored.
+         */
+        Event<DAEbool> on_maximized {};
+
+        /**
+         * \brief Event raised with the new extent, in pixels, of the framebuffer.
+         */
+        Event<DAEint32, DAEint32> on_framebuffer_resized {};
+
+        /**
+         * \brief Event raised with the new axis content scale of the window
+         */
+        Event<DAEfloat, DAEfloat> on_content_rescaled {};
 
         #pragma endregion
 
-        #pragma region Constructors and Destructor
-
-        explicit Window(WindowParams const& in_params) noexcept;
+        #pragma region Constructors
 
         Window(Window const&    in_copy) = delete;
-        Window(Window&&         in_move) = default;
+        Window(Window&&         in_move) noexcept;
 
         ~Window() noexcept;
 
@@ -175,21 +143,15 @@ class Window
         #pragma region Setters
 
         /**
-         * \brief This can be used to override the user's attempt to close this window,
-         *        or to signal that it should be closed.
+         * \brief This function sets the window title, encoded as UTF-8, of the specified window.
          */
-        DAEvoid SetShouldClose(DAEbool in_should_close) const noexcept;
-
-        /**
-         * \brief Sets the title, encoded as UTF-8, of this window.
-         */
-        DAEvoid SetName(DAEchar const* in_name);
+        DAEvoid SetName(DAEchar const* in_name) noexcept;
 
         /**
          * \brief Sets the position, in screen coordinates, of the upper-left corner of the content area of the window.
          * \note  If the window is a full screen window, this function does nothing.
          */
-        DAEvoid SetPosition(VkOffset2D const& in_position) const noexcept;
+        DAEvoid SetPosition(Position2D const& in_position) const noexcept;
 
         /**
          * \brief Sets the size limits of the content area of the window.
@@ -197,12 +159,14 @@ class Window
          * \param in_max_size The maximum size, in screen coordinates, of the content area.
          * \note  If the window is full screen, the size limits only take effect once it is made windowed.
          *        If the window is not resizable, this function does nothing.
+         *        The size limits are applied immediately to a windowed mode window and may cause it to be resized.
          */
-        DAEvoid SetSizeLimits(VkExtent2D const& in_min_size,
-                              VkExtent2D const& in_max_size) const noexcept;
+        DAEvoid SetSizeLimits(Extent2D const& in_min_size, Extent2D const& in_max_size) const noexcept;
 
         /**
          * \brief Sets the required aspect ratio of the content area of the window.
+         *        The aspect ratio is specified as a numerator and a denominator and both values must be greater than zero.
+         *        For example, the common 16:9 aspect ratio is specified as 16 and 9, respectively.
          * \note  If the window is full screen, the aspect ratio only takes effect once it is made windowed.
          *        If the window is not resizable, this function does nothing.
          */
@@ -213,10 +177,11 @@ class Window
          * \note  For full screen windows, this function updates the resolution of its desired video mode
          *        and switches to the video mode closest to it, without affecting the window's context.
          */
-        DAEvoid SetSize(VkExtent2D const& in_size) const noexcept;
+        DAEvoid SetSize(Extent2D const& in_size) const noexcept;
 
         /**
          * \brief Sets the opacity of the window, including any decorations.
+         *        The opacity (or alpha) value is a positive finite number between zero and one, where zero is fully transparent and one is fully opaque.
          * \note  A window created with framebuffer transparency may not use whole window transparency.
          *        The results of doing this are undefined.
          */
@@ -224,6 +189,7 @@ class Window
 
         /**
          * \brief Iconifies (minimizes) the window if it was previously restored.
+         *        If the window is already iconified, this function does nothing.
          * \note  If the specified window is a full screen window,
          *        the original monitor resolution is restored until the window is restored.
          */
@@ -231,6 +197,7 @@ class Window
 
         /**
          * \brief Restores the window if it was previously iconified (minimized) or maximized.
+         *        If the window is already restored, this function does nothing.
          * \note  If the specified window is a full screen window,
          *        the resolution chosen for the window is restored on the selected monitor.
          */
@@ -238,12 +205,14 @@ class Window
 
         /**
          * \brief Maximizes the window if it was previously not maximized.
+         *        If the window is already maximized, this function does nothing.
          * \note  If the window is a full screen window, this function does nothing.
          */
         DAEvoid Maximize() const noexcept;
 
         /**
          * \brief Makes the window visible if it was previously hidden.
+         *        If the window is already visible or is in full screen mode, this function does nothing.
          * \note  By default, windowed mode windows are focused when shown.
          *        Set the 'focused_on_show' parameter to change this behavior for a newly created window.
          */
@@ -251,6 +220,7 @@ class Window
 
         /**
          * \brief Hides the window if it was previously visible.
+         *        If the window is already hidden or is in full screen mode, this function does nothing.
          */
         DAEvoid Hide() const noexcept;
 
@@ -263,6 +233,7 @@ class Window
 
         /**
          * \brief Requests user attention to the window.
+         * \note  On platforms where this is not supported, attention is requested to the application as a whole.
          */
         DAEvoid RequestAttention() const noexcept;
 
@@ -274,28 +245,28 @@ class Window
         DAEvoid SetFullscreen(DAEbool in_fullscreen) const noexcept;
 
         /**
-         * \brief Sets whether the specified window is resizable by the user.
-         */
-        [[nodiscard]]
-        DAEvoid SetResizable(DAEbool in_resizable) const noexcept;
-
-        /**
          * \brief Sets whether the specified window has decorations.
          */
         [[nodiscard]]
         DAEvoid SetDecorated(DAEbool in_decorated) const noexcept;
 
         /**
-         * \brief Sets whether the specified full screen window is iconified on focus loss.
+         * \brief Sets whether the specified window is resizable by the user.
          */
         [[nodiscard]]
-        DAEvoid SetAutoIconified(DAEbool in_auto_iconified) const noexcept;
+        DAEvoid SetResizable(DAEbool in_resizable) const noexcept;
 
         /**
          * \brief Sets whether the specified window is floating, also called topmost or always-on-top..
          */
         [[nodiscard]]
         DAEvoid SetFloating(DAEbool in_floating) const noexcept;
+
+        /**
+         * \brief Sets whether the specified full screen window is iconified on focus loss.
+         */
+        [[nodiscard]]
+        DAEvoid SetAutoIconified(DAEbool in_auto_iconified) const noexcept;
 
         /**
          * \brief Sets whether the window will be given input focus when shown.
@@ -307,51 +278,37 @@ class Window
 
         #pragma region Getters
 
-        /**
-         * \return Opaque window object.
-         */
         [[nodiscard]]
         GLFWwindow* GetHandle() const noexcept;
-
-        /**
-         * \return The UTF-8 encoded window title.
-         */
         [[nodiscard]]
         std::string const& GetName() const noexcept;
-
         [[nodiscard]]
         DAEbool ShouldClose() const noexcept;
-
-        /**
-         * \return The window's current parameters.
-         */
-        [[nodiscard]]
-        WindowParams GetParameters() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the content area of the window.
          */
         [[nodiscard]]
-        VkOffset2D GetPosition() const noexcept;
+        Position2D GetPosition() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of the content area of the window.
          */
         [[nodiscard]]
-        VkExtent2D GetSize() const noexcept;
+        Extent2D GetSize() const noexcept;
 
         /**
          * \return The size, in pixels, of the framebuffer of the window.
          */
         [[nodiscard]]
-        VkExtent2D GetFramebufferSize() const noexcept;
+        Extent2D GetFramebufferSize() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of each edge of the frame of the window.
          * \note   This size includes the title bar, if the window has one.
          */
         [[nodiscard]]
-        VkRect2D GetFrameSize() const noexcept;
+        Rect2D GetFrameSize() const noexcept;
 
         /**
          * \return The content scale for the window (the ratio between the current DPI and the platform's default DPI).
@@ -359,7 +316,7 @@ class Window
          *         on which monitor the system considers the window to be on.
          */
         [[nodiscard]]
-        Vector2f GetContentScale() const noexcept;
+        Scale2D GetContentScale() const noexcept;
 
         /**
          * \return The opacity of the window, including any decorations (between 0 and 1).
@@ -446,12 +403,24 @@ class Window
         [[nodiscard]]
         DAEbool IsValid() const noexcept;
 
+        #ifdef DAEMON_OS_WINDOWS
+
+        /**
+         * \return The HWND of the specified window, or NULL if an error occurred.
+         */
+        HWND GetWin32Window() const noexcept;
+
+        #endif
+
         #pragma endregion
 
         #pragma region Operators
 
         Window& operator=(Window const& in_copy) = delete;
-        Window& operator=(Window&&      in_move) = default;
+        Window& operator=(Window&&      in_move) noexcept;
+
+        DAEbool operator==(Window const& in_other) const noexcept;
+        DAEbool operator!=(Window const& in_other) const noexcept;
 
         #pragma endregion
 };

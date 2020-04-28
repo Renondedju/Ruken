@@ -24,29 +24,39 @@
 
 #include "Windowing/WindowManager.hpp"
 
-#include "Core/ServiceProvider.hpp"
+#include "Kernel.hpp"
+#include "KernelProxy.hpp"
+
+#include "Debug/Logging/Logger.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
-WindowManager::WindowManager(ServiceProvider& in_service_provider):
-    Service<WindowManager>  {in_service_provider},
-    m_logger                {in_service_provider.LocateService<Logger>()->AddChild("Windowing")}
+WindowManager::WindowManager(ServiceProvider& in_service_provider) noexcept:
+    Service {in_service_provider}
 {
-    glfwSetErrorCallback(&ErrorCallback);
+    if (auto* root_logger = in_service_provider.LocateService<Logger>())
+        m_logger = root_logger->AddChild("Windowing");
 
-    if (glfwInit())
+    // TODO : SetErrorCallback
+
+    if (!glfwInit())
     {
-        glfwSetMonitorCallback(&MonitorCallback);
+        if (m_logger)
+            m_logger->Fatal("Failed to initialize GLFW!");
 
-        DiscoverScreens();
+        m_service_provider.LocateService<KernelProxy>()->GetKernelReference().RequestShutdown(1);
 
-        m_logger->Info("GLFW initialized successfully.");
+        return;
     }
 
-    else
-        m_logger->Fatal("Failed to initialize GLFW!");
+    if (m_logger)
+        m_logger->Info("GLFW initialized.");
+
+    SetupScreens();
+
+    // TODO : SetMonitorCallback
 }
 
 WindowManager::~WindowManager() noexcept
@@ -56,167 +66,51 @@ WindowManager::~WindowManager() noexcept
 
     glfwTerminate();
 
-    m_logger->Info("GLFW terminated.");
+    if (m_logger)
+        m_logger->Info("GLFW terminated.");
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-#pragma region Callbacks
-
-DAEvoid WindowManager::ErrorCallback(DAEint32 const in_error_code, DAEchar const*in_description)
+DAEvoid WindowManager::SetupScreens() noexcept
 {
-    std::string message;
-
-    switch (in_error_code)
-    {
-        case GLFW_NOT_INITIALIZED:
-            message = "GLFW_NOT_INITIALIZED";
-            break;
-
-        case GLFW_NO_CURRENT_CONTEXT:
-            message = "GLFW_NO_CURRENT_CONTEXT";
-            break;
-
-        case GLFW_INVALID_ENUM:
-            message = "GLFW_INVALID_ENUM";
-            break;
-
-        case GLFW_INVALID_VALUE:
-            message = "GLFW_INVALID_VALUE";
-            break;
-
-        case GLFW_OUT_OF_MEMORY:
-            message = "GLFW_OUT_OF_MEMORY";
-            break;
-
-        case GLFW_API_UNAVAILABLE:
-            message = "GLFW_API_UNAVAILABLE";
-            break;
-
-        case GLFW_VERSION_UNAVAILABLE:
-            message = "GLFW_VERSION_UNAVAILABLE";
-            break;
-
-        case GLFW_PLATFORM_ERROR:
-            message = "GLFW_PLATFORM_ERROR";
-            break;
-
-        case GLFW_FORMAT_UNAVAILABLE:
-            message = "GLFW_FORMAT_UNAVAILABLE";
-            break;
-
-        case GLFW_NO_WINDOW_CONTEXT:
-            message = "GLFW_NO_WINDOW_CONTEXT";
-            break;
-
-        default:
-            message = "GLFW_UNKNOWN_ERROR_CODE";
-            break;
-    }
-}
-
-DAEvoid WindowManager::MonitorCallback(GLFWmonitor* in_monitor, DAEint32 const in_event)
-{
-    if (in_event == GLFW_CONNECTED)
-    {
-    }
-
-    else if (in_event == GLFW_DISCONNECTED)
-    {
-    }
-}
-
-#pragma endregion
-
-DAEvoid WindowManager::AddScreen(GLFWmonitor* in_monitor)
-{
-    auto& screen = m_screens.emplace_back(std::make_unique<Screen>(in_monitor));
-
-    on_screen_created.Invoke(*screen);
-}
-
-DAEvoid WindowManager::RemoveScreen(GLFWmonitor* in_monitor) noexcept
-{
-    for (auto it = m_screens.begin(); it != m_screens.end(); ++it)
-    {
-        if (it->get()->GetHandle() == in_monitor)
-        {
-            on_screen_destroyed.Invoke(*it->get());
-
-            m_screens.erase(it);
-
-            return;
-        }
-    }
-}
-
-DAEvoid WindowManager::DiscoverScreens()
-{
-    DAEint32 count;
-
-    auto const monitors = glfwGetMonitors(&count);
+    auto        count    = 0;
+    auto* const monitors = glfwGetMonitors(&count);
 
     m_screens.reserve(count);
 
     for (auto i = 0; i < count; ++i)
     {
-        AddScreen(monitors[i]);
-    }
+        Screen screen(m_logger, monitors[i]);
 
-    m_logger->Info("Available screen count : " + std::to_string(count));
+        m_screens.emplace_back(std::move(screen));
+    }
 }
 
-DAEvoid WindowManager::Update() noexcept
+DAEvoid WindowManager::Update() const noexcept
 {
     glfwPollEvents();
 }
 
-Window& WindowManager::CreateWindow(WindowParams const& in_params)
+Window& WindowManager::CreateWindow(WindowParams const& in_params) noexcept
 {
-    auto& window = m_windows.emplace_back(std::make_unique<Window>(in_params));
+    Window window(m_logger, in_params);
 
-    on_window_created.Invoke(*window);
+    auto& new_window = m_windows.emplace_back(std::move(window));
 
-    return *window;
+    on_window_created.Invoke(new_window);
+
+    return new_window;
 }
 
-DAEbool WindowManager::DestroyWindow(Window const* in_window) noexcept
+DAEvoid WindowManager::DestroyWindow(Window const& in_window) noexcept
 {
-    for (auto it = m_windows.begin(); it != m_windows.end(); ++it)
-    {
-        if (it->get()->GetHandle() == in_window->m_handle)
-        {
-            on_window_destroyed.Invoke(*it->get());
+    auto const it = std::find(m_windows.cbegin(), m_windows.cend(), in_window);
 
-            m_windows.erase(it);
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-Logger* WindowManager::GetLogger() const noexcept
-{
-    return m_logger;
-}
-
-Window& WindowManager::GetWindow(DAEuint32 const in_index) noexcept
-{
-    return *m_windows[in_index];
-}
-
-Window& WindowManager::GetMainWindow() noexcept
-{
-    return *m_windows.front();
-}
-
-Screen& WindowManager::GetScreen(DAEuint32 const in_index) noexcept
-{
-    return *m_screens[in_index];
+    if (it != m_windows.cend())
+        m_windows.erase(it);
 }
 
 #pragma endregion

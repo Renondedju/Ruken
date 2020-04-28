@@ -24,12 +24,10 @@
 
 #pragma once
 
+#include "Core/Service.hpp"
+
 #include "Windowing/Screen.hpp"
 #include "Windowing/Window.hpp"
-
-#include "Core/Service.hpp"
-#include "Types/Unique.hpp"
-#include "Debug/Logging/Logger.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -41,48 +39,24 @@ class Logger;
 class WindowManager final: public Service<WindowManager>
 {
     private:
-    
+
+        using Service<WindowManager>::Service;
+
         #pragma region Members
 
-        Logger* m_logger;
+        Logger* m_logger {nullptr};
 
-        std::vector<std::unique_ptr<Window>> m_windows;
-        std::vector<std::unique_ptr<Screen>> m_screens;
+        std::vector<Window> m_windows {};
+        std::vector<Screen> m_screens {};
 
         #pragma endregion
 
         #pragma region Methods
 
-        #pragma region Callbacks
-
-        /**
-         * \param in_error_code  An error code.
-         * \param in_description A UTF-8 encoded string describing the error.
-         */
-        static DAEvoid ErrorCallback(DAEint32 in_error_code, DAEchar const* in_description);
-
-        /**
-         * \param in_monitor The monitor that was connected or disconnected.
-         * \param in_event   One of 'GLFW_CONNECTED' or 'GLFW_DISCONNECTED'.
-         */
-        static DAEvoid MonitorCallback(GLFWmonitor* in_monitor, DAEint32 in_event);
-
-        #pragma endregion
-
-        /**
-         * \brief Creates a screen object managing the specified monitor.
-         */
-        DAEvoid AddScreen(GLFWmonitor* in_monitor);
-
-        /**
-         * \brief Destroys the screen object managing the specified monitor.
-         */
-        DAEvoid RemoveScreen(GLFWmonitor* in_monitor) noexcept;
-
         /**
          * \brief Finds all connected monitors and creates the corresponding screen objects to manage them.
          */
-        DAEvoid DiscoverScreens();
+        DAEvoid SetupScreens() noexcept;
 
         #pragma endregion
 
@@ -90,21 +64,18 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Events
 
-        Event<Window&> on_window_created;
-        Event<Window&> on_window_destroyed;
-        Event<Screen&> on_screen_created;
-        Event<Screen&> on_screen_destroyed;
+        Event<Window const&> on_window_created      {};
+        Event<Window const&> on_window_destroyed    {};
 
         #pragma endregion
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        using Service<WindowManager>::Service;
-
-        WindowManager(ServiceProvider& in_service_provider);
+        explicit WindowManager(ServiceProvider& in_service_provider) noexcept;
         
-        WindowManager(WindowManager const& in_other) = delete;
-        WindowManager(WindowManager&&      in_other) = delete;
+        WindowManager(WindowManager const&  in_copy) = delete;
+        WindowManager(WindowManager&&       in_move) = delete;
+
         ~WindowManager() noexcept;
 
         #pragma endregion
@@ -114,41 +85,17 @@ class WindowManager final: public Service<WindowManager>
         /**
          * \brief Processes all pending events.
          */
-        DAEvoid Update() noexcept;
+        DAEvoid Update() const noexcept;
 
         /**
-         * \return A pointer to the window created with the specified parameters.
+         * \return A reference to the newly created window.
          */
-        Window& CreateWindow(WindowParams const& in_params);
+        Window& CreateWindow(WindowParams const& in_params) noexcept;
 
         /**
-         * \return True if the window could be destroyed, else False.
+         * \brief Destroys the specified window if it is managed by the WindowManager.
          */
-        DAEbool DestroyWindow(Window const* in_window) noexcept;
-
-        /**
-         * \return This module's logger.
-         */
-        [[nodiscard]]
-        Logger* GetLogger() const noexcept;
-
-        /**
-         * \return A pointer to the requested window.
-         */
-        [[nodiscard]]
-        Window& GetWindow(DAEuint32 in_index) noexcept;
-
-        /**
-         * \return A pointer to the main window.
-         */
-        [[nodiscard]]
-        Window& GetMainWindow() noexcept;
-
-        /**
-         * \return A pointer to the requested screen.
-         */
-        [[nodiscard]]
-        Screen& GetScreen(DAEuint32 in_index) noexcept;
+        DAEvoid DestroyWindow(Window const& in_window) noexcept;
 
         #pragma endregion
 

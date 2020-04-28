@@ -73,15 +73,19 @@ Kernel::Kernel():
 
 DAEint Kernel::Run() noexcept
 {
-    auto* window_manager = m_service_provider.LocateService<WindowManager>();
+    auto& window_manager = *m_service_provider.LocateService<WindowManager>();
 
-    WindowParams const params = {};
+    WindowParams params = {};
 
-    Window& window = window_manager->CreateWindow(params);
+    params.name        = DAEMON_PROJECT_NAME;
+    params.size.width  = 1600;
+    params.size.height = 900;
+
+    auto& window = window_manager.CreateWindow(params);
 
     while (!m_shutdown_requested.load(std::memory_order_acquire))
     {
-        window_manager->Update();
+        window_manager.Update();
 
         if (window.ShouldClose())
             RequestShutdown(0);

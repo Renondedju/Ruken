@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -29,44 +29,29 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This struct contains the parameters used when creating a new window.
- * \note  It can also be retrieved from an existing one.
+ * \brief This describes the gamma ramp for a monitor.
  */
-struct WindowParams
+struct GammaRamp
 {
     /**
-     * \brief The UTF-8 encoded window title.
+     * \brief An array of value describing the response of the red channel.
      */
-    DAEchar const* name {"NONE"};
+    DAEuint16* red {nullptr};
 
     /**
-     * \brief The position, in screen coordinates, of the upper-left corner of the content area of the window.
+     * \brief An array of value describing the response of the green channel.
      */
-    Position2D position {};
+    DAEuint16* green {nullptr};
 
     /**
-     * \brief The size, in screen coordinates, of the content area of the window.
+     * \brief An array of value describing the response of the blue channel.
      */
-    Extent2D size {};
+    DAEuint16* blue {nullptr};
 
     /**
-     * \brief The opacity (or alpha) value is a positive finite number between 0 and 1.
-     * \note  0 is fully transparent and 1 is fully opaque.
+     * \brief The number of elements in each array.
      */
-    DAEfloat opacity {1.0f};
-
-    DAEbool fullscreen              {false};
-    DAEbool resizable               {true};
-    DAEbool visible                 {true};
-    DAEbool decorated               {true};
-    DAEbool focused                 {true};
-    DAEbool auto_iconified          {true};
-    DAEbool floating                {false};
-    DAEbool maximized               {false};
-    DAEbool cursor_centered         {true};
-    DAEbool transparent_framebuffer {false};
-    DAEbool focused_on_show         {true};
-    DAEbool scale_to_monitor        {false};
+    DAEuint32 size {0u};
 };
 
 END_DAEMON_NAMESPACE
