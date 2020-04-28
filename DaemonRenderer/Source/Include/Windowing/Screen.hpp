@@ -27,7 +27,9 @@
 #include <string>
 #include <vector>
 
+#include "Windowing/Metrics.hpp"
 #include "Windowing/GammaRamp.hpp"
+#include "Windowing/Utilities.hpp"
 #include "Windowing/VideoMode.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -48,10 +50,10 @@ class Screen
 
         #pragma region Members
 
-        Logger*                 m_logger        {nullptr};
-        GLFWmonitor*            m_handle        {nullptr};
-        std::string             m_name          {};
-        std::vector<VideoMode>  m_video_modes   {};
+        Logger*                m_logger      {nullptr};
+        GLFWmonitor*           m_handle      {nullptr};
+        std::string            m_name        {};
+        std::vector<VideoMode> m_video_modes {};
 
         #pragma endregion
 
@@ -71,8 +73,8 @@ class Screen
 
         #pragma region Constructors
 
-        Screen(Screen const&    in_copy) = delete;
-        Screen(Screen&&         in_move) noexcept;
+        Screen(Screen const& in_copy) = delete;
+        Screen(Screen&&      in_move) noexcept;
 
         ~Screen() = default;
 
@@ -80,12 +82,9 @@ class Screen
 
         #pragma region Methods
 
-        [[nodiscard]]
-        GLFWmonitor* GetHandle() const noexcept;
-        [[nodiscard]]
-        std::string const& GetName() const noexcept;
-        [[nodiscard]]
-        std::vector<VideoMode> const& GetVideoModes() const noexcept;
+        [[nodiscard]] GLFWmonitor*                  GetHandle    () const noexcept;
+        [[nodiscard]] std::string            const& GetName      () const noexcept;
+        [[nodiscard]] std::vector<VideoMode> const& GetVideoModes() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the monitor.

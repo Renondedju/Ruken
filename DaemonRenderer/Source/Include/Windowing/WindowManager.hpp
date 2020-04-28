@@ -44,8 +44,7 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Members
 
-        Logger* m_logger {nullptr};
-
+        Logger*             m_logger  {nullptr};
         std::vector<Window> m_windows {};
         std::vector<Screen> m_screens {};
 
@@ -64,8 +63,8 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Events
 
-        Event<Window const&> on_window_created      {};
-        Event<Window const&> on_window_destroyed    {};
+        Event<Window const&> on_window_created   {};
+        Event<Window const&> on_window_destroyed {};
 
         #pragma endregion
 
@@ -73,8 +72,8 @@ class WindowManager final: public Service<WindowManager>
 
         explicit WindowManager(ServiceProvider& in_service_provider) noexcept;
         
-        WindowManager(WindowManager const&  in_copy) = delete;
-        WindowManager(WindowManager&&       in_move) = delete;
+        WindowManager(WindowManager const& in_copy) = delete;
+        WindowManager(WindowManager&&      in_move) = delete;
 
         ~WindowManager() noexcept;
 
@@ -101,8 +100,8 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Operators
 
-        WindowManager& operator=(WindowManager const&   in_copy) = delete;
-        WindowManager& operator=(WindowManager&&        in_move) = delete;
+        WindowManager& operator=(WindowManager const& in_copy) = delete;
+        WindowManager& operator=(WindowManager&&      in_move) = delete;
 
         #pragma endregion
 };

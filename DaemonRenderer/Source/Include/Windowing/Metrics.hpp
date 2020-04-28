@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -28,40 +28,28 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-/**
- * \brief This describes a single video mode.
- */
-struct VideoMode
+struct Position2D
 {
-    /**
-     * \brief The width, in screen coordinates, of the video mode.
-     */
-    DAEint32 width {0};
+    DAEint32 x;
+    DAEint32 y;
+};
 
-    /**
-     * \brief The height, in screen coordinates, of the video mode.
-     */
-    DAEint32 height {0};
+struct Extent2D
+{
+    DAEint32 width;
+    DAEint32 height;
+};
 
-    /**
-     * \brief The bit depth of the red channel of the video mode.
-     */
-    DAEint32 red_bits {0};
+struct Scale2D
+{
+    DAEfloat x;
+    DAEfloat y;
+};
 
-    /**
-     * \brief The bit depth of the green channel of the video mode.
-     */
-    DAEint32 green_bits {0};
-
-    /**
-     * \brief The bit depth of the blue channel of the video mode.
-     */
-    DAEint32 blue_bits {0};
-
-    /**
-     * \brief The refresh rate, in Hz, of the video mode.
-     */
-    DAEint32 refresh_rate {0};
+struct Rect2D
+{
+    Position2D position;
+    Extent2D   extent;
 };
 
 END_DAEMON_NAMESPACE

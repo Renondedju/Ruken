@@ -32,33 +32,6 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-struct Position2D
-{
-    DAEint32 x;
-    DAEint32 y;
-};
-
-struct Extent2D
-{
-    DAEint32 width;
-    DAEint32 height;
-};
-
-struct Scale2D
-{
-    DAEfloat x;
-    DAEfloat y;
-};
-
-struct Rect2D
-{
-    Position2D  position;
-    Extent2D    extent;
-};
-
-namespace windowing
-{
-    DAEchar const* ToString(DAEint32 in_error_code) noexcept;
-}
+DAEchar const* GlfwErrorToString(DAEint32 in_error_code) noexcept;
 
 END_DAEMON_NAMESPACE

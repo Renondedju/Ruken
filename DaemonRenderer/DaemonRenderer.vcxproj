@@ -266,6 +266,7 @@
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
     <ClInclude Include="Source\Include\Windowing\GammaRamp.hpp" />
+    <ClInclude Include="Source\Include\Windowing\Metrics.hpp" />
     <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
     <ClInclude Include="Source\Include\Windowing\Utilities.hpp" />
     <ClInclude Include="Source\Include\Windowing\VideoMode.hpp" />

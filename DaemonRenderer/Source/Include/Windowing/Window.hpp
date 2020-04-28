@@ -26,6 +26,7 @@
 
 #include "Functional/Event.hpp"
 
+#include "Windowing/Utilities.hpp"
 #include "Windowing/WindowParams.hpp"
 
 #ifdef DAEMON_OS_WINDOWS
@@ -50,9 +51,9 @@ class Window
 
         #pragma region Members
 
-        Logger*     m_logger    {nullptr};
-        GLFWwindow* m_handle    {nullptr};
-        std::string m_name      {};
+        Logger*     m_logger {nullptr};
+        GLFWwindow* m_handle {nullptr};
+        std::string m_name   {};
 
         #pragma endregion
 
@@ -66,22 +67,22 @@ class Window
 
         #pragma region Callbacks
         
-        static DAEvoid WindowPosCallback            (GLFWwindow* in_window, DAEint32 in_x_pos, DAEint32 in_y_pos) noexcept;
-        static DAEvoid WindowSizeCallback           (GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
-        static DAEvoid WindowCloseCallback          (GLFWwindow* in_window) noexcept;
-        static DAEvoid WindowRefreshCallback        (GLFWwindow* in_window) noexcept;
-        static DAEvoid WindowFocusCallback          (GLFWwindow* in_window, DAEint32 in_focused) noexcept;
-        static DAEvoid WindowIconifyCallback        (GLFWwindow* in_window, DAEint32 in_iconified) noexcept;
-        static DAEvoid WindowMaximizeCallback       (GLFWwindow* in_window, DAEint32 in_maximized) noexcept;
-        static DAEvoid FramebufferSizeCallback      (GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height) noexcept;
-        static DAEvoid WindowContentScaleCallback   (GLFWwindow* in_window, DAEfloat in_x_scale, DAEfloat in_y_scale) noexcept;
+        static DAEvoid WindowPosCallback         (GLFWwindow* in_window, DAEint32 in_x_pos, DAEint32 in_y_pos)     noexcept;
+        static DAEvoid WindowSizeCallback        (GLFWwindow* in_window, DAEint32 in_width, DAEint32 in_height)    noexcept;
+        static DAEvoid WindowCloseCallback       (GLFWwindow* in_window)                                           noexcept;
+        static DAEvoid WindowRefreshCallback     (GLFWwindow* in_window)                                           noexcept;
+        static DAEvoid WindowFocusCallback       (GLFWwindow* in_window, DAEint32 in_focused)                      noexcept;
+        static DAEvoid WindowIconifyCallback     (GLFWwindow* in_window, DAEint32 in_iconified)                    noexcept;
+        static DAEvoid WindowMaximizeCallback    (GLFWwindow* in_window, DAEint32 in_maximized)                    noexcept;
+        static DAEvoid FramebufferSizeCallback   (GLFWwindow* in_window, DAEint32 in_width,   DAEint32 in_height)  noexcept;
+        static DAEvoid WindowContentScaleCallback(GLFWwindow* in_window, DAEfloat in_x_scale, DAEfloat in_y_scale) noexcept;
 
         #pragma endregion
 
         static Window* GetWindowUserPointer(GLFWwindow* in_window) noexcept;
         
-        DAEvoid CreateWindow    (WindowParams const& in_params) noexcept;
-        DAEvoid SetupCallbacks  () noexcept;
+        DAEvoid CreateWindow  (WindowParams const& in_params) noexcept;
+        DAEvoid SetupCallbacks()                              noexcept;
 
         #pragma endregion
 
@@ -89,8 +90,8 @@ class Window
 
         #pragma region Events
 
-        Event<> on_closed       {};
-        Event<> on_refreshed    {};
+        Event<> on_closed    {};
+        Event<> on_refreshed {};
 
         /**
          * \brief Event raised with the new coordinates, in screen coordinates, of the upper-left corner of the content area of the window.
@@ -131,8 +132,8 @@ class Window
 
         #pragma region Constructors
 
-        Window(Window const&    in_copy) = delete;
-        Window(Window&&         in_move) noexcept;
+        Window(Window const& in_copy) = delete;
+        Window(Window&&      in_move) noexcept;
 
         ~Window() noexcept;
 
@@ -278,10 +279,12 @@ class Window
 
         #pragma region Getters
 
-        [[nodiscard]]
-        GLFWwindow* GetHandle() const noexcept;
-        [[nodiscard]]
-        std::string const& GetName() const noexcept;
+        [[nodiscard]] GLFWwindow*        GetHandle() const noexcept;
+        [[nodiscard]] std::string const& GetName  () const noexcept;
+
+        /**
+         * \return The value of the close flag of the window. 
+         */
         [[nodiscard]]
         DAEbool ShouldClose() const noexcept;
 
