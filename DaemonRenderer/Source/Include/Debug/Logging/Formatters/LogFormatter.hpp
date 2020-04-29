@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include <string>
+
 #include "Debug/Logging/LogRecord.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -36,18 +37,8 @@ class LogFormatter
 {
     protected:
 
-        #pragma region Constructor
-
-        LogFormatter() = default;
-
-        #pragma endregion
-
         #pragma region Methods
 
-        /**
-         * \param in_record The record to compute a label for.
-         * \return The resulting label.
-         */
         [[nodiscard]]
         virtual std::string ComputeLabel(LogRecord const& in_record) const noexcept;
 
@@ -57,41 +48,22 @@ class LogFormatter
 
         #pragma region Constructors
 
-        LogFormatter(LogFormatter const&    in_copy) = delete;
-        LogFormatter(LogFormatter&&         in_move) = delete;
-        virtual ~LogFormatter()                      = default;
+        LogFormatter() = default;
+
+        LogFormatter(LogFormatter const& in_copy) = delete;
+        LogFormatter(LogFormatter&&      in_move) = delete;
+
+        virtual ~LogFormatter() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \param in_record The record to format.
-         * \return The resulting string.
+         * \return The resulting string computed from the record.
          */
         [[nodiscard]]
         virtual std::string Format(LogRecord const& in_record) const noexcept;
-
-        /**
-         * \param in_record The record to format.
-         * \return The resulting string.
-         */
-        [[nodiscard]]
-        virtual std::string FormatTime(LogRecord const& in_record) const noexcept;
-
-        /**
-         * \param in_record The record to format.
-         * \return The resulting string.
-         */
-        [[nodiscard]]
-        virtual std::string FormatException(LogRecord const& in_record) const noexcept;
-
-        /**
-         * \param in_record The record to format.
-         * \return The resulting string.
-         */
-        [[nodiscard]]
-        virtual std::string FormatStack(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 

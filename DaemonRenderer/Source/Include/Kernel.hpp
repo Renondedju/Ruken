@@ -34,8 +34,7 @@
 #include "Core/ServiceProvider.hpp"
 
 #include "Debug/Logging/Logger.hpp"
-#include "Debug/Logging/Handlers/StreamHandler.hpp"
-#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
+#include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -54,9 +53,8 @@ class Kernel
         ServiceProvider m_service_provider;
 
         // Logging
-        Logger&          m_logger;
-        StreamHandler    m_stream_handler;
-        ConsoleFormatter m_console_formatter;
+        Logger&        m_logger;
+        ConsoleHandler m_console_handler;
 
         // Lifetime maintenance
         std::atomic<DAEbool> m_shutdown_requested;

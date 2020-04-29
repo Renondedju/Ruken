@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include "Config.hpp"
 #include "Debug/Logging/Formatters/LogFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -34,20 +33,27 @@ BEGIN_DAEMON_NAMESPACE
  */
 class ConsoleFormatter final : public LogFormatter
 {
-    protected:
+    /**
+     * \brief ConsoleHandler is the only class able to create a ConsoleFormatter.
+     */
+    friend class ConsoleHandler;
+
+    private:
 
         #pragma region Members
 
-        DAEvoid* m_handle;
+        DAEvoid* m_handle {nullptr};
+
+        #pragma endregion
+
+        #pragma region Constructors
+
+        ConsoleFormatter() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
-        /**
-         * \param in_record The record to compute a label for.
-         * \return The resulting label.
-         */
         [[nodiscard]]
         std::string ComputeLabel(LogRecord const& in_record) const noexcept override;
 
@@ -57,11 +63,10 @@ class ConsoleFormatter final : public LogFormatter
 
         #pragma region Constructors
 
-        ConsoleFormatter() noexcept;
-
         ConsoleFormatter(ConsoleFormatter const& in_copy) = delete;
         ConsoleFormatter(ConsoleFormatter&&      in_move) = delete;
-        ~ConsoleFormatter()                               = default;
+
+        ~ConsoleFormatter() = default;
 
         #pragma endregion
 

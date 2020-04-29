@@ -28,10 +28,8 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-StreamHandler::StreamHandler(LogFormatter const* in_formatter,
-                             std::ostream const& in_stream,
-                             ELogLevel    const  in_level) noexcept:
-    LogHandler {in_formatter, in_level},
+StreamHandler::StreamHandler(LogFormatter const& in_formatter, std::ostream const& in_stream) noexcept:
+    LogHandler {in_formatter},
     m_stream   {in_stream.rdbuf()}
 {
 
@@ -41,14 +39,16 @@ StreamHandler::StreamHandler(LogFormatter const* in_formatter,
 
 #pragma region Methods
 
-DAEvoid StreamHandler::Emit(LogRecord const& in_record)
-{
-    m_stream << m_formatter->Format(in_record);
-}
-
 DAEvoid StreamHandler::Flush()
 {
-    m_stream.flush();
+    while (!m_records.Empty())
+    {
+        LogRecord record;
+
+        m_records.Dequeue(record);
+
+        m_stream << m_formatter.Format(record);
+    }
 }
 
 #pragma endregion

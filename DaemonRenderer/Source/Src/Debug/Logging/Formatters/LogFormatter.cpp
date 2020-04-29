@@ -32,7 +32,6 @@ std::string LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcep
 {
     switch (in_record.level)
     {
-        case ELogLevel::NotSet:  return "[NOTSET]";
         case ELogLevel::Debug:   return "[DEBUG]";
         case ELogLevel::Info:    return "[INFO]";
         case ELogLevel::Warning: return "[WARNING]";
@@ -45,22 +44,7 @@ std::string LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcep
 
 std::string LogFormatter::Format(LogRecord const& in_record) const noexcept
 {
-    return ComputeLabel(in_record) + ' ' + in_record.message + "\n";
-}
-
-std::string LogFormatter::FormatTime(LogRecord const& in_record) const noexcept
-{
-    return in_record.message;
-}
-
-std::string LogFormatter::FormatException(LogRecord const& in_record) const noexcept
-{
-    return in_record.message;
-}
-
-std::string LogFormatter::FormatStack(LogRecord const& in_record) const noexcept
-{
-    return in_record.message;
+    return ComputeLabel(in_record) + " " + in_record.message + "\n";
 }
 
 #pragma endregion

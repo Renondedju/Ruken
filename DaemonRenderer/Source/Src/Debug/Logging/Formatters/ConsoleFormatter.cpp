@@ -24,66 +24,42 @@
 
 #include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
-USING_DAEMON_NAMESPACE
-
 #ifdef DAEMON_OS_WINDOWS
 
 #include "Utility/WindowsOS.hpp"
 
-#define DAEMON_FOREGROUND_GREY      (FOREGROUND_INTENSITY)
-#define DAEMON_FOREGROUND_RED       (FOREGROUND_INTENSITY | FOREGROUND_RED)
-#define DAEMON_FOREGROUND_GREEN     (FOREGROUND_INTENSITY | FOREGROUND_GREEN)
-#define DAEMON_FOREGROUND_BLUE      (FOREGROUND_INTENSITY | FOREGROUND_BLUE)
-#define DAEMON_FOREGROUND_YELLOW    (FOREGROUND_INTENSITY | FOREGROUND_RED   | FOREGROUND_GREEN)
-#define DAEMON_FOREGROUND_PURPLE    (FOREGROUND_INTENSITY | FOREGROUND_RED   | FOREGROUND_BLUE)
-#define DAEMON_FOREGROUND_CYAN      (FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE)
-#define DAEMON_FOREGROUND_WHITE     (FOREGROUND_INTENSITY | FOREGROUND_RED   | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define DAEMON_FOREGROUND_GREY   (FOREGROUND_INTENSITY)
+#define DAEMON_FOREGROUND_RED    (FOREGROUND_INTENSITY | FOREGROUND_RED)
+#define DAEMON_FOREGROUND_GREEN  (FOREGROUND_INTENSITY | FOREGROUND_GREEN)
+#define DAEMON_FOREGROUND_BLUE   (FOREGROUND_INTENSITY | FOREGROUND_BLUE)
+#define DAEMON_FOREGROUND_YELLOW (FOREGROUND_INTENSITY | FOREGROUND_RED   | FOREGROUND_GREEN)
+#define DAEMON_FOREGROUND_PURPLE (FOREGROUND_INTENSITY | FOREGROUND_RED   | FOREGROUND_BLUE)
+#define DAEMON_FOREGROUND_CYAN   (FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define DAEMON_FOREGROUND_WHITE  (FOREGROUND_INTENSITY | FOREGROUND_RED   | FOREGROUND_GREEN | FOREGROUND_BLUE)
 
-#define DAEMON_BACKGROUND_GREY      (BACKGROUND_INTENSITY)
-#define DAEMON_BACKGROUND_RED       (BACKGROUND_RED)
-#define DAEMON_BACKGROUND_GREEN     (BACKGROUND_GREEN)
-#define DAEMON_BACKGROUND_BLUE      (BACKGROUND_BLUE)
-#define DAEMON_BACKGROUND_YELLOW    (BACKGROUND_RED   | BACKGROUND_GREEN)
-#define DAEMON_BACKGROUND_PURPLE    (BACKGROUND_RED   | BACKGROUND_BLUE)
-#define DAEMON_BACKGROUND_CYAN      (BACKGROUND_GREEN | BACKGROUND_BLUE)
-#define DAEMON_BACKGROUND_WHITE     (BACKGROUND_RED   | BACKGROUND_GREEN | BACKGROUND_BLUE)
-
-#else
-
-#define DAEMON_FOREGROUND_GREY      
-#define DAEMON_FOREGROUND_RED       
-#define DAEMON_FOREGROUND_GREEN     
-#define DAEMON_FOREGROUND_BLUE      
-#define DAEMON_FOREGROUND_YELLOW    
-#define DAEMON_FOREGROUND_PURPLE    
-#define DAEMON_FOREGROUND_CYAN      
-#define DAEMON_FOREGROUND_WHITE     
-
-#define DAEMON_BACKGROUND_GREY      
-#define DAEMON_BACKGROUND_RED       
-#define DAEMON_BACKGROUND_GREEN     
-#define DAEMON_BACKGROUND_BLUE      
-#define DAEMON_BACKGROUND_YELLOW    
-#define DAEMON_BACKGROUND_PURPLE    
-#define DAEMON_BACKGROUND_CYAN      
-#define DAEMON_BACKGROUND_WHITE
+#define DAEMON_BACKGROUND_GREY   (BACKGROUND_INTENSITY)
+#define DAEMON_BACKGROUND_RED    (BACKGROUND_RED)
+#define DAEMON_BACKGROUND_GREEN  (BACKGROUND_GREEN)
+#define DAEMON_BACKGROUND_BLUE   (BACKGROUND_BLUE)
+#define DAEMON_BACKGROUND_YELLOW (BACKGROUND_RED   | BACKGROUND_GREEN)
+#define DAEMON_BACKGROUND_PURPLE (BACKGROUND_RED   | BACKGROUND_BLUE)
+#define DAEMON_BACKGROUND_CYAN   (BACKGROUND_GREEN | BACKGROUND_BLUE)
+#define DAEMON_BACKGROUND_WHITE  (BACKGROUND_RED   | BACKGROUND_GREEN | BACKGROUND_BLUE)
 
 #endif
 
-#pragma region Constructor
+USING_DAEMON_NAMESPACE
+
+#pragma region Constructors
 
 #ifdef DAEMON_OS_WINDOWS
 
 ConsoleFormatter::ConsoleFormatter() noexcept:
     LogFormatter {},
     m_handle     {GetStdHandle(STD_OUTPUT_HANDLE)}
-{}
-
-#else
-
-ConsoleFormatter::ConsoleFormatter() noexcept:
-    LogFormatter {}
-{}
+{
+    
+}
 
 #endif
 
@@ -93,14 +69,10 @@ ConsoleFormatter::ConsoleFormatter() noexcept:
 
 std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 {
+    #ifdef DAEMON_OS_WINDOWS
+
     switch (in_record.level)
     {
-        #ifdef DAEMON_OS_WINDOWS
-
-        case ELogLevel::NotSet:
-            SetConsoleTextAttribute(m_handle, DAEMON_FOREGROUND_WHITE);
-            break;
-
         case ELogLevel::Debug:
             SetConsoleTextAttribute(m_handle, DAEMON_FOREGROUND_GREY);
             break;
@@ -120,18 +92,9 @@ std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noe
         case ELogLevel::Fatal:
             SetConsoleTextAttribute(m_handle, DAEMON_FOREGROUND_WHITE | DAEMON_BACKGROUND_RED);
             break;
-
-        #else
-
-        case ELogLevel::NotSet:  return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Debug:   return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Info:    return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Warning: return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Error:   return "" + LogFormatter::ComputeLabel(in_record);
-        case ELogLevel::Fatal:   return "" + LogFormatter::ComputeLabel(in_record);
-
-        #endif
     }
+
+    #endif
 
     return LogFormatter::ComputeLabel(in_record);
 }

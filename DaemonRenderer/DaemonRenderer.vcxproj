@@ -132,6 +132,7 @@
     <ClInclude Include="Source\Include\Core\ServiceBase.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\ConsoleFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\FileFormatter.hpp" />
+    <ClInclude Include="Source\Include\Debug\Logging\Handlers\ConsoleHandler.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\LogLevel.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\FileHandler.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\LogHandler.hpp" />
@@ -325,6 +326,7 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
     <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Vertex.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\MeshLoadingDescriptor.cpp" />
@@ -364,7 +366,6 @@
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\StreamHandler.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Formatters\LogFormatter.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Logger.cpp" />
-    <ClCompile Include="Source\Src\Debug\Logging\LogRecord.cpp" />
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
     <ClCompile Include="Source\Src\ECS\ArchetypeBase.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />

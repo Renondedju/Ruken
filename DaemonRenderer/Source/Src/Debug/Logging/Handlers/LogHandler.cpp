@@ -26,64 +26,21 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
+#pragma region Constructors
 
-LogHandler::LogHandler(LogFormatter const* in_formatter,
-                       ELogLevel    const  in_level) noexcept :
-    m_level     {in_level},
+LogHandler::LogHandler(LogFormatter const& in_formatter) noexcept:
     m_formatter {in_formatter}
-{}
+{
+    
+}
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid LogHandler::SetLevel(ELogLevel const in_level) noexcept
-{
-    m_level = in_level;
-}
-
-DAEvoid LogHandler::SetFormatter(LogFormatter const* in_formatter) noexcept
-{
-    m_formatter = in_formatter;
-}
-
-DAEvoid LogHandler::AddFilter(LogFilter const* in_filter)
-{
-    m_filters.push_front(in_filter);
-}
-
-DAEvoid LogHandler::RemoveFilter(LogFilter const* in_filter)
-{
-    m_filters.remove(in_filter);
-}
-
-DAEbool LogHandler::Filter(LogRecord const& in_record) const noexcept
-{
-    for (auto const& filter : m_filters)
-    {
-        if (filter && !filter->Filter(in_record))
-            return false;
-    }
-
-    return true;
-}
-
 DAEvoid LogHandler::Handle(LogRecord const& in_record) noexcept
 {
-    if (Filter(in_record))
-        Emit(in_record);
-}
-
-DAEvoid LogHandler::HandleError(LogRecord const& in_record) noexcept
-{
-    if (Filter(in_record))
-        Emit(in_record);
-}
-
-std::string LogHandler::Format(LogRecord const& in_record) const noexcept
-{
-    return m_formatter->Format(in_record);
+    m_records.Enqueue(LogRecord(in_record));
 }
 
 #pragma endregion

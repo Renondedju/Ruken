@@ -24,19 +24,37 @@
 
 #pragma once
 
-#include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-enum class ELogLevel : DAEint8
+enum class ELogLevel : DAEuint8
 {
-    NotSet  = 0,
-    Debug   = 10,
-    Info    = 20,
-    Warning = 30,
-    Error   = 40,
-    Fatal   = 50
+    /**
+     * \brief Detailed information, typically of interest only when diagnosing problems.
+     */
+    Debug,
+
+    /**
+     * \brief Confirmation that things are working as expected.
+     */
+    Info,
+
+    /**
+     * \brief An indication that something unexpected happened, or indicative of some problem in the near future.
+     * \note  The software is still working as expected.
+     */
+    Warning,
+
+    /**
+     * \brief Due to a more serious problem, the software has not been able to perform some function.
+     */
+    Error,
+
+    /**
+     * \brief A serious error, indicating that the program itself may be unable to continue running.
+     */
+    Fatal
 };
 
 END_DAEMON_NAMESPACE

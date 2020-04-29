@@ -26,7 +26,6 @@
 
 #include <fstream>
 
-#include "Config.hpp"
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -36,7 +35,7 @@ BEGIN_DAEMON_NAMESPACE
  */
 class FileHandler final : public LogHandler
 {
-    protected:
+    private:
 
         #pragma region Members
 
@@ -44,35 +43,26 @@ class FileHandler final : public LogHandler
 
         #pragma endregion
 
-        #pragma region Methods
-
-        /**
-         * \brief Outputs the record to the file.
-         * \param in_record The record to emit.
-         */
-        DAEvoid Emit(LogRecord const& in_record) override;
-
-        #pragma endregion
-
     public:
 
         #pragma region Contructors
 
-        explicit FileHandler(LogFormatter const* in_formatter,
+        explicit FileHandler(LogFormatter const& in_formatter,
                              std::string  const& in_path,
-                             std::ios::openmode  in_mode,
-                             ELogLevel           in_level = ELogLevel::NotSet) noexcept;
+                             std::ios::openmode  in_mode) noexcept;
 
-        FileHandler(FileHandler const&  in_copy) = delete;
-        FileHandler(FileHandler&&       in_move) = delete;
-        ~FileHandler()                           = default;
+        FileHandler(FileHandler const& in_copy) = delete;
+        FileHandler(FileHandler&&      in_move) = delete;
+
+        ~FileHandler() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Flushes the stream.
+         * \brief Empties the entire queue to the file.
+         * \note  This method must not be called on multiple threads at a time.
          */
         DAEvoid Flush() override;
 
