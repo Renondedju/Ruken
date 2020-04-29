@@ -33,6 +33,8 @@
     typedef struct HWND__* HWND;
 #endif
 
+struct GLFWwindow;
+
 BEGIN_DAEMON_NAMESPACE
 
 class Logger;

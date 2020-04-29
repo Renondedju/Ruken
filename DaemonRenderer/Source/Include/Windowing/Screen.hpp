@@ -29,8 +29,9 @@
 
 #include "Windowing/Metrics.hpp"
 #include "Windowing/GammaRamp.hpp"
-#include "Windowing/Utilities.hpp"
 #include "Windowing/VideoMode.hpp"
+
+struct GLFWmonitor;
 
 BEGIN_DAEMON_NAMESPACE
 

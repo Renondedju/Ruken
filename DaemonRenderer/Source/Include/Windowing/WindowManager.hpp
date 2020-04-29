@@ -63,8 +63,8 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Events
 
-        Event<Window const&> on_window_created   {};
-        Event<Window const&> on_window_destroyed {};
+        Event<Window&> on_window_created   {};
+        Event<Window&> on_window_destroyed {};
 
         #pragma endregion
 

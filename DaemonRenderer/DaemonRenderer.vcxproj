@@ -179,7 +179,6 @@
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandPool.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\DescriptorPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\FencePool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanImage.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanInstance.hpp" />
@@ -352,7 +351,6 @@
     <ClCompile Include="Source\Src\Rendering\RenderFrame.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanBuffer.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\DescriptorPool.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanImage.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanLoader.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanPipelineCache.cpp" />
