@@ -26,28 +26,34 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
+#pragma region Constructors
 
-FileHandler::FileHandler(LogFormatter       const* in_formatter,
+FileHandler::FileHandler(LogFormatter       const& in_formatter,
                          std::string        const& in_path,
-                         std::ios::openmode const  in_mode,
-                         ELogLevel          const  in_level) noexcept:
-    LogHandler {in_formatter, in_level},
+                         std::ios::openmode const  in_mode) noexcept:
+    LogHandler {in_formatter},
     m_stream   {in_path, in_mode}
-{}
+{
+
+}
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid FileHandler::Emit(LogRecord const& in_record)
-{
-    m_stream << m_formatter->Format(in_record);
-}
-
 DAEvoid FileHandler::Flush()
 {
-    m_stream.flush();
+    if (!m_stream.is_open())
+        return;
+
+    while (!m_records.Empty())
+    {
+        LogRecord record;
+
+        m_records.Dequeue(record);
+
+        m_stream << m_formatter.Format(record);
+    }
 }
 
 #pragma endregion

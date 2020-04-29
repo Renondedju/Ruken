@@ -26,15 +26,14 @@
 
 #include <ostream>
 
-#include "Config.hpp"
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief This class sends logging output to streams.
+ * \brief This class sends logging output to a stream.
  */
-class StreamHandler final : public LogHandler
+class StreamHandler : public LogHandler
 {
     protected:
 
@@ -44,42 +43,24 @@ class StreamHandler final : public LogHandler
 
         #pragma endregion
 
-        #pragma region Methods
-
-        /**
-         * \brief If a formatter is specified, it is used to format the record.
-         *        The record is then written to the stream with a terminator.
-         * \param in_record The record to emit.
-         * \note If exception information is present, it is formatted and appended to the stream.
-         */
-        DAEvoid Emit(LogRecord const& in_record) override;
-
-        #pragma endregion
-
     public:
 
         #pragma region Contructors
 
-        /**
-         * \brief Initializes the handler
-         * \param in_formatter Formatter to use
-         * \param in_stream Stream to output the logs into
-         * \param in_level Log level of the handler
-         */
-        explicit StreamHandler(LogFormatter const* in_formatter,
-                               std::ostream const& in_stream,
-                               ELogLevel           in_level = ELogLevel::NotSet) noexcept;
+        explicit StreamHandler(LogFormatter const& in_formatter, std::ostream const& in_stream) noexcept;
 
-        StreamHandler(StreamHandler const&  in_copy) = delete;
-        StreamHandler(StreamHandler&&       in_move) = delete;
-        ~StreamHandler()                             = default;
+        StreamHandler(StreamHandler const& in_copy) = delete;
+        StreamHandler(StreamHandler&&      in_move) = delete;
+
+        ~StreamHandler() = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Flushes the stream.
+         * \brief Empties the entire queue to the stream.
+         * \note  This method must not be called on multiple threads at a time.
          */
         DAEvoid Flush() override;
 

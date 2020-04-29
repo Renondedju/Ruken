@@ -22,8 +22,6 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-
 #include "Kernel.hpp"
 #include "Config.hpp"
 #include "Build.hpp"
@@ -57,13 +55,11 @@ Kernel::Kernel():
     m_service_provider   {},
     // Setting up the logger before any other services to make sure that others can use it to output
     // anything while initializing if needed
-    m_logger             {*m_service_provider.ProvideService<Logger>("root", ELogLevel::Debug, nullptr, true)},
-    m_stream_handler     {&m_console_formatter, std::cout},
-    m_console_formatter  {},
+    m_logger             {*m_service_provider.ProvideService<Logger>("Root", ELogLevel::Debug)},
     m_shutdown_requested {false},
     m_exit_code          {0}
 {
-    m_logger.AddHandler(&m_stream_handler);
+    m_logger.AddHandler(&m_console_handler);
 
     m_logger.Info("Booting up " DAEMON_BUILD_INFO);
     m_logger.Info(DAEMON_LICENSE_STR " " DAEMON_COPYRIGHT_STR " (" DAEMON_URL ")");
@@ -89,11 +85,17 @@ DAEint Kernel::Run() noexcept
 
         if (window.ShouldClose())
             RequestShutdown(0);
+
+        // TODO : Call this in a separate thread to avoid stalling ?
+        m_console_handler.Flush();
     }
 
     DestroyServices();
 
     m_logger.Info("Cleanup done, exiting application");
+
+    // TODO : Maybe call this in the destructor ?
+    m_console_handler.Flush();
 
     return m_exit_code;
 }

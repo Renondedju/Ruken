@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -22,24 +22,18 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include <iostream>
 
-#include <string>
+#include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-#include "Debug/Logging/LogLevel.hpp"
+USING_DAEMON_NAMESPACE
 
-BEGIN_DAEMON_NAMESPACE
+#pragma region Constructors
 
-/**
- * \brief Instances of this structure are created automatically by the Logger every time something is logged
- *        and can be created manually.
- *        It contains all the information pertinent to the event being logged.
- */
-struct LogRecord
+ConsoleHandler::ConsoleHandler() noexcept:
+    StreamHandler {m_console_formatter, std::cout}
 {
-    ELogLevel   level       {ELogLevel::Debug};
-    std::string logger_name {""};
-    std::string message     {""};
-};
+    
+}
 
-END_DAEMON_NAMESPACE
+#pragma endregion

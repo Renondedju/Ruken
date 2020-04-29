@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,22 +24,53 @@
 
 #pragma once
 
-#include <string>
+#include "Debug/Logging/Handlers/StreamHandler.hpp"
 
-#include "Debug/Logging/LogLevel.hpp"
+#include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief Instances of this structure are created automatically by the Logger every time something is logged
- *        and can be created manually.
- *        It contains all the information pertinent to the event being logged.
+ * \brief This class sends output to the system console.
  */
-struct LogRecord
+class ConsoleHandler final : public StreamHandler
 {
-    ELogLevel   level       {ELogLevel::Debug};
-    std::string logger_name {""};
-    std::string message     {""};
+    /**
+     * \brief Kernel is the only class able to create a ConsoleHandler.
+     */
+    friend class Kernel;
+
+    private:
+
+        #pragma region Members
+
+        ConsoleFormatter m_console_formatter;
+
+        #pragma endregion
+
+        #pragma region Constructors
+
+        ConsoleHandler() noexcept;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Constructors
+
+        ConsoleHandler(ConsoleHandler const& in_copy) = delete;
+        ConsoleHandler(ConsoleHandler&&      in_move) = delete;
+
+        ~ConsoleHandler() = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        ConsoleHandler& operator=(ConsoleHandler const& in_copy) = delete;
+        ConsoleHandler& operator=(ConsoleHandler&&      in_move) = delete;
+
+        #pragma endregion
 };
 
 END_DAEMON_NAMESPACE

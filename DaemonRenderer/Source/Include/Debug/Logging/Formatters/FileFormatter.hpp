@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include "Config.hpp"
 #include "Debug/Logging/Formatters/LogFormatter.hpp"
 
 BEGIN_DAEMON_NAMESPACE
@@ -38,10 +37,12 @@ class FileFormatter final : public LogFormatter
 
         #pragma region Constructors
 
-        FileFormatter()                             = default;
+        FileFormatter() = default;
+
         FileFormatter(FileFormatter const& in_copy) = delete;
         FileFormatter(FileFormatter&&      in_move) = delete;
-        ~FileFormatter()                            = default;
+
+        ~FileFormatter() = default;
 
         #pragma endregion
 
