@@ -52,14 +52,12 @@ DAEbool VulkanLoader::Initialize() noexcept
 
 DAEvoid VulkanLoader::LoadInstance(VkInstance in_instance) noexcept
 {
-    if (in_instance)
-        volkLoadInstanceOnly(in_instance);
+    volkLoadInstanceOnly(in_instance);
 }
 
 DAEvoid VulkanLoader::LoadDevice(VkDevice in_device) noexcept
 {
-    if (in_device)
-        volkLoadDevice(in_device);
+    volkLoadDevice(in_device);
 }
 
 VkInstance VulkanLoader::GetLoadedInstance() noexcept

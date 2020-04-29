@@ -26,8 +26,6 @@
 
 #include <optional>
 
-#include "Vulkan/Utilities/VulkanConfig.hpp"
-
 #include "Vulkan/Core/VulkanImage.hpp"
 #include "Vulkan/Core/VulkanBuffer.hpp"
 
@@ -50,8 +48,7 @@ class VulkanDeviceAllocator
 
         #pragma region Constructors
 
-        explicit VulkanDeviceAllocator(class VulkanPhysicalDevice const& in_physical_device,
-                                       class VulkanDevice         const& in_device) noexcept;
+        explicit VulkanDeviceAllocator(class VulkanPhysicalDevice const& in_physical_device) noexcept;
 
         VulkanDeviceAllocator(VulkanDeviceAllocator const& in_copy) = delete;
         VulkanDeviceAllocator(VulkanDeviceAllocator&&      in_move) = delete;
@@ -61,6 +58,9 @@ class VulkanDeviceAllocator
         #pragma endregion
 
         #pragma region Methods
+
+        [[nodiscard]]
+        DAEbool IsValid() const noexcept;
 
         [[nodiscard]]
         std::optional<VulkanImage> CreateImage(VkImageCreateInfo       const& in_image_create_info,

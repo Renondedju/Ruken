@@ -42,8 +42,6 @@ DAEvoid VulkanDebug::Initialize(Logger* in_parent_logger) noexcept
         return;
 
     m_logger = in_parent_logger->AddChild("Vulkan");
-
-    m_logger->SetLevel(ELogLevel::Info);
 }
 
 DAEvoid VulkanDebug::Debug(std::string_view const in_message) noexcept
@@ -119,7 +117,7 @@ DAEvoid VulkanDebug::CreateDebugMessenger() noexcept
                                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     debug_messenger_info.pfnUserCallback = DebugCallback;
 
-    VK_ASSERT(vkCreateDebugUtilsMessengerEXT(VulkanLoader::GetLoadedInstance(), &debug_messenger_info, nullptr, &m_debug_messenger));
+    VK_CHECK(vkCreateDebugUtilsMessengerEXT(VulkanLoader::GetLoadedInstance(), &debug_messenger_info, nullptr, &m_debug_messenger));
 }
 
 DAEvoid VulkanDebug::DestroyDebugMessenger() noexcept
@@ -322,6 +320,7 @@ std::string VulkanDebug::ToString(VkDebugUtilsMessageTypeFlagsEXT const in_messa
 
 std::string VulkanDebug::ToString(VkDebugUtilsMessengerCallbackDataEXT const* in_callback_data) noexcept
 {
+    // TODO : needs to look for a better way to format the message.
     std::string output;
 
     output += " - Message ID Number : ";
@@ -347,7 +346,9 @@ std::string VulkanDebug::ToString(VkDebugUtilsMessengerCallbackDataEXT const* in
             output += " | Handle ";
             output += std::to_string(in_callback_data->pObjects[index].objectHandle);
             output += " | Name ";
-            output += in_callback_data->pObjects[index].pObjectName;
+
+            if (in_callback_data->pObjects[index].pObjectName)
+                output += in_callback_data->pObjects[index].pObjectName;
         }
     }
 

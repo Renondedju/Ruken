@@ -99,11 +99,11 @@ class VulkanDebug
          * \param in_size   The number of bytes of data to attach to the object.
          * \param in_tag    The data to be associated with the object.
          */
-        static DAEvoid SetObjectTag(VkObjectType    in_type,
-                                    DAEuint64       in_handle,
-                                    DAEuint64       in_name,
-                                    DAEsize         in_size,
-                                    DAEvoid const*  in_tag) noexcept;
+        static DAEvoid SetObjectTag(VkObjectType   in_type,
+                                    DAEuint64      in_handle,
+                                    DAEuint64      in_name,
+                                    DAEsize        in_size,
+                                    DAEvoid const* in_tag) noexcept;
 
         static std::string ToString(VkResult                                    in_result)        noexcept;
         static std::string ToString(VkObjectType                                in_object)        noexcept;
