@@ -42,7 +42,7 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
 {
     m_logger->SetLevel(ELogLevel::Debug);
 
-    VulkanDebug ::Initialize(*m_logger);
+    VulkanDebug ::Initialize(m_logger);
     VulkanLoader::Initialize();
 
     m_instance         = std::make_unique<VulkanInstance>       ();

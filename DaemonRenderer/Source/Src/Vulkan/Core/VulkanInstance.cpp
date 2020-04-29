@@ -42,8 +42,13 @@ std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
 
     #endif
 
-    VK_KHR_SURFACE_EXTENSION_NAME,
-    VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+    #ifdef DAEMON_CONFIG_DEBUG
+
+    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+
+    #endif
+
+    VK_KHR_SURFACE_EXTENSION_NAME
 };
 
 std::vector<DAEchar const*> VulkanInstance::m_required_validation_layers =
@@ -72,7 +77,7 @@ std::vector<VkValidationFeatureDisableEXT> VulkanInstance::m_disabled_validation
 
 #pragma endregion
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
 VulkanInstance::VulkanInstance() noexcept
 {
@@ -80,7 +85,7 @@ VulkanInstance::VulkanInstance() noexcept
     CheckValidationLayers  ();
     CreateInstance         ();
 
-    VulkanDebug ::CreateDebugMessenger(m_handle);
+    VulkanDebug::CreateDebugMessenger();
 }
 
 VulkanInstance::~VulkanInstance() noexcept
@@ -88,7 +93,7 @@ VulkanInstance::~VulkanInstance() noexcept
     if (!m_handle)
         return;
 
-    VulkanDebug::DestroyDebugMessenger(m_handle);
+    VulkanDebug::DestroyDebugMessenger();
 
     vkDestroyInstance(m_handle, nullptr);
 }
@@ -97,17 +102,19 @@ VulkanInstance::~VulkanInstance() noexcept
 
 #pragma region Methods
 
-DAEvoid VulkanInstance::CheckInstanceExtensions() noexcept
+DAEbool VulkanInstance::CheckInstanceExtensions() noexcept
 {
     auto count = 0u;
 
     // Returns the number of global extension properties.
-    VK_ASSERT(vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr));
+    if (VK_ASSERT(vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr)))
+        return false;
 
     std::vector<VkExtensionProperties> supported_extensions(count);
 
     // Returns the global extension properties.
-    VK_ASSERT(vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data()));
+    if (VK_ASSERT(vkEnumerateInstanceExtensionProperties(nullptr, &count, supported_extensions.data())))
+        return false;
 
     std::set<std::string> required_extensions(m_required_extensions.cbegin(),
                                               m_required_extensions.cend  ());
@@ -118,27 +125,29 @@ DAEvoid VulkanInstance::CheckInstanceExtensions() noexcept
         required_extensions.erase(extension.extensionName);
 
         if (required_extensions.empty())
-            return;
+            return true;
     }
 
     // In case some extensions could not be found, enumerates them.
     for (auto const& extension : required_extensions)
-        VulkanDebug::GetLogger().Fatal("Missing instance extension : " + extension + "!");
+        VulkanDebug::Fatal(("Missing instance extension : " + extension + "!").c_str());
 
-    exit(1);
+    return false;
 }
 
-DAEvoid VulkanInstance::CheckValidationLayers() noexcept
+DAEbool VulkanInstance::CheckValidationLayers() noexcept
 {
     auto count = 0u;
 
     // Returns the number of layer properties available.
-    VK_ASSERT(vkEnumerateInstanceLayerProperties(&count, nullptr));
+    if (VK_ASSERT(vkEnumerateInstanceLayerProperties(&count, nullptr)))
+        return false;
 
     std::vector<VkLayerProperties> supported_layers(count);
 
     // Returns the global layer properties
-    VK_ASSERT(vkEnumerateInstanceLayerProperties(&count, supported_layers.data()));
+    if (VK_ASSERT(vkEnumerateInstanceLayerProperties(&count, supported_layers.data())))
+        return false;
 
     std::set<std::string> required_layers(m_required_validation_layers.cbegin(),
                                           m_required_validation_layers.cend  ());
@@ -149,14 +158,14 @@ DAEvoid VulkanInstance::CheckValidationLayers() noexcept
         required_layers.erase(layer.layerName);
 
         if (required_layers.empty())
-            return;
+            return true;
     }
 
     // In case some layers could not be found, enumerates them.
     for (auto const& layer : required_layers)
-        VulkanDebug::GetLogger().Fatal("Missing validation layer : " + layer + "!");
+        VulkanDebug::Fatal(("Missing validation layer : " + layer + "!").c_str());
 
-    exit(1);
+    return false;
 }
 
 DAEvoid VulkanInstance::CreateInstance() noexcept

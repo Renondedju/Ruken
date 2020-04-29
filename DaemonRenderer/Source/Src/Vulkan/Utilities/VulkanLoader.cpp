@@ -22,33 +22,44 @@
  *  SOFTWARE.
  */
 
+#pragma warning (push, 0)
+
+#define VOLK_IMPLEMENTATION
+
 #include "Vulkan/Utilities/VulkanLoader.hpp"
-#include "Vulkan/Utilities/VulkanConfig.hpp"
+
+#pragma warning (pop)
+
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-DAEvoid VulkanLoader::Initialize()
+DAEbool VulkanLoader::Initialize() noexcept
 {
-    VK_CHECK(volkInitialize());
+    if (VK_ASSERT(volkInitialize()))
+        return false;
 
     if (volkGetInstanceVersion() < VK_API_VERSION_1_2)
     {
-        VulkanDebug::GetLogger().Fatal("Vulkan 1.2 is not supported!");
-        exit(1);
+        VulkanDebug::Fatal("Vulkan 1.2 is not supported!");
+        return false;
     }
+
+    return true;
 }
 
 DAEvoid VulkanLoader::LoadInstance(VkInstance in_instance) noexcept
 {
-    volkLoadInstanceOnly(in_instance);
+    if (in_instance)
+        volkLoadInstanceOnly(in_instance);
 }
 
 DAEvoid VulkanLoader::LoadDevice(VkDevice in_device) noexcept
 {
-    volkLoadDevice(in_device);
+    if (in_device)
+        volkLoadDevice(in_device);
 }
 
 VkInstance VulkanLoader::GetLoadedInstance() noexcept

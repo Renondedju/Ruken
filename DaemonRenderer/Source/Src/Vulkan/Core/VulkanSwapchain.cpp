@@ -165,11 +165,11 @@ DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_windo
         if (m_queue)
             return true;
 
-        VulkanDebug::GetLogger().Error("No queue supports presentation to the surface!");
+        VulkanDebug::Error("No queue supports presentation to the surface!");
     }
 
     else
-        VulkanDebug::GetLogger().Error("Failed to create surface!");
+        VulkanDebug::Error("Failed to create surface!");
 
     return false;
 }
@@ -225,7 +225,7 @@ DAEvoid VulkanSwapchain::CreateImages()
     // Obtains the number of presentable images associated with the swapchain.
     if (vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr) != VK_SUCCESS)
     {
-        VulkanDebug::GetLogger().Error("Failed to create swapchain images!");
+        VulkanDebug::Error("Failed to create swapchain images!");
         return;
     }
 
@@ -265,7 +265,7 @@ DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
 
     if (vkAcquireNextImageKHR(VulkanLoader::GetLoadedDevice(), m_handle, UINT64_MAX, image_available_semaphore.GetHandle(), nullptr, &image_index) != VK_SUCCESS)
     {
-        VulkanDebug::GetLogger().Error("");
+        VulkanDebug::Error("");
         return;
     }
 

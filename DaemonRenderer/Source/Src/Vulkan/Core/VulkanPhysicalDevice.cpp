@@ -155,7 +155,7 @@ DAEvoid VulkanPhysicalDevice::PickPhysicalDevice(VulkanInstance const& in_instan
         }
     }
 
-    VulkanDebug::GetLogger().Fatal("No suitable GPU!");
+    VulkanDebug::Fatal("No suitable GPU!");
 
     exit(1);
 }
@@ -199,7 +199,7 @@ DAEvoid VulkanPhysicalDevice::SetupQueueFamilies() noexcept
     if (m_queue_families.IsComplete())
         return;
 
-    VulkanDebug::GetLogger().Fatal("");
+    VulkanDebug::Fatal("");
     exit(1);
 }
 
