@@ -25,7 +25,6 @@
 #include "Vulkan/Core/VulkanCommandPool.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
-
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
@@ -40,7 +39,7 @@ VulkanCommandPool::VulkanCommandPool(DAEuint32 const in_queue_family, VkCommandP
     command_pool_create_info.flags            = in_flags;
     command_pool_create_info.queueFamilyIndex = in_queue_family;
 
-    VK_ASSERT(vkCreateCommandPool(VulkanLoader::GetLoadedDevice(), &command_pool_create_info, nullptr, &m_handle));
+    VK_CHECK(vkCreateCommandPool(VulkanLoader::GetLoadedDevice(), &command_pool_create_info, nullptr, &m_handle));
 }
 
 VulkanCommandPool::VulkanCommandPool(VulkanCommandPool&& in_move) noexcept:
@@ -71,38 +70,28 @@ std::optional<VulkanCommandBuffer> VulkanCommandPool::AllocateCommandBuffer(VkCo
     command_buffer_allocate_info.level              = in_level;
     command_buffer_allocate_info.commandBufferCount = 1u;
 
-    if (vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, &command_buffer) != VK_SUCCESS)
+    if (VK_CHECK(vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, &command_buffer)))
         return std::nullopt;
 
     return VulkanCommandBuffer(command_buffer, m_handle);
 }
 
-std::vector<VulkanCommandBuffer> VulkanCommandPool::AllocateCommandBuffers(DAEuint32            const in_count,
-                                                                           VkCommandBufferLevel const in_level) const noexcept
+VkCommandPool const& VulkanCommandPool::GetHandle() const noexcept
 {
-    std::vector<VulkanCommandBuffer> command_buffers;
-
-    VkCommandBufferAllocateInfo command_buffer_allocate_info = {};
-
-    command_buffer_allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    command_buffer_allocate_info.commandPool        = m_handle;
-    command_buffer_allocate_info.level              = in_level;
-    command_buffer_allocate_info.commandBufferCount = in_count;
-
-    std::vector<VkCommandBuffer> handles(in_count);
-
-    if (vkAllocateCommandBuffers(VulkanLoader::GetLoadedDevice(), &command_buffer_allocate_info, handles.data()) != VK_SUCCESS)
-        return command_buffers;
-
-    for (auto const& handle : handles)
-        command_buffers.emplace_back(handle, m_handle);
-
-    return command_buffers;
+    return m_handle;
 }
 
-DAEvoid VulkanCommandPool::Reset(VkCommandPoolResetFlags const in_flags) const noexcept
+#pragma endregion
+
+#pragma region Operators
+
+VulkanCommandPool& VulkanCommandPool::operator=(VulkanCommandPool&& in_move) noexcept
 {
-    VK_CHECK(vkResetCommandPool(VulkanLoader::GetLoadedDevice(), m_handle, in_flags));
+    m_handle = in_move.m_handle;
+
+    in_move.m_handle = nullptr;
+
+    return *this;
 }
 
 #pragma endregion

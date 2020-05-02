@@ -113,8 +113,6 @@ class VulkanDebug
         #pragma endregion
 };
 
-#ifdef DAEMON_CONFIG_DEBUG
-
 /**
  * \return True if the result is an error, else False.
  * \note   Use this methods to check the result of non-critical calls to Vulkan functions.
@@ -126,12 +124,5 @@ class VulkanDebug
  * \note   Use this method to check the result of critical calls to Vulkan functions.
  */
 #define VK_ASSERT(result) VulkanDebug::AssertResult(result, #result)
-
-#else
-
-#define VK_CHECK(result) result
-#define VK_ASSERT(result) result
-
-#endif
 
 END_DAEMON_NAMESPACE

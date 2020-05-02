@@ -24,24 +24,58 @@
 
 #include "Vulkan/FencePool.hpp"
 
+
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
+
 USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-VulkanFence& FencePool::RequestFence()
+VulkanFence& FencePool::RequestFence() noexcept
 {
-    while (m_index >= m_fences.size())
-        m_fences.emplace_back();
+    if (m_index.load(std::memory_order_acquire) >= m_fences.size())
+    {
+        std::lock_guard lock(m_mutex);
 
-    return m_fences[m_index++];
+        m_fences.emplace_back();
+    }
+
+    return m_fences[m_index.fetch_add(1u, std::memory_order_release)];
 }
 
-DAEvoid FencePool::Reset() noexcept
+DAEbool FencePool::Wait() const noexcept
 {
-    for (auto const& fence : m_fences)
-        fence.Reset();
+    std::lock_guard lock(m_mutex);
 
-    m_index = 0u;
+    std::vector<VkFence> handles(m_fences.size());
+
+    for (auto const& fence : m_fences)
+        handles.emplace_back(fence.GetHandle());
+
+    if (VK_CHECK(vkWaitForFences(VulkanLoader::GetLoadedDevice(), static_cast<DAEuint32>(handles.size()), handles.data(), VK_TRUE, UINT64_MAX)))
+        return false;
+
+    return true;
+}
+
+DAEbool FencePool::Reset() noexcept
+{
+    {
+        std::lock_guard lock(m_mutex);
+
+        std::vector<VkFence> handles(m_fences.size());
+
+        for (auto const& fence : m_fences)
+            handles.emplace_back(fence.GetHandle());
+
+        if (VK_CHECK(vkResetFences(VulkanLoader::GetLoadedDevice(), static_cast<DAEuint32>(handles.size()), handles.data())))
+            return false;
+    }
+
+    m_index.store(0u, std::memory_order_release);
+
+    return true;
 }
 
 #pragma endregion

@@ -89,11 +89,6 @@ VulkanDeviceAllocator::~VulkanDeviceAllocator() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanDeviceAllocator::IsValid() const noexcept
-{
-    return m_handle != nullptr;
-}
-
 std::optional<VulkanImage> VulkanDeviceAllocator::CreateImage(VkImageCreateInfo       const& in_image_create_info,
                                                               VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
@@ -101,10 +96,19 @@ std::optional<VulkanImage> VulkanDeviceAllocator::CreateImage(VkImageCreateInfo 
     VmaAllocation     allocation      = nullptr;
     VmaAllocationInfo allocation_info = {};
 
-    if (VK_CHECK(vmaCreateImage(m_handle, &in_image_create_info, &in_allocation_create_info, &image, &allocation, &allocation_info)))
+    if (VK_CHECK(vmaCreateImage(m_handle,
+                                &in_image_create_info,
+                                &in_allocation_create_info,
+                                &image,
+                                &allocation,
+                                &allocation_info)))
         return std::nullopt;
 
-    return VulkanImage(image, m_handle, allocation, allocation_info, in_image_create_info.extent);
+    return VulkanImage(image,
+                       m_handle,
+                       allocation,
+                       in_image_create_info.format,
+                       in_image_create_info.extent);
 }
 
 std::optional<VulkanBuffer> VulkanDeviceAllocator::CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
@@ -114,14 +118,24 @@ std::optional<VulkanBuffer> VulkanDeviceAllocator::CreateBuffer(VkBufferCreateIn
     VmaAllocation     allocation      = nullptr;
     VmaAllocationInfo allocation_info = {};
 
-    if (VK_CHECK(vmaCreateBuffer(m_handle, &in_buffer_create_info, &in_allocation_create_info, &buffer, &allocation, &allocation_info)))
+    if (VK_CHECK(vmaCreateBuffer(m_handle,
+                                 &in_buffer_create_info,
+                                 &in_allocation_create_info,
+                                 &buffer,
+                                 &allocation,
+                                 &allocation_info)))
         return std::nullopt;
 
     return VulkanBuffer(buffer,
                         m_handle,
                         allocation,
                         allocation_info,
-                        (in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT) == 0);
+                        in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT);
+}
+
+DAEbool VulkanDeviceAllocator::IsValid() const noexcept
+{
+    return m_handle != nullptr;
 }
 
 #pragma endregion

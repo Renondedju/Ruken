@@ -34,37 +34,50 @@
 BEGIN_DAEMON_NAMESPACE
 
 class VulkanCommandBuffer;
+class VulkanSemaphore;
+class VulkanSwapchain;
 
+/**
+ * \brief RAII-class wrapping a 'VkQueue' object.
+ *        Creating a logical device also creates the queues associated with that device.
+ *        Command buffers must be submitted to a queue for execution.
+ * \note  A queue does not always support graphics, compute and transfer operations.
+ */
 class VulkanQueue
 {
     private:
 
         #pragma region Members
 
-        VkPhysicalDevice    m_physical_device   {nullptr};
-        VkQueue             m_handle            {nullptr};
-        DAEuint32           m_queue_family      {UINT_MAX};
+        VkPhysicalDevice m_physical_device {nullptr};
+        VkQueue          m_handle          {nullptr};
+        DAEuint32        m_queue_family    {UINT_MAX};
 
-        mutable std::mutex m_mutex;
+        mutable std::mutex m_mutex {};
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        explicit VulkanQueue(VkPhysicalDevice   in_physical_device,
-                             VkQueue            in_handle,
-                             DAEuint32          in_queue_family) noexcept;
+        explicit VulkanQueue(VkPhysicalDevice in_physical_device,
+                             VkQueue          in_handle,
+                             DAEuint32        in_queue_family) noexcept;
 
-        VulkanQueue(VulkanQueue const&  in_copy) = delete;
-        VulkanQueue(VulkanQueue&&       in_move) noexcept;
+        VulkanQueue(VulkanQueue const& in_copy) = delete;
+        VulkanQueue(VulkanQueue&&      in_move) noexcept;
 
         ~VulkanQueue() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
+
+        /**
+         * \brief Waits on the host for the completion of outstanding queue operations on this queue.
+         */
+        DAEvoid WaitIdle() const noexcept;
 
         /**
          * \brief Opens a queue debug label region.
@@ -74,40 +87,58 @@ class VulkanQueue
         DAEvoid BeginLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept;
 
         /**
-         * \brief Closes a queue debug label region.
-         */
-        DAEvoid EndLabel() const noexcept;
-
-        /**
          * \brief Inserts a label into a queue.
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
         DAEvoid InsertLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept; 
 
-        DAEvoid Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence = nullptr) const noexcept;
+        /**
+         * \brief Closes a queue debug label region.
+         */
+        DAEvoid EndLabel() const noexcept;
 
-        DAEvoid Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
+        /**
+         * \brief Submits a single command buffer and an optional fence for execution.
+         * \note  Use this function to quickly submit a transfer operation.
+         */
+        DAEbool Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence = nullptr) const noexcept;
 
-        DAEvoid Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence = nullptr) const noexcept;
+        /**
+         * \brief Submits a sequence of semaphores or command buffers and an optional fence for execution.
+         */
+        DAEbool Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence = nullptr) const noexcept;
 
-        DAEvoid Present(VkPresentInfoKHR const& in_present_info) const noexcept;
+        /**
+         * \brief Submits multiple sequences of semaphores or command buffers and an optional fence for execution.
+         */
+        DAEbool Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
 
-        DAEvoid WaitIdle() const noexcept;
+        /**
+         * \return True if an image could be queued for presentation, else False.
+         */
+        DAEbool Present(VulkanSwapchain const& in_swapchain, VulkanSemaphore const& in_semaphore) const noexcept;
 
-        [[nodiscard]]
-        VkQueue const& GetHandle() const noexcept;
-        [[nodiscard]]
-        DAEuint32 GetQueueFamily() const noexcept;
+        /**
+         * \return True if an image could be queued for presentation, else False.
+         */
+        DAEbool Present(VkPresentInfoKHR const& in_present_info) const noexcept;
+
+        /**
+         * \return True if presentation is supported to the given surface, else False.
+         */
         [[nodiscard]]
         DAEbool IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept;
+
+        [[nodiscard]] VkQueue const& GetHandle     () const noexcept;
+        [[nodiscard]] DAEuint32      GetQueueFamily() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        VulkanQueue& operator=(VulkanQueue const&   in_copy) = delete;
-        VulkanQueue& operator=(VulkanQueue&&        in_move) = delete;
+        VulkanQueue& operator=(VulkanQueue const& in_copy) = delete;
+        VulkanQueue& operator=(VulkanQueue&&      in_move) noexcept;
 
         #pragma endregion
 };

@@ -24,7 +24,10 @@
 
 #include "Rendering/Renderer.hpp"
 
-#include "Core/ServiceProvider.hpp"
+#include "Kernel.hpp"
+#include "KernelProxy.hpp"
+
+#include "Threading/Scheduler.hpp"
 
 #include "Windowing/WindowManager.hpp"
 
@@ -33,63 +36,68 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
 Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
-    Service<Renderer>   {in_service_provider},
-    m_logger            {in_service_provider.LocateService<Logger>   ()->AddChild("Rendering")},
-    m_scheduler         {in_service_provider.LocateService<Scheduler>()}
+    Service<Renderer> {in_service_provider},
+    m_scheduler       {in_service_provider.LocateService<Scheduler>()}
 {
-    m_logger->SetLevel(ELogLevel::Debug);
+    auto& kernel         = in_service_provider.LocateService<KernelProxy>  ()->GetKernelReference();
+    auto* window_manager = in_service_provider.LocateService<WindowManager>();
+    auto* root_logger    = in_service_provider.LocateService<Logger>       ();
 
-    VulkanDebug ::Initialize(m_logger);
-    VulkanLoader::Initialize();
+    if (root_logger)
+        m_logger = root_logger->AddChild("Rendering");
 
-    m_instance         = std::make_unique<VulkanInstance>       ();
-    m_physical_device  = std::make_unique<VulkanPhysicalDevice> (*m_instance);
-    m_device           = std::make_unique<VulkanDevice>         (*m_scheduler,
-                                                                 *m_physical_device);
-    m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device,
-                                                                 *m_device);
+    VulkanDebug::Initialize(m_logger);
+
+    if (!VulkanLoader::Initialize())
+    {
+        kernel.RequestShutdown(1);
+        return;
+    }
+
+    if ((m_instance         = std::make_unique<VulkanInstance>       ())                  ->IsValid() &&
+        (m_physical_device  = std::make_unique<VulkanPhysicalDevice> ())                  ->IsValid() &&
+        (m_device           = std::make_unique<VulkanDevice>         (*m_scheduler,
+                                                                      *m_physical_device))->IsValid() &&
+        (m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device))->IsValid())
+    {
+        window_manager->on_window_created += [this](Window& in_window)
+        {
+            MakeContext(in_window);
+        };
+
+        if (m_logger)
+            m_logger->Info("Renderer initialized.");
+    }
+
+    else
+        kernel.RequestShutdown(1);
 }
 
 Renderer::~Renderer() noexcept
 {
-    m_device->WaitIdle();
+    if (m_device)
+        m_device->WaitIdle();
 
-    m_render_contexts.clear();
-
+    m_render_contexts .clear();
     m_device_allocator.reset();
     m_device          .reset();
     m_physical_device .reset();
     m_instance        .reset();
+
+    if (m_logger)
+        m_logger->Info("Renderer shutdown.");
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid Renderer::MakeContext(Window& in_window)
+DAEvoid Renderer::MakeContext(Window& in_window) noexcept
 {
-    m_render_contexts.push_back(std::make_unique<RenderContext>(*this, *m_scheduler, in_window));
-}
-
-DAEvoid Renderer::OnUpdate() noexcept
-{
-    for (auto const& render_context : m_render_contexts)
-    {
-        if (render_context->BeginFrame())
-        {
-
-
-            render_context->EndFrame();
-        }
-    }
-}
-
-Logger& Renderer::GetLogger() const noexcept
-{
-    return *m_logger;
+    m_render_contexts.emplace_back(*this, *m_scheduler, in_window);
 }
 
 VulkanInstance& Renderer::GetInstance() const noexcept

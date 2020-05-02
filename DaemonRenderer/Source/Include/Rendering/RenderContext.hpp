@@ -33,9 +33,8 @@
 BEGIN_DAEMON_NAMESPACE
 
 class Window;
-class Scheduler;
 class Renderer;
-class VulkanSwapchain;
+class Scheduler;
 
 class RenderContext
 {
@@ -62,12 +61,12 @@ class RenderContext
 
         #pragma region Constructors and Destructor
 
-        explicit RenderContext(Renderer& in_renderer,
+        explicit RenderContext(Renderer&  in_renderer,
                                Scheduler& in_scheduler,
-                               Window&          in_window);
+                               Window&    in_window);
 
-        RenderContext(RenderContext const&  in_copy) = delete;
-        RenderContext(RenderContext&&       in_move) = delete;
+        RenderContext(RenderContext const& in_copy) = delete;
+        RenderContext(RenderContext&&      in_move) = default;
 
         ~RenderContext() = default;
 

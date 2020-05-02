@@ -41,11 +41,20 @@ DAEbool VulkanLoader::Initialize() noexcept
     if (VK_ASSERT(volkInitialize()))
         return false;
 
-    if (volkGetInstanceVersion() < VK_API_VERSION_1_2)
+    auto const version = volkGetInstanceVersion();
+
+    if (version < VK_API_VERSION_1_2)
     {
         VulkanDebug::Fatal("Vulkan 1.2 is not supported!");
+
         return false;
     }
+
+    auto const major = std::to_string(VK_VERSION_MAJOR(version));
+    auto const minor = std::to_string(VK_VERSION_MINOR(version));
+    auto const patch = std::to_string(VK_VERSION_PATCH(version));
+
+    VulkanDebug::Info("Loaded Vulkan " + major + "." + minor + "." + patch + ".");
 
     return true;
 }

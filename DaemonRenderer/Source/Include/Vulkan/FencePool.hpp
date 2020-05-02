@@ -24,32 +24,40 @@
 
 #pragma once
 
+#include <mutex>
+#include <atomic>
 #include <vector>
 
 #include "Vulkan/Core/VulkanFence.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief High level interface managing fence allocation.
+ *        Fences are cached to improve performance, but they are single use.
+ *        The "Reset" function must be called before on this pool in order to reuse its fences.
+ */
 class FencePool
 {
     private:
 
         #pragma region Members
 
-        DAEuint32 m_index {0u};
+        std::atomic<DAEuint32>   m_index  {0u};
+        std::vector<VulkanFence> m_fences {};
 
-        std::vector<VulkanFence> m_fences;
+        mutable std::mutex m_mutex {};
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         FencePool() = default;
 
-        FencePool(FencePool const&  in_copy) = delete;
-        FencePool(FencePool&&       in_move) = delete;
+        FencePool(FencePool const& in_copy) = delete;
+        FencePool(FencePool&&      in_move) = delete;
 
         ~FencePool() = default;
 
@@ -57,17 +65,32 @@ class FencePool
 
         #pragma region Methods
 
+        /**
+         * \return An available single use fence from the pool or a newly allocated one.
+         * \note   This function is safe to call from any thread.
+         */
         [[nodiscard]]
-        VulkanFence& RequestFence();
+        VulkanFence& RequestFence() noexcept;
 
-        DAEvoid Reset() noexcept;
+        /**
+         * \brief 
+         */
+        [[nodiscard]]
+        DAEbool Wait() const noexcept;
+
+        /**
+         * \brief Resets all managed fences, meaning previously requested ones can be reused.
+         * \note  This function must be called once at the beginning of a frame.
+         */
+        [[nodiscard]]
+        DAEbool Reset() noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        FencePool& operator=(FencePool const&   in_copy) = delete;
-        FencePool& operator=(FencePool&&        in_move) = delete;
+        FencePool& operator=(FencePool const& in_copy) = delete;
+        FencePool& operator=(FencePool&&      in_move) = delete;
 
         #pragma endregion
 };

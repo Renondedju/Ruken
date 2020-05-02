@@ -26,9 +26,9 @@
 #include <set>
 
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
-#include "Vulkan/Core/VulkanInstance.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
 
@@ -41,13 +41,15 @@ std::vector<DAEchar const*> VulkanPhysicalDevice::m_required_extensions =
 
 #pragma endregion
 
-#pragma region Constructor
+#pragma region Constructors
 
-VulkanPhysicalDevice::VulkanPhysicalDevice(VulkanInstance const& in_instance) noexcept
+VulkanPhysicalDevice::VulkanPhysicalDevice() noexcept
 {
-    PickPhysicalDevice (in_instance);
-    SetupPhysicalDevice();
-    SetupQueueFamilies ();
+    if (PickPhysicalDevice())
+    {
+        SetupPhysicalDevice();
+        SetupQueueFamilies ();
+    }
 }
 
 #pragma endregion
@@ -59,12 +61,14 @@ DAEbool VulkanPhysicalDevice::CheckDeviceExtensions(VkPhysicalDevice in_handle) 
     auto count = 0u;
 
     // Returns the number of available physical device extensions.
-    vkEnumerateDeviceExtensionProperties(in_handle, nullptr, &count, nullptr);
+    if (VK_CHECK(vkEnumerateDeviceExtensionProperties(in_handle, nullptr, &count, nullptr)))
+        return false;
 
     std::vector<VkExtensionProperties> supported_extensions(count);
 
     // Returns the available physical device extensions.
-    vkEnumerateDeviceExtensionProperties(in_handle, nullptr, &count, supported_extensions.data());
+    if (VK_CHECK(vkEnumerateDeviceExtensionProperties(in_handle, nullptr, &count, supported_extensions.data())))
+        return false;
 
     std::set<std::string> required_extensions(m_required_extensions.cbegin(),
                                               m_required_extensions.cend  ());
@@ -128,17 +132,19 @@ DAEuint32 VulkanPhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_handle
     return 0u;
 }
 
-DAEvoid VulkanPhysicalDevice::PickPhysicalDevice(VulkanInstance const& in_instance) noexcept
+DAEbool VulkanPhysicalDevice::PickPhysicalDevice() noexcept
 {
-    DAEuint32 count = 0u;
+    auto count = 0u;
 
     // Returns the number of physical devices accessible to this Vulkan instance.
-    VK_CHECK(vkEnumeratePhysicalDevices(in_instance.GetHandle(), &count, nullptr));
+    if (VK_ASSERT(vkEnumeratePhysicalDevices(VulkanLoader::GetLoadedInstance(), &count, nullptr)))
+        return false;
 
     std::vector<VkPhysicalDevice> physical_devices(count);
 
     // Returns the physical devices accessible to this Vulkan instance.
-    VK_CHECK(vkEnumeratePhysicalDevices(in_instance.GetHandle(), &count, physical_devices.data()));
+    if (VK_ASSERT(vkEnumeratePhysicalDevices(VulkanLoader::GetLoadedInstance(), &count, physical_devices.data())))
+        return false;
 
     // Uses an ordered map to automatically sort candidates by increasing score.
     std::multimap<DAEuint32, VkPhysicalDevice> candidates;
@@ -151,13 +157,14 @@ DAEvoid VulkanPhysicalDevice::PickPhysicalDevice(VulkanInstance const& in_instan
         if (candidate.first > 0u)
         {
             m_handle = candidate.second;
-            return;
+
+            return true;
         }
     }
 
     VulkanDebug::Fatal("No suitable GPU!");
 
-    exit(1);
+    return false;
 }
 
 DAEvoid VulkanPhysicalDevice::SetupPhysicalDevice() noexcept
@@ -187,25 +194,26 @@ DAEvoid VulkanPhysicalDevice::SetupQueueFamilies() noexcept
             m_queue_families.transfer = i;
 
         // Dedicated compute queue gives better performance.
-        if (m_queue_family_properties[i].queueFlags & VK_QUEUE_COMPUTE_BIT && (m_queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)
+        if (m_queue_family_properties[i].queueFlags & VK_QUEUE_COMPUTE_BIT &&
+           (m_queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)
             m_queue_families.compute = i;
 
         // Dedicated transfer queue gives better performance.
-        if (m_queue_family_properties[i].queueFlags & VK_QUEUE_TRANSFER_BIT && (m_queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0 &&
-                                                                               (m_queue_family_properties[i].queueFlags & VK_QUEUE_COMPUTE_BIT)  == 0)
+        if (m_queue_family_properties[i].queueFlags & VK_QUEUE_TRANSFER_BIT &&
+           (m_queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0 &&
+           (m_queue_family_properties[i].queueFlags & VK_QUEUE_COMPUTE_BIT)  == 0)
             m_queue_families.transfer = i;
     }
-
-    if (m_queue_families.IsComplete())
-        return;
-
-    VulkanDebug::Fatal("");
-    exit(1);
 }
 
 std::vector<DAEchar const*> const& VulkanPhysicalDevice::GetRequiredExtensions() noexcept
 {
     return m_required_extensions;
+}
+
+DAEbool VulkanPhysicalDevice::IsValid() const noexcept
+{
+    return m_handle != nullptr;
 }
 
 VkPhysicalDevice const& VulkanPhysicalDevice::GetHandle() const noexcept

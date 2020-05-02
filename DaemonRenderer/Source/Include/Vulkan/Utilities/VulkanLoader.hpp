@@ -32,7 +32,7 @@ BEGIN_DAEMON_NAMESPACE
  * \brief This class wraps volk, a meta-loader for Vulkan.
  *        It allows you to dynamically load entry points required to use Vulkan
  *        without linking to vulkan-1.dll or statically linking Vulkan loader.
- * \note  volk enables loading Vulkan entry points directly from the driver
+ * \note  Volk enables loading Vulkan entry points directly from the driver
  *        which can increase performance by skipping loader dispatch overhead.
  */
 class VulkanLoader

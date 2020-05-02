@@ -26,94 +26,68 @@
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructors and Destructor
+#pragma region Constructors
 
-VulkanImage::VulkanImage(VkImage in_handle) noexcept:
-    m_handle {in_handle}
+VulkanImage::VulkanImage(VkImage          in_handle,
+                         VkFormat   const in_format,
+                         VkExtent3D const in_extent) noexcept:
+    m_handle {in_handle},
+    m_format {in_format},
+    m_extent {in_extent}
 {
 
 }
 
-VulkanImage::VulkanImage(VkImage            in_handle,
-                         VmaAllocator       in_allocator,
-                         VmaAllocation      in_allocation,
-                         VmaAllocationInfo  in_allocation_info) noexcept:
-    m_handle            {in_handle},
-    m_allocator         {in_allocator},
-    m_allocation        {in_allocation},
-    m_allocation_info   {in_allocation_info}
+VulkanImage::VulkanImage(VkImage          in_handle,
+                         VmaAllocator     in_allocator,
+                         VmaAllocation    in_allocation,
+                         VkFormat   const in_format,
+                         VkExtent3D const in_extent) noexcept:
+    m_handle     {in_handle},
+    m_allocator  {in_allocator},
+    m_allocation {in_allocation},
+    m_format     {in_format},
+    m_extent     {in_extent}
 {
 
 }
 
 VulkanImage::VulkanImage(VulkanImage&& in_move) noexcept:
-    m_handle            {in_move.m_handle},
-    m_allocator         {in_move.m_allocator},
-    m_allocation        {in_move.m_allocation},
-    m_allocation_info   {in_move.m_allocation_info},
-    m_is_mapped         {in_move.m_is_mapped}
+    m_handle     {in_move.m_handle},
+    m_allocator  {in_move.m_allocator},
+    m_allocation {in_move.m_allocation},
+    m_extent     {in_move.m_extent}
 {
-    in_move.m_handle          = nullptr;
-    in_move.m_allocator       = nullptr;
-    in_move.m_allocation      = nullptr;
-    in_move.m_allocation_info = {};
-    in_move.m_is_mapped       = false;
+    in_move.m_handle     = nullptr;
+    in_move.m_allocator  = nullptr;
+    in_move.m_allocation = nullptr;
 }
 
 VulkanImage::~VulkanImage() noexcept
 {
-    if (m_handle && m_allocator && m_allocation)
-    {
-        UnMap();
+    if (!m_handle || !m_allocator || !m_allocation)
+        return;
 
-        vmaDestroyImage(m_allocator, m_handle, m_allocation);
-    }
+    vmaDestroyImage(m_allocator, m_handle, m_allocation);
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid* VulkanImage::Map() noexcept
-{
-    if (!m_is_mapped && !m_allocation_info.pMappedData)
-    {
-        m_is_mapped = true;
-
-        vmaMapMemory(m_allocator, m_allocation, &m_allocation_info.pMappedData);
-    }
-
-    return m_allocation_info.pMappedData;
-}
-
-DAEvoid VulkanImage::UnMap() noexcept
-{
-    if (!m_is_mapped || !m_allocation_info.pMappedData)
-        return;
-
-    m_is_mapped = false;
-
-    vmaUnmapMemory(m_allocator, m_allocation);
-}
-
 VkImage const& VulkanImage::GetHandle() const noexcept
 {
     return m_handle;
 }
 
-VmaAllocation const& VulkanImage::GetAllocation() const noexcept
+VkImageType const& VulkanImage::GetType() const noexcept
 {
-    return m_allocation;
+    return m_type;
 }
 
-VkDeviceMemory const& VulkanImage::GetMemory() const noexcept
+VkFormat const& VulkanImage::GetFormat() const noexcept
 {
-    return m_allocation_info.deviceMemory;
-}
-
-DAEvoid* VulkanImage::GetMappedData() const noexcept
-{
-    return m_allocation_info.pMappedData;
+    return m_format;
 }
 
 VkExtent3D const& VulkanImage::GetExtent() const noexcept
@@ -123,23 +97,36 @@ VkExtent3D const& VulkanImage::GetExtent() const noexcept
 
 #pragma endregion
 
-#pragma region Operator
+#pragma region Operators
 
 VulkanImage& VulkanImage::operator=(VulkanImage&& in_move) noexcept
 {
-    m_handle            = in_move.m_handle;
-    m_allocator         = in_move.m_allocator;
-    m_allocation        = in_move.m_allocation;
-    m_allocation_info   = in_move.m_allocation_info;
-    m_is_mapped         = in_move.m_is_mapped;
+    m_handle     = in_move.m_handle;
+    m_allocator  = in_move.m_allocator;
+    m_allocation = in_move.m_allocation;
+    m_type       = in_move.m_type;
+    m_format     = in_move.m_format;
+    m_extent     = in_move.m_extent;
 
-    in_move.m_handle          = nullptr;
-    in_move.m_allocator       = nullptr;
-    in_move.m_allocation      = nullptr;
-    in_move.m_allocation_info = {};
-    in_move.m_is_mapped       = false;
+    in_move.m_handle     = nullptr;
+    in_move.m_allocator  = nullptr;
+    in_move.m_allocation = nullptr;
 
     return *this;
+}
+
+DAEbool DAEMON_NAMESPACE::operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept
+{
+    return in_lhs.width  == in_rhs.width  &&
+           in_rhs.height == in_lhs.height &&
+           in_rhs.depth  == in_lhs.depth;
+}
+
+DAEbool DAEMON_NAMESPACE::operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept
+{
+    return in_lhs.width  != in_rhs.width  ||
+           in_rhs.height != in_lhs.height ||
+           in_rhs.depth  != in_lhs.depth;
 }
 
 #pragma endregion

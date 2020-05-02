@@ -24,22 +24,29 @@
 
 #include "Rendering/RenderFrame.hpp"
 
+#include "Rendering/Renderer.hpp"
+
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
+#pragma region Constructors
 
-RenderFrame::RenderFrame(Scheduler& in_scheduler) noexcept:
-    m_fence_pool        {std::make_unique<FencePool>    ()},
-    m_semaphore_pool    {std::make_unique<SemaphorePool>()}
+RenderFrame::RenderFrame(Renderer& in_renderer, Scheduler& in_scheduler) noexcept:
+    m_fence_pool            {std::make_unique<FencePool>    ()},
+    m_semaphore_pool        {std::make_unique<SemaphorePool>()},
+    m_graphics_command_pool {std::make_unique<CommandPool>  (in_scheduler, in_renderer.GetDevice().GetGraphicsFamily())},
+    m_compute_command_pool  {std::make_unique<CommandPool>  (in_scheduler, in_renderer.GetDevice().GetComputeFamily ())},
+    m_render_target         {std::make_unique<RenderTarget> ()}
 {
-    m_command_pool = std::make_unique<CommandPool>(in_scheduler, 0u);
+
 }
 
 RenderFrame::RenderFrame(RenderFrame&& in_move) noexcept:
-    m_fence_pool        {std::move(in_move.m_fence_pool)},
-    m_semaphore_pool    {std::move(in_move.m_semaphore_pool)},
-    m_command_pool      {std::move(in_move.m_command_pool)},
-    m_render_views      {std::move(in_move.m_render_views)}
+    m_fence_pool            {std::move(in_move.m_fence_pool)},
+    m_semaphore_pool        {std::move(in_move.m_semaphore_pool)},
+    m_graphics_command_pool {std::move(in_move.m_graphics_command_pool)},
+    m_compute_command_pool  {std::move(in_move.m_compute_command_pool)},
+    m_render_target         {std::move(in_move.m_render_target)},
+    m_render_views          {std::move(in_move.m_render_views)}
 {
 
 }
@@ -48,36 +55,40 @@ RenderFrame::RenderFrame(RenderFrame&& in_move) noexcept:
 
 #pragma region Methods
 
-DAEvoid RenderFrame::Reset() noexcept
+DAEbool RenderFrame::Reset() noexcept
 {
-    m_fence_pool    ->Reset();
-    m_semaphore_pool->Reset();
-    m_command_pool  ->Reset();
-
     m_render_views.clear();
+
+    if (m_fence_pool           ->Reset() &&
+        m_semaphore_pool       ->Reset() &&
+        m_graphics_command_pool->Reset() &&
+        m_compute_command_pool ->Reset() )
+        return true;
+
+    return false;
 }
 
-VulkanFence& RenderFrame::RequestFence() const noexcept
+FencePool& RenderFrame::GetFencePool() const noexcept
 {
-    return m_fence_pool->RequestFence();
+    return *m_fence_pool;
 }
 
-VulkanSemaphore& RenderFrame::RequestSemaphore() const noexcept
+SemaphorePool& RenderFrame::GetSemaphorePool() const noexcept
 {
-    return m_semaphore_pool->RequestSemaphore();
+    return *m_semaphore_pool;
 }
 
-VulkanTimelineSemaphore& RenderFrame::RequestTimelineSemaphore() const noexcept
+CommandPool& RenderFrame::GetGraphicsCommandPool() const noexcept
 {
-    return m_semaphore_pool->RequestTimelineSemaphore();
+    return *m_graphics_command_pool;
 }
 
-VulkanCommandBuffer* RenderFrame::RequestCommandBuffer(VkCommandBufferLevel const in_level) const noexcept
+CommandPool& RenderFrame::GetComputeCommandPool() const noexcept
 {
-    return m_command_pool->RequestCommandBuffer(in_level);
+    return *m_compute_command_pool;
 }
 
-RenderTarget const& RenderFrame::GetRenderTarget() const noexcept
+RenderTarget& RenderFrame::GetRenderTarget() const noexcept
 {
     return *m_render_target;
 }

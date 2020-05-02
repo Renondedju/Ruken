@@ -37,18 +37,11 @@ USING_DAEMON_NAMESPACE
 std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
 {
     #ifdef DAEMON_OS_WINDOWS
-
-    VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
     #endif
 
-    #ifdef DAEMON_CONFIG_DEBUG
-
-    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-
-    #endif
-
-    VK_KHR_SURFACE_EXTENSION_NAME
+    VK_KHR_SURFACE_EXTENSION_NAME,
+    VK_EXT_DEBUG_UTILS_EXTENSION_NAME
 };
 
 std::vector<DAEchar const*> VulkanInstance::m_required_validation_layers =
@@ -62,12 +55,7 @@ std::vector<DAEchar const*> VulkanInstance::m_required_validation_layers =
 
 std::vector<VkValidationFeatureEnableEXT> VulkanInstance::m_enabled_validation_features =
 {
-    #ifdef DAEMON_CONFIG_DEBUG
-
-    VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
-    VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT
-
-    #endif
+    VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT
 };
 
 std::vector<VkValidationFeatureDisableEXT> VulkanInstance::m_disabled_validation_features =
@@ -81,11 +69,10 @@ std::vector<VkValidationFeatureDisableEXT> VulkanInstance::m_disabled_validation
 
 VulkanInstance::VulkanInstance() noexcept
 {
-    CheckInstanceExtensions();
-    CheckValidationLayers  ();
-    CreateInstance         ();
-
-    VulkanDebug::CreateDebugMessenger();
+    if (CheckInstanceExtensions() &&
+        CheckValidationLayers  () &&
+        CreateInstance         ())
+        VulkanDebug::CreateDebugMessenger();
 }
 
 VulkanInstance::~VulkanInstance() noexcept
@@ -130,7 +117,7 @@ DAEbool VulkanInstance::CheckInstanceExtensions() noexcept
 
     // In case some extensions could not be found, enumerates them.
     for (auto const& extension : required_extensions)
-        VulkanDebug::Fatal(("Missing instance extension : " + extension + "!").c_str());
+        VulkanDebug::Fatal("Missing instance extension : " + extension + "!");
 
     return false;
 }
@@ -163,12 +150,12 @@ DAEbool VulkanInstance::CheckValidationLayers() noexcept
 
     // In case some layers could not be found, enumerates them.
     for (auto const& layer : required_layers)
-        VulkanDebug::Fatal(("Missing validation layer : " + layer + "!").c_str());
+        VulkanDebug::Fatal("Missing validation layer : " + layer + "!");
 
     return false;
 }
 
-DAEvoid VulkanInstance::CreateInstance() noexcept
+DAEbool VulkanInstance::CreateInstance() noexcept
 {
     // This struct allows us to enable/disable specific validation features.
     VkValidationFeaturesEXT validation_features = {};
@@ -201,17 +188,25 @@ DAEvoid VulkanInstance::CreateInstance() noexcept
 
     VkInstanceCreateInfo instance_create_info = {};
 
-    instance_create_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instance_create_info.pNext                   = &debug_messenger_create_info;
+    instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+
+    DAEMON_DEBUG
+    {
+        instance_create_info.pNext = &debug_messenger_create_info;
+    }
+
     instance_create_info.pApplicationInfo        = &app_info;
     instance_create_info.enabledLayerCount       = static_cast<DAEuint32>(m_required_validation_layers.size());
     instance_create_info.ppEnabledLayerNames     = m_required_validation_layers.data();
     instance_create_info.enabledExtensionCount   = static_cast<DAEuint32>(m_required_extensions.size());
     instance_create_info.ppEnabledExtensionNames = m_required_extensions.data();
 
-    VK_ASSERT(vkCreateInstance(&instance_create_info, nullptr, &m_handle));
+    if (VK_ASSERT(vkCreateInstance(&instance_create_info, nullptr, &m_handle)))
+        return false;
 
     VulkanLoader::LoadInstance(m_handle);
+
+    return true;
 }
 
 std::vector<DAEchar const*> const& VulkanInstance::GetRequiredExtensions() noexcept
@@ -232,6 +227,11 @@ std::vector<VkValidationFeatureEnableEXT> const& VulkanInstance::GetEnabledValid
 std::vector<VkValidationFeatureDisableEXT> const& VulkanInstance::GetDisabledValidationFeatures() noexcept
 {
     return m_disabled_validation_features;
+}
+
+DAEbool VulkanInstance::IsValid() const noexcept
+{
+    return m_handle != nullptr;
 }
 
 VkInstance const& VulkanInstance::GetHandle() const noexcept

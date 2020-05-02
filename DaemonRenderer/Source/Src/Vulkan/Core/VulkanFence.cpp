@@ -26,11 +26,12 @@
 
 #include "Vulkan/Core/VulkanFence.hpp"
 
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructors and Destructor
+#pragma region Constructors
 
 VulkanFence::VulkanFence() noexcept
 {
@@ -39,7 +40,7 @@ VulkanFence::VulkanFence() noexcept
     create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    vkCreateFence(VulkanLoader::GetLoadedDevice(), &create_info, nullptr, &m_handle);
+    VK_CHECK(vkCreateFence(VulkanLoader::GetLoadedDevice(), &create_info, nullptr, &m_handle));
 }
 
 VulkanFence::VulkanFence(VulkanFence&& in_move) noexcept:
@@ -60,14 +61,17 @@ VulkanFence::~VulkanFence() noexcept
 
 #pragma region Methods
 
-DAEvoid VulkanFence::Reset() const noexcept
+DAEbool VulkanFence::Reset() const noexcept
 {
-    vkResetFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle);
+    if (VK_CHECK(vkResetFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle)))
+        return false;
+
+    return true;
 }
 
 DAEvoid VulkanFence::Wait() const noexcept
 {
-    vkWaitForFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle, VK_TRUE, UINT64_MAX);
+    VK_CHECK(vkWaitForFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle, VK_TRUE, UINT64_MAX));
 }
 
 DAEbool VulkanFence::IsSignaled() const noexcept
@@ -78,6 +82,19 @@ DAEbool VulkanFence::IsSignaled() const noexcept
 VkFence const& VulkanFence::GetHandle() const noexcept
 {
     return m_handle;
+}
+
+#pragma endregion
+
+#pragma region Operators
+
+VulkanFence& VulkanFence::operator=(VulkanFence&& in_move) noexcept
+{
+    m_handle = in_move.m_handle;
+
+    in_move.m_handle = nullptr;
+
+    return *this;
 }
 
 #pragma endregion

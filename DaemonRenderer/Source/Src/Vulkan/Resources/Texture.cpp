@@ -86,7 +86,7 @@ DAEvoid Texture::UploadData(VulkanDevice          const&    in_device,
                             DAEvoid               const*    in_data,
                             DAEuint64             const     in_size) const
 {
-    auto const staging_buffer = CreateStagingBuffer(in_allocator, in_size);
+    auto staging_buffer = CreateStagingBuffer(in_allocator, in_size);
 
     if (!staging_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate the staging buffer!");
@@ -96,56 +96,53 @@ DAEvoid Texture::UploadData(VulkanDevice          const&    in_device,
     if (!command_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate the command buffer!");
 
+    if (!staging_buffer->Update(in_data, in_size))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "");
+
     VulkanFence const fence;
 
-    memcpy(staging_buffer->GetMappedData(), in_data, in_size);
+    if (!command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to begin the command buffer!");
 
-    command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    {
-        VkImageMemoryBarrier memory_barrier = {};
+    VkImageMemoryBarrier memory_barrier = {};
 
-        memory_barrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memory_barrier.srcAccessMask       = 0u;
-        memory_barrier.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
-        memory_barrier.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memory_barrier.srcQueueFamilyIndex = in_device.GetGraphicsFamily();
-        memory_barrier.dstQueueFamilyIndex = in_device.GetTransferFamily();
-        memory_barrier.image               = m_image->GetHandle();
+    memory_barrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    memory_barrier.srcAccessMask       = 0u;
+    memory_barrier.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+    memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+    memory_barrier.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    memory_barrier.srcQueueFamilyIndex = in_device.GetGraphicsFamily();
+    memory_barrier.dstQueueFamilyIndex = in_device.GetTransferFamily();
+    memory_barrier.image               = m_image->GetHandle();
 
-        memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        memory_barrier.subresourceRange.levelCount = 1u;
-        memory_barrier.subresourceRange.layerCount = 1u;
+    memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    memory_barrier.subresourceRange.levelCount = 1u;
+    memory_barrier.subresourceRange.layerCount = 1u;
 
-        command_buffer->InsertMemoryBarrier(memory_barrier);
+    command_buffer->InsertMemoryBarrier(0u, 0u, VK_DEPENDENCY_BY_REGION_BIT, memory_barrier);
 
-        VkBufferImageCopy region = {};
+    VkBufferImageCopy region = {};
 
-        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        region.imageSubresource.layerCount = 1u;
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.layerCount = 1u;
 
-        region.imageExtent = m_image->GetExtent();
+    region.imageExtent = m_image->GetExtent();
 
-        command_buffer->CopyBufferToImage(*staging_buffer, *m_image, region);
+    command_buffer->CopyBufferToImage(*staging_buffer, *m_image, region);
 
-        memory_barrier.srcAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memory_barrier.dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
-        memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memory_barrier.newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        memory_barrier.srcQueueFamilyIndex = in_device.GetTransferFamily();
-        memory_barrier.dstQueueFamilyIndex = in_device.GetGraphicsFamily();
+    memory_barrier.srcAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+    memory_barrier.dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
+    memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    memory_barrier.newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    memory_barrier.srcQueueFamilyIndex = in_device.GetTransferFamily();
+    memory_barrier.dstQueueFamilyIndex = in_device.GetGraphicsFamily();
 
-        command_buffer->InsertMemoryBarrier(memory_barrier);
-    }
-    command_buffer->End();
+    command_buffer->InsertMemoryBarrier(0u, 0u, VK_DEPENDENCY_BY_REGION_BIT, memory_barrier);
 
-    VkSubmitInfo submit_info = {};
+    if (!command_buffer->End())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to end the command buffer!");
 
-    submit_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.commandBufferCount = 1u;
-    submit_info.pCommandBuffers    = &(*command_buffer).GetHandle();
-
-    in_device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
+    in_device.GetTransferQueue().Submit(*command_buffer, fence.GetHandle());
 
     fence.Wait();
 }
@@ -156,9 +153,6 @@ DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor con
 {
     m_loading_descriptor = reinterpret_cast<TextureLoadingDescriptor const&>(in_descriptor);
 
-    if (!m_loading_descriptor)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::RequirementsNotSatisfied, "Invalid texture loading descriptor!");
-
     auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
     auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
 
@@ -167,6 +161,9 @@ DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor con
     auto comp   = 0;
 
     auto* pixels = stbi_load(m_loading_descriptor->path, &width, &height, &comp, STBI_rgb_alpha);
+
+    if (!pixels)
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::Other);
 
     m_image = CreateImage(allocator, width, height);
 

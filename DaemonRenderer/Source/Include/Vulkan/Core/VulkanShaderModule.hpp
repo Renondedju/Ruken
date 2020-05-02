@@ -30,6 +30,13 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief RAII-class wrapping a 'VkShaderModule' object.
+ *        Shader modules contain shader code and one or more entry points.
+ *        Shaders are selected from a shader module by specifying an entry point as part of pipeline creation.
+ *        The stages of a pipeline can use shaders that come from different modules.
+ *        The shader code defining a shader module must be in the SPIR-V format.
+ */
 class VulkanShaderModule
 {
     private:
@@ -42,12 +49,12 @@ class VulkanShaderModule
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         explicit VulkanShaderModule(std::vector<DAEuint32> const& in_code) noexcept;
 
-        VulkanShaderModule(VulkanShaderModule const&    in_copy) = delete;
-        VulkanShaderModule(VulkanShaderModule&&         in_move) = delete;
+        VulkanShaderModule(VulkanShaderModule const& in_copy) = delete;
+        VulkanShaderModule(VulkanShaderModule&&      in_move) noexcept;
 
         ~VulkanShaderModule() noexcept;
 
@@ -55,14 +62,15 @@ class VulkanShaderModule
 
         #pragma region Methods
 
-        VkShaderModule const& GetHandle() const noexcept;
+        [[nodiscard]] DAEbool               IsValid  () const noexcept;
+        [[nodiscard]] VkShaderModule const& GetHandle() const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
         VulkanShaderModule& operator=(VulkanShaderModule const& in_copy) = delete;
-        VulkanShaderModule& operator=(VulkanShaderModule&&      in_move) = delete;
+        VulkanShaderModule& operator=(VulkanShaderModule&&      in_move) noexcept;
 
         #pragma endregion
 };

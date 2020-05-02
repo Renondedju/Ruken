@@ -96,8 +96,8 @@ DAEvoid Mesh::UploadData(VulkanDevice           const& in_device,
     auto const vertex_buffer_size = sizeof(Vertex)    * in_vertices.size();
     auto const index_buffer_size  = sizeof(DAEuint32) * in_indices .size();
 
-    auto const staging_vertex_buffer = CreateStagingBuffer(in_allocator, vertex_buffer_size);
-    auto const staging_index_buffer  = CreateStagingBuffer(in_allocator, index_buffer_size);
+    auto staging_vertex_buffer = CreateStagingBuffer(in_allocator, vertex_buffer_size);
+    auto staging_index_buffer  = CreateStagingBuffer(in_allocator, index_buffer_size);
 
     if (!staging_vertex_buffer || !staging_index_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate staging buffers!");
@@ -107,32 +107,29 @@ DAEvoid Mesh::UploadData(VulkanDevice           const& in_device,
     if (!command_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate command buffer!");
 
+    if (!staging_vertex_buffer->Update(in_vertices.data(), in_vertices.size()) ||
+        !staging_index_buffer ->Update(in_indices .data(), in_indices .size()))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "");
+
     VulkanFence const fence;
 
-    memcpy(staging_vertex_buffer->GetMappedData(), in_vertices.data(), vertex_buffer_size);
-    memcpy(staging_index_buffer ->GetMappedData(), in_indices .data(), index_buffer_size);
+    if (!command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT))
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to begin command buffer!");
 
-    command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    {
-        VkBufferCopy region = {};
+    VkBufferCopy region = {};
 
-        region.size = m_vertex_buffer->GetSize();
+    region.size = m_vertex_buffer->GetSize();
 
-        command_buffer->CopyBuffer(*staging_vertex_buffer, *m_vertex_buffer, region);
+    command_buffer->CopyBufferToBuffer(*staging_vertex_buffer, *m_vertex_buffer, region);
 
-        region.size = m_index_buffer->GetSize();
+    region.size = m_index_buffer->GetSize();
 
-        command_buffer->CopyBuffer(*staging_index_buffer, *m_index_buffer, region);
-    }
-    command_buffer->End();
+    command_buffer->CopyBufferToBuffer(*staging_index_buffer, *m_index_buffer, region);
 
-    VkSubmitInfo submit_info = {};
+    if (!command_buffer->End())
+        throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to end command buffer!");
 
-    submit_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.commandBufferCount = 1u;
-    submit_info.pCommandBuffers    = &(*command_buffer).GetHandle();
-
-    in_device.GetTransferQueue().Submit(submit_info, fence.GetHandle());
+    in_device.GetTransferQueue().Submit(*command_buffer, fence.GetHandle());
 
     fence.Wait();
 }
@@ -142,9 +139,6 @@ DAEvoid Mesh::UploadData(VulkanDevice           const& in_device,
 DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<MeshLoadingDescriptor const&>(in_descriptor);
-
-    if (!m_loading_descriptor)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::RequirementsNotSatisfied, "Invalid mesh loading descriptor!");
 
     auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
     auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
@@ -179,9 +173,6 @@ DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const&
 
 DAEvoid Mesh::Reload(ResourceManager& in_manager)
 {
-    if (!m_loading_descriptor || !m_vertex_buffer || !m_index_buffer)
-        throw ResourceProcessingFailure(EResourceProcessingFailureCode::CorruptedResource, "Trying to reload an invalid mesh!");
-
     auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
     auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
 

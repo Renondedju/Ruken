@@ -26,23 +26,26 @@
 
 #include "Vulkan/Core/VulkanDevice.hpp"
 
+#include "Threading/Scheduler.hpp"
+
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
-#include "Threading/Scheduler.hpp"
-
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
-VulkanDevice::VulkanDevice(Scheduler const& in_scheduler, VulkanPhysicalDevice const& in_physical_device) noexcept:
+VulkanDevice::VulkanDevice(Scheduler            const& in_scheduler,
+                           VulkanPhysicalDevice const& in_physical_device) noexcept:
     m_queue_families {in_physical_device.GetQueueFamilies()}
 {
-    CreateDevice      (in_physical_device);
+    if (!CreateDevice(in_physical_device))
+        return;
+
     CreateQueues      (in_physical_device);
     CreateCommandPools(in_scheduler);
 
-    m_pipeline_cache = std::make_unique<VulkanPipelineCache>();
+    m_pipeline_cache = std::make_unique<VulkanPipelineCache>("Data/PipelineCache.data");
 }
 
 VulkanDevice::~VulkanDevice() noexcept
@@ -61,15 +64,15 @@ VulkanDevice::~VulkanDevice() noexcept
 
 #pragma region Methods
 
-DAEvoid VulkanDevice::CreateDevice(VulkanPhysicalDevice const& in_physical_device) noexcept
+DAEbool VulkanDevice::CreateDevice(VulkanPhysicalDevice const& in_physical_device) noexcept
 {
     std::set<DAEuint32> const unique_queue_families = {
-        m_queue_families.graphics.value(),
-        m_queue_families.compute .value(),
-        m_queue_families.transfer.value(),
+        *m_queue_families.graphics,
+        *m_queue_families.compute,
+        *m_queue_families.transfer,
     };
 
-    std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
+    std::vector<VkDeviceQueueCreateInfo> queue_create_infos(unique_queue_families.size());
 
     auto priority = 1.0f;
 
@@ -82,28 +85,46 @@ DAEvoid VulkanDevice::CreateDevice(VulkanPhysicalDevice const& in_physical_devic
         queue_create_info.queueCount       = 1u;
         queue_create_info.pQueuePriorities = &priority;
 
-        queue_create_infos.emplace_back(queue_create_info);
+        queue_create_infos[queue_family] = std::move(queue_create_info);
     }
+
+    VkPhysicalDeviceVulkan12Features vulkan_12_features = {};
+
+    vulkan_12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+
+    VkPhysicalDeviceVulkan11Features vulkan_11_features = {};
+
+    vulkan_11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+    vulkan_11_features.pNext = &vulkan_12_features;
+
+    VkPhysicalDeviceFeatures2 features = {};
+
+    features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    features.pNext = &vulkan_11_features;
 
     VkDeviceCreateInfo device_create_info = {};
 
     device_create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    device_create_info.pNext                   = &features;
     device_create_info.queueCreateInfoCount    = static_cast<DAEuint32>(queue_create_infos.size());
     device_create_info.pQueueCreateInfos       = queue_create_infos.data();
     device_create_info.enabledExtensionCount   = static_cast<DAEuint32>(VulkanPhysicalDevice::GetRequiredExtensions().size());
     device_create_info.ppEnabledExtensionNames = VulkanPhysicalDevice::GetRequiredExtensions().data();
 
-    VK_ASSERT(vkCreateDevice(in_physical_device.GetHandle(), &device_create_info, nullptr, &m_handle));
+    if (VK_ASSERT(vkCreateDevice(in_physical_device.GetHandle(), &device_create_info, nullptr, &m_handle)))
+        return false;
 
     VulkanLoader::LoadDevice(m_handle);
+
+    return true;
 }
 
 DAEvoid VulkanDevice::CreateQueues(VulkanPhysicalDevice const& in_physical_device) noexcept
 {
     std::set<DAEuint32> const unique_queue_families = {
-        m_queue_families.graphics.value(),
-        m_queue_families.compute .value(),
-        m_queue_families.transfer.value(),
+        *m_queue_families.graphics,
+        *m_queue_families.compute,
+        *m_queue_families.transfer,
     };
 
     VkQueue queue = nullptr;
@@ -119,9 +140,9 @@ DAEvoid VulkanDevice::CreateQueues(VulkanPhysicalDevice const& in_physical_devic
 DAEvoid VulkanDevice::CreateCommandPools(Scheduler const& in_scheduler) noexcept
 {
     std::set<DAEuint32> const unique_queue_families = {
-        m_queue_families.graphics.value(),
-        m_queue_families.compute .value(),
-        m_queue_families.transfer.value(),
+        *m_queue_families.graphics,
+        *m_queue_families.compute,
+        *m_queue_families.transfer,
     };
 
     for (auto const& queue_family : unique_queue_families)
@@ -135,12 +156,34 @@ DAEvoid VulkanDevice::CreateCommandPools(Scheduler const& in_scheduler) noexcept
 
 DAEvoid VulkanDevice::WaitIdle() const noexcept
 {
-    VK_ASSERT(vkDeviceWaitIdle(m_handle));
+    VK_CHECK(vkDeviceWaitIdle(m_handle));
 }
 
-VkDevice const& VulkanDevice::GetHandle() const noexcept
+std::optional<DAEuint32> VulkanDevice::FindPresentFamily(VkSurfaceKHR const& in_surface) const noexcept
 {
-    return m_handle;
+    for (auto const& queue : m_queues)
+    {
+        if (queue.IsPresentationSupported(in_surface))
+            return queue.GetQueueFamily();
+    }
+
+    return std::nullopt;
+}
+
+VulkanQueue const* VulkanDevice::RequestPresentQueue(VkSurfaceKHR const& in_surface) const noexcept
+{
+    for (auto const& queue : m_queues)
+    {
+        if (queue.IsPresentationSupported(in_surface))
+            return &queue;
+    }
+
+    return nullptr;
+}
+
+DAEbool VulkanDevice::IsValid() const noexcept
+{
+    return m_handle != nullptr;
 }
 
 DAEuint32 VulkanDevice::GetGraphicsFamily() const noexcept
@@ -158,15 +201,9 @@ DAEuint32 VulkanDevice::GetTransferFamily() const noexcept
     return *m_queue_families.transfer;
 }
 
-std::optional<DAEuint32> VulkanDevice::GetPresentFamily(VkSurfaceKHR const& in_surface) const noexcept
+VkDevice const& VulkanDevice::GetHandle() const noexcept
 {
-    for (auto const& queue : m_queues)
-    {
-        if (queue.IsPresentationSupported(in_surface))
-            return queue.GetQueueFamily();
-    }
-
-    return std::nullopt;
+    return m_handle;
 }
 
 VulkanQueue const& VulkanDevice::GetGraphicsQueue() const noexcept
@@ -182,17 +219,6 @@ VulkanQueue const& VulkanDevice::GetComputeQueue() const noexcept
 VulkanQueue const& VulkanDevice::GetTransferQueue() const noexcept
 {
     return m_queues[*m_queue_families.transfer];
-}
-
-VulkanQueue const* VulkanDevice::GetPresentQueue(VkSurfaceKHR const& in_surface) const noexcept
-{
-    for (auto const& queue : m_queues)
-    {
-        if (queue.IsPresentationSupported(in_surface))
-            return &queue;
-    }
-
-    return nullptr;
 }
 
 VulkanCommandPool const& VulkanDevice::GetGraphicsCommandPool() const noexcept

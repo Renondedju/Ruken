@@ -33,19 +33,13 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Constructor
 
-RenderContext::RenderContext(Renderer& in_renderer,
-                               Scheduler& in_scheduler,
-                               Window&          in_window):
+RenderContext::RenderContext(Renderer&  in_renderer,
+                             Scheduler& in_scheduler,
+                             Window&    in_window):
     m_swapchain {std::make_unique<VulkanSwapchain>(in_renderer.GetPhysicalDevice(), in_renderer.GetDevice(), in_window)}
 {
     for (DAEuint32 i = 0; i < 2u; ++i)
-        m_render_frames.emplace_back(in_scheduler);
-
-    in_window.on_framebuffer_resized += [this] (DAEint32 const in_width, DAEint32 const in_height)
-    {
-        if (m_swapchain)
-            m_swapchain->Resize(in_width, in_height);
-    };
+        m_render_frames.emplace_back(in_renderer, in_scheduler);
 }
 
 #pragma endregion
@@ -61,7 +55,10 @@ DAEbool RenderContext::BeginFrame() noexcept
 
     auto& active_frame = m_render_frames[m_frame_index];
 
-    active_frame.Reset();
+    if (!active_frame.Reset())
+        return false;
+
+    m_is_frame_active = true;
 
     return true;
 }

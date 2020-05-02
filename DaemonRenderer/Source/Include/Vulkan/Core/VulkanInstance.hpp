@@ -29,7 +29,8 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief There is no global state in Vulkan and all per-application state is stored in a 'VkInstance' object.
+ * \brief RAII-class wrapping a 'VkInstance' object.
+ *        There is no global state in Vulkan and all per-application state is stored in a 'VkInstance' object.
  *        Creating a 'VkInstance' object initializes the Vulkan library and allows the application to
  *        pass information about itself to the implementation.
  */
@@ -53,7 +54,7 @@ class VulkanInstance
         static DAEbool CheckInstanceExtensions() noexcept;
         static DAEbool CheckValidationLayers  () noexcept;
 
-        DAEvoid CreateInstance() noexcept;
+        DAEbool CreateInstance() noexcept;
 
         #pragma endregion
 
@@ -77,8 +78,8 @@ class VulkanInstance
         [[nodiscard]] static std::vector<VkValidationFeatureEnableEXT>  const& GetEnabledValidationFeatures () noexcept;
         [[nodiscard]] static std::vector<VkValidationFeatureDisableEXT> const& GetDisabledValidationFeatures() noexcept;
 
-        [[nodiscard]]
-        VkInstance const& GetHandle() const noexcept;
+        [[nodiscard]] DAEbool           IsValid  () const noexcept;
+        [[nodiscard]] VkInstance const& GetHandle() const noexcept;
 
         #pragma endregion
 

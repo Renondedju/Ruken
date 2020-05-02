@@ -79,6 +79,8 @@ DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string_view cons
     if (in_result == VK_SUCCESS)
         return false;
 
+    #ifdef DAEMON_CONFIG_DEBUG
+
     auto const message = std::string(in_function_name) + " : " + ToString(in_result);
 
     if (in_result > VK_SUCCESS)
@@ -86,23 +88,39 @@ DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string_view cons
     else
         m_logger->Error(message);
 
+    #else
+
+    (DAEvoid)in_function_name;
+
+    #endif
+
     return in_result < 0;
 }
 
 DAEbool VulkanDebug::AssertResult(VkResult const in_result, std::string_view const in_function_name) noexcept
 {
-    auto const message = std::string(in_function_name) + " : " + ToString(in_result);
-
     if (in_result == VK_SUCCESS)
         return false;
 
+    #ifdef DAEMON_CONFIG_DEBUG
+
+    auto const message = std::string(in_function_name) + " : " + ToString(in_result);
+
     m_logger->Fatal(message);
+
+    #else
+
+    (DAEvoid)in_function_name;
+
+    #endif
 
     return true;
 }
 
 DAEvoid VulkanDebug::CreateDebugMessenger() noexcept
 {
+    #ifdef DAEMON_CONFIG_DEBUG
+
     if (m_debug_messenger)
         return;
 
@@ -118,6 +136,8 @@ DAEvoid VulkanDebug::CreateDebugMessenger() noexcept
     debug_messenger_info.pfnUserCallback = DebugCallback;
 
     VK_CHECK(vkCreateDebugUtilsMessengerEXT(VulkanLoader::GetLoadedInstance(), &debug_messenger_info, nullptr, &m_debug_messenger));
+
+    #endif
 }
 
 DAEvoid VulkanDebug::DestroyDebugMessenger() noexcept
@@ -132,6 +152,8 @@ VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const
                                     DAEvoid*                                      in_user_data)
 {
     (DAEvoid)in_user_data;
+
+    #ifdef DAEMON_CONFIG_DEBUG
 
     if (!m_logger)
         return VK_FALSE;
@@ -160,6 +182,14 @@ VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const
         default:
             break;
     }
+
+    #else
+
+    (DAEvoid)in_message_severity;
+    (DAEvoid)in_message_type;
+    (DAEvoid)in_callback_data;
+
+    #endif
 
     return VK_FALSE;
 }

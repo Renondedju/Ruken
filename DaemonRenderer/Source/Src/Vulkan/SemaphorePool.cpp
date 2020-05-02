@@ -28,33 +28,50 @@ USING_DAEMON_NAMESPACE
 
 #pragma region Methods
 
-VulkanSemaphore& SemaphorePool::RequestSemaphore()
+VulkanSemaphore& SemaphorePool::RequestSemaphore() noexcept
 {
-    while (m_semaphore_index >= m_semaphores.size())
+    if (m_semaphore_index.load(std::memory_order_acquire) >= m_semaphores.size())
+    {
+        std::lock_guard lock(m_mutex);
+
         m_semaphores.emplace_back();
+    }
 
-    return m_semaphores[m_semaphore_index++];
+    return m_semaphores[m_semaphore_index.fetch_add(1u, std::memory_order_release)];
 }
 
-VulkanTimelineSemaphore& SemaphorePool::RequestTimelineSemaphore()
+VulkanTimelineSemaphore& SemaphorePool::RequestTimelineSemaphore() noexcept
 {
-    while (m_timeline_semaphore_index >= m_timeline_semaphores.size())
-        m_timeline_semaphores.emplace_back();
+    if (m_timeline_semaphore_index.load(std::memory_order_acquire) >= m_timeline_semaphores.size())
+    {
+        std::lock_guard lock(m_mutex);
 
-    return m_timeline_semaphores[m_timeline_semaphore_index++];
+        m_timeline_semaphores.emplace_back();
+    }
+
+    return m_timeline_semaphores[m_timeline_semaphore_index.fetch_add(1u, std::memory_order_release)];
 }
 
-DAEvoid SemaphorePool::Reset()
+DAEbool SemaphorePool::Reset() noexcept
 {
     auto const timeline_semaphore_count = m_timeline_semaphores.size();
 
-    m_timeline_semaphores.clear();
+    {
+        std::lock_guard lock(m_mutex);
 
-    for (DAEsize i = 0; i < timeline_semaphore_count; ++i)
-        m_timeline_semaphores.emplace_back();
+        m_timeline_semaphores.clear();
 
-    m_semaphore_index          = 0u;
-    m_timeline_semaphore_index = 0u;
+        for (DAEsize i = 0; i < timeline_semaphore_count; ++i)
+        {
+            if (!m_timeline_semaphores.emplace_back().GetHandle())
+                return false;
+        }
+    }
+
+    m_semaphore_index         .store(0u, std::memory_order_release);
+    m_timeline_semaphore_index.store(0u, std::memory_order_release);
+
+    return true;
 }
 
 #pragma endregion

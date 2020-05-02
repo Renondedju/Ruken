@@ -22,15 +22,14 @@
  *  SOFTWARE.
  */
 
-#include "spirv_cross/spirv_cross.hpp"
-
 #include "Vulkan/Core/VulkanShaderModule.hpp"
 
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
 VulkanShaderModule::VulkanShaderModule(std::vector<DAEuint32> const& in_code) noexcept
 {
@@ -40,7 +39,13 @@ VulkanShaderModule::VulkanShaderModule(std::vector<DAEuint32> const& in_code) no
     shader_module_create_info.codeSize = in_code.size() * sizeof(DAEuint32);
     shader_module_create_info.pCode    = in_code.data();
 
-    vkCreateShaderModule(VulkanLoader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle);
+    VK_CHECK(vkCreateShaderModule(VulkanLoader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle));
+}
+
+VulkanShaderModule::VulkanShaderModule(VulkanShaderModule&& in_move) noexcept:
+    m_handle {in_move.m_handle}
+{
+    in_move.m_handle = nullptr;
 }
 
 VulkanShaderModule::~VulkanShaderModule() noexcept
@@ -55,9 +60,27 @@ VulkanShaderModule::~VulkanShaderModule() noexcept
 
 #pragma region Methods
 
+DAEbool VulkanShaderModule::IsValid() const noexcept
+{
+    return m_handle != nullptr;
+}
+
 VkShaderModule const& VulkanShaderModule::GetHandle() const noexcept
 {
     return m_handle;
+}
+
+#pragma endregion
+
+#pragma region Operators
+
+VulkanShaderModule& VulkanShaderModule::operator=(VulkanShaderModule&& in_move) noexcept
+{
+    m_handle = in_move.m_handle;
+
+    in_move.m_handle = nullptr;
+
+    return *this;
 }
 
 #pragma endregion

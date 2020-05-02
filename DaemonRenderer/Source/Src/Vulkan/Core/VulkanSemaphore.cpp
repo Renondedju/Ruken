@@ -22,10 +22,9 @@
  *  SOFTWARE.
  */
 
-#include <memory>
-
 #include "Vulkan/Core/VulkanSemaphore.hpp"
 
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
@@ -38,11 +37,11 @@ VulkanSemaphore::VulkanSemaphore() noexcept
 
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-    vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
+    VK_CHECK(vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle));
 }
 
 VulkanSemaphore::VulkanSemaphore(VulkanSemaphore&& in_move) noexcept:
-    m_handle {std::move(in_move.m_handle)}
+    m_handle {in_move.m_handle}
 {
     in_move.m_handle = nullptr;
 }
@@ -62,6 +61,19 @@ VulkanSemaphore::~VulkanSemaphore() noexcept
 VkSemaphore const& VulkanSemaphore::GetHandle() const noexcept
 {
     return m_handle;
+}
+
+#pragma endregion
+
+#pragma region Operators
+
+VulkanSemaphore& VulkanSemaphore::operator=(VulkanSemaphore&& in_move) noexcept
+{
+    m_handle = in_move.m_handle;
+
+    in_move.m_handle = nullptr;
+
+    return *this;
 }
 
 #pragma endregion

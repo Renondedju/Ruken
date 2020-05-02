@@ -22,56 +22,46 @@
  *  SOFTWARE.
  */
 
-#include <memory>
-
 #include "Vulkan/Core/VulkanBuffer.hpp"
+
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructors and Destructor
+#pragma region Constructors
 
-VulkanBuffer::VulkanBuffer(VkBuffer in_handle) noexcept:
-    m_handle {in_handle}
-{
-
-}
-
-VulkanBuffer::VulkanBuffer(VkBuffer             in_handle,
-                           VmaAllocator         in_allocator,
-                           VmaAllocation        in_allocation,
-                           VmaAllocationInfo    in_allocation_info,
-                           DAEbool const        in_persistent) noexcept:
-    m_handle            {in_handle},
-    m_allocator         {in_allocator},
-    m_allocation        {in_allocation},
-    m_allocation_info   {in_allocation_info},
-    m_is_persistent     {in_persistent}
+VulkanBuffer::VulkanBuffer(VkBuffer          in_handle,
+                           VmaAllocator      in_allocator,
+                           VmaAllocation     in_allocation,
+                           VmaAllocationInfo in_allocation_info,
+                           DAEbool const     in_persistent) noexcept:
+    m_handle          {in_handle},
+    m_allocator       {in_allocator},
+    m_allocation      {in_allocation},
+    m_allocation_info {in_allocation_info},
+    m_is_persistent   {in_persistent},
+    m_is_mapped       {in_persistent}
 {
 
 }
 
 VulkanBuffer::VulkanBuffer(VulkanBuffer&& in_move) noexcept:
-    m_handle            {in_move.m_handle},
-    m_allocator         {in_move.m_allocator},
-    m_allocation        {in_move.m_allocation},
-    m_allocation_info   {in_move.m_allocation_info},
-    m_is_mapped         {in_move.m_is_mapped},
-    m_is_persistent     {in_move.m_is_persistent}
+    m_handle          {in_move.m_handle},
+    m_allocator       {in_move.m_allocator},
+    m_allocation      {in_move.m_allocation},
+    m_allocation_info {in_move.m_allocation_info},
+    m_is_persistent   {in_move.m_is_persistent},
+    m_is_mapped       {in_move.m_is_mapped}
 {
-    in_move.m_handle          = nullptr;
-    in_move.m_allocator       = nullptr;
-    in_move.m_allocation      = nullptr;
-    in_move.m_allocation_info = {};
-    in_move.m_is_mapped       = false;
-    in_move.m_is_persistent   = false;
+    in_move.m_handle     = nullptr;
+    in_move.m_allocator  = nullptr;
+    in_move.m_allocation = nullptr;
 }
 
 VulkanBuffer::~VulkanBuffer() noexcept
 {
     if (!m_handle || !m_allocator || !m_allocation)
         return;
-
-    UnMap();
 
     vmaDestroyBuffer(m_allocator, m_handle, m_allocation);
 }
@@ -82,70 +72,58 @@ VulkanBuffer::~VulkanBuffer() noexcept
 
 DAEvoid* VulkanBuffer::Map() noexcept
 {
-    if (!m_is_persistent && !m_is_mapped && !m_allocation_info.pMappedData)
+    // Mapping persistent or already mapped data does nothing.
+    if (!m_is_persistent && !m_is_mapped)
     {
-        m_is_mapped = true;
+        if (VK_CHECK(vmaMapMemory(m_allocator, m_allocation, &m_allocation_info.pMappedData)))
+            return nullptr;
 
-        vmaMapMemory(m_allocator, m_allocation, &m_allocation_info.pMappedData);
+        m_is_mapped = true;
     }
+
+    if (VK_CHECK(vmaInvalidateAllocation(m_allocator, m_allocation, 0ull, m_allocation_info.size)))
+        return nullptr;
 
     return m_allocation_info.pMappedData;
 }
 
-DAEvoid VulkanBuffer::UnMap() noexcept
+DAEbool VulkanBuffer::Update(DAEvoid const* in_data, DAEsize const in_size) noexcept
 {
-    if (m_is_persistent || !m_is_mapped || !m_allocation_info.pMappedData)
-        return;
-
-    m_is_mapped = false;
-
-    vmaUnmapMemory(m_allocator, m_allocation);
-}
-
-DAEvoid VulkanBuffer::Flush() const noexcept
-{
-    vmaFlushAllocation(m_allocator, m_allocation, m_allocation_info.offset, m_allocation_info.size);
-}
-
-DAEvoid VulkanBuffer::Update(DAEvoid const* in_data, VkDeviceSize const in_offset, VkDeviceSize const in_size) noexcept
-{
-    (void)in_offset;
-
+    // Persistent data is always mapped.
     if (m_is_persistent)
     {
         memcpy(m_allocation_info.pMappedData, in_data, in_size);
 
-        Flush();
+        return true;
     }
 
-    else
-    {
-        Map();
+    if (!Map())
+        return false;
 
-        memcpy(m_allocation_info.pMappedData, in_data, in_size);
+    memcpy(m_allocation_info.pMappedData, in_data, in_size);
 
-        Flush();
-        UnMap();
-    }
+    return Unmap();
 }
 
-DAEbool VulkanBuffer::IsMappable() const noexcept
+DAEbool VulkanBuffer::Unmap() noexcept
 {
-    VkMemoryPropertyFlags flags;
+    // Unmapping persistent or already unmapped data does nothing.
+    if (!m_is_persistent && m_is_mapped)
+    {
+        vmaUnmapMemory(m_allocator, m_allocation);
+        
+        m_is_mapped = false;
+    }
 
-    vmaGetMemoryTypeProperties(m_allocator, m_allocation_info.memoryType, &flags);
+    if (VK_CHECK(vmaFlushAllocation(m_allocator, m_allocation, 0ull, m_allocation_info.size)))
+        return false;
 
-    return (flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) == 0;
+    return true;
 }
 
 VkBuffer const& VulkanBuffer::GetHandle() const noexcept
 {
     return m_handle;
-}
-
-VmaAllocation const& VulkanBuffer::GetAllocation() const noexcept
-{
-    return m_allocation;
 }
 
 VkDeviceMemory const& VulkanBuffer::GetMemory() const noexcept
@@ -163,14 +141,14 @@ VkDeviceSize const& VulkanBuffer::GetSize() const noexcept
     return m_allocation_info.size;
 }
 
-DAEvoid* VulkanBuffer::GetMappedData() const noexcept
+DAEbool VulkanBuffer::IsMapped() const noexcept
 {
-    return m_allocation_info.pMappedData;
+    return m_is_mapped;
 }
 
 #pragma endregion
 
-#pragma region Operator
+#pragma region Operators
 
 VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer&& in_move) noexcept
 {
@@ -178,15 +156,12 @@ VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer&& in_move) noexcept
     m_allocator       = in_move.m_allocator;
     m_allocation      = in_move.m_allocation;
     m_allocation_info = in_move.m_allocation_info;
-    m_is_mapped       = in_move.m_is_mapped;
     m_is_persistent   = in_move.m_is_persistent;
+    m_is_mapped       = in_move.m_is_mapped;
 
-    in_move.m_handle          = nullptr;
-    in_move.m_allocator       = nullptr;
-    in_move.m_allocation      = nullptr;
-    in_move.m_allocation_info = {};
-    in_move.m_is_mapped       = false;
-    in_move.m_is_persistent   = false;
+    in_move.m_handle     = nullptr;
+    in_move.m_allocator  = nullptr;
+    in_move.m_allocation = nullptr;
 
     return *this;
 }

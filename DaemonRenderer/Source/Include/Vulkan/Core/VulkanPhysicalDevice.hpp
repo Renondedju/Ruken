@@ -31,31 +31,22 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class VulkanInstance;
-
 struct QueueFamilyIndices
 {
-    #pragma region Members
-
     std::optional<DAEuint32> graphics;
     std::optional<DAEuint32> compute;
     std::optional<DAEuint32> transfer;
-
-    #pragma endregion
-
-    #pragma region Methods
 
     [[nodiscard]]
     constexpr DAEbool IsComplete() const noexcept
     {
         return graphics.has_value() && compute.has_value() && transfer.has_value();
     }
-
-    #pragma endregion
 };
 
 /**
- * \brief A physical device usually represents a single complete implementation of Vulkan
+ * \brief RAII-class wrapping a 'VkPhysicalDevice' object.
+ *        A physical device usually represents a single complete implementation of Vulkan
  *        (excluding instance-level functionality) available to the host, of which there are a finite number.
  * \note  Vulkan separates the concept of physical and logical devices.
  */
@@ -67,36 +58,35 @@ class VulkanPhysicalDevice
 
         static std::vector<DAEchar const*> m_required_extensions;
 
-        VkPhysicalDevice                    m_handle            {nullptr};
-        VkPhysicalDeviceProperties          m_properties        {};
-        VkPhysicalDeviceMemoryProperties    m_memory_properties {};
-        VkPhysicalDeviceFeatures            m_features          {};
-        QueueFamilyIndices                  m_queue_families    {};
-
-        std::vector<VkQueueFamilyProperties> m_queue_family_properties;
+        VkPhysicalDevice                     m_handle                  {nullptr};
+        VkPhysicalDeviceProperties           m_properties              {};
+        VkPhysicalDeviceMemoryProperties     m_memory_properties       {};
+        VkPhysicalDeviceFeatures             m_features                {};
+        QueueFamilyIndices                   m_queue_families          {};
+        std::vector<VkQueueFamilyProperties> m_queue_family_properties {};
 
         #pragma endregion
 
         #pragma region Methods
 
-        static DAEbool      CheckDeviceExtensions   (VkPhysicalDevice in_handle) noexcept;
-        static DAEbool      CheckQueueFamilies      (VkPhysicalDevice in_handle) noexcept;
-        static DAEuint32    RateDeviceSuitability   (VkPhysicalDevice in_handle) noexcept;
+        static DAEbool   CheckDeviceExtensions(VkPhysicalDevice in_handle) noexcept;
+        static DAEbool   CheckQueueFamilies   (VkPhysicalDevice in_handle) noexcept;
+        static DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_handle) noexcept;
 
-        DAEvoid PickPhysicalDevice  (VulkanInstance const& in_instance) noexcept;
-        DAEvoid SetupPhysicalDevice () noexcept;
-        DAEvoid SetupQueueFamilies  () noexcept;
+        DAEbool PickPhysicalDevice () noexcept;
+        DAEvoid SetupPhysicalDevice() noexcept;
+        DAEvoid SetupQueueFamilies () noexcept;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        explicit VulkanPhysicalDevice(VulkanInstance const& in_instance) noexcept;
+        explicit VulkanPhysicalDevice() noexcept;
 
-        VulkanPhysicalDevice(VulkanPhysicalDevice const&    in_copy) = delete;
-        VulkanPhysicalDevice(VulkanPhysicalDevice&&         in_move) = delete;
+        VulkanPhysicalDevice(VulkanPhysicalDevice const& in_copy) = delete;
+        VulkanPhysicalDevice(VulkanPhysicalDevice&&      in_move) = delete;
 
         ~VulkanPhysicalDevice() = default;
 
@@ -107,18 +97,13 @@ class VulkanPhysicalDevice
         [[nodiscard]]
         static std::vector<DAEchar const*> const& GetRequiredExtensions() noexcept;
 
-        [[nodiscard]]
-        VkPhysicalDevice const& GetHandle() const noexcept;
-        [[nodiscard]]
-        VkPhysicalDeviceProperties const& GetProperties() const noexcept;
-        [[nodiscard]]
-        VkPhysicalDeviceMemoryProperties const& GetMemoryProperties() const noexcept;
-        [[nodiscard]]
-        VkPhysicalDeviceFeatures const& GetFeatures() const noexcept;
-        [[nodiscard]]
-        QueueFamilyIndices const& GetQueueFamilies() const noexcept;
-        [[nodiscard]]
-        std::vector<VkQueueFamilyProperties> const& GetQueueFamilyProperties() const noexcept;
+        [[nodiscard]] DAEbool                                     IsValid                 () const noexcept;
+        [[nodiscard]] VkPhysicalDevice                     const& GetHandle               () const noexcept;
+        [[nodiscard]] VkPhysicalDeviceProperties           const& GetProperties           () const noexcept;
+        [[nodiscard]] VkPhysicalDeviceMemoryProperties     const& GetMemoryProperties     () const noexcept;
+        [[nodiscard]] VkPhysicalDeviceFeatures             const& GetFeatures             () const noexcept;
+        [[nodiscard]] QueueFamilyIndices                   const& GetQueueFamilies        () const noexcept;
+        [[nodiscard]] std::vector<VkQueueFamilyProperties> const& GetQueueFamilyProperties() const noexcept;
 
         #pragma endregion
 

@@ -60,15 +60,15 @@ class VulkanDeviceAllocator
         #pragma region Methods
 
         [[nodiscard]]
-        DAEbool IsValid() const noexcept;
-
-        [[nodiscard]]
         std::optional<VulkanImage> CreateImage(VkImageCreateInfo       const& in_image_create_info,
                                                VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
 
         [[nodiscard]]
         std::optional<VulkanBuffer> CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
                                                  VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
+
+        [[nodiscard]]
+        DAEbool IsValid() const noexcept;
 
         #pragma endregion
 
