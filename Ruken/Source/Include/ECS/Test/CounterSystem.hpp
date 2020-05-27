@@ -26,6 +26,7 @@
 
 #include "ECS/System.hpp"
 
+#include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 #include "ECS/Test/TestExclusiveComponent.hpp"
 

@@ -49,7 +49,7 @@ class Group
         #pragma region Members
 
         Archetype&                  m_archetype;
-        std::tuple<TComponents&...> m_components;
+        std::tuple<TComponents&...> m_components {};
 
         #pragma endregion
 

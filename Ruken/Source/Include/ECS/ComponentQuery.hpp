@@ -32,14 +32,18 @@ BEGIN_DAEMON_NAMESPACE
 
 class Archetype;
 
+/**
+ * \brief A component query allows to quickly check if an archetype matches a given query
+ *        This is used by systems to find archetypes to iterate over and process
+ */
 class ComponentQuery
 {
     private:
 
         #pragma region Members
 
-        ArchetypeFingerprint m_included;
-        ArchetypeFingerprint m_excluded;
+        ArchetypeFingerprint m_included {};
+        ArchetypeFingerprint m_excluded {};
 
         #pragma endregion
 

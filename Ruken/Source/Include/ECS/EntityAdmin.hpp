@@ -48,9 +48,9 @@ class EntityAdmin
 
         #pragma region Members
 
-        std::vector       <std::unique_ptr<SystemBase>>                      m_systems;
-        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes;
-        std::unordered_map<DAEsize, std::unique_ptr<ExclusiveComponentBase>> m_exclusive_components;
+        std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
+        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
+        std::unordered_map<DAEsize, std::unique_ptr<ExclusiveComponentBase>> m_exclusive_components {};
         
         #pragma endregion 
 

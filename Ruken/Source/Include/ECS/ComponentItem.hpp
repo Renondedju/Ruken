@@ -40,7 +40,7 @@ template <typename TType>
 using ComponentVector = std::vector<TType, std::allocator<TType>>;
 
 /**
- * \brief This class describes the memory layout of your component to the ECS
+ * \brief Describes the memory layout of a component to the ECS
  * \tparam TMembers Variable types
  */
 template <typename... TMembers>

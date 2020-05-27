@@ -37,21 +37,21 @@ class SystemBase
 
         #pragma region Mebers
 
-        ComponentQuery m_query;
+        ComponentQuery m_query {};
 
         #pragma endregion
 
     public:
 
-        #pragma region Mebers
+        #pragma region Members
 
-        DAEbool enabled;
+        DAEbool enabled {true};
 
         #pragma endregion
 
         #pragma region Constructors
 
-        SystemBase() noexcept;
+        SystemBase()                          = default;
         SystemBase(SystemBase const& in_copy) = default;
         SystemBase(SystemBase&&      in_move) = default;
         virtual ~SystemBase()                 = default;

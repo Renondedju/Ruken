@@ -58,8 +58,8 @@ class Archetype
 
         #pragma region Members
         
-        std::unordered_map<DAEsize, std::unique_ptr<ComponentBase>> m_components;
-        ArchetypeFingerprint                                        m_fingerprint;
+        std::unordered_map<DAEsize, std::unique_ptr<ComponentBase>> m_components  {};
+        ArchetypeFingerprint                                        m_fingerprint {};
 
         #pragma endregion 
 

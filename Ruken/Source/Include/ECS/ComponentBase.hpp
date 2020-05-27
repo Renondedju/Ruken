@@ -30,6 +30,9 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief Base class of the Component class, this is simply used to store components as they are templated
+ */
 class ComponentBase
 {
     public:

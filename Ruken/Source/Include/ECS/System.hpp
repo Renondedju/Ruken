@@ -55,7 +55,7 @@ class System : public SystemBase
         // This vector stores every group we wish to read/write
         // You really should not try to edit the vector itself yourself.
         // Instead, use it for iteration purposes only !
-        std::vector<Group<TComponents...>> m_groups;
+        std::vector<Group<TComponents...>> m_groups {};
         EntityAdmin&                       m_admin;
 
         #pragma endregion

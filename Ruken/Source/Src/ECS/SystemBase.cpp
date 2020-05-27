@@ -26,10 +26,6 @@
 
 USING_DAEMON_NAMESPACE
 
-SystemBase::SystemBase() noexcept:
-    enabled {true}
-{}
-
 ComponentQuery const& SystemBase::GetQuery() const noexcept
 {
     return m_query;

@@ -26,7 +26,9 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/Meta.hpp"
 #include "Meta/Assert.hpp"
+
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ComponentItem.hpp"
 
@@ -57,7 +59,7 @@ class Component final : public ComponentBase
         #pragma region Members
 
         // Storage of the component
-        typename Layout::ContainerType m_storage;
+        typename Layout::ContainerType m_storage {};
 
         #pragma endregion 
 

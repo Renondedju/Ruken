@@ -51,7 +51,7 @@ class TagComponent final : public ComponentBase
         // The size of the component must still be tracked in case where the
         // archetype we are living in queries us to find its size.
         // TODO(Basile): That job could be handled by the Archetype instead
-        DAEsize m_component_size;
+        DAEsize m_component_size {0};
 
         #pragma endregion 
 
