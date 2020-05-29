@@ -130,6 +130,8 @@
     <ClInclude Include="Source\Include\Build\Platform.hpp" />
     <ClInclude Include="Source\Include\Build\Revision.hpp" />
     <ClInclude Include="Source\Include\Build\Config.hpp" />
+    <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
+    <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayout.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayoutItem.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayoutView.hpp" />
