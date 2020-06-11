@@ -28,6 +28,7 @@
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Vulkan/Utilities/VulkanUtilities.hpp"
 
 USING_DAEMON_NAMESPACE
 

@@ -115,18 +115,4 @@ VulkanImage& VulkanImage::operator=(VulkanImage&& in_move) noexcept
     return *this;
 }
 
-DAEbool DAEMON_NAMESPACE::operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept
-{
-    return in_lhs.width  == in_rhs.width  &&
-           in_rhs.height == in_lhs.height &&
-           in_rhs.depth  == in_lhs.depth;
-}
-
-DAEbool DAEMON_NAMESPACE::operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept
-{
-    return in_lhs.width  != in_rhs.width  ||
-           in_rhs.height != in_lhs.height ||
-           in_rhs.depth  != in_lhs.depth;
-}
-
 #pragma endregion

@@ -204,7 +204,7 @@ VulkanQueue& VulkanQueue::operator=(VulkanQueue&& in_move) noexcept
 
     in_move.m_handle          = nullptr;
     in_move.m_physical_device = nullptr;
-    in_move.m_queue_family    = UINT64_MAX;
+    in_move.m_queue_family    = UINT32_MAX;
 
     return *this;
 }

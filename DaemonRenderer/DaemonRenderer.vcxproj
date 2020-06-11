@@ -265,6 +265,7 @@
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanUtilities.hpp" />
     <ClInclude Include="Source\Include\Windowing\GammaRamp.hpp" />
     <ClInclude Include="Source\Include\Windowing\Metrics.hpp" />
     <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
@@ -325,6 +326,7 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
     <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Vertex.cpp" />
