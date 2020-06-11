@@ -28,6 +28,8 @@
 
 #if defined(DAEMON_OS_WINDOWS)
     #define VK_USE_PLATFORM_WIN32_KHR
+#else
+    #error Platform not supported
 #endif
 
 #include <volk/volk.h>

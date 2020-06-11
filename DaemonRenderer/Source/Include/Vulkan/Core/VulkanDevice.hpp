@@ -53,6 +53,10 @@ class VulkanDevice
         QueueFamilyIndices       m_queue_families {};
         std::vector<VulkanQueue> m_queues         {};
 
+        /**
+         * \brief A command pool is dedicated to a queue family (first key) and to a thread (second key),
+         *        because they cannot be used concurrently.
+         */
         std::unordered_map<DAEuint32, std::unordered_map<std::thread::id, VulkanCommandPool>> m_command_pools {};
 
         std::unique_ptr<VulkanPipelineCache> m_pipeline_cache {};

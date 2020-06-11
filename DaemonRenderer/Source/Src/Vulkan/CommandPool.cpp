@@ -63,9 +63,11 @@ VulkanCommandBuffer* CommandPool::RequestCommandBuffer(VkCommandBufferLevel cons
 
     if (in_level == VK_COMMAND_BUFFER_LEVEL_PRIMARY)
     {
+        // Returns a command buffer from the pool if one is available.
         if (data.primary_index < data.primary_command_buffers.size())
             return data.primary_command_buffers[data.primary_index++].get();
 
+        // Allocates a new command buffer if none is available.
         if (auto command_buffer = data.pool->AllocateCommandBuffer(in_level))
         {
             data.primary_index++;
@@ -76,9 +78,11 @@ VulkanCommandBuffer* CommandPool::RequestCommandBuffer(VkCommandBufferLevel cons
 
     else
     {
+        // Returns a command buffer from the pool if one is available.
         if (data.secondary_index < data.second_command_buffers.size())
             return data.second_command_buffers[data.secondary_index++].get();
 
+        // Allocates a new command buffer if none is available.
         if (auto command_buffer = data.pool->AllocateCommandBuffer(in_level))
         {
             data.secondary_index++;
@@ -94,11 +98,12 @@ DAEbool CommandPool::Reset() noexcept
 {
     for (auto& it : m_command_pools)
     {
-        it.second.primary_index   = 0u;
-        it.second.secondary_index = 0u;
-
+        // Resets the indexes of a pool if it could be reset.
         if (VK_CHECK(vkResetCommandPool(VulkanLoader::GetLoadedDevice(), it.second.pool->GetHandle(), 0u)))
             return false;
+
+        it.second.primary_index   = 0u;
+        it.second.secondary_index = 0u;
     }
 
     return true;
