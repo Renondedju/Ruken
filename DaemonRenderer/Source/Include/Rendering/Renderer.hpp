@@ -28,10 +28,7 @@
 
 #include "Core/Service.hpp"
 
-#include "Threading/Scheduler.hpp"
 #include "Rendering/RenderContext.hpp"
-
-#include "Debug/Logging/Logger.hpp"
 
 #include "Vulkan/Core/VulkanDevice.hpp"
 #include "Vulkan/Core/VulkanInstance.hpp"
@@ -41,38 +38,41 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class Logger;
+class Window;
+class Scheduler;
+
 class Renderer final : public Service<Renderer>
 {
     private:
 
         #pragma region Members
 
-        Logger*     m_logger;
-        Scheduler*  m_scheduler;
+        Logger*    m_logger    {nullptr};
+        Scheduler* m_scheduler {nullptr};
 
-        std::unique_ptr<VulkanInstance>         m_instance;
-        std::unique_ptr<VulkanPhysicalDevice>   m_physical_device;
-        std::unique_ptr<VulkanDevice>           m_device;
-        std::unique_ptr<VulkanDeviceAllocator>  m_device_allocator;
-        
-        std::vector<std::unique_ptr<RenderContext>> m_render_contexts;
+        std::unique_ptr<VulkanInstance>        m_instance         {};
+        std::unique_ptr<VulkanPhysicalDevice>  m_physical_device  {};
+        std::unique_ptr<VulkanDevice>          m_device           {};
+        std::unique_ptr<VulkanDeviceAllocator> m_device_allocator {};
+        std::vector    <RenderContext>         m_render_contexts  {};
 
         #pragma endregion
 
         #pragma region Methods
 
-        DAEvoid MakeContext(class Window& in_window);
+        DAEvoid MakeContext(Window& in_window) noexcept;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         explicit Renderer(ServiceProvider& in_service_provider) noexcept;
 
-        Renderer(Renderer const&    in_copy) = delete;
-        Renderer(Renderer&&         in_move) = delete;
+        Renderer(Renderer const& in_copy) = delete;
+        Renderer(Renderer&&      in_move) = delete;
 
         ~Renderer() noexcept;
 
@@ -80,22 +80,10 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Methods
 
-        DAEvoid OnUpdate() noexcept;
-
-        [[nodiscard]]
-        Logger& GetLogger() const noexcept;
-
-        [[nodiscard]]
-        VulkanInstance& GetInstance() const noexcept;
-
-        [[nodiscard]]
-        VulkanPhysicalDevice& GetPhysicalDevice() const noexcept;
-
-        [[nodiscard]]
-        VulkanDevice& GetDevice() const noexcept;
-
-        [[nodiscard]]
-        VulkanDeviceAllocator& GetDeviceAllocator() const noexcept;
+        [[nodiscard]] VulkanInstance&        GetInstance       () const noexcept;
+        [[nodiscard]] VulkanPhysicalDevice&  GetPhysicalDevice () const noexcept;
+        [[nodiscard]] VulkanDevice&          GetDevice         () const noexcept;
+        [[nodiscard]] VulkanDeviceAllocator& GetDeviceAllocator() const noexcept;
 
         #pragma endregion
 

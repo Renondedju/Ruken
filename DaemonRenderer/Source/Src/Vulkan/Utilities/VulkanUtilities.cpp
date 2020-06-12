@@ -1,7 +1,7 @@
 ﻿/*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,20 @@
  *  SOFTWARE.
  */
 
-#include "Vulkan/DescriptorPool.hpp"
+#include "Vulkan/Utilities/VulkanUtilities.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+DAEbool DAEMON_NAMESPACE::operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept
+{
+    return in_lhs.width  == in_rhs.width  &&
+           in_rhs.height == in_lhs.height &&
+           in_rhs.depth  == in_lhs.depth;
+}
 
-#pragma endregion
-
-#pragma region Methods
-
-#pragma endregion
+DAEbool DAEMON_NAMESPACE::operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept
+{
+    return in_lhs.width  != in_rhs.width  ||
+           in_rhs.height != in_lhs.height ||
+           in_rhs.depth  != in_lhs.depth;
+}

@@ -36,6 +36,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+class Renderer;
 class Scheduler;
 
 class RenderFrame
@@ -44,29 +45,23 @@ class RenderFrame
 
         #pragma region Members
 
-        std::unique_ptr<FencePool>      m_fence_pool;
-        std::unique_ptr<SemaphorePool>  m_semaphore_pool;
-        std::unique_ptr<CommandPool>    m_command_pool;
-        std::unique_ptr<RenderTarget> m_render_target;
-
-        std::vector<RenderView> m_render_views;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
+        std::unique_ptr<FencePool>     m_fence_pool;
+        std::unique_ptr<SemaphorePool> m_semaphore_pool;
+        std::unique_ptr<CommandPool>   m_graphics_command_pool;
+        std::unique_ptr<CommandPool>   m_compute_command_pool;
+        std::unique_ptr<RenderTarget>  m_render_target;
+        std::vector    <RenderView>    m_render_views;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        RenderFrame(Scheduler& in_scheduler) noexcept;
+        RenderFrame(Renderer& in_renderer, Scheduler& in_scheduler) noexcept;
 
-        RenderFrame(RenderFrame const&  in_copy) = delete;
-        RenderFrame(RenderFrame&&       in_move) noexcept;
+        RenderFrame(RenderFrame const& in_copy) = delete;
+        RenderFrame(RenderFrame&&      in_move) noexcept;
 
         ~RenderFrame() = default;
 
@@ -74,29 +69,21 @@ class RenderFrame
 
         #pragma region Methods
 
-        DAEvoid Reset() noexcept;
-
         [[nodiscard]]
-        VulkanFence& RequestFence() const noexcept;
+        DAEbool Reset() noexcept;
 
-        [[nodiscard]]
-        VulkanSemaphore& RequestSemaphore() const noexcept;
-
-        [[nodiscard]]
-        VulkanTimelineSemaphore& RequestTimelineSemaphore() const noexcept;
-
-        [[nodiscard]]
-        VulkanCommandBuffer* RequestCommandBuffer(VkCommandBufferLevel in_level) const noexcept;
-
-        [[nodiscard]]
-        RenderTarget const& GetRenderTarget() const noexcept;
+        [[nodiscard]] FencePool&     GetFencePool          () const noexcept;
+        [[nodiscard]] SemaphorePool& GetSemaphorePool      () const noexcept;
+        [[nodiscard]] CommandPool&   GetGraphicsCommandPool() const noexcept;
+        [[nodiscard]] CommandPool&   GetComputeCommandPool () const noexcept;
+        [[nodiscard]] RenderTarget&  GetRenderTarget       () const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        RenderFrame& operator=(RenderFrame const&   in_copy) = delete;
-        RenderFrame& operator=(RenderFrame&&        in_move) = delete;
+        RenderFrame& operator=(RenderFrame const& in_copy) = delete;
+        RenderFrame& operator=(RenderFrame&&      in_move) = delete;
 
         #pragma endregion
 };

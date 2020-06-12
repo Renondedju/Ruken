@@ -22,7 +22,14 @@
  *  SOFTWARE.
  */
 
+#include <array>
+
 #include "Vulkan/Core/VulkanSwapchain.hpp"
+
+#include "Windowing/Window.hpp"
+
+#include "Rendering/RenderFrame.hpp"
+
 #include "Vulkan/Core/VulkanQueue.hpp"
 #include "Vulkan/Core/VulkanDevice.hpp"
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
@@ -30,26 +37,34 @@
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
-#include "Windowing/Window.hpp"
-
-#include "Rendering/RenderFrame.hpp"
-#include "Rendering/Renderer.hpp"
+#ifdef DAEMON_OS_WINDOWS
+    #include "Utility/WindowsOS.hpp"
+#endif
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
-VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& in_physical_device, VulkanDevice& in_device, Window& in_window):
-    m_device            {in_device},
-    m_physical_device   {in_physical_device.GetHandle()}
+VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& in_physical_device,
+                                 VulkanDevice&         in_device,
+                                 Window&               in_window) noexcept:
+    m_physical_device {in_physical_device},
+    m_device          {in_device}
 {
     auto const extent = in_window.GetFramebufferSize();
 
     m_image_extent.width  = static_cast<DAEuint32>(extent.width);
     m_image_extent.height = static_cast<DAEuint32>(extent.height);
 
-    if (CreateSurface(in_device, in_window) && CreateSwapchain())
+    if (CreateSurface(in_device, in_window) && SetupSwapchain() && CreateSwapchain())
+    {
         CreateImages();
+
+        in_window.on_framebuffer_resized += [this](DAEint32 const in_width, DAEint32 const in_height)
+        {
+            RecreateSwapchain(in_width, in_height);
+        };
+    }
 }
 
 VulkanSwapchain::~VulkanSwapchain() noexcept
@@ -82,6 +97,7 @@ DAEvoid VulkanSwapchain::SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> con
     {
         m_surface_format.format     = VK_FORMAT_B8G8R8A8_SRGB;
         m_surface_format.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+
         return;
     }
 
@@ -93,7 +109,8 @@ DAEvoid VulkanSwapchain::SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> con
         if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB)
             m_surface_format = available_format;
 
-        if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB  && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        if (available_format.format     == VK_FORMAT_B8G8R8A8_SRGB &&
+            available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {
             m_surface_format = available_format;
             break;
@@ -108,17 +125,14 @@ DAEvoid VulkanSwapchain::SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_ca
         m_image_extent = in_capabilities.currentExtent;
     }
 
-    //m_image_extent.width  = Clamp(m_image_extent.width,  in_capabilities.minImageExtent.width,  in_capabilities.maxImageExtent.width);
-    //m_image_extent.height = Clamp(m_image_extent.height, in_capabilities.minImageExtent.height, in_capabilities.maxImageExtent.height);
+    // m_image_extent.width  = Clamp(m_image_extent.width,  in_capabilities.minImageExtent.width,  in_capabilities.maxImageExtent.width);
+    // m_image_extent.height = Clamp(m_image_extent.height, in_capabilities.minImageExtent.height, in_capabilities.maxImageExtent.height);
 }
 
 DAEvoid VulkanSwapchain::SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
 {
     if (in_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
-    {
         m_pre_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    }
-
     else
         m_pre_transform = in_capabilities.currentTransform;
 }
@@ -158,41 +172,62 @@ DAEvoid VulkanSwapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& 
 
 DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept
 {
-    if (glfwCreateWindowSurface(VulkanLoader::GetLoadedInstance(), in_window.GetHandle(), nullptr, &m_surface) == VK_SUCCESS)
-    {
-        m_queue = in_device.GetPresentQueue(m_surface);
+    #ifdef DAEMON_OS_WINDOWS
 
-        if (m_queue)
-            return true;
+    VkWin32SurfaceCreateInfoKHR surface_create_info = {};
 
-        VulkanDebug::GetLogger().Error("No queue supports presentation to the surface!");
-    }
+    surface_create_info.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    surface_create_info.hinstance = GetModuleHandle(nullptr);
+    surface_create_info.hwnd      = in_window.GetWin32Window();
 
-    else
-        VulkanDebug::GetLogger().Error("Failed to create surface!");
+    if (VK_CHECK(vkCreateWin32SurfaceKHR(VulkanLoader::GetLoadedInstance(), &surface_create_info, nullptr, &m_surface)))
+        return false;
+
+    #else
+
+    (DAEvoid)in_device;
+    (DAEvoid)in_window;
 
     return false;
+
+    #endif
+
+    m_queue = in_device.RequestPresentQueue(m_surface);
+
+    if (!m_queue)
+    {
+        VulkanDebug::Error("No queue supports presentation to the surface!");
+
+        return false;
+    }
+
+    return true;
 }
 
-DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
+DAEbool VulkanSwapchain::SetupSwapchain() noexcept
 {
     VkSurfaceCapabilitiesKHR capabilities;
 
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physical_device, m_surface, &capabilities);
+    if (VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physical_device.GetHandle(), m_surface, &capabilities)))
+        return false;
 
-    DAEuint32 count = 0u;
+    auto count = 0u;
 
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device, m_surface, &count, nullptr);
+    if (VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device.GetHandle(), m_surface, &count, nullptr)))
+        return false;
 
     std::vector<VkSurfaceFormatKHR> formats(count);
 
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device, m_surface, &count, formats.data());
+    if (VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device.GetHandle(), m_surface, &count, formats.data())))
+        return false;
 
-    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physical_device, m_surface, &count, nullptr);
+    if (VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(m_physical_device.GetHandle(), m_surface, &count, nullptr)))
+        return false;
 
     std::vector<VkPresentModeKHR> present_modes(count);
 
-    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physical_device, m_surface, &count, present_modes.data());
+    if (VK_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(m_physical_device.GetHandle(), m_surface, &count, present_modes.data())))
+        return false;
 
     SelectImageCount    (capabilities);
     SelectSurfaceFormat (formats);
@@ -201,6 +236,11 @@ DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexce
     SelectCompositeAlpha(capabilities);
     SelectPresentMode   (present_modes);
 
+    return true;
+}
+
+DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
+{
     VkSwapchainCreateInfoKHR swapchain_info = {};
 
     swapchain_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -211,92 +251,145 @@ DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexce
     swapchain_info.imageExtent      = m_image_extent;
     swapchain_info.imageArrayLayers = 1u;
     swapchain_info.imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-    swapchain_info.preTransform     = capabilities.currentTransform;
-    swapchain_info.compositeAlpha   = m_composite_alpha;
-    swapchain_info.presentMode      = m_present_mode;
-    swapchain_info.clipped          = VK_TRUE;
-    swapchain_info.oldSwapchain     = in_old_swapchain;
 
-   return vkCreateSwapchainKHR(VulkanLoader::GetLoadedDevice(), &swapchain_info, nullptr, &m_handle) == VK_SUCCESS;
+    std::array<DAEuint32, 2> queue_families_indices = {
+        m_device.GetGraphicsFamily(),
+        m_device.FindPresentFamily(m_surface).value_or(UINT64_MAX)
+    };
+
+    if (queue_families_indices[0] != queue_families_indices[1])
+    {
+        swapchain_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+        swapchain_info.queueFamilyIndexCount = static_cast<DAEuint32>(queue_families_indices.size());
+        swapchain_info.pQueueFamilyIndices   = queue_families_indices.data();
+    }
+
+    swapchain_info.preTransform   = m_pre_transform;
+    swapchain_info.compositeAlpha = m_composite_alpha;
+    swapchain_info.presentMode    = m_present_mode;
+    swapchain_info.clipped        = VK_TRUE;
+    swapchain_info.oldSwapchain   = in_old_swapchain;
+
+    if (VK_CHECK(vkCreateSwapchainKHR(VulkanLoader::GetLoadedDevice(), &swapchain_info, nullptr, &m_handle)))
+        return false;
+
+    return true;
 }
 
-DAEvoid VulkanSwapchain::CreateImages()
+DAEvoid VulkanSwapchain::CreateImages() noexcept
 {
     // Obtains the number of presentable images associated with the swapchain.
-    if (vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr) != VK_SUCCESS)
-    {
-        VulkanDebug::GetLogger().Error("Failed to create swapchain images!");
-        return;
-    }
+    VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr));
 
     std::vector<VkImage> images(m_image_count);
 
     // Obtains the array of presentable images associated with the swapchain.
-    vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, images.data());
+    VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, images.data()));
 
-    for (DAEuint32 i = 0; i < m_image_count; ++i)
+    VkExtent3D extent = {
+        m_image_extent.width,
+        m_image_extent.height,
+        1u
+    };
+
+    for (auto i = 0u; i < m_image_count; ++i)
     {
-        m_images.emplace_back(images[i]);
+        m_images.emplace_back(images[i], m_surface_format.format, extent);
 
         VulkanDebug::SetObjectName(VK_OBJECT_TYPE_IMAGE, reinterpret_cast<DAEuint64>(images[i]), "SwapchainImage_" + std::to_string(i));
     }
 }
 
-DAEvoid VulkanSwapchain::Resize(DAEint32 const in_width, DAEint32 const in_height)
+DAEvoid VulkanSwapchain::RecreateSwapchain(DAEint32 const in_width, DAEint32 const in_height) noexcept
 {
-    if (in_width == 0 || in_height == 0)
-        return;
-
     m_image_extent.width  = in_width;
     m_image_extent.height = in_height;
 
+    if (m_image_extent.width  == 0 || m_image_extent.height == 0)
+        return;
+
     m_images.clear();
 
-    if (CreateSwapchain(m_handle))
+    if (SetupSwapchain() && CreateSwapchain(m_handle))
         CreateImages();
 }
 
-DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
+DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) noexcept
 {
-    auto& image_available_semaphore = in_frame.RequestSemaphore();
-    auto& transfer_finished_semaphore = in_frame.RequestSemaphore();
-
-    DAEuint32 image_index = 0u;
-
-    if (vkAcquireNextImageKHR(VulkanLoader::GetLoadedDevice(), m_handle, UINT64_MAX, image_available_semaphore.GetHandle(), nullptr, &image_index) != VK_SUCCESS)
-    {
-        VulkanDebug::GetLogger().Error("");
+    if (m_image_extent.width  == 0 || m_image_extent.height == 0)
         return;
-    }
 
-    auto* command_buffer = in_frame.RequestCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    auto& image_available_semaphore   = in_frame.GetSemaphorePool().RequestSemaphore();
+    auto& transfer_finished_semaphore = in_frame.GetSemaphorePool().RequestSemaphore();
+
+    if (VK_CHECK(vkAcquireNextImageKHR(VulkanLoader::GetLoadedDevice(),
+                                       m_handle,
+                                       UINT64_MAX,
+                                       image_available_semaphore.GetHandle(),
+                                       nullptr,
+                                       &m_image_index)))
+        return;
+
+    auto* command_buffer = in_frame.GetGraphicsCommandPool().RequestCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+    if (!command_buffer)
+        return;
+
+    auto const& src_image = in_frame.GetRenderTarget().GetImage();
+    auto const& dst_image = m_images[m_image_index];
+
+    if (!command_buffer->Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT))
+        return;
 
     VkImageMemoryBarrier memory_barrier = {};
 
     memory_barrier.sType                       = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    memory_barrier.srcAccessMask               = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    memory_barrier.dstAccessMask               = VK_ACCESS_TRANSFER_READ_BIT;
-    memory_barrier.oldLayout                   = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    memory_barrier.newLayout                   = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    memory_barrier.srcQueueFamilyIndex         = m_device.GetGraphicsFamily();
-    memory_barrier.dstQueueFamilyIndex         = m_device.GetTransferFamily();
-    memory_barrier.image                       = in_frame.GetRenderTarget().GetImage().GetHandle();
+    memory_barrier.srcQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
+    memory_barrier.dstQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
     memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     memory_barrier.subresourceRange.levelCount = 1u;
     memory_barrier.subresourceRange.layerCount = 1u;
 
-    command_buffer->InsertMemoryBarrier(memory_barrier);
+    // ...
+    memory_barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    memory_barrier.oldLayout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    memory_barrier.newLayout     = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    memory_barrier.image         = src_image.GetHandle();
 
-    // command_buffer->CopyImage();
+    command_buffer->InsertMemoryBarrier(0u, 0u, VK_DEPENDENCY_BY_REGION_BIT, memory_barrier);
 
-    memory_barrier.srcAccessMask       = VK_ACCESS_TRANSFER_READ_BIT;
-    memory_barrier.dstAccessMask       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    memory_barrier.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    memory_barrier.newLayout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    memory_barrier.srcQueueFamilyIndex = m_device.GetTransferFamily();
-    memory_barrier.dstQueueFamilyIndex = m_device.GetGraphicsFamily();
+    // ...
+    memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    memory_barrier.oldLayout     = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    memory_barrier.newLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    memory_barrier.image         = dst_image.GetHandle();
 
-    command_buffer->InsertMemoryBarrier(memory_barrier);
+    command_buffer->InsertMemoryBarrier(0u, 0u, VK_DEPENDENCY_BY_REGION_BIT, memory_barrier);
+
+    command_buffer->BlitImage(src_image, dst_image, VK_FILTER_NEAREST);
+
+    // ...
+    memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    memory_barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    memory_barrier.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    memory_barrier.newLayout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    memory_barrier.image         = src_image.GetHandle();
+
+    command_buffer->InsertMemoryBarrier(0u, 0u, VK_DEPENDENCY_BY_REGION_BIT, memory_barrier);
+
+    // ...
+    memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    memory_barrier.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    memory_barrier.newLayout     = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    memory_barrier.image         = dst_image.GetHandle();
+
+    command_buffer->InsertMemoryBarrier(0u, 0u, VK_DEPENDENCY_BY_REGION_BIT, memory_barrier);
+
+    if (!command_buffer->End())
+        return;
 
     VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 
@@ -311,23 +404,31 @@ DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) const noexcept
     submit_info.signalSemaphoreCount = 1u;
     submit_info.pSignalSemaphores    = &transfer_finished_semaphore.GetHandle();
 
-    m_device.GetTransferQueue().Submit(submit_info);
+    if (!m_device.GetGraphicsQueue().Submit(submit_info))
+        VulkanDebug::Error("");
 
-    VkPresentInfoKHR present_info = {};
-
-    present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    present_info.waitSemaphoreCount = 1u;
-    present_info.pWaitSemaphores    = &transfer_finished_semaphore.GetHandle();
-    present_info.swapchainCount     = 1u;
-    present_info.pSwapchains        = &m_handle;
-    present_info.pImageIndices      = &image_index;
-
-    m_queue->Present(present_info);
+    if (!m_queue->Present(*this, transfer_finished_semaphore))
+        VulkanDebug::Error("Failed to queue an image for presentation!");
 }
 
 DAEbool VulkanSwapchain::IsValid() const noexcept
 {
     return m_surface && m_queue && m_handle && !m_images.empty();
+}
+
+VkSwapchainKHR const& VulkanSwapchain::GetHandle() const noexcept
+{
+    return m_handle;
+}
+
+DAEuint32 const& VulkanSwapchain::GetImageIndex() const noexcept
+{
+    return m_image_index;
+}
+
+DAEuint32 VulkanSwapchain::GetImageCount() const noexcept
+{
+    return m_image_count;
 }
 
 #pragma endregion

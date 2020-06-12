@@ -24,14 +24,16 @@
 
 #pragma once
 
-#include <string>
-
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief This class wraps a messenger object which handles passing along debug messages to a provided debug callback.
+ *        It also contains helper functions to simplify Vulkan debugging, like checking the result of a vulkan function.
+ */
 class VulkanDebug
 {
     private:
@@ -47,27 +49,27 @@ class VulkanDebug
 
         #pragma region Methods
 
-        /**
-         * \brief 
-         */
-        static DAEvoid Initialize(Logger& in_parent_logger);
+        static DAEvoid Initialize           (Logger* in_parent_logger) noexcept;
+        static DAEvoid CreateDebugMessenger ()                         noexcept;
+        static DAEvoid DestroyDebugMessenger()                         noexcept;
+
+        static DAEvoid Debug  (std::string_view in_message) noexcept;
+        static DAEvoid Info   (std::string_view in_message) noexcept;
+        static DAEvoid Warning(std::string_view in_message) noexcept;
+        static DAEvoid Error  (std::string_view in_message) noexcept;
+        static DAEvoid Fatal  (std::string_view in_message) noexcept;
 
         /**
-         * \return True if the result is an error value, else False.
+         * \return True if the result is an error, else False.
+         * \note   Use this methods to check the result of non-critical calls to Vulkan functions.
          */
-        static DAEbool CheckResult(VkResult in_result, std::string const& in_function) noexcept;
-
-        static DAEvoid AssertResult(VkResult in_result, std::string const& in_function) noexcept;
-
-        /**
-         * \param in_instance The instance the messenger will be used with.
-         */
-        static DAEvoid CreateDebugMessenger(VkInstance                          in_instance) noexcept;
+        static DAEbool CheckResult(VkResult in_result, std::string_view in_function_name) noexcept;
 
         /**
-         * \param in_instance The instance where the callback was created.
+         * \return True if the result is not VK_SUCCESS, else False.
+         * \note   Use this method to check the result of critical calls to Vulkan functions.
          */
-        static DAEvoid DestroyDebugMessenger(VkInstance in_instance) noexcept;
+        static DAEbool AssertResult(VkResult in_result, std::string_view in_function_name) noexcept;
 
         /**
          * \brief Application-defined debug messenger callback function.
@@ -76,66 +78,51 @@ class VulkanDebug
          * \param in_callback_data    Structure specifying parameters returned to the callback.
          * \param in_user_data        User data provided when the debug messenger was created.
          */
-        static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT        in_message_severity,
-                                      VkDebugUtilsMessageTypeFlagsEXT               in_message_type,
-                                      VkDebugUtilsMessengerCallbackDataEXT const*   in_callback_data,
-                                      DAEvoid*                                      in_user_data);
+        static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT      in_message_severity,
+                                      VkDebugUtilsMessageTypeFlagsEXT             in_message_type,
+                                      VkDebugUtilsMessengerCallbackDataEXT const* in_callback_data,
+                                      DAEvoid*                                    in_user_data);
 
         /**
-         * \param in_object_type   The type of the object to be named.
-         * \param in_object_handle The object to be named.
-         * \param in_object_name   The name to apply to object.
+         * \param in_type   The type of the object to be named.
+         * \param in_handle The object to be named.
+         * \param in_name   The name to apply to object.
          */
-        static DAEvoid SetObjectName(VkObjectType       in_object_type,
-                                     DAEuint64          in_object_handle,
-                                     std::string const& in_object_name) noexcept;
+        static DAEvoid SetObjectName(VkObjectType     in_type,
+                                     DAEuint64        in_handle,
+                                     std::string_view in_name) noexcept;
 
         /**
-         * \param in_object_type   The type of the object to be tagged.
-         * \param in_object_handle The object to be tagged.
-         * \param in_tag_name      The numerical identifier of the tag.
-         * \param in_tag_size      The number of bytes of data to attach to the object.
-         * \param in_tag           The data to be associated with the object.
+         * \param in_type   The type of the object to be tagged.
+         * \param in_handle The object to be tagged.
+         * \param in_name   The numerical identifier of the tag.
+         * \param in_size   The number of bytes of data to attach to the object.
+         * \param in_tag    The data to be associated with the object.
          */
-        static DAEvoid SetObjectTag(VkObjectType    in_object_type,
-                                    DAEuint64       in_object_handle,
-                                    DAEuint64       in_tag_name,
-                                    DAEsize         in_tag_size,
-                                    DAEvoid const*  in_tag) noexcept;
+        static DAEvoid SetObjectTag(VkObjectType   in_type,
+                                    DAEuint64      in_handle,
+                                    DAEuint64      in_name,
+                                    DAEsize        in_size,
+                                    DAEvoid const* in_tag) noexcept;
 
-        /**
-         * \return 
-         */
-        static std::string ToString(VkResult in_result) noexcept;
-
-        /**
-         * \return 
-         */
-        static std::string ToString(VkObjectType in_object) noexcept;
-
-        /**
-         * \return 
-         */
-        static Logger& GetLogger() noexcept;
-
-        /**
-         * \return 
-         */
-        static VkDebugUtilsMessengerEXT const& GetDebugMessenger() noexcept;
+        static std::string ToString(VkResult                                    in_result)        noexcept;
+        static std::string ToString(VkObjectType                                in_object)        noexcept;
+        static std::string ToString(VkDebugUtilsMessageTypeFlagsEXT             in_message_type)  noexcept;
+        static std::string ToString(VkDebugUtilsMessengerCallbackDataEXT const* in_callback_data) noexcept;
 
         #pragma endregion
 };
 
-#ifdef DAEMON_CONFIG_DEBUG
+/**
+ * \return True if the result is an error, else False.
+ * \note   Use this methods to check the result of non-critical calls to Vulkan functions.
+ */
+#define VK_CHECK(result) VulkanDebug::CheckResult(result, #result)
 
-#define VK_CHECK(result)  VulkanDebug::CheckResult (result, #result)
+/**
+ * \return True if the result is not VK_SUCCESS, else False.
+ * \note   Use this method to check the result of critical calls to Vulkan functions.
+ */
 #define VK_ASSERT(result) VulkanDebug::AssertResult(result, #result)
-
-#else
-
-#define VK_CHECK(result)  result
-#define VK_ASSERT(result) result
-
-#endif
 
 END_DAEMON_NAMESPACE

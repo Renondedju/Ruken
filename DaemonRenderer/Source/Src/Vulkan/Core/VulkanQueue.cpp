@@ -25,6 +25,8 @@
 #include "Vulkan/Core/VulkanQueue.hpp"
 #include "Vulkan/Core/VulkanCommandBuffer.hpp"
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
+#include "Vulkan/Core/VulkanSemaphore.hpp"
+#include "Vulkan/Core/VulkanSwapchain.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 
@@ -64,6 +66,13 @@ VulkanQueue::~VulkanQueue() noexcept
 
 #pragma region Methods
 
+DAEvoid VulkanQueue::WaitIdle() const noexcept
+{
+    std::lock_guard lock(m_mutex);
+
+    VK_CHECK(vkQueueWaitIdle(m_handle));
+}
+
 DAEvoid VulkanQueue::BeginLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept
 {
     VkDebugUtilsLabelEXT label_info = {};
@@ -76,11 +85,6 @@ DAEvoid VulkanQueue::BeginLabel(DAEchar const* in_label_name, Vector4f const& in
     label_info.color[3]   = in_color.data[3];
 
     vkQueueBeginDebugUtilsLabelEXT(m_handle, &label_info);
-}
-
-DAEvoid VulkanQueue::EndLabel() const noexcept
-{
-    vkQueueEndDebugUtilsLabelEXT(m_handle);
 }
 
 DAEvoid VulkanQueue::InsertLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept
@@ -97,45 +101,85 @@ DAEvoid VulkanQueue::InsertLabel(DAEchar const* in_label_name, Vector4f const& i
     vkQueueInsertDebugUtilsLabelEXT(m_handle, &label_info);
 }
 
-DAEvoid VulkanQueue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence) const noexcept
+DAEvoid VulkanQueue::EndLabel() const noexcept
 {
-    std::lock_guard lock(m_mutex);
-
-    VK_CHECK(vkQueueSubmit(m_handle, 1u, &in_submit_info, in_fence));
+    vkQueueEndDebugUtilsLabelEXT(m_handle);
 }
 
-DAEvoid VulkanQueue::Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence) const noexcept
+
+DAEbool VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence) const noexcept
 {
-    std::lock_guard lock(m_mutex);
-
-    VK_CHECK(vkQueueSubmit(m_handle, static_cast<DAEuint32>(in_submit_infos.size()), in_submit_infos.data(), in_fence));
-}
-
-DAEvoid VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence) const noexcept
-{
-    std::lock_guard lock(m_mutex);
-
     VkSubmitInfo submit_info = {};
 
-    submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.commandBufferCount   = 1u;
-    submit_info.pCommandBuffers      = &in_command_buffer.GetHandle();
+    submit_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.commandBufferCount = 1u;
+    submit_info.pCommandBuffers    = &in_command_buffer.GetHandle();
 
-    VK_CHECK(vkQueueSubmit(m_handle, 1u, &submit_info, in_fence));
+    std::lock_guard lock(m_mutex);
+
+    if (VK_CHECK(vkQueueSubmit(m_handle, 1u, &submit_info, in_fence)))
+        return false;
+
+    return true;
 }
 
-DAEvoid VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
+DAEbool VulkanQueue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence) const noexcept
 {
     std::lock_guard lock(m_mutex);
 
-    VK_CHECK(vkQueuePresentKHR(m_handle, &in_present_info));
+    if (VK_CHECK(vkQueueSubmit(m_handle, 1u, &in_submit_info, in_fence)))
+        return false;
+
+    return true;
 }
 
-DAEvoid VulkanQueue::WaitIdle() const noexcept
+DAEbool VulkanQueue::Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence) const noexcept
 {
     std::lock_guard lock(m_mutex);
 
-    VK_CHECK(vkQueueWaitIdle(m_handle));
+    if (VK_CHECK(vkQueueSubmit(m_handle, static_cast<DAEuint32>(in_submit_infos.size()), in_submit_infos.data(), in_fence)))
+        return false;
+
+    return true;
+}
+
+DAEbool VulkanQueue::Present(VulkanSwapchain const& in_swapchain, VulkanSemaphore const& in_semaphore) const noexcept
+{
+    VkPresentInfoKHR present_info = {};
+
+    present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1u;
+    present_info.pWaitSemaphores    = &in_semaphore.GetHandle();
+    present_info.swapchainCount     = 1u;
+    present_info.pSwapchains        = &in_swapchain.GetHandle();
+    present_info.pImageIndices      = &in_swapchain.GetImageIndex();
+
+    std::lock_guard lock(m_mutex);
+
+    if (VK_CHECK(vkQueuePresentKHR(m_handle, &present_info)))
+        return false;
+
+    return true;
+}
+
+DAEbool VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
+{
+    std::lock_guard lock(m_mutex);
+
+    if (VK_CHECK(vkQueuePresentKHR(m_handle, &in_present_info)))
+        return false;
+
+    return true;
+}
+
+DAEbool VulkanQueue::IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept
+{
+    VkBool32 presentation_support = VK_FALSE;
+
+    if (VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(m_physical_device, m_queue_family, in_surface, &presentation_support)))
+        return false;
+
+    return presentation_support;
 }
 
 VkQueue const& VulkanQueue::GetHandle() const noexcept
@@ -148,13 +192,21 @@ DAEuint32 VulkanQueue::GetQueueFamily() const noexcept
     return m_queue_family;
 }
 
-DAEbool VulkanQueue::IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept
+#pragma endregion
+
+#pragma region Operators
+
+VulkanQueue& VulkanQueue::operator=(VulkanQueue&& in_move) noexcept
 {
-    VkBool32 presentation_support = VK_FALSE;
+    m_handle          = in_move.m_handle;
+    m_physical_device = in_move.m_physical_device;
+    m_queue_family    = in_move.m_queue_family;
 
-    vkGetPhysicalDeviceSurfaceSupportKHR(m_physical_device, m_queue_family, in_surface, &presentation_support);
+    in_move.m_handle          = nullptr;
+    in_move.m_physical_device = nullptr;
+    in_move.m_queue_family    = UINT32_MAX;
 
-    return presentation_support;
+    return *this;
 }
 
 #pragma endregion

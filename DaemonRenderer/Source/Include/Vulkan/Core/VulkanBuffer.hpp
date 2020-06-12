@@ -28,26 +28,31 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief RAII-class wrapping a 'VkBuffer' object.
+ *        Buffers represent linear arrays of data which are used for various purposes
+ *        by binding them to a graphics or compute pipeline via descriptor sets or via certain commands,
+ *        or by directly specifying them as parameters to certain commands.
+ * \note  A buffer must be allocated from the VulkanDeviceAllocator and the memory will be freed at buffer's destruction.
+ */
 class VulkanBuffer
 {
     private:
 
         #pragma region Members
 
-        VkBuffer            m_handle            {nullptr};
-        VmaAllocator        m_allocator         {nullptr};
-        VmaAllocation       m_allocation        {nullptr};
-        VmaAllocationInfo   m_allocation_info   {};
-        DAEbool             m_is_mapped         {false};
-        DAEbool             m_is_persistent     {false};
+        VkBuffer          m_handle          {nullptr};
+        VmaAllocator      m_allocator       {nullptr};
+        VmaAllocation     m_allocation      {nullptr};
+        VmaAllocationInfo m_allocation_info {};
+        DAEbool           m_is_persistent   {false};
+        DAEbool           m_is_mapped       {false};
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
-
-        explicit VulkanBuffer(VkBuffer in_handle) noexcept;
+        #pragma region Constructors
 
         explicit VulkanBuffer(VkBuffer          in_handle,
                               VmaAllocator      in_allocator,
@@ -55,8 +60,8 @@ class VulkanBuffer
                               VmaAllocationInfo in_allocation_info,
                               DAEbool           in_persistent) noexcept;
 
-        VulkanBuffer(VulkanBuffer const&    in_copy) = delete;
-        VulkanBuffer(VulkanBuffer&&         in_move) noexcept;
+        VulkanBuffer(VulkanBuffer const& in_copy) = delete;
+        VulkanBuffer(VulkanBuffer&&      in_move) noexcept;
 
         ~VulkanBuffer() noexcept;
 
@@ -64,34 +69,32 @@ class VulkanBuffer
 
         #pragma region Methods
 
+        /**
+         * \return A pointer to the first byte of this memory if the memory was correctly mapped, else nullptr.
+         * \note   This function automatically flushes or invalidates caches if necessary.
+         */
+        [[nodiscard]]
         DAEvoid* Map() noexcept;
 
-        DAEvoid UnMap() noexcept;
-
-        DAEvoid Flush() const noexcept;
-
-        DAEvoid Update(DAEvoid const* in_data, VkDeviceSize in_offset, VkDeviceSize in_size) noexcept;
-
+        /**
+         * \return True if the data was correctly updated, else False.
+         * \note   This function automatically maps and unmaps memory if necessary.
+         */
         [[nodiscard]]
-        DAEbool IsMappable() const noexcept;
+        DAEbool Update(DAEvoid const* in_data, DAEsize in_size) noexcept;
 
+        /**
+         * \return True if the memory was correctly unmapped, else False.
+         * \note   This function automatically flushes or invalidates caches if necessary.
+         */
         [[nodiscard]]
-        VkBuffer const& GetHandle() const noexcept;
+        DAEbool Unmap() noexcept;
 
-        [[nodiscard]]
-        VmaAllocation const& GetAllocation() const noexcept;
-
-        [[nodiscard]]
-        VkDeviceMemory const& GetMemory() const noexcept;
-
-        [[nodiscard]]
-        VkDeviceSize const& GetOffset() const noexcept;
-
-        [[nodiscard]]
-        VkDeviceSize const& GetSize() const noexcept;
-
-        [[nodiscard]]
-        DAEvoid* GetMappedData() const noexcept;
+        [[nodiscard]] VkBuffer       const& GetHandle() const noexcept;
+        [[nodiscard]] VkDeviceMemory const& GetMemory() const noexcept;
+        [[nodiscard]] VkDeviceSize   const& GetOffset() const noexcept;
+        [[nodiscard]] VkDeviceSize   const& GetSize  () const noexcept;
+        [[nodiscard]] DAEbool               IsMapped () const noexcept;
 
         #pragma endregion
 

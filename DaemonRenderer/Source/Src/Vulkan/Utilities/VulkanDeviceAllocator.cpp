@@ -30,17 +30,16 @@
 
 #pragma warning (pop)
 
-#include "Vulkan/Utilities/VulkanDebug.hpp"
-
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
-#include "Vulkan/Core/VulkanDevice.hpp"
+
+#include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor and Destructor
+#pragma region Constructors
 
-VulkanDeviceAllocator::VulkanDeviceAllocator(VulkanPhysicalDevice const& in_physical_device,
-                                             VulkanDevice         const& in_device) noexcept
+VulkanDeviceAllocator::VulkanDeviceAllocator(VulkanPhysicalDevice const& in_physical_device) noexcept
 {
     VmaVulkanFunctions functions = {
         vkGetPhysicalDeviceProperties,
@@ -60,20 +59,22 @@ VulkanDeviceAllocator::VulkanDeviceAllocator(VulkanPhysicalDevice const& in_phys
         vkCreateImage,
         vkDestroyImage,
         vkCmdCopyBuffer,
-        vkGetBufferMemoryRequirements2KHR,
-        vkGetImageMemoryRequirements2KHR,
-        vkBindBufferMemory2KHR,
-        vkBindImageMemory2KHR,
-        vkGetPhysicalDeviceMemoryProperties2KHR
+        vkGetBufferMemoryRequirements2,
+        vkGetImageMemoryRequirements2,
+        vkBindBufferMemory2,
+        vkBindImageMemory2,
+        vkGetPhysicalDeviceMemoryProperties2
     };
 
     VmaAllocatorCreateInfo allocator_create_info = {};
 
     allocator_create_info.physicalDevice   = in_physical_device.GetHandle();
-    allocator_create_info.device           = in_device.GetHandle();
+    allocator_create_info.device           = VulkanLoader::GetLoadedDevice();
     allocator_create_info.pVulkanFunctions = &functions;
+    allocator_create_info.instance         = VulkanLoader::GetLoadedInstance();
+    allocator_create_info.vulkanApiVersion = VK_API_VERSION_1_2;
 
-    VK_CHECK(vmaCreateAllocator(&allocator_create_info, &m_handle));
+    VK_ASSERT(vmaCreateAllocator(&allocator_create_info, &m_handle));
 }
 
 VulkanDeviceAllocator::~VulkanDeviceAllocator() noexcept
@@ -89,31 +90,52 @@ VulkanDeviceAllocator::~VulkanDeviceAllocator() noexcept
 #pragma region Methods
 
 std::optional<VulkanImage> VulkanDeviceAllocator::CreateImage(VkImageCreateInfo       const& in_image_create_info,
-                                                        VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
+                                                              VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
     VkImage           image           = nullptr;
     VmaAllocation     allocation      = nullptr;
     VmaAllocationInfo allocation_info = {};
 
-    if (vmaCreateImage(m_handle, &in_image_create_info, &in_allocation_create_info, &image, &allocation, &allocation_info) != VK_SUCCESS)
+    if (VK_CHECK(vmaCreateImage(m_handle,
+                                &in_image_create_info,
+                                &in_allocation_create_info,
+                                &image,
+                                &allocation,
+                                &allocation_info)))
         return std::nullopt;
 
-    return VulkanImage(image, m_handle, allocation, allocation_info);
+    return VulkanImage(image,
+                       m_handle,
+                       allocation,
+                       in_image_create_info.format,
+                       in_image_create_info.extent);
 }
 
 std::optional<VulkanBuffer> VulkanDeviceAllocator::CreateBuffer(VkBufferCreateInfo      const& in_buffer_create_info,
-                                                          VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
+                                                                VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept
 {
     VkBuffer          buffer          = nullptr;
     VmaAllocation     allocation      = nullptr;
     VmaAllocationInfo allocation_info = {};
 
-    if (vmaCreateBuffer(m_handle, &in_buffer_create_info, &in_allocation_create_info, &buffer, &allocation, &allocation_info) != VK_SUCCESS)
+    if (VK_CHECK(vmaCreateBuffer(m_handle,
+                                 &in_buffer_create_info,
+                                 &in_allocation_create_info,
+                                 &buffer,
+                                 &allocation,
+                                 &allocation_info)))
         return std::nullopt;
 
-    DAEbool const is_persistent = (in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT) == 0;
+    return VulkanBuffer(buffer,
+                        m_handle,
+                        allocation,
+                        allocation_info,
+                        in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT);
+}
 
-    return VulkanBuffer(buffer, m_handle, allocation, allocation_info, is_persistent);
+DAEbool VulkanDeviceAllocator::IsValid() const noexcept
+{
+    return m_handle != nullptr;
 }
 
 #pragma endregion

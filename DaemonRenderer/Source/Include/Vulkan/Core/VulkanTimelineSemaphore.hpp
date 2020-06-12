@@ -28,16 +28,25 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief RAII-class wrapping a timeline 'VkSemaphore' object.
+ *        Semaphores are a synchronization primitive that can be used to insert a dependency
+ *        between queue operations or between a queue operation and the host.
+ *        Timeline semaphores have a monotonically increasing 64-bit unsigned integer payload
+ *        and are signaled with respect to a particular reference value.
+ *        A timeline semaphore can additionally be signaled from the host with the "Signal" command
+ *        and waited on from the host with the "Wait" command.
+ */
 class VulkanTimelineSemaphore final : public VulkanSemaphore
 {
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         VulkanTimelineSemaphore() noexcept;
 
-        VulkanTimelineSemaphore(VulkanTimelineSemaphore const&  in_copy) = delete;
-        VulkanTimelineSemaphore(VulkanTimelineSemaphore&&       in_move) noexcept;
+        VulkanTimelineSemaphore(VulkanTimelineSemaphore const& in_copy) = delete;
+        VulkanTimelineSemaphore(VulkanTimelineSemaphore&&      in_move) = default;
 
         ~VulkanTimelineSemaphore() = default;
 
@@ -45,10 +54,23 @@ class VulkanTimelineSemaphore final : public VulkanSemaphore
 
         #pragma region Methods
 
-        DAEvoid Signal(DAEuint64 in_value) const noexcept;
+        /**
+         * \return True if this semaphore could be set to the given value, else False.
+         */
+        [[nodiscard]]
+        DAEbool Signal(DAEuint64 in_value) const noexcept;
 
+        /**
+         * \brief If the condition is satisfied when this function is called, then it returns immediately.
+         *        If the condition is not satisfied at the time this function is called,
+         *        then it will block and wait for the condition to become satisfied.
+         */
+        [[nodiscard]]
         DAEvoid Wait(DAEuint64 in_value) const noexcept;
 
+        /**
+         * \return The current counter value of this semaphore or 'UINT64_MAX' if the operation failed.
+         */
         [[nodiscard]]
         DAEuint64 GetValue() const noexcept;
 
@@ -56,8 +78,8 @@ class VulkanTimelineSemaphore final : public VulkanSemaphore
 
         #pragma region Operators
 
-        VulkanTimelineSemaphore& operator=(VulkanTimelineSemaphore const&   in_copy) = delete;
-        VulkanTimelineSemaphore& operator=(VulkanTimelineSemaphore&&        in_move) = delete;
+        VulkanTimelineSemaphore& operator=(VulkanTimelineSemaphore const& in_copy) = delete;
+        VulkanTimelineSemaphore& operator=(VulkanTimelineSemaphore&&      in_move) = default;
 
         #pragma endregion
 };

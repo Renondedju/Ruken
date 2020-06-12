@@ -28,41 +28,7 @@
 
 BEGIN_DAEMON_NAMESPACE
 
-class DescriptorPool
-{
-    private:
-
-        #pragma region Members
-
-        
-
-        #pragma endregion
-
-    public:
-
-        #pragma region Constructors and Destructor
-
-        DescriptorPool() = default;
-
-        DescriptorPool(DescriptorPool const&    in_copy) = delete;
-        DescriptorPool(DescriptorPool&&         in_move) = delete;
-
-        ~DescriptorPool() = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        DescriptorPool& operator=(DescriptorPool const& in_copy) = delete;
-        DescriptorPool& operator=(DescriptorPool&&      in_move) = delete;
-
-        #pragma endregion
-};
+DAEbool operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
+DAEbool operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
 
 END_DAEMON_NAMESPACE

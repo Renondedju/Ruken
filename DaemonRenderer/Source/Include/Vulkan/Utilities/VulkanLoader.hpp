@@ -24,10 +24,17 @@
 
 #pragma once
 
-#include "VulkanConfig.hpp"
+#include "Vulkan/Utilities/VulkanConfig.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief This class wraps volk, a meta-loader for Vulkan.
+ *        It allows you to dynamically load entry points required to use Vulkan
+ *        without linking to vulkan-1.dll or statically linking Vulkan loader.
+ * \note  Volk enables loading Vulkan entry points directly from the driver
+ *        which can increase performance by skipping loader dispatch overhead.
+ */
 class VulkanLoader
 {
     public:
@@ -35,10 +42,10 @@ class VulkanLoader
         #pragma region Methods
 
         /**
-         * \brief Initializes the volk library by loading the Vulkan DLL.
-         * \note  Call this function before creating the Vulkan instance.
+         * \return True if the volk library could be initialized, else False.
+         * \note   Call this function before creating the Vulkan instance.
          */
-        static DAEvoid Initialize();
+        static DAEbool Initialize() noexcept;
 
         /**
          * \brief Loads global function pointers using application-created 'VkInstance'.

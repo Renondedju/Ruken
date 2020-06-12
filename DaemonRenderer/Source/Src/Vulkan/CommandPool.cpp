@@ -27,35 +27,30 @@
 #include "Threading/Scheduler.hpp"
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
+#include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
 
-#pragma region Constructor
+#pragma region Constructors
 
 CommandPool::CommandPool(Scheduler& in_scheduler, DAEuint32 const in_queue_family_index) noexcept
 {
+    // Creates a command pool for each worker.
     for (auto const& worker : in_scheduler.GetWorkers())
     {
-        CommandPoolData command_pool = {
-            0u,
-            0u,
-            std::make_unique<VulkanCommandPool>(in_queue_family_index),
-            {},
-            {}
-        };
+        CommandPoolData data = {};
 
-        m_command_pools.emplace(worker.ID(), std::move(command_pool));
+        data.pool = std::make_unique<VulkanCommandPool>(in_queue_family_index);
+
+        m_command_pools.emplace(worker.ID(), std::move(data));
     }
 
-    CommandPoolData command_pool = {
-        0u,
-        0u,
-        std::make_unique<VulkanCommandPool>(in_queue_family_index),
-        {},
-        {}
-    };
+    // Creates a command pool for the main thread since it is not managed by the Scheduler.
+    CommandPoolData data = {};
 
-    m_command_pools.emplace(std::this_thread::get_id(), std::move(command_pool));
+    data.pool = std::make_unique<VulkanCommandPool>(in_queue_family_index);
+
+    m_command_pools.emplace(std::this_thread::get_id(), std::move(data));
 }
 
 #pragma endregion
@@ -64,46 +59,54 @@ CommandPool::CommandPool(Scheduler& in_scheduler, DAEuint32 const in_queue_famil
 
 VulkanCommandBuffer* CommandPool::RequestCommandBuffer(VkCommandBufferLevel const in_level) noexcept
 {
-    auto& command_pool = m_command_pools.at(std::this_thread::get_id());
+    auto& data = m_command_pools.at(std::this_thread::get_id());
 
     if (in_level == VK_COMMAND_BUFFER_LEVEL_PRIMARY)
     {
-        if (command_pool.primary_index < command_pool.primary_command_buffers.size())
-            return &command_pool.primary_command_buffers[command_pool.primary_index++];
+        // Returns a command buffer from the pool if one is available.
+        if (data.primary_index < data.primary_command_buffers.size())
+            return data.primary_command_buffers[data.primary_index++].get();
 
-        if (auto command_buffer = command_pool.pool->AllocateCommandBuffer(in_level))
+        // Allocates a new command buffer if none is available.
+        if (auto command_buffer = data.pool->AllocateCommandBuffer(in_level))
         {
-            command_pool.primary_index++;
+            data.primary_index++;
 
-            return &command_pool.primary_command_buffers.emplace_back(std::move(*command_buffer));
+            return data.primary_command_buffers.emplace_back(std::make_unique<VulkanCommandBuffer>(std::move(*command_buffer))).get();
         }
     }
 
     else
     {
-        if (command_pool.secondary_index < command_pool.second_command_buffers.size())
-            return &command_pool.second_command_buffers[command_pool.secondary_index++];
+        // Returns a command buffer from the pool if one is available.
+        if (data.secondary_index < data.second_command_buffers.size())
+            return data.second_command_buffers[data.secondary_index++].get();
 
-        if (auto command_buffer = command_pool.pool->AllocateCommandBuffer(in_level))
+        // Allocates a new command buffer if none is available.
+        if (auto command_buffer = data.pool->AllocateCommandBuffer(in_level))
         {
-            command_pool.secondary_index++;
+            data.secondary_index++;
 
-            return &command_pool.second_command_buffers.emplace_back(std::move(*command_buffer));
+            return data.second_command_buffers.emplace_back(std::make_unique<VulkanCommandBuffer>(std::move(*command_buffer))).get();
         }
     }
 
     return nullptr;
 }
 
-DAEvoid CommandPool::Reset()
+DAEbool CommandPool::Reset() noexcept
 {
-    for (auto& command_pool : m_command_pools)
+    for (auto& it : m_command_pools)
     {
-        command_pool.second.primary_index   = 0u;
-        command_pool.second.secondary_index = 0u;
+        // Resets the indexes of a pool if it could be reset.
+        if (VK_CHECK(vkResetCommandPool(VulkanLoader::GetLoadedDevice(), it.second.pool->GetHandle(), 0u)))
+            return false;
 
-        command_pool.second.pool->Reset();
+        it.second.primary_index   = 0u;
+        it.second.secondary_index = 0u;
     }
+
+    return true;
 }
 
 #pragma endregion

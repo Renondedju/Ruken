@@ -24,6 +24,8 @@
 
 #include "Windowing/WindowManager.hpp"
 
+#include <GLFW/glfw3.h>
+
 #include "Kernel.hpp"
 #include "KernelProxy.hpp"
 

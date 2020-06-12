@@ -28,6 +28,14 @@
 
 BEGIN_DAEMON_NAMESPACE
 
+/**
+ * \brief RAII-class wrapping a binary 'VkSemaphore' object.
+ *        Semaphores are a synchronization primitive that can be used to insert a dependency
+ *        between queue operations or between a queue operation and the host.
+ *        Binary semaphores have two states - signaled and unsignaled.
+ *        A semaphore can be signaled after execution of a queue operation is completed,
+ *        and a queue operation can wait for a semaphore to become signaled before it begins execution.
+ */
 class VulkanSemaphore
 {
     protected:
@@ -40,12 +48,12 @@ class VulkanSemaphore
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         VulkanSemaphore() noexcept;
 
-        VulkanSemaphore(VulkanSemaphore const&  in_copy) = delete;
-        VulkanSemaphore(VulkanSemaphore&&       in_move) noexcept;
+        VulkanSemaphore(VulkanSemaphore const& in_copy) = delete;
+        VulkanSemaphore(VulkanSemaphore&&      in_move) noexcept;
 
         virtual ~VulkanSemaphore() noexcept;
 
@@ -60,8 +68,8 @@ class VulkanSemaphore
 
         #pragma region Operators
 
-        VulkanSemaphore& operator=(VulkanSemaphore const&   in_copy) = delete;
-        VulkanSemaphore& operator=(VulkanSemaphore&&        in_move) = delete;
+        VulkanSemaphore& operator=(VulkanSemaphore const& in_copy) = delete;
+        VulkanSemaphore& operator=(VulkanSemaphore&&      in_move) noexcept;
 
         #pragma endregion
 };

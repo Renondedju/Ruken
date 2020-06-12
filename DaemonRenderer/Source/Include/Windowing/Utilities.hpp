@@ -26,12 +26,12 @@
 
 #define GLFW_INCLUDE_NONE
 
-#include <GLFW/glfw3.h>
+#include <string>
 
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
-DAEchar const* GlfwErrorToString(DAEint32 in_error_code) noexcept;
+std::string GlfwErrorToString(DAEint32 in_error_code) noexcept;
 
 END_DAEMON_NAMESPACE

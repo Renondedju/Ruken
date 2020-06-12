@@ -24,9 +24,11 @@
 
 #include "Windowing/Utilities.hpp"
 
+#include <GLFW/glfw3.h>
+
 USING_DAEMON_NAMESPACE
 
-DAEchar const* GlfwErrorToString(DAEint32 const in_error_code) noexcept
+std::string GlfwErrorToString(DAEint32 const in_error_code) noexcept
 {
     switch (in_error_code)
     {
@@ -41,6 +43,8 @@ DAEchar const* GlfwErrorToString(DAEint32 const in_error_code) noexcept
         case GLFW_PLATFORM_ERROR:      return "GLFW_PLATFORM_ERROR";
         case GLFW_FORMAT_UNAVAILABLE:  return "GLFW_FORMAT_UNAVAILABLE";
         case GLFW_NO_WINDOW_CONTEXT:   return "GLFW_NO_WINDOW_CONTEXT";
-        default:                       return "GLFW_UNKNOWN_ERROR_CODE";
+
+        default:
+            return "GLFW_UNKNOWN_ERROR_CODE";
     }
 }

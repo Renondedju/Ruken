@@ -63,7 +63,7 @@
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;volk.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -110,7 +110,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;volk.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -179,7 +179,6 @@
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandPool.hpp" />
-    <ClInclude Include="Source\Include\Vulkan\DescriptorPool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\FencePool.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanImage.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanInstance.hpp" />
@@ -266,6 +265,7 @@
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
+    <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanUtilities.hpp" />
     <ClInclude Include="Source\Include\Windowing\GammaRamp.hpp" />
     <ClInclude Include="Source\Include\Windowing\Metrics.hpp" />
     <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
@@ -326,6 +326,7 @@
     <None Include="Source\Src\Types\NamedType.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
     <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Resources\Vertex.cpp" />
@@ -352,7 +353,6 @@
     <ClCompile Include="Source\Src\Rendering\RenderFrame.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanBuffer.cpp" />
-    <ClCompile Include="Source\Src\Vulkan\DescriptorPool.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanImage.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanLoader.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanPipelineCache.cpp" />

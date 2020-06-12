@@ -29,8 +29,9 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
- *        Creating a VkInstance object initializes the Vulkan library and allows the application to
+ * \brief RAII-class wrapping a 'VkInstance' object.
+ *        There is no global state in Vulkan and all per-application state is stored in a 'VkInstance' object.
+ *        Creating a 'VkInstance' object initializes the Vulkan library and allows the application to
  *        pass information about itself to the implementation.
  */
 class VulkanInstance
@@ -39,10 +40,10 @@ class VulkanInstance
 
         #pragma region Members
 
-        static std::vector<DAEchar const*>                  m_required_extensions;
-        static std::vector<DAEchar const*>                  m_required_validation_layers;
-        static std::vector<VkValidationFeatureEnableEXT>    m_enabled_validation_features;
-        static std::vector<VkValidationFeatureDisableEXT>   m_disabled_validation_features;
+        static std::vector<DAEchar const*>                m_required_extensions;
+        static std::vector<DAEchar const*>                m_required_validation_layers;
+        static std::vector<VkValidationFeatureEnableEXT>  m_enabled_validation_features;
+        static std::vector<VkValidationFeatureDisableEXT> m_disabled_validation_features;
 
         VkInstance m_handle {nullptr};
 
@@ -50,21 +51,21 @@ class VulkanInstance
 
         #pragma region Methods
 
-        static DAEvoid CheckInstanceExtensions  () noexcept;
-        static DAEvoid CheckValidationLayers    () noexcept;
+        static DAEbool CheckInstanceExtensions() noexcept;
+        static DAEbool CheckValidationLayers  () noexcept;
 
-        DAEvoid CreateInstance() noexcept;
+        DAEbool CreateInstance() noexcept;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
         VulkanInstance() noexcept;
 
-        VulkanInstance(VulkanInstance const&    in_copy) = delete;
-        VulkanInstance(VulkanInstance&&         in_move) = delete;
+        VulkanInstance(VulkanInstance const& in_copy) = delete;
+        VulkanInstance(VulkanInstance&&      in_move) = delete;
 
         ~VulkanInstance() noexcept;
 
@@ -72,17 +73,13 @@ class VulkanInstance
 
         #pragma region Methods
 
-        [[nodiscard]]
-        static std::vector<DAEchar const*> const& GetRequiredExtensions() noexcept;
-        [[nodiscard]]
-        static std::vector<DAEchar const*>  const& GetRequiredValidationLayers() noexcept;
-        [[nodiscard]]
-        static std::vector<VkValidationFeatureEnableEXT> const& GetEnabledValidationFeatures() noexcept;
-        [[nodiscard]]
-        static std::vector<VkValidationFeatureDisableEXT> const& GetDisabledValidationFeatures() noexcept;
+        [[nodiscard]] static std::vector<DAEchar const*>                const& GetRequiredExtensions        () noexcept;
+        [[nodiscard]] static std::vector<DAEchar const*>                const& GetRequiredValidationLayers  () noexcept;
+        [[nodiscard]] static std::vector<VkValidationFeatureEnableEXT>  const& GetEnabledValidationFeatures () noexcept;
+        [[nodiscard]] static std::vector<VkValidationFeatureDisableEXT> const& GetDisabledValidationFeatures() noexcept;
 
-        [[nodiscard]]
-        VkInstance const& GetHandle() const noexcept;
+        [[nodiscard]] DAEbool           IsValid  () const noexcept;
+        [[nodiscard]] VkInstance const& GetHandle() const noexcept;
 
         #pragma endregion
 

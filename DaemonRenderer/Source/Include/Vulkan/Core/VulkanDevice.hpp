@@ -38,7 +38,8 @@ BEGIN_DAEMON_NAMESPACE
 class Scheduler;
 
 /**
- * \brief A logical device represents an instance of physical device implementation
+ * \brief RAII-class wrapping a 'VkDevice' object.
+ *        A logical device represents an instance of physical device implementation
  *        with its own state and resources independent of other logical devices.
  * \note  Vulkan separates the concept of physical and logical devices.
  */
@@ -48,33 +49,37 @@ class VulkanDevice
 
         #pragma region Members
 
-        VkDevice            m_handle            {nullptr};
-        QueueFamilyIndices  m_queue_families    {};
+        VkDevice                 m_handle         {nullptr};
+        QueueFamilyIndices       m_queue_families {};
+        std::vector<VulkanQueue> m_queues         {};
 
-        std::vector<VulkanQueue> m_queues;
+        /**
+         * \brief A command pool is dedicated to a queue family (first key) and to a thread (second key),
+         *        because they cannot be used concurrently.
+         */
+        std::unordered_map<DAEuint32, std::unordered_map<std::thread::id, VulkanCommandPool>> m_command_pools {};
 
-        std::unordered_map<DAEuint32, std::unordered_map<std::thread::id, VulkanCommandPool>> m_command_pools;
-
-        std::unique_ptr<VulkanPipelineCache> m_pipeline_cache;
+        std::unique_ptr<VulkanPipelineCache> m_pipeline_cache {};
 
         #pragma endregion
 
         #pragma region Methods
 
-        DAEvoid CreateDevice        (VulkanPhysicalDevice const& in_physical_device) noexcept;
-        DAEvoid CreateQueues        (VulkanPhysicalDevice const& in_physical_device) noexcept;
-        DAEvoid CreateCommandPools  (Scheduler const& in_scheduler) noexcept;
+        DAEbool CreateDevice      (VulkanPhysicalDevice const& in_physical_device) noexcept;
+        DAEvoid CreateQueues      (VulkanPhysicalDevice const& in_physical_device) noexcept;
+        DAEvoid CreateCommandPools(Scheduler            const& in_scheduler)       noexcept;
 
         #pragma endregion
 
     public:
 
-        #pragma region Constructors and Destructor
+        #pragma region Constructors
 
-        explicit VulkanDevice(Scheduler const& in_scheduler, VulkanPhysicalDevice const& in_physical_device) noexcept;
+        explicit VulkanDevice(Scheduler            const& in_scheduler,
+                              VulkanPhysicalDevice const& in_physical_device) noexcept;
 
-        VulkanDevice(VulkanDevice const&    in_copy) = delete;
-        VulkanDevice(VulkanDevice&&         in_move) = delete;
+        VulkanDevice(VulkanDevice const& in_copy) = delete;
+        VulkanDevice(VulkanDevice&&      in_move) = delete;
 
         ~VulkanDevice() noexcept;
 
@@ -82,34 +87,33 @@ class VulkanDevice
 
         #pragma region Methods
 
+        /**
+         * \brief Waits on the host for the completion of outstanding queue operations for all queues on this device.
+         */
         DAEvoid WaitIdle() const noexcept;
 
-        [[nodiscard]]
-        VkDevice const& GetHandle() const noexcept;
-        [[nodiscard]]
-        DAEuint32 GetGraphicsFamily() const noexcept;
-        [[nodiscard]]
-        DAEuint32 GetComputeFamily() const noexcept;
-        [[nodiscard]]
-        DAEuint32 GetTransferFamily() const noexcept;
-        [[nodiscard]]
-        std::optional<DAEuint32> GetPresentFamily(VkSurfaceKHR const& in_surface) const noexcept;
-        [[nodiscard]]
-        VulkanQueue const& GetGraphicsQueue() const noexcept;
-        [[nodiscard]]
-        VulkanQueue const& GetComputeQueue() const noexcept;
-        [[nodiscard]]
-        VulkanQueue const& GetTransferQueue() const noexcept;
-        [[nodiscard]]
-        VulkanQueue const* GetPresentQueue(VkSurfaceKHR const& in_surface) const noexcept;
-        [[nodiscard]]
-        VulkanCommandPool const& GetGraphicsCommandPool() const noexcept;
-        [[nodiscard]]
-        VulkanCommandPool const& GetComputeCommandPool() const noexcept;
-        [[nodiscard]]
-        VulkanCommandPool const& GetTransferCommandPool() const noexcept;
-        [[nodiscard]]
-        VulkanPipelineCache const& GetPipelineCache() const noexcept;
+        /**
+         * \return A queue family supporting presentation to the given surface.
+         */
+        [[nodiscard]] std::optional<DAEuint32> FindPresentFamily(VkSurfaceKHR const& in_surface) const noexcept;
+
+        /**
+         * \return A pointer to a queue supporting presentation to the given surface.
+         */
+        [[nodiscard]] VulkanQueue const* RequestPresentQueue(VkSurfaceKHR const& in_surface) const noexcept;
+
+        [[nodiscard]] DAEbool                    IsValid               () const noexcept;
+        [[nodiscard]] DAEuint32                  GetGraphicsFamily     () const noexcept;
+        [[nodiscard]] DAEuint32                  GetComputeFamily      () const noexcept;
+        [[nodiscard]] DAEuint32                  GetTransferFamily     () const noexcept;
+        [[nodiscard]] VkDevice            const& GetHandle             () const noexcept;
+        [[nodiscard]] VulkanQueue         const& GetGraphicsQueue      () const noexcept;
+        [[nodiscard]] VulkanQueue         const& GetComputeQueue       () const noexcept;
+        [[nodiscard]] VulkanQueue         const& GetTransferQueue      () const noexcept;
+        [[nodiscard]] VulkanCommandPool   const& GetGraphicsCommandPool() const noexcept;
+        [[nodiscard]] VulkanCommandPool   const& GetComputeCommandPool () const noexcept;
+        [[nodiscard]] VulkanCommandPool   const& GetTransferCommandPool() const noexcept;
+        [[nodiscard]] VulkanPipelineCache const& GetPipelineCache      () const noexcept;
 
         #pragma endregion
 

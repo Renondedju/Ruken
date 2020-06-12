@@ -22,10 +22,9 @@
  *  SOFTWARE.
  */
 
-#include <memory>
-
 #include "Vulkan/Core/VulkanTimelineSemaphore.hpp"
 
+#include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
 USING_DAEMON_NAMESPACE
@@ -45,19 +44,14 @@ VulkanTimelineSemaphore::VulkanTimelineSemaphore() noexcept
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     semaphore_create_info.pNext = &semaphore_type_create_info;
 
-    vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle);
-}
-
-VulkanTimelineSemaphore::VulkanTimelineSemaphore(VulkanTimelineSemaphore&& in_move) noexcept: VulkanSemaphore(std::move(in_move))
-{
-
+    VK_CHECK(vkCreateSemaphore(VulkanLoader::GetLoadedDevice(), &semaphore_create_info, nullptr, &m_handle));
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-DAEvoid VulkanTimelineSemaphore::Signal(DAEuint64 const in_value) const noexcept
+DAEbool VulkanTimelineSemaphore::Signal(DAEuint64 const in_value) const noexcept
 {
     VkSemaphoreSignalInfo signal_info = {};
 
@@ -65,7 +59,10 @@ DAEvoid VulkanTimelineSemaphore::Signal(DAEuint64 const in_value) const noexcept
     signal_info.semaphore = m_handle;
     signal_info.value     = in_value;
 
-    vkSignalSemaphore(VulkanLoader::GetLoadedDevice(), &signal_info);
+    if (VK_CHECK(vkSignalSemaphore(VulkanLoader::GetLoadedDevice(), &signal_info)))
+        return false;
+
+    return true;
 }
 
 DAEvoid VulkanTimelineSemaphore::Wait(DAEuint64 const in_value) const noexcept
@@ -77,14 +74,15 @@ DAEvoid VulkanTimelineSemaphore::Wait(DAEuint64 const in_value) const noexcept
     wait_info.pSemaphores    = &m_handle;
     wait_info.pValues        = &in_value;
 
-    vkWaitSemaphores(VulkanLoader::GetLoadedDevice(), &wait_info, std::numeric_limits<DAEuint64>::max());
+    VK_CHECK(vkWaitSemaphores(VulkanLoader::GetLoadedDevice(), &wait_info, UINT64_MAX));
 }
 
 DAEuint64 VulkanTimelineSemaphore::GetValue() const noexcept
 {
-    DAEuint64 value;
+    auto value = 0ull;
 
-    vkGetSemaphoreCounterValue(VulkanLoader::GetLoadedDevice(), m_handle, &value);
+    if (VK_CHECK(vkGetSemaphoreCounterValue(VulkanLoader::GetLoadedDevice(), m_handle, &value)))
+        return UINT64_MAX;
 
     return value;
 }
