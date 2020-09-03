@@ -43,6 +43,8 @@ class LinkedChunkList
 
         using Node = LinkedChunkListNode<TType, TChunkSize>;
 
+        static constexpr DAEsize chunk_element_count = Node::element_count;
+
     private:
 
         #pragma region Members

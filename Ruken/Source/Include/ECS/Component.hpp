@@ -61,7 +61,9 @@ class Component final : public ComponentBase
         // Storage of the component
         typename Layout::ContainerType m_storage {};
 
-        #pragma endregion 
+        DAEsize m_size {0ULL};
+
+        #pragma endregion
 
     public:
 

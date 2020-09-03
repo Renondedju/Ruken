@@ -41,11 +41,13 @@ class LinkedChunkListNode
 {
     public:
 
+        static constexpr DAEsize element_count = TChunkSize / sizeof(TType);
+
         #pragma region Members
 
-        std::array<TType, TChunkSize / sizeof(TType)> data      {};
-        LinkedChunkListNode<TType, TChunkSize>*       next_node {nullptr};
-        LinkedChunkListNode<TType, TChunkSize>*       prev_node {nullptr};
+        std::array<TType, element_count>        data      {};
+        LinkedChunkListNode<TType, TChunkSize>* next_node {nullptr};
+        LinkedChunkListNode<TType, TChunkSize>* prev_node {nullptr};
 
         #pragma endregion
 
