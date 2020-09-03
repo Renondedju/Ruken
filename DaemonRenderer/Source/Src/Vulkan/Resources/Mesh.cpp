@@ -42,7 +42,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Methods
 
-std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator const& in_allocator, DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator const& in_allocator, RkUint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -58,7 +58,7 @@ std::optional<VulkanBuffer> Mesh::CreateStagingBuffer(VulkanDeviceAllocator cons
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator const& in_allocator, DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator const& in_allocator, RkUint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -73,7 +73,7 @@ std::optional<VulkanBuffer> Mesh::CreateVertexBuffer(VulkanDeviceAllocator const
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator const& in_allocator, DAEuint64 const in_size) noexcept
+std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator const& in_allocator, RkUint64 const in_size) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -88,13 +88,13 @@ std::optional<VulkanBuffer> Mesh::CreateIndexBuffer(VulkanDeviceAllocator const&
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-DAEvoid Mesh::UploadData(VulkanDevice           const& in_device,
+RkVoid Mesh::UploadData(VulkanDevice           const& in_device,
                          VulkanDeviceAllocator  const& in_allocator,
                          std::vector<Vertex>    const& in_vertices,
-                         std::vector<DAEuint32> const& in_indices) const
+                         std::vector<RkUint32> const& in_indices) const
 {
     auto const vertex_buffer_size = sizeof(Vertex)    * in_vertices.size();
-    auto const index_buffer_size  = sizeof(DAEuint32) * in_indices .size();
+    auto const index_buffer_size  = sizeof(RkUint32) * in_indices .size();
 
     auto staging_vertex_buffer = CreateStagingBuffer(in_allocator, vertex_buffer_size);
     auto staging_index_buffer  = CreateStagingBuffer(in_allocator, index_buffer_size);
@@ -136,7 +136,7 @@ DAEvoid Mesh::UploadData(VulkanDevice           const& in_device,
 
 #pragma warning (disable : 4100)
 
-DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+RkVoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<MeshLoadingDescriptor const&>(in_descriptor);
 
@@ -155,23 +155,23 @@ DAEvoid Mesh::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const&
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::CorruptedResource, "Failed to load the .obj file!");
 
     std::vector<Vertex>    vertices;
-    std::vector<DAEuint32> indices;
+    std::vector<RkUint32> indices;
 
     // TODO : Load vertices and indices data.
 
     m_vertex_buffer = CreateVertexBuffer(allocator, sizeof(Vertex)    * vertices.size());
-    m_index_buffer  = CreateIndexBuffer (allocator, sizeof(DAEuint32) * indices .size());
+    m_index_buffer  = CreateIndexBuffer (allocator, sizeof(RkUint32) * indices .size());
 
     if (!m_vertex_buffer || !m_index_buffer)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::OutOfMemory, "Failed to allocate the buffers!");
 
     UploadData(device, allocator, vertices, indices);
 
-    VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<DAEuint64>(m_vertex_buffer->GetHandle()), "");
-    VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<DAEuint64>(m_index_buffer ->GetHandle()), "");
+    VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<RkUint64>(m_vertex_buffer->GetHandle()), "");
+    VulkanDebug::SetObjectName(VK_OBJECT_TYPE_BUFFER, reinterpret_cast<RkUint64>(m_index_buffer ->GetHandle()), "");
 }
 
-DAEvoid Mesh::Reload(ResourceManager& in_manager)
+RkVoid Mesh::Reload(ResourceManager& in_manager)
 {
     auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
     auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
@@ -188,20 +188,20 @@ DAEvoid Mesh::Reload(ResourceManager& in_manager)
         throw ResourceProcessingFailure(EResourceProcessingFailureCode::CorruptedResource, "Failed to load the .obj file!");
 
     std::vector<Vertex>    vertices;
-    std::vector<DAEuint32> indices;
+    std::vector<RkUint32> indices;
 
     // TODO : Load vertices and indices data.
 
     if (m_vertex_buffer->GetSize() != sizeof(Vertex) * vertices.size())
         m_vertex_buffer = CreateVertexBuffer(allocator, sizeof(Vertex) * vertices.size());
 
-    if (m_index_buffer->GetSize() != sizeof(DAEuint32) * indices.size())
-        m_index_buffer = CreateVertexBuffer(allocator, sizeof(DAEuint32) * indices.size());
+    if (m_index_buffer->GetSize() != sizeof(RkUint32) * indices.size())
+        m_index_buffer = CreateVertexBuffer(allocator, sizeof(RkUint32) * indices.size());
 
     UploadData(device, allocator, vertices, indices);
 }
 
-DAEvoid Mesh::Unload(ResourceManager& in_manager) noexcept
+RkVoid Mesh::Unload(ResourceManager& in_manager) noexcept
 {
     m_loading_descriptor.reset();
     m_vertex_buffer     .reset();

@@ -61,7 +61,7 @@ VulkanCommandBuffer::~VulkanCommandBuffer() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanCommandBuffer::Begin(VkCommandBufferUsageFlags      const  in_usage_flags,
+RkBool VulkanCommandBuffer::Begin(VkCommandBufferUsageFlags      const  in_usage_flags,
                                    VkCommandBufferInheritanceInfo const* in_inheritance_info) const noexcept
 {
     VkCommandBufferBeginInfo command_buffer_begin_info = {};
@@ -76,7 +76,7 @@ DAEbool VulkanCommandBuffer::Begin(VkCommandBufferUsageFlags      const  in_usag
     return true;
 }
 
-DAEbool VulkanCommandBuffer::End() const noexcept
+RkBool VulkanCommandBuffer::End() const noexcept
 {
     if (VK_CHECK(vkEndCommandBuffer(m_handle)))
         return false;
@@ -84,7 +84,7 @@ DAEbool VulkanCommandBuffer::End() const noexcept
     return true;
 }
 
-DAEvoid VulkanCommandBuffer::BeginLabel(std::string_view const in_label_name, Vector4f const& in_color) const noexcept
+RkVoid VulkanCommandBuffer::BeginLabel(std::string_view const in_label_name, Vector4f const& in_color) const noexcept
 {
     VkDebugUtilsLabelEXT label_info = {};
 
@@ -98,7 +98,7 @@ DAEvoid VulkanCommandBuffer::BeginLabel(std::string_view const in_label_name, Ve
     vkCmdBeginDebugUtilsLabelEXT(m_handle, &label_info);
 }
 
-DAEvoid VulkanCommandBuffer::InsertLabel(std::string_view const in_label_name, Vector4f const& in_color) const noexcept
+RkVoid VulkanCommandBuffer::InsertLabel(std::string_view const in_label_name, Vector4f const& in_color) const noexcept
 {
     VkDebugUtilsLabelEXT label_info = {};
 
@@ -112,12 +112,12 @@ DAEvoid VulkanCommandBuffer::InsertLabel(std::string_view const in_label_name, V
     vkCmdInsertDebugUtilsLabelEXT(m_handle, &label_info);
 }
 
-DAEvoid VulkanCommandBuffer::EndLabel() const noexcept
+RkVoid VulkanCommandBuffer::EndLabel() const noexcept
 {
     vkCmdEndDebugUtilsLabelEXT(m_handle);
 }
 
-DAEvoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags const  in_src_stage,
+RkVoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags const  in_src_stage,
                                                  VkPipelineStageFlags const  in_dst_stage,
                                                  VkDependencyFlags    const  in_dependency_flags,
                                                  VkMemoryBarrier      const& in_memory_barrier) const noexcept
@@ -131,7 +131,7 @@ DAEvoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags const  in_
                          0u, nullptr);
 }
 
-DAEvoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags  const  in_src_stage,
+RkVoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags  const  in_src_stage,
                                                  VkPipelineStageFlags  const  in_dst_stage,
                                                  VkDependencyFlags     const  in_dependency_flags,
                                                  VkBufferMemoryBarrier const& in_memory_barrier) const noexcept
@@ -145,7 +145,7 @@ DAEvoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags  const  in
                          0u, nullptr);
 }
 
-DAEvoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags const  in_src_stage,
+RkVoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags const  in_src_stage,
                                                  VkPipelineStageFlags const  in_dst_stage,
                                                  VkDependencyFlags    const  in_dependency_flags,
                                                  VkImageMemoryBarrier const& in_memory_barrier) const noexcept
@@ -159,7 +159,7 @@ DAEvoid VulkanCommandBuffer::InsertMemoryBarrier(VkPipelineStageFlags const  in_
                          1u, &in_memory_barrier);
 }
 
-DAEvoid VulkanCommandBuffer::CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
+RkVoid VulkanCommandBuffer::CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
                                                 VulkanBuffer const& in_dst_buffer) const noexcept
 {
     if (in_src_buffer.GetSize() != in_dst_buffer.GetSize())
@@ -172,14 +172,14 @@ DAEvoid VulkanCommandBuffer::CopyBufferToBuffer(VulkanBuffer const& in_src_buffe
     vkCmdCopyBuffer(m_handle, in_src_buffer.GetHandle(), in_dst_buffer.GetHandle(), 1u, &region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
+RkVoid VulkanCommandBuffer::CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
                                                 VulkanBuffer const& in_dst_buffer,
                                                 VkBufferCopy const& in_region) const noexcept
 {
     vkCmdCopyBuffer(m_handle, in_src_buffer.GetHandle(), in_dst_buffer.GetHandle(), 1u, &in_region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyImageToImage(VulkanImage const& in_src_image,
+RkVoid VulkanCommandBuffer::CopyImageToImage(VulkanImage const& in_src_image,
                                               VulkanImage const& in_dst_image) const noexcept
 {
     if (in_src_image.GetExtent() != in_dst_image.GetExtent())
@@ -202,7 +202,7 @@ DAEvoid VulkanCommandBuffer::CopyImageToImage(VulkanImage const& in_src_image,
                    &region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyImageToImage(VulkanImage const& in_src_image,
+RkVoid VulkanCommandBuffer::CopyImageToImage(VulkanImage const& in_src_image,
                                               VulkanImage const& in_dst_image,
                                               VkImageCopy const& in_region) const noexcept
 {
@@ -215,7 +215,7 @@ DAEvoid VulkanCommandBuffer::CopyImageToImage(VulkanImage const& in_src_image,
                    &in_region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyBufferToImage(VulkanBuffer const& in_buffer,
+RkVoid VulkanCommandBuffer::CopyBufferToImage(VulkanBuffer const& in_buffer,
                                                VulkanImage  const& in_image) const noexcept
 {
     VkBufferImageCopy region = {};
@@ -232,7 +232,7 @@ DAEvoid VulkanCommandBuffer::CopyBufferToImage(VulkanBuffer const& in_buffer,
                            &region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyBufferToImage(VulkanBuffer      const& in_buffer,
+RkVoid VulkanCommandBuffer::CopyBufferToImage(VulkanBuffer      const& in_buffer,
                                                VulkanImage       const& in_image,
                                                VkBufferImageCopy const& in_region) const noexcept
 {
@@ -244,7 +244,7 @@ DAEvoid VulkanCommandBuffer::CopyBufferToImage(VulkanBuffer      const& in_buffe
                            &in_region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyImageToBuffer(VulkanImage  const& in_image,
+RkVoid VulkanCommandBuffer::CopyImageToBuffer(VulkanImage  const& in_image,
                                                VulkanBuffer const& in_buffer) const noexcept
 {
     VkBufferImageCopy region = {};
@@ -261,7 +261,7 @@ DAEvoid VulkanCommandBuffer::CopyImageToBuffer(VulkanImage  const& in_image,
                            &region);
 }
 
-DAEvoid VulkanCommandBuffer::CopyImageToBuffer(VulkanImage       const& in_image,
+RkVoid VulkanCommandBuffer::CopyImageToBuffer(VulkanImage       const& in_image,
                                                VulkanBuffer      const& in_buffer,
                                                VkBufferImageCopy const& in_region) const noexcept
 {
@@ -273,7 +273,7 @@ DAEvoid VulkanCommandBuffer::CopyImageToBuffer(VulkanImage       const& in_image
                            &in_region);
 }
 
-DAEvoid VulkanCommandBuffer::BlitImage(VulkanImage const& in_src_image,
+RkVoid VulkanCommandBuffer::BlitImage(VulkanImage const& in_src_image,
                                        VulkanImage const& in_dst_image,
                                        VkFilter    const  in_filter) const noexcept
 {
@@ -297,7 +297,7 @@ DAEvoid VulkanCommandBuffer::BlitImage(VulkanImage const& in_src_image,
                    in_filter);
 }
 
-DAEvoid VulkanCommandBuffer::BlitImage(VulkanImage const& in_src_image,
+RkVoid VulkanCommandBuffer::BlitImage(VulkanImage const& in_src_image,
                                        VulkanImage const& in_dst_image,
                                        VkImageBlit const& in_region,
                                        VkFilter    const  in_filter) const noexcept

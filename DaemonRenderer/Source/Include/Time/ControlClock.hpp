@@ -47,19 +47,19 @@ class ControlClock
         TimePoint m_last_time;
 
         // Measured time between 2 ControlPoint() calls
-        DAEdouble m_control_time;
-        DAEdouble m_corrected_control_time;
+        RkDouble m_control_time;
+        RkDouble m_corrected_control_time;
 
         // Timer, this is used to sleep if required
         Timer m_timer;
 
         // Maximum frequency allowed between 2 ControlPoint() calls
-        DAEfloat m_frequency;
+        RkFloat m_frequency;
 
         // Time scale of the clock, this can be used to temporarily
         // slow down or speed up the clock without having to modify the frequency of the clock
         // Be careful since this also multiplies the impressions of the clock
-        DAEfloat m_time_scale;
+        RkFloat m_time_scale;
 
         #pragma endregion
 
@@ -80,25 +80,25 @@ class ControlClock
          * \brief Main method, must be called every time you wish to be synchronized with the clock
          * \note If you are too slow between 2 clock cycles, this method has no effect
          */
-        DAEvoid ControlPoint() noexcept;
+        RkVoid ControlPoint() noexcept;
 
         /**
          * \brief Sets the target frequency of the clock
          * \param in_frequency frequency of the clock (number of seconds / cycle count)
          */
-        DAEvoid SetControlFrequency(DAEfloat in_frequency) noexcept;
+        RkVoid SetControlFrequency(RkFloat in_frequency) noexcept;
 
         /**
          * \brief Queries the time spent between 2 ControlPoint() calls
          * \return Control time
          */
-        DAEfloat GetControlTime() const noexcept;
+        RkFloat GetControlTime() const noexcept;
 
         /**
          * \brief Queries the time spent between 2 ControlPoint() calls and omits the time scale of the clock
          * \return Unscaled control time
          */
-        DAEfloat GetUnscaledControlTime() const noexcept;
+        RkFloat GetUnscaledControlTime() const noexcept;
 
         #pragma endregion
 

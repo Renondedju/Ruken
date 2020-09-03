@@ -36,22 +36,22 @@ struct GammaRamp
     /**
      * \brief An array of value describing the response of the red channel.
      */
-    DAEuint16* red {nullptr};
+    RkUint16* red {nullptr};
 
     /**
      * \brief An array of value describing the response of the green channel.
      */
-    DAEuint16* green {nullptr};
+    RkUint16* green {nullptr};
 
     /**
      * \brief An array of value describing the response of the blue channel.
      */
-    DAEuint16* blue {nullptr};
+    RkUint16* blue {nullptr};
 
     /**
      * \brief The number of elements in each array.
      */
-    DAEuint32 size {0u};
+    RkUint32 size {0u};
 };
 
 END_RUKEN_NAMESPACE

@@ -44,7 +44,7 @@ class ServiceProvider
         #pragma region Members
 
         // Provided services key = service id, value = service pointer
-        std::unordered_map<DAEsize, ServiceBase*> m_services;
+        std::unordered_map<RkSize, ServiceBase*> m_services;
 
         #pragma endregion
 
@@ -70,7 +70,7 @@ class ServiceProvider
          *          will override the previous instance without destroying it, leading to memory leaks
          * \return New service instance
          */
-        template <typename TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, DAEbool> = true>
+        template <typename TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool> = true>
         TService* ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>);
 
         /**
@@ -80,7 +80,7 @@ class ServiceProvider
          * \tparam TService Service type
          */
         template <typename TService>
-        DAEvoid DestroyService() noexcept;
+        RkVoid DestroyService() noexcept;
 
         /**
          * \brief Locates a service. This service could be unavailable or unprovided yet, if this is the case, a nullptr will be returned

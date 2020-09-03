@@ -30,7 +30,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-#define RUKEN_IS_BIG_ENDIAN    (*(DAEuint16 *)"\0\1" == 1)
+#define RUKEN_IS_BIG_ENDIAN    (*(RkUint16 *)"\0\1" == 1)
 #define RUKEN_IS_LITTLE_ENDIAN !RUKEN_IS_BIG_ENDIAN
 
 /**
@@ -38,7 +38,7 @@ BEGIN_RUKEN_NAMESPACE
  * \param in_x Base value
  * \return Converted value
  */
-static DAEuint16 Swap16Endian (DAEuint16 const in_x)
+static RkUint16 Swap16Endian (RkUint16 const in_x)
 {
     return in_x << 8 | in_x >> 8;
 }
@@ -48,7 +48,7 @@ static DAEuint16 Swap16Endian (DAEuint16 const in_x)
  * \param in_x Base value
  * \return Converted value
  */
-static DAEuint32 Swap32Endian(DAEuint32 const in_x)
+static RkUint32 Swap32Endian(RkUint32 const in_x)
 {
     return in_x << 24 | in_x >> 24 |
 		(in_x & 0xff00) << 8 | (in_x >> 8 & 0xff00);
@@ -59,7 +59,7 @@ static DAEuint32 Swap32Endian(DAEuint32 const in_x)
  * \param in_x Base value
  * \return Converted value
  */
-static DAEuint64 Swap64Endian(DAEuint64 const in_x)
+static RkUint64 Swap64Endian(RkUint64 const in_x)
 {
     return in_x << 56 | in_x >> 56 |
         (in_x & 0xff00    ) << 40 | (in_x >> 40 & 0xff00) |
@@ -72,7 +72,7 @@ static DAEuint64 Swap64Endian(DAEuint64 const in_x)
  * \param in_x Base value
  * \return Converted value 
  */
-static DAEuint16 ToBigEndian16(DAEuint16 const in_x)
+static RkUint16 ToBigEndian16(RkUint16 const in_x)
 {
     return RUKEN_IS_BIG_ENDIAN ? in_x : Swap16Endian(in_x);
 }
@@ -82,7 +82,7 @@ static DAEuint16 ToBigEndian16(DAEuint16 const in_x)
  * \param in_x Base value
  * \return Converted value 
  */
-static DAEuint32 ToBigEndian32(DAEuint32 const in_x)
+static RkUint32 ToBigEndian32(RkUint32 const in_x)
 {
     return RUKEN_IS_BIG_ENDIAN ? in_x : Swap32Endian(in_x);
 }
@@ -92,7 +92,7 @@ static DAEuint32 ToBigEndian32(DAEuint32 const in_x)
  * \param in_x Base value
  * \return Converted value 
  */
-static DAEuint64 ToBigEndian64(DAEuint64 const in_x)
+static RkUint64 ToBigEndian64(RkUint64 const in_x)
 {
     return RUKEN_IS_BIG_ENDIAN ? in_x : Swap64Endian(in_x);
 }
@@ -102,7 +102,7 @@ static DAEuint64 ToBigEndian64(DAEuint64 const in_x)
  * \param in_x Base value
  * \return Converted value 
  */
-static DAEuint16 ToLittleEndian16(DAEuint16 const in_x)
+static RkUint16 ToLittleEndian16(RkUint16 const in_x)
 {
     return RUKEN_IS_BIG_ENDIAN ? Swap16Endian(in_x) : in_x;
 }
@@ -112,7 +112,7 @@ static DAEuint16 ToLittleEndian16(DAEuint16 const in_x)
  * \param in_x Base value
  * \return Converted value 
  */
-static DAEuint32 ToLittleEndian32(DAEuint32 const in_x)
+static RkUint32 ToLittleEndian32(RkUint32 const in_x)
 {
     return RUKEN_IS_BIG_ENDIAN ? Swap32Endian(in_x) : in_x;
 }
@@ -122,7 +122,7 @@ static DAEuint32 ToLittleEndian32(DAEuint32 const in_x)
  * \param in_x Base value
  * \return Converted value 
  */
-static DAEuint64 ToLittleEndian64(DAEuint64 const in_x)
+static RkUint64 ToLittleEndian64(RkUint64 const in_x)
 {
     return RUKEN_IS_BIG_ENDIAN ? Swap64Endian(in_x) : in_x;
 }

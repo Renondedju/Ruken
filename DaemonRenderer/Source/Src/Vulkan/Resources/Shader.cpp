@@ -38,19 +38,19 @@ USING_RUKEN_NAMESPACE
 
 #pragma warning (disable : 4100)
 
-DAEvoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+RkVoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<ShaderLoadingDescriptor const&>(in_descriptor);
 
     // NotImplementedException
 }
 
-DAEvoid Shader::Reload(ResourceManager& in_manager)
+RkVoid Shader::Reload(ResourceManager& in_manager)
 {
     // NotImplementedException
 }
 
-DAEvoid Shader::Unload(ResourceManager& in_manager) noexcept
+RkVoid Shader::Unload(ResourceManager& in_manager) noexcept
 {
     m_loading_descriptor.reset();
 }

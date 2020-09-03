@@ -36,13 +36,13 @@ struct MaterialLoadingDescriptor final : ResourceLoadingDescriptor
 
         #pragma region Members
 
-        DAEchar const* path;
+        RkChar const* path;
 
         #pragma endregion
 
         #pragma region Constructors and Destructor
 
-        explicit MaterialLoadingDescriptor(DAEchar const* in_path) noexcept;
+        explicit MaterialLoadingDescriptor(RkChar const* in_path) noexcept;
 
         MaterialLoadingDescriptor(MaterialLoadingDescriptor const&  in_copy) = default;
         MaterialLoadingDescriptor(MaterialLoadingDescriptor&&       in_move) = default;

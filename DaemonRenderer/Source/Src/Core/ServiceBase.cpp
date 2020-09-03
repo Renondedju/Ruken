@@ -26,9 +26,9 @@
 
 USING_RUKEN_NAMESPACE
 
-DAEsize ServiceBase::GetNextId() noexcept
+RkSize ServiceBase::GetNextId() noexcept
 {
-    static DAEsize id = 0;
+    static RkSize id = 0;
 
     return id++;
 }

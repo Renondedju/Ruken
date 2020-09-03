@@ -59,7 +59,7 @@ ResourceIdentifier& ResourceIdentifier::operator=(ResourceIdentifier&& in_move) 
     return *this;
 }
 
-DAEbool ResourceIdentifier::operator==(ResourceIdentifier const& in_other) const noexcept
+RkBool ResourceIdentifier::operator==(ResourceIdentifier const& in_other) const noexcept
 {
     return name == in_other.name;
 }

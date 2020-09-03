@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, DAEbool>>
+template <typename TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool>>
 TService* ServiceProvider::ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
 {
     static_assert(std::is_base_of_v<Service<TService>, TService>, "The provided service should inherit from Service<TService>");
@@ -34,7 +34,7 @@ TService* ServiceProvider::ProvideService(TArgs&&... in_args) noexcept(std::is_n
 }
 
 template <typename TService>
-DAEvoid ServiceProvider::DestroyService() noexcept
+RkVoid ServiceProvider::DestroyService() noexcept
 {
     delete m_services[TService::ServiceID()];
     m_services.erase(TService::ServiceID());

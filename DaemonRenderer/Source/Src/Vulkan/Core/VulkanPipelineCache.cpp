@@ -40,7 +40,7 @@ VulkanPipelineCache::VulkanPipelineCache(std::string_view const in_path)
     if (!file.is_open())
         return;
 
-    std::vector<DAEchar> cache(file.seekg(0, std::ios::end).tellg());
+    std::vector<RkChar> cache(file.seekg(0, std::ios::end).tellg());
 
     file.seekg(0, std::ios::beg).read(cache.data(), cache.size());
 
@@ -65,19 +65,19 @@ VulkanPipelineCache::~VulkanPipelineCache() noexcept
 
 #pragma region Methods
 
-DAEvoid VulkanPipelineCache::SaveData(std::string_view const in_path) const
+RkVoid VulkanPipelineCache::SaveData(std::string_view const in_path) const
 {
     std::ofstream file(in_path.data());
 
     if (!file.is_open())
         return;
 
-    DAEsize size = 0;
+    RkSize size = 0;
 
     if (VK_CHECK(vkGetPipelineCacheData(VulkanLoader::GetLoadedDevice(), m_handle, &size, nullptr)))
         return;
 
-    std::vector<DAEchar> cache(size);
+    std::vector<RkChar> cache(size);
 
     if (VK_CHECK(vkGetPipelineCacheData(VulkanLoader::GetLoadedDevice(), m_handle, &size, cache.data())))
         return;
@@ -111,7 +111,7 @@ std::vector<VkPipeline> VulkanPipelineCache::CreateGraphicsPipelines(std::vector
 
     if (VK_CHECK(vkCreateGraphicsPipelines(VulkanLoader::GetLoadedDevice(),
                                            m_handle,
-                                           static_cast<DAEuint32>(handles.size()),
+                                           static_cast<RkUint32>(handles.size()),
                                            in_pipeline_create_infos.data(),
                                            nullptr,
                                            handles.data())))
@@ -126,7 +126,7 @@ std::vector<VkPipeline> VulkanPipelineCache::CreateComputePipelines(std::vector<
 
     if (VK_CHECK(vkCreateComputePipelines(VulkanLoader::GetLoadedDevice(),
                                           m_handle,
-                                          static_cast<DAEuint32>(handles.size()),
+                                          static_cast<RkUint32>(handles.size()),
                                           in_pipeline_create_infos.data(),
                                           nullptr,
                                           handles.data())))

@@ -42,13 +42,13 @@ struct TextureLoadingDescriptor final : ResourceLoadingDescriptor
 
         std::reference_wrapper<Renderer const> renderer;
 
-        DAEchar const* path;
+        RkChar const* path;
 
         #pragma endregion
 
         #pragma region Constructors and Destructor
 
-        explicit TextureLoadingDescriptor(Renderer const& in_renderer, DAEchar const* in_path) noexcept;
+        explicit TextureLoadingDescriptor(Renderer const& in_renderer, RkChar const* in_path) noexcept;
 
         TextureLoadingDescriptor(TextureLoadingDescriptor const&    in_copy) = default;
         TextureLoadingDescriptor(TextureLoadingDescriptor&&         in_move) = default;

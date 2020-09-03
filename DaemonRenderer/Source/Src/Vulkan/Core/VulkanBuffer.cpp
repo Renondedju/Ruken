@@ -34,7 +34,7 @@ VulkanBuffer::VulkanBuffer(VkBuffer          in_handle,
                            VmaAllocator      in_allocator,
                            VmaAllocation     in_allocation,
                            VmaAllocationInfo in_allocation_info,
-                           DAEbool const     in_persistent) noexcept:
+                           RkBool const     in_persistent) noexcept:
     m_handle          {in_handle},
     m_allocator       {in_allocator},
     m_allocation      {in_allocation},
@@ -70,7 +70,7 @@ VulkanBuffer::~VulkanBuffer() noexcept
 
 #pragma region Methods
 
-DAEvoid* VulkanBuffer::Map() noexcept
+RkVoid* VulkanBuffer::Map() noexcept
 {
     // Mapping persistent or already mapped data does nothing.
     if (!m_is_persistent && !m_is_mapped)
@@ -87,7 +87,7 @@ DAEvoid* VulkanBuffer::Map() noexcept
     return m_allocation_info.pMappedData;
 }
 
-DAEbool VulkanBuffer::Update(DAEvoid const* in_data, DAEsize const in_size) noexcept
+RkBool VulkanBuffer::Update(RkVoid const* in_data, RkSize const in_size) noexcept
 {
     // Persistent data is always mapped.
     if (m_is_persistent)
@@ -105,7 +105,7 @@ DAEbool VulkanBuffer::Update(DAEvoid const* in_data, DAEsize const in_size) noex
     return Unmap();
 }
 
-DAEbool VulkanBuffer::Unmap() noexcept
+RkBool VulkanBuffer::Unmap() noexcept
 {
     // Unmapping persistent or already unmapped data does nothing.
     if (!m_is_persistent && m_is_mapped)
@@ -141,7 +141,7 @@ VkDeviceSize const& VulkanBuffer::GetSize() const noexcept
     return m_allocation_info.size;
 }
 
-DAEbool VulkanBuffer::IsMapped() const noexcept
+RkBool VulkanBuffer::IsMapped() const noexcept
 {
     return m_is_mapped;
 }

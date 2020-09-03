@@ -33,7 +33,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-CommandPool::CommandPool(Scheduler& in_scheduler, DAEuint32 const in_queue_family_index) noexcept
+CommandPool::CommandPool(Scheduler& in_scheduler, RkUint32 const in_queue_family_index) noexcept
 {
     // Creates a command pool for each worker.
     for (auto const& worker : in_scheduler.GetWorkers())
@@ -94,7 +94,7 @@ VulkanCommandBuffer* CommandPool::RequestCommandBuffer(VkCommandBufferLevel cons
     return nullptr;
 }
 
-DAEbool CommandPool::Reset() noexcept
+RkBool CommandPool::Reset() noexcept
 {
     for (auto& it : m_command_pools)
     {

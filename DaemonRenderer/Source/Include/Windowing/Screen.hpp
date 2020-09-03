@@ -137,7 +137,7 @@ class Screen
          * \brief This function generates an appropriately sized gamma ramp from the specified exponent and then sets it like "SetGammaRamp".
          * \note  The value must be a finite number greater than zero.
          */
-        DAEvoid SetGamma(DAEfloat in_gamma) const noexcept;
+        RkVoid SetGamma(RkFloat in_gamma) const noexcept;
 
         /**
          * \brief Sets the current gamma ramp for the monitor.
@@ -145,19 +145,19 @@ class Screen
          *        which today is usually an approximation of sRGB gamma.
          *        This means that setting a perfectly linear ramp, or gamma 1.0, will produce the default (usually sRGB-like) behavior.
          */
-        DAEvoid SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept;
+        RkVoid SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept;
 
         #ifdef RUKEN_OS_WINDOWS
 
         /**
          * \brief The UTF-8 encoded adapter device name (for example \\.\DISPLAY1) of the specified monitor, or NULL if an error occurred.
          */
-        DAEchar const* GetWin32Adapter() const noexcept;
+        RkChar const* GetWin32Adapter() const noexcept;
 
         /**
          * \brief The UTF-8 encoded display device name (for example \\.\DISPLAY1\Monitor0) of the specified monitor, or NULL if an error occurred.
          */
-        DAEchar const* GetWin32Monitor() const noexcept;
+        RkChar const* GetWin32Monitor() const noexcept;
 
         #endif
 
@@ -168,8 +168,8 @@ class Screen
         Screen& operator=(Screen const& in_copy) = delete;
         Screen& operator=(Screen&&      in_move) noexcept;
 
-        DAEbool operator==(Screen const& in_other) const noexcept;
-        DAEbool operator!=(Screen const& in_other) const noexcept;
+        RkBool operator==(Screen const& in_other) const noexcept;
+        RkBool operator!=(Screen const& in_other) const noexcept;
 
         #pragma endregion
 };

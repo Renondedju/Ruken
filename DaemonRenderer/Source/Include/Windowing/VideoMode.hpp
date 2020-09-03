@@ -36,32 +36,32 @@ struct VideoMode
     /**
      * \brief The width, in screen coordinates, of the video mode.
      */
-    DAEint32 width {0};
+    RkInt32 width {0};
 
     /**
      * \brief The height, in screen coordinates, of the video mode.
      */
-    DAEint32 height {0};
+    RkInt32 height {0};
 
     /**
      * \brief The bit depth of the red channel of the video mode.
      */
-    DAEint32 red_bits {0};
+    RkInt32 red_bits {0};
 
     /**
      * \brief The bit depth of the green channel of the video mode.
      */
-    DAEint32 green_bits {0};
+    RkInt32 green_bits {0};
 
     /**
      * \brief The bit depth of the blue channel of the video mode.
      */
-    DAEint32 blue_bits {0};
+    RkInt32 blue_bits {0};
 
     /**
      * \brief The refresh rate, in Hz, of the video mode.
      */
-    DAEint32 refresh_rate {0};
+    RkInt32 refresh_rate {0};
 };
 
 END_RUKEN_NAMESPACE

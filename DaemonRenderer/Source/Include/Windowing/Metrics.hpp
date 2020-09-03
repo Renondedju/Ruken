@@ -30,20 +30,20 @@ BEGIN_RUKEN_NAMESPACE
 
 struct Position2D
 {
-    DAEint32 x;
-    DAEint32 y;
+    RkInt32 x;
+    RkInt32 y;
 };
 
 struct Extent2D
 {
-    DAEint32 width;
-    DAEint32 height;
+    RkInt32 width;
+    RkInt32 height;
 };
 
 struct Scale2D
 {
-    DAEfloat x;
-    DAEfloat y;
+    RkFloat x;
+    RkFloat y;
 };
 
 struct Rect2D

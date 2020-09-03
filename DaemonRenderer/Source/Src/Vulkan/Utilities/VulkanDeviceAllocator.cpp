@@ -133,7 +133,7 @@ std::optional<VulkanBuffer> VulkanDeviceAllocator::CreateBuffer(VkBufferCreateIn
                         in_allocation_create_info.flags & VMA_ALLOCATION_CREATE_MAPPED_BIT);
 }
 
-DAEbool VulkanDeviceAllocator::IsValid() const noexcept
+RkBool VulkanDeviceAllocator::IsValid() const noexcept
 {
     return m_handle != nullptr;
 }

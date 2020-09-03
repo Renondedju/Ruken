@@ -76,7 +76,7 @@ WindowManager::~WindowManager() noexcept
 
 #pragma region Methods
 
-DAEvoid WindowManager::SetupScreens() noexcept
+RkVoid WindowManager::SetupScreens() noexcept
 {
     auto        count    = 0;
     auto* const monitors = glfwGetMonitors(&count);
@@ -91,7 +91,7 @@ DAEvoid WindowManager::SetupScreens() noexcept
     }
 }
 
-DAEvoid WindowManager::Update() const noexcept
+RkVoid WindowManager::Update() const noexcept
 {
     glfwPollEvents();
 }
@@ -107,7 +107,7 @@ Window& WindowManager::CreateWindow(WindowParams const& in_params) noexcept
     return new_window;
 }
 
-DAEvoid WindowManager::DestroyWindow(Window const& in_window) noexcept
+RkVoid WindowManager::DestroyWindow(Window const& in_window) noexcept
 {
     auto const it = std::find(m_windows.cbegin(), m_windows.cend(), in_window);
 

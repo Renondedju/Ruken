@@ -23,7 +23,7 @@
  */
 
 template <typename TType>
-DAEbool ThreadSafeQueue<TType>::Empty() const noexcept
+RkBool ThreadSafeQueue<TType>::Empty() const noexcept
 {
     QueueReadAccess access(m_queue);
 
@@ -31,7 +31,7 @@ DAEbool ThreadSafeQueue<TType>::Empty() const noexcept
 }
 
 template <typename TType>
-DAEvoid ThreadSafeQueue<TType>::Enqueue(TType&& in_item) noexcept
+RkVoid ThreadSafeQueue<TType>::Enqueue(TType&& in_item) noexcept
 {
     QueueWriteAccess access(m_queue);
 
@@ -39,7 +39,7 @@ DAEvoid ThreadSafeQueue<TType>::Enqueue(TType&& in_item) noexcept
 }
 
 template <typename TType>
-DAEvoid ThreadSafeQueue<TType>::Dequeue(TType& out_item) noexcept
+RkVoid ThreadSafeQueue<TType>::Dequeue(TType& out_item) noexcept
 {
     QueueWriteAccess access(m_queue);
     

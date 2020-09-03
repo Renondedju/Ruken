@@ -54,7 +54,7 @@ struct ResourceProcessingFailure final : std::exception
      * If set to true, the error message will still be displayed but the resource will be considered as valid.
      * This can be useful if a resource by default has been loaded instead.
      */
-    DAEbool resource_validity;
+    RkBool resource_validity;
 
     /**
      * \brief Error code.
@@ -66,7 +66,7 @@ struct ResourceProcessingFailure final : std::exception
 
     #pragma region Constructors
 
-    explicit ResourceProcessingFailure (EResourceProcessingFailureCode in_code, DAEbool in_validity = false, DAEchar const* in_description = "") noexcept;
+    explicit ResourceProcessingFailure (EResourceProcessingFailureCode in_code, RkBool in_validity = false, RkChar const* in_description = "") noexcept;
 
     ResourceProcessingFailure ()                                         noexcept = delete;
     ResourceProcessingFailure (ResourceProcessingFailure const& in_copy) noexcept = default;

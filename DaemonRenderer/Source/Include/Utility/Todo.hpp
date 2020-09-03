@@ -39,9 +39,9 @@ namespace internal
     struct Todo
     {
         template<unsigned TN>
-        static constexpr DAEuint64 Date(DAEchar const (&in_dt)[TN] )
+        static constexpr RkUint64 Date(RkChar const (&in_dt)[TN] )
         {
-            return static_cast<DAEuint64>(
+            return static_cast<RkUint64>(
                     /*D*/ ( in_dt[4] == ' ' ? 0 : (in_dt[4] - '0') * 10 ) + (in_dt[5] - '0') +
                     /*M*/ ( in_dt[2] == 'n' ? 1
                           : in_dt[2] == 'b' ? 2
@@ -58,7 +58,7 @@ namespace internal
         }
 
         template<unsigned TN>
-        static constexpr bool Check( DAEchar const (&in_dt)[TN] )
+        static constexpr bool Check( RkChar const (&in_dt)[TN] )
         {
             return Date(__DATE__) < Date(in_dt);
         }

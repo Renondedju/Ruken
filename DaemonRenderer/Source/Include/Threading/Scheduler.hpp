@@ -46,7 +46,7 @@ BEGIN_RUKEN_NAMESPACE
  */
 class Scheduler final: public Service<Scheduler>, Unique
 {
-    public: using Job = std::function<DAEvoid()>;
+    public: using Job = std::function<RkVoid()>;
 
     private:
 
@@ -65,7 +65,7 @@ class Scheduler final: public Service<Scheduler>, Unique
         /**
          * \brief Job given to every worker used my the scheduler
          */
-        DAEvoid WorkersJob() noexcept;
+        RkVoid WorkersJob() noexcept;
 
         #pragma endregion
 
@@ -78,7 +78,7 @@ class Scheduler final: public Service<Scheduler>, Unique
          * \param in_service_provider Service provider
          * \param in_workers_count Number of managed workers
          */
-        Scheduler(ServiceProvider& in_service_provider, DAEuint16 in_workers_count = 0u);
+        Scheduler(ServiceProvider& in_service_provider, RkUint16 in_workers_count = 0u);
 
         Scheduler(Scheduler const& in_copy)     = delete;
         Scheduler(Scheduler&& in_move) noexcept = delete;
@@ -93,18 +93,18 @@ class Scheduler final: public Service<Scheduler>, Unique
          * \param in_task Task to schedule, any return value will be discarded
          * \note If Shutdown() has been called, this method has no effect
          */
-        DAEvoid ScheduleTask(Job&& in_task) noexcept;
+        RkVoid ScheduleTask(Job&& in_task) noexcept;
 
         /**
          * \brief Waits until all the queued tasks are completed
          */
-        DAEvoid WaitForQueuedTasks() noexcept;
+        RkVoid WaitForQueuedTasks() noexcept;
 
         /**
          * \brief Waits for all current active tasks to be done and drops any queued jobs. This also detaches any workers.
          * \note This method can only be called once
          */
-        DAEvoid Shutdown() noexcept;
+        RkVoid Shutdown() noexcept;
 
         std::vector<Worker> const& GetWorkers() const noexcept;
 

@@ -30,7 +30,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <DAEsize... TIndices>
+template <RkSize... TIndices>
 struct IndexPack {};
 
 END_RUKEN_NAMESPACE

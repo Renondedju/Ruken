@@ -52,13 +52,13 @@ class Texture final : public IResource
 
         #pragma region Methods
 
-        static std::optional<VulkanImage>   CreateImage         (VulkanDeviceAllocator const& in_allocator, DAEuint32 in_width, DAEuint32 in_height) noexcept;
-        static std::optional<VulkanBuffer>  CreateStagingBuffer (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanImage>   CreateImage         (VulkanDeviceAllocator const& in_allocator, RkUint32 in_width, RkUint32 in_height) noexcept;
+        static std::optional<VulkanBuffer>  CreateStagingBuffer (VulkanDeviceAllocator const& in_allocator, RkUint64 in_size) noexcept;
 
-        DAEvoid UploadData(VulkanDevice          const& in_device,
+        RkVoid UploadData(VulkanDevice          const& in_device,
                            VulkanDeviceAllocator const& in_allocator,
-                           DAEvoid               const* in_data,
-                           DAEuint64                    in_size) const;
+                           RkVoid               const* in_data,
+                           RkUint64                    in_size) const;
 
         #pragma endregion
 
@@ -77,11 +77,11 @@ class Texture final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        RkVoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        RkVoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        RkVoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VulkanImage const& GetImage() const noexcept;

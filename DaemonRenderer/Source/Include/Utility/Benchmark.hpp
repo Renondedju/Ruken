@@ -43,8 +43,8 @@ class Benchmark
 
         #pragma region Members
 
-        DAEchar const*  m_label;
-        DAEuint64       m_execution_count;
+        RkChar const*  m_label;
+        RkUint64       m_execution_count;
         TimePoint       m_time;
 
         #pragma endregion 
@@ -58,7 +58,7 @@ class Benchmark
          * \param in_label Label of the benchmark
          * \param in_execution_count Number of times that the benchmarked code will be executed
          */
-        Benchmark (DAEchar const*   in_label, DAEuint64 in_execution_count) noexcept;
+        Benchmark (RkChar const*   in_label, RkUint64 in_execution_count) noexcept;
         Benchmark (Benchmark const& in_copy)          = default;
         Benchmark (Benchmark&&      in_move) noexcept = default;
         ~Benchmark();
@@ -89,7 +89,7 @@ namespace internal
      */
     struct BenchmarkIterator
     {
-        DAEuint64 loop_count;
+        RkUint64 loop_count;
         Benchmark benchmark;
     };
 }

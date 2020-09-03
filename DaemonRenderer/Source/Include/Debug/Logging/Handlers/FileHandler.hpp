@@ -64,7 +64,7 @@ class FileHandler final : public LogHandler
          * \brief Empties the entire queue to the file.
          * \note  This method must not be called on multiple threads at a time.
          */
-        DAEvoid Flush() override;
+        RkVoid Flush() override;
 
         #pragma endregion
 

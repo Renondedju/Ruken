@@ -57,15 +57,15 @@ class Kernel
         ConsoleHandler m_console_handler;
 
         // Lifetime maintenance
-        std::atomic<DAEbool> m_shutdown_requested;
-        DAEint               m_exit_code;
+        std::atomic<RkBool> m_shutdown_requested;
+        RkInt               m_exit_code;
 
         #pragma endregion
 
         #pragma region Methods
 
-        DAEvoid SetupServices  () noexcept;
-        DAEvoid DestroyServices() noexcept;
+        RkVoid SetupServices  () noexcept;
+        RkVoid DestroyServices() noexcept;
 
         #pragma endregion
 
@@ -87,7 +87,7 @@ class Kernel
          * \see RequestShutdown method
          * \return Exit code
          */
-        DAEint Run() noexcept;
+        RkInt Run() noexcept;
 
         /**
          * \brief Requests the application shutdown with a full cleanup
@@ -101,7 +101,7 @@ class Kernel
          * \param in_exit_code Exit code, this is the code that will be passed
          *        to the return statement of the main once everything is done
          */
-        DAEvoid RequestShutdown(DAEint in_exit_code) noexcept;
+        RkVoid RequestShutdown(RkInt in_exit_code) noexcept;
 
         #pragma endregion
 

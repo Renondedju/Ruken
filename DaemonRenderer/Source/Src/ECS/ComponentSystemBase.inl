@@ -23,7 +23,7 @@
  */
 
 template <typename ... TComponents>
-DAEvoid ComponentSystemBase::SetupTargetFingerprint() noexcept
+RkVoid ComponentSystemBase::SetupTargetFingerprint() noexcept
 {
     (m_target_fingerprint.AddTrait(TComponents::TypeId()), ...);
 }

@@ -42,8 +42,8 @@ class RenderContext
 
         #pragma region Members
 
-        DAEint32    m_frame_index       {-1};
-        DAEbool     m_is_frame_active   {false};
+        RkInt32    m_frame_index       {-1};
+        RkBool     m_is_frame_active   {false};
 
         std::unique_ptr<VulkanSwapchain> m_swapchain;
 
@@ -81,9 +81,9 @@ class RenderContext
 
         #pragma region Methods
 
-        DAEbool BeginFrame() noexcept;
+        RkBool BeginFrame() noexcept;
 
-        DAEvoid EndFrame() noexcept;
+        RkVoid EndFrame() noexcept;
 
         #pragma endregion
 };

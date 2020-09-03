@@ -189,7 +189,7 @@ namespace internal
  * 
  * Example:
  * 
- * Calling ``RUKEN_CREATE_NAMED_TYPE_LITERAL(Test, DAEdouble, test)``
+ * Calling ``RUKEN_CREATE_NAMED_TYPE_LITERAL(Test, RkDouble, test)``
  * would allow to create test objects by writing ``12.2_test``
  */
 #define RUKEN_CREATE_NAMED_TYPE_LITERAL(in_typename, in_literaltype, in_literalname) \

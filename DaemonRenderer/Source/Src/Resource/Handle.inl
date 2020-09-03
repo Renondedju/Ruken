@@ -81,7 +81,7 @@ EResourceStatus Handle<TResource_Type>::Status() const noexcept
 }
 
 template <typename TResource_Type>
-DAEbool Handle<TResource_Type>::Available() const noexcept
+RkBool Handle<TResource_Type>::Available() const noexcept
 {
     if (!m_manifest)
         return false;
@@ -90,7 +90,7 @@ DAEbool Handle<TResource_Type>::Available() const noexcept
 }
 
 template <typename TResource_Type>
-DAEbool Handle<TResource_Type>::Valid() const noexcept
+RkBool Handle<TResource_Type>::Valid() const noexcept
 {
     if (!m_manifest)
         return false;
@@ -108,7 +108,7 @@ ResourceManifest::ReferenceCountType Handle<TResource_Type>::ReferenceCount() co
 }
 
 template <typename TResource_Type>
-DAEbool Handle<TResource_Type>::WaitForValidity(DAEfloat in_timeout) const noexcept
+RkBool Handle<TResource_Type>::WaitForValidity(RkFloat in_timeout) const noexcept
 {
     // No manifest, cannot wait for anything (this avoid infinite loops in case of a problem)
     if (!m_manifest)

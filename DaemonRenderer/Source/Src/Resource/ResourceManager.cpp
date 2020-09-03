@@ -31,7 +31,7 @@
 
 USING_RUKEN_NAMESPACE
 
-DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor)
+RkVoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor)
 {
     in_manifest->status.store(EResourceStatus::Processed, std::memory_order_release);
 
@@ -68,7 +68,7 @@ DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceL
     }
 }
 
-DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
+RkVoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
 {
     if (!in_manifest || in_manifest->status.load(std::memory_order_acquire) != EResourceStatus::Loaded)
         return;
@@ -107,7 +107,7 @@ DAEvoid ResourceManager::ReloadingRoutine(ResourceManifest* in_manifest)
     }
 }
 
-DAEvoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest)
+RkVoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest)
 {
     if (!in_manifest)
         return;
@@ -123,7 +123,7 @@ DAEvoid ResourceManager::UnloadingRoutine(ResourceManifest* in_manifest)
     --m_current_operation_count;
 }
 
-DAEvoid ResourceManager::InvalidateResource(ResourceManifest* in_manifest) noexcept
+RkVoid ResourceManager::InvalidateResource(ResourceManifest* in_manifest) noexcept
 {
     if (!in_manifest || in_manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
         return;
@@ -131,7 +131,7 @@ DAEvoid ResourceManager::InvalidateResource(ResourceManifest* in_manifest) noexc
     UnloadingRoutine(in_manifest);
 }
 
-ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_unique_identifier, DAEbool const in_auto_create_manifest) noexcept
+ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_unique_identifier, RkBool const in_auto_create_manifest) noexcept
 {
     ManifestsWriteAccess access(m_manifests);
 
@@ -151,7 +151,7 @@ ResourceManifest* ResourceManager::RequestManifest(ResourceIdentifier const& in_
     return manifest;
 }
 
-DAEvoid ResourceManager::Cleanup() noexcept
+RkVoid ResourceManager::Cleanup() noexcept
 {
     // Waiting for any pending operations to be done to avoid concurrent accesses
     while (m_current_operation_count.load(std::memory_order_acquire) > 0)
@@ -187,7 +187,7 @@ ResourceManager::~ResourceManager() noexcept
     Cleanup();
 }
 
-DAEvoid ResourceManager::TriggerSceneGC() noexcept
+RkVoid ResourceManager::TriggerSceneGC() noexcept
 {
     // Clearing every invalid value in the scene garbage collection since we know that every handle is more likely to be unused now.
     // (to avoid segmentation faults)
@@ -196,7 +196,7 @@ DAEvoid ResourceManager::TriggerSceneGC() noexcept
     }, true);
 }
 
-DAEvoid ResourceManager::TriggerReferenceGC() noexcept
+RkVoid ResourceManager::TriggerReferenceGC() noexcept
 {
     GarbageCollection([] (ResourceManifest const& in_manifest) {
         return in_manifest.gc_strategy    .load(std::memory_order_acquire) == EResourceGCStrategy::ReferenceCount &&
@@ -204,12 +204,12 @@ DAEvoid ResourceManager::TriggerReferenceGC() noexcept
     });    
 }
 
-DAEvoid ResourceManager::SetGarbageCollectionMode(EGCCollectionMode const in_collection_mode) noexcept
+RkVoid ResourceManager::SetGarbageCollectionMode(EGCCollectionMode const in_collection_mode) noexcept
 {
     m_collection_mode = in_collection_mode;
 }
 
-DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier, ESynchronizationMode const in_loading_mode) noexcept
+RkBool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier, ESynchronizationMode const in_loading_mode) noexcept
 {
     ResourceManifest* manifest = RequestManifest(in_identifier);
 
@@ -228,7 +228,7 @@ DAEbool ResourceManager::UnloadResource(ResourceIdentifier const& in_identifier,
     return true;
 }
 
-DAEuint64 ResourceManager::GetCurrentOperationCount() const noexcept
+RkUint64 ResourceManager::GetCurrentOperationCount() const noexcept
 {
     return m_current_operation_count.load(std::memory_order_acquire);
 }

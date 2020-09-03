@@ -36,7 +36,7 @@ VkDebugUtilsMessengerEXT VulkanDebug::m_debug_messenger {nullptr};
 
 #pragma region Methods
 
-DAEvoid VulkanDebug::Initialize(Logger* in_parent_logger) noexcept
+RkVoid VulkanDebug::Initialize(Logger* in_parent_logger) noexcept
 {
     if (!in_parent_logger)
         return;
@@ -44,37 +44,37 @@ DAEvoid VulkanDebug::Initialize(Logger* in_parent_logger) noexcept
     m_logger = in_parent_logger->AddChild("Vulkan");
 }
 
-DAEvoid VulkanDebug::Debug(std::string_view const in_message) noexcept
+RkVoid VulkanDebug::Debug(std::string_view const in_message) noexcept
 {
     if (m_logger)
         m_logger->Debug(in_message);
 }
 
-DAEvoid VulkanDebug::Info(std::string_view const in_message) noexcept
+RkVoid VulkanDebug::Info(std::string_view const in_message) noexcept
 {
     if (m_logger)
         m_logger->Info(in_message);
 }
 
-DAEvoid VulkanDebug::Warning(std::string_view const in_message) noexcept
+RkVoid VulkanDebug::Warning(std::string_view const in_message) noexcept
 {
     if (m_logger)
         m_logger->Warning(in_message);
 }
 
-DAEvoid VulkanDebug::Error(std::string_view const in_message) noexcept
+RkVoid VulkanDebug::Error(std::string_view const in_message) noexcept
 {
     if (m_logger)
         m_logger->Error(in_message);
 }
 
-DAEvoid VulkanDebug::Fatal(std::string_view const in_message) noexcept
+RkVoid VulkanDebug::Fatal(std::string_view const in_message) noexcept
 {
     if (m_logger)
         m_logger->Fatal(in_message);
 }
 
-DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string_view const in_function_name) noexcept
+RkBool VulkanDebug::CheckResult(VkResult const in_result, std::string_view const in_function_name) noexcept
 {
     if (in_result == VK_SUCCESS)
         return false;
@@ -90,14 +90,14 @@ DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string_view cons
 
     #else
 
-    (DAEvoid)in_function_name;
+    (RkVoid)in_function_name;
 
     #endif
 
     return in_result < 0;
 }
 
-DAEbool VulkanDebug::AssertResult(VkResult const in_result, std::string_view const in_function_name) noexcept
+RkBool VulkanDebug::AssertResult(VkResult const in_result, std::string_view const in_function_name) noexcept
 {
     if (in_result == VK_SUCCESS)
         return false;
@@ -110,14 +110,14 @@ DAEbool VulkanDebug::AssertResult(VkResult const in_result, std::string_view con
 
     #else
 
-    (DAEvoid)in_function_name;
+    (RkVoid)in_function_name;
 
     #endif
 
     return true;
 }
 
-DAEvoid VulkanDebug::CreateDebugMessenger() noexcept
+RkVoid VulkanDebug::CreateDebugMessenger() noexcept
 {
     #ifdef RUKEN_CONFIG_DEBUG
 
@@ -140,7 +140,7 @@ DAEvoid VulkanDebug::CreateDebugMessenger() noexcept
     #endif
 }
 
-DAEvoid VulkanDebug::DestroyDebugMessenger() noexcept
+RkVoid VulkanDebug::DestroyDebugMessenger() noexcept
 {
     if (m_debug_messenger)
         vkDestroyDebugUtilsMessengerEXT(VulkanLoader::GetLoadedInstance(), m_debug_messenger, nullptr);
@@ -149,9 +149,9 @@ DAEvoid VulkanDebug::DestroyDebugMessenger() noexcept
 VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const  in_message_severity,
                                     VkDebugUtilsMessageTypeFlagsEXT        const  in_message_type,
                                     VkDebugUtilsMessengerCallbackDataEXT   const* in_callback_data,
-                                    DAEvoid*                                      in_user_data)
+                                    RkVoid*                                      in_user_data)
 {
-    (DAEvoid)in_user_data;
+    (RkVoid)in_user_data;
 
     #ifdef RUKEN_CONFIG_DEBUG
 
@@ -185,17 +185,17 @@ VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const
 
     #else
 
-    (DAEvoid)in_message_severity;
-    (DAEvoid)in_message_type;
-    (DAEvoid)in_callback_data;
+    (RkVoid)in_message_severity;
+    (RkVoid)in_message_type;
+    (RkVoid)in_callback_data;
 
     #endif
 
     return VK_FALSE;
 }
 
-DAEvoid VulkanDebug::SetObjectName(VkObjectType     const in_type,
-                                   DAEuint64        const in_handle,
+RkVoid VulkanDebug::SetObjectName(VkObjectType     const in_type,
+                                   RkUint64        const in_handle,
                                    std::string_view const in_name) noexcept
 {
     VkDebugUtilsObjectNameInfoEXT object_info = {};
@@ -208,11 +208,11 @@ DAEvoid VulkanDebug::SetObjectName(VkObjectType     const in_type,
     VK_CHECK(vkSetDebugUtilsObjectNameEXT(VulkanLoader::GetLoadedDevice(), &object_info));
 }
 
-DAEvoid VulkanDebug::SetObjectTag(VkObjectType const  in_type,
-                                  DAEuint64    const  in_handle,
-                                  DAEuint64    const  in_name,
-                                  DAEsize      const  in_size,
-                                  DAEvoid      const* in_tag) noexcept
+RkVoid VulkanDebug::SetObjectTag(VkObjectType const  in_type,
+                                  RkUint64    const  in_handle,
+                                  RkUint64    const  in_name,
+                                  RkSize      const  in_size,
+                                  RkVoid      const* in_tag) noexcept
 {
     VkDebugUtilsObjectTagInfoEXT tag_info = {};
 

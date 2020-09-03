@@ -30,7 +30,7 @@ ComponentSystemBase::ComponentSystemBase() noexcept:
     m_enabled {true}
 {}
 
-DAEbool ComponentSystemBase::Enabled() const
+RkBool ComponentSystemBase::Enabled() const
 {
     return m_enabled;
 }

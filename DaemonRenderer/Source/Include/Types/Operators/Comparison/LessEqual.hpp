@@ -52,7 +52,7 @@ struct LessEqual
      *
      * \return Returns True if the left operand is lesser than or equal to the right operand, false otherwise.
      */
-    friend constexpr DAEbool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
+    friend constexpr RkBool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
     {
         using Type = internal::UnderlyingType<TStrongTypedef>;
 

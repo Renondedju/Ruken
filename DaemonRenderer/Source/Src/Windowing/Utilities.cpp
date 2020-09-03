@@ -28,7 +28,7 @@
 
 USING_RUKEN_NAMESPACE
 
-std::string GlfwErrorToString(DAEint32 const in_error_code) noexcept
+std::string GlfwErrorToString(RkInt32 const in_error_code) noexcept
 {
     switch (in_error_code)
     {

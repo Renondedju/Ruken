@@ -62,7 +62,7 @@ class StreamHandler : public LogHandler
          * \brief Empties the entire queue to the stream.
          * \note  This method must not be called on multiple threads at a time.
          */
-        DAEvoid Flush() override;
+        RkVoid Flush() override;
 
         #pragma endregion
 

@@ -49,27 +49,27 @@ class VulkanDebug
 
         #pragma region Methods
 
-        static DAEvoid Initialize           (Logger* in_parent_logger) noexcept;
-        static DAEvoid CreateDebugMessenger ()                         noexcept;
-        static DAEvoid DestroyDebugMessenger()                         noexcept;
+        static RkVoid Initialize           (Logger* in_parent_logger) noexcept;
+        static RkVoid CreateDebugMessenger ()                         noexcept;
+        static RkVoid DestroyDebugMessenger()                         noexcept;
 
-        static DAEvoid Debug  (std::string_view in_message) noexcept;
-        static DAEvoid Info   (std::string_view in_message) noexcept;
-        static DAEvoid Warning(std::string_view in_message) noexcept;
-        static DAEvoid Error  (std::string_view in_message) noexcept;
-        static DAEvoid Fatal  (std::string_view in_message) noexcept;
+        static RkVoid Debug  (std::string_view in_message) noexcept;
+        static RkVoid Info   (std::string_view in_message) noexcept;
+        static RkVoid Warning(std::string_view in_message) noexcept;
+        static RkVoid Error  (std::string_view in_message) noexcept;
+        static RkVoid Fatal  (std::string_view in_message) noexcept;
 
         /**
          * \return True if the result is an error, else False.
          * \note   Use this methods to check the result of non-critical calls to Vulkan functions.
          */
-        static DAEbool CheckResult(VkResult in_result, std::string_view in_function_name) noexcept;
+        static RkBool CheckResult(VkResult in_result, std::string_view in_function_name) noexcept;
 
         /**
          * \return True if the result is not VK_SUCCESS, else False.
          * \note   Use this method to check the result of critical calls to Vulkan functions.
          */
-        static DAEbool AssertResult(VkResult in_result, std::string_view in_function_name) noexcept;
+        static RkBool AssertResult(VkResult in_result, std::string_view in_function_name) noexcept;
 
         /**
          * \brief Application-defined debug messenger callback function.
@@ -81,15 +81,15 @@ class VulkanDebug
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT      in_message_severity,
                                       VkDebugUtilsMessageTypeFlagsEXT             in_message_type,
                                       VkDebugUtilsMessengerCallbackDataEXT const* in_callback_data,
-                                      DAEvoid*                                    in_user_data);
+                                      RkVoid*                                    in_user_data);
 
         /**
          * \param in_type   The type of the object to be named.
          * \param in_handle The object to be named.
          * \param in_name   The name to apply to object.
          */
-        static DAEvoid SetObjectName(VkObjectType     in_type,
-                                     DAEuint64        in_handle,
+        static RkVoid SetObjectName(VkObjectType     in_type,
+                                     RkUint64        in_handle,
                                      std::string_view in_name) noexcept;
 
         /**
@@ -99,11 +99,11 @@ class VulkanDebug
          * \param in_size   The number of bytes of data to attach to the object.
          * \param in_tag    The data to be associated with the object.
          */
-        static DAEvoid SetObjectTag(VkObjectType   in_type,
-                                    DAEuint64      in_handle,
-                                    DAEuint64      in_name,
-                                    DAEsize        in_size,
-                                    DAEvoid const* in_tag) noexcept;
+        static RkVoid SetObjectTag(VkObjectType   in_type,
+                                    RkUint64      in_handle,
+                                    RkUint64      in_name,
+                                    RkSize        in_size,
+                                    RkVoid const* in_tag) noexcept;
 
         static std::string ToString(VkResult                                    in_result)        noexcept;
         static std::string ToString(VkObjectType                                in_object)        noexcept;

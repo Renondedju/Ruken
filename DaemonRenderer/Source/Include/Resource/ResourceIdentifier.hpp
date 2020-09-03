@@ -65,7 +65,7 @@ struct ResourceIdentifier
     ResourceIdentifier& operator=(ResourceIdentifier const& in_copy) noexcept;
     ResourceIdentifier& operator=(ResourceIdentifier&&        in_move) noexcept;
 
-    DAEbool operator==(ResourceIdentifier const& in_other) const noexcept;
+    RkBool operator==(ResourceIdentifier const& in_other) const noexcept;
 
     #pragma endregion
 };

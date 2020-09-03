@@ -37,13 +37,13 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TPack, typename... TTypes>
 struct ComponentItemView;
 
-template <template <DAEsize...> class TPack, DAEsize... TIndices, typename... TTypes>
+template <template <RkSize...> class TPack, RkSize... TIndices, typename... TTypes>
 struct ComponentItemView<TPack<TIndices...>, TTypes...> : public DataLayoutView<std::index_sequence<TIndices...>, TTypes...>
 {
-    template<DAEsize TMember>
+    template<RkSize TMember>
     auto&       Fetch()       { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
 
-    template<DAEsize TMember>
+    template<RkSize TMember>
     auto const& Fetch() const { return std::get<SelectValueIndex<TMember, TIndices...>>(*this); }
 
     // Making constructors available

@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename TItem, DAEsize TUniqueId>
+template <typename TItem, RkSize TUniqueId>
 typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::CreateItem(TItem&& in_item)
 {
     Layout::PushBack(m_storage, std::forward<TItem>(in_item));
@@ -30,7 +30,7 @@ typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::Create
     return ItemId(Layout::Size(m_storage) - 1);
 }
 
-template <typename TItem, DAEsize TUniqueId>
+template <typename TItem, RkSize TUniqueId>
 typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::CreateItem()
 {
     Layout::PushBack(m_storage, std::forward<TItem>(TItem{}));
@@ -38,8 +38,8 @@ typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::Create
     return ItemId(Layout::Size(m_storage) - 1);
 }
 
-template <typename TItem, DAEsize TUniqueId>
-DAEsize Component<TItem, TUniqueId>::GetItemCount() const noexcept
+template <typename TItem, RkSize TUniqueId>
+RkSize Component<TItem, TUniqueId>::GetItemCount() const noexcept
 {
     return Layout::Size(m_storage);
 }

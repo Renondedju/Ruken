@@ -36,14 +36,14 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Entity ID class. This class is actually a strong typing of the DAEsize type
+ * \brief Entity ID class. This class is actually a strong typing of the RkSize type
  *
  * And entity ID is constant and valid for the whole application lifetime
  * or until the attached entity is deleted or moved into another archetype
  * (which should almost only happen when a scene is deleted/reloaded/loaded or
  * in the context of a non runtime app like an editor)
  */
-struct EntityID : public NamedType <DAEsize, EntityID>,
+struct EntityID : public NamedType <RkSize, EntityID>,
                   public Comparison<EntityID>,
                   public Decrement <EntityID>,
                   public Increment <EntityID>

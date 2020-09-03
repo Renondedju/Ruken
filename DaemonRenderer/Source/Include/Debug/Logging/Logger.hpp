@@ -64,7 +64,7 @@ class Logger final: public Service<Logger>
          *        and its parents (until a false value of 'propagate' is found).
          * \note  No filtering is applied.
          */
-        DAEvoid ForceHandle(LogRecord const& in_record) const noexcept;
+        RkVoid ForceHandle(LogRecord const& in_record) const noexcept;
 
         #pragma endregion
 
@@ -77,7 +77,7 @@ class Logger final: public Service<Logger>
          *        in addition to any handlers attached to this logger. Messages are passed directly to the parent loggersÅ' handlers,
          *        neither the level nor filters of the parent loggers in question are considered.
          */
-        DAEbool propagate {true};
+        RkBool propagate {true};
 
         #pragma endregion
 
@@ -104,13 +104,13 @@ class Logger final: public Service<Logger>
          *        Logging messages which are less severe than 'in_level' will be ignored;
          *        logging messages which have severity level or higher will be emitted by whichever handler or handlers service this logger.
          */
-        DAEvoid SetLevel(ELogLevel in_level) noexcept;
+        RkVoid SetLevel(ELogLevel in_level) noexcept;
 
         /**
          * \return True if a message of the specified level would be processed by this logger, else False.
          */
         [[nodiscard]]
-        DAEbool IsEnabledFor(ELogLevel in_level) const noexcept;
+        RkBool IsEnabledFor(ELogLevel in_level) const noexcept;
 
         /**
          * \return A pointer to the newly created logger with its parent set to this logger.
@@ -121,66 +121,66 @@ class Logger final: public Service<Logger>
         /**
          * \brief Logs a message with the specified level on this logger.
          */
-        DAEvoid Log(ELogLevel in_level, std::string_view in_message) const noexcept;
+        RkVoid Log(ELogLevel in_level, std::string_view in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Debug'.
          */
-        DAEvoid Debug(std::string_view in_message) const noexcept;
+        RkVoid Debug(std::string_view in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Info'.
          */
-        DAEvoid Info(std::string_view in_message) const noexcept;
+        RkVoid Info(std::string_view in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Warning'.
          */
-        DAEvoid Warning(std::string_view in_message) const noexcept;
+        RkVoid Warning(std::string_view in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Error'.
          */
-        DAEvoid Error(std::string_view in_message) const noexcept;
+        RkVoid Error(std::string_view in_message) const noexcept;
 
         /**
          * \brief Logs a message with level 'Fatal'.
          */
-        DAEvoid Fatal(std::string_view in_message) const noexcept;
+        RkVoid Fatal(std::string_view in_message) const noexcept;
 
         /**
          * \brief Adds the specified filter to this logger.
          */
-        DAEvoid AddFilter(LogFilter const* in_filter) noexcept;
+        RkVoid AddFilter(LogFilter const* in_filter) noexcept;
 
         /**
          * \brief Removes the specified filter from this logger.
          */
-        DAEvoid RemoveFilter(LogFilter const* in_filter) noexcept;
+        RkVoid RemoveFilter(LogFilter const* in_filter) noexcept;
 
         /**
          * \brief  The filters are consulted in turn, until one of them returns a false value.
          * \return True if the record is to be processed, else False.
          */
         [[nodiscard]]
-        DAEbool Filter(LogRecord const& in_record) const noexcept;
+        RkBool Filter(LogRecord const& in_record) const noexcept;
 
         /**
          * \brief Adds the specified handler to this logger.
          */
-        DAEvoid AddHandler(LogHandler* in_handler) noexcept;
+        RkVoid AddHandler(LogHandler* in_handler) noexcept;
 
         /**
          * \brief Removes the specified handler from this logger.
          */
-        DAEvoid RemoveHandler(LogHandler* in_handler) noexcept;
+        RkVoid RemoveHandler(LogHandler* in_handler) noexcept;
 
         /**
          * \brief Handles a record by passing it to all handlers associated with this logger
          *        and its parent (until a false value of 'propagate' is found).
          * \note  Logger-level filtering is applied using "Filter".
          */
-        DAEvoid Handle(LogRecord const& in_record) const noexcept;
+        RkVoid Handle(LogRecord const& in_record) const noexcept;
 
         /**
          * \brief  Checks to see if this logger has any handlers configured.
@@ -190,7 +190,7 @@ class Logger final: public Service<Logger>
          * \return True if a handler could be found, else False.
          */
         [[nodiscard]]
-        DAEbool HasHandlers() const noexcept;
+        RkBool HasHandlers() const noexcept;
 
         #pragma endregion
 

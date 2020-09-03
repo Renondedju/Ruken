@@ -36,7 +36,7 @@ BEGIN_RUKEN_NAMESPACE
  * Disabled  => Disabled, no GC can be triggered when this mode is active. This is useful when reloading a scene
  * Manual    => Manual garbage collection. Automatic GC calls are disabled.
  */
-enum class EGCCollectionMode : DAEint8
+enum class EGCCollectionMode : RkInt8
 {
     Disabled,
     Automatic,

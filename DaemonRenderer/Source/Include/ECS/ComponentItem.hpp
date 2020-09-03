@@ -53,12 +53,12 @@ class ComponentItem : public DataLayoutItem<std::vector, TTypes...>
         using DataLayoutItem<std::vector, TTypes...>::operator=;
 
         // View constructors
-        template <DAEsize... TItems>
+        template <RkSize... TItems>
         using MakeView = ComponentItemView<IndexPack<TItems...>, SelectType<TItems, TTypes...>...>;
 
     private:
 
-        template <DAEsize... TItems>
+        template <RkSize... TItems>
         constexpr static MakeView<TItems...> MakeFullViewHelper(std::index_sequence<TItems...>);
 
     public:

@@ -52,7 +52,7 @@ class VulkanCommandPool
 
         #pragma region Constructors
 
-        explicit VulkanCommandPool(DAEuint32 in_queue_family, VkCommandPoolCreateFlags in_flags = 0u) noexcept;
+        explicit VulkanCommandPool(RkUint32 in_queue_family, VkCommandPoolCreateFlags in_flags = 0u) noexcept;
 
         VulkanCommandPool(VulkanCommandPool const& in_copy) = delete;
         VulkanCommandPool(VulkanCommandPool&&      in_move) noexcept;

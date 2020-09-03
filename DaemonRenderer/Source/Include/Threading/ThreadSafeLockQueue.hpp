@@ -75,29 +75,29 @@ class ThreadSafeLockQueue
         /**
          * \brief Releases the queue
          */
-        DAEvoid Release();
+        RkVoid Release();
 
         /**
          * \brief Clears the queue
          */
-        DAEvoid Clear() noexcept;
+        RkVoid Clear() noexcept;
 
         /**
          * \brief Blocks the current thread until the queue gets emptied.
          */
-        DAEvoid WaitUntilEmpty();
+        RkVoid WaitUntilEmpty();
 
         /**
          * \brief Checks if the queue is empty
          * \return True if the queue is empty, false otherwise
          */
-        DAEbool Empty() noexcept;
+        RkBool Empty() noexcept;
 
         /**
          * \brief Enqueue an item
          * \param in_item Item to enqueue
          */
-        DAEvoid Enqueue(TType&& in_item) noexcept;
+        RkVoid Enqueue(TType&& in_item) noexcept;
 
         /**
          * \brief Tries to dequeue an item, if the queue is empty,
@@ -108,7 +108,7 @@ class ThreadSafeLockQueue
          * 
          * \note This method only returns false if Release() is called from another thread
          */
-        DAEbool Dequeue(TType& out_item) noexcept;
+        RkBool Dequeue(TType& out_item) noexcept;
 
         #pragma endregion 
 

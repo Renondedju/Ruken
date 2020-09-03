@@ -45,8 +45,8 @@ class CommandPool
 
         struct CommandPoolData
         {
-            DAEuint32 primary_index   {0u};
-            DAEuint32 secondary_index {0u};
+            RkUint32 primary_index   {0u};
+            RkUint32 secondary_index {0u};
 
             std::unique_ptr<VulkanCommandPool> pool {};
 
@@ -64,7 +64,7 @@ class CommandPool
 
         #pragma region Constructors
 
-        explicit CommandPool(Scheduler& in_scheduler, DAEuint32 in_queue_family_index) noexcept;
+        explicit CommandPool(Scheduler& in_scheduler, RkUint32 in_queue_family_index) noexcept;
 
         CommandPool(CommandPool const& in_copy) = delete;
         CommandPool(CommandPool&&      in_move) = delete;
@@ -88,7 +88,7 @@ class CommandPool
          * \note  This function must be called once at the beginning of a frame.
          */
         [[nodiscard]]
-        DAEbool Reset() noexcept;
+        RkBool Reset() noexcept;
 
         #pragma endregion
 

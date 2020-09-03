@@ -36,7 +36,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Methods
 
-DAEbool VulkanLoader::Initialize() noexcept
+RkBool VulkanLoader::Initialize() noexcept
 {
     if (VK_ASSERT(volkInitialize()))
         return false;
@@ -59,12 +59,12 @@ DAEbool VulkanLoader::Initialize() noexcept
     return true;
 }
 
-DAEvoid VulkanLoader::LoadInstance(VkInstance in_instance) noexcept
+RkVoid VulkanLoader::LoadInstance(VkInstance in_instance) noexcept
 {
     volkLoadInstanceOnly(in_instance);
 }
 
-DAEvoid VulkanLoader::LoadDevice(VkDevice in_device) noexcept
+RkVoid VulkanLoader::LoadDevice(VkDevice in_device) noexcept
 {
     volkLoadDevice(in_device);
 }

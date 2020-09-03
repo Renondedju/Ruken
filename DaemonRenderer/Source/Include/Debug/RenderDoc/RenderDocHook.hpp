@@ -64,7 +64,7 @@ class RenderDocHook
          * \brief Checks if the hook is available or not.
          * \return True if the hook is available, false otherwise.
          */
-        DAEbool Available() const noexcept;
+        RkBool Available() const noexcept;
 
         /**
          * \brief This function returns the actual API version of the implementation returned.
@@ -79,7 +79,7 @@ class RenderDocHook
          * \param out_minor will be filled with the minor version of the implementation’s version.
          * \param out_patch will be filled with the patch version of the implementation’s version.
          */
-        DAEvoid GetAPIVersion(DAEint32& out_major, DAEint32& out_minor, DAEint32& out_patch) const noexcept;
+        RkVoid GetAPIVersion(RkInt32& out_major, RkInt32& out_minor, RkInt32& out_patch) const noexcept;
 
         /**
          * \brief Set one of the options for tweaking some behaviours of capturing.
@@ -91,7 +91,7 @@ class RenderDocHook
          * \param in_value The unsigned integer value to set for the above option.
          * \return The function returns true if the option is valid, and the value set on the option is within valid ranges, false otherwise.
          */
-        DAEbool SetCaptureOptionU32(ERenderDocCaptureOption in_option, DAEuint32 in_value) const noexcept;
+        RkBool SetCaptureOptionU32(ERenderDocCaptureOption in_option, RkUint32 in_value) const noexcept;
 
         /**
          * \brief Set one of the options for tweaking some behaviours of capturing.
@@ -103,21 +103,21 @@ class RenderDocHook
          * \param in_value The floating point value to set for the above option.
          * \return The function returns true if the option is valid, and the value set on the option is within valid ranges, false otherwise.
          */
-        DAEbool SetCaptureOptionF32(ERenderDocCaptureOption in_option, DAEfloat  in_value) const noexcept;
+        RkBool SetCaptureOptionF32(ERenderDocCaptureOption in_option, RkFloat  in_value) const noexcept;
 
         /**
          * \brief Gets the current value of one of the different options listed above in SetCaptureOption().
          * \param in_option Specifies which capture option should be retrieved.
          * \return The function returns the value of the capture option, if the option is a valid RENDERDOC_CaptureOption enum. Otherwise returns 0xffffffff.
          */
-        DAEuint32 GetCaptureOptionU32(ERenderDocCaptureOption in_option) const noexcept;
+        RkUint32 GetCaptureOptionU32(ERenderDocCaptureOption in_option) const noexcept;
 
         /**
          * \brief Gets the current value of one of the different options listed above in SetCaptureOptionF32().
          * \param in_option Specifies which capture option should be retrieved.
          * \return The function returns the value of the capture option, if the option is a valid RENDERDOC_CaptureOption enum. Otherwise returns -FLT_MAX.
          */
-        DAEfloat GetCaptureOptionF32(ERenderDocCaptureOption in_option) const noexcept;
+        RkFloat GetCaptureOptionF32(ERenderDocCaptureOption in_option) const noexcept;
 
         /**
          * \brief This function will attempt to shut down and remove RenderDoc and its hooks from the target process.
@@ -125,7 +125,7 @@ class RenderDocHook
          * It must be called as early as possible in the process, and will
          * have undefined results if any graphics API functions have been called.
          */
-        DAEvoid Shutdown() const noexcept;
+        RkVoid Shutdown() const noexcept;
 
         /**
          * \brief This function will remove RenderDoc’s crash handler from the target process.
@@ -133,7 +133,7 @@ class RenderDocHook
          * If you have your own crash handler that you want to handle any exceptions,
          * RenderDoc’s handler could interfere so it can be disabled.
          */
-        DAEvoid UnloadCrashHandler() const noexcept;
+        RkVoid UnloadCrashHandler() const noexcept;
 
         /**
          * \brief Set the template for new captures.
@@ -147,19 +147,19 @@ class RenderDocHook
          * 
          * \param in_path_template Specifies the capture path template to set, as UTF-8 null-terminated string.
          */
-        DAEvoid SetCaptureFilePathTemplate(DAEchar const* in_path_template) const noexcept;
+        RkVoid SetCaptureFilePathTemplate(RkChar const* in_path_template) const noexcept;
 
         /**
          * \brief Get the current capture path template, see SetCaptureFilePathTemplate().
          * \return The current capture path template as a UTF-8 null-terminated string.
          */
-        DAEchar const* GetCaptureFilePathTemplate() const noexcept;
+        RkChar const* GetCaptureFilePathTemplate() const noexcept;
 
         /**
          * \brief This function returns the number of frame captures that have been made.
          * \return The number of frame captures that have been made
          */
-        DAEuint32 GetNumCaptures() const noexcept;
+        RkUint32 GetNumCaptures() const noexcept;
 
         /**
          * \brief This function returns the details of a particular frame capture, as specified by an index from 0 to GetNumCaptures() - 1.
@@ -178,20 +178,20 @@ class RenderDocHook
          * 
          * \return Returns true if the capture index was valid, or false if it was out of range.
          */
-        DAEbool GetCapture(DAEuint32 in_idx, DAEchar* in_filename, DAEuint32* out_path_length, DAEuint64* out_timestamp) const noexcept;
+        RkBool GetCapture(RkUint32 in_idx, RkChar* in_filename, RkUint32* out_path_length, RkUint64* out_timestamp) const noexcept;
 
         /**
          * \brief This function will trigger a capture as if the user had pressed one of the capture hotkeys.
          * 
          * The capture will be taken from the next frame presented to whichever window is considered current.
          */
-        DAEvoid TriggerCapture() const noexcept;
+        RkVoid TriggerCapture() const noexcept;
 
         /**
          * \brief This function returns a value to indicate whether the RenderDoc UI is currently connected to the current process.
          * \return Returns true if the RenderDoc UI is currently connected, or false otherwise.
          */
-        DAEbool IsTargetControlConnected() const noexcept;
+        RkBool IsTargetControlConnected() const noexcept;
 
         /**
          * \brief This function will determine the closest matching replay UI executable for the current RenderDoc module and launch it.
@@ -201,7 +201,7 @@ class RenderDocHook
          *                     If this parameter is NULL, the command line will be unmodified.
          * \return If the UI was successfully launched, this function will return the PID of the new process. Otherwise it will return 0.
          */
-        DAEuint32 LaunchReplayUI(DAEuint32 in_connect_target_control, DAEchar const* in_cmdline) const noexcept;
+        RkUint32 LaunchReplayUI(RkUint32 in_connect_target_control, RkChar const* in_cmdline) const noexcept;
 
         /**
          * \brief This function will explicitly set which window is considered active.
@@ -220,7 +220,7 @@ class RenderDocHook
          * \note You can use the RENDERDOC_DEVICEPOINTER_FROM_VKINSTANCE helper macro defined in the renderdoc header to obtain this pointer from any VkInstance.
          * \note RENDERDOC_WindowHandle is a typedef to void *. It is the platform specific HWND, xcb_window_t, or Xlib Window.
          */
-        DAEvoid SetActiveWindow(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
+        RkVoid SetActiveWindow(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
 
         /**
          * \brief This function will immediately begin a capture for the specified device/window combination.
@@ -238,13 +238,13 @@ class RenderDocHook
          * \note NULL can be specified for the window handle and the device object can be passed to select that API.
          * \note If both are set to NULL, RenderDoc will simply choose one at random so is only recommended for the case where only one is present.
          */
-        DAEvoid StartFrameCapture(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
+        RkVoid StartFrameCapture(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
 
         /**
          * \brief This function returns a value to indicate whether the current frame is capturing.
          * \return Returns true if the frame is currently capturing, or false otherwise.
          */
-        DAEbool IsFrameCapturing() const noexcept;
+        RkBool IsFrameCapturing() const noexcept;
 
         /**
          * \brief This function will immediately end an active capture for the specified device/window combination.
@@ -257,7 +257,7 @@ class RenderDocHook
          * \note Wildcard matching of device and wndHandle is described above in BeginFrameCapture().
          * \note There will be undefined results if there is not an active frame capture for the device/window combination.
          */
-        DAEvoid EndFrameCapture(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
+        RkVoid EndFrameCapture(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
 
         /**
          * \brief This function is similar to EndFrameCapture() but the capture contents will be discarded immediately, and not processed and written to disk.
@@ -273,7 +273,7 @@ class RenderDocHook
          * \note Wildcard matching of device and wndHandle is described above in BeginFrameCapture().
          * \note There will be undefined results if there is not an active frame capture for the device/window combination.
          */
-        DAEvoid DiscardFrameCapture(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
+        RkVoid DiscardFrameCapture(RENDERDOC_DevicePointer in_device, RENDERDOC_WindowHandle in_window_handle) const noexcept;
 
         /**
          * \brief This function will trigger multiple sequential frame captures as if the user had pressed one of the capture hotkeys before each frame.
@@ -283,7 +283,7 @@ class RenderDocHook
          * 
          * \param in_frame_count The number of frames to capture.
          */
-        DAEvoid TriggerMultiFrameCapture(DAEuint32 in_frame_count) const noexcept;
+        RkVoid TriggerMultiFrameCapture(RkUint32 in_frame_count) const noexcept;
 
         /**
          * \brief This function adds an arbitrary comments field to an existing capture on disk, which will then be displayed in the UI to anyone opening the capture.
@@ -292,7 +292,7 @@ class RenderDocHook
          *                       If this path is NULL or an empty string, the most recent capture file that has been created will be used.
          * \param in_comments Specifies the comments to set in the capture file, as UTF-8 null-terminated string.
          */
-        DAEvoid SetCaptureFileComments(DAEchar const* in_file_path, DAEchar const* in_comments) const noexcept;
+        RkVoid SetCaptureFileComments(RkChar const* in_file_path, RkChar const* in_comments) const noexcept;
 
         #pragma endregion
 

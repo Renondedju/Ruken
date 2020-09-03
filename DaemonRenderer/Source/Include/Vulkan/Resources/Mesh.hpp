@@ -54,14 +54,14 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        static std::optional<VulkanBuffer> CreateStagingBuffer  (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
-        static std::optional<VulkanBuffer> CreateVertexBuffer   (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
-        static std::optional<VulkanBuffer> CreateIndexBuffer    (VulkanDeviceAllocator const& in_allocator, DAEuint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateStagingBuffer  (VulkanDeviceAllocator const& in_allocator, RkUint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateVertexBuffer   (VulkanDeviceAllocator const& in_allocator, RkUint64 in_size) noexcept;
+        static std::optional<VulkanBuffer> CreateIndexBuffer    (VulkanDeviceAllocator const& in_allocator, RkUint64 in_size) noexcept;
 
-        DAEvoid UploadData(VulkanDevice           const& in_device,
+        RkVoid UploadData(VulkanDevice           const& in_device,
                            VulkanDeviceAllocator  const& in_allocator,
                            std::vector<Vertex>    const& in_vertices,
-                           std::vector<DAEuint32> const& in_indices) const;
+                           std::vector<RkUint32> const& in_indices) const;
 
         #pragma endregion
 
@@ -80,11 +80,11 @@ class Mesh final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        RkVoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        RkVoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        RkVoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VulkanBuffer const& GetVertexBuffer() const noexcept;

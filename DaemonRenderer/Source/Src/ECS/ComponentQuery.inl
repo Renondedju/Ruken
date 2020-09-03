@@ -23,13 +23,13 @@
  */
 
 template <typename ... TComponents>
-DAEvoid ComponentQuery::SetupInclusionQuery() noexcept
+RkVoid ComponentQuery::SetupInclusionQuery() noexcept
 {
     (m_included.Add(TComponents::id), ...);
 }
 
 template <typename ... TComponents>
-DAEvoid ComponentQuery::SetupExclusionQuery() noexcept
+RkVoid ComponentQuery::SetupExclusionQuery() noexcept
 {
     (m_excluded.Add(TComponents::id), ...);
 }

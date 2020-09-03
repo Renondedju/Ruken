@@ -61,7 +61,7 @@ VulkanFence::~VulkanFence() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanFence::Reset() const noexcept
+RkBool VulkanFence::Reset() const noexcept
 {
     if (VK_CHECK(vkResetFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle)))
         return false;
@@ -69,12 +69,12 @@ DAEbool VulkanFence::Reset() const noexcept
     return true;
 }
 
-DAEvoid VulkanFence::Wait() const noexcept
+RkVoid VulkanFence::Wait() const noexcept
 {
     VK_CHECK(vkWaitForFences(VulkanLoader::GetLoadedDevice(), 1u, &m_handle, VK_TRUE, UINT64_MAX));
 }
 
-DAEbool VulkanFence::IsSignaled() const noexcept
+RkBool VulkanFence::IsSignaled() const noexcept
 {
     return vkGetFenceStatus(VulkanLoader::GetLoadedDevice(), m_handle) == VK_SUCCESS;
 }

@@ -23,25 +23,25 @@
  */
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
-template <typename TLayoutView, DAEsize... TIds>
+template <typename TLayoutView, RkSize... TIds>
 constexpr auto DataLayout<TContainer, TLayoutTypes...>::GetHelper(
-    ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept
+    ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
     return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
 }
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
-template <DAEsize... TIds>
-constexpr DAEvoid DataLayout<TContainer, TLayoutTypes...>::ResizeHelper(
-    ContainerType& in_container, DAEsize in_size, std::index_sequence<TIds...>) noexcept
+template <RkSize... TIds>
+constexpr RkVoid DataLayout<TContainer, TLayoutTypes...>::ResizeHelper(
+    ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept
 {
     (std::get<TIds>(in_container).resize(in_size), ...);
 }
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
-template <typename TValue, DAEsize... TIds>
-constexpr DAEvoid DataLayout<TContainer, TLayoutTypes...>::PushBackHelper(
+template <typename TValue, RkSize... TIds>
+constexpr RkVoid DataLayout<TContainer, TLayoutTypes...>::PushBackHelper(
     ContainerType& in_container, TValue&& in_value, std::index_sequence<TIds...>) noexcept
 {
     // Fold expression
@@ -51,28 +51,28 @@ constexpr DAEvoid DataLayout<TContainer, TLayoutTypes...>::PushBackHelper(
 template <template <typename> class TContainer, typename ... TLayoutTypes>
 template <typename TLayoutView>
 constexpr auto DataLayout<TContainer, TLayoutTypes...>::Get(
-	ContainerType& in_container, DAEsize in_position) noexcept
+	ContainerType& in_container, RkSize in_position) noexcept
 {
     return GetHelper<TLayoutView>(in_container, in_position, typename TLayoutView::Sequence());
 }
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
-constexpr DAEvoid DataLayout<TContainer, TLayoutTypes...>::Resize(
-	ContainerType& in_container, DAEsize in_size) noexcept
+constexpr RkVoid DataLayout<TContainer, TLayoutTypes...>::Resize(
+	ContainerType& in_container, RkSize in_size) noexcept
 {
     ResizeHelper(in_container, in_size, std::make_index_sequence<sizeof...(TLayoutTypes)>());
 }
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
 template <typename TValue>
-constexpr DAEvoid DataLayout<TContainer, TLayoutTypes...>::PushBack(
+constexpr RkVoid DataLayout<TContainer, TLayoutTypes...>::PushBack(
 	ContainerType& in_container, TValue&& in_value) noexcept
 {
     PushBackHelper(in_container, std::forward<TValue>(in_value), std::make_index_sequence<sizeof...(TLayoutTypes)>());
 }
 
 template <template <typename> class TContainer, typename ... TLayoutTypes>
-constexpr DAEsize DataLayout<TContainer, TLayoutTypes...>::Size(
+constexpr RkSize DataLayout<TContainer, TLayoutTypes...>::Size(
     ContainerType const& in_container) noexcept
 {
     return std::get<0>(in_container).size();

@@ -51,7 +51,7 @@ VulkanTimelineSemaphore::VulkanTimelineSemaphore() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanTimelineSemaphore::Signal(DAEuint64 const in_value) const noexcept
+RkBool VulkanTimelineSemaphore::Signal(RkUint64 const in_value) const noexcept
 {
     VkSemaphoreSignalInfo signal_info = {};
 
@@ -65,7 +65,7 @@ DAEbool VulkanTimelineSemaphore::Signal(DAEuint64 const in_value) const noexcept
     return true;
 }
 
-DAEvoid VulkanTimelineSemaphore::Wait(DAEuint64 const in_value) const noexcept
+RkVoid VulkanTimelineSemaphore::Wait(RkUint64 const in_value) const noexcept
 {
     VkSemaphoreWaitInfo wait_info = {};
 
@@ -77,7 +77,7 @@ DAEvoid VulkanTimelineSemaphore::Wait(DAEuint64 const in_value) const noexcept
     VK_CHECK(vkWaitSemaphores(VulkanLoader::GetLoadedDevice(), &wait_info, UINT64_MAX));
 }
 
-DAEuint64 VulkanTimelineSemaphore::GetValue() const noexcept
+RkUint64 VulkanTimelineSemaphore::GetValue() const noexcept
 {
     auto value = 0ull;
 

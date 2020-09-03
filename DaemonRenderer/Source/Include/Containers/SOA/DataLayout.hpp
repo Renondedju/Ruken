@@ -65,8 +65,8 @@ class DataLayout
          * \param in_position position of the get
          * \return View instance containing references to the requested resources
          */
-        template <typename TLayoutView, DAEsize... TIds>
-        constexpr static auto GetHelper(ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept;
+        template <typename TLayoutView, RkSize... TIds>
+        constexpr static auto GetHelper(ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief Resize helper
@@ -74,8 +74,8 @@ class DataLayout
          * \param in_container Container instance
          * \param in_size New size
          */
-        template <DAEsize... TIds>
-        constexpr static DAEvoid ResizeHelper(ContainerType& in_container, DAEsize in_size, std::index_sequence<TIds...>) noexcept;
+        template <RkSize... TIds>
+        constexpr static RkVoid ResizeHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief Push back helper
@@ -84,8 +84,8 @@ class DataLayout
          * \param in_container Container instance
          * \param in_value Value instance to push back
          */
-        template <typename TValue, DAEsize... TIds>
-        constexpr static DAEvoid PushBackHelper(ContainerType& in_container, TValue&& in_value, std::index_sequence<TIds...>) noexcept;
+        template <typename TValue, RkSize... TIds>
+        constexpr static RkVoid PushBackHelper(ContainerType& in_container, TValue&& in_value, std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
 
@@ -108,14 +108,14 @@ class DataLayout
          * \return View instance containing references to the requested resources
          */
         template <typename TLayoutView>
-        constexpr static auto Get(ContainerType& in_container, DAEsize in_position) noexcept;
+        constexpr static auto Get(ContainerType& in_container, RkSize in_position) noexcept;
 
         /**
          * \brief Allows to resize the layout underlying container
          * \param in_container Container instance
          * \param in_size New size
          */
-        constexpr static DAEvoid Resize(ContainerType& in_container, DAEsize in_size) noexcept;
+        constexpr static RkVoid Resize(ContainerType& in_container, RkSize in_size) noexcept;
 
         /**
          * \brief Pushes back new values into the underlying containers
@@ -124,14 +124,14 @@ class DataLayout
          * \param in_value Value instance to push back
          */
         template <typename TValue>
-        constexpr static DAEvoid PushBack(ContainerType& in_container, TValue&& in_value) noexcept;
+        constexpr static RkVoid PushBack(ContainerType& in_container, TValue&& in_value) noexcept;
 
         /**
          * \brief Returns the size of the layout
          * \param in_container Container instance
          * \return Container size
          */
-        constexpr static DAEsize Size(ContainerType const& in_container) noexcept;
+        constexpr static RkSize Size(ContainerType const& in_container) noexcept;
 
         #pragma endregion 
 };

@@ -28,7 +28,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructor
 
-ShaderLoadingDescriptor::ShaderLoadingDescriptor(DAEchar const* in_path) noexcept:
+ShaderLoadingDescriptor::ShaderLoadingDescriptor(RkChar const* in_path) noexcept:
     path {in_path}
 {
     

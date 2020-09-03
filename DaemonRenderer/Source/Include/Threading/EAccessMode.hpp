@@ -35,7 +35,7 @@ BEGIN_RUKEN_NAMESPACE
  * Read  => Read  protection
  * Write => Write protection
  */
-enum class EAccessMode : DAEbyte
+enum class EAccessMode : RkByte
 {
     Read,
     Write,

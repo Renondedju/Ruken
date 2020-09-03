@@ -35,7 +35,7 @@ class Timer : Unique
 {
     private:
 
-        DAEvoid* m_win_handle;
+        RkVoid* m_win_handle;
 
     public:
 
@@ -55,13 +55,13 @@ class Timer : Unique
          * \param in_nanoseconds Amount of nanoseconds to set
          * \return true if the operation succeeded, false otherwise
          */
-        DAEbool SetTiming(DAEint64 in_nanoseconds) const noexcept;
+        RkBool SetTiming(RkInt64 in_nanoseconds) const noexcept;
 
         /**
          * \brief Sleeps for x amount of nanoseconds (set via SetTiming())
          * \return true if the operation succeeded, false otherwise
          */
-        DAEbool NSleep() const noexcept;
+        RkBool NSleep() const noexcept;
 
         #pragma endregion
 

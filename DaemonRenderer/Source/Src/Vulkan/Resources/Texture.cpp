@@ -42,7 +42,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Methods
 
-std::optional<VulkanImage> Texture::CreateImage(VulkanDeviceAllocator const& in_allocator, DAEuint32 const in_width, DAEuint32 const in_height) noexcept
+std::optional<VulkanImage> Texture::CreateImage(VulkanDeviceAllocator const& in_allocator, RkUint32 const in_width, RkUint32 const in_height) noexcept
 {
     VmaAllocationCreateInfo allocation_create_info = {};
 
@@ -81,10 +81,10 @@ std::optional<VulkanBuffer> Texture::CreateStagingBuffer(VulkanDeviceAllocator c
     return in_allocator.CreateBuffer(buffer_create_info, allocation_create_info);
 }
 
-DAEvoid Texture::UploadData(VulkanDevice          const&    in_device,
+RkVoid Texture::UploadData(VulkanDevice          const&    in_device,
                             VulkanDeviceAllocator const&    in_allocator,
-                            DAEvoid               const*    in_data,
-                            DAEuint64             const     in_size) const
+                            RkVoid               const*    in_data,
+                            RkUint64             const     in_size) const
 {
     auto staging_buffer = CreateStagingBuffer(in_allocator, in_size);
 
@@ -149,7 +149,7 @@ DAEvoid Texture::UploadData(VulkanDevice          const&    in_device,
 
 #pragma warning (disable : 4100)
 
-DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+RkVoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<TextureLoadingDescriptor const&>(in_descriptor);
 
@@ -173,7 +173,7 @@ DAEvoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor con
     UploadData(device, allocator, pixels, width * height * comp);
 }
 
-DAEvoid Texture::Reload(ResourceManager& in_manager)
+RkVoid Texture::Reload(ResourceManager& in_manager)
 {
     auto const& device    = m_loading_descriptor->renderer.get().GetDevice();
     auto const& allocator = m_loading_descriptor->renderer.get().GetDeviceAllocator();
@@ -187,7 +187,7 @@ DAEvoid Texture::Reload(ResourceManager& in_manager)
     UploadData(device, allocator, pixels, width * height * comp);
 }
 
-DAEvoid Texture::Unload(ResourceManager& in_manager) noexcept
+RkVoid Texture::Unload(ResourceManager& in_manager) noexcept
 {
     m_loading_descriptor.reset();
     m_image             .reset();

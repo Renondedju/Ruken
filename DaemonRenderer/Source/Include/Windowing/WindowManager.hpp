@@ -55,7 +55,7 @@ class WindowManager final: public Service<WindowManager>
         /**
          * \brief Finds all connected monitors and creates the corresponding screen objects to manage them.
          */
-        DAEvoid SetupScreens() noexcept;
+        RkVoid SetupScreens() noexcept;
 
         #pragma endregion
 
@@ -84,7 +84,7 @@ class WindowManager final: public Service<WindowManager>
         /**
          * \brief Processes all pending events.
          */
-        DAEvoid Update() const noexcept;
+        RkVoid Update() const noexcept;
 
         /**
          * \return A reference to the newly created window.
@@ -94,7 +94,7 @@ class WindowManager final: public Service<WindowManager>
         /**
          * \brief Destroys the specified window if it is managed by the WindowManager.
          */
-        DAEvoid DestroyWindow(Window const& in_window) noexcept;
+        RkVoid DestroyWindow(Window const& in_window) noexcept;
 
         #pragma endregion
 

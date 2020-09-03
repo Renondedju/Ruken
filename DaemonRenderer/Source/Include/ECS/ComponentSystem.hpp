@@ -47,8 +47,8 @@ class ComponentSystem : public ComponentSystemBase
         #pragma region Methods
 
         /*
-        virtual DAEvoid OnUpdate() const noexcept = 0;
-        virtual DAEvoid OnQuery () const noexcept = 0;
+        virtual RkVoid OnUpdate() const noexcept = 0;
+        virtual RkVoid OnQuery () const noexcept = 0;
         */
 
         #pragma endregion

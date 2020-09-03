@@ -57,7 +57,7 @@ class VulkanDevice
          * \brief A command pool is dedicated to a queue family (first key) and to a thread (second key),
          *        because they cannot be used concurrently.
          */
-        std::unordered_map<DAEuint32, std::unordered_map<std::thread::id, VulkanCommandPool>> m_command_pools {};
+        std::unordered_map<RkUint32, std::unordered_map<std::thread::id, VulkanCommandPool>> m_command_pools {};
 
         std::unique_ptr<VulkanPipelineCache> m_pipeline_cache {};
 
@@ -65,9 +65,9 @@ class VulkanDevice
 
         #pragma region Methods
 
-        DAEbool CreateDevice      (VulkanPhysicalDevice const& in_physical_device) noexcept;
-        DAEvoid CreateQueues      (VulkanPhysicalDevice const& in_physical_device) noexcept;
-        DAEvoid CreateCommandPools(Scheduler            const& in_scheduler)       noexcept;
+        RkBool CreateDevice      (VulkanPhysicalDevice const& in_physical_device) noexcept;
+        RkVoid CreateQueues      (VulkanPhysicalDevice const& in_physical_device) noexcept;
+        RkVoid CreateCommandPools(Scheduler            const& in_scheduler)       noexcept;
 
         #pragma endregion
 
@@ -90,22 +90,22 @@ class VulkanDevice
         /**
          * \brief Waits on the host for the completion of outstanding queue operations for all queues on this device.
          */
-        DAEvoid WaitIdle() const noexcept;
+        RkVoid WaitIdle() const noexcept;
 
         /**
          * \return A queue family supporting presentation to the given surface.
          */
-        [[nodiscard]] std::optional<DAEuint32> FindPresentFamily(VkSurfaceKHR const& in_surface) const noexcept;
+        [[nodiscard]] std::optional<RkUint32> FindPresentFamily(VkSurfaceKHR const& in_surface) const noexcept;
 
         /**
          * \return A pointer to a queue supporting presentation to the given surface.
          */
         [[nodiscard]] VulkanQueue const* RequestPresentQueue(VkSurfaceKHR const& in_surface) const noexcept;
 
-        [[nodiscard]] DAEbool                    IsValid               () const noexcept;
-        [[nodiscard]] DAEuint32                  GetGraphicsFamily     () const noexcept;
-        [[nodiscard]] DAEuint32                  GetComputeFamily      () const noexcept;
-        [[nodiscard]] DAEuint32                  GetTransferFamily     () const noexcept;
+        [[nodiscard]] RkBool                    IsValid               () const noexcept;
+        [[nodiscard]] RkUint32                  GetGraphicsFamily     () const noexcept;
+        [[nodiscard]] RkUint32                  GetComputeFamily      () const noexcept;
+        [[nodiscard]] RkUint32                  GetTransferFamily     () const noexcept;
         [[nodiscard]] VkDevice            const& GetHandle             () const noexcept;
         [[nodiscard]] VulkanQueue         const& GetGraphicsQueue      () const noexcept;
         [[nodiscard]] VulkanQueue         const& GetComputeQueue       () const noexcept;

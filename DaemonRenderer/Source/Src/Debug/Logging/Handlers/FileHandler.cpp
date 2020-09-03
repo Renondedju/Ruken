@@ -41,7 +41,7 @@ FileHandler::FileHandler(LogFormatter       const& in_formatter,
 
 #pragma region Methods
 
-DAEvoid FileHandler::Flush()
+RkVoid FileHandler::Flush()
 {
     if (!m_stream.is_open())
         return;

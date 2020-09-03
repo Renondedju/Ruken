@@ -27,7 +27,7 @@
 
 USING_RUKEN_NAMESPACE
 
-Scheduler::Scheduler(ServiceProvider& in_service_provider, DAEuint16 const in_workers_count):
+Scheduler::Scheduler(ServiceProvider& in_service_provider, RkUint16 const in_workers_count):
     Service<Scheduler> {in_service_provider},
     m_workers   {in_workers_count == 0u ? std::thread::hardware_concurrency() - 1 : in_workers_count},
     m_running   {true},
@@ -37,7 +37,7 @@ Scheduler::Scheduler(ServiceProvider& in_service_provider, DAEuint16 const in_wo
     if (m_logger)
         m_logger->Info("Spawning " + std::to_string(m_workers.size()) + " workers");
 
-    DAEuint16 index = 0;
+    RkUint16 index = 0;
     for (Worker& worker : m_workers)
     {
         worker.Label() = "Scheduler worker " + std::to_string(index++);
@@ -50,7 +50,7 @@ Scheduler::~Scheduler()
     Shutdown();
 }
 
-DAEvoid Scheduler::ScheduleTask(Job&& in_task) noexcept
+RkVoid Scheduler::ScheduleTask(Job&& in_task) noexcept
 {
     if (!m_running.load(std::memory_order_acquire))
         return;
@@ -58,7 +58,7 @@ DAEvoid Scheduler::ScheduleTask(Job&& in_task) noexcept
     m_job_queue.Enqueue(std::forward<Job>(in_task));
 }
 
-DAEvoid Scheduler::WaitForQueuedTasks() noexcept
+RkVoid Scheduler::WaitForQueuedTasks() noexcept
 {
     if (!m_running.load(std::memory_order_acquire))
         return;
@@ -67,7 +67,7 @@ DAEvoid Scheduler::WaitForQueuedTasks() noexcept
         std::this_thread::yield();
 }
 
-DAEvoid Scheduler::Shutdown() noexcept
+RkVoid Scheduler::Shutdown() noexcept
 {
     if (!m_running.load(std::memory_order_acquire))
         return;
@@ -84,14 +84,14 @@ std::vector<Worker> const& Scheduler::GetWorkers() const noexcept
     return m_workers;
 }
 
-DAEvoid Scheduler::WorkersJob() noexcept
+RkVoid Scheduler::WorkersJob() noexcept
 {
     Job current_job;
 
     while (m_running.load(std::memory_order_acquire))
     {
         // Always try to dequeue jobs, the job queue will lock us if nothing is available
-        DAEbool const job_validity = m_job_queue.Dequeue(current_job);
+        RkBool const job_validity = m_job_queue.Dequeue(current_job);
 
         if (job_validity)
             current_job();

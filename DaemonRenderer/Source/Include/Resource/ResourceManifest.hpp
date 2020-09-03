@@ -64,7 +64,7 @@ struct ResourceManifest
 
     public:
 
-        typedef DAEuint32 ReferenceCountType;
+        typedef RkUint32 ReferenceCountType;
 
         #pragma region Members
 

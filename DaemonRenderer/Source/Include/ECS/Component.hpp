@@ -40,7 +40,7 @@ BEGIN_RUKEN_NAMESPACE
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <typename TItem, DAEsize TUniqueId>
+template <typename TItem, RkSize TUniqueId>
 class Component
 {
      RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
@@ -58,9 +58,9 @@ class Component
 
         using Layout = typename TItem::Layout;
         using Item   = TItem;
-        using ItemId = DAEsize;
+        using ItemId = RkSize;
 
-        static constexpr DAEsize id = TUniqueId;
+        static constexpr RkSize id = TUniqueId;
 
         #pragma region Constructors
 
@@ -85,7 +85,7 @@ class Component
          * \brief Returns the count of items in this component
          * \return Component item count
          */
-        DAEsize GetItemCount() const noexcept;
+        RkSize GetItemCount() const noexcept;
 
         #pragma endregion 
 
@@ -105,7 +105,7 @@ class Component
  * \param in_component_name Name of the component as described in the above component table enum
  */
 #define RUKEN_DEFINE_COMPONENT(in_component_table, in_component_name)\
-    using in_component_name##Component = Component<in_component_name##ComponentItem, static_cast<DAEsize>(in_component_table::in_component_name)>
+    using in_component_name##Component = Component<in_component_name##ComponentItem, static_cast<RkSize>(in_component_table::in_component_name)>
 
 #include "ECS/Component.inl"
 

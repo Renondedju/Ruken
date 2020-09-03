@@ -36,59 +36,59 @@ constexpr Bitmask<TEnumType>::Bitmask(TData... in_data) noexcept:
 
 template <typename TEnumType>
 template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
-constexpr DAEbool Bitmask<TEnumType>::HasAll(TData... in_data) const noexcept
+constexpr RkBool Bitmask<TEnumType>::HasAll(TData... in_data) const noexcept
 {
     return Parent::HasAll(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
 template <typename TEnumType>
-constexpr DAEbool Bitmask<TEnumType>::HasAll(Bitmask<TEnumType> const& in_bitmask) const noexcept
+constexpr RkBool Bitmask<TEnumType>::HasAll(Bitmask<TEnumType> const& in_bitmask) const noexcept
 {
     return Parent::HasAll(static_cast<Parent>(*this));
 }
 
 template <typename TEnumType>
 template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
-constexpr DAEbool Bitmask<TEnumType>::HasOne(TData... in_data) const noexcept
+constexpr RkBool Bitmask<TEnumType>::HasOne(TData... in_data) const noexcept
 {
     return Parent::HasOne(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
 template <typename TEnumType>
-constexpr DAEbool Bitmask<TEnumType>::HasOne(Bitmask<TEnumType> const& in_bitmask) const noexcept
+constexpr RkBool Bitmask<TEnumType>::HasOne(Bitmask<TEnumType> const& in_bitmask) const noexcept
 {
     return Parent::HasOne(static_cast<Parent>(*this));
 }
 
 template <typename TEnumType>
 template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
-constexpr DAEvoid Bitmask<TEnumType>::Add(TData... in_data) noexcept
+constexpr RkVoid Bitmask<TEnumType>::Add(TData... in_data) noexcept
 {
     Parent::Add(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
 template <typename TEnumType>
-constexpr DAEvoid Bitmask<TEnumType>::Add(Bitmask<TEnumType> const& in_bitmask) noexcept
+constexpr RkVoid Bitmask<TEnumType>::Add(Bitmask<TEnumType> const& in_bitmask) noexcept
 {
     Parent::Add(static_cast<Parent>(in_bitmask));
 }
 
 template <typename TEnumType>
 template <typename... TData, internal::AreEnumType<TEnumType, TData...>>
-constexpr DAEvoid Bitmask<TEnumType>::Remove(TData... in_data) noexcept
+constexpr RkVoid Bitmask<TEnumType>::Remove(TData... in_data) noexcept
 {
     Parent::Remove(std::forward(static_cast<UnderlyingType>(in_data))...);
 }
 
 template <typename TEnumType>
-constexpr DAEvoid Bitmask<TEnumType>::Remove(Bitmask<TEnumType> const& in_bitmask) noexcept
+constexpr RkVoid Bitmask<TEnumType>::Remove(Bitmask<TEnumType> const& in_bitmask) noexcept
 {
     Parent::Remove(static_cast<Parent>(in_bitmask));
 }
 
 template <typename TEnumType>
 template <typename TLambdaType>
-constexpr DAEvoid Bitmask<TEnumType>::Foreach(TLambdaType in_lambda) const noexcept
+constexpr RkVoid Bitmask<TEnumType>::Foreach(TLambdaType in_lambda) const noexcept
 {
     Parent::template Foreach<TLambdaType, UnderlyingType>(std::forward(in_lambda));
 }

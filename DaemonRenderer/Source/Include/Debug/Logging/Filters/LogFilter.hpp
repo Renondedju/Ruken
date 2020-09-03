@@ -53,7 +53,7 @@ class __declspec(novtable) LogFilter
          * \return True if the specified record is to be logged, else False.
          */
         [[nodiscard]]
-        virtual DAEbool Filter(LogRecord const& in_record) const = 0;
+        virtual RkBool Filter(LogRecord const& in_record) const = 0;
 
         #pragma endregion
 

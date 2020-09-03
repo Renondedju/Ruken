@@ -45,8 +45,8 @@ class VulkanBuffer
         VmaAllocator      m_allocator       {nullptr};
         VmaAllocation     m_allocation      {nullptr};
         VmaAllocationInfo m_allocation_info {};
-        DAEbool           m_is_persistent   {false};
-        DAEbool           m_is_mapped       {false};
+        RkBool           m_is_persistent   {false};
+        RkBool           m_is_mapped       {false};
 
         #pragma endregion
 
@@ -58,7 +58,7 @@ class VulkanBuffer
                               VmaAllocator      in_allocator,
                               VmaAllocation     in_allocation,
                               VmaAllocationInfo in_allocation_info,
-                              DAEbool           in_persistent) noexcept;
+                              RkBool           in_persistent) noexcept;
 
         VulkanBuffer(VulkanBuffer const& in_copy) = delete;
         VulkanBuffer(VulkanBuffer&&      in_move) noexcept;
@@ -74,27 +74,27 @@ class VulkanBuffer
          * \note   This function automatically flushes or invalidates caches if necessary.
          */
         [[nodiscard]]
-        DAEvoid* Map() noexcept;
+        RkVoid* Map() noexcept;
 
         /**
          * \return True if the data was correctly updated, else False.
          * \note   This function automatically maps and unmaps memory if necessary.
          */
         [[nodiscard]]
-        DAEbool Update(DAEvoid const* in_data, DAEsize in_size) noexcept;
+        RkBool Update(RkVoid const* in_data, RkSize in_size) noexcept;
 
         /**
          * \return True if the memory was correctly unmapped, else False.
          * \note   This function automatically flushes or invalidates caches if necessary.
          */
         [[nodiscard]]
-        DAEbool Unmap() noexcept;
+        RkBool Unmap() noexcept;
 
         [[nodiscard]] VkBuffer       const& GetHandle() const noexcept;
         [[nodiscard]] VkDeviceMemory const& GetMemory() const noexcept;
         [[nodiscard]] VkDeviceSize   const& GetOffset() const noexcept;
         [[nodiscard]] VkDeviceSize   const& GetSize  () const noexcept;
-        [[nodiscard]] DAEbool               IsMapped () const noexcept;
+        [[nodiscard]] RkBool               IsMapped () const noexcept;
 
         #pragma endregion
 

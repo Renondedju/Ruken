@@ -52,7 +52,7 @@ struct LogicalAnd
      *
      * \return Value of the operation
      */
-    friend constexpr DAEbool operator&&(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
+    friend constexpr RkBool operator&&(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
     {
         using Type = internal::UnderlyingType<TStrongTypedef>;
 

@@ -70,7 +70,7 @@ class RenderFrame
         #pragma region Methods
 
         [[nodiscard]]
-        DAEbool Reset() noexcept;
+        RkBool Reset() noexcept;
 
         [[nodiscard]] FencePool&     GetFencePool          () const noexcept;
         [[nodiscard]] SemaphorePool& GetSemaphorePool      () const noexcept;

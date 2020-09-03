@@ -36,7 +36,7 @@ USING_RUKEN_NAMESPACE
 
 VulkanQueue::VulkanQueue(VkPhysicalDevice   in_physical_device,
                          VkQueue            in_handle,
-                         DAEuint32 const    in_queue_family) noexcept:
+                         RkUint32 const    in_queue_family) noexcept:
     m_physical_device   {in_physical_device},
     m_handle            {in_handle},
     m_queue_family      {in_queue_family}
@@ -66,14 +66,14 @@ VulkanQueue::~VulkanQueue() noexcept
 
 #pragma region Methods
 
-DAEvoid VulkanQueue::WaitIdle() const noexcept
+RkVoid VulkanQueue::WaitIdle() const noexcept
 {
     std::lock_guard lock(m_mutex);
 
     VK_CHECK(vkQueueWaitIdle(m_handle));
 }
 
-DAEvoid VulkanQueue::BeginLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept
+RkVoid VulkanQueue::BeginLabel(RkChar const* in_label_name, Vector4f const& in_color) const noexcept
 {
     VkDebugUtilsLabelEXT label_info = {};
 
@@ -87,7 +87,7 @@ DAEvoid VulkanQueue::BeginLabel(DAEchar const* in_label_name, Vector4f const& in
     vkQueueBeginDebugUtilsLabelEXT(m_handle, &label_info);
 }
 
-DAEvoid VulkanQueue::InsertLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept
+RkVoid VulkanQueue::InsertLabel(RkChar const* in_label_name, Vector4f const& in_color) const noexcept
 {
     VkDebugUtilsLabelEXT label_info = {};
 
@@ -101,13 +101,13 @@ DAEvoid VulkanQueue::InsertLabel(DAEchar const* in_label_name, Vector4f const& i
     vkQueueInsertDebugUtilsLabelEXT(m_handle, &label_info);
 }
 
-DAEvoid VulkanQueue::EndLabel() const noexcept
+RkVoid VulkanQueue::EndLabel() const noexcept
 {
     vkQueueEndDebugUtilsLabelEXT(m_handle);
 }
 
 
-DAEbool VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence) const noexcept
+RkBool VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence) const noexcept
 {
     VkSubmitInfo submit_info = {};
 
@@ -123,7 +123,7 @@ DAEbool VulkanQueue::Submit(VulkanCommandBuffer const& in_command_buffer, VkFenc
     return true;
 }
 
-DAEbool VulkanQueue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence) const noexcept
+RkBool VulkanQueue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence) const noexcept
 {
     std::lock_guard lock(m_mutex);
 
@@ -133,17 +133,17 @@ DAEbool VulkanQueue::Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence
     return true;
 }
 
-DAEbool VulkanQueue::Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence) const noexcept
+RkBool VulkanQueue::Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence) const noexcept
 {
     std::lock_guard lock(m_mutex);
 
-    if (VK_CHECK(vkQueueSubmit(m_handle, static_cast<DAEuint32>(in_submit_infos.size()), in_submit_infos.data(), in_fence)))
+    if (VK_CHECK(vkQueueSubmit(m_handle, static_cast<RkUint32>(in_submit_infos.size()), in_submit_infos.data(), in_fence)))
         return false;
 
     return true;
 }
 
-DAEbool VulkanQueue::Present(VulkanSwapchain const& in_swapchain, VulkanSemaphore const& in_semaphore) const noexcept
+RkBool VulkanQueue::Present(VulkanSwapchain const& in_swapchain, VulkanSemaphore const& in_semaphore) const noexcept
 {
     VkPresentInfoKHR present_info = {};
 
@@ -162,7 +162,7 @@ DAEbool VulkanQueue::Present(VulkanSwapchain const& in_swapchain, VulkanSemaphor
     return true;
 }
 
-DAEbool VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
+RkBool VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noexcept
 {
     std::lock_guard lock(m_mutex);
 
@@ -172,7 +172,7 @@ DAEbool VulkanQueue::Present(VkPresentInfoKHR const& in_present_info) const noex
     return true;
 }
 
-DAEbool VulkanQueue::IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept
+RkBool VulkanQueue::IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept
 {
     VkBool32 presentation_support = VK_FALSE;
 
@@ -187,7 +187,7 @@ VkQueue const& VulkanQueue::GetHandle() const noexcept
     return m_handle;
 }
 
-DAEuint32 VulkanQueue::GetQueueFamily() const noexcept
+RkUint32 VulkanQueue::GetQueueFamily() const noexcept
 {
     return m_queue_family;
 }

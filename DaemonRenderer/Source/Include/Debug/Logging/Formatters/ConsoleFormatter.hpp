@@ -42,7 +42,7 @@ class ConsoleFormatter final : public LogFormatter
 
         #pragma region Members
 
-        DAEvoid* m_handle {nullptr};
+        RkVoid* m_handle {nullptr};
 
         #pragma endregion
 

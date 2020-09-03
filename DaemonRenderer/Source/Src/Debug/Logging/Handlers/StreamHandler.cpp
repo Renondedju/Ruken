@@ -39,7 +39,7 @@ StreamHandler::StreamHandler(LogFormatter const& in_formatter, std::ostream cons
 
 #pragma region Methods
 
-DAEvoid StreamHandler::Flush()
+RkVoid StreamHandler::Flush()
 {
     while (!m_records.Empty())
     {

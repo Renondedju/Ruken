@@ -32,19 +32,19 @@ USING_RUKEN_NAMESPACE
 
 #pragma warning (disable : 4100)
 
-DAEvoid Material::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+RkVoid Material::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
     m_loading_descriptor = reinterpret_cast<MaterialLoadingDescriptor const&>(in_descriptor);
 
     // NotImplementedException
 }
 
-DAEvoid Material::Reload(ResourceManager& in_manager)
+RkVoid Material::Reload(ResourceManager& in_manager)
 {
     // NotImplementedException
 }
 
-DAEvoid Material::Unload(ResourceManager& in_manager) noexcept
+RkVoid Material::Unload(ResourceManager& in_manager) noexcept
 {
     m_loading_descriptor.reset();
 }

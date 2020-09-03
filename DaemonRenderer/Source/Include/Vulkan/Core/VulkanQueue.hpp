@@ -51,7 +51,7 @@ class VulkanQueue
 
         VkPhysicalDevice m_physical_device {nullptr};
         VkQueue          m_handle          {nullptr};
-        DAEuint32        m_queue_family    {UINT_MAX};
+        RkUint32        m_queue_family    {UINT_MAX};
 
         mutable std::mutex m_mutex {};
 
@@ -63,7 +63,7 @@ class VulkanQueue
 
         explicit VulkanQueue(VkPhysicalDevice in_physical_device,
                              VkQueue          in_handle,
-                             DAEuint32        in_queue_family) noexcept;
+                             RkUint32        in_queue_family) noexcept;
 
         VulkanQueue(VulkanQueue const& in_copy) = delete;
         VulkanQueue(VulkanQueue&&      in_move) noexcept;
@@ -77,61 +77,61 @@ class VulkanQueue
         /**
          * \brief Waits on the host for the completion of outstanding queue operations on this queue.
          */
-        DAEvoid WaitIdle() const noexcept;
+        RkVoid WaitIdle() const noexcept;
 
         /**
          * \brief Opens a queue debug label region.
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
-        DAEvoid BeginLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept;
+        RkVoid BeginLabel(RkChar const* in_label_name, Vector4f const& in_color) const noexcept;
 
         /**
          * \brief Inserts a label into a queue.
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
-        DAEvoid InsertLabel(DAEchar const* in_label_name, Vector4f const& in_color) const noexcept; 
+        RkVoid InsertLabel(RkChar const* in_label_name, Vector4f const& in_color) const noexcept; 
 
         /**
          * \brief Closes a queue debug label region.
          */
-        DAEvoid EndLabel() const noexcept;
+        RkVoid EndLabel() const noexcept;
 
         /**
          * \brief Submits a single command buffer and an optional fence for execution.
          * \note  Use this function to quickly submit a transfer operation.
          */
-        DAEbool Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence = nullptr) const noexcept;
+        RkBool Submit(VulkanCommandBuffer const& in_command_buffer, VkFence in_fence = nullptr) const noexcept;
 
         /**
          * \brief Submits a sequence of semaphores or command buffers and an optional fence for execution.
          */
-        DAEbool Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence = nullptr) const noexcept;
+        RkBool Submit(VkSubmitInfo const& in_submit_info, VkFence in_fence = nullptr) const noexcept;
 
         /**
          * \brief Submits multiple sequences of semaphores or command buffers and an optional fence for execution.
          */
-        DAEbool Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
+        RkBool Submit(std::vector<VkSubmitInfo> const& in_submit_infos, VkFence in_fence = nullptr) const noexcept;
 
         /**
          * \return True if an image could be queued for presentation, else False.
          */
-        DAEbool Present(VulkanSwapchain const& in_swapchain, VulkanSemaphore const& in_semaphore) const noexcept;
+        RkBool Present(VulkanSwapchain const& in_swapchain, VulkanSemaphore const& in_semaphore) const noexcept;
 
         /**
          * \return True if an image could be queued for presentation, else False.
          */
-        DAEbool Present(VkPresentInfoKHR const& in_present_info) const noexcept;
+        RkBool Present(VkPresentInfoKHR const& in_present_info) const noexcept;
 
         /**
          * \return True if presentation is supported to the given surface, else False.
          */
         [[nodiscard]]
-        DAEbool IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept;
+        RkBool IsPresentationSupported(VkSurfaceKHR in_surface) const noexcept;
 
         [[nodiscard]] VkQueue const& GetHandle     () const noexcept;
-        [[nodiscard]] DAEuint32      GetQueueFamily() const noexcept;
+        [[nodiscard]] RkUint32      GetQueueFamily() const noexcept;
 
         #pragma endregion
 

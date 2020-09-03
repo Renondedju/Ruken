@@ -51,7 +51,7 @@ class VulkanShaderModule
 
         #pragma region Constructors
 
-        explicit VulkanShaderModule(std::vector<DAEuint32> const& in_code) noexcept;
+        explicit VulkanShaderModule(std::vector<RkUint32> const& in_code) noexcept;
 
         VulkanShaderModule(VulkanShaderModule const& in_copy) = delete;
         VulkanShaderModule(VulkanShaderModule&&      in_move) noexcept;
@@ -62,7 +62,7 @@ class VulkanShaderModule
 
         #pragma region Methods
 
-        [[nodiscard]] DAEbool               IsValid  () const noexcept;
+        [[nodiscard]] RkBool               IsValid  () const noexcept;
         [[nodiscard]] VkShaderModule const& GetHandle() const noexcept;
 
         #pragma endregion

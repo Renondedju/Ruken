@@ -33,12 +33,12 @@ BEGIN_RUKEN_NAMESPACE
 
 struct QueueFamilyIndices
 {
-    std::optional<DAEuint32> graphics;
-    std::optional<DAEuint32> compute;
-    std::optional<DAEuint32> transfer;
+    std::optional<RkUint32> graphics;
+    std::optional<RkUint32> compute;
+    std::optional<RkUint32> transfer;
 
     [[nodiscard]]
-    constexpr DAEbool IsComplete() const noexcept
+    constexpr RkBool IsComplete() const noexcept
     {
         return graphics.has_value() && compute.has_value() && transfer.has_value();
     }
@@ -56,7 +56,7 @@ class VulkanPhysicalDevice
 
         #pragma region Members
 
-        static std::vector<DAEchar const*> m_required_extensions;
+        static std::vector<RkChar const*> m_required_extensions;
 
         VkPhysicalDevice                     m_handle                  {nullptr};
         VkPhysicalDeviceProperties           m_properties              {};
@@ -69,13 +69,13 @@ class VulkanPhysicalDevice
 
         #pragma region Methods
 
-        static DAEbool   CheckDeviceExtensions(VkPhysicalDevice in_handle) noexcept;
-        static DAEbool   CheckQueueFamilies   (VkPhysicalDevice in_handle) noexcept;
-        static DAEuint32 RateDeviceSuitability(VkPhysicalDevice in_handle) noexcept;
+        static RkBool   CheckDeviceExtensions(VkPhysicalDevice in_handle) noexcept;
+        static RkBool   CheckQueueFamilies   (VkPhysicalDevice in_handle) noexcept;
+        static RkUint32 RateDeviceSuitability(VkPhysicalDevice in_handle) noexcept;
 
-        DAEbool PickPhysicalDevice () noexcept;
-        DAEvoid SetupPhysicalDevice() noexcept;
-        DAEvoid SetupQueueFamilies () noexcept;
+        RkBool PickPhysicalDevice () noexcept;
+        RkVoid SetupPhysicalDevice() noexcept;
+        RkVoid SetupQueueFamilies () noexcept;
 
         #pragma endregion
 
@@ -95,9 +95,9 @@ class VulkanPhysicalDevice
         #pragma region Methods
 
         [[nodiscard]]
-        static std::vector<DAEchar const*> const& GetRequiredExtensions() noexcept;
+        static std::vector<RkChar const*> const& GetRequiredExtensions() noexcept;
 
-        [[nodiscard]] DAEbool                                     IsValid                 () const noexcept;
+        [[nodiscard]] RkBool                                     IsValid                 () const noexcept;
         [[nodiscard]] VkPhysicalDevice                     const& GetHandle               () const noexcept;
         [[nodiscard]] VkPhysicalDeviceProperties           const& GetProperties           () const noexcept;
         [[nodiscard]] VkPhysicalDeviceMemoryProperties     const& GetMemoryProperties     () const noexcept;

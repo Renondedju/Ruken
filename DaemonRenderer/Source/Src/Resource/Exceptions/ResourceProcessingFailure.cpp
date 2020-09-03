@@ -26,7 +26,7 @@
 
 USING_RUKEN_NAMESPACE
 
-ResourceProcessingFailure::ResourceProcessingFailure(EResourceProcessingFailureCode const in_code, DAEbool const in_validity, DAEchar const* in_description) noexcept:
+ResourceProcessingFailure::ResourceProcessingFailure(EResourceProcessingFailureCode const in_code, RkBool const in_validity, RkChar const* in_description) noexcept:
     std::exception        {in_description},
     description            {in_description},
     resource_validity    {in_validity},

@@ -36,7 +36,7 @@ Timer::~Timer() noexcept
     CloseHandle(static_cast<HANDLE>(m_win_handle));
 }
 
-DAEbool Timer::SetTiming(DAEint64 const in_nanoseconds) const noexcept
+RkBool Timer::SetTiming(RkInt64 const in_nanoseconds) const noexcept
 {
     if(!m_win_handle)
         return false;
@@ -47,7 +47,7 @@ DAEbool Timer::SetTiming(DAEint64 const in_nanoseconds) const noexcept
     return SetWaitableTimer(m_win_handle, &li, 0, nullptr, nullptr, false);
 }
 
-DAEbool Timer::NSleep() const noexcept
+RkBool Timer::NSleep() const noexcept
 {
     if(!m_win_handle)
         return false;

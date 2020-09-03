@@ -32,6 +32,6 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-std::string GlfwErrorToString(DAEint32 in_error_code) noexcept;
+std::string GlfwErrorToString(RkInt32 in_error_code) noexcept;
 
 END_RUKEN_NAMESPACE

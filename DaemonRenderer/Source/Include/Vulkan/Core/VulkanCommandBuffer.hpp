@@ -72,7 +72,7 @@ class VulkanCommandBuffer
          * \note   Commands must not be issued if recording is not started.
          */
         [[nodiscard]]
-        DAEbool Begin(VkCommandBufferUsageFlags             in_usage_flags,
+        RkBool Begin(VkCommandBufferUsageFlags             in_usage_flags,
                       VkCommandBufferInheritanceInfo const* in_inheritance_info = nullptr) const noexcept;
 
         /**
@@ -80,31 +80,31 @@ class VulkanCommandBuffer
          * \note   A command buffer must not be submitted to a queue if recording is not finished.
          */
         [[nodiscard]]
-        DAEbool End() const noexcept;
+        RkBool End() const noexcept;
 
         /**
          * \brief Opens a command buffer debug label region.
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
-        DAEvoid BeginLabel(std::string_view in_label_name, Vector4f const& in_color) const noexcept;
+        RkVoid BeginLabel(std::string_view in_label_name, Vector4f const& in_color) const noexcept;
 
         /**
          * \brief Inserts a label into a command buffer.
          * \param in_label_name The name of the label.
          * \param in_color      The RGBA color value that can be associated with the label (ranged from 0.0 to 1.0).
          */
-        DAEvoid InsertLabel(std::string_view in_label_name, Vector4f const& in_color) const noexcept;
+        RkVoid InsertLabel(std::string_view in_label_name, Vector4f const& in_color) const noexcept;
 
         /**
          * \brief Closes a command buffer label region.
          */
-        DAEvoid EndLabel() const noexcept;
+        RkVoid EndLabel() const noexcept;
 
         /**
          * \brief Inserts a global memory dependency.
          */
-        DAEvoid InsertMemoryBarrier(VkPipelineStageFlags   in_src_stage,
+        RkVoid InsertMemoryBarrier(VkPipelineStageFlags   in_src_stage,
                                     VkPipelineStageFlags   in_dst_stage,
                                     VkDependencyFlags      in_dependency_flags,
                                     VkMemoryBarrier const& in_memory_barrier) const noexcept;
@@ -112,7 +112,7 @@ class VulkanCommandBuffer
         /**
          * \brief Inserts a buffer memory dependency.
          */
-        DAEvoid InsertMemoryBarrier(VkPipelineStageFlags         in_src_stage,
+        RkVoid InsertMemoryBarrier(VkPipelineStageFlags         in_src_stage,
                                     VkPipelineStageFlags         in_dst_stage,
                                     VkDependencyFlags            in_dependency_flags,
                                     VkBufferMemoryBarrier const& in_memory_barrier) const noexcept;
@@ -120,7 +120,7 @@ class VulkanCommandBuffer
         /**
          * \brief Inserts an image memory dependency.
          */
-        DAEvoid InsertMemoryBarrier(VkPipelineStageFlags        in_src_stage,
+        RkVoid InsertMemoryBarrier(VkPipelineStageFlags        in_src_stage,
                                     VkPipelineStageFlags        in_dst_stage,
                                     VkDependencyFlags           in_dependency_flags,
                                     VkImageMemoryBarrier const& in_memory_barrier) const noexcept;
@@ -129,14 +129,14 @@ class VulkanCommandBuffer
          * \brief Copies data between two buffers of the same size.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
+        RkVoid CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
                                    VulkanBuffer const& in_dst_buffer) const noexcept;
 
         /**
          * \brief Copies data between two buffer regions.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
+        RkVoid CopyBufferToBuffer(VulkanBuffer const& in_src_buffer,
                                    VulkanBuffer const& in_dst_buffer,
                                    VkBufferCopy const& in_region) const noexcept;
 
@@ -144,14 +144,14 @@ class VulkanCommandBuffer
          * \brief Copies data between two images of the same size.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyImageToImage(VulkanImage const& in_src_image,
+        RkVoid CopyImageToImage(VulkanImage const& in_src_image,
                                  VulkanImage const& in_dst_image) const noexcept;
 
         /**
          * \brief Copies data between two image regions.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyImageToImage(VulkanImage const& in_src_image,
+        RkVoid CopyImageToImage(VulkanImage const& in_src_image,
                                  VulkanImage const& in_dst_image,
                                  VkImageCopy const& in_region) const noexcept;
 
@@ -159,14 +159,14 @@ class VulkanCommandBuffer
          * \brief Copies data from a buffer into an image.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyBufferToImage(VulkanBuffer const& in_buffer,
+        RkVoid CopyBufferToImage(VulkanBuffer const& in_buffer,
                                   VulkanImage  const& in_image) const noexcept;
 
         /**
          * \brief Copies data from a buffer region into an image region.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyBufferToImage(VulkanBuffer      const& in_buffer,
+        RkVoid CopyBufferToImage(VulkanBuffer      const& in_buffer,
                                   VulkanImage       const& in_image,
                                   VkBufferImageCopy const& in_region) const noexcept;
 
@@ -174,14 +174,14 @@ class VulkanCommandBuffer
          * \brief Copies image data into a buffer.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyImageToBuffer(VulkanImage  const& in_image,
+        RkVoid CopyImageToBuffer(VulkanImage  const& in_image,
                                   VulkanBuffer const& in_buffer) const noexcept;
 
         /**
          * \brief Copies data from an image region into a buffer region.
          * \note  This is a transfer operation supported on all queues.
          */
-        DAEvoid CopyImageToBuffer(VulkanImage       const& in_image,
+        RkVoid CopyImageToBuffer(VulkanImage       const& in_image,
                                   VulkanBuffer      const& in_buffer,
                                   VkBufferImageCopy const& in_region) const noexcept;
 
@@ -189,7 +189,7 @@ class VulkanCommandBuffer
          * \brief Copies an image into another one, potentially performing format conversion.
          * \note  This is a transfer operation only supported on graphics queues.
          */
-        DAEvoid BlitImage(VulkanImage const& in_src_image,
+        RkVoid BlitImage(VulkanImage const& in_src_image,
                           VulkanImage const& in_dst_image,
                           VkFilter           in_filter) const noexcept;
 
@@ -197,7 +197,7 @@ class VulkanCommandBuffer
          * \brief Copies regions of an image, potentially performing format conversion.
          * \note  This is a transfer operation only supported on graphics queues.
          */
-        DAEvoid BlitImage(VulkanImage const& in_src_image,
+        RkVoid BlitImage(VulkanImage const& in_src_image,
                           VulkanImage const& in_dst_image,
                           VkImageBlit const& in_region,
                           VkFilter           in_filter) const noexcept;

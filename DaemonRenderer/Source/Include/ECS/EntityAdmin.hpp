@@ -65,12 +65,12 @@ class EntityAdmin
          * \tparam TSystem System type to push to the entity admin 
          */
         template <typename TSystem>
-        DAEvoid CreateSystem() noexcept;
+        RkVoid CreateSystem() noexcept;
 
         /**
          * \brief Updates every system
          */
-        DAEvoid UpdateSystems() noexcept;
+        RkVoid UpdateSystems() noexcept;
 
         /**
          * \brief 

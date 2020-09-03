@@ -27,7 +27,7 @@
 
 USING_RUKEN_NAMESPACE
 
-DAEbool ComponentQuery::Match(ArchetypeBase const& in_archetype) const noexcept
+RkBool ComponentQuery::Match(ArchetypeBase const& in_archetype) const noexcept
 {
     // Checking inclusion
     if (!in_archetype.GetFingerprint().HasAll(m_included))

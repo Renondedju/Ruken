@@ -65,7 +65,7 @@ struct Decrement
      *
      * \return Value of the new instance
      */
-    friend constexpr TStrongTypedef operator--(TStrongTypedef& in_instance, DAEint) noexcept
+    friend constexpr TStrongTypedef operator--(TStrongTypedef& in_instance, RkInt) noexcept
     {
         using Type = internal::UnderlyingType<TStrongTypedef>;
 

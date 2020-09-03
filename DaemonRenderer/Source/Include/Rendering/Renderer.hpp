@@ -61,7 +61,7 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Methods
 
-        DAEvoid MakeContext(Window& in_window) noexcept;
+        RkVoid MakeContext(Window& in_window) noexcept;
 
         #pragma endregion
 

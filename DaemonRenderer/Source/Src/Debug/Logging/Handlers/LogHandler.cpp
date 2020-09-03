@@ -38,7 +38,7 @@ LogHandler::LogHandler(LogFormatter const& in_formatter) noexcept:
 
 #pragma region Methods
 
-DAEvoid LogHandler::Handle(LogRecord const& in_record) noexcept
+RkVoid LogHandler::Handle(LogRecord const& in_record) noexcept
 {
     m_records.Enqueue(LogRecord(in_record));
 }

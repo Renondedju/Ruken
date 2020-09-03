@@ -55,7 +55,7 @@ RenderFrame::RenderFrame(RenderFrame&& in_move) noexcept:
 
 #pragma region Methods
 
-DAEbool RenderFrame::Reset() noexcept
+RkBool RenderFrame::Reset() noexcept
 {
     m_render_views.clear();
 

@@ -51,7 +51,7 @@ struct LogicalNot
      *
      * \return Value of the operation
      */
-    friend constexpr DAEbool operator!(TStrongTypedef const& in_instance) noexcept
+    friend constexpr RkBool operator!(TStrongTypedef const& in_instance) noexcept
     {
         using Type = internal::UnderlyingType<TStrongTypedef>;
 

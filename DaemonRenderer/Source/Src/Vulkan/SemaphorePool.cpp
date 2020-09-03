@@ -52,7 +52,7 @@ VulkanTimelineSemaphore& SemaphorePool::RequestTimelineSemaphore() noexcept
     return m_timeline_semaphores[m_timeline_semaphore_index.fetch_add(1u, std::memory_order_release)];
 }
 
-DAEbool SemaphorePool::Reset() noexcept
+RkBool SemaphorePool::Reset() noexcept
 {
     auto const timeline_semaphore_count = m_timeline_semaphores.size();
 
@@ -61,7 +61,7 @@ DAEbool SemaphorePool::Reset() noexcept
 
         m_timeline_semaphores.clear();
 
-        for (DAEsize i = 0; i < timeline_semaphore_count; ++i)
+        for (RkSize i = 0; i < timeline_semaphore_count; ++i)
         {
             if (!m_timeline_semaphores.emplace_back().GetHandle())
                 return false;

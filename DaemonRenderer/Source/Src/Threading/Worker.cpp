@@ -29,7 +29,7 @@ USING_RUKEN_NAMESPACE
 // Label enabled code
 #ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
 
-Worker::Worker(DAEchar const* in_label) noexcept:
+Worker::Worker(RkChar const* in_label) noexcept:
     m_thread {},
     m_label  {in_label}
 {}
@@ -51,7 +51,7 @@ std::string& Worker::Label() noexcept
 
 #else // Label disabled code
 
-Worker::Worker(DAEchar const*) noexcept:
+Worker::Worker(RkChar const*) noexcept:
     m_thread {}
 {}
 
@@ -72,18 +72,18 @@ Worker::~Worker() noexcept
         m_thread.join();
 }
 
-DAEbool Worker::Available() const noexcept
+RkBool Worker::Available() const noexcept
 {
     return m_thread.joinable();
 }
 
-DAEvoid Worker::WaitForAvailability() noexcept
+RkVoid Worker::WaitForAvailability() noexcept
 {
     if (m_thread.joinable())
         m_thread.join();
 }
 
-DAEvoid Worker::Detach() noexcept
+RkVoid Worker::Detach() noexcept
 {
     if (!m_thread.joinable())
         m_thread.detach();

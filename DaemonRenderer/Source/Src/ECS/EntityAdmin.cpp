@@ -35,7 +35,7 @@ EntityAdmin::~EntityAdmin()
         delete system;
 }
 
-DAEvoid EntityAdmin::UpdateSystems() noexcept
+RkVoid EntityAdmin::UpdateSystems() noexcept
 {
     
 }

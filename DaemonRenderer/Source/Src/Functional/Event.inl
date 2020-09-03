@@ -23,32 +23,32 @@
  */
 
 template <typename ... TArgs>
-DAEvoid Event<TArgs...>::Reset() noexcept
+RkVoid Event<TArgs...>::Reset() noexcept
 {
     m_subscribers.clear();
 }
 
 template <typename ... TArgs>
-DAEvoid Event<TArgs...>::Subscribe(Function const& in_function) noexcept
+RkVoid Event<TArgs...>::Subscribe(Function const& in_function) noexcept
 {
     m_subscribers.emplace_back(std::forward<Function>(in_function));
 }
 
 template <typename ... TArgs>
-DAEvoid Event<TArgs...>::Subscribe(Function&& in_function) noexcept
+RkVoid Event<TArgs...>::Subscribe(Function&& in_function) noexcept
 {
     m_subscribers.emplace_back(std::forward<Function>(in_function));
 }
 
 template <typename ... TArgs>
-DAEvoid Event<TArgs...>::Invoke(TArgs... in_args) noexcept
+RkVoid Event<TArgs...>::Invoke(TArgs... in_args) noexcept
 {
     for (Function& function : m_subscribers)
         function(std::forward<TArgs>(in_args)...);
 }
 
 template <typename ... TArgs>
-DAEvoid Event<TArgs...>::operator()(TArgs... in_args) noexcept
+RkVoid Event<TArgs...>::operator()(TArgs... in_args) noexcept
 {
     Invoke(std::forward<TArgs>(in_args)...);
 }

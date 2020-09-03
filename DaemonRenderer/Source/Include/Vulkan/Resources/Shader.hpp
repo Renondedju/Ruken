@@ -60,11 +60,11 @@ class Shader final : public IResource
 
         #pragma region Methods
 
-        DAEvoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        RkVoid Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
 
-        DAEvoid Reload(ResourceManager& in_manager) override;
+        RkVoid Reload(ResourceManager& in_manager) override;
 
-        DAEvoid Unload(ResourceManager& in_manager) noexcept override;
+        RkVoid Unload(ResourceManager& in_manager) noexcept override;
 
         [[nodiscard]]
         VulkanShaderModule const& GetModule() const noexcept;

@@ -55,7 +55,7 @@ class Archetype: public ArchetypeBase
          * \tparam TIds Indices of the tuple elements
          * \return New entity id
          */
-        template<DAEsize... TIds>
+        template<RkSize... TIds>
         EntityID CreateEntityHelper(std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
@@ -86,7 +86,7 @@ class Archetype: public ArchetypeBase
          * \tparam TIndex Index to look for
          * \return Component storage reference
          */
-        template<DAEsize TIndex>
+        template<RkSize TIndex>
         auto GetComponent() noexcept;
 
         /**
@@ -100,7 +100,7 @@ class Archetype: public ArchetypeBase
          * \brief Returns the total count of entity stored in this archetype
          * \return Entities count
          */
-        DAEsize EntitiesCount() const noexcept;
+        RkSize EntitiesCount() const noexcept;
 
         #pragma endregion
 
@@ -122,7 +122,7 @@ namespace internal
     ))::Type;
 
     template <std::size_t TLhs, std::size_t TRhs>
-    struct LessComparator : std::integral_constant<DAEbool, (TLhs < TRhs)>
+    struct LessComparator : std::integral_constant<RkBool, (TLhs < TRhs)>
     {};
 
     template <typename TTuple, typename TSequence>

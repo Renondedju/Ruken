@@ -42,7 +42,7 @@ BEGIN_RUKEN_NAMESPACE
  * TemporarilyUnavailable    => The resource is not available for now but might be later, retries can be considered.
  * RequirementsNotSatisfied    => Any of the requirements of the resource isn't satisfied. Retries can be considered.
  */
-enum class EResourceProcessingFailureCode : DAEuint8
+enum class EResourceProcessingFailureCode : RkUint8
 {
     Other,
     Unknown,

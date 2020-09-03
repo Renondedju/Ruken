@@ -35,7 +35,7 @@ BEGIN_RUKEN_NAMESPACE
  * Disabled => The component item is disabled for now but might be enabled back later to be used at any moment
  * Unused   => The component item is marked for deletion and isn't used anymore
  */
-enum class EComponentItemStatus : DAEuint8
+enum class EComponentItemStatus : RkUint8
 {
     Enabled,
     Disabled,

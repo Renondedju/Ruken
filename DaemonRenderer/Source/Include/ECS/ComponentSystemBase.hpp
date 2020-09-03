@@ -39,7 +39,7 @@ class ComponentSystemBase
 
         #pragma region Mebers
 
-        DAEbool        m_enabled;
+        RkBool        m_enabled;
         ComponentQuery m_query;
 
         #pragma endregion
@@ -53,7 +53,7 @@ class ComponentSystemBase
          * \tparam TComponents Components of the system
          */
         template <typename... TComponents>
-        DAEvoid SetupTargetFingerprint() noexcept;
+        RkVoid SetupTargetFingerprint() noexcept;
 
         #pragma endregion
 
@@ -73,7 +73,7 @@ class ComponentSystemBase
         /**
          * \brief Checks if the system is enabled 
          */
-        DAEbool Enabled() const;
+        RkBool Enabled() const;
 
         #pragma endregion
 

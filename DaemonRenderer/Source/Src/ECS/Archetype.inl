@@ -23,7 +23,7 @@
  */
 
 template <typename... TComponents>
-template <DAEsize... TIds>
+template <RkSize... TIds>
 EntityID Archetype<TComponents...>::CreateEntityHelper(std::index_sequence<TIds...>) noexcept
 {
 	(std::get<TIds>(m_components).CreateItem(), ...);
@@ -45,7 +45,7 @@ auto Archetype<TComponents...>::GetComponent() noexcept
 }
 
 template <typename ... TComponents>
-template <DAEsize TIndex>
+template <RkSize TIndex>
 auto Archetype<TComponents...>::GetComponent() noexcept
 {
     return std::reference_wrapper(std::get<TIndex>(m_components));
@@ -58,7 +58,7 @@ EntityID Archetype<TComponents...>::CreateEntity() noexcept
 }
 
 template <typename ... TComponents>
-DAEsize Archetype<TComponents...>::EntitiesCount() const noexcept
+RkSize Archetype<TComponents...>::EntitiesCount() const noexcept
 {
     return std::get<0>(m_components).GetItemCount();
 }

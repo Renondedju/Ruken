@@ -23,7 +23,7 @@
  */
 
 template <typename TSystem>
-DAEvoid EntityAdmin::CreateSystem() noexcept
+RkVoid EntityAdmin::CreateSystem() noexcept
 {
     m_systems.emplace_back(new TSystem());
 }

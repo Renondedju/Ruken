@@ -35,7 +35,7 @@ namespace internal
 {
     // Used by the SizedBitmask to check if all passed types are integral types
     template <typename... TTypes>
-    using CheckIntegralTypes = std::enable_if_t<std::conjunction_v<std::is_integral<TTypes>...>, DAEbool>;
+    using CheckIntegralTypes = std::enable_if_t<std::conjunction_v<std::is_integral<TTypes>...>, RkBool>;
 }
 
 /**
@@ -50,7 +50,7 @@ namespace internal
  *       If you use less than 64 flags, then TSize should stay at one and you should decrease
  *       the chunk size accordingly to match your needs.
  */
-template <DAEsize TSize, typename TChunk = DAEsize>
+template <RkSize TSize, typename TChunk = RkSize>
 class SizedBitmask
 {
     static_assert(std::is_integral_v<TChunk>, "TChunk must be an integral type");
@@ -65,8 +65,8 @@ class SizedBitmask
 
     public:
 
-        static constexpr DAEsize sizeof_chunk = sizeof(TChunk) * 8; 
-        static constexpr DAEsize flags_count  = TSize * sizeof_chunk;
+        static constexpr RkSize sizeof_chunk = sizeof(TChunk) * 8; 
+        static constexpr RkSize flags_count  = TSize * sizeof_chunk;
 
         #pragma region Constructors
 
@@ -91,8 +91,8 @@ class SizedBitmask
          *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
         template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        [[nodiscard]] constexpr DAEbool HasAll(TData... in_data)               const noexcept;
-        [[nodiscard]] constexpr DAEbool HasAll(SizedBitmask const& in_bitmask) const noexcept;
+        [[nodiscard]] constexpr RkBool HasAll(TData... in_data)               const noexcept;
+        [[nodiscard]] constexpr RkBool HasAll(SizedBitmask const& in_bitmask) const noexcept;
 
         /**
          * \brief Checks if the bitmask has at least one the flags passed as enabled.
@@ -104,8 +104,8 @@ class SizedBitmask
          *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
         template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        [[nodiscard]] constexpr DAEbool HasOne(TData... in_data)               const noexcept;
-        [[nodiscard]] constexpr DAEbool HasOne(SizedBitmask const& in_bitmask) const noexcept;
+        [[nodiscard]] constexpr RkBool HasOne(TData... in_data)               const noexcept;
+        [[nodiscard]] constexpr RkBool HasOne(SizedBitmask const& in_bitmask) const noexcept;
 
         /**
          * \brief Returns the number of enabled flags in the bitmask.
@@ -114,7 +114,7 @@ class SizedBitmask
          * \return Number of enabled flags
          * \note Time Complexity: O(log n).
          */
-        [[nodiscard]] constexpr DAEuint16 Popcnt() const noexcept;
+        [[nodiscard]] constexpr RkUint16 Popcnt() const noexcept;
 
         /**
          * \brief Enables the specified flags.
@@ -125,8 +125,8 @@ class SizedBitmask
          *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
         template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        constexpr DAEvoid Add(TData... in_data)               noexcept;
-        constexpr DAEvoid Add(SizedBitmask const& in_bitmask) noexcept;
+        constexpr RkVoid Add(TData... in_data)               noexcept;
+        constexpr RkVoid Add(SizedBitmask const& in_bitmask) noexcept;
 
         /**
          * \brief Disables the specified flags.
@@ -137,28 +137,28 @@ class SizedBitmask
          *          this function will result in an undefined behavior, you must make sure that your values are correct !
          */
         template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        constexpr DAEvoid Remove(TData... in_data)               noexcept;
-        constexpr DAEvoid Remove(SizedBitmask const& in_bitmask) noexcept;
+        constexpr RkVoid Remove(TData... in_data)               noexcept;
+        constexpr RkVoid Remove(SizedBitmask const& in_bitmask) noexcept;
 
         /**
          * \brief Clears the bitmask.
          */
-        constexpr DAEvoid Clear() noexcept;
+        constexpr RkVoid Clear() noexcept;
 
         /**
          * \brief Creates a hash code for the given bitmask
          * \return Generated hash code
          */
-        constexpr DAEsize HashCode() const noexcept;
+        constexpr RkSize HashCode() const noexcept;
 
         /**
          * \brief Executes a function pointer on each enabled flag in the bitmask.
-         * \tparam TLambdaType Type of the lambda, the signature of the function used must be DAEvoid (*in_lambda)(TEnumType in_flag)
+         * \tparam TLambdaType Type of the lambda, the signature of the function used must be RkVoid (*in_lambda)(TEnumType in_flag)
          * \tparam TPreCast Type to cast the value into before sending it into the predicate
          * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
          */
         template <typename TLambdaType, typename TPreCast = TChunk>
-        constexpr DAEvoid Foreach(TLambdaType in_lambda) const noexcept;
+        constexpr RkVoid Foreach(TLambdaType in_lambda) const noexcept;
 
         #pragma endregion 
 
@@ -169,7 +169,7 @@ class SizedBitmask
 
         constexpr SizedBitmask  operator+ (SizedBitmask const& in_bitmask) const noexcept;
         constexpr SizedBitmask  operator- (SizedBitmask const& in_bitmask) const noexcept;
-        constexpr DAEbool       operator==(SizedBitmask const& in_other)   const noexcept;
+        constexpr RkBool       operator==(SizedBitmask const& in_other)   const noexcept;
         constexpr SizedBitmask& operator+=(SizedBitmask const& in_bitmask)       noexcept;
         constexpr SizedBitmask& operator-=(SizedBitmask const& in_bitmask)       noexcept;
 

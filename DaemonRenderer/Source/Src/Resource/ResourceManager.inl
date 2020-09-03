@@ -23,7 +23,7 @@
  */
 
 template <class TUnary_Predicate>
-DAEvoid ResourceManager::GarbageCollection(TUnary_Predicate in_predicate, DAEbool const in_clear_invalid_resources) noexcept
+RkVoid ResourceManager::GarbageCollection(TUnary_Predicate in_predicate, RkBool const in_clear_invalid_resources) noexcept
 {
     if (m_collection_mode == EGCCollectionMode::Disabled)
         return;
@@ -58,7 +58,7 @@ DAEvoid ResourceManager::GarbageCollection(TUnary_Predicate in_predicate, DAEboo
 }
 
 template <typename TResource_Type>
-DAEvoid ResourceManager::LoadResource(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
+RkVoid ResourceManager::LoadResource(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
 {
     if (!in_manifest)
         return;

@@ -62,7 +62,7 @@ class ComponentQuery
          * \tparam TComponents Required components of the query
          */
         template <typename... TComponents>
-        DAEvoid SetupInclusionQuery() noexcept;
+        RkVoid SetupInclusionQuery() noexcept;
 
         /**
          * \brief Setups the exclusion query of the group.
@@ -71,14 +71,14 @@ class ComponentQuery
          * \tparam TComponents Excluded components of the query
          */
         template <typename... TComponents>
-        DAEvoid SetupExclusionQuery() noexcept;
+        RkVoid SetupExclusionQuery() noexcept;
 
         /**
          * \brief Checks if the passed archetype matches the query
          * \param in_archetype Archetype to match
          * \return True if the query matched, false otherwise
          */
-        DAEbool Match(ArchetypeBase const& in_archetype) const noexcept;
+        RkBool Match(ArchetypeBase const& in_archetype) const noexcept;
 
         #pragma endregion
 

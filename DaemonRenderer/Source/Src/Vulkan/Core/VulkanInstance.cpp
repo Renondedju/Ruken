@@ -34,7 +34,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Static Members
 
-std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
+std::vector<RkChar const*> VulkanInstance::m_required_extensions =
 {
     #ifdef RUKEN_OS_WINDOWS
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
@@ -44,7 +44,7 @@ std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
     VK_EXT_DEBUG_UTILS_EXTENSION_NAME
 };
 
-std::vector<DAEchar const*> VulkanInstance::m_required_validation_layers =
+std::vector<RkChar const*> VulkanInstance::m_required_validation_layers =
 {
     #ifdef RUKEN_CONFIG_DEBUG
 
@@ -89,7 +89,7 @@ VulkanInstance::~VulkanInstance() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanInstance::CheckInstanceExtensions() noexcept
+RkBool VulkanInstance::CheckInstanceExtensions() noexcept
 {
     auto count = 0u;
 
@@ -122,7 +122,7 @@ DAEbool VulkanInstance::CheckInstanceExtensions() noexcept
     return false;
 }
 
-DAEbool VulkanInstance::CheckValidationLayers() noexcept
+RkBool VulkanInstance::CheckValidationLayers() noexcept
 {
     auto count = 0u;
 
@@ -155,15 +155,15 @@ DAEbool VulkanInstance::CheckValidationLayers() noexcept
     return false;
 }
 
-DAEbool VulkanInstance::CreateInstance() noexcept
+RkBool VulkanInstance::CreateInstance() noexcept
 {
     // This struct allows us to enable/disable specific validation features.
     VkValidationFeaturesEXT validation_features = {};
 
     validation_features.sType                          = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    validation_features.enabledValidationFeatureCount  = static_cast<DAEuint32>(m_enabled_validation_features.size());
+    validation_features.enabledValidationFeatureCount  = static_cast<RkUint32>(m_enabled_validation_features.size());
     validation_features.pEnabledValidationFeatures     = m_enabled_validation_features.data();
-    validation_features.disabledValidationFeatureCount = static_cast<DAEuint32>(m_disabled_validation_features.size());
+    validation_features.disabledValidationFeatureCount = static_cast<RkUint32>(m_disabled_validation_features.size());
     validation_features.pDisabledValidationFeatures    = m_disabled_validation_features.data();
 
     // This struct allows us to get debug callbacks during instance creation/destruction.
@@ -196,9 +196,9 @@ DAEbool VulkanInstance::CreateInstance() noexcept
     }
 
     instance_create_info.pApplicationInfo        = &app_info;
-    instance_create_info.enabledLayerCount       = static_cast<DAEuint32>(m_required_validation_layers.size());
+    instance_create_info.enabledLayerCount       = static_cast<RkUint32>(m_required_validation_layers.size());
     instance_create_info.ppEnabledLayerNames     = m_required_validation_layers.data();
-    instance_create_info.enabledExtensionCount   = static_cast<DAEuint32>(m_required_extensions.size());
+    instance_create_info.enabledExtensionCount   = static_cast<RkUint32>(m_required_extensions.size());
     instance_create_info.ppEnabledExtensionNames = m_required_extensions.data();
 
     if (VK_ASSERT(vkCreateInstance(&instance_create_info, nullptr, &m_handle)))
@@ -209,12 +209,12 @@ DAEbool VulkanInstance::CreateInstance() noexcept
     return true;
 }
 
-std::vector<DAEchar const*> const& VulkanInstance::GetRequiredExtensions() noexcept
+std::vector<RkChar const*> const& VulkanInstance::GetRequiredExtensions() noexcept
 {
     return m_required_extensions;
 }
 
-std::vector<DAEchar const*> const& VulkanInstance::GetRequiredValidationLayers() noexcept
+std::vector<RkChar const*> const& VulkanInstance::GetRequiredValidationLayers() noexcept
 {
     return m_required_validation_layers;
 }
@@ -229,7 +229,7 @@ std::vector<VkValidationFeatureDisableEXT> const& VulkanInstance::GetDisabledVal
     return m_disabled_validation_features;
 }
 
-DAEbool VulkanInstance::IsValid() const noexcept
+RkBool VulkanInstance::IsValid() const noexcept
 {
     return m_handle != nullptr;
 }

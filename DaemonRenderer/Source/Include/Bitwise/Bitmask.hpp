@@ -48,17 +48,17 @@ BEGIN_RUKEN_NAMESPACE
 namespace internal
 {
     template <typename TEnumType, typename... TTypes>
-    using AreEnumType = std::enable_if_t<std::conjunction_v<std::is_same<TTypes, TEnumType>...>, DAEbool>;
+    using AreEnumType = std::enable_if_t<std::conjunction_v<std::is_same<TTypes, TEnumType>...>, RkBool>;
 }
 
 /**
  * \brief A bitmask can be used to store multiple flags into a single integer.
  * 
  * All enums used should have continuous values starting from 0. Use the macro RUKEN_BITMASK to safely declare a bitmask.
- * Example : enum class EEnum : DAEuint8 { First, Second, Third };
+ * Example : enum class EEnum : RkUint8 { First, Second, Third };
  *
  * This enum is safe since all the elements in the enum are continuous and starts from 0.
- * Also the underlying type of the enum is DAEuint8 (8 bits) which is enough to contain all the values (3).
+ * Also the underlying type of the enum is RkUint8 (8 bits) which is enough to contain all the values (3).
  * 
  * \tparam TEnumType Enum to strong type the bitmask with
  * \note Enum classes are supported
@@ -94,8 +94,8 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
          * \return True if the bitmask has all the specified flags enabled
          */
         template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        [[nodiscard]] constexpr DAEbool HasAll(TData...       in_data)    const noexcept;
-        [[nodiscard]] constexpr DAEbool HasAll(Bitmask const& in_bitmask) const noexcept;
+        [[nodiscard]] constexpr RkBool HasAll(TData...       in_data)    const noexcept;
+        [[nodiscard]] constexpr RkBool HasAll(Bitmask const& in_bitmask) const noexcept;
 
         /**
          * \brief Checks if the bitmask has at least one the flags passed as enabled.
@@ -104,8 +104,8 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
          * \return True if the bitmask has at least one of the specified flags enabled
          */
         template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        [[nodiscard]] constexpr DAEbool HasOne(TData...       in_data)    const noexcept;
-        [[nodiscard]] constexpr DAEbool HasOne(Bitmask const& in_bitmask) const noexcept;
+        [[nodiscard]] constexpr RkBool HasOne(TData...       in_data)    const noexcept;
+        [[nodiscard]] constexpr RkBool HasOne(Bitmask const& in_bitmask) const noexcept;
 
         /**
          * \brief Enables the specified flags.
@@ -113,8 +113,8 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
          * \param in_data Flags to enable
          */
         template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        constexpr DAEvoid Add(TData...       in_data)    noexcept;
-        constexpr DAEvoid Add(Bitmask const& in_bitmask) noexcept;
+        constexpr RkVoid Add(TData...       in_data)    noexcept;
+        constexpr RkVoid Add(Bitmask const& in_bitmask) noexcept;
 
         /**
          * \brief Disables the specified flags.
@@ -122,16 +122,16 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
          * \param in_data Flags to disable
          */
         template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        constexpr DAEvoid Remove(TData...       in_data)    noexcept;
-        constexpr DAEvoid Remove(Bitmask const& in_bitmask) noexcept;
+        constexpr RkVoid Remove(TData...       in_data)    noexcept;
+        constexpr RkVoid Remove(Bitmask const& in_bitmask) noexcept;
 
         /**
          * \brief Executes a function pointer on each enabled flag in the bitmask.
-         * \tparam TLambdaType Type of the lambda, the signature of the function used must be DAEvoid (*in_lambda)(TEnumType in_flag)
+         * \tparam TLambdaType Type of the lambda, the signature of the function used must be RkVoid (*in_lambda)(TEnumType in_flag)
          * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
          */
         template <typename TLambdaType>
-        constexpr DAEvoid Foreach(TLambdaType in_lambda) const noexcept;
+        constexpr RkVoid Foreach(TLambdaType in_lambda) const noexcept;
 
         #pragma endregion
 

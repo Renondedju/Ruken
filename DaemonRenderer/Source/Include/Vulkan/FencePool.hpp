@@ -43,7 +43,7 @@ class FencePool
 
         #pragma region Members
 
-        std::atomic<DAEuint32>   m_index  {0u};
+        std::atomic<RkUint32>   m_index  {0u};
         std::vector<VulkanFence> m_fences {};
 
         mutable std::mutex m_mutex {};
@@ -76,14 +76,14 @@ class FencePool
          * \brief 
          */
         [[nodiscard]]
-        DAEbool Wait() const noexcept;
+        RkBool Wait() const noexcept;
 
         /**
          * \brief Resets all managed fences, meaning previously requested ones can be reused.
          * \note  This function must be called once at the beginning of a frame.
          */
         [[nodiscard]]
-        DAEbool Reset() noexcept;
+        RkBool Reset() noexcept;
 
         #pragma endregion
 

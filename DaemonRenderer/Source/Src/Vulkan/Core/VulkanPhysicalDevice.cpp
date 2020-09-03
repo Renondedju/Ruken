@@ -34,7 +34,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Static Members
 
-std::vector<DAEchar const*> VulkanPhysicalDevice::m_required_extensions =
+std::vector<RkChar const*> VulkanPhysicalDevice::m_required_extensions =
 {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
@@ -56,7 +56,7 @@ VulkanPhysicalDevice::VulkanPhysicalDevice() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanPhysicalDevice::CheckDeviceExtensions(VkPhysicalDevice in_handle) noexcept
+RkBool VulkanPhysicalDevice::CheckDeviceExtensions(VkPhysicalDevice in_handle) noexcept
 {
     auto count = 0u;
 
@@ -85,7 +85,7 @@ DAEbool VulkanPhysicalDevice::CheckDeviceExtensions(VkPhysicalDevice in_handle) 
     return false;
 }
 
-DAEbool VulkanPhysicalDevice::CheckQueueFamilies(VkPhysicalDevice in_handle) noexcept
+RkBool VulkanPhysicalDevice::CheckQueueFamilies(VkPhysicalDevice in_handle) noexcept
 {
     auto count = 0u;
 
@@ -97,7 +97,7 @@ DAEbool VulkanPhysicalDevice::CheckQueueFamilies(VkPhysicalDevice in_handle) noe
 
     QueueFamilyIndices queue_families;
 
-    for (auto i = 0u; i < static_cast<DAEuint32>(queue_family_properties.size()); ++i)
+    for (auto i = 0u; i < static_cast<RkUint32>(queue_family_properties.size()); ++i)
     {
         if (queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             queue_families.graphics = i;
@@ -110,7 +110,7 @@ DAEbool VulkanPhysicalDevice::CheckQueueFamilies(VkPhysicalDevice in_handle) noe
     return queue_families.IsComplete();
 }
 
-DAEuint32 VulkanPhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_handle) noexcept
+RkUint32 VulkanPhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_handle) noexcept
 {
     if (!CheckDeviceExtensions(in_handle) || !CheckQueueFamilies(in_handle))
         return 0u;
@@ -132,7 +132,7 @@ DAEuint32 VulkanPhysicalDevice::RateDeviceSuitability(VkPhysicalDevice in_handle
     return 0u;
 }
 
-DAEbool VulkanPhysicalDevice::PickPhysicalDevice() noexcept
+RkBool VulkanPhysicalDevice::PickPhysicalDevice() noexcept
 {
     auto count = 0u;
 
@@ -147,7 +147,7 @@ DAEbool VulkanPhysicalDevice::PickPhysicalDevice() noexcept
         return false;
 
     // Uses an ordered map to automatically sort candidates by increasing score.
-    std::multimap<DAEuint32, VkPhysicalDevice> candidates;
+    std::multimap<RkUint32, VkPhysicalDevice> candidates;
 
     for (auto const& physical_device : physical_devices)
         candidates.insert(std::make_pair(RateDeviceSuitability(physical_device), physical_device));
@@ -167,14 +167,14 @@ DAEbool VulkanPhysicalDevice::PickPhysicalDevice() noexcept
     return false;
 }
 
-DAEvoid VulkanPhysicalDevice::SetupPhysicalDevice() noexcept
+RkVoid VulkanPhysicalDevice::SetupPhysicalDevice() noexcept
 {
     vkGetPhysicalDeviceProperties      (m_handle, &m_properties);
     vkGetPhysicalDeviceMemoryProperties(m_handle, &m_memory_properties);
     vkGetPhysicalDeviceFeatures        (m_handle, &m_features);
 }
 
-DAEvoid VulkanPhysicalDevice::SetupQueueFamilies() noexcept
+RkVoid VulkanPhysicalDevice::SetupQueueFamilies() noexcept
 {
     auto count = 0u;
 
@@ -184,7 +184,7 @@ DAEvoid VulkanPhysicalDevice::SetupQueueFamilies() noexcept
 
     vkGetPhysicalDeviceQueueFamilyProperties(m_handle, &count, m_queue_family_properties.data());
 
-    for (auto i = 0u; i < static_cast<DAEuint32>(m_queue_family_properties.size()); ++i)
+    for (auto i = 0u; i < static_cast<RkUint32>(m_queue_family_properties.size()); ++i)
     {
         if (!m_queue_families.graphics && m_queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             m_queue_families.graphics = i;
@@ -206,12 +206,12 @@ DAEvoid VulkanPhysicalDevice::SetupQueueFamilies() noexcept
     }
 }
 
-std::vector<DAEchar const*> const& VulkanPhysicalDevice::GetRequiredExtensions() noexcept
+std::vector<RkChar const*> const& VulkanPhysicalDevice::GetRequiredExtensions() noexcept
 {
     return m_required_extensions;
 }
 
-DAEbool VulkanPhysicalDevice::IsValid() const noexcept
+RkBool VulkanPhysicalDevice::IsValid() const noexcept
 {
     return m_handle != nullptr;
 }

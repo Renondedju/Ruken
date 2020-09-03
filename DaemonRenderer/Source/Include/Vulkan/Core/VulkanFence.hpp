@@ -65,16 +65,16 @@ class VulkanFence
          * \return True if this fence could be reset to the unsignaled state, else False.
          */
         [[nodiscard]]
-        DAEbool Reset() const noexcept;
+        RkBool Reset() const noexcept;
 
         /**
          * \brief If the condition is satisfied when this function is called, then it returns immediately.
          *        If the condition is not satisfied at the time this function is called,
          *        then this function will block and wait for the condition to become satisfied.
          */
-        DAEvoid Wait() const noexcept;
+        RkVoid Wait() const noexcept;
 
-        [[nodiscard]] DAEbool        IsSignaled() const noexcept;
+        [[nodiscard]] RkBool        IsSignaled() const noexcept;
         [[nodiscard]] VkFence const& GetHandle () const noexcept;
 
         #pragma endregion

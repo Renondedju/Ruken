@@ -28,7 +28,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructor
 
-MaterialLoadingDescriptor::MaterialLoadingDescriptor(DAEchar const* in_path) noexcept:
+MaterialLoadingDescriptor::MaterialLoadingDescriptor(RkChar const* in_path) noexcept:
     path {in_path}
 {
     

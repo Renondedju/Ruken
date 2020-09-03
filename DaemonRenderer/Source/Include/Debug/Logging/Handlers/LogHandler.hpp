@@ -62,12 +62,12 @@ class __declspec(novtable) LogHandler
 
         #pragma region Methods
 
-        virtual DAEvoid Flush() = 0;
+        virtual RkVoid Flush() = 0;
 
         /**
          * \brief Adds the specified record to a thread safe queue.
          */
-        DAEvoid Handle(LogRecord const& in_record) noexcept;
+        RkVoid Handle(LogRecord const& in_record) noexcept;
 
         #pragma endregion
 

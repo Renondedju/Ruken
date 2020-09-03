@@ -31,12 +31,12 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-VulkanShaderModule::VulkanShaderModule(std::vector<DAEuint32> const& in_code) noexcept
+VulkanShaderModule::VulkanShaderModule(std::vector<RkUint32> const& in_code) noexcept
 {
     VkShaderModuleCreateInfo shader_module_create_info = {};
 
     shader_module_create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shader_module_create_info.codeSize = in_code.size() * sizeof(DAEuint32);
+    shader_module_create_info.codeSize = in_code.size() * sizeof(RkUint32);
     shader_module_create_info.pCode    = in_code.data();
 
     VK_CHECK(vkCreateShaderModule(VulkanLoader::GetLoadedDevice(), &shader_module_create_info, nullptr, &m_handle));
@@ -60,7 +60,7 @@ VulkanShaderModule::~VulkanShaderModule() noexcept
 
 #pragma region Methods
 
-DAEbool VulkanShaderModule::IsValid() const noexcept
+RkBool VulkanShaderModule::IsValid() const noexcept
 {
     return m_handle != nullptr;
 }

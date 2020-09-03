@@ -32,7 +32,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, MinimumTypeT<64, DAEsize>>
+class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, MinimumTypeT<64, RkSize>>
 {
     public:
 

@@ -34,7 +34,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief ECaptureOption enum. Defines all the possible capture option
  */
-enum class ERenderDocCaptureOption : DAEuint16
+enum class ERenderDocCaptureOption : RkUint16
 {
     /**
      * \brief Allow the application to enable vsync

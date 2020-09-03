@@ -38,7 +38,7 @@ RenderContext::RenderContext(Renderer&  in_renderer,
                              Window&    in_window):
     m_swapchain {std::make_unique<VulkanSwapchain>(in_renderer.GetPhysicalDevice(), in_renderer.GetDevice(), in_window)}
 {
-    for (DAEuint32 i = 0; i < 2u; ++i)
+    for (RkUint32 i = 0; i < 2u; ++i)
         m_render_frames.emplace_back(in_renderer, in_scheduler);
 }
 
@@ -46,7 +46,7 @@ RenderContext::RenderContext(Renderer&  in_renderer,
 
 #pragma region Methods
 
-DAEbool RenderContext::BeginFrame() noexcept
+RkBool RenderContext::BeginFrame() noexcept
 {
     if (m_is_frame_active)
         return false;
@@ -63,7 +63,7 @@ DAEbool RenderContext::BeginFrame() noexcept
     return true;
 }
 
-DAEvoid RenderContext::EndFrame() noexcept
+RkVoid RenderContext::EndFrame() noexcept
 {
     if (!m_is_frame_active)
         return;

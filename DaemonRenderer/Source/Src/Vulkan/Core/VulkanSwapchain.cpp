@@ -53,14 +53,14 @@ VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDevice& in_physical_device,
 {
     auto const extent = in_window.GetFramebufferSize();
 
-    m_image_extent.width  = static_cast<DAEuint32>(extent.width);
-    m_image_extent.height = static_cast<DAEuint32>(extent.height);
+    m_image_extent.width  = static_cast<RkUint32>(extent.width);
+    m_image_extent.height = static_cast<RkUint32>(extent.height);
 
     if (CreateSurface(in_device, in_window) && SetupSwapchain() && CreateSwapchain())
     {
         CreateImages();
 
-        in_window.on_framebuffer_resized += [this](DAEint32 const in_width, DAEint32 const in_height)
+        in_window.on_framebuffer_resized += [this](RkInt32 const in_width, RkInt32 const in_height)
         {
             RecreateSwapchain(in_width, in_height);
         };
@@ -80,7 +80,7 @@ VulkanSwapchain::~VulkanSwapchain() noexcept
 
 #pragma region Methods
 
-DAEvoid VulkanSwapchain::SelectImageCount(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
+RkVoid VulkanSwapchain::SelectImageCount(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
 {
     m_image_count = in_capabilities.minImageCount + 1u;
 
@@ -90,7 +90,7 @@ DAEvoid VulkanSwapchain::SelectImageCount(VkSurfaceCapabilitiesKHR const& in_cap
     }
 }
 
-DAEvoid VulkanSwapchain::SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept
+RkVoid VulkanSwapchain::SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept
 {
     // Best case scenario, the surface has no preferred format.
     if (in_available_formats.size() == 1u && in_available_formats[0].format == VK_FORMAT_UNDEFINED)
@@ -118,7 +118,7 @@ DAEvoid VulkanSwapchain::SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> con
     }
 }
 
-DAEvoid VulkanSwapchain::SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
+RkVoid VulkanSwapchain::SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
 {
     if (in_capabilities.currentExtent.width != UINT32_MAX)
     {
@@ -129,7 +129,7 @@ DAEvoid VulkanSwapchain::SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_ca
     // m_image_extent.height = Clamp(m_image_extent.height, in_capabilities.minImageExtent.height, in_capabilities.maxImageExtent.height);
 }
 
-DAEvoid VulkanSwapchain::SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
+RkVoid VulkanSwapchain::SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
 {
     if (in_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
         m_pre_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
@@ -137,7 +137,7 @@ DAEvoid VulkanSwapchain::SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_c
         m_pre_transform = in_capabilities.currentTransform;
 }
 
-DAEvoid VulkanSwapchain::SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
+RkVoid VulkanSwapchain::SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept
 {
     std::vector<VkCompositeAlphaFlagBitsKHR> composite_alphas = {
         VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
@@ -156,7 +156,7 @@ DAEvoid VulkanSwapchain::SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in
     }
 }
 
-DAEvoid VulkanSwapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& in_available_present_modes) noexcept
+RkVoid VulkanSwapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& in_available_present_modes) noexcept
 {
     m_present_mode = VK_PRESENT_MODE_FIFO_KHR;
 
@@ -170,7 +170,7 @@ DAEvoid VulkanSwapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& 
     }
 }
 
-DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept
+RkBool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept
 {
     #ifdef RUKEN_OS_WINDOWS
 
@@ -185,8 +185,8 @@ DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_windo
 
     #else
 
-    (DAEvoid)in_device;
-    (DAEvoid)in_window;
+    (RkVoid)in_device;
+    (RkVoid)in_window;
 
     return false;
 
@@ -204,7 +204,7 @@ DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_windo
     return true;
 }
 
-DAEbool VulkanSwapchain::SetupSwapchain() noexcept
+RkBool VulkanSwapchain::SetupSwapchain() noexcept
 {
     VkSurfaceCapabilitiesKHR capabilities;
 
@@ -239,7 +239,7 @@ DAEbool VulkanSwapchain::SetupSwapchain() noexcept
     return true;
 }
 
-DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
+RkBool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexcept
 {
     VkSwapchainCreateInfoKHR swapchain_info = {};
 
@@ -252,7 +252,7 @@ DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexce
     swapchain_info.imageArrayLayers = 1u;
     swapchain_info.imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-    std::array<DAEuint32, 2> queue_families_indices = {
+    std::array<RkUint32, 2> queue_families_indices = {
         m_device.GetGraphicsFamily(),
         m_device.FindPresentFamily(m_surface).value_or(UINT64_MAX)
     };
@@ -260,7 +260,7 @@ DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexce
     if (queue_families_indices[0] != queue_families_indices[1])
     {
         swapchain_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
-        swapchain_info.queueFamilyIndexCount = static_cast<DAEuint32>(queue_families_indices.size());
+        swapchain_info.queueFamilyIndexCount = static_cast<RkUint32>(queue_families_indices.size());
         swapchain_info.pQueueFamilyIndices   = queue_families_indices.data();
     }
 
@@ -276,7 +276,7 @@ DAEbool VulkanSwapchain::CreateSwapchain(VkSwapchainKHR in_old_swapchain) noexce
     return true;
 }
 
-DAEvoid VulkanSwapchain::CreateImages() noexcept
+RkVoid VulkanSwapchain::CreateImages() noexcept
 {
     // Obtains the number of presentable images associated with the swapchain.
     VK_CHECK(vkGetSwapchainImagesKHR(VulkanLoader::GetLoadedDevice(), m_handle, &m_image_count, nullptr));
@@ -296,11 +296,11 @@ DAEvoid VulkanSwapchain::CreateImages() noexcept
     {
         m_images.emplace_back(images[i], m_surface_format.format, extent);
 
-        VulkanDebug::SetObjectName(VK_OBJECT_TYPE_IMAGE, reinterpret_cast<DAEuint64>(images[i]), "SwapchainImage_" + std::to_string(i));
+        VulkanDebug::SetObjectName(VK_OBJECT_TYPE_IMAGE, reinterpret_cast<RkUint64>(images[i]), "SwapchainImage_" + std::to_string(i));
     }
 }
 
-DAEvoid VulkanSwapchain::RecreateSwapchain(DAEint32 const in_width, DAEint32 const in_height) noexcept
+RkVoid VulkanSwapchain::RecreateSwapchain(RkInt32 const in_width, RkInt32 const in_height) noexcept
 {
     m_image_extent.width  = in_width;
     m_image_extent.height = in_height;
@@ -314,7 +314,7 @@ DAEvoid VulkanSwapchain::RecreateSwapchain(DAEint32 const in_width, DAEint32 con
         CreateImages();
 }
 
-DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) noexcept
+RkVoid VulkanSwapchain::Present(RenderFrame& in_frame) noexcept
 {
     if (m_image_extent.width  == 0 || m_image_extent.height == 0)
         return;
@@ -411,7 +411,7 @@ DAEvoid VulkanSwapchain::Present(RenderFrame& in_frame) noexcept
         VulkanDebug::Error("Failed to queue an image for presentation!");
 }
 
-DAEbool VulkanSwapchain::IsValid() const noexcept
+RkBool VulkanSwapchain::IsValid() const noexcept
 {
     return m_surface && m_queue && m_handle && !m_images.empty();
 }
@@ -421,12 +421,12 @@ VkSwapchainKHR const& VulkanSwapchain::GetHandle() const noexcept
     return m_handle;
 }
 
-DAEuint32 const& VulkanSwapchain::GetImageIndex() const noexcept
+RkUint32 const& VulkanSwapchain::GetImageIndex() const noexcept
 {
     return m_image_index;
 }
 
-DAEuint32 VulkanSwapchain::GetImageCount() const noexcept
+RkUint32 VulkanSwapchain::GetImageCount() const noexcept
 {
     return m_image_count;
 }

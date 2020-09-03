@@ -37,7 +37,7 @@ struct WindowParams
     /**
      * \brief The UTF-8 encoded window title.
      */
-    DAEchar const* name {"NONE"};
+    RkChar const* name {"NONE"};
 
     /**
      * \brief The position, in screen coordinates, of the upper-left corner of the content area of the window.
@@ -53,20 +53,20 @@ struct WindowParams
      * \brief The opacity (or alpha) value is a positive finite number between 0 and 1.
      * \note  0 is fully transparent and 1 is fully opaque.
      */
-    DAEfloat opacity {1.0f};
+    RkFloat opacity {1.0f};
 
-    DAEbool fullscreen              {false};
-    DAEbool resizable               {true};
-    DAEbool visible                 {true};
-    DAEbool decorated               {true};
-    DAEbool focused                 {true};
-    DAEbool auto_iconified          {true};
-    DAEbool floating                {false};
-    DAEbool maximized               {false};
-    DAEbool cursor_centered         {true};
-    DAEbool transparent_framebuffer {false};
-    DAEbool focused_on_show         {true};
-    DAEbool scale_to_monitor        {false};
+    RkBool fullscreen              {false};
+    RkBool resizable               {true};
+    RkBool visible                 {true};
+    RkBool decorated               {true};
+    RkBool focused                 {true};
+    RkBool auto_iconified          {true};
+    RkBool floating                {false};
+    RkBool maximized               {false};
+    RkBool cursor_centered         {true};
+    RkBool transparent_framebuffer {false};
+    RkBool focused_on_show         {true};
+    RkBool scale_to_monitor        {false};
 };
 
 END_RUKEN_NAMESPACE

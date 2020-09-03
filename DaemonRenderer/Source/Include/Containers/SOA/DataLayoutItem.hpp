@@ -49,7 +49,7 @@ struct DataLayoutItem : public std::tuple<TTypes...>
     using Layout   = DataLayout<TContainer, TTypes...>;
     using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
 
-    template <DAEsize... TItems>
+    template <RkSize... TItems>
     using MakeView = DataLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
 };
 

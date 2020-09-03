@@ -33,43 +33,43 @@ BEGIN_RUKEN_NAMESPACE
 
 // Booleans
 
-using DAEbool = bool;
+using RkBool = bool;
 
 //Characters
 
-using DAEchar   = char;
-using DAEschar  = signed char;
-using DAEuchar  = unsigned char;
-using DAEwchar  = wchar_t;
-using DAEchar8  = signed char;
-using DAEchar16 = char16_t;
-using DAEchar32 = char32_t;
+using RkChar   = char;
+using RkSchar  = signed char;
+using RkUchar  = unsigned char;
+using RkWchar  = wchar_t;
+using RkChar8  = signed char;
+using RkChar16 = char16_t;
+using RkChar32 = char32_t;
 
 // Integers
 
-using DAEint    = int;
+using RkInt = int;
 
-using DAEint8   = int8_t;
-using DAEint16  = int16_t;
-using DAEint32  = int32_t;
-using DAEint64  = int64_t;
+using RkInt8  = int8_t;
+using RkInt16 = int16_t;
+using RkInt32 = int32_t;
+using RkInt64 = int64_t;
 
-using DAEuint8  = uint8_t;
-using DAEuint16 = uint16_t;
-using DAEuint32 = uint32_t;
-using DAEuint64 = uint64_t;
+using RkUint8  = uint8_t;
+using RkUint16 = uint16_t;
+using RkUint32 = uint32_t;
+using RkUint64 = uint64_t;
 
-using DAEsize   = size_t;
-using DAEbyte   = DAEuint8;
+using RkSize = size_t;
+using RkByte = RkUint8;
 
 // Floating points
 
-using DAEfloat      = float;
-using DAEdouble     = double;
-using DAEldouble    = long double;
+using RkFloat   = float;
+using RkDouble  = double;
+using RkLdouble = long double;
 
 // Others
 
-using DAEvoid = void;
+using RkVoid = void;
 
 END_RUKEN_NAMESPACE

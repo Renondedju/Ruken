@@ -38,7 +38,7 @@ ThreadSafeLockQueue<TType>::~ThreadSafeLockQueue()
 }
 
 template<typename TType>
-DAEvoid ThreadSafeLockQueue<TType>::Enqueue(TType&& in_item) noexcept
+RkVoid ThreadSafeLockQueue<TType>::Enqueue(TType&& in_item) noexcept
 {
     {
         QueueWriteAccess access(m_queue);
@@ -49,7 +49,7 @@ DAEvoid ThreadSafeLockQueue<TType>::Enqueue(TType&& in_item) noexcept
 }
 
 template<typename TType>
-DAEbool ThreadSafeLockQueue<TType>::Dequeue(TType& out_item) noexcept
+RkBool ThreadSafeLockQueue<TType>::Dequeue(TType& out_item) noexcept
 {
     // If the queue is empty waiting for a new data to be queued
     {
@@ -83,21 +83,21 @@ DAEbool ThreadSafeLockQueue<TType>::Dequeue(TType& out_item) noexcept
 }
 
 template<typename TType>
-DAEvoid ThreadSafeLockQueue<TType>::Release()
+RkVoid ThreadSafeLockQueue<TType>::Release()
 {
     m_unlock_all.store(true, std::memory_order_release);
     m_push_notification.notify_all();
 }
 
 template<typename TType>
-DAEbool ThreadSafeLockQueue<TType>::Empty() noexcept
+RkBool ThreadSafeLockQueue<TType>::Empty() noexcept
 {
     QueueReadAccess access(m_queue);
     return access->empty();
 }
 
 template<typename TType>
-DAEvoid ThreadSafeLockQueue<TType>::Clear() noexcept
+RkVoid ThreadSafeLockQueue<TType>::Clear() noexcept
 {
     QueueWriteAccess access(m_queue);
     typename decltype(m_queue)::UnderlyingType().swap(access.Get());
@@ -106,7 +106,7 @@ DAEvoid ThreadSafeLockQueue<TType>::Clear() noexcept
 }
 
 template<typename TType>
-DAEvoid ThreadSafeLockQueue<TType>::WaitUntilEmpty()
+RkVoid ThreadSafeLockQueue<TType>::WaitUntilEmpty()
 {
     if (Empty())
         return;

@@ -31,7 +31,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructors and Destructor
 
-VulkanCommandPool::VulkanCommandPool(DAEuint32 const in_queue_family, VkCommandPoolCreateFlags const in_flags) noexcept
+VulkanCommandPool::VulkanCommandPool(RkUint32 const in_queue_family, VkCommandPoolCreateFlags const in_flags) noexcept
 {
     VkCommandPoolCreateInfo command_pool_create_info = {};
 

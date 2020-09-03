@@ -68,7 +68,7 @@ class VulkanDeviceAllocator
                                                  VmaAllocationCreateInfo const& in_allocation_create_info) const noexcept;
 
         [[nodiscard]]
-        DAEbool IsValid() const noexcept;
+        RkBool IsValid() const noexcept;
 
         #pragma endregion
 

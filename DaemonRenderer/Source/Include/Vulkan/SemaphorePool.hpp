@@ -44,8 +44,8 @@ class SemaphorePool
 
         #pragma region Members
 
-        std::atomic<DAEuint32> m_semaphore_index          {0u};
-        std::atomic<DAEuint32> m_timeline_semaphore_index {0u};
+        std::atomic<RkUint32> m_semaphore_index          {0u};
+        std::atomic<RkUint32> m_timeline_semaphore_index {0u};
 
         std::vector<VulkanSemaphore>         m_semaphores          {};
         std::vector<VulkanTimelineSemaphore> m_timeline_semaphores {};
@@ -88,7 +88,7 @@ class SemaphorePool
          * \note  This function must be called once at the beginning of a frame.
          */
         [[nodiscard]]
-        DAEbool Reset() noexcept;
+        RkBool Reset() noexcept;
 
         #pragma endregion
 

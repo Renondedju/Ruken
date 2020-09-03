@@ -34,7 +34,7 @@
 
 USING_RUKEN_NAMESPACE
 
-DAEvoid Kernel::SetupServices() noexcept
+RkVoid Kernel::SetupServices() noexcept
 {
     m_service_provider.ProvideService<KernelProxy>(*this);
 
@@ -44,7 +44,7 @@ DAEvoid Kernel::SetupServices() noexcept
     m_service_provider.ProvideService<Renderer>();
 }
 
-DAEvoid Kernel::DestroyServices() noexcept
+RkVoid Kernel::DestroyServices() noexcept
 {
     m_service_provider.DestroyService<Renderer>();
     m_service_provider.DestroyService<WindowManager>();
@@ -67,7 +67,7 @@ Kernel::Kernel():
     SetupServices();
 }
 
-DAEint Kernel::Run() noexcept
+RkInt Kernel::Run() noexcept
 {
     auto& window_manager = *m_service_provider.LocateService<WindowManager>();
 
@@ -100,7 +100,7 @@ DAEint Kernel::Run() noexcept
     return m_exit_code;
 }
 
-DAEvoid Kernel::RequestShutdown(DAEint const in_exit_code) noexcept
+RkVoid Kernel::RequestShutdown(RkInt const in_exit_code) noexcept
 {
     m_exit_code = in_exit_code;
 

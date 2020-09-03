@@ -142,24 +142,24 @@ GammaRamp Screen::GetGammaRamp() const noexcept
     return *reinterpret_cast<GammaRamp const*>(glfwGetGammaRamp(m_handle));
 }
 
-DAEvoid Screen::SetGamma(DAEfloat const in_gamma) const noexcept
+RkVoid Screen::SetGamma(RkFloat const in_gamma) const noexcept
 {
     glfwSetGamma(m_handle, in_gamma);
 }
 
-DAEvoid Screen::SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept
+RkVoid Screen::SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept
 {
     glfwSetGammaRamp(m_handle, reinterpret_cast<GLFWgammaramp const*>(&in_gamma_ramp));
 }
 
 #ifdef RUKEN_OS_WINDOWS
 
-DAEchar const* Screen::GetWin32Adapter() const noexcept
+RkChar const* Screen::GetWin32Adapter() const noexcept
 {
     return glfwGetWin32Adapter(m_handle);
 }
 
-DAEchar const* Screen::GetWin32Monitor() const noexcept
+RkChar const* Screen::GetWin32Monitor() const noexcept
 {
     return glfwGetWin32Monitor(m_handle);
 }
@@ -182,12 +182,12 @@ Screen& Screen::operator=(Screen&& in_move) noexcept
     return *this;
 }
 
-DAEbool Screen::operator==(Screen const& in_other) const noexcept
+RkBool Screen::operator==(Screen const& in_other) const noexcept
 {
     return m_handle == in_other.m_handle;
 }
 
-DAEbool Screen::operator!=(Screen const& in_other) const noexcept
+RkBool Screen::operator!=(Screen const& in_other) const noexcept
 {
     return m_handle != in_other.m_handle;
 }

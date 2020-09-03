@@ -58,7 +58,7 @@ Logger::Logger(Logger&& in_move) noexcept:
 
 #pragma region Methods
 
-DAEvoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
+RkVoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
 {
     if (propagate && m_parent)
         m_parent->ForceHandle(in_record);
@@ -67,12 +67,12 @@ DAEvoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
         handler->Handle(in_record);
 }
 
-DAEvoid Logger::SetLevel(ELogLevel const in_level) noexcept
+RkVoid Logger::SetLevel(ELogLevel const in_level) noexcept
 {
 	m_level = in_level;
 }
 
-DAEbool Logger::IsEnabledFor(ELogLevel const in_level) const noexcept
+RkBool Logger::IsEnabledFor(ELogLevel const in_level) const noexcept
 {
 	return in_level >= m_level;
 }
@@ -82,7 +82,7 @@ Logger* Logger::AddChild(std::string_view const in_name) noexcept
     return &m_children.emplace_front(m_service_provider, in_name, m_level, this);
 }
 
-DAEvoid Logger::Log(ELogLevel const in_level, std::string_view const in_message) const noexcept
+RkVoid Logger::Log(ELogLevel const in_level, std::string_view const in_message) const noexcept
 {
     if (!IsEnabledFor(in_level))
         return;
@@ -90,43 +90,43 @@ DAEvoid Logger::Log(ELogLevel const in_level, std::string_view const in_message)
     Handle(LogRecord {in_level, m_name, std::string(in_message)});
 }
 
-DAEvoid Logger::Debug(std::string_view const in_message) const noexcept
+RkVoid Logger::Debug(std::string_view const in_message) const noexcept
 {
     Log(ELogLevel::Debug, in_message);
 }
 
-DAEvoid Logger::Info(std::string_view const in_message) const noexcept
+RkVoid Logger::Info(std::string_view const in_message) const noexcept
 {
     Log(ELogLevel::Info, in_message);
 }
 
-DAEvoid Logger::Warning(std::string_view const in_message) const noexcept
+RkVoid Logger::Warning(std::string_view const in_message) const noexcept
 {
     Log(ELogLevel::Warning, in_message);
 }
 
-DAEvoid Logger::Error(std::string_view const in_message) const noexcept
+RkVoid Logger::Error(std::string_view const in_message) const noexcept
 {
     Log(ELogLevel::Error, in_message);
 }
 
-DAEvoid Logger::Fatal(std::string_view const in_message) const noexcept
+RkVoid Logger::Fatal(std::string_view const in_message) const noexcept
 {
     Log(ELogLevel::Fatal, in_message);
 }
 
-DAEvoid Logger::AddFilter(LogFilter const* in_filter) noexcept
+RkVoid Logger::AddFilter(LogFilter const* in_filter) noexcept
 {
     if (in_filter)
         m_filters.emplace_front(in_filter);
 }
 
-DAEvoid Logger::RemoveFilter(LogFilter const* in_filter) noexcept
+RkVoid Logger::RemoveFilter(LogFilter const* in_filter) noexcept
 {
     m_filters.remove(in_filter);
 }
 
-DAEbool Logger::Filter(LogRecord const& in_record) const noexcept
+RkBool Logger::Filter(LogRecord const& in_record) const noexcept
 {
     for (auto const* filter : m_filters)
     {
@@ -137,24 +137,24 @@ DAEbool Logger::Filter(LogRecord const& in_record) const noexcept
     return true;
 }
 
-DAEvoid Logger::AddHandler(LogHandler* in_handler) noexcept
+RkVoid Logger::AddHandler(LogHandler* in_handler) noexcept
 {
     if (in_handler)
         m_handlers.emplace_front(in_handler);
 }
 
-DAEvoid Logger::RemoveHandler(LogHandler* in_handler) noexcept
+RkVoid Logger::RemoveHandler(LogHandler* in_handler) noexcept
 {
     m_handlers.remove(in_handler);
 }
 
-DAEvoid Logger::Handle(LogRecord const& in_record) const noexcept
+RkVoid Logger::Handle(LogRecord const& in_record) const noexcept
 {
     if (Filter(in_record))
         ForceHandle(in_record);
 }
 
-DAEbool Logger::HasHandlers() const noexcept
+RkBool Logger::HasHandlers() const noexcept
 {
     if (propagate && m_parent)
         return !m_handlers.empty() || m_parent->HasHandlers();

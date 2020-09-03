@@ -66,7 +66,7 @@ class VulkanPipelineCache
         /**
          * \brief Saves the data retrieved from this pipeline cache to the specified file for reuse.
          */
-        DAEvoid SaveData(std::string_view in_path) const;
+        RkVoid SaveData(std::string_view in_path) const;
 
         [[nodiscard]] VkPipeline CreateGraphicsPipeline(VkGraphicsPipelineCreateInfo const& in_pipeline_create_info) const noexcept;
         [[nodiscard]] VkPipeline CreateComputePipeline (VkComputePipelineCreateInfo  const& in_pipeline_create_info) const noexcept;

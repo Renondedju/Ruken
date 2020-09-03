@@ -39,7 +39,7 @@ BEGIN_RUKEN_NAMESPACE
 template <typename... TArgs>
 class Event
 {
-    using Function = std::function<DAEvoid(TArgs...)>;
+    using Function = std::function<RkVoid(TArgs...)>;
 
     private:
 
@@ -65,14 +65,14 @@ class Event
         /**
          * \brief Clears all the subscribers from the event
          */
-        DAEvoid Reset() noexcept;
+        RkVoid Reset() noexcept;
 
         /**
          * \brief Subscribes a new function to the event
          * \param in_function Function to subscribe
          */
-        DAEvoid Subscribe(Function const& in_function) noexcept;
-        DAEvoid Subscribe(Function&&      in_function) noexcept;
+        RkVoid Subscribe(Function const& in_function) noexcept;
+        RkVoid Subscribe(Function&&      in_function) noexcept;
 
         /**
          * \brief Invokes the event
@@ -80,7 +80,7 @@ class Event
          * 
          * \param in_args Arguments to pass to all the subscribers
          */
-        DAEvoid Invoke(TArgs... in_args) noexcept;
+        RkVoid Invoke(TArgs... in_args) noexcept;
 
         #pragma endregion
 
@@ -90,7 +90,7 @@ class Event
          * \brief Equivalent of the Invoke() method
          * \param in_args Arguments to pass to all the subscribers
          */
-        DAEvoid operator()(TArgs... in_args) noexcept;
+        RkVoid operator()(TArgs... in_args) noexcept;
 
         /**
          * \brief Equivalent of the Subscribe() method

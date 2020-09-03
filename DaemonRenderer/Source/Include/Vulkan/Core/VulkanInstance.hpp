@@ -40,8 +40,8 @@ class VulkanInstance
 
         #pragma region Members
 
-        static std::vector<DAEchar const*>                m_required_extensions;
-        static std::vector<DAEchar const*>                m_required_validation_layers;
+        static std::vector<RkChar const*>                m_required_extensions;
+        static std::vector<RkChar const*>                m_required_validation_layers;
         static std::vector<VkValidationFeatureEnableEXT>  m_enabled_validation_features;
         static std::vector<VkValidationFeatureDisableEXT> m_disabled_validation_features;
 
@@ -51,10 +51,10 @@ class VulkanInstance
 
         #pragma region Methods
 
-        static DAEbool CheckInstanceExtensions() noexcept;
-        static DAEbool CheckValidationLayers  () noexcept;
+        static RkBool CheckInstanceExtensions() noexcept;
+        static RkBool CheckValidationLayers  () noexcept;
 
-        DAEbool CreateInstance() noexcept;
+        RkBool CreateInstance() noexcept;
 
         #pragma endregion
 
@@ -73,12 +73,12 @@ class VulkanInstance
 
         #pragma region Methods
 
-        [[nodiscard]] static std::vector<DAEchar const*>                const& GetRequiredExtensions        () noexcept;
-        [[nodiscard]] static std::vector<DAEchar const*>                const& GetRequiredValidationLayers  () noexcept;
+        [[nodiscard]] static std::vector<RkChar const*>                const& GetRequiredExtensions        () noexcept;
+        [[nodiscard]] static std::vector<RkChar const*>                const& GetRequiredValidationLayers  () noexcept;
         [[nodiscard]] static std::vector<VkValidationFeatureEnableEXT>  const& GetEnabledValidationFeatures () noexcept;
         [[nodiscard]] static std::vector<VkValidationFeatureDisableEXT> const& GetDisabledValidationFeatures() noexcept;
 
-        [[nodiscard]] DAEbool           IsValid  () const noexcept;
+        [[nodiscard]] RkBool           IsValid  () const noexcept;
         [[nodiscard]] VkInstance const& GetHandle() const noexcept;
 
         #pragma endregion

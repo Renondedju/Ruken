@@ -30,7 +30,7 @@
 
 USING_RUKEN_NAMESPACE
 
-DAEbool Sleep::NsSleep(DAEint64 const in_nanoseconds) noexcept
+RkBool Sleep::NsSleep(RkInt64 const in_nanoseconds) noexcept
 {
     HANDLE const timer = CreateWaitableTimer(nullptr, true, nullptr);
     LARGE_INTEGER li;
@@ -50,10 +50,10 @@ DAEbool Sleep::NsSleep(DAEint64 const in_nanoseconds) noexcept
     return true;
 }
 
-DAEvoid Sleep::StdSleep(DAEdouble const in_seconds) noexcept
+RkVoid Sleep::StdSleep(RkDouble const in_seconds) noexcept
 {
-    static constexpr std::chrono::duration<DAEdouble> min_sleep_duration(0);
+    static constexpr std::chrono::duration<RkDouble> min_sleep_duration(0);
     std::chrono::steady_clock::time_point const start = std::chrono::steady_clock::now();
-    while (std::chrono::duration<DAEdouble>(std::chrono::steady_clock::now() - start).count() < in_seconds)
+    while (std::chrono::duration<RkDouble>(std::chrono::steady_clock::now() - start).count() < in_seconds)
         std::this_thread::sleep_for(min_sleep_duration);
 }

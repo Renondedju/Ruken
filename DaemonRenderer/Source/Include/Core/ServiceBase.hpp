@@ -39,7 +39,7 @@ class ServiceBase
          * \brief Returns the next service ID
          * \return Service ID
          */
-        static DAEsize GetNextId() noexcept;
+        static RkSize GetNextId() noexcept;
 
         #pragma endregion
 

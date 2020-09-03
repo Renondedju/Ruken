@@ -23,7 +23,7 @@
  */
 
 template <typename TExecutable, typename ...TArgs>
-DAEvoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
+RkVoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
 {
     // This avoids an std::terminate throw
     WaitForAvailability();
@@ -32,7 +32,7 @@ DAEvoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
 }
 
 template <typename TExecutable, typename ...TArgs>
-DAEvoid Worker::ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept
+RkVoid Worker::ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept
 {
     // This avoids an std::terminate throw
     WaitForAvailability();

@@ -28,10 +28,10 @@ Service<TCrtp>::Service(ServiceProvider& in_service_provider) noexcept:
 {}
 
 template <typename TCrtp>
-DAEsize Service<TCrtp>::ServiceID() noexcept
+RkSize Service<TCrtp>::ServiceID() noexcept
 {
     // Generating the ID once
-    static DAEsize id = GetNextId();
+    static RkSize id = GetNextId();
     
     return id;
 }

@@ -98,14 +98,14 @@ class Handle
          * \return True if the resource is available and valid.
          */
         [[nodiscard]]
-        DAEbool Available() const noexcept;
+        RkBool Available() const noexcept;
 
         /**
          * \brief Checks if the resource is valid, **a valid resource isn't always available**
          * \return True if the resource is valid.
          */
         [[nodiscard]]
-        DAEbool Valid() const noexcept;
+        RkBool Valid() const noexcept;
 
         /**
          * \brief Returns the number of references made to the resource
@@ -119,7 +119,7 @@ class Handle
          * \note If the underlying resource manager hasn't been set, this method won't have any effects
          * \return True if the resource is valid, false otherwise.
          */
-        DAEbool WaitForValidity(DAEfloat in_timeout) const noexcept;
+        RkBool WaitForValidity(RkFloat in_timeout) const noexcept;
 
         /**
          * \brief Returns the garbage collection strategy (get)

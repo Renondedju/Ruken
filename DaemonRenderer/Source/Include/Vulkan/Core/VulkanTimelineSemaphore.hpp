@@ -58,7 +58,7 @@ class VulkanTimelineSemaphore final : public VulkanSemaphore
          * \return True if this semaphore could be set to the given value, else False.
          */
         [[nodiscard]]
-        DAEbool Signal(DAEuint64 in_value) const noexcept;
+        RkBool Signal(RkUint64 in_value) const noexcept;
 
         /**
          * \brief If the condition is satisfied when this function is called, then it returns immediately.
@@ -66,13 +66,13 @@ class VulkanTimelineSemaphore final : public VulkanSemaphore
          *        then it will block and wait for the condition to become satisfied.
          */
         [[nodiscard]]
-        DAEvoid Wait(DAEuint64 in_value) const noexcept;
+        RkVoid Wait(RkUint64 in_value) const noexcept;
 
         /**
          * \return The current counter value of this semaphore or 'UINT64_MAX' if the operation failed.
          */
         [[nodiscard]]
-        DAEuint64 GetValue() const noexcept;
+        RkUint64 GetValue() const noexcept;
 
         #pragma endregion
 

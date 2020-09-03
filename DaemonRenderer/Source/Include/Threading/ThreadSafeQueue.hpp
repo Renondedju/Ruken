@@ -67,20 +67,20 @@ class ThreadSafeQueue
          * \brief Checks if the queue is empty
          * \return True if the queue is empty, false otherwise
          */
-        DAEbool Empty() const noexcept;
+        RkBool Empty() const noexcept;
 
         /**
          * \brief Enqueue an item
          * \param in_item Item to enqueue
          */
-        DAEvoid Enqueue(TType&& in_item) noexcept;
+        RkVoid Enqueue(TType&& in_item) noexcept;
 
         /**
          * \brief Tries to dequeue an item
          * \warning If the queue is empty, the result of this function and the content of out_item are undefined
          * \param out_item Dequeued item
          */
-        DAEvoid Dequeue(TType& out_item) noexcept;
+        RkVoid Dequeue(TType& out_item) noexcept;
 
         #pragma endregion
 

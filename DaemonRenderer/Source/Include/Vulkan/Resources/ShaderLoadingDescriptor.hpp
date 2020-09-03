@@ -36,13 +36,13 @@ struct ShaderLoadingDescriptor final : ResourceLoadingDescriptor
 
         #pragma region Members
 
-        DAEchar const* path;
+        RkChar const* path;
 
         #pragma endregion
 
         #pragma region Constructors and Destructor
 
-        explicit ShaderLoadingDescriptor(DAEchar const* in_path) noexcept;
+        explicit ShaderLoadingDescriptor(RkChar const* in_path) noexcept;
 
         ShaderLoadingDescriptor(ShaderLoadingDescriptor const&  in_copy) = default;
         ShaderLoadingDescriptor(ShaderLoadingDescriptor&&       in_move) = default;

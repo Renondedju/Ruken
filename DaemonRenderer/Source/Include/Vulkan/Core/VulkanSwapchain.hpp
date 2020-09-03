@@ -60,8 +60,8 @@ class VulkanSwapchain
         VulkanQueue const*            m_queue           {nullptr};
         VkSurfaceKHR                  m_surface         {nullptr};
         VkSwapchainKHR                m_handle          {nullptr};
-        DAEuint32                     m_image_index     {0u};
-        DAEuint32                     m_image_count     {0u};
+        RkUint32                     m_image_index     {0u};
+        RkUint32                     m_image_count     {0u};
         VkSurfaceFormatKHR            m_surface_format  {};
         VkExtent2D                    m_image_extent    {};
         VkSurfaceTransformFlagBitsKHR m_pre_transform   {VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR};
@@ -78,18 +78,18 @@ class VulkanSwapchain
          * \note  The implementation will either create the swapchain with at least that many images,
          *        or it will fail to create the swapchain.
          */
-        DAEvoid SelectImageCount(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
+        RkVoid SelectImageCount(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
          * \brief Selects the format the swapchain image(s) will be created with.
          */
-        DAEvoid SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept;
+        RkVoid SelectSurfaceFormat(std::vector<VkSurfaceFormatKHR> const& in_available_formats) noexcept;
 
         /**
          * \brief Selects the size (in pixels) of the swapchain image(s).
          * \note  The behavior is platform-dependent if the image extent does not match the surfaceÅ's 'currentExtent'.
          */
-        DAEvoid SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
+        RkVoid SelectImageExtent(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
          * \brief Selects the value describing the transform,
@@ -98,25 +98,25 @@ class VulkanSwapchain
          * \note  If it does not match the 'currentTransform' value,
          *        the presentation engine will transform the image content as part of the presentation operation.
          */
-        DAEvoid SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
+        RkVoid SelectPreTransform(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
          * \brief Selects the value indicating the alpha compositing mode to use
          *        when this surface is composited together with other surfaces on certain window systems.
          */
-        DAEvoid SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
+        RkVoid SelectCompositeAlpha(VkSurfaceCapabilitiesKHR const& in_capabilities) noexcept;
 
         /**
          * \brief Selects the presentation mode the swapchain will use.
          * \note  A swapchainÅ's present mode determines how incoming present requests will be processed and queued internally.
          */
-        DAEvoid SelectPresentMode(std::vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
+        RkVoid SelectPresentMode(std::vector<VkPresentModeKHR> const& in_available_present_modes) noexcept;
 
-        DAEbool CreateSurface    (VulkanDevice& in_device, Window& in_window) noexcept;
-        DAEbool SetupSwapchain   ()                                           noexcept;
-        DAEbool CreateSwapchain  (VkSwapchainKHR in_old_swapchain = nullptr)  noexcept;
-        DAEvoid CreateImages     ()                                           noexcept;
-        DAEvoid RecreateSwapchain(DAEint32 in_width, DAEint32 in_height)      noexcept;
+        RkBool CreateSurface    (VulkanDevice& in_device, Window& in_window) noexcept;
+        RkBool SetupSwapchain   ()                                           noexcept;
+        RkBool CreateSwapchain  (VkSwapchainKHR in_old_swapchain = nullptr)  noexcept;
+        RkVoid CreateImages     ()                                           noexcept;
+        RkVoid RecreateSwapchain(RkInt32 in_width, RkInt32 in_height)      noexcept;
 
         #pragma endregion
 
@@ -140,12 +140,12 @@ class VulkanSwapchain
         /**
          * \brief Queues the given frame for presentation.
          */
-        DAEvoid Present(RenderFrame& in_frame) noexcept;
+        RkVoid Present(RenderFrame& in_frame) noexcept;
 
-        [[nodiscard]] DAEbool               IsValid      () const noexcept;
+        [[nodiscard]] RkBool               IsValid      () const noexcept;
         [[nodiscard]] VkSwapchainKHR const& GetHandle    () const noexcept;
-        [[nodiscard]] DAEuint32      const& GetImageIndex() const noexcept;
-        [[nodiscard]] DAEuint32             GetImageCount() const noexcept;
+        [[nodiscard]] RkUint32      const& GetImageIndex() const noexcept;
+        [[nodiscard]] RkUint32             GetImageCount() const noexcept;
 
         #pragma endregion
 

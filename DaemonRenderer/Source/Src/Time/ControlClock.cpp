@@ -36,19 +36,19 @@ ControlClock::ControlClock() noexcept:
     m_time_scale             {1.0f}
 {}
 
-DAEvoid ControlClock::ControlPoint() noexcept
+RkVoid ControlClock::ControlPoint() noexcept
 {
     // Updating the accumulator
     TimePoint const now = InternalClock::now();
-    m_control_time        = std::chrono::duration<DAEdouble, std::ratio<1, 1>>(now - m_last_time).count();
+    m_control_time        = std::chrono::duration<RkDouble, std::ratio<1, 1>>(now - m_last_time).count();
 
-    DAEdouble sleep_time = 0.0;
+    RkDouble sleep_time = 0.0;
 
     if (m_control_time < m_frequency)
     {
         sleep_time = m_frequency - m_control_time;
 
-        m_timer.SetTiming(static_cast<DAEint64>(sleep_time * 1e+7));
+        m_timer.SetTiming(static_cast<RkInt64>(sleep_time * 1e+7));
         m_timer.NSleep();
     }
 
@@ -56,17 +56,17 @@ DAEvoid ControlClock::ControlPoint() noexcept
     m_last_time = InternalClock::now();
 }
 
-DAEvoid ControlClock::SetControlFrequency(DAEfloat const in_frequency) noexcept
+RkVoid ControlClock::SetControlFrequency(RkFloat const in_frequency) noexcept
 {
     m_frequency = in_frequency;
 }
 
-DAEfloat ControlClock::GetControlTime() const noexcept
+RkFloat ControlClock::GetControlTime() const noexcept
 {
-    return static_cast<DAEfloat>(m_corrected_control_time * m_time_scale);
+    return static_cast<RkFloat>(m_corrected_control_time * m_time_scale);
 }
 
-DAEfloat ControlClock::GetUnscaledControlTime() const noexcept
+RkFloat ControlClock::GetUnscaledControlTime() const noexcept
 {
-    return static_cast<DAEfloat>(m_corrected_control_time);
+    return static_cast<RkFloat>(m_corrected_control_time);
 }

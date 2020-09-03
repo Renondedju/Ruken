@@ -95,7 +95,7 @@ Renderer::~Renderer() noexcept
 
 #pragma region Methods
 
-DAEvoid Renderer::MakeContext(Window& in_window) noexcept
+RkVoid Renderer::MakeContext(Window& in_window) noexcept
 {
     m_render_contexts.emplace_back(*this, *m_scheduler, in_window);
 }

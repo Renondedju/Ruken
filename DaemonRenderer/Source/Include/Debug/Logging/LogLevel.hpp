@@ -28,7 +28,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-enum class ELogLevel : DAEuint8
+enum class ELogLevel : RkUint8
 {
     /**
      * \brief Detailed information, typically of interest only when diagnosing problems.

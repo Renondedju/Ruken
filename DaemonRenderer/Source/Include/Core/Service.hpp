@@ -71,7 +71,7 @@ class Service : ServiceBase
          * \brief Retrieves the unique ID of the service
          * \return Service ID
          */
-        static DAEsize ServiceID() noexcept;
+        static RkSize ServiceID() noexcept;
 
         #pragma endregion
 

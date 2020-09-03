@@ -52,7 +52,7 @@ class Worker : NonCopyable
 
         #pragma region Constructors
 
-        Worker(DAEchar const* in_label) noexcept;
+        Worker(RkChar const* in_label) noexcept;
         Worker()                        noexcept;
 
         Worker(Worker const& in_copy)    noexcept = delete;
@@ -91,7 +91,7 @@ class Worker : NonCopyable
          * \return True if the worker is busy
          */
         [[nodiscard]]
-        DAEbool Available() const noexcept;
+        RkBool Available() const noexcept;
 
         /**
          * \brief Waits for the last task to execute, and starts the execution of this new job 
@@ -100,7 +100,7 @@ class Worker : NonCopyable
          * \param in_args Args of the job to execute
          */
         template <typename TExecutable, typename ...TArgs>
-        DAEvoid Execute(TExecutable in_job, TArgs... in_args) noexcept;
+        RkVoid Execute(TExecutable in_job, TArgs... in_args) noexcept;
 
         /**
          * \brief Waits for the last task to execute, and starts the execution of this new job 
@@ -109,13 +109,13 @@ class Worker : NonCopyable
          * \param in_args Args of the job to execute
          */
         template <typename TExecutable, typename ...TArgs>
-        DAEvoid ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept;
+        RkVoid ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept;
 
         /**
          * \brief Locks the current thread until the current job has been done.
          * \brief If there was no job currently executed, this method has no effect.
          */
-        DAEvoid WaitForAvailability() noexcept;
+        RkVoid WaitForAvailability() noexcept;
 
         /**
          * \brief Separates the thread of execution from the worker object, allowing execution to continue independently.
@@ -123,7 +123,7 @@ class Worker : NonCopyable
          * \note Any allocated resources will be freed once the thread exits.
          * \note If the worker was available, this method has no effect
          */
-        DAEvoid Detach() noexcept;
+        RkVoid Detach() noexcept;
 
         /**
          * \brief Returns the current underlying thread

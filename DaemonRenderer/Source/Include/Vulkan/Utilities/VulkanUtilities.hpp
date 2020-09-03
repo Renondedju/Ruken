@@ -28,7 +28,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-DAEbool operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
-DAEbool operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
+RkBool operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
+RkBool operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
 
 END_RUKEN_NAMESPACE

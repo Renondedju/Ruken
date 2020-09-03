@@ -39,7 +39,7 @@ BEGIN_RUKEN_NAMESPACE
  *              An invalidation is caused if the resource is tagged for garbage collection (GC)
  *              or if the resource failed to load for any reason.
  */
-enum class EResourceStatus : DAEuint8
+enum class EResourceStatus : RkUint8
 {
     Pending,
     Processed,

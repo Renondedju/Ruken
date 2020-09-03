@@ -37,7 +37,7 @@ RenderDocHook::RenderDocHook():
     if(HMODULE const mod = GetModuleHandleA("renderdoc.dll"))
     {
         pRENDERDOC_GetAPI const RenderDoc_GetAPI = reinterpret_cast<pRENDERDOC_GetAPI>(GetProcAddress(mod, "RENDERDOC_GetAPI"));
-        DAEbool const available = RenderDoc_GetAPI(eRENDERDOC_API_Version_1_4_0, reinterpret_cast<void **>(&m_renderdoc_api));
+        RkBool const available = RenderDoc_GetAPI(eRENDERDOC_API_Version_1_4_0, reinterpret_cast<void **>(&m_renderdoc_api));
         
         if (!available)
             m_renderdoc_api = nullptr;
@@ -45,10 +45,10 @@ RenderDocHook::RenderDocHook():
 
 #elif defined(RUKEN_OS_LINUX)
 
-    if(DAEvoid* mod = dlopen("librenderdoc.so", RTLD_NOW | RTLD_NOLOAD))
+    if(RkVoid* mod = dlopen("librenderdoc.so", RTLD_NOW | RTLD_NOLOAD))
     {
         pRENDERDOC_GetAPI RENDERDOC_GetAPI = reinterpret_cast<pRENDERDOC_GetAPI>(dlsym(mod, "RENDERDOC_GetAPI"));
-        DAEbool const available = RenderDoc_GetAPI(eRENDERDOC_API_Version_1_4_0, reinterpret_cast<void **>(&m_renderdoc_api));
+        RkBool const available = RenderDoc_GetAPI(eRENDERDOC_API_Version_1_4_0, reinterpret_cast<void **>(&m_renderdoc_api));
 
         if (!available)
             m_renderdoc_api = nullptr;
@@ -56,10 +56,10 @@ RenderDocHook::RenderDocHook():
 
 #elif defined(RUKEN_OS_ANDROID)
 
-    if(DAEvoid* mod = dlopen("libVkLayer_GLES_RenderDoc.so", RTLD_NOW | RTLD_NOLOAD))
+    if(RkVoid* mod = dlopen("libVkLayer_GLES_RenderDoc.so", RTLD_NOW | RTLD_NOLOAD))
     {
         pRENDERDOC_GetAPI RENDERDOC_GetAPI = reinterpret_cast<pRENDERDOC_GetAPI>(dlsym(mod, "RENDERDOC_GetAPI"));
-        DAEbool const available = RenderDoc_GetAPI(eRENDERDOC_API_Version_1_4_0, reinterpret_cast<void **>(&m_renderdoc_api));
+        RkBool const available = RenderDoc_GetAPI(eRENDERDOC_API_Version_1_4_0, reinterpret_cast<void **>(&m_renderdoc_api));
 
         if (!available)
             m_renderdoc_api = nullptr;
@@ -70,12 +70,12 @@ RenderDocHook::RenderDocHook():
 #endif
 }
 
-DAEbool RenderDocHook::Available() const noexcept
+RkBool RenderDocHook::Available() const noexcept
 {
     return m_renderdoc_api;
 }
 
-DAEvoid RenderDocHook::GetAPIVersion(DAEint32& out_major, DAEint32& out_minor, DAEint32& out_patch) const noexcept
+RkVoid RenderDocHook::GetAPIVersion(RkInt32& out_major, RkInt32& out_minor, RkInt32& out_patch) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -83,7 +83,7 @@ DAEvoid RenderDocHook::GetAPIVersion(DAEint32& out_major, DAEint32& out_minor, D
     m_renderdoc_api->GetAPIVersion(&out_major, &out_minor, &out_patch);
 }
 
-DAEbool RenderDocHook::SetCaptureOptionU32(ERenderDocCaptureOption const in_option, DAEuint32 const in_value) const noexcept
+RkBool RenderDocHook::SetCaptureOptionU32(ERenderDocCaptureOption const in_option, RkUint32 const in_value) const noexcept
 {
     if (!m_renderdoc_api)
         return false;
@@ -91,7 +91,7 @@ DAEbool RenderDocHook::SetCaptureOptionU32(ERenderDocCaptureOption const in_opti
     return m_renderdoc_api->SetCaptureOptionU32(static_cast<RENDERDOC_CaptureOption>(in_option), in_value);
 }
 
-DAEbool RenderDocHook::SetCaptureOptionF32(ERenderDocCaptureOption const in_option, DAEfloat const in_value) const noexcept
+RkBool RenderDocHook::SetCaptureOptionF32(ERenderDocCaptureOption const in_option, RkFloat const in_value) const noexcept
 {
     if (!m_renderdoc_api)
         return false;
@@ -99,7 +99,7 @@ DAEbool RenderDocHook::SetCaptureOptionF32(ERenderDocCaptureOption const in_opti
     return m_renderdoc_api->SetCaptureOptionF32(static_cast<RENDERDOC_CaptureOption>(in_option), in_value);
 }
 
-DAEuint32 RenderDocHook::GetCaptureOptionU32(ERenderDocCaptureOption in_option) const noexcept
+RkUint32 RenderDocHook::GetCaptureOptionU32(ERenderDocCaptureOption in_option) const noexcept
 {
     if (!m_renderdoc_api)
         return 0xffffffff;
@@ -107,7 +107,7 @@ DAEuint32 RenderDocHook::GetCaptureOptionU32(ERenderDocCaptureOption in_option) 
     return m_renderdoc_api->GetCaptureOptionU32(static_cast<RENDERDOC_CaptureOption>(in_option));
 }
 
-DAEfloat RenderDocHook::GetCaptureOptionF32(ERenderDocCaptureOption in_option) const noexcept
+RkFloat RenderDocHook::GetCaptureOptionF32(ERenderDocCaptureOption in_option) const noexcept
 {
     if (!m_renderdoc_api)
         return -FLT_MAX;
@@ -115,7 +115,7 @@ DAEfloat RenderDocHook::GetCaptureOptionF32(ERenderDocCaptureOption in_option) c
     return m_renderdoc_api->GetCaptureOptionF32(static_cast<RENDERDOC_CaptureOption>(in_option));
 }
 
-DAEvoid RenderDocHook::Shutdown() const noexcept
+RkVoid RenderDocHook::Shutdown() const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -123,7 +123,7 @@ DAEvoid RenderDocHook::Shutdown() const noexcept
     m_renderdoc_api->Shutdown();
 }
 
-DAEvoid RenderDocHook::UnloadCrashHandler() const noexcept
+RkVoid RenderDocHook::UnloadCrashHandler() const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -131,7 +131,7 @@ DAEvoid RenderDocHook::UnloadCrashHandler() const noexcept
     m_renderdoc_api->UnloadCrashHandler();
 }
 
-DAEvoid RenderDocHook::SetCaptureFilePathTemplate(DAEchar const* in_path_template) const noexcept
+RkVoid RenderDocHook::SetCaptureFilePathTemplate(RkChar const* in_path_template) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -139,7 +139,7 @@ DAEvoid RenderDocHook::SetCaptureFilePathTemplate(DAEchar const* in_path_templat
     m_renderdoc_api->SetCaptureFilePathTemplate(in_path_template);
 }
 
-DAEchar const* RenderDocHook::GetCaptureFilePathTemplate() const noexcept
+RkChar const* RenderDocHook::GetCaptureFilePathTemplate() const noexcept
 {
     if (!m_renderdoc_api)
         return "";
@@ -147,7 +147,7 @@ DAEchar const* RenderDocHook::GetCaptureFilePathTemplate() const noexcept
     return m_renderdoc_api->GetCaptureFilePathTemplate();
 }
 
-DAEuint32 RenderDocHook::GetNumCaptures() const noexcept
+RkUint32 RenderDocHook::GetNumCaptures() const noexcept
 {
     if (!m_renderdoc_api)
         return 0;
@@ -155,7 +155,7 @@ DAEuint32 RenderDocHook::GetNumCaptures() const noexcept
     return m_renderdoc_api->GetNumCaptures();
 }
 
-DAEbool RenderDocHook::GetCapture(DAEuint32 const in_idx, DAEchar* in_filename, DAEuint32* out_path_length, DAEuint64* out_timestamp) const noexcept
+RkBool RenderDocHook::GetCapture(RkUint32 const in_idx, RkChar* in_filename, RkUint32* out_path_length, RkUint64* out_timestamp) const noexcept
 {
     if (!m_renderdoc_api)
         return false;
@@ -163,7 +163,7 @@ DAEbool RenderDocHook::GetCapture(DAEuint32 const in_idx, DAEchar* in_filename, 
     return m_renderdoc_api->GetCapture(in_idx, in_filename, out_path_length, out_timestamp);
 }
 
-DAEvoid RenderDocHook::TriggerCapture() const noexcept
+RkVoid RenderDocHook::TriggerCapture() const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -171,7 +171,7 @@ DAEvoid RenderDocHook::TriggerCapture() const noexcept
     return m_renderdoc_api->TriggerCapture();
 }
 
-DAEbool RenderDocHook::IsTargetControlConnected() const noexcept
+RkBool RenderDocHook::IsTargetControlConnected() const noexcept
 {
     if (!m_renderdoc_api)
         return false;
@@ -179,7 +179,7 @@ DAEbool RenderDocHook::IsTargetControlConnected() const noexcept
     return m_renderdoc_api->IsTargetControlConnected();
 }
 
-DAEuint32 RenderDocHook::LaunchReplayUI(DAEuint32 const in_connect_target_control, DAEchar const* in_cmdline) const noexcept
+RkUint32 RenderDocHook::LaunchReplayUI(RkUint32 const in_connect_target_control, RkChar const* in_cmdline) const noexcept
 {
     if (!m_renderdoc_api)
         return 0;
@@ -187,7 +187,7 @@ DAEuint32 RenderDocHook::LaunchReplayUI(DAEuint32 const in_connect_target_contro
     return m_renderdoc_api->LaunchReplayUI(in_connect_target_control, in_cmdline);
 }
 
-DAEvoid RenderDocHook::SetActiveWindow(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
+RkVoid RenderDocHook::SetActiveWindow(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -195,7 +195,7 @@ DAEvoid RenderDocHook::SetActiveWindow(RENDERDOC_DevicePointer const in_device, 
     m_renderdoc_api->SetActiveWindow(in_device, in_window_handle);
 }
 
-DAEvoid RenderDocHook::StartFrameCapture(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
+RkVoid RenderDocHook::StartFrameCapture(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -203,7 +203,7 @@ DAEvoid RenderDocHook::StartFrameCapture(RENDERDOC_DevicePointer const in_device
     m_renderdoc_api->StartFrameCapture(in_device, in_window_handle);
 }
 
-DAEbool RenderDocHook::IsFrameCapturing() const noexcept
+RkBool RenderDocHook::IsFrameCapturing() const noexcept
 {
     if (!m_renderdoc_api)
         return false;
@@ -211,7 +211,7 @@ DAEbool RenderDocHook::IsFrameCapturing() const noexcept
     return m_renderdoc_api->IsFrameCapturing();
 }
 
-DAEvoid RenderDocHook::EndFrameCapture(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
+RkVoid RenderDocHook::EndFrameCapture(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -219,7 +219,7 @@ DAEvoid RenderDocHook::EndFrameCapture(RENDERDOC_DevicePointer const in_device, 
     m_renderdoc_api->EndFrameCapture(in_device, in_window_handle);
 }
 
-DAEvoid RenderDocHook::DiscardFrameCapture(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
+RkVoid RenderDocHook::DiscardFrameCapture(RENDERDOC_DevicePointer const in_device, RENDERDOC_WindowHandle const in_window_handle) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -227,7 +227,7 @@ DAEvoid RenderDocHook::DiscardFrameCapture(RENDERDOC_DevicePointer const in_devi
     m_renderdoc_api->DiscardFrameCapture(in_device, in_window_handle);
 }
 
-DAEvoid RenderDocHook::TriggerMultiFrameCapture(DAEuint32 const in_frame_count) const noexcept
+RkVoid RenderDocHook::TriggerMultiFrameCapture(RkUint32 const in_frame_count) const noexcept
 {
     if (!m_renderdoc_api)
         return;
@@ -235,7 +235,7 @@ DAEvoid RenderDocHook::TriggerMultiFrameCapture(DAEuint32 const in_frame_count) 
     m_renderdoc_api->TriggerMultiFrameCapture(in_frame_count);
 }
 
-DAEvoid RenderDocHook::SetCaptureFileComments(DAEchar const* in_file_path, DAEchar const* in_comments) const noexcept
+RkVoid RenderDocHook::SetCaptureFileComments(RkChar const* in_file_path, RkChar const* in_comments) const noexcept
 {
     if (!m_renderdoc_api)
         return;

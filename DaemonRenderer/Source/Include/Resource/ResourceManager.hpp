@@ -60,7 +60,7 @@ class ResourceManager : public Service<ResourceManager>, Unique
         Scheduler& m_scheduler_reference;
         
         // The actual number of resource being processed
-        std::atomic<DAEuint64> m_current_operation_count;
+        std::atomic<RkUint64> m_current_operation_count;
 
         #pragma endregion
 
@@ -70,15 +70,15 @@ class ResourceManager : public Service<ResourceManager>, Unique
 
         #pragma region Methods
 
-        DAEvoid LoadingRoutine  (struct ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor);
-        DAEvoid ReloadingRoutine(struct ResourceManifest* in_manifest);
-        DAEvoid UnloadingRoutine(struct ResourceManifest* in_manifest);
+        RkVoid LoadingRoutine  (struct ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor);
+        RkVoid ReloadingRoutine(struct ResourceManifest* in_manifest);
+        RkVoid UnloadingRoutine(struct ResourceManifest* in_manifest);
 
         /**
          * \brief Invalidates a resource and tags it's corresponding resource manager for garbage collection.
          * \param in_manifest Manifest of the resource to delete
          */
-        DAEvoid InvalidateResource(struct ResourceManifest* in_manifest) noexcept;
+        RkVoid InvalidateResource(struct ResourceManifest* in_manifest) noexcept;
 
         /**
          * \brief Finds or creates a resource manifest by name.
@@ -87,7 +87,7 @@ class ResourceManager : public Service<ResourceManager>, Unique
          * \return The requested manifest.
          */
         [[nodiscard]]
-        struct ResourceManifest* RequestManifest(ResourceIdentifier const& in_unique_identifier, DAEbool in_auto_create_manifest = true) noexcept;
+        struct ResourceManifest* RequestManifest(ResourceIdentifier const& in_unique_identifier, RkBool in_auto_create_manifest = true) noexcept;
 
         /**
          * \brief Triggers a garbage collection
@@ -103,7 +103,7 @@ class ResourceManager : public Service<ResourceManager>, Unique
          * \param in_clear_invalid_resources Should this collection clear all the invalid resources as well
          */
         template <class TUnary_Predicate>
-        DAEvoid GarbageCollection(TUnary_Predicate in_predicate, DAEbool in_clear_invalid_resources = false) noexcept;
+        RkVoid GarbageCollection(TUnary_Predicate in_predicate, RkBool in_clear_invalid_resources = false) noexcept;
 
         /**
          * \brief Loads a resource
@@ -113,13 +113,13 @@ class ResourceManager : public Service<ResourceManager>, Unique
          * \param in_loading_mode Loading mode of the resource (async/sync)
          */
         template <typename TResource_Type>
-        DAEvoid LoadResource(ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode in_loading_mode) noexcept;
+        RkVoid LoadResource(ResourceManifest* in_manifest, class ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode in_loading_mode) noexcept;
 
         /**
          * \brief Unloads all the currently loaded resources in the manager
          * \warning This method also invalidates every handle, be careful
          */
-        DAEvoid Cleanup() noexcept;
+        RkVoid Cleanup() noexcept;
 
         #pragma endregion
 
@@ -143,12 +143,12 @@ class ResourceManager : public Service<ResourceManager>, Unique
          * ie. the garbage collection of all the resources using the
          * EResourceGCStrategy::SceneDeletion strategy.
          */
-        DAEvoid TriggerSceneGC() noexcept;
+        RkVoid TriggerSceneGC() noexcept;
 
         /**
          * \brief Triggers the garbage collection of all the resources that are using the EResourceGCStrategy::ReferenceCount strategy.
          */
-        DAEvoid TriggerReferenceGC() noexcept;
+        RkVoid TriggerReferenceGC() noexcept;
 
         /**
          * \brief References a resource into the resource manager 
@@ -215,7 +215,7 @@ class ResourceManager : public Service<ResourceManager>, Unique
          * 
          * \param in_collection_mode Garbage Collection mode
          */
-        DAEvoid SetGarbageCollectionMode(EGCCollectionMode in_collection_mode) noexcept;
+        RkVoid SetGarbageCollectionMode(EGCCollectionMode in_collection_mode) noexcept;
 
         /**
          * \brief Completely remove the resource from the ResourceManager
@@ -225,13 +225,13 @@ class ResourceManager : public Service<ResourceManager>, Unique
          * \param in_loading_mode Resource loading mode. See ESynchronizationMode for more detailed information.
          * \return true if the resource has been successfully removed, false otherwise
          */
-        DAEbool UnloadResource(ResourceIdentifier const& in_identifier, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
+        RkBool UnloadResource(ResourceIdentifier const& in_identifier, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
 
         /**
          * \brief Returns the current number of resource operations being done. This number should go up in loading times, and stay close to 0 while playing.
          * \return Operation count
          */
-        DAEuint64 GetCurrentOperationCount() const noexcept;
+        RkUint64 GetCurrentOperationCount() const noexcept;
 
         #pragma endregion
 

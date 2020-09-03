@@ -42,13 +42,13 @@ struct MeshLoadingDescriptor final : ResourceLoadingDescriptor
 
         std::reference_wrapper<Renderer const> renderer;
 
-        DAEchar const* path;
+        RkChar const* path;
 
         #pragma endregion
 
         #pragma region Constructors and Destructor
 
-        explicit MeshLoadingDescriptor(Renderer const& in_renderer, DAEchar const* in_path) noexcept;
+        explicit MeshLoadingDescriptor(Renderer const& in_renderer, RkChar const* in_path) noexcept;
 
         MeshLoadingDescriptor(MeshLoadingDescriptor const&  in_copy) = default;
         MeshLoadingDescriptor(MeshLoadingDescriptor&&       in_move) = default;

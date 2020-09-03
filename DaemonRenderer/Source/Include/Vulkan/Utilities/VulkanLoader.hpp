@@ -45,19 +45,19 @@ class VulkanLoader
          * \return True if the volk library could be initialized, else False.
          * \note   Call this function before creating the Vulkan instance.
          */
-        static DAEbool Initialize() noexcept;
+        static RkBool Initialize() noexcept;
 
         /**
          * \brief Loads global function pointers using application-created 'VkInstance'.
          * \note  Call this function after creating the Vulkan instance.
          */
-        static DAEvoid LoadInstance(VkInstance in_instance) noexcept;
+        static RkVoid LoadInstance(VkInstance in_instance) noexcept;
 
         /**
          * \brief Loads global function pointers using application-created 'VkDevice'.
          * \note  Call this function after creating the Vulkan device.
          */
-        static DAEvoid LoadDevice(VkDevice in_device) noexcept;
+        static RkVoid LoadDevice(VkDevice in_device) noexcept;
 
         /**
          * \return The last 'VkInstance' for which global function pointers have been loaded.

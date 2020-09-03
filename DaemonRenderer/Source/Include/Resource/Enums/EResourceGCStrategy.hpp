@@ -38,7 +38,7 @@ BEGIN_RUKEN_NAMESPACE
  * Manual         => Manual GC, this allows the use of the Handle<Resource_Type>::deleteResource() method. 
  *                   Doing so will invalidate every handle on this resource.
  */
-enum class EResourceGCStrategy : DAEuint8
+enum class EResourceGCStrategy : RkUint8
 {
     ReferenceCount,
     KeepEverywhere,
