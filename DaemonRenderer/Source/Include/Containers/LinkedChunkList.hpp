@@ -39,12 +39,16 @@ BEGIN_DAEMON_NAMESPACE
 template<typename TType, DAEsize TChunkSize = 2048>
 class LinkedChunkList
 {
+    public:
+
+        using Node = LinkedChunkListNode<TType, TChunkSize>;
+
     private:
 
         #pragma region Members
 
-        LinkedChunkListNode<TType, TChunkSize>* m_head;
-        LinkedChunkListNode<TType, TChunkSize>* m_tail;
+        Node* m_head {nullptr};
+        Node* m_tail {nullptr};
 
         #pragma endregion
 
@@ -55,7 +59,33 @@ class LinkedChunkList
         LinkedChunkList()                               = default;
         LinkedChunkList(LinkedChunkList const& in_copy) = default;
         LinkedChunkList(LinkedChunkList&&      in_move) = default;
-        ~LinkedChunkList()                              = default;
+        ~LinkedChunkList();
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Creates a new node at the end of the list
+         * \return Reference onto the new node
+         */
+        Node& CreateNode() noexcept;
+
+        /**
+         * \brief Deletes a node from the list 
+         * \param in_node Reference onto the node to delete
+         * \warning Make sure the node you are passing is owned by the list you are calling this function on
+         *          otherwise, that may create bugs in ur code, since no verification is done before manipulating the node
+         */
+        DAEvoid DeleteNode(Node& in_node) noexcept;
+
+        /**
+         * \brief Executes a function for each element block of the list
+         * \tparam TLambda Lambda type, of type void (*in_lambda)(LinkedChunkList<TType, TChunkSize>::Node&)
+         * \param in_lambda Actual lambda
+         */
+        template <typename TLambda>
+        DAEvoid Foreach(TLambda in_lambda) noexcept;
 
         #pragma endregion
 
@@ -66,5 +96,7 @@ class LinkedChunkList
 
         #pragma endregion
 };
+
+#include "Containers/LinkedChunkList.inl"
 
 END_DAEMON_NAMESPACE

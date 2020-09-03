@@ -288,6 +288,7 @@
     <None Include="Source\Include\ECS\ExclusiveComponentBase.hpp" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
+    <None Include="Source\Src\Containers\LinkedChunkList.inl" />
     <None Include="Source\Src\Containers\SOA\DataLayout.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
     <None Include="Source\Src\Core\Service.inl" />

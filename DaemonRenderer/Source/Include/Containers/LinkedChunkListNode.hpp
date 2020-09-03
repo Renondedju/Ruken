@@ -45,6 +45,7 @@ class LinkedChunkListNode
 
         std::array<TType, TChunkSize / sizeof(TType)> data      {};
         LinkedChunkListNode<TType, TChunkSize>*       next_node {nullptr};
+        LinkedChunkListNode<TType, TChunkSize>*       prev_node {nullptr};
 
         #pragma endregion
 
