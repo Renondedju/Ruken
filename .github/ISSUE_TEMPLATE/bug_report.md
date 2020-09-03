@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 10 Pro - x64]
- - Daemon renderer version [e.g. V1.0.5]
+ - Ruken version [e.g. V1.0.5]
  - Graphics card(s) model(s) [e.g. Nvidia GeForce GTX 1060Ti - 8Go]
  - Graphics card(s) driver(s) [e.g. GeForce Game Ready Driver V430.86]
 
