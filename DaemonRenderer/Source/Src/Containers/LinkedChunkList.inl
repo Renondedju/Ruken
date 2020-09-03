@@ -30,12 +30,35 @@ LinkedChunkList<TType, TChunkSize>::~LinkedChunkList()
         DeleteNode(*m_head);
 }
 
+#pragma region Getters
+
+template <typename TType, DAEsize TChunkSize>
+DAEsize LinkedChunkList<TType, TChunkSize>::GetSize() const noexcept
+{
+    return m_size;
+}
+
+template <typename TType, DAEsize TChunkSize>
+typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunkSize>::GetHead() const noexcept
+{
+    return m_head;
+}
+
+template <typename TType, DAEsize TChunkSize>
+typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunkSize>::GetTail() const noexcept
+{
+    return m_tail;
+}
+
+#pragma endregion 
+
 #pragma region Methods
 
 template <typename TType, DAEsize TChunkSize>
 typename LinkedChunkList<TType, TChunkSize>::Node& LinkedChunkList<TType, TChunkSize>::CreateNode() noexcept
 {
     Node* new_node = new Node();
+    m_size++;
 
     // If the list is empty
     if (m_tail == nullptr)
@@ -72,6 +95,8 @@ DAEvoid LinkedChunkList<TType, TChunkSize>::DeleteNode(Node& in_node) noexcept
     // Updating the prev pointer
     if (in_node.prev_node != nullptr)
         in_node.prev_node->next_node = in_node.next_node;
+
+    m_size--;
 
     delete &in_node;
 }

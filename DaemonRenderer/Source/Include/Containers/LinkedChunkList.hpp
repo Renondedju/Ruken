@@ -47,8 +47,9 @@ class LinkedChunkList
 
         #pragma region Members
 
-        Node* m_head {nullptr};
-        Node* m_tail {nullptr};
+        Node*   m_head {nullptr};
+        Node*   m_tail {nullptr};
+        DAEsize m_size {0ULL};
 
         #pragma endregion
 
@@ -62,6 +63,28 @@ class LinkedChunkList
         ~LinkedChunkList();
 
         #pragma endregion
+
+        #pragma region Getters
+
+        /**
+         * \brief Returns the number of chunks stored in the list
+         * \return Number of chunks stored in the list
+         */
+        [[nodiscard]] DAEsize GetSize() const noexcept;
+
+        /**
+         * \brief Returns the head of the list, could be null 
+         * \return Head of the list
+         */
+        [[nodiscard]] Node* GetHead() const noexcept;
+
+        /**
+         * \brief Returns the tail of the list, could be null
+         * \return Tail of the list
+         */
+        [[nodiscard]] Node* GetTail() const noexcept;
+
+        #pragma endregion 
 
         #pragma region Methods
 
