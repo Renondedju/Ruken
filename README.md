@@ -1,7 +1,7 @@
-# Daemon
+# Ruken
 
-Link to the latest release [here](https://github.com/Renondedju/Daemon/releases)  
-Daemon renderer is a Vulkan based PBR rendering engine.
+Link to the latest release [here](https://github.com/Renondedju/Ruken/releases)  
+Ruken is a data oriented Vulkan based game engine.
 
 # License 
   
