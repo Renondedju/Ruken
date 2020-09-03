@@ -29,7 +29,7 @@
 #include "Vulkan/Core/VulkanImage.hpp"
 #include "Vulkan/Core/VulkanBuffer.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class wraps memory allocation and resource (buffer and image) creation in Vulkan.
@@ -80,4 +80,4 @@ class VulkanDeviceAllocator
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

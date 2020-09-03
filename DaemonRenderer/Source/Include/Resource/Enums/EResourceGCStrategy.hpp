@@ -27,7 +27,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief EResourceGCStrategy describes the Garbage Collection (GC) strategy of a resource
@@ -46,4 +46,4 @@ enum class EResourceGCStrategy : DAEuint8
     Manual
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

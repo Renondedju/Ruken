@@ -29,7 +29,7 @@
 #include "Meta/IndexSequence/PartitionIndexSequence.hpp"
 #include "Meta/IndexSequence/ConcatenateIndexSequence.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Quicksort an std::index_sequence
@@ -70,4 +70,4 @@ struct QuicksortIndexSequence<TCompare, std::index_sequence<TId, TIds...>>
         QuicksortIndexSequenceT<TCompare, SecondSequence>>;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

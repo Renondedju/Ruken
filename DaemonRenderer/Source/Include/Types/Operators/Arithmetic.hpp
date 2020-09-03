@@ -36,7 +36,7 @@
 #include "Types/Operators/Arithmetic/Subtraction.hpp"
 #include "Types/Operators/Arithmetic/Multiplication.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common arithmetic operators
@@ -57,4 +57,4 @@ struct Arithmetic:  Modulo          <TStrongTypedef>,
                     Multiplication  <TStrongTypedef>
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -30,7 +30,7 @@
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 #include "Vulkan/Utilities/VulkanUtilities.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 

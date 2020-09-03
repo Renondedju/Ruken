@@ -27,7 +27,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Describes the general type of the resource loading error
@@ -78,4 +78,4 @@ inline std::string EnumToString(EResourceProcessingFailureCode const in_code)
     }
 }
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

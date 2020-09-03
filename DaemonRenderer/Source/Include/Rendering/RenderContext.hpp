@@ -30,7 +30,7 @@
 
 #include "Vulkan/Core/VulkanSwapchain.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Window;
 class Renderer;
@@ -88,4 +88,4 @@ class RenderContext
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

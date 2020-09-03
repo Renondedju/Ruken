@@ -30,7 +30,7 @@
 
 #include "Vulkan/Core/VulkanFence.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief High level interface managing fence allocation.
@@ -95,4 +95,4 @@ class FencePool
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

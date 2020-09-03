@@ -28,9 +28,9 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
-#if defined(DAEMON_COMPILER_MSVC) && _MSC_VER <= 1800
+#if defined(RUKEN_COMPILER_MSVC) && _MSC_VER <= 1800
     #define TODO(...) // constexpr wont work :(
 #else
 
@@ -77,4 +77,4 @@ namespace internal
 
 #endif
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

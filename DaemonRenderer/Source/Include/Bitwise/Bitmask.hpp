@@ -32,18 +32,18 @@
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-// Used for the DAEMON_BITMASK macro
+// Used for the RUKEN_BITMASK macro
 #include "Meta/Meta.hpp"
 #include "Meta/MinimumType.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Creates an enum that matches every conditions required to be used used as a bitmask
  * \param name Name of the enum to create
  */
-#define DAEMON_BITMASK(name, ...) enum class name : MinimumTypeT<DAEMON_GET_ARG_COUNT(##__VA_ARGS__)> { ##__VA_ARGS__ }; \
-    static_assert(DAEMON_GET_ARG_COUNT(##__VA_ARGS__) < 64, "Bitmask enums only support a maximum of 64 values")
+#define RUKEN_BITMASK(name, ...) enum class name : MinimumTypeT<RUKEN_GET_ARG_COUNT(##__VA_ARGS__)> { ##__VA_ARGS__ }; \
+    static_assert(RUKEN_GET_ARG_COUNT(##__VA_ARGS__) < 64, "Bitmask enums only support a maximum of 64 values")
 
 namespace internal
 {
@@ -54,7 +54,7 @@ namespace internal
 /**
  * \brief A bitmask can be used to store multiple flags into a single integer.
  * 
- * All enums used should have continuous values starting from 0. Use the macro DAEMON_BITMASK to safely declare a bitmask.
+ * All enums used should have continuous values starting from 0. Use the macro RUKEN_BITMASK to safely declare a bitmask.
  * Example : enum class EEnum : DAEuint8 { First, Second, Third };
  *
  * This enum is safe since all the elements in the enum are continuous and starts from 0.
@@ -66,7 +66,7 @@ namespace internal
 template <typename TEnumType>
 class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type_t<TEnumType>>
 {
-    DAEMON_STATIC_ASSERT(std::is_enum_v<TEnumType>, "Cannot create a Bitmask from a non enum type");
+    RUKEN_STATIC_ASSERT(std::is_enum_v<TEnumType>, "Cannot create a Bitmask from a non enum type");
 
     public:
 
@@ -151,4 +151,4 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
 
 #include "Bitwise/Bitmask.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

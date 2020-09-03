@@ -27,7 +27,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * Component Item Status enum
@@ -42,4 +42,4 @@ enum class EComponentItemStatus : DAEuint8
     Unused
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

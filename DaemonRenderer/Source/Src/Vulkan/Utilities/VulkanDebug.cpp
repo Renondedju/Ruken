@@ -25,7 +25,7 @@
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Static Members
 
@@ -79,7 +79,7 @@ DAEbool VulkanDebug::CheckResult(VkResult const in_result, std::string_view cons
     if (in_result == VK_SUCCESS)
         return false;
 
-    #ifdef DAEMON_CONFIG_DEBUG
+    #ifdef RUKEN_CONFIG_DEBUG
 
     auto const message = std::string(in_function_name) + " : " + ToString(in_result);
 
@@ -102,7 +102,7 @@ DAEbool VulkanDebug::AssertResult(VkResult const in_result, std::string_view con
     if (in_result == VK_SUCCESS)
         return false;
 
-    #ifdef DAEMON_CONFIG_DEBUG
+    #ifdef RUKEN_CONFIG_DEBUG
 
     auto const message = std::string(in_function_name) + " : " + ToString(in_result);
 
@@ -119,7 +119,7 @@ DAEbool VulkanDebug::AssertResult(VkResult const in_result, std::string_view con
 
 DAEvoid VulkanDebug::CreateDebugMessenger() noexcept
 {
-    #ifdef DAEMON_CONFIG_DEBUG
+    #ifdef RUKEN_CONFIG_DEBUG
 
     if (m_debug_messenger)
         return;
@@ -153,7 +153,7 @@ VkBool32 VulkanDebug::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT const
 {
     (DAEvoid)in_user_data;
 
-    #ifdef DAEMON_CONFIG_DEBUG
+    #ifdef RUKEN_CONFIG_DEBUG
 
     if (!m_logger)
         return VK_FALSE;

@@ -34,7 +34,7 @@
 #include "Threading/Synchronized.hpp"
 #include "Threading/SynchronizedAccess.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Thread safe locking queue
@@ -122,4 +122,4 @@ class ThreadSafeLockQueue
 
 #include "Threading/ThreadSafeLockQueue.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -27,7 +27,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
     
 /**
  * \brief Describes the mode of loading of a resource
@@ -43,4 +43,4 @@ enum class ESynchronizationMode : DAEuint8
     Asynchronous
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

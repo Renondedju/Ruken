@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Returns the minimum type required to store an object containing ``TSize`` bytes
@@ -54,4 +54,4 @@ struct MinimumType {
 template <DAEuint8 TSize, typename TExcessType = DAEvoid>
 using MinimumTypeT = typename MinimumType<TSize, TExcessType>::Type;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -24,10 +24,10 @@
 
 #include "Threading/Worker.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 // Label enabled code
-#ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
+#ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
 
 Worker::Worker(DAEchar const* in_label) noexcept:
     m_thread {},

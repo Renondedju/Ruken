@@ -28,7 +28,7 @@
 
 #include "Vector/Vector.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 struct Vertex
 {
@@ -61,4 +61,4 @@ struct Vertex
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

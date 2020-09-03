@@ -32,7 +32,7 @@
 
 #include "Vulkan/Resources/ShaderLoadingDescriptor.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Shader final : public IResource
 {
@@ -79,4 +79,4 @@ class Shader final : public IResource
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

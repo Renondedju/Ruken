@@ -29,13 +29,13 @@
 #include "Windowing/Utilities.hpp"
 #include "Windowing/WindowParams.hpp"
 
-#ifdef DAEMON_OS_WINDOWS
+#ifdef RUKEN_OS_WINDOWS
     typedef struct HWND__* HWND;
 #endif
 
 struct GLFWwindow;
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 
@@ -408,7 +408,7 @@ class Window
         [[nodiscard]]
         DAEbool IsValid() const noexcept;
 
-        #ifdef DAEMON_OS_WINDOWS
+        #ifdef RUKEN_OS_WINDOWS
 
         /**
          * \return The HWND of the specified window, or NULL if an error occurred.
@@ -430,4 +430,4 @@ class Window
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

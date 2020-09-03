@@ -26,7 +26,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class RenderTechnique
 {
@@ -65,4 +65,4 @@ class RenderTechnique
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

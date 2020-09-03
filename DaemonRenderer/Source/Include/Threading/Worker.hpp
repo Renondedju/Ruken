@@ -32,7 +32,7 @@
 #include "Types/NonCopyable.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Worker : NonCopyable
 {
@@ -42,7 +42,7 @@ class Worker : NonCopyable
 
         std::thread m_thread;
 
-        #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
+        #ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
             std::string m_label;
         #endif
 
@@ -63,10 +63,10 @@ class Worker : NonCopyable
 
         #pragma region Methods
 
-        #ifdef DAEMON_THREADING_ENABLE_THREAD_LABELS
+        #ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
 
         /**
-         * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
+         * \brief Label getter. If RUKEN_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
          * \return Worker's label
          */
         [[nodiscard]]
@@ -78,7 +78,7 @@ class Worker : NonCopyable
         #else
 
         /**
-         * \brief Label getter. If DAEMON_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
+         * \brief Label getter. If RUKEN_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
          * \return Worker's label
          */
         [[nodiscard]]
@@ -148,4 +148,4 @@ class Worker : NonCopyable
 
 #include "Threading/Worker.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

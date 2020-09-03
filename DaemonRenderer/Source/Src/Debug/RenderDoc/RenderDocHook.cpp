@@ -26,12 +26,12 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Utility/WindowsOS.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 RenderDocHook::RenderDocHook():
     m_renderdoc_api {nullptr}
 {
-#if defined(DAEMON_OS_WINDOWS)
+#if defined(RUKEN_OS_WINDOWS)
 
     // Checking if the renderdoc dll is active
     if(HMODULE const mod = GetModuleHandleA("renderdoc.dll"))
@@ -43,7 +43,7 @@ RenderDocHook::RenderDocHook():
             m_renderdoc_api = nullptr;
     }
 
-#elif defined(DAEMON_OS_LINUX)
+#elif defined(RUKEN_OS_LINUX)
 
     if(DAEvoid* mod = dlopen("librenderdoc.so", RTLD_NOW | RTLD_NOLOAD))
     {
@@ -54,7 +54,7 @@ RenderDocHook::RenderDocHook():
             m_renderdoc_api = nullptr;
     }
 
-#elif defined(DAEMON_OS_ANDROID)
+#elif defined(RUKEN_OS_ANDROID)
 
     if(DAEvoid* mod = dlopen("libVkLayer_GLES_RenderDoc.so", RTLD_NOW | RTLD_NOLOAD))
     {

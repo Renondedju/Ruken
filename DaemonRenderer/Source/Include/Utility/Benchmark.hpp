@@ -30,7 +30,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Benchmark class, prints the lifetime of the class on destruction
@@ -102,4 +102,4 @@ namespace internal
 #define LOOPED_BENCHMARK(in_benchmark_label, in_benchmark_exection_count) \
     for (internal::BenchmarkIterator benchmark_iterator = {0, Benchmark(in_benchmark_label, in_benchmark_exection_count)}; benchmark_iterator.loop_count < in_benchmark_exection_count; ++benchmark_iterator.loop_count)
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

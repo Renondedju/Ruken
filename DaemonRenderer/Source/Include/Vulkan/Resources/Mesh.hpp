@@ -34,7 +34,7 @@
 #include "Vulkan/Resources/Vertex.hpp"
 #include "Vulkan/Resources/MeshLoadingDescriptor.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class VulkanDevice;
 class VulkanCommandBuffer;
@@ -102,4 +102,4 @@ class Mesh final : public IResource
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

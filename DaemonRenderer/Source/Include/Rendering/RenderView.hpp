@@ -26,7 +26,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class RenderView
 {
@@ -65,4 +65,4 @@ class RenderView
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

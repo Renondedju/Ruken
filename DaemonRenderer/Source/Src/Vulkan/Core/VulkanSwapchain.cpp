@@ -37,11 +37,11 @@
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
-#ifdef DAEMON_OS_WINDOWS
+#ifdef RUKEN_OS_WINDOWS
     #include "Utility/WindowsOS.hpp"
 #endif
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
@@ -172,7 +172,7 @@ DAEvoid VulkanSwapchain::SelectPresentMode(std::vector<VkPresentModeKHR> const& 
 
 DAEbool VulkanSwapchain::CreateSurface(VulkanDevice& in_device, Window& in_window) noexcept
 {
-    #ifdef DAEMON_OS_WINDOWS
+    #ifdef RUKEN_OS_WINDOWS
 
     VkWin32SurfaceCreateInfoKHR surface_create_info = {};
 

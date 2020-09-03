@@ -26,7 +26,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 struct Position2D
 {
@@ -52,4 +52,4 @@ struct Rect2D
     Extent2D   extent;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

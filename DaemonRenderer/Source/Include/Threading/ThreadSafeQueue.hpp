@@ -30,7 +30,7 @@
 #include "Threading/Synchronized.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Thread safe queue encapsulation
@@ -94,4 +94,4 @@ class ThreadSafeQueue
 
 #include "Threading/ThreadSafeQueue.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

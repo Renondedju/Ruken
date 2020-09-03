@@ -30,7 +30,7 @@
 
 #include "Threading/EAccessMode.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 // Forward declaration
 template<class, EAccessMode>
@@ -118,4 +118,4 @@ class Synchronized
 
 #include "Threading/Synchronized.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

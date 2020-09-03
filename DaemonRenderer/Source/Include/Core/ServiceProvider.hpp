@@ -32,7 +32,7 @@
 #include "Core/ServiceBase.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Locates and provides services
@@ -102,4 +102,4 @@ class ServiceProvider
 
 #include "Core/ServiceProvider.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

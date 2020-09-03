@@ -25,7 +25,7 @@
 #include "Time/ControlClock.hpp"
 #include <ctime>
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ControlClock::ControlClock() noexcept:
     m_last_time                 {InternalClock::now()},

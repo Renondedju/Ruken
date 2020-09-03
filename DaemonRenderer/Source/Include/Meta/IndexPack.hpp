@@ -28,9 +28,9 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <DAEsize... TIndices>
 struct IndexPack {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

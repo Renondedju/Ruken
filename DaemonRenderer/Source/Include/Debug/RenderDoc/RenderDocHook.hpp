@@ -30,7 +30,7 @@
 #include "Bitwise/Bitmask.hpp"
 #include "Debug/RenderDoc/ERenderDocCaptureOption.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Render Doc runtime API debugger
@@ -304,4 +304,4 @@ class RenderDocHook
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

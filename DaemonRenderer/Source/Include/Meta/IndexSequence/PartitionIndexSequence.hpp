@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Meta/IndexSequence/ConcatenateIndexSequence.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Partitions a given sequence into 2 sub sequences via a given predicate
@@ -69,4 +69,4 @@ struct PartitionIndexSequence<TPredicate, std::index_sequence<TId, TIds...>>
         using SecondSequence = ConcatenateIndexSequenceT<std::conditional_t<outcome, Excluded, Included>, typename TailPartition::SecondSequence>;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

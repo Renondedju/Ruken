@@ -26,7 +26,7 @@
 
 #include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 

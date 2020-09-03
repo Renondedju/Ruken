@@ -43,7 +43,7 @@
 #include "Resource/Enums/EGCCollectionMode.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class ResourceManager : public Service<ResourceManager>, Unique
 {
@@ -245,4 +245,4 @@ class ResourceManager : public Service<ResourceManager>, Unique
 
 #include "Resource/ResourceManager.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

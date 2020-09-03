@@ -25,7 +25,7 @@
 #include "Time/Timer.hpp"
 #include "Utility/WindowsOS.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 Timer::Timer() noexcept:
     m_win_handle {CreateWaitableTimer(nullptr, true, nullptr)}

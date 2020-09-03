@@ -27,11 +27,11 @@
 #include "Config.hpp"
 #include "Functional/Event.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Exact same class as the event class except that the Invoke method and () operator are protected.
- * \brief This is meant to be inherited from and friend the owner class (use the macro DAEMON_DECLARE_RESERVED_EVENT)
+ * \brief This is meant to be inherited from and friend the owner class (use the macro RUKEN_DECLARE_RESERVED_EVENT)
  * \tparam TArgs 
  */
 template <typename... TArgs>
@@ -71,6 +71,6 @@ class ReservedEvent : public Event<TArgs...>
  * \param in_owner_class Owner class, only this class will be able to invoke the event
  * \param ... Arguments of the event (types)
  */
-#define DAEMON_DECLARE_RESERVED_EVENT(in_event_name, in_owner_class, ...) class in_event_name : public ReservedEvent<__VA_ARGS__> { friend in_owner_class; }
+#define RUKEN_DECLARE_RESERVED_EVENT(in_event_name, in_owner_class, ...) class in_event_name : public ReservedEvent<__VA_ARGS__> { friend in_owner_class; }
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

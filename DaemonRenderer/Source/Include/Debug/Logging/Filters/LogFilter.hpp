@@ -26,7 +26,7 @@
 
 #include "Debug/Logging/LogRecord.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class provides a finer grained facility for determining which log records to output.
@@ -65,4 +65,4 @@ class __declspec(novtable) LogFilter
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

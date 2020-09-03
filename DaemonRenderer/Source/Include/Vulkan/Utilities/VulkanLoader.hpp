@@ -26,7 +26,7 @@
 
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class wraps volk, a meta-loader for Vulkan.
@@ -72,4 +72,4 @@ class VulkanLoader
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

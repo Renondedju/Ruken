@@ -29,7 +29,7 @@
 #include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Timer : Unique
 {
@@ -73,4 +73,4 @@ class Timer : Unique
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

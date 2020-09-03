@@ -30,13 +30,13 @@
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Static Members
 
 std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
 {
-    #ifdef DAEMON_OS_WINDOWS
+    #ifdef RUKEN_OS_WINDOWS
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
     #endif
 
@@ -46,7 +46,7 @@ std::vector<DAEchar const*> VulkanInstance::m_required_extensions =
 
 std::vector<DAEchar const*> VulkanInstance::m_required_validation_layers =
 {
-    #ifdef DAEMON_CONFIG_DEBUG
+    #ifdef RUKEN_CONFIG_DEBUG
 
     "VK_LAYER_KHRONOS_validation"
 
@@ -182,7 +182,7 @@ DAEbool VulkanInstance::CreateInstance() noexcept
     VkApplicationInfo app_info = {};
 
     app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.pApplicationName   = DAEMON_PROJECT_NAME;
+    app_info.pApplicationName   = RUKEN_PROJECT_NAME;
     app_info.applicationVersion = VK_API_VERSION_1_0;
     app_info.apiVersion         = VK_API_VERSION_1_2;
 
@@ -190,7 +190,7 @@ DAEbool VulkanInstance::CreateInstance() noexcept
 
     instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 
-    DAEMON_DEBUG
+    RUKEN_DEBUG
     {
         instance_create_info.pNext = &debug_messenger_create_info;
     }

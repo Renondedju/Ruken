@@ -31,7 +31,7 @@
 #include "Vulkan/Core/VulkanSemaphore.hpp"
 #include "Vulkan/Core/VulkanTimelineSemaphore.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief High level interface managing binary and timeline semaphore allocation.
@@ -100,4 +100,4 @@ class SemaphorePool
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -28,7 +28,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Concatenates multiple std::index_sequence together
@@ -58,4 +58,4 @@ struct ConcatenateIndexSequence<std::index_sequence<TIds1...>,
     using Type = ConcatenateIndexSequenceT<std::index_sequence<TIds1..., TIds2...>, TTailSequences...>;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

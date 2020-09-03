@@ -25,7 +25,7 @@
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/ArchetypeBase.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 DAEbool ComponentQuery::Match(ArchetypeBase const& in_archetype) const noexcept
 {

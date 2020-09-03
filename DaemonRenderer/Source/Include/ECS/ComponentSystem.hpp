@@ -28,7 +28,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "ECS/ComponentSystemBase.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <typename... TComponents>
 class ComponentSystem : public ComponentSystemBase
@@ -63,4 +63,4 @@ class ComponentSystem : public ComponentSystemBase
 
 #include "ECS/ComponentSystem.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

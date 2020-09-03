@@ -34,7 +34,7 @@
 #include "ECS/ArchetypeBase.hpp"
 #include "ECS/ComponentSystemBase.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class EntityAdmin
 {
@@ -92,4 +92,4 @@ class EntityAdmin
 
 #include "ECS/EntityAdmin.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

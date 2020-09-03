@@ -24,7 +24,7 @@
 
 #include "Windowing/Window.hpp"
 
-#ifdef DAEMON_OS_WINDOWS
+#ifdef RUKEN_OS_WINDOWS
     #define GLFW_EXPOSE_NATIVE_WIN32
 #endif
 
@@ -35,7 +35,7 @@
 
 #include "Debug/Logging/Logger.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
@@ -433,7 +433,7 @@ DAEbool Window::IsValid() const noexcept
     return m_handle != nullptr;
 }
 
-#ifdef DAEMON_OS_WINDOWS
+#ifdef RUKEN_OS_WINDOWS
 
 HWND Window::GetWin32Window() const noexcept
 {

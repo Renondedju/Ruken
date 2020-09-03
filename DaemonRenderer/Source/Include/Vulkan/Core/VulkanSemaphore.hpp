@@ -26,7 +26,7 @@
 
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief RAII-class wrapping a binary 'VkSemaphore' object.
@@ -74,4 +74,4 @@ class VulkanSemaphore
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

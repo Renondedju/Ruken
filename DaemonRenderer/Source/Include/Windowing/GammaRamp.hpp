@@ -26,7 +26,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This describes the gamma ramp for a monitor.
@@ -54,4 +54,4 @@ struct GammaRamp
     DAEuint32 size {0u};
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

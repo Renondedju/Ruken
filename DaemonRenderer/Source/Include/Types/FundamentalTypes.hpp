@@ -29,7 +29,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 // Booleans
 
@@ -72,4 +72,4 @@ using DAEldouble    = long double;
 
 using DAEvoid = void;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

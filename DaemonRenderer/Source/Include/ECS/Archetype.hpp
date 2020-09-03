@@ -35,7 +35,7 @@
 #include "Meta/ValueIndexer.hpp"
 #include "Meta/IndexSequence/QuicksortIndexSequence.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <typename... TComponents>
 class Archetype: public ArchetypeBase
@@ -146,4 +146,4 @@ using MakeArchetype = typename internal::ArchetypeFactory<std::tuple<TComponents
 
 #include "ECS/Archetype.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

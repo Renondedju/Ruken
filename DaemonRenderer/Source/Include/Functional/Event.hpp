@@ -30,7 +30,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Event class. This class is comparable to the C# delegate without the -= operator
@@ -109,4 +109,4 @@ class Event
 
 #include "Functional/Event.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

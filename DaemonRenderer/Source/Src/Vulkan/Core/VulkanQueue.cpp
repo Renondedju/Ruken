@@ -30,7 +30,7 @@
 
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors and Destructor
 

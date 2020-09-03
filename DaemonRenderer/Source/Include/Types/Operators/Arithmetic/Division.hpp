@@ -28,7 +28,7 @@
 
 #include "Types/NamedType.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Division operator class
@@ -79,4 +79,4 @@ struct Division
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

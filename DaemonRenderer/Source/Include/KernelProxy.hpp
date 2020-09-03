@@ -28,7 +28,7 @@
 #include "Core/Service.hpp"
 #include "Types/Unique.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Kernel;
 class ServiceProvider;
@@ -73,4 +73,4 @@ class KernelProxy final: public Service<KernelProxy>, Unique
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

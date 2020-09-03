@@ -31,7 +31,7 @@
 #include "Types/Operators/Arithmetic.hpp"
 #include "Types/Operators/Comparison.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all operators
@@ -47,4 +47,4 @@ struct Operators:   Bitwise     <TStrongTypedef>,
                     Comparison  <TStrongTypedef>
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

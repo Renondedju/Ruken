@@ -28,7 +28,7 @@
 
 #include "Vulkan/Core/VulkanImage.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class RenderTarget
 {
@@ -68,4 +68,4 @@ class RenderTarget
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -35,7 +35,7 @@
 
 #include <type_traits>
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A handle is a smart pointer to a resource managed by the resource manager.
@@ -155,4 +155,4 @@ class Handle
 
 #include "Resource/Handle.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

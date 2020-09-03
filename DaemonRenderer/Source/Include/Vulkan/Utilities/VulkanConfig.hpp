@@ -26,7 +26,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-#if defined(DAEMON_OS_WINDOWS)
+#if defined(RUKEN_OS_WINDOWS)
     #define VK_USE_PLATFORM_WIN32_KHR
 #else
     #error Platform not supported

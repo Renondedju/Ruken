@@ -29,7 +29,7 @@
 #include "Meta/Assert.hpp"
 #include "Containers/SOA/DataLayout.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class is the actual component class used to store the items.
@@ -43,7 +43,7 @@ BEGIN_DAEMON_NAMESPACE
 template <typename TItem, DAEsize TUniqueId>
 class Component
 {
-     DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+     RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
 
     private:
 
@@ -104,9 +104,9 @@ class Component
  * \param in_component_table Component table enum
  * \param in_component_name Name of the component as described in the above component table enum
  */
-#define DAEMON_DEFINE_COMPONENT(in_component_table, in_component_name)\
+#define RUKEN_DEFINE_COMPONENT(in_component_table, in_component_name)\
     using in_component_name##Component = Component<in_component_name##ComponentItem, static_cast<DAEsize>(in_component_table::in_component_name)>
 
 #include "ECS/Component.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

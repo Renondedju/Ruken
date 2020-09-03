@@ -34,7 +34,7 @@
 #include "Rendering/RenderView.hpp"
 #include "Rendering/RenderTarget.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Renderer;
 class Scheduler;
@@ -88,4 +88,4 @@ class RenderFrame
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

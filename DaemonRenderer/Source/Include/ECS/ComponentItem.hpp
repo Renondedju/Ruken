@@ -32,7 +32,7 @@
 #include "ECS/ComponentItemView.hpp"
 #include "Containers/SOA/DataLayoutItem.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class describes the memory layout of your component to the ECS
@@ -66,4 +66,4 @@ class ComponentItem : public DataLayoutItem<std::vector, TTypes...>
         using FullView = decltype(MakeFullViewHelper(std::make_index_sequence<sizeof...(TTypes)>()));
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

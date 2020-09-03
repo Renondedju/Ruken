@@ -28,7 +28,7 @@
 
 #include "Vulkan/Core/VulkanCommandBuffer.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief RAII-class wrapping a 'VkCommandPool' object.
@@ -84,4 +84,4 @@ class VulkanCommandPool
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

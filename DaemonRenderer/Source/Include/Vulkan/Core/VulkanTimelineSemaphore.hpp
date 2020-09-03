@@ -26,7 +26,7 @@
 
 #include "Vulkan/Core/VulkanSemaphore.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief RAII-class wrapping a timeline 'VkSemaphore' object.
@@ -84,4 +84,4 @@ class VulkanTimelineSemaphore final : public VulkanSemaphore
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

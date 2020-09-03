@@ -26,7 +26,7 @@
 
 #include "Windowing/Metrics.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This struct contains the parameters used when creating a new window.
@@ -69,4 +69,4 @@ struct WindowParams
     DAEbool scale_to_monitor        {false};
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -29,7 +29,7 @@
 #include "Types/NonCopyable.hpp"
 #include "Types/NonMovable.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This is a helper class for the creation of unique objects by inheriting from it.
@@ -39,4 +39,4 @@ BEGIN_DAEMON_NAMESPACE
 struct Unique : NonCopyable, NonMovable
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

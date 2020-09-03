@@ -29,7 +29,7 @@
 #include "Windowing/Screen.hpp"
 #include "Windowing/Window.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 
@@ -106,4 +106,4 @@ class WindowManager final: public Service<WindowManager>
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -29,7 +29,7 @@
 #include "Types/NamedType.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Spaceship than or equal class
@@ -47,4 +47,4 @@ struct Spaceship
     // Not yet implemented (C++20)
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

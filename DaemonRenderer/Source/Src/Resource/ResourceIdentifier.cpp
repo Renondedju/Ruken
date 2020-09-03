@@ -24,7 +24,7 @@
 
 #include "Resource/ResourceIdentifier.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ResourceIdentifier::ResourceIdentifier(std::string const& in_name) noexcept:
     name {in_name}

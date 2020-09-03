@@ -32,7 +32,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/SOA/DataLayoutView.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <typename TPack, typename... TTypes>
 struct ComponentItemView;
@@ -51,4 +51,4 @@ struct ComponentItemView<TPack<TIndices...>, TTypes...> : public DataLayoutView<
     using DataLayoutView<std::index_sequence<TIndices...>, TTypes...>::operator=;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

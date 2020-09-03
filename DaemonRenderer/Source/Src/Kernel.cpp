@@ -32,7 +32,7 @@
 #include "Windowing/WindowManager.hpp"
 #include "Resource/ResourceManager.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 DAEvoid Kernel::SetupServices() noexcept
 {
@@ -61,8 +61,8 @@ Kernel::Kernel():
 {
     m_logger.AddHandler(&m_console_handler);
 
-    m_logger.Info("Booting up " DAEMON_BUILD_INFO);
-    m_logger.Info(DAEMON_LICENSE_STR " " DAEMON_COPYRIGHT_STR " (" DAEMON_URL ")");
+    m_logger.Info("Booting up " RUKEN_BUILD_INFO);
+    m_logger.Info(RUKEN_LICENSE_STR " " RUKEN_COPYRIGHT_STR " (" RUKEN_URL ")");
 
     SetupServices();
 }
@@ -73,7 +73,7 @@ DAEint Kernel::Run() noexcept
 
     WindowParams params = {};
 
-    params.name        = DAEMON_PROJECT_NAME;
+    params.name        = RUKEN_PROJECT_NAME;
     params.size.width  = 1600;
     params.size.height = 900;
 

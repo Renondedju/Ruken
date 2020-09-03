@@ -28,7 +28,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class ArchetypeBase;
 
@@ -92,4 +92,4 @@ class ComponentQuery
 
 #include "ECS/ComponentQuery.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

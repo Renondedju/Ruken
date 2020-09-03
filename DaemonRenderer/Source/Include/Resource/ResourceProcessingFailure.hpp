@@ -32,7 +32,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceLoadingFailureCode.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Resource loading failure exception.
@@ -95,4 +95,4 @@ struct ResourceProcessingFailure final : std::exception
     #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

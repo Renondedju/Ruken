@@ -31,7 +31,7 @@
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class ComponentSystemBase
 {
@@ -87,4 +87,4 @@ class ComponentSystemBase
 
 #include "ECS/ComponentSystemBase.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -30,7 +30,7 @@
 
 #include "Meta/Meta.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A named type allows the creation of strong types more easily
@@ -176,9 +176,9 @@ namespace internal
  * 
  * To avoid this issue, please create a complex NamedType instead
  */
-#define DAEMON_CREATE_SIMPLE_NAMED_TYPE(in_typename, in_basetype) \
-    namespace internal { struct DAEMON_GLUE(Phantom, in_typename) {}; } \
-    using in_typename = NamedType<in_basetype, internal::DAEMON_GLUE(Phantom, in_typename)>;
+#define RUKEN_CREATE_SIMPLE_NAMED_TYPE(in_typename, in_basetype) \
+    namespace internal { struct RUKEN_GLUE(Phantom, in_typename) {}; } \
+    using in_typename = NamedType<in_basetype, internal::RUKEN_GLUE(Phantom, in_typename)>;
 
 /**
  * \brief Creates a literal for a NamedType
@@ -189,11 +189,11 @@ namespace internal
  * 
  * Example:
  * 
- * Calling ``DAEMON_CREATE_NAMED_TYPE_LITERAL(Test, DAEdouble, test)``
+ * Calling ``RUKEN_CREATE_NAMED_TYPE_LITERAL(Test, DAEdouble, test)``
  * would allow to create test objects by writing ``12.2_test``
  */
-#define DAEMON_CREATE_NAMED_TYPE_LITERAL(in_typename, in_literaltype, in_literalname) \
-    constexpr in_typename operator"" DAEMON_GLUE(_, in_literalname)(in_literaltype const in_param) noexcept \
-    { return in_typename(static_cast<DAEMON_GLUE(in_typename, ::UnderlyingType)>(in_param)); }
+#define RUKEN_CREATE_NAMED_TYPE_LITERAL(in_typename, in_literaltype, in_literalname) \
+    constexpr in_typename operator"" RUKEN_GLUE(_, in_literalname)(in_literaltype const in_param) noexcept \
+    { return in_typename(static_cast<RUKEN_GLUE(in_typename, ::UnderlyingType)>(in_param)); }
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -24,7 +24,7 @@
 
 #include "Kernel.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 int main()
 {

@@ -29,7 +29,7 @@
 #include "Types/NamedType.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Increment operator class
@@ -73,4 +73,4 @@ struct Increment
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

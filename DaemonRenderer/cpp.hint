@@ -2,6 +2,6 @@
 // such as names of functions and macros.
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
 
-#define DAEMON_NAMESPACE daemon
-#define BEGIN_DAEMON_NAMESPACE namespace DAEMON_NAMESPACE {
-#define END_DAEMON_NAMESPACE }
+#define RUKEN_NAMESPACE daemon
+#define BEGIN_RUKEN_NAMESPACE namespace RUKEN_NAMESPACE {
+#define END_RUKEN_NAMESPACE }

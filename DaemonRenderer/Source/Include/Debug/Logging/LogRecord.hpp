@@ -28,7 +28,7 @@
 
 #include "Debug/Logging/LogLevel.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Instances of this structure are created automatically by the Logger every time something is logged
@@ -42,4 +42,4 @@ struct LogRecord
     std::string message     {""};
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

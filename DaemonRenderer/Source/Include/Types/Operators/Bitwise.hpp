@@ -33,7 +33,7 @@
 #include "Types/Operators/Bitwise/LeftShift.hpp"
 #include "Types/Operators/Bitwise/RightShift.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common bitwise operators
@@ -51,4 +51,4 @@ struct Bitwise: Or          <TStrongTypedef>,
                 RightShift  <TStrongTypedef>
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

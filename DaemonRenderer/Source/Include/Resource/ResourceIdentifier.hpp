@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Resource Identifier class
@@ -70,15 +70,15 @@ struct ResourceIdentifier
     #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE
 
 namespace std
 {
     // Hash support for ResourceIdentifier
     template<>
-    struct hash<DAEMON_NAMESPACE::ResourceIdentifier> 
+    struct hash<RUKEN_NAMESPACE::ResourceIdentifier> 
     {
-        size_t operator()(DAEMON_NAMESPACE::ResourceIdentifier const& in_identifier) const noexcept
+        size_t operator()(RUKEN_NAMESPACE::ResourceIdentifier const& in_identifier) const noexcept
         {
             return std::hash<std::string>()(in_identifier.name);
         }

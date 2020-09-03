@@ -28,7 +28,7 @@
 
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class sends logging output to a disk file.
@@ -76,4 +76,4 @@ class FileHandler final : public LogHandler
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

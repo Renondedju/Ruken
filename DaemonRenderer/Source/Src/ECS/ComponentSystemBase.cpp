@@ -24,7 +24,7 @@
 
 #include "ECS/ComponentSystemBase.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ComponentSystemBase::ComponentSystemBase() noexcept:
     m_enabled {true}

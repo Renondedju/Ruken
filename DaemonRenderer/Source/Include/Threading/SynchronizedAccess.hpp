@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Threading/EAccessMode.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <typename TType>
 class Synchronized;
@@ -203,4 +203,4 @@ class SynchronizedAccess<TData, EAccessMode::Write>
 
 #include "Threading/SynchronizedAccess.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

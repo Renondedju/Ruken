@@ -26,9 +26,9 @@
 
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 DAEbool operator==(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
 DAEbool operator!=(VkExtent3D const& in_lhs, VkExtent3D const& in_rhs) noexcept;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

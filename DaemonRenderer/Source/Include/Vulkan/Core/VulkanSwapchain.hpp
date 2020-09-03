@@ -29,7 +29,7 @@
 #include "Vulkan/Core/VulkanImage.hpp"
 #include "Vulkan/Core/VulkanQueue.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Window;
 class RenderFrame;
@@ -157,4 +157,4 @@ class VulkanSwapchain
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

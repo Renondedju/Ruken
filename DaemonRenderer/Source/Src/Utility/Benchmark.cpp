@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 Benchmark::Benchmark(const DAEchar* in_label, DAEuint64 const in_execution_count) noexcept:
     m_label {in_label},

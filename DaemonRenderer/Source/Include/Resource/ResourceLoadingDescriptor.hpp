@@ -26,10 +26,10 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 // Base Resource loading descriptor
 class __declspec(novtable) ResourceLoadingDescriptor
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

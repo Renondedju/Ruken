@@ -29,7 +29,7 @@
 
 #include "Vulkan/Core/VulkanCommandPool.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Scheduler;
 
@@ -100,4 +100,4 @@ class CommandPool
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

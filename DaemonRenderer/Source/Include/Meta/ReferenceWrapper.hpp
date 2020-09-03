@@ -28,7 +28,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This is a "decorated" std::reference_wrapper
@@ -54,4 +54,4 @@ struct ReferenceWrapper : public std::reference_wrapper<TType>
 
 #include "Meta/ReferenceWrapper.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

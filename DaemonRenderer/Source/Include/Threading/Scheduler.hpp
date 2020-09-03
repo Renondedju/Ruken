@@ -39,7 +39,7 @@
 #include "Threading/Worker.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class is responsible for the repartition of different tasks between workers
@@ -118,4 +118,4 @@ class Scheduler final: public Service<Scheduler>, Unique
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

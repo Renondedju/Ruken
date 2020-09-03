@@ -24,7 +24,7 @@
 
 #include "Windowing/Screen.hpp"
 
-#ifdef DAEMON_OS_WINDOWS
+#ifdef RUKEN_OS_WINDOWS
     #define GLFW_EXPOSE_NATIVE_WIN32
 #endif
 
@@ -33,7 +33,7 @@
 
 #include "Debug/Logging/Logger.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
@@ -152,7 +152,7 @@ DAEvoid Screen::SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept
     glfwSetGammaRamp(m_handle, reinterpret_cast<GLFWgammaramp const*>(&in_gamma_ramp));
 }
 
-#ifdef DAEMON_OS_WINDOWS
+#ifdef RUKEN_OS_WINDOWS
 
 DAEchar const* Screen::GetWin32Adapter() const noexcept
 {

@@ -34,7 +34,7 @@
 #include "Types/Operators/Comparison/Spaceship.hpp"
 #include "Types/Operators/Comparison/GreaterEqual.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common comparison operators
@@ -53,4 +53,4 @@ struct Comparison:  Less        <TStrongTypedef>,
                     GreaterEqual<TStrongTypedef>
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

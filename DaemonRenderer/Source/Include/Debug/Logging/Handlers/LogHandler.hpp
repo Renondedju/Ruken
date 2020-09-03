@@ -28,7 +28,7 @@
 
 #include "Debug/Logging/Formatters/LogFormatter.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This is the base class responsible for dispatching the appropriate log messages
@@ -79,4 +79,4 @@ class __declspec(novtable) LogHandler
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -30,7 +30,7 @@
 
 #include "Resource/ResourceLoadingDescriptor.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Renderer;
 
@@ -65,4 +65,4 @@ struct TextureLoadingDescriptor final : ResourceLoadingDescriptor
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -24,7 +24,7 @@
 
 #include "KernelProxy.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 KernelProxy::KernelProxy(ServiceProvider& in_service_provider, Kernel& in_kernel) noexcept:
     Service<KernelProxy> {in_service_provider},

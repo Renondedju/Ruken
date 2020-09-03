@@ -26,7 +26,7 @@
 
 #include <GLFW/glfw3.h>
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 std::string GlfwErrorToString(DAEint32 const in_error_code) noexcept
 {

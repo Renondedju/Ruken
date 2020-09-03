@@ -33,7 +33,7 @@
 
 #include "Vulkan/Resources/TextureLoadingDescriptor.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class VulkanDevice;
 class VulkanCommandBuffer;
@@ -96,4 +96,4 @@ class Texture final : public IResource
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

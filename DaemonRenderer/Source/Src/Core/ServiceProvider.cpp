@@ -24,7 +24,7 @@
 
 #include "Core/ServiceProvider.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ServiceProvider::~ServiceProvider() noexcept
 {

@@ -28,7 +28,7 @@
 
 #include "Types/NamedType.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Bitwise right shift operator class
@@ -76,4 +76,4 @@ struct RightShift
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -24,7 +24,7 @@
 
 #include "ECS/EntityAdmin.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 EntityAdmin::~EntityAdmin()
 {

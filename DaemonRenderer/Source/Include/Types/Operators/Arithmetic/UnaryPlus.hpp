@@ -28,7 +28,7 @@
 
 #include "Types/NamedType.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief UnaryPlus operator class
@@ -58,4 +58,4 @@ struct UnaryPlus
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

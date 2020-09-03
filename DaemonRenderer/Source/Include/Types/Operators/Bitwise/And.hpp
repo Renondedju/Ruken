@@ -28,7 +28,7 @@
 
 #include "Types/NamedType.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Bitwise AND operator class
@@ -76,4 +76,4 @@ struct And
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -28,10 +28,10 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
-#define DAEMON_STATIC_ASSERT(in_expr, in_message) static_assert(in_expr, in_message)
-#define DAEMON_ASSERT_MESSAGE(in_expr, in_message) internal::Assert(#in_expr, in_expr, __FILE__, __LINE__, in_message)
+#define RUKEN_STATIC_ASSERT(in_expr, in_message) static_assert(in_expr, in_message)
+#define RUKEN_ASSERT_MESSAGE(in_expr, in_message) internal::Assert(#in_expr, in_expr, __FILE__, __LINE__, in_message)
 
 namespace internal
 {
@@ -47,4 +47,4 @@ namespace internal
     }
 }
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

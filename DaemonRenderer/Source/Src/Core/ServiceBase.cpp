@@ -24,7 +24,7 @@
 
 #include "Core/ServiceBase.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 DAEsize ServiceBase::GetNextId() noexcept
 {

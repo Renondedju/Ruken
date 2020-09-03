@@ -30,7 +30,7 @@
 #include "Types/Operators/Logical/LogicalAnd.hpp"
 #include "Types/Operators/Logical/LogicalNot.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common logical operators
@@ -45,4 +45,4 @@ struct Logical: LogicalOr   <TStrongTypedef>,
                 LogicalNot  <TStrongTypedef>
 {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

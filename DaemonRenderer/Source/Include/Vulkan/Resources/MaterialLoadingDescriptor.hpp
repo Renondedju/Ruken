@@ -28,7 +28,7 @@
 
 #include "Resource/ResourceLoadingDescriptor.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 struct MaterialLoadingDescriptor final : ResourceLoadingDescriptor
 {
@@ -59,4 +59,4 @@ struct MaterialLoadingDescriptor final : ResourceLoadingDescriptor
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

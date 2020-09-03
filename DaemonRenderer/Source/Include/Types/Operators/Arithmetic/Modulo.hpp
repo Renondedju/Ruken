@@ -28,7 +28,7 @@
 
 #include "Types/NamedType.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Modulo operator class
@@ -79,4 +79,4 @@ struct Modulo
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

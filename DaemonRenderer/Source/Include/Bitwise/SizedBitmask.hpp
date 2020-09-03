@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 namespace internal
 {
@@ -178,4 +178,4 @@ class SizedBitmask
 
 #include "Bitwise/SizedBitmask.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

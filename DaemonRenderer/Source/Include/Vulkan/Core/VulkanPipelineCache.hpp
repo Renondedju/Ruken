@@ -29,7 +29,7 @@
 
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief RAII-class wrapping a 'VkPipelineCache' object.
@@ -87,4 +87,4 @@ class VulkanPipelineCache
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

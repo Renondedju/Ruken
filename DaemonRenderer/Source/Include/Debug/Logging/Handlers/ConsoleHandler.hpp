@@ -28,7 +28,7 @@
 
 #include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class sends output to the system console.
@@ -73,4 +73,4 @@ class ConsoleHandler final : public StreamHandler
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

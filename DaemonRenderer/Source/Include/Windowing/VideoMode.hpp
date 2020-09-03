@@ -26,7 +26,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This describes a single video mode.
@@ -64,4 +64,4 @@ struct VideoMode
     DAEint32 refresh_rate {0};
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

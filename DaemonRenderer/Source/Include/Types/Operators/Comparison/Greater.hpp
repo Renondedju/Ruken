@@ -29,7 +29,7 @@
 #include "Types/NamedType.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Greater operator class
@@ -60,4 +60,4 @@ struct Greater
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

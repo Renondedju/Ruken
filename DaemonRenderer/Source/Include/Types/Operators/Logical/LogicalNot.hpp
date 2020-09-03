@@ -29,7 +29,7 @@
 #include "Types/NamedType.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Logical NOT operator class
@@ -59,4 +59,4 @@ struct LogicalNot
     }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

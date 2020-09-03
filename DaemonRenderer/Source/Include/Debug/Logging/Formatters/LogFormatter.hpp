@@ -28,7 +28,7 @@
 
 #include "Debug/Logging/LogRecord.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class configures the final order, structure, and contents of the log message.
@@ -75,4 +75,4 @@ class LogFormatter
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

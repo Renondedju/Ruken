@@ -28,7 +28,7 @@
 
 #include "ECS/ArchetypeFingerprint.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class ArchetypeBase
 {
@@ -69,4 +69,4 @@ class ArchetypeBase
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

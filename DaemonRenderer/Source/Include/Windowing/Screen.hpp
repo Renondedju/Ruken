@@ -33,7 +33,7 @@
 
 struct GLFWmonitor;
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 
@@ -147,7 +147,7 @@ class Screen
          */
         DAEvoid SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept;
 
-        #ifdef DAEMON_OS_WINDOWS
+        #ifdef RUKEN_OS_WINDOWS
 
         /**
          * \brief The UTF-8 encoded adapter device name (for example \\.\DISPLAY1) of the specified monitor, or NULL if an error occurred.
@@ -174,4 +174,4 @@ class Screen
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

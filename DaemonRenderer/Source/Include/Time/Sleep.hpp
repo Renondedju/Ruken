@@ -28,7 +28,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 struct Sleep
 {
@@ -47,4 +47,4 @@ struct Sleep
     static DAEvoid StdSleep(DAEdouble in_seconds) noexcept;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

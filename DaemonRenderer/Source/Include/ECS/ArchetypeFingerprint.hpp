@@ -30,9 +30,9 @@
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
-class ArchetypeFingerprint : public SizedBitmask<DAEMON_MAX_ECS_COMPONENTS / 64, MinimumTypeT<64, DAEsize>>
+class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, MinimumTypeT<64, DAEsize>>
 {
     public:
 
@@ -65,15 +65,15 @@ class ArchetypeFingerprint : public SizedBitmask<DAEMON_MAX_ECS_COMPONENTS / 64,
 
 #include "ECS/ArchetypeFingerprint.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE
 
 // std::hash specialization for ArchetypeFingerprint
 namespace std
 {
     template <>
-    struct hash<DAEMON_NAMESPACE::ArchetypeFingerprint>
+    struct hash<RUKEN_NAMESPACE::ArchetypeFingerprint>
     {
-        size_t operator()(DAEMON_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
+        size_t operator()(RUKEN_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
         {
             return in_key.HashCode();
         }

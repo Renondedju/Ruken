@@ -30,8 +30,8 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 std::string GlfwErrorToString(DAEint32 in_error_code) noexcept;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

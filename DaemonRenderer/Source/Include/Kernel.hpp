@@ -36,7 +36,7 @@
 #include "Debug/Logging/Logger.hpp"
 #include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief The kernel is the base class of the application,
@@ -113,4 +113,4 @@ class Kernel
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

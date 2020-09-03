@@ -24,7 +24,7 @@
 
 #include "Resource/ResourceProcessingFailure.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ResourceProcessingFailure::ResourceProcessingFailure(EResourceProcessingFailureCode const in_code, DAEbool const in_validity, DAEchar const* in_description) noexcept:
     std::exception        {in_description},

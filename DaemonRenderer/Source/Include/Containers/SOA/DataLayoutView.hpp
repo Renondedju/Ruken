@@ -28,7 +28,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * Data layout view class
@@ -56,4 +56,4 @@ struct DataLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTy
     using std::tuple<TTypes&...>::operator=;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

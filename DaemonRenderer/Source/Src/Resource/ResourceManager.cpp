@@ -29,7 +29,7 @@
 #include "Resource/ResourceLoadingDescriptor.hpp"
 #include "Resource/ResourceProcessingFailure.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 DAEvoid ResourceManager::LoadingRoutine(ResourceManifest* in_manifest, ResourceLoadingDescriptor const& in_descriptor)
 {

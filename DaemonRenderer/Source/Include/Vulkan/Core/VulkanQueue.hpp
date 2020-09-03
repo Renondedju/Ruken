@@ -31,7 +31,7 @@
 
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class VulkanCommandBuffer;
 class VulkanSemaphore;
@@ -143,4 +143,4 @@ class VulkanQueue
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

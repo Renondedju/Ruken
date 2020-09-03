@@ -32,7 +32,7 @@
 #include "Containers/SOA/DataLayout.hpp"
 #include "Containers/SOA/DataLayoutView.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /** 
  * \brienf DataItem class
@@ -53,4 +53,4 @@ struct DataLayoutItem : public std::tuple<TTypes...>
     using MakeView = DataLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief ECaptureOption enum. Defines all the possible capture option
@@ -179,4 +179,4 @@ enum class ERenderDocCaptureOption : DAEuint16
     AllowUnsupportedVendorExtensions = eRENDERDOC_Option_AllowUnsupportedVendorExtensions
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

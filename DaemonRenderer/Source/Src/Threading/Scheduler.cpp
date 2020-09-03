@@ -25,7 +25,7 @@
 #include "Threading/Scheduler.hpp"
 #include "Core/ServiceProvider.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 Scheduler::Scheduler(ServiceProvider& in_service_provider, DAEuint16 const in_workers_count):
     Service<Scheduler> {in_service_provider},

@@ -30,7 +30,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class describes an SOA layout and implements an interface to interact with the given layout
@@ -138,4 +138,4 @@ class DataLayout
 
 #include "Containers/SOA/DataLayout.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

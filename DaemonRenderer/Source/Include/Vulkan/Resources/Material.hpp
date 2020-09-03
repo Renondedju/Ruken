@@ -30,7 +30,7 @@
 
 #include "Vulkan/Resources/MaterialLoadingDescriptor.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Material final : public IResource
 {
@@ -73,4 +73,4 @@ class Material final : public IResource
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -24,10 +24,10 @@
 
 #include "Resource/ResourceManifest.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ResourceManifest::ResourceManifest() noexcept:
-#ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
+#ifdef RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER
     m_identifier    {""},
 #endif
     data            {nullptr},
@@ -37,7 +37,7 @@ ResourceManifest::ResourceManifest() noexcept:
 {}
 
 ResourceManifest::ResourceManifest(ResourceIdentifier const& in_identifier, class IResource* in_data, EResourceGCStrategy const in_gc_strategy) noexcept:
-#ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
+#ifdef RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER
     m_identifier    {in_identifier},
 #endif
     data            {in_data},
@@ -46,7 +46,7 @@ ResourceManifest::ResourceManifest(ResourceIdentifier const& in_identifier, clas
     status            {EResourceStatus::Invalid}
 {}
 
-#ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
+#ifdef RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER
 
 ResourceIdentifier const& ResourceManifest::GetIdentifier() const noexcept
 {

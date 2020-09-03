@@ -32,11 +32,11 @@
 #include "Resource/Enums/EResourceGCStrategy.hpp"
 #include "Resource/ResourceIdentifier.hpp"
 
-#ifndef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
-    #define DAEMON_RESOURCE_MANIFEST_DONT_STORE_IDENTIFIER
+#ifndef RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER
+    #define RUKEN_RESOURCE_MANIFEST_DONT_STORE_IDENTIFIER
 #endif
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A resource manifest is a class used by the resource manager to store the resource as well as it's corresponding data
@@ -55,7 +55,7 @@ struct ResourceManifest
 
         #pragma region Members
 
-#ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
+#ifdef RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER
         // This is only used for debug messages
         const ResourceIdentifier m_identifier;
 #endif
@@ -97,10 +97,10 @@ struct ResourceManifest
         #pragma region Methods 
 
         /**
-         * \brief Returns the identifier of the manifest, if DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER isn't defined, this will return a default identifier instead
+         * \brief Returns the identifier of the manifest, if RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER isn't defined, this will return a default identifier instead
          * \return Resource identifier
          */
-#ifdef DAEMON_RESOURCE_MANIFEST_STORE_IDENTIFIER
+#ifdef RUKEN_RESOURCE_MANIFEST_STORE_IDENTIFIER
         [[nodiscard]] ResourceIdentifier const& GetIdentifier() const noexcept;
 #else
         [[nodiscard]] ResourceIdentifier        GetIdentifier() const noexcept;
@@ -116,4 +116,4 @@ struct ResourceManifest
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

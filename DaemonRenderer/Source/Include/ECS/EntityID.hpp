@@ -33,7 +33,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Entity ID class. This class is actually a strong typing of the DAEsize type
@@ -51,4 +51,4 @@ struct EntityID : public NamedType <DAEsize, EntityID>,
     using NamedType::NamedType;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

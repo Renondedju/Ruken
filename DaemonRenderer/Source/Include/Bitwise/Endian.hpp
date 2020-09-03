@@ -28,10 +28,10 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
-#define DAEMON_IS_BIG_ENDIAN    (*(DAEuint16 *)"\0\1" == 1)
-#define DAEMON_IS_LITTLE_ENDIAN !DAEMON_IS_BIG_ENDIAN
+#define RUKEN_IS_BIG_ENDIAN    (*(DAEuint16 *)"\0\1" == 1)
+#define RUKEN_IS_LITTLE_ENDIAN !RUKEN_IS_BIG_ENDIAN
 
 /**
  * \brief Swaps the endianness of the value (16).
@@ -74,7 +74,7 @@ static DAEuint64 Swap64Endian(DAEuint64 const in_x)
  */
 static DAEuint16 ToBigEndian16(DAEuint16 const in_x)
 {
-    return DAEMON_IS_BIG_ENDIAN ? in_x : Swap16Endian(in_x);
+    return RUKEN_IS_BIG_ENDIAN ? in_x : Swap16Endian(in_x);
 }
 
 /**
@@ -84,7 +84,7 @@ static DAEuint16 ToBigEndian16(DAEuint16 const in_x)
  */
 static DAEuint32 ToBigEndian32(DAEuint32 const in_x)
 {
-    return DAEMON_IS_BIG_ENDIAN ? in_x : Swap32Endian(in_x);
+    return RUKEN_IS_BIG_ENDIAN ? in_x : Swap32Endian(in_x);
 }
 
 /**
@@ -94,7 +94,7 @@ static DAEuint32 ToBigEndian32(DAEuint32 const in_x)
  */
 static DAEuint64 ToBigEndian64(DAEuint64 const in_x)
 {
-    return DAEMON_IS_BIG_ENDIAN ? in_x : Swap64Endian(in_x);
+    return RUKEN_IS_BIG_ENDIAN ? in_x : Swap64Endian(in_x);
 }
 
 /**
@@ -104,7 +104,7 @@ static DAEuint64 ToBigEndian64(DAEuint64 const in_x)
  */
 static DAEuint16 ToLittleEndian16(DAEuint16 const in_x)
 {
-    return DAEMON_IS_BIG_ENDIAN ? Swap16Endian(in_x) : in_x;
+    return RUKEN_IS_BIG_ENDIAN ? Swap16Endian(in_x) : in_x;
 }
 
 /**
@@ -114,7 +114,7 @@ static DAEuint16 ToLittleEndian16(DAEuint16 const in_x)
  */
 static DAEuint32 ToLittleEndian32(DAEuint32 const in_x)
 {
-    return DAEMON_IS_BIG_ENDIAN ? Swap32Endian(in_x) : in_x;
+    return RUKEN_IS_BIG_ENDIAN ? Swap32Endian(in_x) : in_x;
 }
 
 /**
@@ -124,7 +124,7 @@ static DAEuint32 ToLittleEndian32(DAEuint32 const in_x)
  */
 static DAEuint64 ToLittleEndian64(DAEuint64 const in_x)
 {
-    return DAEMON_IS_BIG_ENDIAN ? Swap64Endian(in_x) : in_x;
+    return RUKEN_IS_BIG_ENDIAN ? Swap64Endian(in_x) : in_x;
 }
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

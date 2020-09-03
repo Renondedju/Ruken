@@ -26,7 +26,7 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 enum class ELogLevel : DAEuint8
 {
@@ -57,4 +57,4 @@ enum class ELogLevel : DAEuint8
     Fatal
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

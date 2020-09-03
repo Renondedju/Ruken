@@ -33,7 +33,7 @@
 #include "Vulkan/Core/VulkanPipelineCache.hpp"
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Scheduler;
 
@@ -125,4 +125,4 @@ class VulkanDevice
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

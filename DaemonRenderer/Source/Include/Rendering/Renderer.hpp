@@ -36,7 +36,7 @@
 
 #include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 class Window;
@@ -95,4 +95,4 @@ class Renderer final : public Service<Renderer>
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

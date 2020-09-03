@@ -26,7 +26,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This is a helper class for the creation of non movable objects by inheriting from it.
@@ -64,4 +64,4 @@ class NonMovable
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -28,7 +28,7 @@
 #include "Time/Sleep.hpp"
 #include "Utility/WindowsOS.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 DAEbool Sleep::NsSleep(DAEint64 const in_nanoseconds) noexcept
 {

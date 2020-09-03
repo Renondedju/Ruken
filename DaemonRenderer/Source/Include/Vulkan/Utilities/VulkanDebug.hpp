@@ -28,7 +28,7 @@
 
 #include "Debug/Logging/Logger.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class wraps a messenger object which handles passing along debug messages to a provided debug callback.
@@ -125,4 +125,4 @@ class VulkanDebug
  */
 #define VK_ASSERT(result) VulkanDebug::AssertResult(result, #result)
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

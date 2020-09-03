@@ -24,7 +24,7 @@
 
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 

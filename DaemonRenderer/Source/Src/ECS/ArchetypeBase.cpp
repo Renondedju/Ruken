@@ -24,7 +24,7 @@
 
 #include "ECS/ArchetypeBase.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ArchetypeFingerprint const& ArchetypeBase::GetFingerprint() const noexcept
 {

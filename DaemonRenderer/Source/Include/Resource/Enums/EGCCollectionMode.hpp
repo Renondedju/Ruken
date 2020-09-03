@@ -27,7 +27,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This defines how the garbage collector should behaves
@@ -43,4 +43,4 @@ enum class EGCCollectionMode : DAEint8
     Manual
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

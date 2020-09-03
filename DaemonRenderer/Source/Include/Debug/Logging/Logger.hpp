@@ -32,7 +32,7 @@
 
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Logger objects have a threefold job.
@@ -202,4 +202,4 @@ class Logger final: public Service<Logger>
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE
