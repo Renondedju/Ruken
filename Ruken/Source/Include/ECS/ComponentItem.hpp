@@ -38,10 +38,10 @@ BEGIN_DAEMON_NAMESPACE
 
 /**
  * \brief Describes the memory layout of a component to the ECS
- * \tparam TMembers Variable types
+ * \tparam TField Variable types
  */
-template <typename... TMembers>
-class ComponentItem : public LinkedChunkLayoutItem<typename TMembers::Type...>
+template <typename... TField>
+class ComponentItem : public LinkedChunkLayoutItem<typename TField::Type...>
 {
     private:
 
@@ -50,24 +50,24 @@ class ComponentItem : public LinkedChunkLayoutItem<typename TMembers::Type...>
          * \tparam TMember Member class
          */
         template <typename TMember>
-        using VariableIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<TMembers...>>;
+        using VariableIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<TField...>>;
 
     public:
 
         // Default constructor
-        ComponentItem(typename TMembers::Type&&... in_data) noexcept:
-            LinkedChunkLayoutItem<typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
+        ComponentItem(typename TField::Type&&... in_data) noexcept:
+            LinkedChunkLayoutItem<typename TField::Type...>(std::forward<typename TField::Type>(in_data)...)
         {}
 
         // Exposing parent constructors
-        using LinkedChunkLayoutItem<typename TMembers::Type...>::LinkedChunkLayoutItem;
-        using LinkedChunkLayoutItem<typename TMembers::Type...>::operator=;
+        using LinkedChunkLayoutItem<typename TField::Type...>::LinkedChunkLayoutItem;
+        using LinkedChunkLayoutItem<typename TField::Type...>::operator=;
 
         // View constructors
         template <typename... TSelectedVariables>
         using MakeView         = ComponentItemView<IndexPack<VariableIndex<TSelectedVariables>::value...>, TSelectedVariables...>;
-        using FullView         = MakeView<TMembers...>;
-        using FullReadonlyView = MakeView<TMembers const...> const;
+        using FullView         = MakeView<TField...>;
+        using FullReadonlyView = MakeView<TField const...> const;
 };
 
 END_DAEMON_NAMESPACE

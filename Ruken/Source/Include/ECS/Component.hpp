@@ -54,6 +54,13 @@ class Component final : public ComponentBase
         using Item   = ComponentItem<TFields...>;
         using Layout = typename Item::Layout;
 
+        /**
+         * \brief Returns the container type for a single field
+         * \tparam TField Field to get the container type of
+         */
+        template <typename TField>
+        using FieldContainerType = std::tuple_element_t<Item::template VariableIndex<TField>::value, typename Layout::ContainerType>;
+
     private:
 
         #pragma region Members
