@@ -35,7 +35,7 @@
 BEGIN_DAEMON_NAMESPACE
 
 /**
- * \brief A component is a simple data store which contains no behavior, no code logic to transform its data.
+ * \brief A component is a simple data container which contains no behavior, no code logic to transform its data.
  * \tparam TFields Fields of the component
  * \tparam TUniqueId Unique ID of the component.
  *                   Ideally this would be generated automatically at compile time but doing so in c++ is
@@ -72,7 +72,7 @@ class Component final : public ComponentBase
         Component()                         = default;
         Component(Component const& in_copy) = default;
         Component(Component&&      in_move) = default;
-        virtual ~Component()                = default;
+        virtual ~Component() override       = default;
 
         #pragma endregion
 

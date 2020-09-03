@@ -31,7 +31,7 @@
 #include "Meta/CopyConst.hpp"
 #include "Meta/TupleIndex.hpp"
 #include "Meta/TupleHasType.hpp"
-#include "Containers/SOA/DataLayoutView.hpp"
+#include "Containers/SOA/LinkedChunkLayoutView.hpp"
 
 BEGIN_DAEMON_NAMESPACE
 
@@ -45,7 +45,7 @@ template <typename TPack, typename... TMembers>
 struct ComponentItemView;
 
 template <template <DAEsize...> class TPack, DAEsize... TIndices, typename... TMembers>
-struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>
+struct ComponentItemView<TPack<TIndices...>, TMembers...> : public LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>
 {
     private:
 
@@ -72,8 +72,8 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public DataLayoutVie
     public:
 
         // Making parent constructors available
-        using DataLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::DataLayoutView;
-        using DataLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::operator=;
+        using LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::LinkedChunkLayoutView;
+        using LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::operator=;
 
         /**
          * \brief Returns a reference onto a given member stored in the view.

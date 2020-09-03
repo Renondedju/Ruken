@@ -32,22 +32,23 @@
 #include "Meta/IndexPack.hpp"
 #include "Meta/TupleIndex.hpp"
 #include "ECS/ComponentItemView.hpp"
-#include "Containers/SOA/DataLayoutItem.hpp"
+#include "Containers/SOA/LinkedChunkLayoutItem.hpp"
 
 BEGIN_DAEMON_NAMESPACE
-
-template <typename TType>
-using ComponentVector = std::vector<TType, std::allocator<TType>>;
 
 /**
  * \brief Describes the memory layout of a component to the ECS
  * \tparam TMembers Variable types
  */
 template <typename... TMembers>
-class ComponentItem : public DataLayoutItem<ComponentVector, typename TMembers::Type...>
+class ComponentItem : public LinkedChunkLayoutItem<typename TMembers::Type...>
 {
     private:
 
+        /**
+         * \brief Returns the index of a member using the member class
+         * \tparam TMember Member class
+         */
         template <typename TMember>
         using VariableIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<TMembers...>>;
 
@@ -55,12 +56,12 @@ class ComponentItem : public DataLayoutItem<ComponentVector, typename TMembers::
 
         // Default constructor
         ComponentItem(typename TMembers::Type&&... in_data) noexcept:
-            DataLayoutItem<ComponentVector, typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
+            LinkedChunkLayoutItem<typename TMembers::Type...>(std::forward<typename TMembers::Type>(in_data)...)
         {}
 
         // Exposing parent constructors
-        using DataLayoutItem<ComponentVector, typename TMembers::Type...>::DataLayoutItem;
-        using DataLayoutItem<ComponentVector, typename TMembers::Type...>::operator=;
+        using LinkedChunkLayoutItem<typename TMembers::Type...>::LinkedChunkLayoutItem;
+        using LinkedChunkLayoutItem<typename TMembers::Type...>::operator=;
 
         // View constructors
         template <typename... TSelectedVariables>

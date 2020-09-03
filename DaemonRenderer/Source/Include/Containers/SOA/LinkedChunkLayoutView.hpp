@@ -28,16 +28,17 @@
 
 #include "Build/Namespace.hpp"
 
-BEGIN_RUKEN_NAMESPACE
+BEGIN_DAEMON_NAMESPACE
 
 /**
- * Data layout view class
- * 
- * This class is used to fetch only certain fields when using DataLayout::Get
- * \see DataLayout::Get
+ * \brief This class is used to fetch only certain fields when using LinkedChunkLayout::Get
+ * \tparam TSequence index sequence of the elements in the original LinkedChunkLayout
+ * \tparam TTypes Types of the referred elements
+ *
+ * \see LinkedChunkLayout::Get
  */
 template <class TSequence, typename... TTypes>
-struct DataLayoutView : public std::tuple<TTypes&...>
+struct LinkedChunkLayoutView : public std::tuple<TTypes&...>
 {
     using Sequence = TSequence;
 
@@ -47,7 +48,7 @@ struct DataLayoutView : public std::tuple<TTypes&...>
 };
 
 template <template <std::size_t...> class TSequence, typename... TTypes, std::size_t... TIndices>
-struct DataLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTypes&...>
+struct LinkedChunkLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTypes&...>
 {
     using Sequence = TSequence<TIndices...>;
 
@@ -56,4 +57,4 @@ struct DataLayoutView<TSequence<TIndices...>, TTypes...> : public std::tuple<TTy
     using std::tuple<TTypes&...>::operator=;
 };
 
-END_RUKEN_NAMESPACE
+END_DAEMON_NAMESPACE

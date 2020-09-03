@@ -1,0 +1,99 @@
+/*
+ *  MIT License
+ *
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *  SOFTWARE.
+ */
+
+#pragma once
+
+#include <tuple>
+#include <utility>
+
+#include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
+#include "Containers/LinkedChunkList.hpp"
+
+BEGIN_DAEMON_NAMESPACE
+
+/**
+ * \brief This class describes an SOA layout and implements an interface to interact with the given layout
+ * \tparam TLayoutTypes Types to be contained in the layout
+ */
+template <typename... TLayoutTypes>
+class LinkedChunkLayout
+{
+    public:
+
+        using ContainerType = std::tuple<LinkedChunkList<TLayoutTypes>...>;
+
+    private:
+
+        #pragma region Constructors
+
+        LinkedChunkLayout()                                 = default;
+        LinkedChunkLayout(LinkedChunkLayout const& in_copy) = default;
+        LinkedChunkLayout(LinkedChunkLayout&&      in_move) = default;
+        ~LinkedChunkLayout()                                = default;
+
+        #pragma endregion 
+
+        #pragma region Methods
+
+        /**
+         * \brief Getter helper 
+         * \tparam TLayoutView View type to operate with
+         * \tparam TIds Index sequence of the view
+         * \param in_container Container instance
+         * \param in_position position of the get
+         * \return View instance containing references to the requested resources
+         */
+        template <typename TLayoutView, DAEsize... TIds>
+        constexpr static auto GetHelper(ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        LinkedChunkLayout& operator=(LinkedChunkLayout const& in_copy) = default;
+        LinkedChunkLayout& operator=(LinkedChunkLayout&&      in_move) = default;
+
+        #pragma endregion
+
+    public:
+
+        #pragma region Methods
+
+        /**
+         * \brief Get method, this method operates with a layout view allowing the fetch only the requested data
+         * \tparam TLayoutView Layout view type
+         * \param in_container Container instance
+         * \param in_position Position to get the data at
+         * \return View instance containing references to the requested resources
+         */
+        template <typename TLayoutView>
+        constexpr static auto Get(ContainerType& in_container, DAEsize in_position) noexcept;
+
+        #pragma endregion 
+};
+
+#include "Containers/SOA/LinkedChunkLayout.inl"
+
+END_DAEMON_NAMESPACE

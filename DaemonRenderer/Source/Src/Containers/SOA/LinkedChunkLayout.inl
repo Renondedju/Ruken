@@ -22,35 +22,23 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#pragma region Methods
 
-#include <tuple>
-
-#include "Build/Namespace.hpp"
-#include "Meta/ValueIndexer.hpp"
-
-#include "Containers/SOA/DataLayout.hpp"
-#include "Containers/SOA/DataLayoutView.hpp"
-
-BEGIN_DAEMON_NAMESPACE
-
-/** 
- * \brienf DataItem class
- * This class is meant to describe a full data layout as well as implementing setters/getters
- * This class also comes in handy for Item inheritance
- */
-template <template <typename> typename TContainer, typename... TTypes>
-struct DataLayoutItem : public std::tuple<TTypes...>
+template <typename ... TLayoutTypes>
+template <typename TLayoutView, DAEsize... TIds>
+constexpr auto LinkedChunkLayout<TLayoutTypes...>::GetHelper(
+    ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept
 {
-    // Making constructors available
-    using std::tuple<TTypes...>::tuple;
-    using std::tuple<TTypes...>::operator=;
+    // Guaranteed copy elision
+    return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
+}
 
-    template <DAEsize... TItems>
-    using MakeView = DataLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
-    using FullView = DataLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
+template <typename ... TLayoutTypes>
+template <typename TLayoutView>
+constexpr auto LinkedChunkLayout<TLayoutTypes...>::Get(
+	ContainerType& in_container, DAEsize in_position) noexcept
+{
+    return GetHelper<TLayoutView>(in_container, in_position, typename TLayoutView::Sequence());
+}
 
-    using Layout   = DataLayout<TContainer, TTypes...>;
-};
-
-END_DAEMON_NAMESPACE
+#pragma endregion
