@@ -23,15 +23,15 @@
  */
 
 template <DAEsize TUniqueId, typename... TMembers>
-EntityID Component<TUniqueId, TMembers...>::CreateItem(Item&& in_item) noexcept
+DAEsize Component<TUniqueId, TMembers...>::CreateItem(Item&& in_item) noexcept
 {
     //Layout::PushBack(m_storage, std::forward<Item>(in_item));
 
-    return EntityID(m_size);
+    return m_size;
 }
 
 template <DAEsize TUniqueId, typename... TMembers>
-EntityID Component<TUniqueId, TMembers...>::CreateItem() noexcept
+DAEsize Component<TUniqueId, TMembers...>::CreateItem() noexcept
 {
     return CreateItem(Item {});
 }

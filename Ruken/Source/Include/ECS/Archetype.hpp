@@ -30,7 +30,7 @@
 #include "Config.hpp"
 
 #include "ECS/Group.hpp"
-#include "ECS/EntityID.hpp"
+#include "ECS/Entity.hpp"
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
@@ -93,10 +93,10 @@ class Archetype
 
         /**
          * \brief Creates an entity in the archetype
-         * \return The new ID of this entity.
-         * \see EntityID for lifetime info
+         * \return Entity handle.
+         * \see Entity for lifetime info
          */
-        EntityID CreateEntity() noexcept;
+        Entity CreateEntity() noexcept;
 
         /**
          * \brief Returns the total count of entity stored in this archetype

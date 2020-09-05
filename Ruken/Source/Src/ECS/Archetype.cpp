@@ -31,14 +31,14 @@ ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
     return m_fingerprint;
 }
 
-EntityID Archetype::CreateEntity() noexcept
+Entity Archetype::CreateEntity() noexcept
 {
-    EntityID id = 0;
+    DAEsize local_identifier = 0;
 
-    for (auto&& component: m_components)
-        id = component.second->CreateItem();
+    for (auto& [id, component]: m_components)
+        local_identifier = component->CreateItem();
 
-    return id;
+    return Entity(*this, local_identifier);
 }
 
 DAEsize Archetype::EntitiesCount() const noexcept

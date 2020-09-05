@@ -92,8 +92,8 @@ class Component final : public ComponentBase
          * \param in_item item to push back
          * \return Created item id
          */
-        EntityID CreateItem(Item&& in_item) noexcept;
-        EntityID CreateItem()               noexcept override;
+        DAEsize CreateItem(Item&& in_item) noexcept;
+        DAEsize CreateItem()               noexcept override;
 
         /**
          * \brief Returns the count of items in this component

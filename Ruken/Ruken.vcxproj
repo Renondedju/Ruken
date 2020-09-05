@@ -159,10 +159,10 @@
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
+    <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\SystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
-    <ClInclude Include="Source\Include\ECS\EntityID.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
     <ClInclude Include="Source\Include\ECS\Group.hpp" />
     <ClInclude Include="Source\Include\ECS\TagComponent.hpp" />
@@ -355,6 +355,7 @@
     <ClCompile Include="Source\Src\Debug\RenderDoc\RenderDocHook.cpp" />
     <ClCompile Include="Source\Src\ECS\Archetype.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
+    <ClCompile Include="Source\Src\ECS\Entity.cpp" />
     <ClCompile Include="Source\Src\ECS\SystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Core\Kernel.cpp" />

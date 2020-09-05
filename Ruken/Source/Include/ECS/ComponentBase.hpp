@@ -48,8 +48,8 @@ class ComponentBase
 
         #pragma region Methods
 
-        virtual EntityID CreateItem  ()       noexcept = 0;
-        virtual DAEsize  GetItemCount() const noexcept = 0;
+        virtual DAEsize CreateItem  ()       noexcept = 0;
+        virtual DAEsize GetItemCount() const noexcept = 0;
 
         #pragma endregion 
 

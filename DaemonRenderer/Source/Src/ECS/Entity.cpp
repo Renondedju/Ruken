@@ -22,33 +22,27 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "ECS/Entity.hpp"
+#include "ECS/Archetype.hpp"
 
-#include <Types/NamedType.hpp>
-#include <Types/Operators/Comparison.hpp>
-#include <Types/Operators/Arithmetic/Decrement.hpp>
-#include <Types/Operators/Arithmetic/Increment.hpp>
+USING_DAEMON_NAMESPACE
 
-#include "Config.hpp"
+Entity::Entity(Archetype& in_archetype, DAEsize const in_local_identifier):
+    m_archetype        {&in_archetype},
+    m_local_identifier {in_local_identifier}
+{ }
 
-#include "Types/FundamentalTypes.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-/**
- * \brief Entity ID class. This class is actually a strong typing of the RkSize type
- *
- * And entity ID is constant and valid for the whole application lifetime
- * or until the attached entity is deleted or moved into another archetype
- * (which should almost only happen when a scene is deleted/reloaded/loaded or
- * in the context of a non runtime app like an editor)
- */
-struct EntityID : public NamedType <RkSize, EntityID>,
-                  public Comparison<EntityID>,
-                  public Decrement <EntityID>,
-                  public Increment <EntityID>
+Archetype const& Entity::GetOwner() const noexcept
 {
-    using NamedType::NamedType;
-};
+    return *m_archetype;
+}
 
-END_RUKEN_NAMESPACE
+DAEsize Entity::GetLocalIdentifier() const noexcept
+{
+    return m_local_identifier;
+}
+
+DAEbool Entity::operator==(Entity const& in_other) const noexcept
+{
+    return in_other.m_archetype == m_archetype && in_other.m_local_identifier == m_local_identifier;
+}
