@@ -28,7 +28,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "ECS/ExclusiveComponentBase.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief An exclusive component is a special kind of component;
@@ -45,14 +45,14 @@ BEGIN_DAEMON_NAMESPACE
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <DAEsize TUniqueId>
+template <RkSize TUniqueId>
 class ExclusiveComponent : public ExclusiveComponentBase
 {
     public:
 
         #pragma region Members
 
-        static constexpr DAEsize id = TUniqueId;
+        static constexpr RkSize id = TUniqueId;
 
         #pragma endregion 
 
@@ -73,4 +73,4 @@ class ExclusiveComponent : public ExclusiveComponentBase
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -34,7 +34,7 @@
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Archetypes are at the very core of this ECS implementation.
@@ -58,7 +58,7 @@ class Archetype
 
         #pragma region Members
         
-        std::unordered_map<DAEsize, std::unique_ptr<ComponentBase>> m_components  {};
+        std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_components  {};
         ArchetypeFingerprint                                        m_fingerprint {};
 
         #pragma endregion 
@@ -102,7 +102,7 @@ class Archetype
          * \brief Returns the total count of entity stored in this archetype
          * \return Entities count
          */
-        DAEsize EntitiesCount() const noexcept;
+        RkSize EntitiesCount() const noexcept;
 
         /**
          * \brief Creates a components reference group
@@ -132,4 +132,4 @@ class Archetype
 
 #include "ECS/Archetype.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

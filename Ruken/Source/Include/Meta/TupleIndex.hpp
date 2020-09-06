@@ -29,7 +29,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Finds the index of the first occurence of TType in TTuple
@@ -43,13 +43,13 @@ struct TupleIndex;
 template <class TType, class... TTypes>
 struct TupleIndex<TType, std::tuple<TType, TTypes...>>
 {
-    static constexpr DAEsize value = 0;
+    static constexpr RkSize value = 0;
 };
 
 template <class TType, class TFirst, class... TTypes>
 struct TupleIndex<TType, std::tuple<TFirst, TTypes...>>
 {
-    static constexpr DAEsize value = 1 + TupleIndex<TType, std::tuple<TTypes...>>::value;
+    static constexpr RkSize value = 1 + TupleIndex<TType, std::tuple<TTypes...>>::value;
 };
 
 /**
@@ -59,6 +59,6 @@ struct TupleIndex<TType, std::tuple<TFirst, TTypes...>>
  * \tparam TTuple Tuple to look into
  */
 template <class TType, class TTuple>
-inline constexpr DAEsize TupleIndexV = TupleIndex<TType, TTuple>::value;
+inline constexpr RkSize TupleIndexV = TupleIndex<TType, TTuple>::value;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

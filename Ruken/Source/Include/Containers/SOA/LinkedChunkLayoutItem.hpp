@@ -32,7 +32,7 @@
 #include "Containers/SOA/LinkedChunkLayout.hpp"
 #include "Containers/SOA/LinkedChunkLayoutView.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Describes a full linked chunk list layout as well as implementing setters/getters
@@ -46,11 +46,11 @@ struct LinkedChunkLayoutItem : public std::tuple<TTypes...>
     using std::tuple<TTypes...>::tuple;
     using std::tuple<TTypes...>::operator=;
 
-    template <DAEsize... TItems>
+    template <RkSize... TItems>
     using MakeView = LinkedChunkLayoutView<std::index_sequence<TItems...>, SelectType<TItems, TTypes...>...>;
     using FullView = LinkedChunkLayoutView<std::make_index_sequence<sizeof...(TTypes)>, TTypes...>;
 
     using Layout   = LinkedChunkLayout<TTypes...>;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -24,21 +24,21 @@
 
 #include "ECS/EntityAdmin.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
-DAEvoid EntityAdmin::StartSimulation() noexcept
+RkVoid EntityAdmin::StartSimulation() noexcept
 {
     for (auto && system: m_systems)
         system->OnStart();
 }
 
-DAEvoid EntityAdmin::UpdateSimulation() noexcept
+RkVoid EntityAdmin::UpdateSimulation() noexcept
 {
     for (auto && system: m_systems)
         system->OnUpdate(0.0f);
 }
 
-DAEvoid EntityAdmin::EndSimulation() noexcept
+RkVoid EntityAdmin::EndSimulation() noexcept
 {
     for (auto && system: m_systems)
         system->OnEnd();

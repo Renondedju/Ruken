@@ -28,7 +28,7 @@
 #include "ECS/EntityID.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Base class of the Component class, this is simply used to store components as they are templated
@@ -48,8 +48,8 @@ class ComponentBase
 
         #pragma region Methods
 
-        virtual DAEsize CreateItem  ()       noexcept = 0;
-        virtual DAEsize GetItemCount() const noexcept = 0;
+        virtual RkSize CreateItem  ()       noexcept = 0;
+        virtual RkSize GetItemCount() const noexcept = 0;
 
         #pragma endregion 
 
@@ -61,4 +61,4 @@ class ComponentBase
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

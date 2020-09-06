@@ -28,7 +28,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Archetype;
 
@@ -66,7 +66,7 @@ class ComponentQuery
          * \tparam TComponents Required components of the query
          */
         template <typename... TComponents>
-        DAEvoid SetupInclusionQuery() noexcept;
+        RkVoid SetupInclusionQuery() noexcept;
 
         /**
          * \brief Setups the exclusion query of the group.
@@ -75,14 +75,14 @@ class ComponentQuery
          * \tparam TComponents Excluded components of the query
          */
         template <typename... TComponents>
-        DAEvoid SetupExclusionQuery() noexcept;
+        RkVoid SetupExclusionQuery() noexcept;
 
         /**
          * \brief Checks if the passed archetype matches the query
          * \param in_archetype Archetype to match
          * \return True if the query matched, false otherwise
          */
-        DAEbool Match(Archetype const& in_archetype) const noexcept;
+        RkBool Match(Archetype const& in_archetype) const noexcept;
 
         #pragma endregion
 
@@ -96,4 +96,4 @@ class ComponentQuery
 
 #include "ECS/ComponentQuery.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

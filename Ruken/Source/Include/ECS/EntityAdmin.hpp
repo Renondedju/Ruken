@@ -30,12 +30,12 @@
 
 #include "Build/Namespace.hpp"
 
-#include "ECS/EntityID.hpp"
+#include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
 #include "ECS/ExclusiveComponentBase.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief EntityAdmins are for isolation.
@@ -50,7 +50,7 @@ class EntityAdmin
 
         std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
         std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
-        std::unordered_map<DAEsize, std::unique_ptr<ExclusiveComponentBase>> m_exclusive_components {};
+        std::unordered_map<RkSize, std::unique_ptr<ExclusiveComponentBase>>  m_exclusive_components {};
         
         #pragma endregion 
 
@@ -80,9 +80,9 @@ class EntityAdmin
 
         // --- Simulation manipulation
 
-        DAEvoid StartSimulation () noexcept;
-        DAEvoid UpdateSimulation() noexcept;
-        DAEvoid EndSimulation   () noexcept;
+        RkVoid StartSimulation () noexcept;
+        RkVoid UpdateSimulation() noexcept;
+        RkVoid EndSimulation   () noexcept;
 
         // --- Entity / Systems lifetime manipulation
 
@@ -91,7 +91,7 @@ class EntityAdmin
          * \tparam TSystem System type to push to the entity admin 
          */
         template <typename TSystem>
-        DAEvoid CreateSystem() noexcept;
+        RkVoid CreateSystem() noexcept;
 
         /**
          * \brief Attempts the creation of an exclusive component
@@ -99,7 +99,7 @@ class EntityAdmin
          * \tparam TComponent Component class to add
          */
         template <typename TComponent>
-        DAEvoid CreateExclusiveComponent() noexcept;
+        RkVoid CreateExclusiveComponent() noexcept;
 
         /**
          * \brief Fetches an exclusive component
@@ -115,7 +115,7 @@ class EntityAdmin
          * \return Created entity id
          */
         template <typename... TComponents>
-        EntityID CreateEntity() noexcept;
+        Entity CreateEntity() noexcept;
 
         #pragma endregion
 
@@ -129,4 +129,4 @@ class EntityAdmin
 
 #include "ECS/EntityAdmin.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

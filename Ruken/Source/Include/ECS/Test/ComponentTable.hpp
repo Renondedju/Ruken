@@ -31,7 +31,7 @@
  *        it is also used to create and maintain every component ID,
  *        see the Component class for more info.
  */
-DAEMON_DEFINE_COMPONENT_TABLE(
+RUKEN_DEFINE_COMPONENT_TABLE(
     Counter,
     TestTag
 );

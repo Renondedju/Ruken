@@ -28,7 +28,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <std::size_t TIndex, typename TType>
 struct Indexed
@@ -62,4 +62,4 @@ using SelectType = typename decltype(Select<TIndex>(
     Indexer<std::index_sequence_for<TTypes...>, TTypes...>{}
 ))::Type;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

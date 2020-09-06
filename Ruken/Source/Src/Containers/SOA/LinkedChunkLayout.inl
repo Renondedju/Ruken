@@ -22,27 +22,23 @@
  *  SOFTWARE.
  */
 
-#include "ECS/Entity.hpp"
-#include "ECS/Archetype.hpp"
+#pragma region Methods
 
-USING_DAEMON_NAMESPACE
-
-Entity::Entity(Archetype& in_archetype, DAEsize const in_local_identifier):
-    m_archetype        {&in_archetype},
-    m_local_identifier {in_local_identifier}
-{ }
-
-Archetype const& Entity::GetOwner() const noexcept
+template <typename ... TLayoutTypes>
+template <typename TLayoutView, RkSize... TIds>
+constexpr auto LinkedChunkLayout<TLayoutTypes...>::GetHelper(
+    ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept
 {
-    return *m_archetype;
+    // Guaranteed copy elision
+    return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
 }
 
-DAEsize Entity::GetLocalIdentifier() const noexcept
+template <typename ... TLayoutTypes>
+template <typename TLayoutView>
+constexpr auto LinkedChunkLayout<TLayoutTypes...>::Get(
+	ContainerType& in_container, RkSize in_position) noexcept
 {
-    return m_local_identifier;
+    return GetHelper<TLayoutView>(in_container, in_position, typename TLayoutView::Sequence());
 }
 
-DAEbool Entity::operator==(Entity const& in_other) const noexcept
-{
-    return in_other.m_archetype == m_archetype && in_other.m_local_identifier == m_local_identifier;
-}
+#pragma endregion

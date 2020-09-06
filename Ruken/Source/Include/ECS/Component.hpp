@@ -32,7 +32,7 @@
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ComponentItem.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A component is a simple data container which contains no behavior, no code logic to transform its data.
@@ -43,11 +43,11 @@ BEGIN_DAEMON_NAMESPACE
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <DAEsize TUniqueId, typename... TFields>
+template <RkSize TUniqueId, typename... TFields>
 class Component final : public ComponentBase
 {
-    DAEMON_STATIC_ASSERT(sizeof...(TFields) > 0               , "A component must have at least one field, use a TagComponent instead."    );
-    DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0               , "A component must have at least one field, use a TagComponent instead."    );
+    RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
 
     public:
 
@@ -68,13 +68,13 @@ class Component final : public ComponentBase
         // Storage of the component
         typename Layout::ContainerType m_storage {};
 
-        DAEsize m_size {0ULL};
+        RkSize m_size {0ULL};
 
         #pragma endregion
 
     public:
 
-        static constexpr DAEsize id = TUniqueId;
+        static constexpr RkSize id = TUniqueId;
 
         #pragma region Constructors
 
@@ -92,14 +92,14 @@ class Component final : public ComponentBase
          * \param in_item item to push back
          * \return Created item id
          */
-        DAEsize CreateItem(Item&& in_item) noexcept;
-        DAEsize CreateItem()               noexcept override;
+        RkSize CreateItem(Item&& in_item) noexcept;
+        RkSize CreateItem()               noexcept override;
 
         /**
          * \brief Returns the count of items in this component
          * \return Component item count
          */
-        DAEsize GetItemCount() const noexcept override;
+        RkSize GetItemCount() const noexcept override;
 
         /**
          * \brief Returns a view containing all the requested fields of a given entity
@@ -125,17 +125,17 @@ class Component final : public ComponentBase
  * \param in_component_name Name of the component as defined in the component table
  * \param ... Fields of the component. Theses must inherit from the ComponentField class
  */
-#define DAEMON_DEFINE_COMPONENT(in_component_name, ...)\
-    using DAEMON_GLUE(in_component_name, Component) = Component<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name), __VA_ARGS__>
+#define RUKEN_DEFINE_COMPONENT(in_component_name, ...)\
+    using RUKEN_GLUE(in_component_name, Component) = Component<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name), __VA_ARGS__>
     
 /**
  * \brief Creates an enum called EComponentTable used to keep track of every available
  *        component in the ECS. It is also used to create and maintain every component ID.
  *        See the Component class for more info.
  */
-#define DAEMON_DEFINE_COMPONENT_TABLE(...)\
+#define RUKEN_DEFINE_COMPONENT_TABLE(...)\
     enum class EComponentTable { __VA_ARGS__ }
 
 #include "ECS/Component.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

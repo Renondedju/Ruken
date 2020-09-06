@@ -31,14 +31,14 @@
 #include "ECS/ComponentField.hpp"
 #include "ECS/Test/ComponentTable.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
-struct Count       : ComponentField<DAEsize>                 {};
-struct TestPadding : ComponentField<std::array<DAEsize, 10>> {};
+struct Count       : ComponentField<RkSize>                 {};
+struct TestPadding : ComponentField<std::array<RkSize, 10>> {};
 
-DAEMON_DEFINE_COMPONENT(Counter,
+RUKEN_DEFINE_COMPONENT(Counter,
     Count,        // Actual count variable
     TestPadding); // Test padding to demonstrate views 
 
 // Declaring a simple tag component named "TestTagComponent"
-DAEMON_DEFINE_TAG_COMPONENT(TestTag);
+RUKEN_DEFINE_TAG_COMPONENT(TestTag);

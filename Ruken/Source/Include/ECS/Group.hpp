@@ -28,7 +28,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Archetype;
 
@@ -94,4 +94,4 @@ class Group
 
 #include "ECS/Group.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

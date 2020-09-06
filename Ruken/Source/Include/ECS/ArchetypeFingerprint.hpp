@@ -31,13 +31,13 @@
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Stores a bitmask holding data about the component types stored inside an archetype
  *        This allows for fast archetype comparisons and fast component queries. 
  */
-class ArchetypeFingerprint : public SizedBitmask<DAEMON_MAX_ECS_COMPONENTS / 64, MinimumTypeT<DAEMON_MAX_ECS_COMPONENTS, DAEsize>>
+class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, MinimumTypeT<RUKEN_MAX_ECS_COMPONENTS, RkSize>>
 {
     public:
 
@@ -70,15 +70,15 @@ class ArchetypeFingerprint : public SizedBitmask<DAEMON_MAX_ECS_COMPONENTS / 64,
 
 #include "ECS/ArchetypeFingerprint.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE
 
 // std::hash specialization for ArchetypeFingerprint
 namespace std
 {
     template <>
-    struct hash<DAEMON_NAMESPACE::ArchetypeFingerprint>
+    struct hash<RUKEN_NAMESPACE::ArchetypeFingerprint>
     {
-        size_t operator()(DAEMON_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
+        size_t operator()(RUKEN_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
         {
             return in_key.HashCode();
         }

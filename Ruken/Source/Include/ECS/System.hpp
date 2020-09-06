@@ -32,7 +32,7 @@
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class EntityAdmin;
 
@@ -80,7 +80,7 @@ class System : public SystemBase
          *        if the component query of this archetype and the system matches
          * \param in_archetype Referenced archetype of the group to create 
          */
-        virtual DAEvoid AddReferenceGroup(Archetype& in_archetype) noexcept override final;
+        virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept override final;
 
         #pragma endregion
 
@@ -94,4 +94,4 @@ class System : public SystemBase
 
 #include "ECS/System.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

@@ -29,7 +29,7 @@
 #include "Meta/Assert.hpp"
 #include "ECS/ComponentBase.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A tag component does not hold any data, its only purpose is to differentiate 2 entities from each other by "tagging" it.
@@ -39,10 +39,10 @@ BEGIN_DAEMON_NAMESPACE
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <DAEsize TUniqueId>
+template <RkSize TUniqueId>
 class TagComponent final : public ComponentBase
 {
-    DAEMON_STATIC_ASSERT(TUniqueId < DAEMON_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+    RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
 
     private:
 
@@ -51,13 +51,13 @@ class TagComponent final : public ComponentBase
         // The size of the component must still be tracked in case where the
         // archetype we are living in queries us to find its size.
         // TODO(Basile): That job could be handled by the Archetype instead
-        DAEsize m_component_size {0};
+        RkSize m_component_size {0};
 
         #pragma endregion 
 
     public:
 
-        static constexpr DAEsize id = TUniqueId;
+        static constexpr RkSize id = TUniqueId;
 
         #pragma region Constructors
 
@@ -80,7 +80,7 @@ class TagComponent final : public ComponentBase
          * \brief Returns the count of items in this component
          * \return Component item count
          */
-        DAEsize GetItemCount() const noexcept override;
+        RkSize GetItemCount() const noexcept override;
 
         #pragma endregion 
 
@@ -98,7 +98,7 @@ class TagComponent final : public ComponentBase
  * \brief Shorthand to declare a tag component named "<in_component_name>Component"
  * \param in_component_name Name of the component as defined in the component table
  */
-#define DAEMON_DEFINE_TAG_COMPONENT(in_component_name, ...)\
-    using DAEMON_GLUE(in_component_name, Component) = TagComponent<static_cast<::DAEMON_NAMESPACE::DAEsize>(EComponentTable::in_component_name)>
+#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name, ...)\
+    using RUKEN_GLUE(in_component_name, Component) = TagComponent<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name)>
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

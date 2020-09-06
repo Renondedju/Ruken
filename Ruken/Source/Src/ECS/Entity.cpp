@@ -22,23 +22,27 @@
  *  SOFTWARE.
  */
 
-#pragma region Methods
+#include "ECS/Entity.hpp"
+#include "ECS/Archetype.hpp"
 
-template <typename ... TLayoutTypes>
-template <typename TLayoutView, DAEsize... TIds>
-constexpr auto LinkedChunkLayout<TLayoutTypes...>::GetHelper(
-    ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept
+USING_RUKEN_NAMESPACE
+
+Entity::Entity(Archetype& in_archetype, RkSize const in_local_identifier):
+    m_archetype        {&in_archetype},
+    m_local_identifier {in_local_identifier}
+{ }
+
+Archetype const& Entity::GetOwner() const noexcept
 {
-    // Guaranteed copy elision
-    return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
+    return *m_archetype;
 }
 
-template <typename ... TLayoutTypes>
-template <typename TLayoutView>
-constexpr auto LinkedChunkLayout<TLayoutTypes...>::Get(
-	ContainerType& in_container, DAEsize in_position) noexcept
+RkSize Entity::GetLocalIdentifier() const noexcept
 {
-    return GetHelper<TLayoutView>(in_container, in_position, typename TLayoutView::Sequence());
+    return m_local_identifier;
 }
 
-#pragma endregion
+RkBool Entity::operator==(Entity const& in_other) const noexcept
+{
+    return in_other.m_archetype == m_archetype && in_other.m_local_identifier == m_local_identifier;
+}

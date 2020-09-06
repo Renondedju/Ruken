@@ -28,7 +28,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkListNode.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A linked chunk list mimics a linked list but instead of every node containing one object,
@@ -36,14 +36,14 @@ BEGIN_DAEMON_NAMESPACE
  * \tparam TType Type to hold in every node
  * \tparam TChunkSize Size in octets of one chunk (default is 16Kb or 2046 octets)
  */
-template<typename TType, DAEsize TChunkSize = 2048>
+template<typename TType, RkSize TChunkSize = 2048>
 class LinkedChunkList
 {
     public:
 
         using Node = LinkedChunkListNode<TType, TChunkSize>;
 
-        static constexpr DAEsize chunk_element_count = Node::element_count;
+        static constexpr RkSize chunk_element_count = Node::element_count;
 
     private:
 
@@ -51,7 +51,7 @@ class LinkedChunkList
 
         Node*   m_head {nullptr};
         Node*   m_tail {nullptr};
-        DAEsize m_size {0ULL};
+        RkSize m_size {0ULL};
 
         #pragma endregion
 
@@ -72,7 +72,7 @@ class LinkedChunkList
          * \brief Returns the number of chunks stored in the list
          * \return Number of chunks stored in the list
          */
-        [[nodiscard]] DAEsize GetSize() const noexcept;
+        [[nodiscard]] RkSize GetSize() const noexcept;
 
         /**
          * \brief Returns the head of the list, could be null 
@@ -102,7 +102,7 @@ class LinkedChunkList
          * \warning Make sure the node you are passing is owned by the list you are calling this function on
          *          otherwise, that may create bugs in ur code, since no verification is done before manipulating the node
          */
-        DAEvoid DeleteNode(Node& in_node) noexcept;
+        RkVoid DeleteNode(Node& in_node) noexcept;
 
         /**
          * \brief Executes a function for each element block of the list
@@ -110,7 +110,7 @@ class LinkedChunkList
          * \param in_lambda Actual lambda
          */
         template <typename TLambda>
-        DAEvoid Foreach(TLambda in_lambda) noexcept;
+        RkVoid Foreach(TLambda in_lambda) noexcept;
 
         #pragma endregion
 
@@ -124,4 +124,4 @@ class LinkedChunkList
 
 #include "Containers/LinkedChunkList.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

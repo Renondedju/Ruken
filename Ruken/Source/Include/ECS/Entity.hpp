@@ -27,7 +27,7 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class Archetype;
 
@@ -42,7 +42,7 @@ class Entity
         #pragma region Members
 
         Archetype* m_archetype        {nullptr};
-        DAEsize    m_local_identifier {0ULL};
+        RkSize    m_local_identifier {0ULL};
 
         #pragma endregion
 
@@ -55,7 +55,7 @@ class Entity
          * \param in_archetype Archetype of the entity
          * \param in_local_identifier Unique local identifier of the entity
          */
-        Entity(Archetype& in_archetype, DAEsize in_local_identifier);
+        Entity(Archetype& in_archetype, RkSize in_local_identifier);
     
         Entity(Entity const& in_copy) = default;
         Entity(Entity&&      in_move) = default;
@@ -76,7 +76,7 @@ class Entity
          * \return Local identifier
          * \note This can only be used to compare entities stored in the same archetype
          */
-        DAEsize GetLocalIdentifier() const noexcept;
+        RkSize GetLocalIdentifier() const noexcept;
 
         #pragma endregion
 
@@ -87,7 +87,7 @@ class Entity
          * \param in_other Other entity
          * \return True if the 2 compared entities are the same, false otherwise
          */
-        DAEbool operator==(Entity const& in_other) const noexcept;
+        RkBool operator==(Entity const& in_other) const noexcept;
 
         Entity& operator=(Entity const& in_copy) = default;
         Entity& operator=(Entity&&      in_move) = default;
@@ -95,4 +95,4 @@ class Entity
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

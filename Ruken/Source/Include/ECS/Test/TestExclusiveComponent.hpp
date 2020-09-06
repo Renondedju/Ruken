@@ -26,11 +26,11 @@
 
 #include "ECS/ExclusiveComponent.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 struct TestExclusiveComponent final: public ExclusiveComponent<0>
 {
-    DAEsize data1;
-    DAEsize data2;
-    DAEsize data3;
+    RkSize data1;
+    RkSize data2;
+    RkSize data3;
 };

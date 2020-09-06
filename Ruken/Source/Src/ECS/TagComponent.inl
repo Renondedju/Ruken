@@ -24,14 +24,14 @@
 
 #pragma once
 
-template <DAEsize TUniqueId>
+template <RkSize TUniqueId>
 EntityID TagComponent<TUniqueId>::CreateItem() noexcept
 {
     return m_component_size++;
 }
 
-template <DAEsize TUniqueId>
-DAEsize TagComponent<TUniqueId>::GetItemCount() const noexcept
+template <RkSize TUniqueId>
+RkSize TagComponent<TUniqueId>::GetItemCount() const noexcept
 {
     return m_component_size;
 }

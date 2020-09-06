@@ -22,29 +22,29 @@
  *  SOFTWARE.
  */
 
-template <DAEsize TUniqueId, typename... TMembers>
-DAEsize Component<TUniqueId, TMembers...>::CreateItem(Item&& in_item) noexcept
+template <RkSize TUniqueId, typename... TMembers>
+RkSize Component<TUniqueId, TMembers...>::CreateItem(Item&& in_item) noexcept
 {
     //Layout::PushBack(m_storage, std::forward<Item>(in_item));
 
     return m_size;
 }
 
-template <DAEsize TUniqueId, typename... TMembers>
-DAEsize Component<TUniqueId, TMembers...>::CreateItem() noexcept
+template <RkSize TUniqueId, typename... TMembers>
+RkSize Component<TUniqueId, TMembers...>::CreateItem() noexcept
 {
     return CreateItem(Item {});
 }
 
-template <DAEsize TUniqueId, typename... TMembers>
-DAEsize Component<TUniqueId, TMembers...>::GetItemCount() const noexcept
+template <RkSize TUniqueId, typename... TMembers>
+RkSize Component<TUniqueId, TMembers...>::GetItemCount() const noexcept
 {
     return m_size;
 }
 
-template <DAEsize TUniqueId, typename... TMembers>
+template <RkSize TUniqueId, typename... TMembers>
 template <typename TView>
 auto Component<TUniqueId, TMembers...>::GetItemView(EntityID in_entity) noexcept
 {
-    return Layout::template Get<TView>(m_storage, static_cast<DAEsize>(in_entity));
+    return Layout::template Get<TView>(m_storage, static_cast<RkSize>(in_entity));
 }

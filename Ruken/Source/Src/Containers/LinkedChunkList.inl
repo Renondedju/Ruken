@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename TType, DAEsize TChunkSize>
+template <typename TType, RkSize TChunkSize>
 LinkedChunkList<TType, TChunkSize>::~LinkedChunkList()
 {
     // Removing all the nodes from the head to the tail
@@ -32,19 +32,19 @@ LinkedChunkList<TType, TChunkSize>::~LinkedChunkList()
 
 #pragma region Getters
 
-template <typename TType, DAEsize TChunkSize>
-DAEsize LinkedChunkList<TType, TChunkSize>::GetSize() const noexcept
+template <typename TType, RkSize TChunkSize>
+RkSize LinkedChunkList<TType, TChunkSize>::GetSize() const noexcept
 {
     return m_size;
 }
 
-template <typename TType, DAEsize TChunkSize>
+template <typename TType, RkSize TChunkSize>
 typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunkSize>::GetHead() const noexcept
 {
     return m_head;
 }
 
-template <typename TType, DAEsize TChunkSize>
+template <typename TType, RkSize TChunkSize>
 typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunkSize>::GetTail() const noexcept
 {
     return m_tail;
@@ -54,7 +54,7 @@ typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunk
 
 #pragma region Methods
 
-template <typename TType, DAEsize TChunkSize>
+template <typename TType, RkSize TChunkSize>
 typename LinkedChunkList<TType, TChunkSize>::Node& LinkedChunkList<TType, TChunkSize>::CreateNode() noexcept
 {
     Node* new_node = new Node();
@@ -77,8 +77,8 @@ typename LinkedChunkList<TType, TChunkSize>::Node& LinkedChunkList<TType, TChunk
     return *new_node;
 }
 
-template <typename TType, DAEsize TChunkSize>
-DAEvoid LinkedChunkList<TType, TChunkSize>::DeleteNode(Node& in_node) noexcept
+template <typename TType, RkSize TChunkSize>
+RkVoid LinkedChunkList<TType, TChunkSize>::DeleteNode(Node& in_node) noexcept
 {
     // Updating the head
     if (m_head == &in_node)
@@ -101,9 +101,9 @@ DAEvoid LinkedChunkList<TType, TChunkSize>::DeleteNode(Node& in_node) noexcept
     delete &in_node;
 }
 
-template <typename TType, DAEsize TChunkSize>
+template <typename TType, RkSize TChunkSize>
 template <typename TLambda>
-DAEvoid LinkedChunkList<TType, TChunkSize>::Foreach(TLambda in_lambda) noexcept
+RkVoid LinkedChunkList<TType, TChunkSize>::Foreach(TLambda in_lambda) noexcept
 {
     for (Node* current_node = m_head; current_node != nullptr; current_node = current_node->next_node)
         in_lambda(*current_node);

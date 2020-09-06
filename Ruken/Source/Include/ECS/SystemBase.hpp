@@ -29,7 +29,7 @@
 #include "ECS/ComponentQuery.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 class SystemBase
 {
@@ -45,7 +45,7 @@ class SystemBase
 
         #pragma region Members
 
-        DAEbool enabled {true};
+        RkBool enabled {true};
 
         #pragma endregion
 
@@ -74,27 +74,27 @@ class SystemBase
          *        if the component query of this archetype and the system matches
          * \param in_archetype Referenced archetype of the group to create 
          */
-        virtual DAEvoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
+        virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
 
         /**
          * \brief Called once at the start of a simulation
          * \note This method could be called multiple times for the same
          *       instance if the simulation is restated without reloading the whole ECS 
          */
-        virtual DAEvoid OnStart() noexcept;
+        virtual RkVoid OnStart() noexcept;
 
         /**
          * \brief Called every frame
          * \param in_time_step Time passed in seconds since the last frame
          */
-        virtual DAEvoid OnUpdate(DAEfloat in_time_step) noexcept;
+        virtual RkVoid OnUpdate(RkFloat in_time_step) noexcept;
 
         /**
          * \brief Called once at the end of a simulation
          * \note This method could be called multiple times for the same
          *       instance if the simulation is restated without reloading the whole ECS 
          */
-        virtual DAEvoid OnEnd() noexcept;
+        virtual RkVoid OnEnd() noexcept;
 
         #pragma endregion
 
@@ -106,4 +106,4 @@ class SystemBase
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

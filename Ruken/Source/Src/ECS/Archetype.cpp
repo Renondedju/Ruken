@@ -24,7 +24,7 @@
 
 #include "ECS/Archetype.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 {
@@ -33,7 +33,7 @@ ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 
 Entity Archetype::CreateEntity() noexcept
 {
-    DAEsize local_identifier = 0;
+    RkSize local_identifier = 0;
 
     for (auto& [id, component]: m_components)
         local_identifier = component->CreateItem();
@@ -41,7 +41,7 @@ Entity Archetype::CreateEntity() noexcept
     return Entity(*this, local_identifier);
 }
 
-DAEsize Archetype::EntitiesCount() const noexcept
+RkSize Archetype::EntitiesCount() const noexcept
 {
     return m_components.cbegin()->second->GetItemCount();
 }

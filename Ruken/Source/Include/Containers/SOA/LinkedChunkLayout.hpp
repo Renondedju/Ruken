@@ -31,7 +31,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class describes an SOA layout and implements an interface to interact with the given layout
@@ -65,8 +65,8 @@ class LinkedChunkLayout
          * \param in_position position of the get
          * \return View instance containing references to the requested resources
          */
-        template <typename TLayoutView, DAEsize... TIds>
-        constexpr static auto GetHelper(ContainerType& in_container, DAEsize in_position, std::index_sequence<TIds...>) noexcept;
+        template <typename TLayoutView, RkSize... TIds>
+        constexpr static auto GetHelper(ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
 
@@ -89,11 +89,11 @@ class LinkedChunkLayout
          * \return View instance containing references to the requested resources
          */
         template <typename TLayoutView>
-        constexpr static auto Get(ContainerType& in_container, DAEsize in_position) noexcept;
+        constexpr static auto Get(ContainerType& in_container, RkSize in_position) noexcept;
 
         #pragma endregion 
 };
 
 #include "Containers/SOA/LinkedChunkLayout.inl"
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

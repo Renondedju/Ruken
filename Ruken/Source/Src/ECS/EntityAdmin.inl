@@ -31,7 +31,7 @@ RkVoid EntityAdmin::CreateSystem() noexcept
 }
 
 template <typename TComponent>
-DAEvoid EntityAdmin::CreateExclusiveComponent() noexcept
+RkVoid EntityAdmin::CreateExclusiveComponent() noexcept
 {
     m_exclusive_components.try_emplace(TComponent::id, std::make_unique<TComponent>());
 }
@@ -68,7 +68,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
 }
 
 template <typename... TComponents>
-EntityID EntityAdmin::CreateEntity() noexcept
+Entity EntityAdmin::CreateEntity() noexcept
 {
     // Looking for the archetype of the entity
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();

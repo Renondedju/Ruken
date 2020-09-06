@@ -26,7 +26,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Defines a field (or variable) for a component.
@@ -43,4 +43,4 @@ struct ComponentField
     using Type = TDataType;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

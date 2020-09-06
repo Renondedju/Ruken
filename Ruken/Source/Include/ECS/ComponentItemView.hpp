@@ -33,7 +33,7 @@
 #include "Meta/TupleHasType.hpp"
 #include "Containers/SOA/LinkedChunkLayoutView.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Allows to fetch only the required fields in a component, saving on data bus bandwidth and cache
@@ -44,7 +44,7 @@ BEGIN_DAEMON_NAMESPACE
 template <typename TPack, typename... TMembers>
 struct ComponentItemView;
 
-template <template <DAEsize...> class TPack, DAEsize... TIndices, typename... TMembers>
+template <template <RkSize...> class TPack, RkSize... TIndices, typename... TMembers>
 struct ComponentItemView<TPack<TIndices...>, TMembers...> : public LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>
 {
     private:
@@ -67,7 +67,7 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public LinkedChunkLa
          * \tparam TMember Member to look for
          */
         template <typename TMember>
-        using MemberExists = std::enable_if_t<TupleHasType<TMember, std::tuple<std::remove_const_t<TMembers>...>>::value, DAEbool>;
+        using MemberExists = std::enable_if_t<TupleHasType<TMember, std::tuple<std::remove_const_t<TMembers>...>>::value, RkBool>;
 
     public:
 
@@ -94,4 +94,4 @@ struct ComponentItemView<TPack<TIndices...>, TMembers...> : public LinkedChunkLa
         auto const& Fetch() const { return std::get<MemberIndex<TMember>::value>(static_cast<BaseConstTuple const&>(*this)); }
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

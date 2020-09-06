@@ -31,7 +31,7 @@ System<TComponents...>::System(EntityAdmin& in_admin) noexcept:
 }
 
 template <typename ... TComponents>
-DAEvoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
+RkVoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
 {
     m_groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
 }

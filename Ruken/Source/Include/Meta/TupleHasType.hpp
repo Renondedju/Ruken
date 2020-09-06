@@ -29,7 +29,7 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
  /**
  * \brief Checks if a tuple has the passed type, this is cv qualifiers sensitive 
@@ -42,4 +42,4 @@ struct TupleHasType;
 template <typename TType, typename... TTypes>
 struct TupleHasType<TType, std::tuple<TTypes...>> : std::disjunction<std::is_same<TType, TTypes>...> {};
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

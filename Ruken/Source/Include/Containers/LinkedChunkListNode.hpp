@@ -29,19 +29,19 @@
 #include "Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Represents a node in a LinkedChunkList
  * \tparam TType Elements type of the node
  * \tparam TChunkSize Size in octets of the chunk (node) (default is 16Kb or 2046 octets)
  */
-template<typename TType, DAEsize TChunkSize = 2048>
+template<typename TType, RkSize TChunkSize = 2048>
 class LinkedChunkListNode
 {
     public:
 
-        static constexpr DAEsize element_count = TChunkSize / sizeof(TType);
+        static constexpr RkSize element_count = TChunkSize / sizeof(TType);
 
         #pragma region Members
 
@@ -68,4 +68,4 @@ class LinkedChunkListNode
         #pragma endregion
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

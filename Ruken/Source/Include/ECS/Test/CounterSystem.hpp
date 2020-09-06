@@ -30,7 +30,7 @@
 #include "ECS/Test/CounterComponent.hpp"
 #include "ECS/Test/TestExclusiveComponent.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 struct CounterSystem final : System<CounterComponent, TestTagComponent>
 {
@@ -44,9 +44,9 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
      * \note This method could be called multiple times for the same
      *       instance if the simulation is restated without reloading the whole ECS 
      */
-    DAEvoid OnStart() noexcept override
+    RkVoid OnStart() noexcept override
     {
-        DAEsize count = 0;
+        RkSize count = 0;
 
         TestExclusiveComponent* test = m_admin.GetExclusiveComponent<TestExclusiveComponent>();
 
@@ -70,9 +70,9 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
      * \brief Called every frame
      * \param in_time_step Time passed in seconds since the last frame
      */
-    DAEvoid OnUpdate([[maybe_unused]] DAEfloat in_time_step) noexcept override
+    RkVoid OnUpdate([[maybe_unused]] RkFloat in_time_step) noexcept override
     {
-        DAEsize total = 0;
+        RkSize total = 0;
 
         // Iterating over every entity
         for (auto && group: m_groups)

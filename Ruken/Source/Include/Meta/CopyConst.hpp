@@ -28,9 +28,9 @@
 
 #include "Config.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 template <class TSource, class TDestination>
 using CopyConst = std::conditional_t<std::is_const_v<TSource>, const TDestination, std::remove_const_t<TDestination>>;
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

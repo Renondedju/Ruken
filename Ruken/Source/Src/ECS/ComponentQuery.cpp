@@ -25,9 +25,9 @@
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/Archetype.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
-DAEbool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
 {
     // Checking inclusion
     if (!in_archetype.GetFingerprint().HasAll(m_included))

@@ -34,7 +34,7 @@
 #include "ECS/ComponentItemView.hpp"
 #include "Containers/SOA/LinkedChunkLayoutItem.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Describes the memory layout of a component to the ECS
@@ -70,4 +70,4 @@ class ComponentItem : public LinkedChunkLayoutItem<typename TField::Type...>
         using FullReadonlyView = MakeView<TField const...> const;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

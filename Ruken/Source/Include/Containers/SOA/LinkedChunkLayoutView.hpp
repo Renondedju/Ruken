@@ -28,7 +28,7 @@
 
 #include "Build/Namespace.hpp"
 
-BEGIN_DAEMON_NAMESPACE
+BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief This class is used to fetch only certain fields when using LinkedChunkLayout::Get
@@ -57,4 +57,4 @@ struct LinkedChunkLayoutView<TSequence<TIndices...>, TTypes...> : public std::tu
     using std::tuple<TTypes&...>::operator=;
 };
 
-END_DAEMON_NAMESPACE
+END_RUKEN_NAMESPACE

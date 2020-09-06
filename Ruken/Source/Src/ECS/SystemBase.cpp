@@ -24,18 +24,18 @@
 
 #include "ECS/SystemBase.hpp"
 
-USING_DAEMON_NAMESPACE
+USING_RUKEN_NAMESPACE
 
 ComponentQuery const& SystemBase::GetQuery() const noexcept
 {
     return m_query;
 }
 
-DAEvoid SystemBase::OnStart() noexcept
+RkVoid SystemBase::OnStart() noexcept
 {}
 
-DAEvoid SystemBase::OnUpdate(DAEfloat) noexcept
+RkVoid SystemBase::OnUpdate(RkFloat) noexcept
 {}
 
-DAEvoid SystemBase::OnEnd() noexcept
+RkVoid SystemBase::OnEnd() noexcept
 {}
