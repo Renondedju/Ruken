@@ -1,6 +1,6 @@
 # Changelog
 
-> Daemon renderer changelog
+> Ruken changelog
 
 ## Version 0.0.0
 

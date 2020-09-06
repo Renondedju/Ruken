@@ -1,7 +1,0 @@
-// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
-// such as names of functions and macros.
-// For more information see https://go.microsoft.com/fwlink/?linkid=865984
-
-#define DAEMON_NAMESPACE daemon
-#define BEGIN_DAEMON_NAMESPACE namespace DAEMON_NAMESPACE {
-#define END_DAEMON_NAMESPACE }

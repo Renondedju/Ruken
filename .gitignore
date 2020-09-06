@@ -1,7 +1,7 @@
 # Daemon renderer gitignore
 
-!/DaemonRenderer/Source/Include/Debug/
-!/DaemonRenderer/Source/Src/Debug/
+!/Ruken/Source/Include/Debug/
+!/Ruken/Source/Src/Debug/
 
 # Temp and debug folders
 Build/
