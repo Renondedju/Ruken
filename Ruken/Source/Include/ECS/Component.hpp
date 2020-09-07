@@ -31,6 +31,7 @@
 
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ComponentItem.hpp"
+#include "ECS/ComponentLayout.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

@@ -28,32 +28,50 @@
 #include <utility>
 
 #include "Build/Namespace.hpp"
+
+#include "Meta/IndexPack.hpp"
+#include "Meta/TupleIndex.hpp"
+
+#include "ECS/ComponentItem.hpp"
+#include "ECS/ComponentItemView.hpp"
+
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief This class describes an SOA layout and implements an interface to interact with the given layout
- * \tparam TLayoutTypes Types to be contained in the layout
+ * \brief Describes a component layout as well as helpers to interact with that memory layout
+ * \tparam TFields Fields of the component, must be of type ComponentField
+ *
+ * \see ComponentItem, ComponentItemView, ComponentField, Component
  */
-template <typename... TLayoutTypes>
-class LinkedChunkLayout
+template <typename... TFields>
+class ComponentLayout
 {
     public:
 
-        using ContainerType = std::tuple<LinkedChunkList<TLayoutTypes>...>;
+        #pragma region Usings
 
-    private:
+        /**
+         * \brief Returns the index of a member using the member class
+         * \tparam TField Field class
+         */
+        template <typename TField>
+        using FieldIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<TFields...>>;
 
-        #pragma region Constructors
+        using ContainerType = std::tuple<LinkedChunkList<typename TFields::Type>...>;
+        using Item          = ComponentItem<TFields...>;
 
-        LinkedChunkLayout()                                 = default;
-        LinkedChunkLayout(LinkedChunkLayout const& in_copy) = default;
-        LinkedChunkLayout(LinkedChunkLayout&&      in_move) = default;
-        ~LinkedChunkLayout()                                = default;
+        // View constructors
+        template <typename... TSelectedFields>
+        using MakeView         = ComponentItemView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
+        using FullView         = MakeView<TFields...>;
+        using FullReadonlyView = MakeView<TFields const...> const;
 
         #pragma endregion 
+
+    private:
 
         #pragma region Methods
 
@@ -70,14 +88,16 @@ class LinkedChunkLayout
 
         #pragma endregion
 
-        #pragma region Operators
+    public:
 
-        LinkedChunkLayout& operator=(LinkedChunkLayout const& in_copy) = default;
-        LinkedChunkLayout& operator=(LinkedChunkLayout&&      in_move) = default;
+        #pragma region Constructors
+
+        ComponentLayout()                               = default;
+        ComponentLayout(ComponentLayout const& in_copy) = default;
+        ComponentLayout(ComponentLayout&&      in_move) = default;
+        ~ComponentLayout()                              = default;
 
         #pragma endregion
-
-    public:
 
         #pragma region Methods
 
@@ -92,8 +112,15 @@ class LinkedChunkLayout
         constexpr static auto Get(ContainerType& in_container, RkSize in_position) noexcept;
 
         #pragma endregion 
+
+        #pragma region Operators
+
+        ComponentLayout& operator=(ComponentLayout const& in_copy) = default;
+        ComponentLayout& operator=(ComponentLayout&&      in_move) = default;
+
+        #pragma endregion
 };
 
-#include "Containers/SOA/LinkedChunkLayout.inl"
+#include "ECS/ComponentLayout.inl"
 
 END_RUKEN_NAMESPACE

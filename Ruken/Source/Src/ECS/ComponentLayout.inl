@@ -24,19 +24,17 @@
 
 #pragma region Methods
 
-template <typename ... TLayoutTypes>
+template <typename ... TFields>
 template <typename TLayoutView, RkSize... TIds>
-constexpr auto LinkedChunkLayout<TLayoutTypes...>::GetHelper(
-    ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept
+constexpr auto ComponentLayout<TFields...>::GetHelper(ContainerType& in_container, daemon::RkSize in_position, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
     return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
 }
 
-template <typename ... TLayoutTypes>
+template <typename ... TFields>
 template <typename TLayoutView>
-constexpr auto LinkedChunkLayout<TLayoutTypes...>::Get(
-	ContainerType& in_container, RkSize in_position) noexcept
+constexpr auto daemon::ComponentLayout<TFields...>::Get(ContainerType& in_container, RkSize in_position) noexcept
 {
     return GetHelper<TLayoutView>(in_container, in_position, typename TLayoutView::Sequence());
 }

@@ -132,9 +132,6 @@
     <ClInclude Include="Source\Include\Build\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
-    <ClInclude Include="Source\Include\Containers\SOA\LinkedChunkLayout.hpp" />
-    <ClInclude Include="Source\Include\Containers\SOA\LinkedChunkLayoutItem.hpp" />
-    <ClInclude Include="Source\Include\Containers\SOA\LinkedChunkLayoutView.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
     <ClInclude Include="Source\Include\Core\Service.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceBase.hpp" />
@@ -158,6 +155,7 @@
     <ClInclude Include="Source\Include\ECS\ComponentField.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentLayout.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
@@ -289,12 +287,12 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
-    <None Include="Source\Src\Containers\SOA\LinkedChunkLayout.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
     <None Include="Source\Src\Core\Service.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />
     <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
     <None Include="Source\Src\ECS\Component.inl" />
+    <None Include="Source\Src\ECS\ComponentLayout.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />

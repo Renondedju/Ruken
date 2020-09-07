@@ -49,8 +49,8 @@ class LinkedChunkList
 
         #pragma region Members
 
-        Node*   m_head {nullptr};
-        Node*   m_tail {nullptr};
+        Node*  m_head {nullptr};
+        Node*  m_tail {nullptr};
         RkSize m_size {0ULL};
 
         #pragma endregion

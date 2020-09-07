@@ -29,45 +29,20 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/IndexPack.hpp"
-#include "Meta/TupleIndex.hpp"
-#include "ECS/ComponentItemView.hpp"
-#include "Containers/SOA/LinkedChunkLayoutItem.hpp"
-
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Describes the memory layout of a component to the ECS
- * \tparam TField Variable types
+ * \tparam TFields Variable types
  */
-template <typename... TField>
-class ComponentItem : public LinkedChunkLayoutItem<typename TField::Type...>
+template <typename... TFields>
+class ComponentItem : public std::tuple<typename TFields::Type...>
 {
-    private:
-
-        /**
-         * \brief Returns the index of a member using the member class
-         * \tparam TMember Member class
-         */
-        template <typename TMember>
-        using VariableIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<TField...>>;
-
     public:
 
-        // Default constructor
-        ComponentItem(typename TField::Type&&... in_data) noexcept:
-            LinkedChunkLayoutItem<typename TField::Type...>(std::forward<typename TField::Type>(in_data)...)
-        {}
-
-        // Exposing parent constructors
-        using LinkedChunkLayoutItem<typename TField::Type...>::LinkedChunkLayoutItem;
-        using LinkedChunkLayoutItem<typename TField::Type...>::operator=;
-
-        // View constructors
-        template <typename... TSelectedVariables>
-        using MakeView         = ComponentItemView<IndexPack<VariableIndex<TSelectedVariables>::value...>, TSelectedVariables...>;
-        using FullView         = MakeView<TField...>;
-        using FullReadonlyView = MakeView<TField const...> const;
+        // Making constructors available
+        using std::tuple<typename TFields::Type...>::tuple;
+        using std::tuple<typename TFields::Type...>::operator=;
 };
 
 END_RUKEN_NAMESPACE

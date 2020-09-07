@@ -31,7 +31,6 @@
 #include "Meta/CopyConst.hpp"
 #include "Meta/TupleIndex.hpp"
 #include "Meta/TupleHasType.hpp"
-#include "Containers/SOA/LinkedChunkLayoutView.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -39,59 +38,63 @@ BEGIN_RUKEN_NAMESPACE
  * \brief Allows to fetch only the required fields in a component, saving on data bus bandwidth and cache
  * \note All instances of this class are generated via the item type of each component
  * \tparam TPack Index pack enumerating the index of the members to fetch
- * \tparam TMembers Member types to create a reference onto
+ * \tparam TFields Member types to create a reference onto
  */
-template <typename TPack, typename... TMembers>
+template <typename TPack, typename... TFields>
 struct ComponentItemView;
 
-template <template <RkSize...> class TPack, RkSize... TIndices, typename... TMembers>
-struct ComponentItemView<TPack<TIndices...>, TMembers...> : public LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>
+template <template <RkSize...> class TPack, RkSize... TIndices, typename... TFields>
+struct ComponentItemView<TPack<TIndices...>, TFields...> : public std::tuple<CopyConst<TFields, typename TFields::Type&>...>
 {
     private:
 
         // Helpers for the Fetch method
-        // These helpers represents the most basic forms of this class (via inheritance)
-        using BaseTuple      = std::tuple<CopyConst<TMembers, typename TMembers::Type&>...>;
-        using BaseConstTuple = std::tuple<typename TMembers::Type const&...>;
+        using BaseTuple      = std::tuple<CopyConst<TFields, typename TFields::Type&>...>;
+        using BaseConstTuple = std::tuple<typename TFields::Type const&...>;
 
         /**
          * \brief Returns the index of a member inside of the view
-         * \tparam TMember Member to look for
+         * \tparam TField Member to look for
          */
-        template <typename TMember>
-        using MemberIndex = TupleIndex<std::remove_const_t<TMember>, std::tuple<std::remove_const_t<TMembers>...>>;
+        template <typename TField>
+        using MemberIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
 
         /**
          * \brief Checks if a given member exists in this view,
          *        if not SFINAE will prevent compilation to avoid some more ugly errors 
-         * \tparam TMember Member to look for
+         * \tparam TField Member to look for
          */
-        template <typename TMember>
-        using MemberExists = std::enable_if_t<TupleHasType<TMember, std::tuple<std::remove_const_t<TMembers>...>>::value, RkBool>;
+        template <typename TField>
+        using MemberExists = std::enable_if_t<TupleHasType<TField, std::tuple<std::remove_const_t<TFields>...>>::value, RkBool>;
 
     public:
 
         // Making parent constructors available
-        using LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::LinkedChunkLayoutView;
-        using LinkedChunkLayoutView<std::index_sequence<TIndices...>, CopyConst<TMembers, typename TMembers::Type>...>::operator=;
+        using BaseTuple::tuple;
+        using BaseTuple::operator=;
+
+        /**
+         * \brief Member index sequence of the view
+         */
+        using Sequence = std::index_sequence<TIndices...>;
 
         /**
          * \brief Returns a reference onto a given member stored in the view.
          * \note The view must include the requested member to work
-         * \tparam TMember Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
-         * \return Member reference
+         * \tparam TField Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
+         * \return Field reference
          */
-        template<typename TMember, MemberExists<TMember> = true>
-        auto&       Fetch()       { return std::get<MemberIndex<TMember>::value>(static_cast<BaseTuple&>(*this)); }
+        template<typename TField, MemberExists<TField> = true>
+        auto&       Fetch()       { return std::get<MemberIndex<TField>::value>(static_cast<BaseTuple&>(*this)); }
 
         /**
          * \brief Returns a constant reference onto a given member stored in the view.
          * \note The view must include the requested member to work
-         * \tparam TMember Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
-         * \return Member constant reference
+         * \tparam TField Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
+         * \return Field constant reference
          */
-        template<typename TMember, MemberExists<TMember> = true>
-        auto const& Fetch() const { return std::get<MemberIndex<TMember>::value>(static_cast<BaseConstTuple const&>(*this)); }
+        template<typename TField, MemberExists<TField> = true>
+        auto const& Fetch() const { return std::get<MemberIndex<TField>::value>(static_cast<BaseConstTuple const&>(*this)); }
 };
 
 END_RUKEN_NAMESPACE

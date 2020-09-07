@@ -32,9 +32,9 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Finds the index of the first occurence of TType in TTuple
+ * \brief Finds the index of the first occurrence of TType in TTuple
  * \note If the type isn't found, this will throw a hard compilation error
- * \tparam TType Type occurence to look for
+ * \tparam TType Type occurrence to look for
  * \tparam TTuple Tuple to look into
  */
 template <class TType, class TTuple>
@@ -51,14 +51,5 @@ struct TupleIndex<TType, std::tuple<TFirst, TTypes...>>
 {
     static constexpr RkSize value = 1 + TupleIndex<TType, std::tuple<TTypes...>>::value;
 };
-
-/**
- * \brief Finds the index of the first occurence of TType in TTuple
- * \note If the type isn't found, this will throw a hard compilation error
- * \tparam TType Type occurence to look for
- * \tparam TTuple Tuple to look into
- */
-template <class TType, class TTuple>
-inline constexpr RkSize TupleIndexV = TupleIndex<TType, TTuple>::value;
 
 END_RUKEN_NAMESPACE
