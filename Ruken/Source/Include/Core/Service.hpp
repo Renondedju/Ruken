@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Core/ServiceBase.hpp"
 #include "Types/FundamentalTypes.hpp"
 

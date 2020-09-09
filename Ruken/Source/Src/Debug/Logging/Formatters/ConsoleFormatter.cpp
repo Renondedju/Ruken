@@ -22,6 +22,7 @@
  *  SOFTWARE.
  */
 
+#include "Build/OperatingSystem.hpp"
 #include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
 #ifdef RUKEN_OS_WINDOWS

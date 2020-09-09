@@ -28,7 +28,7 @@
 #include <vector>
 #include <functional>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Core/Service.hpp"
 #include "Debug/Logging/Logger.hpp"

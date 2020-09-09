@@ -26,7 +26,7 @@
 
 #include <tuple>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Meta/ValueIndexer.hpp"
 
 #include "Containers/SOA/DataLayout.hpp"

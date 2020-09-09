@@ -27,7 +27,7 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Core/Service.hpp"
 #include "Core/ServiceBase.hpp"
 #include "Types/FundamentalTypes.hpp"

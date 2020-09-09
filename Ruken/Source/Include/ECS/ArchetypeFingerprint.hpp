@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Meta/MinimumType.hpp"
 #include "Bitwise/SizedBitmask.hpp"

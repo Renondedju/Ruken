@@ -26,9 +26,7 @@
 
 #include <atomic>
 
-#include "Config.hpp"
-
-#include "Types/Unique.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Core/Service.hpp"
 #include "Core/ServiceProvider.hpp"

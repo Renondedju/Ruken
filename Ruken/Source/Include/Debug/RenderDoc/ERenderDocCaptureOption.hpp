@@ -26,7 +26,7 @@
 
 #include <RenderDoc/renderdoc_app.h>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE

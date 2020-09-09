@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Types/Operators/Bitwise/Or.hpp"
 #include "Types/Operators/Bitwise/And.hpp"

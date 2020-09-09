@@ -22,9 +22,10 @@
  *  SOFTWARE.
  */
 
+#include "Build/Info.hpp"
+#include "Build/Build.hpp"
+
 #include "Kernel.hpp"
-#include "Config.hpp"
-#include "Build.hpp"
 #include "KernelProxy.hpp"
 
 #include "Rendering/Renderer.hpp"

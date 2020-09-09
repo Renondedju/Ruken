@@ -26,7 +26,7 @@
 
 #include <type_traits>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Meta/Meta.hpp"
 

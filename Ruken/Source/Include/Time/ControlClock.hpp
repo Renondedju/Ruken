@@ -26,7 +26,7 @@
 
 #include <chrono>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Time/Timer.hpp"
 

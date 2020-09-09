@@ -27,7 +27,7 @@
 #include <thread>
 #include <string>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Types/NonCopyable.hpp"
 #include "Types/FundamentalTypes.hpp"

@@ -27,7 +27,7 @@
 #include <string>
 #include <exception>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceLoadingFailureCode.hpp"

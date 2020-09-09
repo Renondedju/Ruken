@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Meta/IndexPack.hpp"
 #include "ECS/ComponentItemView.hpp"

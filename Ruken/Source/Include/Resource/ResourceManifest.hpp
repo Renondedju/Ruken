@@ -26,7 +26,7 @@
 
 #include <atomic>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceStatus.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"

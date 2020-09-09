@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Containers/Queue.hpp"
 #include "Threading/Synchronized.hpp"

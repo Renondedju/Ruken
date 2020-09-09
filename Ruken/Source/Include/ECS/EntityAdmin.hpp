@@ -27,7 +27,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "ECS/EntityID.hpp"
 #include "ECS/Archetype.hpp"

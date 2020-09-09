@@ -25,8 +25,10 @@
 #include <set>
 #include <vector>
 
-#include "Vulkan/Core/VulkanInstance.hpp"
+#include "Build/Info.hpp"
+#include "Build/Config.hpp"
 
+#include "Vulkan/Core/VulkanInstance.hpp"
 #include "Vulkan/Utilities/VulkanDebug.hpp"
 #include "Vulkan/Utilities/VulkanLoader.hpp"
 
