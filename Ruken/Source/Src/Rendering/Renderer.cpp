@@ -24,8 +24,8 @@
 
 #include "Rendering/Renderer.hpp"
 
-#include "Kernel.hpp"
-#include "KernelProxy.hpp"
+#include "Core/Kernel.hpp"
+#include "Core/KernelProxy.hpp"
 
 #include "Threading/Scheduler.hpp"
 

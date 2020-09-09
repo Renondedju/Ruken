@@ -25,8 +25,8 @@
 #include "Build/Info.hpp"
 #include "Build/Build.hpp"
 
-#include "Kernel.hpp"
-#include "KernelProxy.hpp"
+#include "Core/Kernel.hpp"
+#include "Core/KernelProxy.hpp"
 
 #include "Rendering/Renderer.hpp"
 #include "Threading/Scheduler.hpp"
