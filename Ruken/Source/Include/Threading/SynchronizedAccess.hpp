@@ -26,7 +26,7 @@
 
 #include <shared_mutex>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Threading/EAccessMode.hpp"
 
 BEGIN_RUKEN_NAMESPACE

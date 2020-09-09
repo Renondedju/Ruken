@@ -24,40 +24,23 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-
-#include "Types/NamedType.hpp"
-#include "Types/FundamentalTypes.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-/**
- * \brief Less than or equal class
- * 
- * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types.
- * 
- * \tparam TStrongTypedef Base NamedType
- *
- * \see NamedType
- */
-template <typename TStrongTypedef>
-struct LessEqual
-{
-    /**
-     * \brief Less than or equal operator
-     *
-     * \param in_lhs Left-hand side operand
-     * \param in_rhs Right-hand side operand
-     *
-     * \return Returns True if the left operand is lesser than or equal to the right operand, false otherwise.
-     */
-    friend constexpr RkBool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
-    {
-        using Type = internal::UnderlyingType<TStrongTypedef>;
-
-        return static_cast<Type const&>(in_lhs) <= static_cast<Type const&>(in_rhs);
-    }
-};
-
-END_RUKEN_NAMESPACE
+#if    defined(_MSC_VER)
+    #define RUKEN_COMPILER_MSVC
+    #define RUKEN_COMPILER_STR "msvc"
+#elif defined(__ICL) || defined(__ICC) || defined(__INTEL_COMPILER)
+    #define RUKEN_COMPILER_INTEL
+    #define RUKEN_COMPILER_STR "intel"
+#elif defined(__clang__)
+    #define RUKEN_COMPILER_CLANG
+    #define RUKEN_COMPILER_GCC // GCC-Compatible
+    #define RUKEN_COMPILER_STR "clang"
+#elif defined(__ghs__) // must appear _before_ __GNUC__ || __GNUG__
+    #define RUKEN_COMPILER_GHS
+    #define RUKEN_COMPILER_STR "ghs"
+#elif defined(__GNUC__) || defined(__GNUG__)
+    #define RUKEN_COMPILER_GCC
+    #define RUKEN_COMPILER_STR "gcc"
+#else
+    #define RUKEN_COMPILER_UNKNOWN
+    #define RUKEN_COMPILER_STR "unknown"
+#endif

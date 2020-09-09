@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Meta/IndexSequence/PartitionIndexSequence.hpp"
 #include "Meta/IndexSequence/ConcatenateIndexSequence.hpp"

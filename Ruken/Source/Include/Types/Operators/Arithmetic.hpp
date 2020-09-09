@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Types/Operators/Arithmetic/Modulo.hpp"
 #include "Types/Operators/Arithmetic/Addition.hpp"

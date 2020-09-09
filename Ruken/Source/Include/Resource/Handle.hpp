@@ -26,7 +26,7 @@
 
 #include "Utility/Todo.hpp"
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #include "Resource/IResource.hpp"

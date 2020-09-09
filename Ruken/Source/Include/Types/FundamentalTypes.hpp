@@ -27,7 +27,7 @@
 // stdint.h is used instead of cstdint on purpose, please don't modify this.
 #include <stdint.h>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

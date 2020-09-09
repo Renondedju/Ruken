@@ -26,7 +26,7 @@
 
 #include <RenderDoc/renderdoc_app.h>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Bitwise/Bitmask.hpp"
 #include "Debug/RenderDoc/ERenderDocCaptureOption.hpp"
 

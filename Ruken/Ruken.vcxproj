@@ -122,8 +122,14 @@
     <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
     <ClInclude Include="Source\Include\Bitwise\Endian.hpp" />
     <ClInclude Include="Source\Include\Bitwise\SizedBitmask.hpp" />
-    <ClInclude Include="Source\Include\Build.hpp" />
-    <ClInclude Include="Source\Include\Config.hpp" />
+    <ClInclude Include="Source\Include\Build\Build.hpp" />
+    <ClInclude Include="Source\Include\Build\Compiler.hpp" />
+    <ClInclude Include="Source\Include\Build\OperatingSystem.hpp" />
+    <ClInclude Include="Source\Include\Build\Info.hpp" />
+    <ClInclude Include="Source\Include\Build\Namespace.hpp" />
+    <ClInclude Include="Source\Include\Build\Platform.hpp" />
+    <ClInclude Include="Source\Include\Build\Revision.hpp" />
+    <ClInclude Include="Source\Include\Build\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayout.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayoutItem.hpp" />
     <ClInclude Include="Source\Include\Containers\SOA\DataLayoutView.hpp" />

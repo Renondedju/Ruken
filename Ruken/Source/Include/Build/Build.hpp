@@ -24,40 +24,13 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#include "Build/Config.hpp"
+#include "Build/Revision.hpp"
+#include "Build/Platform.hpp"
+#include "Build/Compiler.hpp"
+#include "Build/OperatingSystem.hpp"
 
-#include "Types/NamedType.hpp"
-#include "Types/FundamentalTypes.hpp"
+#define RUKEN_BUILD_VERSION "0.0.0"
+#define RUKEN_BUILD_STAMP   __DATE__ " " __TIME__
 
-BEGIN_RUKEN_NAMESPACE
-
-/**
- * \brief Less than or equal class
- * 
- * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types.
- * 
- * \tparam TStrongTypedef Base NamedType
- *
- * \see NamedType
- */
-template <typename TStrongTypedef>
-struct LessEqual
-{
-    /**
-     * \brief Less than or equal operator
-     *
-     * \param in_lhs Left-hand side operand
-     * \param in_rhs Right-hand side operand
-     *
-     * \return Returns True if the left operand is lesser than or equal to the right operand, false otherwise.
-     */
-    friend constexpr RkBool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
-    {
-        using Type = internal::UnderlyingType<TStrongTypedef>;
-
-        return static_cast<Type const&>(in_lhs) <= static_cast<Type const&>(in_rhs);
-    }
-};
-
-END_RUKEN_NAMESPACE
+#define RUKEN_BUILD_INFO RUKEN_PROJECT_NAME " " RUKEN_BUILD_VERSION " rev " RUKEN_BUILD_REVISION " (" RUKEN_OS_STR "-" RUKEN_PLATFORM_STR " " RUKEN_CONFIG_STR " > " RUKEN_COMPILER_STR ")"

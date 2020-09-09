@@ -24,40 +24,7 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-
-#include "Types/NamedType.hpp"
-#include "Types/FundamentalTypes.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-/**
- * \brief Less than or equal class
- * 
- * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types.
- * 
- * \tparam TStrongTypedef Base NamedType
- *
- * \see NamedType
- */
-template <typename TStrongTypedef>
-struct LessEqual
-{
-    /**
-     * \brief Less than or equal operator
-     *
-     * \param in_lhs Left-hand side operand
-     * \param in_rhs Right-hand side operand
-     *
-     * \return Returns True if the left operand is lesser than or equal to the right operand, false otherwise.
-     */
-    friend constexpr RkBool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
-    {
-        using Type = internal::UnderlyingType<TStrongTypedef>;
-
-        return static_cast<Type const&>(in_lhs) <= static_cast<Type const&>(in_rhs);
-    }
-};
-
-END_RUKEN_NAMESPACE
+#define RUKEN_COPYRIGHT_STR "Copyright (c) 2019-2020 Basile Combet, Philippe Yi"
+#define RUKEN_LICENSE_STR   "MIT License"
+#define RUKEN_PROJECT_NAME  "Ruken"
+#define RUKEN_URL           "https://github.com/Renondedju/Ruken"

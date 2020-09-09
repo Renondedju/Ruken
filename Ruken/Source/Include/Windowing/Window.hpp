@@ -24,6 +24,9 @@
 
 #pragma once
 
+#include "Build/Namespace.hpp"
+#include "Build/OperatingSystem.hpp"
+
 #include "Functional/Event.hpp"
 
 #include "Windowing/Utilities.hpp"

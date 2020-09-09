@@ -26,7 +26,7 @@
 
 #include <typeindex>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Meta/IndexSequence/ConcatenateIndexSequence.hpp"
 
 BEGIN_RUKEN_NAMESPACE

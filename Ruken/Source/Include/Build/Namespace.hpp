@@ -24,40 +24,10 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#define RUKEN_NAMESPACE ruken
+#define USING_RUKEN_NAMESPACE using namespace RUKEN_NAMESPACE;
+#define BEGIN_RUKEN_NAMESPACE namespace RUKEN_NAMESPACE {
+#define END_RUKEN_NAMESPACE }
 
-#include "Types/NamedType.hpp"
-#include "Types/FundamentalTypes.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-/**
- * \brief Less than or equal class
- * 
- * This class is meant to be used in conjunction with the NamedType class.
- * This allows for better and quicker operator integrations to named types.
- * 
- * \tparam TStrongTypedef Base NamedType
- *
- * \see NamedType
- */
-template <typename TStrongTypedef>
-struct LessEqual
-{
-    /**
-     * \brief Less than or equal operator
-     *
-     * \param in_lhs Left-hand side operand
-     * \param in_rhs Right-hand side operand
-     *
-     * \return Returns True if the left operand is lesser than or equal to the right operand, false otherwise.
-     */
-    friend constexpr RkBool operator<=(TStrongTypedef const& in_lhs, TStrongTypedef const& in_rhs) noexcept
-    {
-        using Type = internal::UnderlyingType<TStrongTypedef>;
-
-        return static_cast<Type const&>(in_lhs) <= static_cast<Type const&>(in_rhs);
-    }
-};
-
-END_RUKEN_NAMESPACE
+// This avoids msvc error C2871 (or equivalent) to be triggered
+namespace RUKEN_NAMESPACE {}

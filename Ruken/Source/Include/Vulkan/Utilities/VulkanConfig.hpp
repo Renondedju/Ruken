@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Build/OperatingSystem.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #if defined(RUKEN_OS_WINDOWS)

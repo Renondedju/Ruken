@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 #include "Functional/Event.hpp"
 
 BEGIN_RUKEN_NAMESPACE

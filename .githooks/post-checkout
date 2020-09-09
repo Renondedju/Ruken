@@ -1,4 +1,12 @@
-/*
+#!/bin/bash
+
+# This hook writes the Revision.hpp file to contain the current revision string
+# of the engine. This revision string is included in every build to identify the original
+# commit it has been built from
+
+REVISION=$(git describe --dirty="*" --tags --always)
+
+echo "/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,9 +32,6 @@
 
 #pragma once
 
-#include "Config.hpp"
+#define RUKEN_BUILD_REVISION \"${REVISION}\"" > Ruken/Source/Include/Build/Revision.hpp
 
-#define RUKEN_BUILD_VERSION "0.0.0-dev"
-#define RUKEN_BUILD_STAMP   __DATE__ " " __TIME__
-
-#define RUKEN_BUILD_INFO RUKEN_PROJECT_NAME " " RUKEN_BUILD_VERSION " (" RUKEN_OS_STR "-" RUKEN_PLATFORM_STR " " RUKEN_CONFIG_STR " > " RUKEN_COMPILER_STR ")"
+echo "Current revision number is ${REVISION}"

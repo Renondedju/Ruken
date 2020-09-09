@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Meta/Assert.hpp"
 #include "Containers/SOA/DataLayout.hpp"

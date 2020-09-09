@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Types/Operators/Bitwise.hpp"
 #include "Types/Operators/Logical.hpp"

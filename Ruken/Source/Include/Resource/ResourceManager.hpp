@@ -27,7 +27,7 @@
 #include <atomic>
 #include <unordered_map>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "Core/Service.hpp"
 #include "Types/Unique.hpp"
