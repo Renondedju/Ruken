@@ -1,12 +1,10 @@
-# Daemon renderer gitignore
-
-!/Ruken/Source/Include/Debug/
-!/Ruken/Source/Src/Debug/
-
 # Temp and debug folders
-Build/
 Logs/
+Build/
 Debug/*
+
+# Revision file
+Revision.hpp
 
 #logs
 *.bsc
@@ -42,3 +40,7 @@ ipch
 *.wav
 *.ogg
 _ReSharper.Caches
+
+!/Ruken/Source/Include/Debug/
+!/Ruken/Source/Include/Build/
+!/Ruken/Source/Src/Debug/
