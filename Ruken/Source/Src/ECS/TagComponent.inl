@@ -25,13 +25,13 @@
 #pragma once
 
 template <RkSize TUniqueId>
-EntityID TagComponent<TUniqueId>::CreateItem() noexcept
+EntityID TagComponent<TUniqueId>::CreateEntity() noexcept
 {
     return m_component_size++;
 }
 
 template <RkSize TUniqueId>
-RkSize TagComponent<TUniqueId>::GetItemCount() const noexcept
+RkSize TagComponent<TUniqueId>::GetEntityCount() const noexcept
 {
     return m_component_size;
 }

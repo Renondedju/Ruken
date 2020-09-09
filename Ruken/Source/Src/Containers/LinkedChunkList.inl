@@ -102,6 +102,54 @@ RkVoid LinkedChunkList<TType, TChunkSize>::DeleteNode(Node& in_node) noexcept
 }
 
 template <typename TType, RkSize TChunkSize>
+typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunkSize>::GetNode(RkSize const in_node_index) const noexcept
+{
+    // Tail optimization
+    if (in_node_index == m_size)
+        return m_tail;
+
+    // Head optimization
+    if (in_node_index == 0)
+        return m_head;
+
+    if (in_node_index > m_size)
+        return nullptr;
+
+    // Checking if the node is closer to the beginning or the end
+    if (in_node_index < m_size / 2)
+    {
+        // Forward iteration
+        Node* node = m_head;
+        for (RkSize index = 0ULL; index < in_node_index; ++index)
+            node = node->next_node;
+
+        return node;
+    }
+
+    // Backward iteration
+    Node* node = m_tail;
+    for (RkSize index = 0ULL; index < m_size - in_node_index; ++index)
+        node = node->prev_node;
+
+    return node;
+}
+
+template <typename TType, RkSize TChunkSize>
+RkVoid LinkedChunkList<TType, TChunkSize>::InsertData(RkSize const in_index, TType&& in_data) noexcept
+{
+    // Finding the corresponding chunk
+    RkSize const chunk_id = in_index / chunk_element_count;
+
+    // Creating missing chunks if needed
+    while (m_size < chunk_id)
+        CreateNode();
+
+    // Inserting the data
+    Node* node = GetNode(chunk_id);
+    node->data[in_index % chunk_element_count] = std::move(in_data);
+}
+
+template <typename TType, RkSize TChunkSize>
 template <typename TLambda>
 RkVoid LinkedChunkList<TType, TChunkSize>::Foreach(TLambda in_lambda) noexcept
 {

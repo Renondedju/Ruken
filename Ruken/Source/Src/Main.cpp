@@ -24,11 +24,25 @@
 
 #include "Core/Kernel.hpp"
 
+#include "ECS/EntityAdmin.hpp"
+
+#include "ECS/Test/CounterSystem.hpp"
+#include "ECS/Test/CounterComponent.hpp"
+#include "ECS/Test/TestExclusiveComponent.hpp"
+
 USING_RUKEN_NAMESPACE
 
 int main()
 {
-    Kernel kernel;
+    EntityAdmin admin;
 
-    return kernel.Run();
+    admin.CreateSystem<CounterSystem>();
+    admin.CreateExclusiveComponent<TestExclusiveComponent>();
+
+    for (RkSize index = 0; index < 8000; ++index)
+        admin.CreateEntity<CounterComponent>();
+
+
+    //Kernel kernel;
+    //return kernel.Run();
 }

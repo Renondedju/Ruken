@@ -22,21 +22,21 @@
  *  SOFTWARE.
  */
 
-template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index, Item&& in_item) noexcept
-{
-    Layout::Insert(m_storage, in_index, std::forward<Item>(in_item));
-}
+#include "ECS/Range.hpp"
 
-template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index) noexcept
-{
-    CreateItem(in_index, Item {});
-}
+USING_RUKEN_NAMESPACE
 
-template <RkSize TUniqueId, typename... TMembers>
-template <typename TView>
-auto Component<TUniqueId, TMembers...>::GetItemView(RkSize in_index) noexcept
+Range::Range(RkSize const in_begin, RkSize const in_size):
+    begin {in_begin},
+    size  {in_size}
+{ }
+
+RkSize Range::ReduceRight() noexcept
 {
-    return Layout::template Get<TView>(m_storage, in_index);
+    // Cannot reduce an empty range
+    if (size == 0ULL)
+        return 0ULL;
+
+    ++begin;
+    return --size;
 }

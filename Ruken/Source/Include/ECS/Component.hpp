@@ -47,13 +47,13 @@ BEGIN_RUKEN_NAMESPACE
 template <RkSize TUniqueId, typename... TFields>
 class Component final : public ComponentBase
 {
-    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0               , "A component must have at least one field, use a TagComponent instead."    );
+    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0              , "A component must have at least one field, use a TagComponent instead."    );
     RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
 
     public:
 
-        using Item   = ComponentItem<TFields...>;
-        using Layout = typename Item::Layout;
+        using Item   = ComponentItem  <TFields...>;
+        using Layout = ComponentLayout<TFields...>;
 
         /**
          * \brief Returns the container type for a single field
@@ -68,8 +68,6 @@ class Component final : public ComponentBase
 
         // Storage of the component
         typename Layout::ContainerType m_storage {};
-
-        RkSize m_size {0ULL};
 
         #pragma endregion
 
@@ -90,26 +88,21 @@ class Component final : public ComponentBase
 
         /**
          * \brief Creates an item into the component
-         * \param in_item item to push back
-         * \return Created item id
+         * \note If the index points to a new index never referenced before, this method will allocate new memory if necessary
+         * \param in_index Index to insert the item at
+         * \param in_item Item to insert
          */
-        RkSize CreateItem(Item&& in_item) noexcept;
-        RkSize CreateItem()               noexcept override;
-
-        /**
-         * \brief Returns the count of items in this component
-         * \return Component item count
-         */
-        RkSize GetItemCount() const noexcept override;
+        RkVoid         CreateItemAt(RkSize in_index, Item&& in_item) noexcept;
+        virtual RkVoid CreateItemAt(RkSize in_index)                 noexcept override;
 
         /**
          * \brief Returns a view containing all the requested fields of a given entity
          * \tparam TView View type
-         * \param in_entity Entity to fetch
+         * \param in_index Index of the requested item
          * \return View containing all the requested fields of the given entity
          */
         template <typename TView>
-        auto GetItemView(EntityID in_entity) noexcept;
+        auto GetItemView(RkSize in_index) noexcept;
 
         #pragma endregion 
 

@@ -32,12 +32,12 @@
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final : System<CounterComponent, TestTagComponent>
+struct CounterSystem final : System<CounterComponent>
 {
-    using System<CounterComponent, TestTagComponent>::System;
+    using System<CounterComponent>::System;
 
-    using StartView  = CounterComponent::Item::MakeView<Count>;
-    using UpdateView = CounterComponent::Item::MakeView<Count const> const;
+    using StartView  = CounterComponent::Layout::MakeView<Count>;
+    using UpdateView = CounterComponent::Layout::MakeView<Count const> const;
 
     /**
      * \brief Called once at the start of a simulation
@@ -56,10 +56,10 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
 
         // Iterating over every entity
         for (auto && group: m_groups)
-        for (EntityID entity; entity < group.GetReferencedArchetype().EntitiesCount(); ++entity)
+        for (RkSize entity_index = 0ULL; entity_index < group.GetReferencedArchetype().EntitiesCount(); ++entity_index)
         {
             // Creating views
-            StartView view = group.GetComponent<CounterComponent>().GetItemView<StartView>(entity);
+            StartView view = group.GetComponent<CounterComponent>().GetItemView<StartView>(entity_index);
 
             // Setting the "CounterComponent::Count" variable
             view.Fetch<Count>() = count++;
@@ -76,10 +76,10 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
 
         // Iterating over every entity
         for (auto && group: m_groups)
-        for (EntityID entity; entity < group.GetReferencedArchetype().EntitiesCount(); ++entity)
+        for (RkSize entity_index = 0ULL; entity_index < group.GetReferencedArchetype().EntitiesCount(); ++entity_index)
         {
             // Creating views
-            UpdateView view = group.GetComponent<CounterComponent>().GetItemView<UpdateView>(entity);
+            UpdateView view = group.GetComponent<CounterComponent>().GetItemView<UpdateView>(entity_index);
 
             // Reading the "CounterComponent::Count" variable
             total += view.Fetch<Count>();

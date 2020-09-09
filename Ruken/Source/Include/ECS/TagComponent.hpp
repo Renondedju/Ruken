@@ -44,17 +44,6 @@ class TagComponent final : public ComponentBase
 {
     RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
 
-    private:
-
-        #pragma region Methods
-
-        // The size of the component must still be tracked in case where the
-        // archetype we are living in queries us to find its size.
-        // TODO(Basile): That job could be handled by the Archetype instead
-        RkSize m_component_size {0};
-
-        #pragma endregion 
-
     public:
 
         static constexpr RkSize id = TUniqueId;
@@ -74,13 +63,13 @@ class TagComponent final : public ComponentBase
          * \brief Creates an item into the component
          * \return Created item id
          */
-        EntityID CreateItem() noexcept override;
+        Entity CreateEntity() noexcept override;
 
         /**
          * \brief Returns the count of items in this component
          * \return Component item count
          */
-        RkSize GetItemCount() const noexcept override;
+        RkSize GetEntityCount() const noexcept override;
 
         #pragma endregion 
 

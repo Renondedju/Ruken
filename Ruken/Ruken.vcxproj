@@ -157,6 +157,7 @@
     <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentLayout.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
+    <ClInclude Include="Source\Include\ECS\Range.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\SystemBase.hpp" />
@@ -310,6 +311,7 @@
     <None Include="Source\Src\Threading\Worker.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
     <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />

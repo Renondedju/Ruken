@@ -22,21 +22,55 @@
  *  SOFTWARE.
  */
 
-template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index, Item&& in_item) noexcept
-{
-    Layout::Insert(m_storage, in_index, std::forward<Item>(in_item));
-}
+#pragma once
 
-template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index) noexcept
-{
-    CreateItem(in_index, Item {});
-}
+#include "Config.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-template <RkSize TUniqueId, typename... TMembers>
-template <typename TView>
-auto Component<TUniqueId, TMembers...>::GetItemView(RkSize in_index) noexcept
+BEGIN_RUKEN_NAMESPACE
+
+class Range
 {
-    return Layout::template Get<TView>(m_storage, in_index);
-}
+    public:
+
+        #pragma region Members
+
+        RkSize begin;
+        RkSize size;
+
+        #pragma endregion
+
+        #pragma region Constructors
+
+        /**
+         * \brief Default constructor
+         * \param in_begin Start index of the free range
+         * \param in_size Size of the free range
+         */
+        Range(RkSize in_begin, RkSize in_size);
+
+        Range(Range const& in_copy) = default;
+        Range(Range&&      in_move) = default;
+        ~Range()                    = default;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Reduces the range by one from the right
+         * \return New size of the range
+         */
+        RkSize ReduceRight() noexcept;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        Range& operator=(Range const& in_copy) = default;
+        Range& operator=(Range&&      in_move) = default;
+
+        #pragma endregion
+};
+
+END_RUKEN_NAMESPACE

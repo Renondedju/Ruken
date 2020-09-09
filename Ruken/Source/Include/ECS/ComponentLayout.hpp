@@ -86,6 +86,16 @@ class ComponentLayout
         template <typename TLayoutView, RkSize... TIds>
         constexpr static auto GetHelper(ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept;
 
+        /**
+         * \brief Insert helper
+         * \tparam TIds Index sequence of the view
+         * \param in_container Container instance
+         * \param in_index Index to insert at
+         * \param in_item Item to insert
+         */
+        template <RkSize... TIds>
+        constexpr static RkVoid InsertHelper(ContainerType& in_container, RkSize in_index, Item&& in_item, std::index_sequence<TIds...>) noexcept;
+
         #pragma endregion
 
     public:
@@ -110,6 +120,14 @@ class ComponentLayout
          */
         template <typename TLayoutView>
         constexpr static auto Get(ContainerType& in_container, RkSize in_position) noexcept;
+
+        /**
+         * \brief Inserts an item into a component layout
+         * \param in_container Container instance
+         * \param in_index Index to insert at
+         * \param in_item Item to insert
+         */
+        constexpr static RkVoid Insert(ContainerType& in_container, RkSize in_index, Item&& in_item) noexcept;
 
         #pragma endregion 
 

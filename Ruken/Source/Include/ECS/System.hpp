@@ -68,7 +68,7 @@ class System : public SystemBase
 
         System(System const& in_copy) = default;
         System(System&&      in_move) = default;
-        virtual ~System()             = default;
+        virtual ~System() override    = default;
 
         #pragma endregion
 

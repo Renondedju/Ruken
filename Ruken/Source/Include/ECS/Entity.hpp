@@ -42,7 +42,7 @@ class Entity
         #pragma region Members
 
         Archetype* m_archetype        {nullptr};
-        RkSize    m_local_identifier {0ULL};
+        RkSize     m_local_identifier {0ULL};
 
         #pragma endregion
 

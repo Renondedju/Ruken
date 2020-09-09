@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <list>
 #include <memory>
 #include <unordered_map>
 
@@ -33,6 +34,7 @@
 #include "ECS/Entity.hpp"
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
+#include "ECS/Range.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -57,9 +59,23 @@ class Archetype
     protected:
 
         #pragma region Members
-        
-        std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_components  {};
-        ArchetypeFingerprint                                        m_fingerprint {};
+
+        std::list<Range>     m_free_ranges      {};
+        ArchetypeFingerprint m_fingerprint      {};
+        RkSize               m_allocation_size  {0ULL};
+        RkSize               m_free_space_count {0ULL};
+
+        std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_components {};
+
+        #pragma endregion 
+
+        #pragma region Methods
+
+        /**
+         * \brief Returns a free entity location by either looking up for a free spot, or allocating a new one 
+         * \return Free entity location
+         */
+        RkSize GetFreeEntityLocation() noexcept;
 
         #pragma endregion 
 
@@ -95,6 +111,8 @@ class Archetype
          * \brief Creates an entity in the archetype
          * \return Entity handle.
          * \see Entity for lifetime info
+         * \note Make sure to reinitialize your components after creating a new entity since the memory is pooled and thus
+         *       almost never de-allocated. New memory will be allocated only if the archetype has no more empty spaces to fill
          */
         Entity CreateEntity() noexcept;
 

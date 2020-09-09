@@ -22,9 +22,27 @@
  *  SOFTWARE.
  */
 
+#include "ECS/Range.hpp"
 #include "ECS/Archetype.hpp"
 
 USING_RUKEN_NAMESPACE
+
+#pragma region Methods
+
+RkSize Archetype::GetFreeEntityLocation() noexcept
+{
+    // Checking for a free space
+    Range& free_range = m_free_ranges.front();
+
+    // Reducing the range, and if it is empty, removing it
+    RkSize const location = free_range.begin;
+    if (free_range.ReduceRight() == 0ULL)
+        m_free_ranges.erase(m_free_ranges.cbegin());
+
+    --m_free_space_count;
+
+    return location;
+}
 
 ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 {
@@ -33,15 +51,22 @@ ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 
 Entity Archetype::CreateEntity() noexcept
 {
-    RkSize local_identifier = 0;
+    // If there are no free space in the archetype
+    if (m_free_space_count == 0ULL)
+    {
+        // Allocate a new entity
+        for (auto& [id, component]: m_components)
+            component->CreateItemAt(m_allocation_size);
 
-    for (auto& [id, component]: m_components)
-        local_identifier = component->CreateItem();
+        return Entity(*this, m_allocation_size++);
+    }
 
-    return Entity(*this, local_identifier);
+    return Entity(*this, GetFreeEntityLocation());
 }
 
 RkSize Archetype::EntitiesCount() const noexcept
 {
-    return m_components.cbegin()->second->GetItemCount();
+    return m_allocation_size;
 }
+
+#pragma endregion
