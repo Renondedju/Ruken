@@ -29,9 +29,9 @@
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final : System<CounterComponent>
+struct CounterSystem final : System<CounterComponent, TestTagComponent>
 {
-    using System<CounterComponent>::System;
+    using System<CounterComponent, TestTagComponent>::System;
 
     using StartView  = CounterComponent::Layout::MakeView<Count>;
     using UpdateView = CounterComponent::Layout::MakeView<Count const> const;

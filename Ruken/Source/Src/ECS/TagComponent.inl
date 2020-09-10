@@ -22,17 +22,5 @@
  *  SOFTWARE.
  */
 
-#pragma once
-
 template <RkSize TUniqueId>
-EntityID TagComponent<TUniqueId>::CreateEntity() noexcept
-{
-    return m_component_size++;
-}
-
-template <RkSize TUniqueId>
-RkSize TagComponent<TUniqueId>::GetEntityCount() const noexcept
-{
-    return m_component_size;
-}
-
+RkVoid TagComponent<TUniqueId>::CreateItemAt(RkSize) noexcept {}

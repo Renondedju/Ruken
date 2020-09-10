@@ -27,6 +27,7 @@
 #include <array>
 
 #include "ECS/Component.hpp"
+#include "ECS/TagComponent.hpp"
 #include "ECS/ComponentField.hpp"
 #include "ECS/Test/ComponentTable.hpp"
 
@@ -37,4 +38,6 @@ struct TestPadding : ComponentField<std::array<RkSize, 10>> {};
 
 RUKEN_DEFINE_COMPONENT(Counter,
     Count,        // Actual count variable
-    TestPadding); // Test padding to demonstrate views 
+    TestPadding); // Test padding to demonstrate views
+
+RUKEN_DEFINE_TAG_COMPONENT(TestTag);

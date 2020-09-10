@@ -24,10 +24,14 @@
 
 #pragma once
 
-#include "Config.hpp"
+#include "Build/Config.hpp"
+#include "Build/Namespace.hpp"
 
+#include "Meta/Meta.hpp"
 #include "Meta/Assert.hpp"
+
 #include "ECS/ComponentBase.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -61,15 +65,12 @@ class TagComponent final : public ComponentBase
 
         /**
          * \brief Creates an item into the component
-         * \return Created item id
+         * \note If the index points to a new index never referenced before, this method will allocate new memory if necessary
+         * \param in_index Index to insert the item at
+         *
+         * \note Since a tag component does not contain any data, this method does nothing
          */
-        Entity CreateEntity() noexcept override;
-
-        /**
-         * \brief Returns the count of items in this component
-         * \return Component item count
-         */
-        RkSize GetEntityCount() const noexcept override;
+        virtual RkVoid CreateItemAt(RkSize in_index) noexcept override;
 
         #pragma endregion 
 
@@ -87,7 +88,7 @@ class TagComponent final : public ComponentBase
  * \brief Shorthand to declare a tag component named "<in_component_name>Component"
  * \param in_component_name Name of the component as defined in the component table
  */
-#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name, ...)\
+#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name)\
     using RUKEN_GLUE(in_component_name, Component) = TagComponent<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name)>
 
 END_RUKEN_NAMESPACE

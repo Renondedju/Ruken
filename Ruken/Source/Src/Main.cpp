@@ -39,7 +39,10 @@ int main()
     admin.CreateSystem<CounterSystem>();
     admin.CreateExclusiveComponent<TestExclusiveComponent>();
 
-    for (RkSize index = 0; index < UINT16_MAX; ++index)
+    for (RkSize index = 0; index < 256; ++index)
+        admin.CreateEntity<CounterComponent, TestTagComponent>();
+
+    for (RkSize index = 0; index < 256; ++index)
         admin.CreateEntity<CounterComponent>();
 
     admin.StartSimulation();
