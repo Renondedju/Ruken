@@ -166,8 +166,8 @@
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
     <ClInclude Include="Source\Include\Functional\Method.hpp" />
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
-    <ClInclude Include="Source\Include\Kernel.hpp" />
-    <ClInclude Include="Source\Include\KernelProxy.hpp" />
+    <ClInclude Include="Source\Include\Core\Kernel.hpp" />
+    <ClInclude Include="Source\Include\Core\KernelProxy.hpp" />
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
@@ -377,8 +377,8 @@
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentSystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
-    <ClCompile Include="Source\Src\Kernel.cpp" />
-    <ClCompile Include="Source\Src\KernelProxy.cpp" />
+    <ClCompile Include="Source\Src\Core\Kernel.cpp" />
+    <ClCompile Include="Source\Src\Core\KernelProxy.cpp" />
     <ClCompile Include="Source\Src\Main.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanInstance.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Core\VulkanDevice.cpp" />

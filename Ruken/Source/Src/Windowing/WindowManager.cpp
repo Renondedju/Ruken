@@ -26,8 +26,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Kernel.hpp"
-#include "KernelProxy.hpp"
+#include "Core/Kernel.hpp"
+#include "Core/KernelProxy.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 

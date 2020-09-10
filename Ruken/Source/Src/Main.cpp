@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-#include "Kernel.hpp"
+#include "Core/Kernel.hpp"
 
 USING_RUKEN_NAMESPACE
 

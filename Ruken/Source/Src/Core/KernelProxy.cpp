@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-#include "KernelProxy.hpp"
+#include "Core/KernelProxy.hpp"
 
 USING_RUKEN_NAMESPACE
 
