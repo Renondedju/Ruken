@@ -25,7 +25,6 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "ECS/EntityID.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE

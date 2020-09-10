@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "ECS/Group.hpp"
 #include "ECS/Archetype.hpp"

@@ -28,13 +28,13 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 #include "ECS/Group.hpp"
+#include "ECS/Range.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/ComponentBase.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
-#include "ECS/Range.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

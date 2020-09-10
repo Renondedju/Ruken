@@ -27,7 +27,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
