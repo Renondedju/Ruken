@@ -141,7 +141,7 @@ RkVoid LinkedChunkList<TType, TChunkSize>::InsertData(RkSize const in_index, TTy
     RkSize const chunk_id = in_index / chunk_element_count;
 
     // Creating missing chunks if needed
-    while (m_size < chunk_id)
+    while (m_size <= chunk_id)
         CreateNode();
 
     // Inserting the data

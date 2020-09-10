@@ -31,12 +31,12 @@ RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index, Item&& i
 template <RkSize TUniqueId, typename... TMembers>
 RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index) noexcept
 {
-    CreateItem(in_index, Item {});
+    CreateItemAt(in_index, Item {});
 }
 
 template <RkSize TUniqueId, typename... TMembers>
 template <typename TView>
-auto Component<TUniqueId, TMembers...>::GetItemView(RkSize in_index) noexcept
+TView Component<TUniqueId, TMembers...>::GetView() noexcept
 {
-    return Layout::template Get<TView>(m_storage, in_index);
+    return Layout::template GetView<TView>(m_storage);
 }

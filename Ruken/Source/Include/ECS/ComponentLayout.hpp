@@ -33,7 +33,7 @@
 #include "Meta/TupleIndex.hpp"
 
 #include "ECS/ComponentItem.hpp"
-#include "ECS/ComponentItemView.hpp"
+#include "ECS/ComponentView.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"
@@ -44,7 +44,7 @@ BEGIN_RUKEN_NAMESPACE
  * \brief Describes a component layout as well as helpers to interact with that memory layout
  * \tparam TFields Fields of the component, must be of type ComponentField
  *
- * \see ComponentItem, ComponentItemView, ComponentField, Component
+ * \see ComponentItem, ComponentView, ComponentField, Component
  */
 template <typename... TFields>
 class ComponentLayout
@@ -65,7 +65,7 @@ class ComponentLayout
 
         // View constructors
         template <typename... TSelectedFields>
-        using MakeView         = ComponentItemView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
+        using MakeView         = ComponentView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
         using FullView         = MakeView<TFields...>;
         using FullReadonlyView = MakeView<TFields const...> const;
 
@@ -76,15 +76,13 @@ class ComponentLayout
         #pragma region Methods
 
         /**
-         * \brief Getter helper 
-         * \tparam TLayoutView View type to operate with
-         * \tparam TIds Index sequence of the view
-         * \param in_container Container instance
-         * \param in_position position of the get
-         * \return View instance containing references to the requested resources
+         * \brief GetView helper
+         * \tparam TLayoutView Requested view type
+         * \param in_container component container
+         * \return Requested view instance
          */
         template <typename TLayoutView, RkSize... TIds>
-        constexpr static auto GetHelper(ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept;
+        constexpr static TLayoutView GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief Insert helper
@@ -112,14 +110,14 @@ class ComponentLayout
         #pragma region Methods
 
         /**
-         * \brief Get method, this method operates with a layout view allowing the fetch only the requested data
-         * \tparam TLayoutView Layout view type
-         * \param in_container Container instance
-         * \param in_position Position to get the data at
-         * \return View instance containing references to the requested resources
+         * \brief Returns the requested view of a component storage
+         * \note The view will point onto the head of each field
+         * \tparam TLayoutView Requested view type
+         * \param in_container component container
+         * \return Requested view instance
          */
         template <typename TLayoutView>
-        constexpr static auto Get(ContainerType& in_container, RkSize in_position) noexcept;
+        constexpr static TLayoutView GetView(ContainerType& in_container) noexcept;
 
         /**
          * \brief Inserts an item into a component layout

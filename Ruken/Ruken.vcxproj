@@ -154,7 +154,7 @@
     <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentField.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentItemView.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentLayout.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
     <ClInclude Include="Source\Include\ECS\Range.hpp" />

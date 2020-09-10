@@ -47,7 +47,7 @@ class ComponentBase
 
         #pragma region Methods
 
-        virtual RkVoid CreateItemAt(RkSize in_index) noexcept;
+        virtual RkVoid CreateItemAt(RkSize in_index) noexcept = 0;
 
         #pragma endregion
 

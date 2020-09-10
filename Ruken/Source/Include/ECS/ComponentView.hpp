@@ -31,6 +31,7 @@
 #include "Meta/CopyConst.hpp"
 #include "Meta/TupleIndex.hpp"
 #include "Meta/TupleHasType.hpp"
+#include "Containers/LinkedChunkListNode.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -41,16 +42,16 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TFields Member types to create a reference onto
  */
 template <typename TPack, typename... TFields>
-struct ComponentItemView;
+struct ComponentView;
 
 template <template <RkSize...> class TPack, RkSize... TIndices, typename... TFields>
-struct ComponentItemView<TPack<TIndices...>, TFields...> : public std::tuple<CopyConst<TFields, typename TFields::Type&>...>
+struct ComponentView<TPack<TIndices...>, TFields...> : public std::tuple<CopyConst<TFields, LinkedChunkListNode<typename TFields::Type>*>...>
 {
     private:
 
         // Helpers for the Fetch method
-        using BaseTuple      = std::tuple<CopyConst<TFields, typename TFields::Type&>...>;
-        using BaseConstTuple = std::tuple<typename TFields::Type const&...>;
+        using BaseTuple      = std::tuple<CopyConst<TFields, LinkedChunkListNode<typename TFields::Type>*>...>;
+        using BaseConstTuple = std::tuple<LinkedChunkListNode<typename TFields::Type>* const...>;
 
         /**
          * \brief Returns the index of a member inside of the view
@@ -85,7 +86,8 @@ struct ComponentItemView<TPack<TIndices...>, TFields...> : public std::tuple<Cop
          * \return Field reference
          */
         template<typename TField, MemberExists<TField> = true>
-        auto&       Fetch()       { return std::get<MemberIndex<TField>::value>(static_cast<BaseTuple&>(*this)); }
+        typename TField::Type&       Fetch(RkSize in_index) noexcept
+        { return std::get<MemberIndex<TField>::value>(static_cast<BaseTuple&>(*this))->data[in_index]; }
 
         /**
          * \brief Returns a constant reference onto a given member stored in the view.
@@ -94,7 +96,8 @@ struct ComponentItemView<TPack<TIndices...>, TFields...> : public std::tuple<Cop
          * \return Field constant reference
          */
         template<typename TField, MemberExists<TField> = true>
-        auto const& Fetch() const { return std::get<MemberIndex<TField>::value>(static_cast<BaseConstTuple const&>(*this)); }
+        typename TField::Type const& Fetch(RkSize in_index) const noexcept
+        { return std::get<MemberIndex<TField>::value>(static_cast<BaseConstTuple const&>(*this))->data[in_index]; }
 };
 
 END_RUKEN_NAMESPACE

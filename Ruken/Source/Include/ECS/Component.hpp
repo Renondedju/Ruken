@@ -60,7 +60,7 @@ class Component final : public ComponentBase
          * \tparam TField Field to get the container type of
          */
         template <typename TField>
-        using FieldContainerType = std::tuple_element_t<Item::template VariableIndex<TField>::value, typename Layout::ContainerType>;
+        using FieldContainerType = std::tuple_element_t<Layout::template FieldIndex<TField>::value, typename Layout::ContainerType>;
 
     private:
 
@@ -96,13 +96,12 @@ class Component final : public ComponentBase
         virtual RkVoid CreateItemAt(RkSize in_index)                 noexcept override;
 
         /**
-         * \brief Returns a view containing all the requested fields of a given entity
+         * \brief Returns a view containing all the requested fields
          * \tparam TView View type
-         * \param in_index Index of the requested item
-         * \return View containing all the requested fields of the given entity
+         * \return View containing all the requested fields
          */
         template <typename TView>
-        auto GetItemView(RkSize in_index) noexcept;
+        TView GetView() noexcept;
 
         #pragma endregion 
 

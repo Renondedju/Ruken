@@ -26,30 +26,30 @@
 
 template <typename ... TFields>
 template <typename TLayoutView, RkSize... TIds>
-constexpr auto ComponentLayout<TFields...>::GetHelper(ContainerType& in_container, RkSize in_position, std::index_sequence<TIds...>) noexcept
+constexpr TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
-    return TLayoutView { std::reference_wrapper(std::get<TIds>(in_container)[in_position])... };
+    return TLayoutView { std::get<TIds>(in_container).GetHead()... };
 }
 
 template <typename ... TFields>
 template <RkSize... TIds>
 constexpr RkVoid ComponentLayout<TFields...>::InsertHelper(ContainerType& in_container, RkSize in_index, Item&& in_item, std::index_sequence<TIds...>) noexcept
 {
-    (std::get<TIds>(in_container).InsertData(in_index, std::forward(std::get<TIds>(in_item))), ...);
+    (std::get<TIds>(in_container).InsertData(in_index, std::forward<typename TFields::Type>(std::get<TIds>(in_item))), ...);
 }
 
 template <typename ... TFields>
 template <typename TLayoutView>
-constexpr auto ComponentLayout<TFields...>::Get(ContainerType& in_container, RkSize in_position) noexcept
+constexpr TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container) noexcept
 {
-    return GetHelper<TLayoutView>(in_container, in_position, typename TLayoutView::Sequence());
+    return GetViewHelper<TLayoutView>(in_container, typename TLayoutView::Sequence());
 }
 
 template <typename ... TFields>
 constexpr RkVoid ComponentLayout<TFields...>::Insert(ContainerType& in_container, RkSize in_index, Item&& in_item) noexcept
 {
-    InsertHelper(in_container, in_index, std::forward<Item>(in_index), std::make_index_sequence<sizeof...(TFields)>());
+    InsertHelper(in_container, in_index, std::forward<Item>(in_item), std::make_index_sequence<sizeof...(TFields)>());
 }
 
 #pragma endregion

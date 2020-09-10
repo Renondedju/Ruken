@@ -25,10 +25,7 @@
 #pragma once
 
 #include "ECS/System.hpp"
-
-#include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterComponent.hpp"
-#include "ECS/Test/TestExclusiveComponent.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -48,21 +45,14 @@ struct CounterSystem final : System<CounterComponent>
     {
         RkSize count = 0;
 
-        TestExclusiveComponent* test = m_admin.GetExclusiveComponent<TestExclusiveComponent>();
-
-        test->data1 = 1;
-        test->data2 = 2;
-        test->data3 = 3;
-
         // Iterating over every entity
-        for (auto && group: m_groups)
-        for (RkSize entity_index = 0ULL; entity_index < group.GetReferencedArchetype().EntitiesCount(); ++entity_index)
+        for (auto& group: m_groups)
         {
             // Creating views
-            StartView view = group.GetComponent<CounterComponent>().GetItemView<StartView>(entity_index);
+            StartView view = group.GetComponent<CounterComponent>().GetView<StartView>();
 
             // Setting the "CounterComponent::Count" variable
-            view.Fetch<Count>() = count++;
+            view.Fetch<Count>(0) = count++;
         }
     }
 
@@ -75,14 +65,13 @@ struct CounterSystem final : System<CounterComponent>
         RkSize total = 0;
 
         // Iterating over every entity
-        for (auto && group: m_groups)
-        for (RkSize entity_index = 0ULL; entity_index < group.GetReferencedArchetype().EntitiesCount(); ++entity_index)
+        for (auto& group: m_groups)
         {
             // Creating views
-            UpdateView view = group.GetComponent<CounterComponent>().GetItemView<UpdateView>(entity_index);
+            UpdateView view = group.GetComponent<CounterComponent>().GetView<UpdateView>();
 
             // Reading the "CounterComponent::Count" variable
-            total += view.Fetch<Count>();
+            total += view.Fetch<Count>(0);
         }
     }
 };

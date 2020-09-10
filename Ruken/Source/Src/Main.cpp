@@ -39,9 +39,12 @@ int main()
     admin.CreateSystem<CounterSystem>();
     admin.CreateExclusiveComponent<TestExclusiveComponent>();
 
-    for (RkSize index = 0; index < 8000; ++index)
+    for (RkSize index = 0; index < UINT16_MAX; ++index)
         admin.CreateEntity<CounterComponent>();
 
+    admin.StartSimulation();
+    admin.UpdateSimulation();
+    admin.EndSimulation();
 
     //Kernel kernel;
     //return kernel.Run();
