@@ -62,9 +62,9 @@ class Archetype
 
         #pragma region Members
 
-        std::list<Range>     m_free_ranges      {};
         ArchetypeFingerprint m_fingerprint      {};
-        RkSize               m_allocation_size  {0ULL};
+        std::list<Range>     m_free_entities    {};
+        RkSize               m_entities_count   {0ULL};
         RkSize               m_free_space_count {0ULL};
 
         std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_components {};

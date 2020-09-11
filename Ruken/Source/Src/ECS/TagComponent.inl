@@ -23,4 +23,4 @@
  */
 
 template <RkSize TUniqueId>
-RkVoid TagComponent<TUniqueId>::CreateItemAt(RkSize) noexcept {}
+RkVoid TagComponent<TUniqueId>::EnsureStorageSpace(RkSize) noexcept {}

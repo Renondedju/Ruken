@@ -24,32 +24,42 @@
 
 #pragma region Methods
 
-template <typename ... TFields>
+template <typename... TFields>
 template <typename TLayoutView, RkSize... TIds>
-constexpr TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept
+TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
     return TLayoutView { std::get<TIds>(in_container).GetHead()... };
 }
 
-template <typename ... TFields>
+template <typename... TFields>
 template <RkSize... TIds>
-constexpr RkVoid ComponentLayout<TFields...>::InsertHelper(ContainerType& in_container, RkSize in_index, Item&& in_item, std::index_sequence<TIds...>) noexcept
+RkVoid ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept
 {
-    (std::get<TIds>(in_container).InsertData(in_index, std::forward<typename TFields::Type>(std::get<TIds>(in_item))), ...);
+    // Fold expression applying the bellow lambda for each linked chunk list
+
+    ([in_size](LinkedChunkList<typename TFields::Type>& in_list){
+        // Computes the chunk id required to store all the requested data
+        RkSize const chunk_id = in_size / in_list.chunk_element_count;
+
+        // If the size isn't big enough, allocating some more nodes to fit everything
+        while (in_list.GetSize() <= chunk_id)
+            in_list.CreateNode();
+
+    }(std::get<TIds>(in_container)), ...);
 }
 
-template <typename ... TFields>
+template <typename... TFields>
 template <typename TLayoutView>
-constexpr TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container) noexcept
+TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container) noexcept
 {
     return GetViewHelper<TLayoutView>(in_container, typename TLayoutView::Sequence());
 }
 
-template <typename ... TFields>
-constexpr RkVoid ComponentLayout<TFields...>::Insert(ContainerType& in_container, RkSize in_index, Item&& in_item) noexcept
+template <typename... TFields>
+RkVoid ComponentLayout<TFields...>::EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept
 {
-    InsertHelper(in_container, in_index, std::forward<Item>(in_item), std::make_index_sequence<sizeof...(TFields)>());
+    EnsureStorageSpaceHelper(in_container, in_size, std::make_index_sequence<sizeof...(TFields)>());
 }
 
 #pragma endregion

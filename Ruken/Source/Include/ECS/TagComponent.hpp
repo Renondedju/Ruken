@@ -64,13 +64,13 @@ class TagComponent final : public ComponentBase
         #pragma region Methods
 
         /**
-         * \brief Creates an item into the component
-         * \note If the index points to a new index never referenced before, this method will allocate new memory if necessary
-         * \param in_index Index to insert the item at
+         * \brief Ensures that the component has enough storage space for a given amount of entities
+         *        If this is not the case, containers will be allocated
+         * \param in_size Size to ensure
          *
          * \note Since a tag component does not contain any data, this method does nothing
          */
-        virtual RkVoid CreateItemAt(RkSize in_index) noexcept override;
+        virtual RkVoid EnsureStorageSpace(RkSize in_size) noexcept override;
 
         #pragma endregion 
 

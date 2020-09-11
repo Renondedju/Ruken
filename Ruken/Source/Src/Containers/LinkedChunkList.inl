@@ -135,21 +135,6 @@ typename LinkedChunkList<TType, TChunkSize>::Node* LinkedChunkList<TType, TChunk
 }
 
 template <typename TType, RkSize TChunkSize>
-RkVoid LinkedChunkList<TType, TChunkSize>::InsertData(RkSize const in_index, TType&& in_data) noexcept
-{
-    // Finding the corresponding chunk
-    RkSize const chunk_id = in_index / chunk_element_count;
-
-    // Creating missing chunks if needed
-    while (m_size <= chunk_id)
-        CreateNode();
-
-    // Inserting the data
-    Node* node = GetNode(chunk_id);
-    node->data[in_index % chunk_element_count] = std::move(in_data);
-}
-
-template <typename TType, RkSize TChunkSize>
 template <typename TLambda>
 RkVoid LinkedChunkList<TType, TChunkSize>::Foreach(TLambda in_lambda) noexcept
 {

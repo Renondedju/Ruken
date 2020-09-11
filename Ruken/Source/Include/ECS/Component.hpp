@@ -87,13 +87,11 @@ class Component final : public ComponentBase
         #pragma region Methods
 
         /**
-         * \brief Creates an item into the component
-         * \note If the index points to a new index never referenced before, this method will allocate new memory if necessary
-         * \param in_index Index to insert the item at
-         * \param in_item Item to insert
+         * \brief Ensures that the component has enough storage space for a given amount of entities
+         *        If this is not the case, containers will be allocated
+         * \param in_size Size to ensure
          */
-        RkVoid         CreateItemAt(RkSize in_index, Item&& in_item) noexcept;
-        virtual RkVoid CreateItemAt(RkSize in_index)                 noexcept override;
+        virtual RkVoid EnsureStorageSpace(RkSize in_size) noexcept override;
 
         /**
          * \brief Returns a view containing all the requested fields

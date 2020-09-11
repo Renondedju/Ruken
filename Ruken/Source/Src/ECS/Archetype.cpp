@@ -32,12 +32,12 @@ USING_RUKEN_NAMESPACE
 RkSize Archetype::GetFreeEntityLocation() noexcept
 {
     // Checking for a free space
-    Range& free_range = m_free_ranges.front();
+    Range& free_range = m_free_entities.front();
 
     // Reducing the range, and if it is empty, removing it
     RkSize const location = free_range.begin;
     if (free_range.ReduceRight() == 0ULL)
-        m_free_ranges.erase(m_free_ranges.cbegin());
+        m_free_entities.erase(m_free_entities.cbegin());
 
     --m_free_space_count;
 
@@ -51,16 +51,18 @@ ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
 
 Entity Archetype::CreateEntity() noexcept
 {
-    // If there are no free space in the archetype
     if (m_free_space_count == 0ULL)
     {
-        // Allocate a new entity
+        // If there are no more free space for entities, that means that we might have to allocate some more
+        // to store the new data
         for (auto& [id, component]: m_components)
-            component->CreateItemAt(m_allocation_size);
+            component->EnsureStorageSpace(m_entities_count);
 
-        return Entity(*this, m_allocation_size++);
+        // Creating the entity
+        return Entity(*this, m_entities_count++);
     }
 
+    // Otherwise, fetching an entity id from a free location
     return Entity(*this, GetFreeEntityLocation());
 }
 
@@ -73,14 +75,14 @@ RkVoid Archetype::DeleteEntity(Entity const& in_entity) noexcept
     ++m_free_space_count;
 
     // If there are no ranges yet, creating the first one
-    if (m_free_ranges.empty())
+    if (m_free_entities.empty())
     {
-        m_free_ranges.emplace_front(in_entity.GetLocalIdentifier(), 1ULL);
+        m_free_entities.emplace_front(in_entity.GetLocalIdentifier(), 1ULL);
         return;
     }
 
     // Checking if any empty range can be expanded
-    for (std::list<Range>::iterator it = m_free_ranges.begin(); it != m_free_ranges.end(); ++it)
+    for (std::list<Range>::iterator it = m_free_entities.begin(); it != m_free_entities.end(); ++it)
     {
         if (it->begin - 1ULL == in_entity.GetLocalIdentifier())
         {
@@ -90,7 +92,7 @@ RkVoid Archetype::DeleteEntity(Entity const& in_entity) noexcept
 
         if (it->begin > in_entity.GetLocalIdentifier())
         {
-            m_free_ranges.insert(it, Range(in_entity.GetLocalIdentifier(), 1ULL));
+            m_free_entities.insert(it, Range(in_entity.GetLocalIdentifier(), 1ULL));
             return;
         }
 

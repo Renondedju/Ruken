@@ -47,7 +47,12 @@ class ComponentBase
 
         #pragma region Methods
 
-        virtual RkVoid CreateItemAt(RkSize in_index) noexcept = 0;
+        /**
+         * \brief Ensures that the component has enough storage space for a given amount of entities
+         *        If this is not the case, containers will be allocated
+         * \param in_size Size to ensure
+         */
+        virtual RkVoid EnsureStorageSpace(RkSize in_size) noexcept = 0;
 
         #pragma endregion
 

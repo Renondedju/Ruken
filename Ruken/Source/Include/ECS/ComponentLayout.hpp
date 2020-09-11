@@ -77,22 +77,15 @@ class ComponentLayout
 
         /**
          * \brief GetView helper
-         * \tparam TLayoutView Requested view type
-         * \param in_container component container
-         * \return Requested view instance
          */
         template <typename TLayoutView, RkSize... TIds>
-        constexpr static TLayoutView GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept;
+        static TLayoutView GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept;
 
         /**
-         * \brief Insert helper
-         * \tparam TIds Index sequence of the view
-         * \param in_container Container instance
-         * \param in_index Index to insert at
-         * \param in_item Item to insert
+         * \brief EnsureStorageSpace
          */
         template <RkSize... TIds>
-        constexpr static RkVoid InsertHelper(ContainerType& in_container, RkSize in_index, Item&& in_item, std::index_sequence<TIds...>) noexcept;
+        static RkVoid EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
 
@@ -117,15 +110,17 @@ class ComponentLayout
          * \return Requested view instance
          */
         template <typename TLayoutView>
-        constexpr static TLayoutView GetView(ContainerType& in_container) noexcept;
+        static TLayoutView GetView(ContainerType& in_container) noexcept;
 
         /**
-         * \brief Inserts an item into a component layout
-         * \param in_container Container instance
-         * \param in_index Index to insert at
-         * \param in_item Item to insert
+         * \brief Ensures that the passed container will have the storage space required for a given amount of entities
+         *        If the size of the container is already sufficient, this method will do nothing,
+         *        otherwise memory will be allocated to fill the missing required space
+         *
+         * \param in_container Container to ensure/allocate memory into
+         * \param in_size Size to ensure
          */
-        constexpr static RkVoid Insert(ContainerType& in_container, RkSize in_index, Item&& in_item) noexcept;
+        static RkVoid EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept;
 
         #pragma endregion 
 

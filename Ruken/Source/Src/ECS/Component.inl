@@ -23,15 +23,9 @@
  */
 
 template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index, Item&& in_item) noexcept
+RkVoid Component<TUniqueId, TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
 {
-    Layout::Insert(m_storage, in_index, std::forward<Item>(in_item));
-}
-
-template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::CreateItemAt(RkSize in_index) noexcept
-{
-    CreateItemAt(in_index, Item {});
+    Layout::EnsureStorageSpace(m_storage, in_size);
 }
 
 template <RkSize TUniqueId, typename... TMembers>

@@ -29,7 +29,6 @@
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 #include "ECS/Test/CounterComponent.hpp"
-#include "ECS/Test/TestExclusiveComponent.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -38,29 +37,27 @@ int main()
     EntityAdmin admin;
 
     admin.CreateSystem<CounterSystem>();
-    admin.CreateExclusiveComponent<TestExclusiveComponent>();
 
-    BENCHMARK("Entity creation")
+    BENCHMARK("Entity creation with allocation")
     {
-        for (RkSize index = 0; index < 4092; ++index)
+        for (RkSize index = 0; index < UINT16_MAX; ++index)
             admin.CreateEntity<CounterComponent, TestTagComponent>();
     }
 
-    Entity entity = admin.CreateEntity<TestTagComponent, CounterComponent>();
+    Entity const entity = admin.CreateEntity<TestTagComponent, CounterComponent>();
+    Archetype&   owner  = entity.GetOwner();
 
-    Entity const entity2 = admin.CreateEntity<TestTagComponent, CounterComponent>();
-    Entity const entity3 = admin.CreateEntity<TestTagComponent, CounterComponent>();
-    Entity const entity4 = admin.CreateEntity<TestTagComponent, CounterComponent>();
+    BENCHMARK("Entity deletion")
+    {
+        for (RkSize index = 0; index < UINT16_MAX; ++index)
+            owner.DeleteEntity(Entity(owner, index));
+    }
 
-    entity4.GetOwner().DeleteEntity(entity4);
-    entity3.GetOwner().DeleteEntity(entity3);
-    entity .GetOwner().DeleteEntity(entity);
-
-    entity = admin.CreateEntity<TestTagComponent, CounterComponent>();
-
-    admin.StartSimulation();
-    admin.UpdateSimulation();
-    admin.EndSimulation();
+    BENCHMARK("Entity creation")
+    {
+        for (RkSize index = 0; index < UINT16_MAX; ++index)
+            admin.CreateEntity<CounterComponent, TestTagComponent>();
+    }
 
     //Kernel kernel;
     //return kernel.Run();

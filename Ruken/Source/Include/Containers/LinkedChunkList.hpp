@@ -112,13 +112,6 @@ class LinkedChunkList
         Node* GetNode(RkSize in_node_index) const noexcept;
 
         /**
-         * \brief Inserts some data into one of the chunks of the list. Creates new nodes if needed.
-         * \param in_index Index to insert at (not to mix up with chunk indexes)
-         * \param in_data Data to insert
-         */
-        RkVoid InsertData(RkSize in_index, TType&& in_data) noexcept;
-
-        /**
          * \brief Executes a function for each element block of the list
          * \tparam TLambda Lambda type, of type void (*in_lambda)(LinkedChunkList<TType, TChunkSize>::Node&)
          * \param in_lambda Actual lambda
