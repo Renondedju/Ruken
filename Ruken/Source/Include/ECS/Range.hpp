@@ -63,6 +63,27 @@ class Range
          */
         RkSize ReduceRight() noexcept;
 
+        /**
+         * \brief Expands the range to the left (moving the begin back by one)
+         * \return New size of the range
+         * \note This method will have no effect if the beginning of the range is already 0
+         */
+        RkSize ExpandLeft() noexcept;
+
+        /**
+         * \brief Expands the range to the right (increasing the size by one)
+         * \return New size of the range
+         */
+        RkSize ExpandRight() noexcept;
+
+        /**
+         * \brief Checks if the range contains a given position
+         * \param in_position Position to check
+         * \return True if the range contains the passed position, false otherwise
+         */
+        [[nodiscard]]
+        RkBool Contains(RkSize in_position) const noexcept;
+
         #pragma endregion
 
         #pragma region Operators

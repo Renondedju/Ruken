@@ -64,4 +64,42 @@ Entity Archetype::CreateEntity() noexcept
     return Entity(*this, GetFreeEntityLocation());
 }
 
+RkVoid Archetype::DeleteEntity(Entity const& in_entity) noexcept
+{
+    // Checking if the entity owner (aka archetype) is the right one
+    if (&in_entity.GetOwner() != this)
+        return;
+
+    ++m_free_space_count;
+
+    // If there are no ranges yet, creating the first one
+    if (m_free_ranges.empty())
+    {
+        m_free_ranges.emplace_front(in_entity.GetLocalIdentifier(), 1ULL);
+        return;
+    }
+
+    // Checking if any empty range can be expanded
+    for (std::list<Range>::iterator it = m_free_ranges.begin(); it != m_free_ranges.end(); ++it)
+    {
+        if (it->begin - 1ULL == in_entity.GetLocalIdentifier())
+        {
+            it->ExpandLeft();
+            return;
+        }
+
+        if (it->begin > in_entity.GetLocalIdentifier())
+        {
+            m_free_ranges.insert(it, Range(in_entity.GetLocalIdentifier(), 1ULL));
+            return;
+        }
+
+        if (it->begin + it->size == in_entity.GetLocalIdentifier())
+        {
+            it->ExpandRight();
+            return;
+        }
+    }
+}
+
 #pragma endregion

@@ -32,7 +32,7 @@ Entity::Entity(Archetype& in_archetype, RkSize const in_local_identifier):
     m_local_identifier {in_local_identifier}
 { }
 
-Archetype const& Entity::GetOwner() const noexcept
+Archetype& Entity::GetOwner() const noexcept
 {
     return *m_archetype;
 }

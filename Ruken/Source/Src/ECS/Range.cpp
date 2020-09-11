@@ -40,3 +40,23 @@ RkSize Range::ReduceRight() noexcept
     ++begin;
     return --size;
 }
+
+RkSize Range::ExpandLeft() noexcept
+{
+    // Cannot expand if we are already on the maximum range possible on the left
+    if (begin == 0ULL)
+        return size;
+
+    --begin;
+    return ++size;
+}
+
+RkSize Range::ExpandRight() noexcept
+{
+    return ++size;
+}
+
+RkBool Range::Contains(RkSize const in_position) const noexcept
+{
+    return in_position >= begin && in_position < begin + size;
+}

@@ -123,6 +123,8 @@ class Archetype
         [[nodiscard]]
         Entity CreateEntity() noexcept;
 
+        RkVoid DeleteEntity(Entity const& in_entity) noexcept;
+
         /**
          * \brief Creates a components reference group
          * \tparam TComponents Components to include in the group

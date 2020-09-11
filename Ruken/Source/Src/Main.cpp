@@ -24,8 +24,9 @@
 
 #include "Core/Kernel.hpp"
 
-#include "ECS/EntityAdmin.hpp"
+#include "Utility/Benchmark.hpp"
 
+#include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 #include "ECS/Test/TestExclusiveComponent.hpp"
@@ -39,11 +40,23 @@ int main()
     admin.CreateSystem<CounterSystem>();
     admin.CreateExclusiveComponent<TestExclusiveComponent>();
 
-    for (RkSize index = 0; index < 256; ++index)
-        admin.CreateEntity<CounterComponent, TestTagComponent>();
+    BENCHMARK("Entity creation")
+    {
+        for (RkSize index = 0; index < 4092; ++index)
+            admin.CreateEntity<CounterComponent, TestTagComponent>();
+    }
 
-    for (RkSize index = 0; index < 256; ++index)
-        admin.CreateEntity<CounterComponent>();
+    Entity entity = admin.CreateEntity<TestTagComponent, CounterComponent>();
+
+    Entity const entity2 = admin.CreateEntity<TestTagComponent, CounterComponent>();
+    Entity const entity3 = admin.CreateEntity<TestTagComponent, CounterComponent>();
+    Entity const entity4 = admin.CreateEntity<TestTagComponent, CounterComponent>();
+
+    entity4.GetOwner().DeleteEntity(entity4);
+    entity3.GetOwner().DeleteEntity(entity3);
+    entity .GetOwner().DeleteEntity(entity);
+
+    entity = admin.CreateEntity<TestTagComponent, CounterComponent>();
 
     admin.StartSimulation();
     admin.UpdateSimulation();

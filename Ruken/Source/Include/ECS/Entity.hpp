@@ -69,7 +69,7 @@ class Entity
          * \brief Returns the owning archetype of the entity
          * \return Owning archetype reference
          */
-        Archetype const& GetOwner() const noexcept;
+        Archetype& GetOwner() const noexcept;
 
         /**
          * \brief Returns the unique local identifier of the entity
