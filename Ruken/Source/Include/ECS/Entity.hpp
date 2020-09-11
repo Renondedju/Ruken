@@ -41,7 +41,7 @@ class Entity
 
         #pragma region Members
 
-        Archetype* m_archetype        {nullptr};
+        Archetype& m_archetype;
         RkSize     m_local_identifier {0ULL};
 
         #pragma endregion
@@ -66,6 +66,12 @@ class Entity
         #pragma region Methods
 
         /**
+         * \brief Destroys the entity
+         * \note This class is a handle, and thus won't be invalidated on an entity destruction
+         */
+        RkVoid Delete() const noexcept;
+
+        /**
          * \brief Returns the owning archetype of the entity
          * \return Owning archetype reference
          */
@@ -88,9 +94,6 @@ class Entity
          * \return True if the 2 compared entities are the same, false otherwise
          */
         RkBool operator==(Entity const& in_other) const noexcept;
-
-        Entity& operator=(Entity const& in_copy) = default;
-        Entity& operator=(Entity&&      in_move) = default;
 
         #pragma endregion
 };
