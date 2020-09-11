@@ -23,17 +23,11 @@
  */
 
 template <typename... TComponents>
-Archetype Archetype::CreateArchetype() noexcept
+Archetype::Archetype(Tag<TComponents...>) noexcept:
+    m_fingerprint {ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>()}
 {
-    Archetype new_archetype;
-
-    // Setup fingerprints
-    new_archetype.m_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
-
     // Setup components
-    (new_archetype.m_components.try_emplace(TComponents::id, std::make_unique<TComponents>()), ...);
-
-    return new_archetype;
+    (m_components.try_emplace(TComponents::id, std::make_unique<TComponents>()), ...);
 }
 
 template <typename... TComponents>

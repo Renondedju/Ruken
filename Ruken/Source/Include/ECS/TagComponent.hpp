@@ -57,7 +57,7 @@ class TagComponent final : public ComponentBase
         TagComponent()                            = default;
         TagComponent(TagComponent const& in_copy) = default;
         TagComponent(TagComponent&&      in_move) = default;
-        virtual ~TagComponent()                   = default;
+        virtual ~TagComponent() override          = default;
 
         #pragma endregion
 

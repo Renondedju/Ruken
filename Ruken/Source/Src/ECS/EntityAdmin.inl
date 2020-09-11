@@ -52,8 +52,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
 
     // Creating the actual instance
-    std::unique_ptr<Archetype> new_archetype = std::make_unique<Archetype>();
-    *new_archetype = Archetype::CreateArchetype<TComponents...>();
+    std::unique_ptr<Archetype> new_archetype = std::make_unique<Archetype>(Tag<TComponents...>());
 
     // We need to get the pointer before moving it
     Archetype* archetype_ptr = new_archetype.get();

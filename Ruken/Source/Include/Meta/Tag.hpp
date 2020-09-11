@@ -22,46 +22,18 @@
  *  SOFTWARE.
  */
 
-#include "ECS/Range.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
 
-#pragma region Methods
+BEGIN_RUKEN_NAMESPACE
 
-RkSize Archetype::GetFreeEntityLocation() noexcept
-{
-    // Checking for a free space
-    Range& free_range = m_free_ranges.front();
+/**
+ * \brief Allows the passage of multiple types as arguments for template deduction without any allocation 
+ * \tparam TTypes Types
+ */
+template <typename... TTypes>
+class Tag
+{ };
 
-    // Reducing the range, and if it is empty, removing it
-    RkSize const location = free_range.begin;
-    if (free_range.ReduceRight() == 0ULL)
-        m_free_ranges.erase(m_free_ranges.cbegin());
-
-    --m_free_space_count;
-
-    return location;
-}
-
-ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
-{
-    return m_fingerprint;
-}
-
-Entity Archetype::CreateEntity() noexcept
-{
-    // If there are no free space in the archetype
-    if (m_free_space_count == 0ULL)
-    {
-        // Allocate a new entity
-        for (auto& [id, component]: m_components)
-            component->CreateItemAt(m_allocation_size);
-
-        return Entity(*this, m_allocation_size++);
-    }
-
-    return Entity(*this, GetFreeEntityLocation());
-}
-
-#pragma endregion
+END_RUKEN_NAMESPACE

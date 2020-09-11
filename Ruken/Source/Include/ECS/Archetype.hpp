@@ -30,6 +30,8 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/Tag.hpp"
+
 #include "ECS/Group.hpp"
 #include "ECS/Range.hpp"
 #include "ECS/Entity.hpp"
@@ -83,7 +85,9 @@ class Archetype
 
         #pragma region Constructors
 
-        Archetype()                         = default;
+        template <typename... TComponents>
+        Archetype(Tag<TComponents...>) noexcept;
+
         Archetype(Archetype const& in_copy) = default;
         Archetype(Archetype&&      in_move) = default;
         ~Archetype()                        = default;
@@ -96,6 +100,7 @@ class Archetype
          * \brief Gets the fingerprint of the archetype
          * \return Fingerprint
          */
+        [[nodiscard]]
         ArchetypeFingerprint const& GetFingerprint() const noexcept;
 
         /**
@@ -105,6 +110,7 @@ class Archetype
          * \return Found component
          */
         template<typename TComponent>
+        [[nodiscard]]
         TComponent& GetComponent() noexcept;
 
         /**
@@ -114,13 +120,8 @@ class Archetype
          * \note Make sure to reinitialize your components after creating a new entity since the memory is pooled and thus
          *       almost never de-allocated. New memory will be allocated only if the archetype has no more empty spaces to fill
          */
+        [[nodiscard]]
         Entity CreateEntity() noexcept;
-
-        /**
-         * \brief Returns the total count of entity stored in this archetype
-         * \return Entities count
-         */
-        RkSize EntitiesCount() const noexcept;
 
         /**
          * \brief Creates a components reference group
@@ -128,15 +129,8 @@ class Archetype
          * \return Newly created reference group
          */
         template <typename... TComponents>
+        [[nodiscard]]
         Group<TComponents...> CreateGroupReference() noexcept;
-
-        /**
-         * \brief Creates an archetype
-         * \tparam TComponents Components to use for the archetype initialization
-         * \return New archetype
-         */
-        template <typename... TComponents>
-        static Archetype CreateArchetype() noexcept;
 
         #pragma endregion
 

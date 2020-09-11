@@ -181,6 +181,7 @@
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
+    <ClInclude Include="Source\Include\Meta\Tag.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
     <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
