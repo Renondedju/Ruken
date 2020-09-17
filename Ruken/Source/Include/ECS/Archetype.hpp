@@ -123,7 +123,11 @@ class Archetype
         [[nodiscard]]
         Entity CreateEntity() noexcept;
 
-        RkVoid DeleteEntity(Entity const& in_entity) noexcept;
+        /**
+         * \brief Deletes an entity from the archetype
+         * \param in_local_identifier Local identifier of the entity, if invalid, this method does nothing
+         */
+        RkVoid DeleteEntity(RkSize in_local_identifier) noexcept;
 
         /**
          * \brief Creates a components reference group

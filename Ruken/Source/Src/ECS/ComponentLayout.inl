@@ -34,19 +34,26 @@ TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_contain
 
 template <typename... TFields>
 template <RkSize... TIds>
-RkVoid ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept
+RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept
 {
-    // Fold expression applying the bellow lambda for each linked chunk list
+    return MinExceptZero<RkSize>(
+        { // Initializer list containing all the lambda invocations
+            [in_size](LinkedChunkList<typename TFields::Type>& in_list)
+            {
+                // Computes the chunk id required to store all the requested data
+                RkSize const chunk_id      = in_size / in_list.chunk_element_count;
+                RkSize const chunk_missing = (chunk_id + 1) - in_list.GetSize();
 
-    ([in_size](LinkedChunkList<typename TFields::Type>& in_list){
-        // Computes the chunk id required to store all the requested data
-        RkSize const chunk_id = in_size / in_list.chunk_element_count;
+                // If the size isn't big enough, allocating some more nodes to fit everything
+                for (RkSize index = 0; index < chunk_missing; ++index)
+                    in_list.CreateNode();
 
-        // If the size isn't big enough, allocating some more nodes to fit everything
-        while (in_list.GetSize() <= chunk_id)
-            in_list.CreateNode();
+                // Returning the amount of elements created
+                return chunk_missing * in_list.chunk_element_count;
 
-    }(std::get<TIds>(in_container)), ...);
+            }(std::get<TIds>(in_container))...
+        }
+    );
 }
 
 template <typename... TFields>
@@ -57,9 +64,9 @@ TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container) no
 }
 
 template <typename... TFields>
-RkVoid ComponentLayout<TFields...>::EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept
+RkSize ComponentLayout<TFields...>::EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept
 {
-    EnsureStorageSpaceHelper(in_container, in_size, std::make_index_sequence<sizeof...(TFields)>());
+    return EnsureStorageSpaceHelper(in_container, in_size, std::make_index_sequence<sizeof...(TFields)>());
 }
 
 #pragma endregion

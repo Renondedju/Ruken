@@ -51,8 +51,10 @@ class ComponentBase
          * \brief Ensures that the component has enough storage space for a given amount of entities
          *        If this is not the case, containers will be allocated
          * \param in_size Size to ensure
+         * \return Minimum number of elements allocated by one of the containers in the layout
+         *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
-        virtual RkVoid EnsureStorageSpace(RkSize in_size) noexcept = 0;
+        virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept = 0;
 
         #pragma endregion
 

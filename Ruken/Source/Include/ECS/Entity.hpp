@@ -95,6 +95,9 @@ class Entity
          */
         RkBool operator==(Entity const& in_other) const noexcept;
 
+        Entity& operator=(Entity const& in_copy) = delete;
+        Entity& operator=(Entity&&      in_move) = delete;
+
         #pragma endregion
 };
 

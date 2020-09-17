@@ -23,9 +23,9 @@
  */
 
 template <RkSize TUniqueId, typename... TMembers>
-RkVoid Component<TUniqueId, TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
+RkSize Component<TUniqueId, TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
 {
-    Layout::EnsureStorageSpace(m_storage, in_size);
+    return Layout::EnsureStorageSpace(m_storage, in_size);
 }
 
 template <RkSize TUniqueId, typename... TMembers>

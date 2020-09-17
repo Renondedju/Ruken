@@ -64,13 +64,16 @@ class TagComponent final : public ComponentBase
         #pragma region Methods
 
         /**
+         * \note Since a tag component does not contain any data, this method does nothing
+         *       The returned value is also always UINTMAX_MAX to allow allocators (archetypes) to call this method as few times as possible
+         *
          * \brief Ensures that the component has enough storage space for a given amount of entities
          *        If this is not the case, containers will be allocated
          * \param in_size Size to ensure
-         *
-         * \note Since a tag component does not contain any data, this method does nothing
+         * \return Minimum number of elements allocated by one of the containers in the component layout
+         *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
-        virtual RkVoid EnsureStorageSpace(RkSize in_size) noexcept override;
+        virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
 
         #pragma endregion 
 

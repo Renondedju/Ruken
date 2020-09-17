@@ -27,6 +27,9 @@
 #include <tuple>
 #include <utility>
 
+// MinExceptZero
+#include <Common/Numerics.hpp>
+
 #include "Build/Namespace.hpp"
 
 #include "Meta/IndexPack.hpp"
@@ -85,7 +88,7 @@ class ComponentLayout
          * \brief EnsureStorageSpace
          */
         template <RkSize... TIds>
-        static RkVoid EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept;
+        static RkSize EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept;
 
         #pragma endregion
 
@@ -119,8 +122,10 @@ class ComponentLayout
          *
          * \param in_container Container to ensure/allocate memory into
          * \param in_size Size to ensure
+         * \return Minimum number of elements allocated by one of the containers in the layout
+         *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
-        static RkVoid EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept;
+        static RkSize EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept;
 
         #pragma endregion 
 

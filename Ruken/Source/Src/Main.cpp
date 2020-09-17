@@ -27,36 +27,18 @@
 #include "Utility/Benchmark.hpp"
 
 #include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterSystem.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
 USING_RUKEN_NAMESPACE
 
 int main()
 {
-    EntityAdmin admin;
-
-    admin.CreateSystem<CounterSystem>();
-
-    BENCHMARK("Entity creation with allocation")
+    LOOPED_BENCHMARK("Entity creation with allocation", 500)
     {
-        for (RkSize index = 0; index < UINT16_MAX; ++index)
-            admin.CreateEntity<CounterComponent, TestTagComponent>();
-    }
+        EntityAdmin admin;
 
-    Entity const entity = admin.CreateEntity<TestTagComponent, CounterComponent>();
-    Archetype&   owner  = entity.GetOwner();
-
-    BENCHMARK("Entity deletion")
-    {
         for (RkSize index = 0; index < UINT16_MAX; ++index)
-            owner.DeleteEntity(Entity(owner, index));
-    }
-
-    BENCHMARK("Entity creation")
-    {
-        for (RkSize index = 0; index < UINT16_MAX; ++index)
-            admin.CreateEntity<CounterComponent, TestTagComponent>();
+            admin.CreateEntity<CounterComponent>();
     }
 
     //Kernel kernel;

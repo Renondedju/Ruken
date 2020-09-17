@@ -34,7 +34,7 @@ Entity::Entity(Archetype& in_archetype, RkSize const in_local_identifier):
 
 RkVoid Entity::Delete() const noexcept
 {
-    m_archetype.DeleteEntity(*this);
+    m_archetype.DeleteEntity(m_local_identifier);
 }
 
 Archetype& Entity::GetOwner() const noexcept
