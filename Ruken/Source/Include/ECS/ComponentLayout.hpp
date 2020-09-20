@@ -32,6 +32,7 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/Contains.hpp"
 #include "Meta/IndexPack.hpp"
 #include "Meta/TupleIndex.hpp"
 
@@ -42,6 +43,8 @@
 #include "Containers/LinkedChunkList.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+class Archetype;
 
 /**
  * \brief Describes a component layout as well as helpers to interact with that memory layout
@@ -82,7 +85,7 @@ class ComponentLayout
          * \brief GetView helper
          */
         template <typename TLayoutView, RkSize... TIds>
-        static TLayoutView GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept;
+        static TLayoutView GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief EnsureStorageSpace
@@ -110,10 +113,11 @@ class ComponentLayout
          * \note The view will point onto the head of each field
          * \tparam TLayoutView Requested view type
          * \param in_container component container
+         * \param in_owning_archetype Owning archetype
          * \return Requested view instance
          */
         template <typename TLayoutView>
-        static TLayoutView GetView(ContainerType& in_container) noexcept;
+        static TLayoutView GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept;
 
         /**
          * \brief Ensures that the passed container will have the storage space required for a given amount of entities

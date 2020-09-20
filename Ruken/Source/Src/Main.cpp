@@ -24,23 +24,11 @@
 
 #include "Core/Kernel.hpp"
 
-#include "Utility/Benchmark.hpp"
-
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterComponent.hpp"
-
 USING_RUKEN_NAMESPACE
 
 int main()
 {
-    LOOPED_BENCHMARK("Entity creation with allocation", 500)
-    {
-        EntityAdmin admin;
+    Kernel kernel;
 
-        for (RkSize index = 0; index < UINT16_MAX; ++index)
-            admin.CreateEntity<CounterComponent>();
-    }
-
-    //Kernel kernel;
-    //return kernel.Run();
+    return kernel.Run();
 }

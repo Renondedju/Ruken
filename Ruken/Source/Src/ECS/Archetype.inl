@@ -27,7 +27,7 @@ Archetype::Archetype(Tag<TComponents...>) noexcept:
     m_fingerprint {ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>()}
 {
     // Setup components
-    (m_components.try_emplace(TComponents::id, std::make_unique<TComponents>()), ...);
+    (m_components.try_emplace(TComponents::id, std::make_unique<TComponents>(*this)), ...);
 }
 
 template <typename... TComponents>

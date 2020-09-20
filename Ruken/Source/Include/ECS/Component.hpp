@@ -77,7 +77,12 @@ class Component final : public ComponentBase
 
         #pragma region Constructors
 
-        Component()                         = default;
+        /**
+         * \brief Default constructor
+         * \param in_owning_archetype Owning archetype
+         */
+        Component(Archetype const& in_owning_archetype) noexcept;
+
         Component(Component const& in_copy) = default;
         Component(Component&&      in_move) = default;
         virtual ~Component() override       = default;

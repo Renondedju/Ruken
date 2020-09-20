@@ -51,6 +51,11 @@ ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
     return m_fingerprint;
 }
 
+RkSize Archetype::GetEntitiesCount() const noexcept
+{
+    return m_entities_count;
+}
+
 Entity Archetype::CreateEntity() noexcept
 {
     // If there are no more free space for entities, that means that we might have to allocate some more
@@ -115,6 +120,11 @@ RkVoid Archetype::DeleteEntity(RkSize in_local_identifier) noexcept
             return;
         }
     }
+}
+
+std::list<Range> const& Archetype::GetFreeEntitiesRanges() const noexcept
+{
+    return m_free_entities;
 }
 
 #pragma endregion

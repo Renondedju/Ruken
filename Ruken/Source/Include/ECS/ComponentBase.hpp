@@ -29,16 +29,31 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+class Archetype;
+
 /**
  * \brief Base class of the Component class, this is simply used to store components as they are templated
  */
 class ComponentBase
 {
+    protected:
+
+        #pragma region Members
+
+        Archetype const& m_owning_archetype;
+
+        #pragma endregion
+
     public:
 
         #pragma region Constructors
 
-        ComponentBase()                             = default;
+        /**
+         * \brief Default constructor
+         * \param in_owning_archetype Owning archetype
+         */
+        ComponentBase(Archetype const& in_owning_archetype) noexcept;
+
         ComponentBase(ComponentBase const& in_copy) = default;
         ComponentBase(ComponentBase&&      in_move) = default;
         virtual ~ComponentBase()                    = default;
@@ -60,8 +75,8 @@ class ComponentBase
 
         #pragma region Operators
 
-        ComponentBase& operator=(ComponentBase const& in_copy) = default;
-        ComponentBase& operator=(ComponentBase&&      in_move) = default;
+        ComponentBase& operator=(ComponentBase const& in_copy) = delete;
+        ComponentBase& operator=(ComponentBase&&      in_move) = delete;
 
         #pragma endregion
 };

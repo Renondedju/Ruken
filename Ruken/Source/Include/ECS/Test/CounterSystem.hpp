@@ -29,12 +29,18 @@
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final : System<CounterComponent, TestTagComponent>
+struct CounterSystem final : System<CounterComponent>
 {
-    using System<CounterComponent, TestTagComponent>::System;
+    // Inherited constructor
+    using System<CounterComponent>::System;
 
-    using StartView  = CounterComponent::Layout::MakeView<Count>;
-    using UpdateView = CounterComponent::Layout::MakeView<Count const> const;
+    #pragma region Views
+
+    using CountView = CounterComponent::Layout::MakeView<Count>;
+
+    #pragma endregion 
+
+    #pragma region Methods
 
     /**
      * \brief Called once at the start of a simulation
@@ -47,12 +53,10 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
 
         // Iterating over every entity
         for (auto& group: m_groups)
+        for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
         {
-            // Creating views
-            StartView view = group.GetComponent<CounterComponent>().GetView<StartView>();
-
             // Setting the "CounterComponent::Count" variable
-            view.Fetch<Count>(0) = count++;
+            view.Fetch<Count>() = count++;
         }
     }
 
@@ -66,12 +70,12 @@ struct CounterSystem final : System<CounterComponent, TestTagComponent>
 
         // Iterating over every entity
         for (auto& group: m_groups)
+        for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
         {
-            // Creating views
-            UpdateView view = group.GetComponent<CounterComponent>().GetView<UpdateView>();
-
-            // Reading the "CounterComponent::Count" variable
-            total += view.Fetch<Count>(0);
+            // Incrementing the total count
+            total += view.Fetch<Count>();
         }
     }
+
+    #pragma endregion 
 };

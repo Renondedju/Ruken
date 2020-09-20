@@ -26,10 +26,10 @@
 
 template <typename... TFields>
 template <typename TLayoutView, RkSize... TIds>
-TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, std::index_sequence<TIds...>) noexcept
+TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
-    return TLayoutView { std::get<TIds>(in_container).GetHead()... };
+    return TLayoutView { in_owning_archetype, std::get<TIds>(in_container).GetHead()... };
 }
 
 template <typename... TFields>
@@ -58,9 +58,9 @@ RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_c
 
 template <typename... TFields>
 template <typename TLayoutView>
-TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container) noexcept
+TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept
 {
-    return GetViewHelper<TLayoutView>(in_container, typename TLayoutView::Sequence());
+    return GetViewHelper<TLayoutView>(in_container, in_owning_archetype, typename TLayoutView::Sequence());
 }
 
 template <typename... TFields>

@@ -25,7 +25,6 @@
 #pragma once
 
 #include <tuple>
-#include <vector>
 
 #include "Build/Namespace.hpp"
 

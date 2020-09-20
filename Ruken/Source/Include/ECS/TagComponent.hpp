@@ -54,7 +54,12 @@ class TagComponent final : public ComponentBase
 
         #pragma region Constructors
 
-        TagComponent()                            = default;
+        /**
+         * \brief Default constructor
+         * \param in_owning_archetype Owning archetype
+         */
+        TagComponent(Archetype const& in_owning_archetype) noexcept;
+
         TagComponent(TagComponent const& in_copy) = default;
         TagComponent(TagComponent&&      in_move) = default;
         virtual ~TagComponent() override          = default;

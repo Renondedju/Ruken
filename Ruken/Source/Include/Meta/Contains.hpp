@@ -22,24 +22,20 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include <type_traits>
 
-RkVoid EntityAdmin::StartSimulation() noexcept
-{
-    for (auto && system: m_systems)
-        system->OnStart();
-}
+#include "Build/Namespace.hpp"
 
-RkVoid EntityAdmin::UpdateSimulation() noexcept
-{
-    for (auto && system: m_systems)
-        system->OnUpdate(0.0F);
-}
+BEGIN_RUKEN_NAMESPACE
 
-RkVoid EntityAdmin::EndSimulation() noexcept
-{
-    for (auto && system: m_systems)
-        system->OnEnd();
-}
+/**
+ * \brief Checks if a parameter pack contains the passed type
+ * \tparam TType Type to look for
+ * \tparam TTypes Parameter pack
+ */
+template<typename TType, typename... TTypes>
+using Contains = std::disjunction<std::is_same<TType, TTypes>...>;
+
+END_RUKEN_NAMESPACE

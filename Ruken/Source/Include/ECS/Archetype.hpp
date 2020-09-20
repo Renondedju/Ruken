@@ -96,12 +96,10 @@ class Archetype
 
         #pragma region Methods
 
-        /**
-         * \brief Gets the fingerprint of the archetype
-         * \return Fingerprint
-         */
-        [[nodiscard]]
-        ArchetypeFingerprint const& GetFingerprint() const noexcept;
+        // Getters
+        [[nodiscard]] std::list<Range>     const& GetFreeEntitiesRanges() const noexcept;
+        [[nodiscard]] ArchetypeFingerprint const& GetFingerprint       () const noexcept;
+        [[nodiscard]] RkSize                      GetEntitiesCount     () const noexcept;
 
         /**
          * \brief Returns a component of the passed type stored in this archetype

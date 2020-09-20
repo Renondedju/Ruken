@@ -22,24 +22,10 @@
  *  SOFTWARE.
  */
 
-#include "ECS/EntityAdmin.hpp"
+#include "ECS/ComponentBase.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RkVoid EntityAdmin::StartSimulation() noexcept
-{
-    for (auto && system: m_systems)
-        system->OnStart();
-}
-
-RkVoid EntityAdmin::UpdateSimulation() noexcept
-{
-    for (auto && system: m_systems)
-        system->OnUpdate(0.0F);
-}
-
-RkVoid EntityAdmin::EndSimulation() noexcept
-{
-    for (auto && system: m_systems)
-        system->OnEnd();
-}
+ComponentBase::ComponentBase(Archetype const& in_owning_archetype) noexcept:
+    m_owning_archetype {in_owning_archetype}
+{ }

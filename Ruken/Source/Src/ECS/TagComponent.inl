@@ -23,7 +23,12 @@
  */
 
 template <RkSize TUniqueId>
+TagComponent<TUniqueId>::TagComponent(Archetype const& in_owning_archetype) noexcept:
+    ComponentBase {in_owning_archetype}
+{ }
+
+template <RkSize TUniqueId>
 RkSize TagComponent<TUniqueId>::EnsureStorageSpace(RkSize) noexcept
 {
-    return 0;
+    return 0ULL;
 }

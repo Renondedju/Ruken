@@ -28,7 +28,6 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/CopyConst.hpp"
 #include "Meta/TupleIndex.hpp"
 #include "Meta/TupleHasType.hpp"
 #include "Containers/LinkedChunkListNode.hpp"
@@ -42,62 +41,92 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TFields Member types to create a reference onto
  */
 template <typename TPack, typename... TFields>
-struct ComponentView;
+class ComponentView;
 
 template <template <RkSize...> class TPack, RkSize... TIndices, typename... TFields>
-struct ComponentView<TPack<TIndices...>, TFields...> : public std::tuple<CopyConst<TFields, LinkedChunkListNode<typename TFields::Type>*>...>
+class ComponentView<TPack<TIndices...>, TFields...>
 {
+    template <typename TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
+    template <typename TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
+
     private:
 
-        // Helpers for the Fetch method
-        using BaseTuple      = std::tuple<CopyConst<TFields, LinkedChunkListNode<typename TFields::Type>*>...>;
-        using BaseConstTuple = std::tuple<LinkedChunkListNode<typename TFields::Type>* const...>;
+        #pragma region Members
 
-        /**
-         * \brief Returns the index of a member inside of the view
-         * \tparam TField Member to look for
-         */
-        template <typename TField>
-        using MemberIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
+        // Stores a tuple of
+        // - An index containing the current node index of field container
+        // - A pointer to the actual field node container 
+        std::tuple<ReferencePair<TFields>...> m_fields_references;
 
-        /**
-         * \brief Checks if a given member exists in this view,
-         *        if not SFINAE will prevent compilation to avoid some more ugly errors 
-         * \tparam TField Member to look for
-         */
-        template <typename TField>
-        using MemberExists = std::enable_if_t<TupleHasType<TField, std::tuple<std::remove_const_t<TFields>...>>::value, RkBool>;
+        // Reference to the next empty range of the archetype
+        // This is used to skip de-allocated entities when iterating
+        std::list<Range>::const_iterator m_next_empty_range;
+
+        // Actual owning archetype of the data we want to iterate
+        Archetype const& m_component_archetype;
+
+        // Current entity index we are referencing (local entity identifier)
+        RkSize m_index {0ULL};
+
+        #pragma endregion 
 
     public:
 
-        // Making parent constructors available
-        using BaseTuple::tuple;
-        using BaseTuple::operator=;
+        #pragma region Usings
+
+        template <typename TField> using MemberIndex  = TupleIndex  <TField, std::tuple<TFields...>>;
+        template <typename TField> using MemberExists = TupleHasType<TField, std::tuple<TFields...>>;
 
         /**
          * \brief Member index sequence of the view
          */
         using Sequence = std::index_sequence<TIndices...>;
 
-        /**
-         * \brief Returns a reference onto a given member stored in the view.
-         * \note The view must include the requested member to work
-         * \tparam TField Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
-         * \return Field reference
-         */
-        template<typename TField, MemberExists<TField> = true>
-        typename TField::Type&       Fetch(RkSize in_index) noexcept
-        { return std::get<MemberIndex<TField>::value>(static_cast<BaseTuple&>(*this))->data[in_index]; }
+        #pragma endregion 
+
+        #pragma region Constructors
 
         /**
-         * \brief Returns a constant reference onto a given member stored in the view.
-         * \note The view must include the requested member to work
-         * \tparam TField Requested member. You only must pass the Member representative type without any cv ref/ptr attributes.
-         * \return Field constant reference
+         * \brief Default constructor
+         * \param in_archetype Iterated component archetype. This is used to automatically skip de-allocated entities 
+         * \param in_fields Fields to iterate on
          */
-        template<typename TField, MemberExists<TField> = true>
-        typename TField::Type const& Fetch(RkSize in_index) const noexcept
-        { return std::get<MemberIndex<TField>::value>(static_cast<BaseConstTuple const&>(*this))->data[in_index]; }
+        ComponentView(Archetype const& in_archetype, LinkedChunkListNode<typename TFields::Type>*... in_fields) noexcept;
+
+        ComponentView(ComponentView const& in_copy) = default;
+        ComponentView(ComponentView&&      in_move) = default;
+        ~ComponentView()                            = default;
+
+        #pragma endregion 
+
+        #pragma region Methods
+
+        /**
+         * \brief Updates the view to reference the next entity found, if the view found nothing, false is returned
+         * \return True if the next entity has been found, false otherwise
+         */
+        [[nodiscard]]
+        RkBool FindNextEntity() noexcept;
+
+        /**
+         * \brief Fetches a field of the currently referenced entity
+         * \tparam TField Field type
+         * \return Reference to the entity field
+         */
+        template <typename TField>
+        [[nodiscard]]
+        typename TField::Type& Fetch() noexcept;
+
+        #pragma endregion 
+
+        #pragma region Operators
+
+        ComponentView& operator=(ComponentView const& in_copy) = default;
+        ComponentView& operator=(ComponentView&&      in_move) = default;
+
+        #pragma endregion
 };
+
+#include "ECS/ComponentView.inl"
 
 END_RUKEN_NAMESPACE
