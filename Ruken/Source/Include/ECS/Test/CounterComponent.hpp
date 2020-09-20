@@ -22,20 +22,22 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
+
+#include <array>
+
+#include "ECS/Component.hpp"
+#include "ECS/TagComponent.hpp"
+#include "ECS/ComponentField.hpp"
+#include "ECS/Test/ComponentTable.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
-{
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+struct Count       : ComponentField<RkSize>                 {};
+struct TestPadding : ComponentField<std::array<RkSize, 10>> {};
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+RUKEN_DEFINE_COMPONENT(Counter,
+    Count,        // Actual count variable
+    TestPadding); // Test padding to demonstrate views
 
-    return true;
-}
+RUKEN_DEFINE_TAG_COMPONENT(TestTag);

@@ -22,20 +22,20 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include <type_traits>
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
-{
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+#include "Build/Namespace.hpp"
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+BEGIN_RUKEN_NAMESPACE
 
-    return true;
-}
+/**
+ * \brief Checks if a parameter pack contains the passed type
+ * \tparam TType Type to look for
+ * \tparam TTypes Parameter pack
+ */
+template<typename TType, typename... TTypes>
+using Contains = std::disjunction<std::is_same<TType, TTypes>...>;
+
+END_RUKEN_NAMESPACE

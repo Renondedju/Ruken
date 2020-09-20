@@ -23,42 +23,21 @@
  */
 
 template <typename... TComponents>
-template <RkSize... TIds>
-EntityID Archetype<TComponents...>::CreateEntityHelper(std::index_sequence<TIds...>) noexcept
+Archetype::Archetype(Tag<TComponents...>) noexcept:
+    m_fingerprint {ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>()}
 {
-	(std::get<TIds>(m_components).CreateItem(), ...);
-    return EntityID {EntitiesCount() - 1};
+    // Setup components
+    (m_components.try_emplace(TComponents::id, std::make_unique<TComponents>(*this)), ...);
 }
 
-template <typename ... TComponents>
-Archetype<TComponents...>::Archetype():
-    m_components {}
+template <typename... TComponents>
+Group<TComponents...> Archetype::CreateGroupReference() noexcept
 {
-    m_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>(); 
+    return Group<TComponents...>(*this, GetComponent<TComponents>()...);
 }
 
-template <typename ... TComponents>
 template <typename TComponent>
-auto Archetype<TComponents...>::GetComponent() noexcept
+TComponent& Archetype::GetComponent() noexcept
 {
-    return std::reference_wrapper(std::get<TComponent>(m_components));
-}
-
-template <typename ... TComponents>
-template <RkSize TIndex>
-auto Archetype<TComponents...>::GetComponent() noexcept
-{
-    return std::reference_wrapper(std::get<TIndex>(m_components));
-}
-
-template <typename ... TComponents>
-EntityID Archetype<TComponents...>::CreateEntity() noexcept
-{
-    return CreateEntityHelper(std::make_index_sequence<sizeof...(TComponents)>());
-}
-
-template <typename ... TComponents>
-RkSize Archetype<TComponents...>::EntitiesCount() const noexcept
-{
-    return std::get<0>(m_components).GetItemCount();
+    return static_cast<TComponent&>(*m_components[TComponent::id]);
 }

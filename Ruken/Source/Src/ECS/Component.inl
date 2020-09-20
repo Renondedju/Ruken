@@ -22,24 +22,20 @@
  *  SOFTWARE.
  */
 
-template <typename TItem, RkSize TUniqueId>
-typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::CreateItem(TItem&& in_item)
-{
-    Layout::PushBack(m_storage, std::forward<TItem>(in_item));
+template <RkSize TUniqueId, typename... TMembers>
+Component<TUniqueId, TMembers...>::Component(Archetype const& in_owning_archetype) noexcept:
+    ComponentBase {in_owning_archetype}
+{ }  
 
-    return ItemId(Layout::Size(m_storage) - 1);
+template <RkSize TUniqueId, typename... TMembers>
+RkSize Component<TUniqueId, TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
+{
+    return Layout::EnsureStorageSpace(m_storage, in_size);
 }
 
-template <typename TItem, RkSize TUniqueId>
-typename Component<TItem, TUniqueId>::ItemId Component<TItem, TUniqueId>::CreateItem()
+template <RkSize TUniqueId, typename... TMembers>
+template <typename TView>
+TView Component<TUniqueId, TMembers...>::GetView() noexcept
 {
-    Layout::PushBack(m_storage, std::forward<TItem>(TItem{}));
-
-    return ItemId(Layout::Size(m_storage) - 1);
-}
-
-template <typename TItem, RkSize TUniqueId>
-RkSize Component<TItem, TUniqueId>::GetItemCount() const noexcept
-{
-    return Layout::Size(m_storage);
+    return Layout::template GetView<TView>(m_storage, m_owning_archetype);
 }

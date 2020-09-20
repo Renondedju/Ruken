@@ -24,63 +24,61 @@
 
 #pragma once
 
-#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
-
-#include "Meta/MinimumType.hpp"
-#include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
+class Archetype;
+
 /**
- * \brief Stores a bitmask holding data about the component types stored inside an archetype
- *        This allows for fast archetype comparisons and fast component queries. 
+ * \brief Base class of the Component class, this is simply used to store components as they are templated
  */
-class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, MinimumTypeT<RUKEN_MAX_ECS_COMPONENTS, RkSize>>
+class ComponentBase
 {
+    protected:
+
+        #pragma region Members
+
+        Archetype const& m_owning_archetype;
+
+        #pragma endregion
+
     public:
 
         #pragma region Constructors
 
-        ArchetypeFingerprint()                                    = default;
-        ArchetypeFingerprint(ArchetypeFingerprint const& in_copy) = default;
-        ArchetypeFingerprint(ArchetypeFingerprint&&      in_move) = default;
-        ~ArchetypeFingerprint()                                   = default;
+        /**
+         * \brief Default constructor
+         * \param in_owning_archetype Owning archetype
+         */
+        ComponentBase(Archetype const& in_owning_archetype) noexcept;
+
+        ComponentBase(ComponentBase const& in_copy) = default;
+        ComponentBase(ComponentBase&&      in_move) = default;
+        virtual ~ComponentBase()                    = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Creates a new fingerprint and setups traits based on the passed components
+         * \brief Ensures that the component has enough storage space for a given amount of entities
+         *        If this is not the case, containers will be allocated
+         * \param in_size Size to ensure
+         * \return Minimum number of elements allocated by one of the containers in the layout
+         *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
-        template <typename... TComponents>
-        static ArchetypeFingerprint CreateFingerPrintFrom() noexcept;
+        virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept = 0;
 
         #pragma endregion
 
         #pragma region Operators
 
-        ArchetypeFingerprint& operator=(ArchetypeFingerprint const& in_copy) = default;
-        ArchetypeFingerprint& operator=(ArchetypeFingerprint&&      in_move) = default;
+        ComponentBase& operator=(ComponentBase const& in_copy) = delete;
+        ComponentBase& operator=(ComponentBase&&      in_move) = delete;
 
         #pragma endregion
 };
 
-#include "ECS/ArchetypeFingerprint.inl"
-
 END_RUKEN_NAMESPACE
-
-// std::hash specialization for ArchetypeFingerprint
-namespace std
-{
-    template <>
-    struct hash<RUKEN_NAMESPACE::ArchetypeFingerprint>
-    {
-        size_t operator()(RUKEN_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
-        {
-            return in_key.HashCode();
-        }
-    };
-}

@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,34 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include <tuple>
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+#include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+/**
+ * \brief Finds the index of the first occurrence of TType in TTuple
+ * \note If the type isn't found, this will throw a hard compilation error
+ * \tparam TType Type occurrence to look for
+ * \tparam TTuple Tuple to look into
+ */
+template <class TType, class TTuple>
+struct TupleIndex;
+
+template <class TType, class... TTypes>
+struct TupleIndex<TType, std::tuple<TType, TTypes...>>
 {
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+    static constexpr RkSize value = 0;
+};
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+template <class TType, class TFirst, class... TTypes>
+struct TupleIndex<TType, std::tuple<TFirst, TTypes...>>
+{
+    static constexpr RkSize value = 1 + TupleIndex<TType, std::tuple<TTypes...>>::value;
+};
 
-    return true;
-}
+END_RUKEN_NAMESPACE

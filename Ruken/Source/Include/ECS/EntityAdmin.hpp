@@ -25,26 +25,44 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <unordered_map>
 
 #include "Build/Namespace.hpp"
 
-#include "ECS/EntityID.hpp"
+#include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
-#include "ECS/ArchetypeBase.hpp"
-#include "ECS/ComponentSystemBase.hpp"
+#include "ECS/SystemBase.hpp"
+#include "ECS/ExclusiveComponentBase.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
+/**
+ * \brief EntityAdmins are for isolation.
+ *        Each admin can be described as a simulation containing entities
+ *        and a group of system to maintain and update theses entities.
+ */
 class EntityAdmin
 {
     private:
 
         #pragma region Members
 
-        std::vector       <ComponentSystemBase*>                 m_systems;
-        std::unordered_map<ArchetypeFingerprint, ArchetypeBase*> m_archetypes;
+        std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
+        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
+        std::unordered_map<RkSize, std::unique_ptr<ExclusiveComponentBase>>  m_exclusive_components {};
         
+        #pragma endregion 
+
+        #pragma region Methods
+
+        /**
+         * \brief Creates a new archetype and handles any setup co-routine
+         * \tparam TComponents 
+         */
+        template <typename... TComponents>
+        Archetype* CreateArchetype() noexcept;
+
         #pragma endregion 
 
     public:
@@ -54,31 +72,50 @@ class EntityAdmin
         EntityAdmin()                           = default;
         EntityAdmin(EntityAdmin const& in_copy) = default;
         EntityAdmin(EntityAdmin&&      in_move) = default;
-        ~EntityAdmin();
+        ~EntityAdmin()                          = default;
 
         #pragma endregion
 
         #pragma region Methods
 
+        // --- Simulation manipulation
+
+        RkVoid StartSimulation () noexcept;
+        RkVoid UpdateSimulation() noexcept;
+        RkVoid EndSimulation   () noexcept;
+
+        // --- Entity / Systems lifetime manipulation
+
         /**
-         * \brief 
+         * \brief Creates a system and adds it to the world
          * \tparam TSystem System type to push to the entity admin 
          */
         template <typename TSystem>
         RkVoid CreateSystem() noexcept;
 
         /**
-         * \brief Updates every system
+         * \brief Attempts the creation of an exclusive component
+         *        If the component already existed, this method won't have any effects
+         * \tparam TComponent Component class to add
          */
-        RkVoid UpdateSystems() noexcept;
+        template <typename TComponent>
+        RkVoid CreateExclusiveComponent() noexcept;
 
         /**
-         * \brief 
-         * \tparam TComponents 
-         * \return 
+         * \brief Fetches an exclusive component
+         * \tparam TComponent Exclusive component type to fetch
+         * \return The component or nullptr if no component of this type has been found
+         */
+        template <typename TComponent>
+        [[nodiscard]] TComponent* GetExclusiveComponent() noexcept;
+
+        /**
+         * \brief Creates a new entity with given components
+         * \tparam TComponents Components to attach to the new entity
+         * \return Created entity id
          */
         template <typename... TComponents>
-        EntityID CreateEntity() noexcept;
+        Entity CreateEntity() noexcept;
 
         #pragma endregion
 

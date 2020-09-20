@@ -22,20 +22,16 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include "ECS/Component.hpp"
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
-{
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
-
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
-
-    return true;
-}
+/**
+ * \brief This table keeps track of every available component in the ECS
+ *        it is also used to create and maintain every component ID,
+ *        see the Component class for more info.
+ */
+RUKEN_DEFINE_COMPONENT_TABLE(
+    Counter,
+    TestTag
+);

@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,13 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+template <RkSize TUniqueId>
+TagComponent<TUniqueId>::TagComponent(Archetype const& in_owning_archetype) noexcept:
+    ComponentBase {in_owning_archetype}
+{ }
 
-USING_RUKEN_NAMESPACE
-
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+template <RkSize TUniqueId>
+RkSize TagComponent<TUniqueId>::EnsureStorageSpace(RkSize) noexcept
 {
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
-
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
-
-    return true;
+    return 0ULL;
 }

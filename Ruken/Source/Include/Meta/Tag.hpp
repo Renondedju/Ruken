@@ -22,20 +22,18 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
-{
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+BEGIN_RUKEN_NAMESPACE
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+/**
+ * \brief Allows the passage of multiple types as arguments for template deduction without any allocation 
+ * \tparam TTypes Types
+ */
+template <typename... TTypes>
+class Tag
+{ };
 
-    return true;
-}
+END_RUKEN_NAMESPACE

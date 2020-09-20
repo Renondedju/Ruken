@@ -25,30 +25,60 @@
 template <typename TSystem>
 RkVoid EntityAdmin::CreateSystem() noexcept
 {
-    m_systems.emplace_back(new TSystem());
+    std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
+
+    m_systems.emplace_back(std::move(system));
+}
+
+template <typename TComponent>
+RkVoid EntityAdmin::CreateExclusiveComponent() noexcept
+{
+    m_exclusive_components.try_emplace(TComponent::id, std::make_unique<TComponent>());
+}
+
+template <typename TComponent>
+TComponent* EntityAdmin::GetExclusiveComponent() noexcept
+{
+    auto search = m_exclusive_components.find(TComponent::id);
+    if (search != m_exclusive_components.end())
+        return static_cast<TComponent*>(&(*search->second));
+
+    return nullptr;
 }
 
 template <typename... TComponents>
-EntityID EntityAdmin::CreateEntity() noexcept
+Archetype* EntityAdmin::CreateArchetype() noexcept
 {
-    using TargetArchetype = MakeArchetype<TComponents...>;
+    ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
 
+    // Creating the actual instance
+    std::unique_ptr<Archetype> new_archetype = std::make_unique<Archetype>(Tag<TComponents...>());
+
+    // We need to get the pointer before moving it
+    Archetype* archetype_ptr = new_archetype.get();
+    m_archetypes[targeted_fingerprint] = std::move(new_archetype);
+
+    // Setup
+    for (std::unique_ptr<SystemBase>& system: m_systems)
+        if (system->GetQuery().Match(*archetype_ptr))
+            system->AddReferenceGroup(*archetype_ptr);
+
+    return archetype_ptr; 
+}
+
+template <typename... TComponents>
+Entity EntityAdmin::CreateEntity() noexcept
+{
     // Looking for the archetype of the entity
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
 
-    TargetArchetype* target_archetype;
+    Archetype* target_archetype;
 
     // If we didn't found any corresponding archetypes, creating it
     if (m_archetypes.find(targeted_fingerprint) == m_archetypes.end())
-    {
-        target_archetype                   = new TargetArchetype();
-        m_archetypes[targeted_fingerprint] = target_archetype;
-    }
-    // Otherwise, fetching it
+        target_archetype = CreateArchetype<TComponents...>();
     else
-    {
-        target_archetype = static_cast<TargetArchetype*>(m_archetypes[targeted_fingerprint]);
-    }
+        target_archetype = m_archetypes[targeted_fingerprint].get();
 
     return target_archetype->CreateEntity();
 }

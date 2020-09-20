@@ -22,20 +22,41 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#include "ECS/Range.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+Range::Range(RkSize const in_begin, RkSize const in_size):
+    begin {in_begin},
+    size  {in_size}
+{ }
+
+RkSize Range::ReduceRight() noexcept
 {
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+    // Cannot reduce an empty range
+    if (size == 0ULL)
+        return 0ULL;
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+    ++begin;
+    return --size;
+}
 
-    return true;
+RkSize Range::ExpandLeft() noexcept
+{
+    // Cannot expand if we are already on the maximum range possible on the left
+    if (begin == 0ULL)
+        return size;
+
+    --begin;
+    return ++size;
+}
+
+RkSize Range::ExpandRight() noexcept
+{
+    return ++size;
+}
+
+RkBool Range::Contains(RkSize const in_position) const noexcept
+{
+    return in_position >= begin && in_position < begin + size;
 }

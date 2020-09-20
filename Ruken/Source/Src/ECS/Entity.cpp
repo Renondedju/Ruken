@@ -22,20 +22,32 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
+#include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+Entity::Entity(Archetype& in_archetype, RkSize const in_local_identifier):
+    m_archetype        {in_archetype},
+    m_local_identifier {in_local_identifier}
+{ }
+
+RkVoid Entity::Delete() const noexcept
 {
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+    m_archetype.DeleteEntity(m_local_identifier);
+}
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+Archetype& Entity::GetOwner() const noexcept
+{
+    return m_archetype;
+}
 
-    return true;
+RkSize Entity::GetLocalIdentifier() const noexcept
+{
+    return m_local_identifier;
+}
+
+RkBool Entity::operator==(Entity const& in_other) const noexcept
+{
+    return &in_other.m_archetype == &m_archetype && in_other.m_local_identifier == m_local_identifier;
 }

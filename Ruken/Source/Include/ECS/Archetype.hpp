@@ -24,47 +24,70 @@
 
 #pragma once
 
-#include <tuple>
+#include <list>
+#include <memory>
+#include <unordered_map>
 
 #include "Build/Namespace.hpp"
-#include "Types/FundamentalTypes.hpp"
 
-#include "ECS/EntityID.hpp"
-#include "ECS/ArchetypeBase.hpp"
+#include "Meta/Tag.hpp"
 
-#include "Meta/ValueIndexer.hpp"
-#include "Meta/IndexSequence/QuicksortIndexSequence.hpp"
+#include "ECS/Group.hpp"
+#include "ECS/Range.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/ComponentBase.hpp"
+#include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename... TComponents>
-class Archetype: public ArchetypeBase
+/**
+ * \brief Archetypes are at the very core of this ECS implementation.
+ *        They are responsible for storing and organizing the components
+ *        so that systems can query and work on those in the most efficient way.
+ *
+ * An archetype is a unique set of arrays, each array being used to store one (and one only) type of component.
+ * All these arrays are ordered so that all components at a given index correspond to the same entity;
+ * and so, all entities stored in a given archetype share the exact same set of components.
+ * By storing the components in contiguous homogeneous arrays, the systems can iterate on them very efficiently,
+ * leveraging the hardware pre-fetcher to its fullest potential.
+ *
+ * \note This has a very important implication: each time the structure of an entity is modified
+ *       (i.e. each time we add or remove a component to an entity), it must be memmoved to another archetype.
+ *       This has a cost, especially if doing this on lots of entities very frequently.
+ *       Take this fact into consideration when designing your code.
+ */
+class Archetype
 {
-    private:
+    protected:
 
         #pragma region Members
 
-        std::tuple<TComponents...> m_components;
+        ArchetypeFingerprint m_fingerprint      {};
+        std::list<Range>     m_free_entities    {};
+        RkSize               m_entities_count   {0ULL};
+        RkSize               m_free_space_count {0ULL};
 
-        #pragma endregion
+        std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_components {};
+
+        #pragma endregion 
 
         #pragma region Methods
 
         /**
-         * \brief Create entity helper 
-         * \tparam TIds Indices of the tuple elements
-         * \return New entity id
+         * \brief Returns a free entity location by either looking up for a free spot, or allocating a new one 
+         * \return Free entity location
          */
-        template<RkSize... TIds>
-        EntityID CreateEntityHelper(std::index_sequence<TIds...>) noexcept;
+        RkSize GetFreeEntityLocation() noexcept;
 
-        #pragma endregion
+        #pragma endregion 
 
     public:
 
         #pragma region Constructors
 
-        Archetype();
+        template <typename... TComponents>
+        Archetype(Tag<TComponents...>) noexcept;
+
         Archetype(Archetype const& in_copy) = default;
         Archetype(Archetype&&      in_move) = default;
         ~Archetype()                        = default;
@@ -73,34 +96,45 @@ class Archetype: public ArchetypeBase
 
         #pragma region Methods
 
-        /**
-         * \brief Returns the first occurence of the component in the archetype
-         * \tparam TComponent Component to look for
-         * \return First component storage occurence
-         */
-        template<typename TComponent>
-        auto GetComponent() noexcept;
+        // Getters
+        [[nodiscard]] std::list<Range>     const& GetFreeEntitiesRanges() const noexcept;
+        [[nodiscard]] ArchetypeFingerprint const& GetFingerprint       () const noexcept;
+        [[nodiscard]] RkSize                      GetEntitiesCount     () const noexcept;
 
         /**
-         * \brief Returns the component storage at the `TIndex` position of the archetype
-         * \tparam TIndex Index to look for
-         * \return Component storage reference
+         * \brief Returns a component of the passed type stored in this archetype
+         * \tparam TComponent Component to look for
+         * \note Passing a component type that does not exists in this archetype will result in a crash
+         * \return Found component
          */
-        template<RkSize TIndex>
-        auto GetComponent() noexcept;
+        template<typename TComponent>
+        [[nodiscard]]
+        TComponent& GetComponent() noexcept;
 
         /**
          * \brief Creates an entity in the archetype
-         * \return The new ID of this entity.
-         * \see EntityID for lifetime info
+         * \return Entity handle.
+         * \see Entity for lifetime info
+         * \note Make sure to reinitialize your components after creating a new entity since the memory is pooled and thus
+         *       almost never de-allocated. New memory will be allocated only if the archetype has no more empty spaces to fill
          */
-        EntityID CreateEntity() noexcept;
+        [[nodiscard]]
+        Entity CreateEntity() noexcept;
 
         /**
-         * \brief Returns the total count of entity stored in this archetype
-         * \return Entities count
+         * \brief Deletes an entity from the archetype
+         * \param in_local_identifier Local identifier of the entity, if invalid, this method does nothing
          */
-        RkSize EntitiesCount() const noexcept;
+        RkVoid DeleteEntity(RkSize in_local_identifier) noexcept;
+
+        /**
+         * \brief Creates a components reference group
+         * \tparam TComponents Components to include in the group
+         * \return Newly created reference group
+         */
+        template <typename... TComponents>
+        [[nodiscard]]
+        Group<TComponents...> CreateGroupReference() noexcept;
 
         #pragma endregion
 
@@ -111,38 +145,6 @@ class Archetype: public ArchetypeBase
 
         #pragma endregion
 };
-
-namespace internal
-{
-    // Hidden template magic used to make the "MakeArchetype" work
-
-    template <std::size_t TIndex, typename... TComponents>
-    using ComponentIndexerT = typename decltype(Select<TIndex>(
-        Indexer<std::index_sequence<TComponents::id...>, TComponents...>{}
-    ))::Type;
-
-    template <std::size_t TLhs, std::size_t TRhs>
-    struct LessComparator : std::integral_constant<RkBool, (TLhs < TRhs)>
-    {};
-
-    template <typename TTuple, typename TSequence>
-    struct ArchetypeFactory;
-
-    template <template <typename...> class TTuple, std::size_t... TIds, typename... TComponents>
-    struct ArchetypeFactory<TTuple<TComponents...>, std::index_sequence<TIds...>>
-    {
-        using Type = Archetype<internal::ComponentIndexerT<TIds, TComponents...>...>;
-    };
-}
-
-/**
- * \brief Creates an archetype by reordering components based on their id.
- *        This makes sure that the only one archetype type is used per component combination.
- *
- * \tparam TComponents Components of the archetype to create
- */
-template <typename... TComponents>
-using MakeArchetype = typename internal::ArchetypeFactory<std::tuple<TComponents...>, QuicksortIndexSequenceT<internal::LessComparator, std::index_sequence<TComponents::id...>>>::Type;
 
 #include "ECS/Archetype.inl"
 

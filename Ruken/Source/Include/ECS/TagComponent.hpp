@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,52 +24,29 @@
 
 #pragma once
 
+#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
 
 #include "Meta/Meta.hpp"
 #include "Meta/Assert.hpp"
 
 #include "ECS/ComponentBase.hpp"
-#include "ECS/ComponentItem.hpp"
-#include "ECS/ComponentLayout.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief A component is a simple data container which contains no behavior, no code logic to transform its data.
- * \tparam TFields Fields of the component
+ * \brief A tag component does not hold any data, its only purpose is to differentiate 2 entities from each other by "tagging" it.
  * \tparam TUniqueId Unique ID of the component.
  *                   Ideally this would be generated automatically at compile time but doing so in c++ is
  *                   really hard and not 100% reliable. Since this ID must be unique for each component, the best way to maintain it
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <RkSize TUniqueId, typename... TFields>
-class Component final : public ComponentBase
+template <RkSize TUniqueId>
+class TagComponent final : public ComponentBase
 {
-    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0              , "A component must have at least one field, use a TagComponent instead."    );
     RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
-
-    public:
-
-        using Item   = ComponentItem  <TFields...>;
-        using Layout = ComponentLayout<TFields...>;
-
-        /**
-         * \brief Returns the container type for a single field
-         * \tparam TField Field to get the container type of
-         */
-        template <typename TField>
-        using FieldContainerType = std::tuple_element_t<Layout::template FieldIndex<TField>::value, typename Layout::ContainerType>;
-
-    private:
-
-        #pragma region Members
-
-        // Storage of the component
-        typename Layout::ContainerType m_storage {};
-
-        #pragma endregion
 
     public:
 
@@ -81,17 +58,20 @@ class Component final : public ComponentBase
          * \brief Default constructor
          * \param in_owning_archetype Owning archetype
          */
-        Component(Archetype const& in_owning_archetype) noexcept;
+        TagComponent(Archetype const& in_owning_archetype) noexcept;
 
-        Component(Component const& in_copy) = default;
-        Component(Component&&      in_move) = default;
-        virtual ~Component() override       = default;
+        TagComponent(TagComponent const& in_copy) = default;
+        TagComponent(TagComponent&&      in_move) = default;
+        virtual ~TagComponent() override          = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
+         * \note Since a tag component does not contain any data, this method does nothing
+         *       The returned value is also always UINTMAX_MAX to allow allocators (archetypes) to call this method as few times as possible
+         *
          * \brief Ensures that the component has enough storage space for a given amount of entities
          *        If this is not the case, containers will be allocated
          * \param in_size Size to ensure
@@ -100,40 +80,23 @@ class Component final : public ComponentBase
          */
         virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
 
-        /**
-         * \brief Returns a view containing all the requested fields
-         * \tparam TView View type
-         * \return View containing all the requested fields
-         */
-        template <typename TView>
-        TView GetView() noexcept;
-
         #pragma endregion 
 
         #pragma region Operators
 
-        Component& operator=(Component const& in_copy) = default;
-        Component& operator=(Component&&      in_move) = default;
+        TagComponent& operator=(TagComponent const& in_copy) = default;
+        TagComponent& operator=(TagComponent&&      in_move) = default;
 
         #pragma endregion
 };
 
-/**
- * \brief Shorthand to declare a component named "<in_component_name>Component"
- * \param in_component_name Name of the component as defined in the component table
- * \param ... Fields of the component. Theses must inherit from the ComponentField class
- */
-#define RUKEN_DEFINE_COMPONENT(in_component_name, ...)\
-    using RUKEN_GLUE(in_component_name, Component) = Component<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name), __VA_ARGS__>
-    
-/**
- * \brief Creates an enum called EComponentTable used to keep track of every available
- *        component in the ECS. It is also used to create and maintain every component ID.
- *        See the Component class for more info.
- */
-#define RUKEN_DEFINE_COMPONENT_TABLE(...)\
-    enum class EComponentTable { __VA_ARGS__ }
+#include "ECS/TagComponent.inl"
 
-#include "ECS/Component.inl"
+/**
+ * \brief Shorthand to declare a tag component named "<in_component_name>Component"
+ * \param in_component_name Name of the component as defined in the component table
+ */
+#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name)\
+    using RUKEN_GLUE(in_component_name, Component) = TagComponent<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name)>
 
 END_RUKEN_NAMESPACE

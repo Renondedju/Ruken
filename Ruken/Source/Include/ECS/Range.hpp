@@ -24,63 +24,74 @@
 
 #pragma once
 
-#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
-
-#include "Meta/MinimumType.hpp"
-#include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief Stores a bitmask holding data about the component types stored inside an archetype
- *        This allows for fast archetype comparisons and fast component queries. 
- */
-class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, MinimumTypeT<RUKEN_MAX_ECS_COMPONENTS, RkSize>>
+class Range
 {
     public:
 
+        #pragma region Members
+
+        RkSize begin;
+        RkSize size;
+
+        #pragma endregion
+
         #pragma region Constructors
 
-        ArchetypeFingerprint()                                    = default;
-        ArchetypeFingerprint(ArchetypeFingerprint const& in_copy) = default;
-        ArchetypeFingerprint(ArchetypeFingerprint&&      in_move) = default;
-        ~ArchetypeFingerprint()                                   = default;
+        /**
+         * \brief Default constructor
+         * \param in_begin Start index of the free range
+         * \param in_size Size of the free range
+         */
+        Range(RkSize in_begin, RkSize in_size);
+
+        Range(Range const& in_copy) = default;
+        Range(Range&&      in_move) = default;
+        ~Range()                    = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Creates a new fingerprint and setups traits based on the passed components
+         * \brief Reduces the range by one from the right
+         * \return New size of the range
          */
-        template <typename... TComponents>
-        static ArchetypeFingerprint CreateFingerPrintFrom() noexcept;
+        RkSize ReduceRight() noexcept;
+
+        /**
+         * \brief Expands the range to the left (moving the begin back by one)
+         * \return New size of the range
+         * \note This method will have no effect if the beginning of the range is already 0
+         */
+        RkSize ExpandLeft() noexcept;
+
+        /**
+         * \brief Expands the range to the right (increasing the size by one)
+         * \return New size of the range
+         */
+        RkSize ExpandRight() noexcept;
+
+        /**
+         * \brief Checks if the range contains a given position
+         * \param in_position Position to check
+         * \return True if the range contains the passed position, false otherwise
+         */
+        [[nodiscard]]
+        RkBool Contains(RkSize in_position) const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
-        ArchetypeFingerprint& operator=(ArchetypeFingerprint const& in_copy) = default;
-        ArchetypeFingerprint& operator=(ArchetypeFingerprint&&      in_move) = default;
+        Range& operator=(Range const& in_copy) = default;
+        Range& operator=(Range&&      in_move) = default;
 
         #pragma endregion
 };
 
-#include "ECS/ArchetypeFingerprint.inl"
-
 END_RUKEN_NAMESPACE
-
-// std::hash specialization for ArchetypeFingerprint
-namespace std
-{
-    template <>
-    struct hash<RUKEN_NAMESPACE::ArchetypeFingerprint>
-    {
-        size_t operator()(RUKEN_NAMESPACE::ArchetypeFingerprint const& in_key) const noexcept
-        {
-            return in_key.HashCode();
-        }
-    };
-}

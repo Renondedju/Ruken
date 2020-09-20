@@ -22,20 +22,35 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+BEGIN_RUKEN_NAMESPACE
+
+/**
+ * \brief Exclusive component base, this class is just
+ *        used to store exclusive components in the EntityAdmin
+ */
+class ExclusiveComponentBase
 {
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+    public:
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+        #pragma region Constructors
 
-    return true;
-}
+        ExclusiveComponentBase()                                      = default;
+        ExclusiveComponentBase(ExclusiveComponentBase const& in_copy) = default;
+        ExclusiveComponentBase(ExclusiveComponentBase&&      in_move) = default;
+        virtual ~ExclusiveComponentBase()                             = default;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        ExclusiveComponentBase& operator=(ExclusiveComponentBase const& in_copy) = default;
+        ExclusiveComponentBase& operator=(ExclusiveComponentBase&&      in_move) = default;
+
+        #pragma endregion
+};
+
+END_RUKEN_NAMESPACE

@@ -26,16 +26,20 @@
 
 USING_RUKEN_NAMESPACE
 
-EntityAdmin::~EntityAdmin()
+RkVoid EntityAdmin::StartSimulation() noexcept
 {
-    for (auto const& archetype: m_archetypes)
-        delete archetype.second;
-
-    for (auto system: m_systems)
-        delete system;
+    for (auto && system: m_systems)
+        system->OnStart();
 }
 
-RkVoid EntityAdmin::UpdateSystems() noexcept
+RkVoid EntityAdmin::UpdateSimulation() noexcept
 {
-    
+    for (auto && system: m_systems)
+        system->OnUpdate(0.0F);
+}
+
+RkVoid EntityAdmin::EndSimulation() noexcept
+{
+    for (auto && system: m_systems)
+        system->OnEnd();
 }

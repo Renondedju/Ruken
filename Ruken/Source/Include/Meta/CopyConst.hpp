@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,15 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include <type_traits>
 
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
-{
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+#include "Build/Namespace.hpp"
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
+BEGIN_RUKEN_NAMESPACE
 
-    return true;
-}
+template <class TSource, class TDestination>
+using CopyConst = std::conditional_t<std::is_const_v<TSource>, const TDestination, std::remove_const_t<TDestination>>;
+
+END_RUKEN_NAMESPACE

@@ -22,20 +22,16 @@
  *  SOFTWARE.
  */
 
-#include "ECS/ComponentQuery.hpp"
-#include "ECS/Archetype.hpp"
-
-USING_RUKEN_NAMESPACE
-
-RkBool ComponentQuery::Match(Archetype const& in_archetype) const noexcept
+template <typename ... TComponents>
+System<TComponents...>::System(EntityAdmin& in_admin) noexcept:
+    m_groups {},
+    m_admin  {in_admin}
 {
-    // Checking inclusion
-    if (!in_archetype.GetFingerprint().HasAll(m_included))
-        return false;
+    m_query.SetupInclusionQuery<TComponents...>();
+}
 
-    // Checking exclusion
-    if (in_archetype.GetFingerprint().HasOne(m_excluded))
-        return false;
-
-    return true;
+template <typename ... TComponents>
+RkVoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
+{
+    m_groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());
 }
