@@ -24,13 +24,15 @@
 
 #pragma once
 
+#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
 
 #include "Meta/Meta.hpp"
 #include "Meta/Assert.hpp"
 
 #include "ECS/ComponentBase.hpp"
-#include "ECS/ComponentItem.hpp"
+#include "ECS/ComponentView.hpp"
+#include "ECS/ComponentField.hpp"
 #include "ECS/ComponentLayout.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -44,7 +46,7 @@ BEGIN_RUKEN_NAMESPACE
  *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
  *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <RkSize TUniqueId, typename... TFields>
+template <RkSize TUniqueId, FieldType... TFields>
 class Component final : public ComponentBase
 {
     RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0              , "A component must have at least one field, use a TagComponent instead."    );
@@ -52,14 +54,13 @@ class Component final : public ComponentBase
 
     public:
 
-        using Item   = ComponentItem  <TFields...>;
         using Layout = ComponentLayout<TFields...>;
 
         /**
          * \brief Returns the container type for a single field
          * \tparam TField Field to get the container type of
          */
-        template <typename TField>
+        template <FieldType TField>
         using FieldContainerType = std::tuple_element_t<Layout::template FieldIndex<TField>::value, typename Layout::ContainerType>;
 
     private:
@@ -105,7 +106,7 @@ class Component final : public ComponentBase
          * \tparam TView View type
          * \return View containing all the requested fields
          */
-        template <typename TView>
+        template <ViewType TView>
         TView GetView() noexcept;
 
         #pragma endregion 

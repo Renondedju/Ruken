@@ -32,12 +32,11 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/Contains.hpp"
 #include "Meta/IndexPack.hpp"
 #include "Meta/TupleIndex.hpp"
 
-#include "ECS/ComponentItem.hpp"
 #include "ECS/ComponentView.hpp"
+#include "ECS/ComponentField.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"
@@ -52,28 +51,27 @@ class Archetype;
  *
  * \see ComponentItem, ComponentView, ComponentField, Component
  */
-template <typename... TFields>
+template <FieldType... TFields>
 class ComponentLayout
 {
     public:
 
         #pragma region Usings
 
+        using ContainerType = std::tuple<LinkedChunkList<typename TFields::Type>...>;
+
         /**
          * \brief Returns the index of a member using the member class
          * \tparam TField Field class
          */
-        template <typename TField>
+        template <FieldType TField>
         using FieldIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<TFields...>>;
 
-        using ContainerType = std::tuple<LinkedChunkList<typename TFields::Type>...>;
-        using Item          = ComponentItem<TFields...>;
-
         // View constructors
-        template <typename... TSelectedFields>
+        template <FieldType... TSelectedFields>
         using MakeView         = ComponentView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
         using FullView         = MakeView<TFields...>;
-        using FullReadonlyView = MakeView<TFields const...> const;
+        using FullReadonlyView = MakeView<TFields const...>;
 
         #pragma endregion 
 
@@ -84,8 +82,8 @@ class ComponentLayout
         /**
          * \brief GetView helper
          */
-        template <typename TLayoutView, RkSize... TIds>
-        static TLayoutView GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept;
+        template <ViewType TView, RkSize... TIds>
+        static TView GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief EnsureStorageSpace
@@ -111,13 +109,13 @@ class ComponentLayout
         /**
          * \brief Returns the requested view of a component storage
          * \note The view will point onto the head of each field
-         * \tparam TLayoutView Requested view type
+         * \tparam TView Requested view type
          * \param in_container component container
          * \param in_owning_archetype Owning archetype
          * \return Requested view instance
          */
-        template <typename TLayoutView>
-        static TLayoutView GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept;
+        template <ViewType TView>
+        static TView GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept;
 
         /**
          * \brief Ensures that the passed container will have the storage space required for a given amount of entities

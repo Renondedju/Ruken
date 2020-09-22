@@ -22,19 +22,19 @@
  *  SOFTWARE.
  */
 
-template <RkSize TUniqueId, typename... TMembers>
+template <RkSize TUniqueId, FieldType... TMembers>
 Component<TUniqueId, TMembers...>::Component(Archetype const& in_owning_archetype) noexcept:
     ComponentBase {in_owning_archetype}
 { }  
 
-template <RkSize TUniqueId, typename... TMembers>
+template <RkSize TUniqueId, FieldType... TMembers>
 RkSize Component<TUniqueId, TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
 {
     return Layout::EnsureStorageSpace(m_storage, in_size);
 }
 
-template <RkSize TUniqueId, typename... TMembers>
-template <typename TView>
+template <RkSize TUniqueId, FieldType... TMembers>
+template <ViewType TView>
 TView Component<TUniqueId, TMembers...>::GetView() noexcept
 {
     return Layout::template GetView<TView>(m_storage, m_owning_archetype);

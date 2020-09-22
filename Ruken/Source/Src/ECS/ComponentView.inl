@@ -22,8 +22,8 @@
  *  SOFTWARE.
  */
 
-template <template <RkSize...> class TPack, RkSize... TIndices, typename ... TFields>
-ComponentView<TPack<TIndices...>, TFields...>::ComponentView(Archetype const& in_archetype, LinkedChunkListNode<typename TFields::Type>*... in_fields) noexcept:
+template <template <RkSize...> class TPack, RkSize... TIndices, FieldType... TFields>
+ComponentView<TPack<TIndices...>, TFields...>::ComponentView(Archetype const& in_archetype, FieldChunk<TFields>*... in_fields) noexcept:
     m_fields_references   {ReferencePair<TFields>(0ULL, in_fields)...},
     m_next_empty_range    {in_archetype.GetFreeEntitiesRanges().cbegin()},
     m_component_archetype {in_archetype}
@@ -31,7 +31,7 @@ ComponentView<TPack<TIndices...>, TFields...>::ComponentView(Archetype const& in
 
 #pragma region Methods
 
-template <template <RkSize...> class TPack, RkSize... TIndices, typename ... TFields>
+template <template <RkSize...> class TPack, RkSize... TIndices, FieldType... TFields>
 RkBool ComponentView<TPack<TIndices...>, TFields...>::FindNextEntity() noexcept
 {
     // Stores the increase required in 
@@ -58,9 +58,9 @@ RkBool ComponentView<TPack<TIndices...>, TFields...>::FindNextEntity() noexcept
     return m_index != m_component_archetype.GetEntitiesCount();
 }
 
-template <template <RkSize...> class TPack, RkSize... TIndices, typename ... TFields>
-template <typename TField>
-typename TField::Type& ComponentView<TPack<TIndices...>, TFields...>::Fetch() noexcept
+template <template <RkSize...> class TPack, RkSize... TIndices, FieldType... TFields>
+template <FieldType TField>
+typename ComponentView<TPack<TIndices...>, TFields...>::template FieldAccess<TField>& ComponentView<TPack<TIndices...>, TFields...>::Fetch() const noexcept
 {
     ReferencePair<TField> pair = std::get<ReferencePair<TField>>(m_fields_references);
 

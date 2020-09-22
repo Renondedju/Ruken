@@ -29,10 +29,9 @@
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final : System<CounterComponent>
+struct CounterSystem final: System<CounterComponent>
 {
-    // Inherited constructor
-    using System<CounterComponent>::System;
+    using System::System;
 
     #pragma region Views
 
@@ -73,7 +72,7 @@ struct CounterSystem final : System<CounterComponent>
         for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
         {
             // Incrementing the total count
-            total += view.Fetch<Count>();
+            total += view.Fetch<Count const>();
         }
     }
 

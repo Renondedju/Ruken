@@ -22,20 +22,20 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
+template <ComponentType... TComponents>
 Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_components) noexcept
     : m_archetype  {in_archetype},
       m_components {std::forward_as_tuple(in_components...)}
 {}
 
-template <typename ... TComponents>
-template<typename TComponent>
+template <ComponentType... TComponents>
+template<ComponentType TComponent>
 TComponent& Group<TComponents...>::GetComponent() noexcept
 {
     return std::get<TComponent&>(m_components);
 }
 
-template <typename ... TComponents>
+template <ComponentType... TComponents>
 Archetype& Group<TComponents...>::GetReferencedArchetype() const noexcept
 {
     return m_archetype;

@@ -26,40 +26,21 @@
 
 #include <type_traits>
 
-#include "Config.hpp"
+#include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <std::size_t TIndex, typename TType>
-struct Indexed
-{
-    using Type                         = TType;
-    static constexpr std::size_t index = TIndex;
-};
-
-template <typename TIndices, typename... TTypes>
-struct Indexer;
-
-template <std::size_t... TIndices, typename... TTypes>
-struct Indexer<std::index_sequence<TIndices...>, TTypes...> : Indexed<TIndices, TTypes>...
+template <typename, template <class...> class>
+struct IsInstance : public std::false_type
 { };
 
-template <std::size_t TIndex, typename TType>
-static Indexed<TIndex, TType> Select(Indexed<TIndex, TType>);
-
-template <typename TType, std::size_t TIndex>
-static Indexed<TIndex, TType> InvertedSelect(Indexed<TIndex, TType>);
-
 /**
- * \brief  Allows the extraction of a type using an index in a parameter pack
- * \tparam TIndex Index of the type to extract
- * \tparam TTypes Parameter pack to look into
- *
- * \see http://loungecpp.wikidot.com/tips-and-tricks:indices
+ * \brief Checks if a class is an instance of a templated class 
+ * \tparam TInstance Instance class
+ * \tparam TClass Templated base class
  */
-template <std::size_t TIndex, typename... TTypes>
-using SelectType = typename decltype(Select<TIndex>(
-    Indexer<std::index_sequence_for<TTypes...>, TTypes...>{}
-))::Type;
+template <typename... TInstance, template <class...> class TClass>
+struct IsInstance<TClass<TInstance...>, TClass> : public std::true_type
+{ };
 
 END_RUKEN_NAMESPACE

@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,19 @@
 
 #pragma once
 
-#include <tuple>
+#include <type_traits>
 
 #include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Describes the memory layout of a component to the ECS
- * \tparam TFields Variable types
+ * \brief Pass the constness from the TSource type to the TDestination type
+ *		  If TDestination was already const, TDestination will always be const
+ * \tparam TSource Source type
+ * \tparam TDestination Destination type
  */
-template <typename... TFields>
-class ComponentItem : public std::tuple<typename TFields::Type...>
-{
-    public:
-
-        // Making constructors available
-        using std::tuple<typename TFields::Type...>::tuple;
-        using std::tuple<typename TFields::Type...>::operator=;
-};
+template <class TSource, class TDestination>
+using PassConst = std::conditional_t<std::is_const_v<TSource> && !std::is_const_v<TDestination>, TDestination const, TDestination>;
 
 END_RUKEN_NAMESPACE

@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename ... TComponents>
+template <ComponentType... TComponents>
 System<TComponents...>::System(EntityAdmin& in_admin) noexcept:
     m_groups {},
     m_admin  {in_admin}
@@ -30,7 +30,7 @@ System<TComponents...>::System(EntityAdmin& in_admin) noexcept:
     m_query.SetupInclusionQuery<TComponents...>();
 }
 
-template <typename ... TComponents>
+template <ComponentType... TComponents>
 RkVoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
 {
     m_groups.emplace_back(in_archetype.CreateGroupReference<TComponents...>());

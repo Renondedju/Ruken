@@ -25,7 +25,10 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
+
 #include "Types/FundamentalTypes.hpp"
+
+#include "ECS/ComponentBase.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -65,7 +68,7 @@ class ComponentQuery
          *        Passed components will be *required* by the query.
          * \tparam TComponents Required components of the query
          */
-        template <typename... TComponents>
+        template <ComponentType... TComponents>
         RkVoid SetupInclusionQuery() noexcept;
 
         /**
@@ -74,7 +77,7 @@ class ComponentQuery
          *        even if the inclusion query selected them in the first place.
          * \tparam TComponents Excluded components of the query
          */
-        template <typename... TComponents>
+        template <ComponentType... TComponents>
         RkVoid SetupExclusionQuery() noexcept;
 
         /**

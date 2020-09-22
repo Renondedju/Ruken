@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
+#include "Meta/IsBaseOfTemplate.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "ECS/ExclusiveComponentBase.hpp"
 
@@ -72,5 +73,8 @@ class ExclusiveComponent : public ExclusiveComponentBase
 
         #pragma endregion
 };
+
+template <typename TType>
+concept ExclusiveComponentType = IsBaseOfTemplate<ExclusiveComponent, TType>::value;
 
 END_RUKEN_NAMESPACE

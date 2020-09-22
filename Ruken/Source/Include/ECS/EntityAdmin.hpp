@@ -31,8 +31,10 @@
 #include "Build/Namespace.hpp"
 
 #include "ECS/Entity.hpp"
+#include "ECS/System.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
+#include "ECS/ExclusiveComponent.hpp"
 #include "ECS/ExclusiveComponentBase.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -58,9 +60,9 @@ class EntityAdmin
 
         /**
          * \brief Creates a new archetype and handles any setup co-routine
-         * \tparam TComponents 
+         * \tparam TComponents Component types
          */
-        template <typename... TComponents>
+        template <ComponentType... TComponents>
         Archetype* CreateArchetype() noexcept;
 
         #pragma endregion 
@@ -90,31 +92,31 @@ class EntityAdmin
          * \brief Creates a system and adds it to the world
          * \tparam TSystem System type to push to the entity admin 
          */
-        template <typename TSystem>
+        template <SystemType TSystem>
         RkVoid CreateSystem() noexcept;
 
         /**
          * \brief Attempts the creation of an exclusive component
          *        If the component already existed, this method won't have any effects
-         * \tparam TComponent Component class to add
+         * \tparam TExclusiveComponent Component class to add
          */
-        template <typename TComponent>
+        template <ExclusiveComponentType TExclusiveComponent>
         RkVoid CreateExclusiveComponent() noexcept;
 
         /**
          * \brief Fetches an exclusive component
-         * \tparam TComponent Exclusive component type to fetch
+         * \tparam TExclusiveComponent Exclusive component type to fetch
          * \return The component or nullptr if no component of this type has been found
          */
-        template <typename TComponent>
-        [[nodiscard]] TComponent* GetExclusiveComponent() noexcept;
+        template <ExclusiveComponentType TExclusiveComponent>
+        [[nodiscard]] TExclusiveComponent* GetExclusiveComponent() noexcept;
 
         /**
          * \brief Creates a new entity with given components
          * \tparam TComponents Components to attach to the new entity
          * \return Created entity id
          */
-        template <typename... TComponents>
+        template <ComponentType... TComponents>
         Entity CreateEntity() noexcept;
 
         #pragma endregion

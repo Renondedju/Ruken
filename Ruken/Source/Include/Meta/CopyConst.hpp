@@ -30,7 +30,13 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+/**
+ * \brief Copies the constness from the TSource type to the TDestination type
+ *		  Removes the TDestination constness if TSource is not const
+ * \tparam TSource Source type
+ * \tparam TDestination Destination type
+ */
 template <class TSource, class TDestination>
-using CopyConst = std::conditional_t<std::is_const_v<TSource>, const TDestination, std::remove_const_t<TDestination>>;
+using CopyConst = std::conditional_t<std::is_const_v<TSource>, TDestination const, std::remove_const_t<TDestination>>;
 
 END_RUKEN_NAMESPACE

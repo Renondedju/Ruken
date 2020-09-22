@@ -24,15 +24,15 @@
 
 #pragma region Methods
 
-template <typename... TFields>
-template <typename TLayoutView, RkSize... TIds>
-TLayoutView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept
+template <FieldType... TFields>
+template <ViewType TView, RkSize... TIds>
+TView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
-    return TLayoutView { in_owning_archetype, std::get<TIds>(in_container).GetHead()... };
+    return TView { in_owning_archetype, std::get<TIds>(in_container).GetHead()... };
 }
 
-template <typename... TFields>
+template <FieldType... TFields>
 template <RkSize... TIds>
 RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept
 {
@@ -56,14 +56,14 @@ RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_c
     );
 }
 
-template <typename... TFields>
-template <typename TLayoutView>
-TLayoutView ComponentLayout<TFields...>::GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept
+template <FieldType... TFields>
+template <ViewType TView>
+TView ComponentLayout<TFields...>::GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept
 {
-    return GetViewHelper<TLayoutView>(in_container, in_owning_archetype, typename TLayoutView::Sequence());
+    return GetViewHelper<TView>(in_container, in_owning_archetype, typename TView::FieldIndexSequence());
 }
 
-template <typename... TFields>
+template <FieldType... TFields>
 RkSize ComponentLayout<TFields...>::EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept
 {
     return EnsureStorageSpaceHelper(in_container, in_size, std::make_index_sequence<sizeof...(TFields)>());

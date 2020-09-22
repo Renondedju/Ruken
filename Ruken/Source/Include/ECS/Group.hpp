@@ -28,6 +28,8 @@
 
 #include "Build/Namespace.hpp"
 
+#include "ECS/Component.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 class Archetype;
@@ -41,7 +43,7 @@ class Archetype;
  *        
  * \tparam TComponents Component types to keep a reference onto
  */
-template <typename... TComponents>
+template <ComponentType... TComponents>
 class Group
 {
     private:
@@ -81,7 +83,7 @@ class Group
          * \tparam TComponent Component type to return
          * \return Component reference
          */
-        template<typename TComponent>
+        template<ComponentType TComponent>
         TComponent& GetComponent() noexcept;
 
         #pragma region Operators
