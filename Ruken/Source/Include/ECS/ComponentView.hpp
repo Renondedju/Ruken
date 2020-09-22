@@ -57,6 +57,7 @@ class ComponentView<TPack<TIndices...>, TFields...>
 
         #pragma region Usings
 
+        using IsReadonly         = std::conjunction<std::is_const<TFields>...>;
         using FieldIndexSequence = std::index_sequence<TIndices...>;
 
         template <FieldType TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
@@ -154,5 +155,8 @@ class ComponentView<TPack<TIndices...>, TFields...>
  */
 template <typename TType>
 concept ViewType = IsInstance<TType, ComponentView>::value && !std::is_volatile_v<TType>;
+
+template <typename TType>
+concept ReadonlyViewType = ViewType<TType> && TType::IsReadonly::value;
 
 END_RUKEN_NAMESPACE

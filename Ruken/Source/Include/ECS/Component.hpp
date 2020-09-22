@@ -109,6 +109,15 @@ class Component final : public ComponentBase
         template <ViewType TView>
         TView GetView() noexcept;
 
+        /**
+         * \brief Returns a view containing all the requested fields
+         * \note If the component is constant, this overload ensures that any view referencing it is readonly
+         * \tparam TView View type
+         * \return View containing all the requested fields
+         */
+        template <ReadonlyViewType TView>
+        TView GetView() const noexcept;
+
         #pragma endregion 
 
         #pragma region Operators

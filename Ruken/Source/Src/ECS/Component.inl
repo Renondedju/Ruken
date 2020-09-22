@@ -39,3 +39,10 @@ TView Component<TUniqueId, TMembers...>::GetView() noexcept
 {
     return Layout::template GetView<TView>(m_storage, m_owning_archetype);
 }
+
+template <RkSize TUniqueId, FieldType... TMembers>
+template <ReadonlyViewType TView>
+TView Component<TUniqueId, TMembers...>::GetView() const noexcept
+{
+    return Layout::template GetView<TView>(m_storage, m_owning_archetype);
+}

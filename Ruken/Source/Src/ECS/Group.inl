@@ -29,10 +29,10 @@ Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_compone
 {}
 
 template <ComponentType... TComponents>
-template<ComponentType TComponent>
-TComponent& Group<TComponents...>::GetComponent() noexcept
+template <ComponentType TComponent>
+typename Group<TComponents...>::template ComponentReference<TComponent> Group<TComponents...>::GetComponent() noexcept
 {
-    return std::get<TComponent&>(m_components);
+    return std::get<TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>::value>(m_components);
 }
 
 template <ComponentType... TComponents>

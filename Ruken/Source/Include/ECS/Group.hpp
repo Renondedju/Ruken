@@ -46,6 +46,13 @@ class Archetype;
 template <ComponentType... TComponents>
 class Group
 {
+    // If a component has been passed as const, those helpers will ensure that the
+    // GetComponent method will return a constant reference onto the returned component
+    // thus, enforcing the usage of readonly views to access any field of the component
+
+    template <ComponentType TComponent> using ComponentIndex     = TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>;
+    template <ComponentType TComponent> using ComponentReference = CopyConst<std::tuple_element_t<ComponentIndex<TComponent>::value, std::tuple<TComponents...>>, TComponent>&;
+
     private:
 
         #pragma region Members
@@ -84,7 +91,7 @@ class Group
          * \return Component reference
          */
         template<ComponentType TComponent>
-        TComponent& GetComponent() noexcept;
+        ComponentReference<TComponent> GetComponent() noexcept;
 
         #pragma region Operators
 
