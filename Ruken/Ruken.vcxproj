@@ -153,7 +153,6 @@
     <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentField.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentItem.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentView.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentLayout.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
@@ -177,15 +176,15 @@
     <ClInclude Include="Source\Include\Core\Kernel.hpp" />
     <ClInclude Include="Source\Include\Core\KernelProxy.hpp" />
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
-    <ClInclude Include="Source\Include\Meta\Contains.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
+    <ClInclude Include="Source\Include\Meta\IsBaseOfTemplate.hpp" />
+    <ClInclude Include="Source\Include\Meta\IsInstance.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
-    <ClInclude Include="Source\Include\Meta\ReferenceWrapper.hpp" />
+    <ClInclude Include="Source\Include\Meta\PassConst.hpp" />
     <ClInclude Include="Source\Include\Meta\Tag.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
-    <ClInclude Include="Source\Include\Meta\ValueIndexer.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
@@ -259,7 +258,6 @@
     <ClInclude Include="Source\Include\Windowing\WindowParams.hpp" />
     <ClInclude Include="Source\Include\Windowing\Window.hpp" />
     <ClInclude Include="Source\Include\Windowing\WindowManager.hpp" />
-    <ClInclude Include="Source\Src\Meta\ReferenceWrapper.inl" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanFence.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDeviceAllocator.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanShaderModule.hpp" />

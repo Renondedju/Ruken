@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename TSystem>
+template <SystemType TSystem>
 RkVoid EntityAdmin::CreateSystem() noexcept
 {
     std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
@@ -30,23 +30,23 @@ RkVoid EntityAdmin::CreateSystem() noexcept
     m_systems.emplace_back(std::move(system));
 }
 
-template <typename TComponent>
+template <ExclusiveComponentType TExclusiveComponent>
 RkVoid EntityAdmin::CreateExclusiveComponent() noexcept
 {
-    m_exclusive_components.try_emplace(TComponent::id, std::make_unique<TComponent>());
+    m_exclusive_components.try_emplace(TExclusiveComponent::id, std::make_unique<TExclusiveComponent>());
 }
 
-template <typename TComponent>
-TComponent* EntityAdmin::GetExclusiveComponent() noexcept
+template <ExclusiveComponentType TExclusiveComponent>
+TExclusiveComponent* EntityAdmin::GetExclusiveComponent() noexcept
 {
-    auto search = m_exclusive_components.find(TComponent::id);
+    auto search = m_exclusive_components.find(TExclusiveComponent::id);
     if (search != m_exclusive_components.end())
-        return static_cast<TComponent*>(&(*search->second));
+        return static_cast<TExclusiveComponent*>(&(*search->second));
 
     return nullptr;
 }
 
-template <typename... TComponents>
+template <ComponentType... TComponents>
 Archetype* EntityAdmin::CreateArchetype() noexcept
 {
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
@@ -66,7 +66,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
     return archetype_ptr; 
 }
 
-template <typename... TComponents>
+template <ComponentType... TComponents>
 Entity EntityAdmin::CreateEntity() noexcept
 {
     // Looking for the archetype of the entity

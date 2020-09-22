@@ -28,6 +28,8 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/IsBaseOfTemplate.hpp"
+
 #include "ECS/Group.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
@@ -45,7 +47,7 @@ class EntityAdmin;
  *
  * \tparam TComponents Required components for the system to operate
  */
-template <typename... TComponents>
+template <ComponentType... TComponents>
 class System : public SystemBase
 {
     protected:
@@ -93,5 +95,8 @@ class System : public SystemBase
 };
 
 #include "ECS/System.inl"
+
+template <typename TType>
+concept SystemType = IsBaseOfTemplate<System, TType>::value;
 
 END_RUKEN_NAMESPACE

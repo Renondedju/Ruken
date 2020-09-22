@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename... TComponents>
+template <ComponentType... TComponents>
 ArchetypeFingerprint ArchetypeFingerprint::CreateFingerPrintFrom() noexcept
 {
     ArchetypeFingerprint fingerprint;

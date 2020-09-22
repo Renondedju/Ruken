@@ -28,8 +28,14 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/PassConst.hpp"
+#include "Meta/CopyConst.hpp"
 #include "Meta/TupleIndex.hpp"
 #include "Meta/TupleHasType.hpp"
+
+#include "ECS/Range.hpp"
+#include "ECS/ComponentField.hpp"
+
 #include "Containers/LinkedChunkListNode.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -39,15 +45,39 @@ BEGIN_RUKEN_NAMESPACE
  * \note All instances of this class are generated via the item type of each component
  * \tparam TPack Index pack enumerating the index of the members to fetch
  * \tparam TFields Member types to create a reference onto
+ *                 Fields can be constant, meaning that they will be forced to be readonly on every fetch
  */
-template <typename TPack, typename... TFields>
+template <typename TPack, FieldType... TFields>
 class ComponentView;
 
-template <template <RkSize...> class TPack, RkSize... TIndices, typename... TFields>
+template <template <RkSize...> class TPack, RkSize... TIndices, FieldType... TFields>
 class ComponentView<TPack<TIndices...>, TFields...>
 {
-    template <typename TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
-    template <typename TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
+    public:
+
+        #pragma region Usings
+
+        using FieldIndexSequence = std::index_sequence<TIndices...>;
+
+        template <FieldType TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
+        template <FieldType TField> using FieldExists   = TupleHasType<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
+        template <FieldType TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
+
+        /**
+         * \brief Finds the index of a field in the view, regardless of the constness of the field
+         * \tparam TField Field to find
+         */
+        template <FieldType TField> requires FieldExists<TField>::value
+        using FieldIndex  = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
+
+        /**
+         * \brief Returns the access type of the field
+         * \tparam TField Field to look for
+         */
+        template <FieldType TField> requires FieldExists<TField>::value
+        using FieldAccess = CopyConst<PassConst<TField, std::tuple_element_t<FieldIndex<TField>::value, std::tuple<TFields...>>>, typename TField::Type>;
+
+        #pragma endregion 
 
     private:
 
@@ -72,18 +102,6 @@ class ComponentView<TPack<TIndices...>, TFields...>
 
     public:
 
-        #pragma region Usings
-
-        template <typename TField> using MemberIndex  = TupleIndex  <TField, std::tuple<TFields...>>;
-        template <typename TField> using MemberExists = TupleHasType<TField, std::tuple<TFields...>>;
-
-        /**
-         * \brief Member index sequence of the view
-         */
-        using Sequence = std::index_sequence<TIndices...>;
-
-        #pragma endregion 
-
         #pragma region Constructors
 
         /**
@@ -91,7 +109,7 @@ class ComponentView<TPack<TIndices...>, TFields...>
          * \param in_archetype Iterated component archetype. This is used to automatically skip de-allocated entities 
          * \param in_fields Fields to iterate on
          */
-        ComponentView(Archetype const& in_archetype, LinkedChunkListNode<typename TFields::Type>*... in_fields) noexcept;
+        ComponentView(Archetype const& in_archetype, FieldChunk<TFields>*... in_fields) noexcept;
 
         ComponentView(ComponentView const& in_copy) = default;
         ComponentView(ComponentView&&      in_move) = default;
@@ -105,17 +123,15 @@ class ComponentView<TPack<TIndices...>, TFields...>
          * \brief Updates the view to reference the next entity found, if the view found nothing, false is returned
          * \return True if the next entity has been found, false otherwise
          */
-        [[nodiscard]]
-        RkBool FindNextEntity() noexcept;
+        [[nodiscard]] RkBool FindNextEntity() noexcept;
 
         /**
          * \brief Fetches a field of the currently referenced entity
-         * \tparam TField Field type
+         * \tparam TField Field type, must be contained in the view
          * \return Reference to the entity field
          */
-        template <typename TField>
-        [[nodiscard]]
-        typename TField::Type& Fetch() noexcept;
+        template <FieldType TField>
+        [[nodiscard]] FieldAccess<TField>& Fetch() const noexcept;
 
         #pragma endregion 
 
@@ -128,5 +144,15 @@ class ComponentView<TPack<TIndices...>, TFields...>
 };
 
 #include "ECS/ComponentView.inl"
+
+/**
+ * \brief Checks if the passed type is a valid view
+ *        The passed type must:
+ *        - Be a direct instance of the ComponentView class
+ *        - Not be volatile
+ * \tparam TType Type to check
+ */
+template <typename TType>
+concept ViewType = IsInstance<TType, ComponentView>::value && !std::is_volatile_v<TType>;
 
 END_RUKEN_NAMESPACE

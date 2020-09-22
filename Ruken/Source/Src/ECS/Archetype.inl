@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <typename... TComponents>
+template <ComponentType... TComponents>
 Archetype::Archetype(Tag<TComponents...>) noexcept:
     m_fingerprint {ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>()}
 {
@@ -30,13 +30,13 @@ Archetype::Archetype(Tag<TComponents...>) noexcept:
     (m_components.try_emplace(TComponents::id, std::make_unique<TComponents>(*this)), ...);
 }
 
-template <typename... TComponents>
+template <ComponentType... TComponents>
 Group<TComponents...> Archetype::CreateGroupReference() noexcept
 {
     return Group<TComponents...>(*this, GetComponent<TComponents>()...);
 }
 
-template <typename TComponent>
+template <ComponentType TComponent>
 TComponent& Archetype::GetComponent() noexcept
 {
     return static_cast<TComponent&>(*m_components[TComponent::id]);

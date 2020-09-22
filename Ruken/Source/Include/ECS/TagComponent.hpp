@@ -70,7 +70,6 @@ class TagComponent final : public ComponentBase
 
         /**
          * \note Since a tag component does not contain any data, this method does nothing
-         *       The returned value is also always UINTMAX_MAX to allow allocators (archetypes) to call this method as few times as possible
          *
          * \brief Ensures that the component has enough storage space for a given amount of entities
          *        If this is not the case, containers will be allocated
