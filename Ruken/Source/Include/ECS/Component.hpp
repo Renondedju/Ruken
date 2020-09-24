@@ -31,9 +31,10 @@
 #include "Meta/Assert.hpp"
 
 #include "ECS/ComponentBase.hpp"
-#include "ECS/ComponentView.hpp"
-#include "ECS/ComponentField.hpp"
 #include "ECS/ComponentLayout.hpp"
+
+#include "ECS/Safety/ViewType.hpp"
+#include "ECS/Safety/FieldType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

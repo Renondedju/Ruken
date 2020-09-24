@@ -36,7 +36,8 @@
 #include "Meta/TupleIndex.hpp"
 
 #include "ECS/ComponentView.hpp"
-#include "ECS/ComponentField.hpp"
+#include "ECS/Safety/ViewType.hpp"
+#include "ECS/Safety/FieldType.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"

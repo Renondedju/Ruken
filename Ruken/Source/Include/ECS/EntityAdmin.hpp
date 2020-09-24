@@ -31,11 +31,13 @@
 #include "Build/Namespace.hpp"
 
 #include "ECS/Entity.hpp"
-#include "ECS/System.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
-#include "ECS/ExclusiveComponent.hpp"
 #include "ECS/ExclusiveComponentBase.hpp"
+
+#include "ECS/Safety/SystemType.hpp"
+#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

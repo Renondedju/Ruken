@@ -28,7 +28,10 @@
 
 #include "Build/Namespace.hpp"
 
-#include "ECS/Component.hpp"
+#include "Meta/CopyConst.hpp"
+#include "Meta/TupleIndex.hpp"
+
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

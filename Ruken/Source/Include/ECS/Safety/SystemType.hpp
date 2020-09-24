@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,15 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/IsBaseOfTemplate.hpp"
+#include "ECS/Safety/ComponentType.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief Defines a field (or variable) for a component.
- *        In order to define a field you HAVE to inherit from this class.
- *        The name of the inheriting class will then be the way to refer to your field.
- *        Since this name might not be unique, it is recommended to put these classes in unique namespaces for each component to avoid interferences.
- * \warning We strongly discourage the reuse of the field across multiple components even if this is possible.
- * \warning A field can only be used once per component, doing otherwise will result in undefined behaviors
- * \tparam TDataType Type of the field
- */
-template <typename TDataType>
-struct ComponentField
-{
-    using Type = TDataType;
-};
+template <ComponentType... TComponents>
+class System;
+
+template <typename TType>
+concept SystemType = IsBaseOfTemplate<System, TType>::value;
 
 END_RUKEN_NAMESPACE

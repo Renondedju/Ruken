@@ -29,15 +29,11 @@
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final: System<CounterComponent>
+struct CounterSystem final: public System<CounterComponent>
 {
     using System::System;
 
-    #pragma region Views
-
     using CountView = CounterComponent::Layout::MakeView<Count>;
-
-    #pragma endregion 
 
     #pragma region Methods
 

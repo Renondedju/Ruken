@@ -83,7 +83,4 @@ class ComponentBase
         #pragma endregion
 };
 
-template <typename TComponent>
-concept ComponentType = std::is_base_of_v<ComponentBase, TComponent>;
-
 END_RUKEN_NAMESPACE

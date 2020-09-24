@@ -28,8 +28,8 @@
 
 #include "Types/FundamentalTypes.hpp"
 
-#include "ECS/ComponentBase.hpp"
 #include "ECS/ArchetypeFingerprint.hpp"
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

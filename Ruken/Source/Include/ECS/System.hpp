@@ -28,11 +28,11 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/IsBaseOfTemplate.hpp"
-
 #include "ECS/Group.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
+
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -99,8 +99,5 @@ class System : public SystemBase
 };
 
 #include "ECS/System.inl"
-
-template <typename TType>
-concept SystemType = IsBaseOfTemplate<System, TType>::value;
 
 END_RUKEN_NAMESPACE
