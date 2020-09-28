@@ -94,6 +94,7 @@ class Component final : public ComponentBase
          * \return Minimum number of elements allocated by one of the containers in the component layout
          *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
+        [[nodiscard]]
         virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
 
         /**
@@ -102,7 +103,7 @@ class Component final : public ComponentBase
          * \return View containing all the requested fields
          */
         template <ViewType TView>
-        TView GetView() noexcept;
+        [[nodiscard]] TView GetView() noexcept;
 
         /**
          * \brief Returns a view containing all the requested fields
@@ -111,7 +112,7 @@ class Component final : public ComponentBase
          * \return View containing all the requested fields
          */
         template <ReadonlyViewType TView>
-        TView GetView() const noexcept;
+        [[nodiscard]] TView GetView() const noexcept;
 
         #pragma endregion 
 
@@ -123,13 +124,13 @@ class Component final : public ComponentBase
         #pragma endregion
 };
 
+#include "ECS/Component.inl"
+
 /**
  * \brief Shorthand to declare a component named "in_component_name"
- * \param in_component_name Name of the component as defined in the component table
+ * \param in_component_name Name of the component
  * \param ... Fields of the component. Theses must inherit from the ComponentField class
  */
 #define RUKEN_DEFINE_COMPONENT(in_component_name, ...) using in_component_name = Component<__VA_ARGS__>
-
-#include "ECS/Component.inl"
 
 END_RUKEN_NAMESPACE

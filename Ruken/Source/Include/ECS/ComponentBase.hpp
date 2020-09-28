@@ -32,7 +32,7 @@ BEGIN_RUKEN_NAMESPACE
 class Archetype;
 
 /**
- * \brief Base class of the Component class, this is simply used to store components as they are templated
+ * \brief Base class of the Component class, this is simply used to store components as they might have templates
  */
 class ComponentBase
 {
@@ -75,6 +75,7 @@ class ComponentBase
          * \return Minimum number of elements allocated by one of the containers in the layout
          *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
+        [[nodiscard]]
         virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept = 0;
 
         #pragma endregion

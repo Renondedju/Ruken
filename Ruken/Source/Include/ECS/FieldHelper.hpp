@@ -24,23 +24,36 @@
 
 #pragma once
 
-#include <array>
+#include <tuple>
 
-#include "ECS/Component.hpp"
-#include "ECS/TagComponent.hpp"
-#include "ECS/ComponentField.hpp"
-#include "ECS/ExclusiveComponent.hpp"
+#include "Build/Namespace.hpp"
 
-USING_RUKEN_NAMESPACE
+#include "Meta/TupleIndex.hpp"
+#include "Meta/TupleHasType.hpp"
 
-// Creating fields
-RUKEN_DEFINE_COMPONENT_FIELD(CountField		 , RkSize);
-RUKEN_DEFINE_COMPONENT_FIELD(TestPaddingField, std::array<RkSize, 10>);
+#include "ECS/Safety/FieldType.hpp"
 
-// Creating the associated component
-RUKEN_DEFINE_COMPONENT	  (CounterComponent, CountField, TestPaddingField);
-RUKEN_DEFINE_TAG_COMPONENT(TestTagComponent);
+BEGIN_RUKEN_NAMESPACE
 
-// --- 
-RUKEN_DEFINE_COMPONENT_FIELD	(TestField, RkSize);
-RUKEN_DEFINE_EXCLUSIVE_COMPONENT(ExclusiveComponentTest, TestField);
+template <FieldType... TFields>
+struct FieldHelper
+{
+    // Checks if all the passed fields are constant or not
+    using Readonly = std::conjunction<std::is_const<TFields>...>;
+
+    /**
+     * \brief Checks if a field exists in the passed fields of the class, const modifiers are ignored
+     * \tparam TField Field to check for
+     */
+    template <FieldType TField>
+    using FieldExists = TupleHasType<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
+
+    /**
+     * \brief Finds the index of a field, const modifiers are ignored
+     * \tparam TField Field to find. This field must exist in the passed fields
+     */
+    template <FieldType TField> requires FieldExists<TField>::value
+    using FieldIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
+};
+
+END_RUKEN_NAMESPACE

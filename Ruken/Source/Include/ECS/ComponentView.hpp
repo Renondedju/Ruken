@@ -30,10 +30,9 @@
 
 #include "Meta/PassConst.hpp"
 #include "Meta/CopyConst.hpp"
-#include "Meta/TupleIndex.hpp"
-#include "Meta/TupleHasType.hpp"
 
 #include "ECS/Range.hpp"
+#include "ECS/FieldHelper.hpp"
 #include "ECS/Safety/FieldType.hpp"
 
 #include "Containers/LinkedChunkListNode.hpp"
@@ -53,30 +52,24 @@ class ComponentView;
 template <template <RkSize...> class TPack, RkSize... TIndices, FieldType... TFields>
 class ComponentView<TPack<TIndices...>, TFields...>
 {
+    using Helper = FieldHelper<TFields...>;
+
     public:
 
         #pragma region Usings
 
-        using IsReadonly         = std::conjunction<std::is_const<TFields>...>;
+        using IsReadonly         = typename Helper::Readonly;
         using FieldIndexSequence = std::index_sequence<TIndices...>;
 
         template <FieldType TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
-        template <FieldType TField> using FieldExists   = TupleHasType<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
         template <FieldType TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
-
-        /**
-         * \brief Finds the index of a field in the view, regardless of the constness of the field
-         * \tparam TField Field to find
-         */
-        template <FieldType TField> requires FieldExists<TField>::value
-        using FieldIndex  = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
 
         /**
          * \brief Returns the access type of the field
          * \tparam TField Field to look for
          */
-        template <FieldType TField> requires FieldExists<TField>::value
-        using FieldAccess = CopyConst<PassConst<TField, std::tuple_element_t<FieldIndex<TField>::value, std::tuple<TFields...>>>, typename TField::Type>;
+        template <FieldType TField> requires Helper::template FieldExists<TField>::value
+        using FieldAccess = CopyConst<PassConst<TField, std::tuple_element_t<Helper::template FieldIndex<TField>::value, std::tuple<TFields...>>>, typename TField::Type>;
 
         #pragma endregion 
 

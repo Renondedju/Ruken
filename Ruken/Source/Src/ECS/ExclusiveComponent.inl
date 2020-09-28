@@ -22,25 +22,20 @@
  *  SOFTWARE.
  */
 
-#pragma once
+template <FieldType ... TFields>
+ExclusiveComponent<TFields...>::ExclusiveComponent() noexcept:
+    ComponentBase {nullptr}
+{ }
 
-#include <array>
+#pragma warning(push)
+#pragma warning(disable : 4702) // unreachable code
 
-#include "ECS/Component.hpp"
-#include "ECS/TagComponent.hpp"
-#include "ECS/ComponentField.hpp"
-#include "ECS/ExclusiveComponent.hpp"
+template <FieldType ... TFields>
+RkSize ExclusiveComponent<TFields...>::EnsureStorageSpace(RkSize in_size) noexcept
+{
+    RUKEN_ASSERT_MESSAGE(false, "This method should never be called on an ExclusiveComponent");
 
-USING_RUKEN_NAMESPACE
+    return 0ULL;
+}
 
-// Creating fields
-RUKEN_DEFINE_COMPONENT_FIELD(CountField		 , RkSize);
-RUKEN_DEFINE_COMPONENT_FIELD(TestPaddingField, std::array<RkSize, 10>);
-
-// Creating the associated component
-RUKEN_DEFINE_COMPONENT	  (CounterComponent, CountField, TestPaddingField);
-RUKEN_DEFINE_TAG_COMPONENT(TestTagComponent);
-
-// --- 
-RUKEN_DEFINE_COMPONENT_FIELD	(TestField, RkSize);
-RUKEN_DEFINE_EXCLUSIVE_COMPONENT(ExclusiveComponentTest, TestField);
+#pragma warning(pop)
