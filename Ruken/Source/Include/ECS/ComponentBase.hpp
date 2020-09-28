@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
 

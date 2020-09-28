@@ -94,7 +94,12 @@ class Group
          * \return Component reference
          */
         template<ComponentType TComponent>
-        ComponentReference<TComponent> GetComponent() noexcept;
+        ComponentReference<TComponent> GetComponent() noexcept
+        {
+            // Bug: Because of a MSVC bug, this method has to be inlined in the header for some weird reason
+
+            return std::get<TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>::value>(m_components);
+        }
 
         #pragma region Operators
 
