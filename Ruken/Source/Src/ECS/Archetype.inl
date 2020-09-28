@@ -27,7 +27,7 @@ Archetype::Archetype(Tag<TComponents...>) noexcept:
     m_fingerprint {ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>()}
 {
     // Setup components
-    (m_components.try_emplace(TComponents::id, std::make_unique<TComponents>(*this)), ...);
+    (m_components.try_emplace(TComponents::GetId(), std::make_unique<TComponents>(*this)), ...);
 }
 
 template <ComponentType... TComponents>
@@ -39,5 +39,5 @@ Group<TComponents...> Archetype::CreateGroupReference() noexcept
 template <ComponentType TComponent>
 TComponent& Archetype::GetComponent() noexcept
 {
-    return static_cast<TComponent&>(*m_components[TComponent::id]);
+    return static_cast<TComponent&>(*m_components[TComponent::GetId()]);
 }

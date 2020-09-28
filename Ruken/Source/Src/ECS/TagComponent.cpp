@@ -22,13 +22,15 @@
  *  SOFTWARE.
  */
 
-template <RkSize TUniqueId>
-TagComponent<TUniqueId>::TagComponent(Archetype const& in_owning_archetype) noexcept:
-    ComponentBase {in_owning_archetype}
+#include "ECS/TagComponent.hpp"
+
+USING_RUKEN_NAMESPACE
+
+TagComponent::TagComponent(Archetype const& in_owning_archetype) noexcept:
+    ComponentBase {&in_owning_archetype}
 { }
 
-template <RkSize TUniqueId>
-RkSize TagComponent<TUniqueId>::EnsureStorageSpace(RkSize) noexcept
+RkSize TagComponent::EnsureStorageSpace(RkSize) noexcept
 {
     return 0ULL;
 }

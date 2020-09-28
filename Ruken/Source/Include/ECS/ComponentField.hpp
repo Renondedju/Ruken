@@ -43,4 +43,11 @@ struct ComponentField
     using Type = TDataType;
 };
 
+/**
+ * \brief Defines a component field
+ * \param in_field_name Name of the field class
+ * \param ... Type of the component field
+ */
+#define RUKEN_DEFINE_COMPONENT_FIELD(in_field_name, ...) struct in_field_name: ComponentField<__VA_ARGS__> {}
+
 END_RUKEN_NAMESPACE

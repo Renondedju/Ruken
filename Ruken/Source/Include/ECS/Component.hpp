@@ -24,10 +24,8 @@
 
 #pragma once
 
-#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
 
-#include "Meta/Meta.hpp"
 #include "Meta/Assert.hpp"
 
 #include "ECS/ComponentBase.hpp"
@@ -41,20 +39,16 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief A component is a simple data container which contains no behavior, no code logic to transform its data.
  * \tparam TFields Fields of the component
- * \tparam TUniqueId Unique ID of the component.
- *                   Ideally this would be generated automatically at compile time but doing so in c++ is
- *                   really hard and not 100% reliable. Since this ID must be unique for each component, the best way to maintain it
- *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
- *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
+ *
+ * \warning This component cannot and should not be inherited from, instead, create a type alias of the component containing all the required fields
  */
-template <RkSize TUniqueId, FieldType... TFields>
+template <FieldType... TFields>
 class Component final : public ComponentBase
 {
-    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0              , "A component must have at least one field, use a TagComponent instead."    );
-    RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
+    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0, "A component must have at least one field, use a TagComponent instead.");
 
     public:
-
+        
         using Layout = ComponentLayout<TFields...>;
 
         /**
@@ -75,8 +69,6 @@ class Component final : public ComponentBase
 
     public:
 
-        static constexpr RkSize id = TUniqueId;
-
         #pragma region Constructors
 
         /**
@@ -92,6 +84,8 @@ class Component final : public ComponentBase
         #pragma endregion
 
         #pragma region Methods
+
+        RUKEN_DEFINE_COMPONENT_ID_DECLARATION
 
         /**
          * \brief Ensures that the component has enough storage space for a given amount of entities
@@ -130,20 +124,11 @@ class Component final : public ComponentBase
 };
 
 /**
- * \brief Shorthand to declare a component named "<in_component_name>Component"
+ * \brief Shorthand to declare a component named "in_component_name"
  * \param in_component_name Name of the component as defined in the component table
  * \param ... Fields of the component. Theses must inherit from the ComponentField class
  */
-#define RUKEN_DEFINE_COMPONENT(in_component_name, ...)\
-    using RUKEN_GLUE(in_component_name, Component) = Component<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name), __VA_ARGS__>
-    
-/**
- * \brief Creates an enum called EComponentTable used to keep track of every available
- *        component in the ECS. It is also used to create and maintain every component ID.
- *        See the Component class for more info.
- */
-#define RUKEN_DEFINE_COMPONENT_TABLE(...)\
-    enum class EComponentTable { __VA_ARGS__ }
+#define RUKEN_DEFINE_COMPONENT(in_component_name, ...) using in_component_name = Component<__VA_ARGS__>
 
 #include "ECS/Component.inl"
 

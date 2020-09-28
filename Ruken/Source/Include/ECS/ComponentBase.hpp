@@ -40,7 +40,13 @@ class ComponentBase
 
         #pragma region Members
 
-        Archetype const& m_owning_archetype;
+        inline static RkSize m_id_counter {0ULL};
+
+        // Owning archetypes are only required for components that live in archetypes
+        // Witch isn't the case for exclusive components, that lives in the entity admin
+        //
+        // Components that requires an archetype to exist will only expose references
+        Archetype const* m_owning_archetype {nullptr};
 
         #pragma endregion
 
@@ -52,7 +58,7 @@ class ComponentBase
          * \brief Default constructor
          * \param in_owning_archetype Owning archetype
          */
-        ComponentBase(Archetype const& in_owning_archetype) noexcept;
+        ComponentBase(Archetype const* in_owning_archetype) noexcept;
 
         ComponentBase(ComponentBase const& in_copy) = default;
         ComponentBase(ComponentBase&&      in_move) = default;
@@ -75,10 +81,15 @@ class ComponentBase
 
         #pragma region Operators
 
-        ComponentBase& operator=(ComponentBase const& in_copy) = delete;
-        ComponentBase& operator=(ComponentBase&&      in_move) = delete;
+        ComponentBase& operator=(ComponentBase const& in_copy) = default;
+        ComponentBase& operator=(ComponentBase&&      in_move) = default;
 
         #pragma endregion
 };
+
+/**
+ * \brief Generates the code required to create a unique ID for any component
+ */
+#define RUKEN_DEFINE_COMPONENT_ID_DECLARATION inline static RkSize GetId() noexcept { static RkSize id = m_id_counter++; return id; }
 
 END_RUKEN_NAMESPACE
