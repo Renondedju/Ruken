@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,27 +22,30 @@
  *  SOFTWARE.
  */
 
-#include "Core/Kernel.hpp"
+#pragma once
 
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterSystem.hpp"
-#include "ECS/Test/CounterComponent.hpp"
+#include <type_traits>
 
-USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
+#include "Meta/IsInstance.hpp"
+#include "ECS/Safety/FieldType.hpp"
 
-int main()
-{
-    EntityAdmin admin;
+BEGIN_RUKEN_NAMESPACE
 
-    admin.CreateSystem<CounterSystem>();
-    for (RkSize index = 0ULL; index < UINT16_MAX; ++index)
-        admin.CreateEntity<CounterComponent>();
+template <typename TPack, FieldType... TFields>
+class ComponentView;
 
-    admin.StartSimulation();
-    admin.UpdateSimulation();
-    admin.EndSimulation();
+/**
+ * \brief Checks if the passed type is a valid view
+ *        The passed type must:
+ *        - Be a direct instance of the ComponentView class
+ *        - Not be volatile
+ * \tparam TType Type to check
+ */
+template <typename TType>
+concept ViewType = IsInstance<TType, ComponentView>::value && !std::is_volatile<TType>::value;
 
-    Kernel kernel;
+template <typename TType>
+concept ReadonlyViewType = ViewType<TType> && TType::IsReadonly::value;
 
-    return kernel.Run();
-}
+END_RUKEN_NAMESPACE

@@ -36,7 +36,8 @@
 #include "Meta/TupleIndex.hpp"
 
 #include "ECS/ComponentView.hpp"
-#include "ECS/ComponentField.hpp"
+#include "ECS/Safety/ViewType.hpp"
+#include "ECS/Safety/FieldType.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"
@@ -68,8 +69,9 @@ class ComponentLayout
         using FieldIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<TFields...>>;
 
         // View constructors
-        template <FieldType... TSelectedFields>
-        using MakeView         = ComponentView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
+        template <FieldType... TSelectedFields> using MakeView         = ComponentView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
+        template <FieldType... TSelectedFields> using MakeReadonlyView = MakeView<TSelectedFields const...>;
+
         using FullView         = MakeView<TFields...>;
         using FullReadonlyView = MakeView<TFields const...>;
 
@@ -83,7 +85,7 @@ class ComponentLayout
          * \brief GetView helper
          */
         template <ViewType TView, RkSize... TIds>
-        static TView GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept;
+        static TView GetViewHelper(ContainerType const& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept;
 
         /**
          * \brief EnsureStorageSpace
@@ -115,7 +117,7 @@ class ComponentLayout
          * \return Requested view instance
          */
         template <ViewType TView>
-        static TView GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept;
+        static TView GetView(ContainerType const& in_container, Archetype const& in_owning_archetype) noexcept;
 
         /**
          * \brief Ensures that the passed container will have the storage space required for a given amount of entities

@@ -28,9 +28,10 @@
 #include "Build/Namespace.hpp"
 
 #include "Meta/MinimumType.hpp"
-#include "ECS/ComponentBase.hpp"
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
+
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

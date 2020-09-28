@@ -28,11 +28,11 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/IsBaseOfTemplate.hpp"
-
 #include "ECS/Group.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
+
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -46,6 +46,10 @@ class EntityAdmin;
  * E.g. for rendering all you need is a mesh and a transform matrix; you don’t care if the entity is a player or a tree.
  *
  * \tparam TComponents Required components for the system to operate
+ * \note Passing a component type with a const modifier will notify the ECS that this component is readonly for this system
+ *       Meaning that the ECS can enforce constant access to every field of the component via the ComponentViews.
+ *       This will also notify the ECS update manager that a potential optimization can be done when updating systems,
+ *       using multithreading, reducing frame times further along.
  */
 template <ComponentType... TComponents>
 class System : public SystemBase
@@ -95,8 +99,5 @@ class System : public SystemBase
 };
 
 #include "ECS/System.inl"
-
-template <typename TType>
-concept SystemType = IsBaseOfTemplate<System, TType>::value;
 
 END_RUKEN_NAMESPACE

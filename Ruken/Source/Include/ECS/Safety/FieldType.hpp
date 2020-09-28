@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,27 +22,29 @@
  *  SOFTWARE.
  */
 
-#include "Core/Kernel.hpp"
+#pragma once
 
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterSystem.hpp"
-#include "ECS/Test/CounterComponent.hpp"
+#include <type_traits>
 
-USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
 
-int main()
-{
-    EntityAdmin admin;
+#include "Meta/IsInstance.hpp"
+#include "Meta/IsBaseOfTemplate.hpp"
 
-    admin.CreateSystem<CounterSystem>();
-    for (RkSize index = 0ULL; index < UINT16_MAX; ++index)
-        admin.CreateEntity<CounterComponent>();
+BEGIN_RUKEN_NAMESPACE
 
-    admin.StartSimulation();
-    admin.UpdateSimulation();
-    admin.EndSimulation();
+template <typename TDataType>
+struct ComponentField;
 
-    Kernel kernel;
+/**
+ * \brief Checks if the passed type is a valid field
+ *        The passed type must:
+ *        - Be a direct inheritance from the ComponentField class
+ *        - Not be a direct instance of the ComponentField class
+ *        - Not be volatile
+ * \tparam TType Type to check
+ */
+template <typename TType>
+concept FieldType = IsBaseOfTemplate<ComponentField, TType>::value && !IsInstance<TType, ComponentField>::value && !std::is_volatile<TType>::value;
 
-    return kernel.Run();
-}
+END_RUKEN_NAMESPACE

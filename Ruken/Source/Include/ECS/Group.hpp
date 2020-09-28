@@ -28,7 +28,10 @@
 
 #include "Build/Namespace.hpp"
 
-#include "ECS/Component.hpp"
+#include "Meta/CopyConst.hpp"
+#include "Meta/TupleIndex.hpp"
+
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -46,6 +49,13 @@ class Archetype;
 template <ComponentType... TComponents>
 class Group
 {
+    // If a component has been passed as const, those helpers will ensure that the
+    // GetComponent method will return a constant reference onto the returned component
+    // thus, enforcing the usage of readonly views to access any field of the component
+
+    template <ComponentType TComponent> using ComponentIndex     = TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>;
+    template <ComponentType TComponent> using ComponentReference = CopyConst<std::tuple_element_t<ComponentIndex<TComponent>::value, std::tuple<TComponents...>>, TComponent>&;
+
     private:
 
         #pragma region Members
@@ -84,7 +94,12 @@ class Group
          * \return Component reference
          */
         template<ComponentType TComponent>
-        TComponent& GetComponent() noexcept;
+        ComponentReference<TComponent> GetComponent() noexcept
+        {
+            // Bug: Because of a MSVC bug, this method has to be inlined in the header for some weird reason
+
+            return std::get<TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>::value>(m_components);
+        }
 
         #pragma region Operators
 

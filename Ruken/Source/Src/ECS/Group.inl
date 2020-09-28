@@ -29,13 +29,6 @@ Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_compone
 {}
 
 template <ComponentType... TComponents>
-template<ComponentType TComponent>
-TComponent& Group<TComponents...>::GetComponent() noexcept
-{
-    return std::get<TComponent&>(m_components);
-}
-
-template <ComponentType... TComponents>
 Archetype& Group<TComponents...>::GetReferencedArchetype() const noexcept
 {
     return m_archetype;

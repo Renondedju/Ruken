@@ -26,7 +26,7 @@
 
 template <FieldType... TFields>
 template <ViewType TView, RkSize... TIds>
-TView ComponentLayout<TFields...>::GetViewHelper(ContainerType& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept
+TView ComponentLayout<TFields...>::GetViewHelper(ContainerType const& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept
 {
     // Guaranteed copy elision
     return TView { in_owning_archetype, std::get<TIds>(in_container).GetHead()... };
@@ -58,7 +58,7 @@ RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_c
 
 template <FieldType... TFields>
 template <ViewType TView>
-TView ComponentLayout<TFields...>::GetView(ContainerType& in_container, Archetype const& in_owning_archetype) noexcept
+TView ComponentLayout<TFields...>::GetView(ContainerType const& in_container, Archetype const& in_owning_archetype) noexcept
 {
     return GetViewHelper<TView>(in_container, in_owning_archetype, typename TView::FieldIndexSequence());
 }

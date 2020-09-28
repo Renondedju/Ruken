@@ -159,6 +159,11 @@
     <ClInclude Include="Source\Include\ECS\Range.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\ComponentType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\ExclusiveComponentType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\SystemType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\ViewType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\FieldType.hpp" />
     <ClInclude Include="Source\Include\ECS\SystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />

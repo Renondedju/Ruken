@@ -26,9 +26,6 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/IsInstance.hpp"
-#include "Meta/IsBaseOfTemplate.hpp"
-
 BEGIN_RUKEN_NAMESPACE
 
 /**
@@ -45,16 +42,5 @@ struct ComponentField
 {
     using Type = TDataType;
 };
-
-/**
- * \brief Checks if the passed type is a valid field
- *        The passed type must:
- *        - Be a direct inheritance from the ComponentField class
- *        - Not be a direct instance of the ComponentField class
- *        - Not be volatile
- * \tparam TType Type to check
- */
-template <typename TType>
-concept FieldType = IsBaseOfTemplate<ComponentField, TType>::value && !IsInstance<TType, ComponentField>::value && !std::is_volatile_v<TType>;
 
 END_RUKEN_NAMESPACE

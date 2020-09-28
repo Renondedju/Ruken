@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,27 +22,19 @@
  *  SOFTWARE.
  */
 
-#include "Core/Kernel.hpp"
+#pragma once
 
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterSystem.hpp"
-#include "ECS/Test/CounterComponent.hpp"
+#include "Build/Namespace.hpp"
 
-USING_RUKEN_NAMESPACE
+#include "Types/FundamentalTypes.hpp"
+#include "Meta/IsBaseOfTemplate.hpp"
 
-int main()
-{
-    EntityAdmin admin;
+BEGIN_RUKEN_NAMESPACE
 
-    admin.CreateSystem<CounterSystem>();
-    for (RkSize index = 0ULL; index < UINT16_MAX; ++index)
-        admin.CreateEntity<CounterComponent>();
+template <RkSize TUniqueId>
+class ExclusiveComponent;
 
-    admin.StartSimulation();
-    admin.UpdateSimulation();
-    admin.EndSimulation();
+template <typename TType>
+concept ExclusiveComponentType = IsBaseOfTemplate<ExclusiveComponent, TType>::value;
 
-    Kernel kernel;
-
-    return kernel.Run();
-}
+END_RUKEN_NAMESPACE
