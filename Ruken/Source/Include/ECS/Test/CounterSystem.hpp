@@ -33,7 +33,7 @@ struct CounterSystem final: public System<CounterComponent>
 {
     using System::System;
 
-    using CountView = CounterComponent::Layout::MakeView<Count>;
+    using CountView = CounterComponent::Layout::MakeView<CountField>;
 
     #pragma region Methods
 
@@ -51,7 +51,7 @@ struct CounterSystem final: public System<CounterComponent>
         for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
         {
             // Setting the "CounterComponent::Count" variable
-            view.Fetch<Count>() = count++;
+            view.Fetch<CountField>() = count++;
         }
     }
 
@@ -68,7 +68,7 @@ struct CounterSystem final: public System<CounterComponent>
         for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
         {
             // Incrementing the total count
-            total += view.Fetch<Count const>();
+            total += view.Fetch<CountField const>();
         }
     }
 

@@ -24,11 +24,7 @@
 
 #pragma once
 
-#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
-
-#include "Meta/Meta.hpp"
-#include "Meta/Assert.hpp"
 
 #include "ECS/ComponentBase.hpp"
 #include "Types/FundamentalTypes.hpp"
@@ -37,20 +33,10 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief A tag component does not hold any data, its only purpose is to differentiate 2 entities from each other by "tagging" it.
- * \tparam TUniqueId Unique ID of the component.
- *                   Ideally this would be generated automatically at compile time but doing so in c++ is
- *                   really hard and not 100% reliable. Since this ID must be unique for each component, the best way to maintain it
- *                   is using an enum enumerating every component of the game. This way if a component is deleted, the ids of every other
- *                   component will be maintained automatically. This enum must use the default values in order to work. See examples for more info.
  */
-template <RkSize TUniqueId>
-class TagComponent final : public ComponentBase
+class TagComponent: public ComponentBase
 {
-    RUKEN_STATIC_ASSERT(TUniqueId < RUKEN_MAX_ECS_COMPONENTS, "Please increate the maximum amount of ECS components to run this program.");
-
     public:
-
-        static constexpr RkSize id = TUniqueId;
 
         #pragma region Constructors
 
@@ -89,13 +75,11 @@ class TagComponent final : public ComponentBase
         #pragma endregion
 };
 
-#include "ECS/TagComponent.inl"
-
 /**
- * \brief Shorthand to declare a tag component named "<in_component_name>Component"
+ * \brief Shorthand to declare a tag component named "in_component_name"
  * \param in_component_name Name of the component as defined in the component table
  */
-#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name)\
-    using RUKEN_GLUE(in_component_name, Component) = TagComponent<static_cast<::RUKEN_NAMESPACE::RkSize>(EComponentTable::in_component_name)>
+#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name) struct in_component_name final: TagComponent\
+    { using TagComponent::TagComponent; using TagComponent::operator=; RUKEN_DEFINE_COMPONENT_ID_DECLARATION };
 
 END_RUKEN_NAMESPACE

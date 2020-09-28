@@ -158,9 +158,7 @@
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
     <ClInclude Include="Source\Include\ECS\Range.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
-    <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ComponentType.hpp" />
-    <ClInclude Include="Source\Include\ECS\Safety\ExclusiveComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\SystemType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ViewType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\FieldType.hpp" />
@@ -170,9 +168,7 @@
     <ClInclude Include="Source\Include\ECS\Group.hpp" />
     <ClInclude Include="Source\Include\ECS\TagComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterComponent.hpp" />
-    <ClInclude Include="Source\Include\ECS\Test\ComponentTable.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterSystem.hpp" />
-    <ClInclude Include="Source\Include\ECS\Test\TestExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\Functional\Event.hpp" />
     <ClInclude Include="Source\Include\Functional\Function.hpp" />
     <ClInclude Include="Source\Include\Functional\ICallable.hpp" />
@@ -289,7 +285,6 @@
     <None Include=".vscode\ipch\e571e583f658dfef\mmap_address.bin" />
     <None Include=".vscode\ipch\ebd76eb62536780b\mmap_address.bin" />
     <None Include="cpp.hint" />
-    <None Include="Source\Include\ECS\ExclusiveComponentBase.hpp" />
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
@@ -304,7 +299,6 @@
     <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
     <None Include="Source\Src\ECS\Group.inl" />
-    <None Include="Source\Src\ECS\TagComponent.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
@@ -319,6 +313,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
+    <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
     <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />

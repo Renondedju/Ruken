@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,15 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "ECS/TagComponent.hpp"
 
-#include "Build/Namespace.hpp"
+USING_RUKEN_NAMESPACE
 
-#include "Types/FundamentalTypes.hpp"
-#include "Meta/IsBaseOfTemplate.hpp"
+TagComponent::TagComponent(Archetype const& in_owning_archetype) noexcept:
+    ComponentBase {&in_owning_archetype}
+{ }
 
-BEGIN_RUKEN_NAMESPACE
-
-template <RkSize TUniqueId>
-class ExclusiveComponent;
-
-template <typename TType>
-concept ExclusiveComponentType = IsBaseOfTemplate<ExclusiveComponent, TType>::value;
-
-END_RUKEN_NAMESPACE
+RkSize TagComponent::EnsureStorageSpace(RkSize) noexcept
+{
+    return 0ULL;
+}

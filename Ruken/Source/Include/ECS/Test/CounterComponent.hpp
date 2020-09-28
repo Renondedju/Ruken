@@ -29,15 +29,13 @@
 #include "ECS/Component.hpp"
 #include "ECS/TagComponent.hpp"
 #include "ECS/ComponentField.hpp"
-#include "ECS/Test/ComponentTable.hpp"
 
 USING_RUKEN_NAMESPACE
 
-struct Count       : ComponentField<RkSize>                 {};
-struct TestPadding : ComponentField<std::array<RkSize, 10>> {};
+// Creating fields
+RUKEN_DEFINE_COMPONENT_FIELD(CountField		 , RkSize);
+RUKEN_DEFINE_COMPONENT_FIELD(TestPaddingField, std::array<RkSize, 10>);
 
-RUKEN_DEFINE_COMPONENT(Counter,
-    Count,        // Actual count variable
-    TestPadding); // Test padding to demonstrate views
-
-RUKEN_DEFINE_TAG_COMPONENT(TestTag);
+// Creating the associated component
+RUKEN_DEFINE_COMPONENT	  (CounterComponent, CountField, TestPaddingField);
+RUKEN_DEFINE_TAG_COMPONENT(TestTagComponent);
