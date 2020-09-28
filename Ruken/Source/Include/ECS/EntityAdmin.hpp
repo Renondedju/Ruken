@@ -33,11 +33,9 @@
 #include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
-#include "ECS/ExclusiveComponentBase.hpp"
 
 #include "ECS/Safety/SystemType.hpp"
 #include "ECS/Safety/ComponentType.hpp"
-#include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -52,9 +50,8 @@ class EntityAdmin
 
         #pragma region Members
 
-        std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
-        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
-        std::unordered_map<RkSize, std::unique_ptr<ExclusiveComponentBase>>  m_exclusive_components {};
+        std::vector       <std::unique_ptr<SystemBase>>                      m_systems    {};
+        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes {};
         
         #pragma endregion 
 
@@ -96,22 +93,6 @@ class EntityAdmin
          */
         template <SystemType TSystem>
         RkVoid CreateSystem() noexcept;
-
-        /**
-         * \brief Attempts the creation of an exclusive component
-         *        If the component already existed, this method won't have any effects
-         * \tparam TExclusiveComponent Component class to add
-         */
-        template <ExclusiveComponentType TExclusiveComponent>
-        RkVoid CreateExclusiveComponent() noexcept;
-
-        /**
-         * \brief Fetches an exclusive component
-         * \tparam TExclusiveComponent Exclusive component type to fetch
-         * \return The component or nullptr if no component of this type has been found
-         */
-        template <ExclusiveComponentType TExclusiveComponent>
-        [[nodiscard]] TExclusiveComponent* GetExclusiveComponent() noexcept;
 
         /**
          * \brief Creates a new entity with given components

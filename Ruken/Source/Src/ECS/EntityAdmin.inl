@@ -30,22 +30,6 @@ RkVoid EntityAdmin::CreateSystem() noexcept
     m_systems.emplace_back(std::move(system));
 }
 
-template <ExclusiveComponentType TExclusiveComponent>
-RkVoid EntityAdmin::CreateExclusiveComponent() noexcept
-{
-    m_exclusive_components.try_emplace(TExclusiveComponent::id, std::make_unique<TExclusiveComponent>());
-}
-
-template <ExclusiveComponentType TExclusiveComponent>
-TExclusiveComponent* EntityAdmin::GetExclusiveComponent() noexcept
-{
-    auto search = m_exclusive_components.find(TExclusiveComponent::id);
-    if (search != m_exclusive_components.end())
-        return static_cast<TExclusiveComponent*>(&(*search->second));
-
-    return nullptr;
-}
-
 template <ComponentType... TComponents>
 Archetype* EntityAdmin::CreateArchetype() noexcept
 {
