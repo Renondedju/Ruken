@@ -161,6 +161,7 @@
     <ClInclude Include="Source\Include\ECS\Range.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ComponentType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\ExclusiveComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\SystemType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ViewType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\FieldType.hpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="Source\Include\Meta\Tag.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
+    <ClInclude Include="Source\Include\Meta\TupleSubset.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
