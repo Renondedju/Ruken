@@ -37,7 +37,7 @@
 
 #include "ECS/ComponentView.hpp"
 #include "ECS/Safety/ViewType.hpp"
-#include "ECS/Safety/FieldType.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Containers/LinkedChunkList.hpp"
@@ -52,7 +52,7 @@ class Archetype;
  *
  * \see ComponentItem, ComponentView, ComponentField, Component
  */
-template <FieldType... TFields>
+template <ComponentFieldType... TFields>
 class ComponentLayout
 {
     public:
@@ -65,12 +65,12 @@ class ComponentLayout
          * \brief Returns the index of a member using the member class
          * \tparam TField Field class
          */
-        template <FieldType TField>
+        template <ComponentFieldType TField>
         using FieldIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<TFields...>>;
 
         // View constructors
-        template <FieldType... TSelectedFields> using MakeView         = ComponentView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
-        template <FieldType... TSelectedFields> using MakeReadonlyView = MakeView<TSelectedFields const...>;
+        template <ComponentFieldType... TSelectedFields> using MakeView         = ComponentView<IndexPack<FieldIndex<TSelectedFields>::value...>, TSelectedFields...>;
+        template <ComponentFieldType... TSelectedFields> using MakeReadonlyView = MakeView<TSelectedFields const...>;
 
         using FullView         = MakeView<TFields...>;
         using FullReadonlyView = MakeView<TFields const...>;

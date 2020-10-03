@@ -66,3 +66,13 @@ Entity EntityAdmin::CreateEntity() noexcept
 
     return target_archetype->CreateEntity();
 }
+
+template <ExclusiveComponentType TComponent>
+TComponent& EntityAdmin::GetExclusiveComponent() noexcept
+{
+    // If we didn't found any corresponding component, creating it
+    if (m_exclusive_components.find(TComponent::GetId()) == m_exclusive_components.end())
+        m_exclusive_components.emplace(TComponent::GetId(), std::make_unique<TComponent>());
+
+    return *static_cast<TComponent*>(m_exclusive_components.at(TComponent::GetId()).get());
+}

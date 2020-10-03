@@ -29,9 +29,9 @@
 #include "Meta/Assert.hpp"
 #include "Build/Namespace.hpp"
 
-#include "ECS/FieldHelper.hpp"
 #include "ECS/ComponentBase.hpp"
-#include "ECS/Safety/FieldType.hpp"
+#include "ECS/Meta/FieldHelper.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -46,8 +46,8 @@ BEGIN_RUKEN_NAMESPACE
  *
  * \tparam TFields Fields of the component
  */
-template <FieldType... TFields>
-class ExclusiveComponent final: ComponentBase
+template <ComponentFieldType... TFields>
+class ExclusiveComponent final: public ComponentBase
 {
     using Helper = FieldHelper<TFields...>;
 
@@ -91,7 +91,7 @@ class ExclusiveComponent final: ComponentBase
          * \tparam TField Field to fetch
          * \return Reference to the field
          */
-        template <FieldType TField> requires Helper::template FieldExists<TField>::value
+        template <ComponentFieldType TField> requires Helper::template FieldExists<TField>::value
         [[nodiscard]] typename TField::Type& Fetch() noexcept
         { return std::get<Helper::template FieldIndex<TField>::value>(m_members); }
 
@@ -100,7 +100,7 @@ class ExclusiveComponent final: ComponentBase
          * \tparam TField Field to fetch
          * \return Constant reference to the field
          */
-        template <FieldType TField> requires Helper::template FieldExists<TField>::value
+        template <ComponentFieldType TField> requires Helper::template FieldExists<TField>::value
         [[nodiscard]] typename TField::Type const& Fetch() const noexcept
         { return std::get<Helper::template FieldIndex<TField>::value>(m_members); }
 

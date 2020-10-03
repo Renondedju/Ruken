@@ -29,7 +29,7 @@
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final: public System<CounterComponent>
+struct CounterSystem final: public System<CounterComponent, ExclusiveComponentTest>
 {
     using System::System;
 
@@ -44,7 +44,9 @@ struct CounterSystem final: public System<CounterComponent>
      */
     RkVoid OnStart() noexcept override
     {
-        RkSize count = 0;
+        RkSize count = 0ULL;
+
+        GetExclusiveComponent<ExclusiveComponentTest>().Fetch<TestField>() = 3ULL;
 
         // Iterating over every entity
         for (auto& group: m_groups)
@@ -62,6 +64,8 @@ struct CounterSystem final: public System<CounterComponent>
     RkVoid OnUpdate([[maybe_unused]] RkFloat in_time_step) noexcept override
     {
         RkSize total = 0;
+
+        std::cout << GetExclusiveComponent<ExclusiveComponentTest>().Fetch<TestField>();
 
         // Iterating over every entity
         for (auto& group: m_groups)

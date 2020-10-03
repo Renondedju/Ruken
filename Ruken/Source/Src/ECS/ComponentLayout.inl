@@ -24,7 +24,7 @@
 
 #pragma region Methods
 
-template <FieldType... TFields>
+template <ComponentFieldType... TFields>
 template <ViewType TView, RkSize... TIds>
 TView ComponentLayout<TFields...>::GetViewHelper(ContainerType const& in_container, Archetype const& in_owning_archetype, std::index_sequence<TIds...>) noexcept
 {
@@ -32,7 +32,7 @@ TView ComponentLayout<TFields...>::GetViewHelper(ContainerType const& in_contain
     return TView { in_owning_archetype, std::get<TIds>(in_container).GetHead()... };
 }
 
-template <FieldType... TFields>
+template <ComponentFieldType... TFields>
 template <RkSize... TIds>
 RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_container, RkSize in_size, std::index_sequence<TIds...>) noexcept
 {
@@ -56,14 +56,14 @@ RkSize ComponentLayout<TFields...>::EnsureStorageSpaceHelper(ContainerType& in_c
     );
 }
 
-template <FieldType... TFields>
+template <ComponentFieldType... TFields>
 template <ViewType TView>
 TView ComponentLayout<TFields...>::GetView(ContainerType const& in_container, Archetype const& in_owning_archetype) noexcept
 {
     return GetViewHelper<TView>(in_container, in_owning_archetype, typename TView::FieldIndexSequence());
 }
 
-template <FieldType... TFields>
+template <ComponentFieldType... TFields>
 RkSize ComponentLayout<TFields...>::EnsureStorageSpace(ContainerType& in_container, RkSize in_size) noexcept
 {
     return EnsureStorageSpaceHelper(in_container, in_size, std::make_index_sequence<sizeof...(TFields)>());
