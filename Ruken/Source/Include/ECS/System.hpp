@@ -82,8 +82,8 @@ class System : public SystemBase
          *        If one of the 2 is const, the return type will be const
          * \tparam TComponent Component to look for
          */
-        template <ExclusiveComponentType TComponent> requires ComponentHelper<ExclusiveComponents>::template ComponentExists<TComponent>
-        using ExclusiveComponentAccess = CopyConst<PassConst<TComponent, std::tuple_element_t<ComponentHelper<ExclusiveComponents>::template ComponentIndex<TComponent>::value, ExclusiveComponents>>, typename TComponent::Type>;
+        template <ExclusiveComponentType TComponent> requires ComponentHelper<ExclusiveComponents>::template ComponentExists<TComponent>::value
+        using ExclusiveComponentAccess = PassConst<TComponent, std::tuple_element_t<ComponentHelper<ExclusiveComponents>::template ComponentIndex<TComponent>::value, ExclusiveComponents>>;
 
         #pragma endregion
 
@@ -125,13 +125,7 @@ class System : public SystemBase
          * \return Exclusive component reference
          */
         template <ExclusiveComponentType TExclusiveComponent>
-        TExclusiveComponent& GetExclusiveComponent() noexcept
-        {
-            // Because of a MSVC issue, this method unfortunately has to be inlined and cannot be defined in the .inl
-            // (c++20 is not fully supported at the time of writing this comment)
-
-            return m_admin.GetExclusiveComponent<TExclusiveComponent>();
-        }
+        ExclusiveComponentAccess<TExclusiveComponent>& GetExclusiveComponent() noexcept;
 
         #pragma endregion
 

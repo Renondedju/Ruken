@@ -46,7 +46,8 @@ struct CounterSystem final: public System<CounterComponent, ExclusiveComponentTe
     {
         RkSize count = 0ULL;
 
-        GetExclusiveComponent<ExclusiveComponentTest>().Fetch<TestField>() = 3ULL;
+        auto& test = GetExclusiveComponent<ExclusiveComponentTest>();
+        test.Fetch<TestField>() = 3ULL;
 
         // Iterating over every entity
         for (auto& group: m_groups)

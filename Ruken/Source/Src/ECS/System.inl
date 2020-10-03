@@ -41,3 +41,10 @@ RkVoid System<TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexce
         m_groups.emplace_back(in_archetype.CreateGroupReference<std::tuple_element_t<TIds, IterativeComponents>...>());
     }(std::make_index_sequence<std::tuple_size_v<IterativeComponents>>());
 }
+
+template <ComponentType... TComponents>
+template <ExclusiveComponentType TExclusiveComponent>
+typename System<TComponents...>::template ExclusiveComponentAccess<TExclusiveComponent>& System<TComponents...>::GetExclusiveComponent() noexcept
+{
+    return m_admin.GetExclusiveComponent<TExclusiveComponent>();
+}
