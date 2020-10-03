@@ -22,27 +22,27 @@
  *  SOFTWARE.
  */
 
-template <FieldType... TMembers>
-Component<TMembers...>::Component(Archetype const& in_owning_archetype) noexcept:
+template <ComponentFieldType... TMembers>
+SparseComponent<TMembers...>::SparseComponent(Archetype const& in_owning_archetype) noexcept:
     ComponentBase {&in_owning_archetype}
 { }  
 
-template <FieldType... TMembers>
-RkSize Component<TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
+template <ComponentFieldType... TMembers>
+RkSize SparseComponent<TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
 {
     return Layout::EnsureStorageSpace(m_storage, in_size);
 }
 
-template <FieldType... TMembers>
+template <ComponentFieldType... TMembers>
 template <ViewType TView>
-TView Component<TMembers...>::GetView() noexcept
+TView SparseComponent<TMembers...>::GetView() noexcept
 {
     return Layout::template GetView<TView>(m_storage, *m_owning_archetype);
 }
 
-template <FieldType... TMembers>
+template <ComponentFieldType... TMembers>
 template <ReadonlyViewType TView>
-TView Component<TMembers...>::GetView() const noexcept
+TView SparseComponent<TMembers...>::GetView() const noexcept
 {
     return Layout::template GetView<TView>(m_storage, *m_owning_archetype);
 }

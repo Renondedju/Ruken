@@ -150,7 +150,7 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
     <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
-    <ClInclude Include="Source\Include\ECS\Component.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\SparseComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentField.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentView.hpp" />
@@ -296,7 +296,7 @@
     <None Include="Source\Src\Core\Service.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />
     <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
-    <None Include="Source\Src\ECS\Component.inl" />
+    <None Include="Source\Src\ECS\SparseComponent.inl" />
     <None Include="Source\Src\ECS\ComponentLayout.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentView.inl" />

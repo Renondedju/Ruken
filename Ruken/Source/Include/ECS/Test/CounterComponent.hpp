@@ -26,7 +26,7 @@
 
 #include <array>
 
-#include "ECS/Component.hpp"
+#include "ECS/SparseComponent.hpp"
 #include "ECS/TagComponent.hpp"
 #include "ECS/ComponentField.hpp"
 #include "ECS/ExclusiveComponent.hpp"
