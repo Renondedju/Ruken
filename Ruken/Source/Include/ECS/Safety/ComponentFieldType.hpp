@@ -42,9 +42,18 @@ struct ComponentField;
  *        - Be a direct inheritance from the ComponentField class
  *        - Not be a direct instance of the ComponentField class
  *        - Not be volatile
+ *
  * \tparam TType Type to check
  */
 template <typename TType>
-concept FieldType = IsBaseOfTemplate<ComponentField, TType>::value && !IsInstance<TType, ComponentField>::value && !std::is_volatile<TType>::value;
+struct IsComponentField
+{
+    static constexpr RkBool value = IsBaseOfTemplate<ComponentField, std::remove_const_t<TType>>::value &&
+        !IsInstance<std::remove_const_t<TType>, ComponentField>::value &&
+        !std::is_volatile<std::remove_const_t<TType>>::value;
+};
+
+template <typename TType>
+concept ComponentFieldType = IsComponentField<TType>::value;
 
 END_RUKEN_NAMESPACE

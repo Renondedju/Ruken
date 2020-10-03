@@ -32,19 +32,19 @@
 BEGIN_RUKEN_NAMESPACE
 
 template <ComponentFieldType... TFields>
-class ExclusiveComponent;
+class SparseComponent;
 
 /**
- * \brief Checks if the passed component is an exclusive component
+ * \brief Checks if the passed type is a sparse component
  * \tparam TType Type to check
  */
 template <typename TType>
-struct IsExclusiveComponent
+struct IsSparseComponent
 {
-    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, ExclusiveComponent>::value;
+    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, SparseComponent>::value;
 };
 
 template <typename TType>
-concept ExclusiveComponentType = IsExclusiveComponent<TType>::value;
+concept SparseComponentType = IsSparseComponent<TType>::value;
 
 END_RUKEN_NAMESPACE
