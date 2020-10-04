@@ -24,25 +24,32 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Build/Namespace.hpp"
+
+#include "ECS/Meta/ItemHelper.hpp"
+#include "ECS/Safety/ComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class ComponentBase;
+template <typename TTuple>
+struct ComponentHelper;
 
-/**
- * \brief Checks if the passed type is a component, of any type
- * \tparam TType Type to check
- */
-template <typename TType>
-struct IsComponent
+template <ComponentType... TComponents>
+struct ComponentHelper<std::tuple<TComponents...>>
 {
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
-};
+    /**
+     * \brief Checks if a component exists in the passed components of the class, const modifiers are ignored
+     * \tparam TComponent Component to check for
+     */
+    template <ComponentType TComponent>
+    using ComponentExists = typename ItemHelper<TComponents...>::template ItemExists<TComponent>;
 
-template <typename TComponent>
-concept ComponentType = IsComponent<TComponent>::value;
+    /**
+     * \brief Finds the index of a component, const modifiers are ignored
+     * \tparam TComponent Component to find. This component must exist in the passed fields
+     */
+    template <ComponentType TComponent> requires ComponentExists<TComponent>::value
+    using ComponentIndex = typename ItemHelper<TComponents...>::template ItemIndex<TComponent>;
+};
 
 END_RUKEN_NAMESPACE

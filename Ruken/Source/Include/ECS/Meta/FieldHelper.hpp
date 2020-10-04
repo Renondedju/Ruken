@@ -22,27 +22,36 @@
  *  SOFTWARE.
  */
 
-template <FieldType... TMembers>
-Component<TMembers...>::Component(Archetype const& in_owning_archetype) noexcept:
-    ComponentBase {&in_owning_archetype}
-{ }  
+#pragma once
 
-template <FieldType... TMembers>
-RkSize Component<TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
-{
-    return Layout::EnsureStorageSpace(m_storage, in_size);
-}
+#include <type_traits>
 
-template <FieldType... TMembers>
-template <ViewType TView>
-TView Component<TMembers...>::GetView() noexcept
-{
-    return Layout::template GetView<TView>(m_storage, *m_owning_archetype);
-}
+#include "Build/Namespace.hpp"
 
-template <FieldType... TMembers>
-template <ReadonlyViewType TView>
-TView Component<TMembers...>::GetView() const noexcept
+#include "ECS/Meta/ItemHelper.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+template <ComponentFieldType... TFields>
+struct FieldHelper
 {
-    return Layout::template GetView<TView>(m_storage, *m_owning_archetype);
-}
+    // Checks if all the passed fields are constant or not
+    using Readonly = std::conjunction<std::is_const<TFields>...>;
+
+    /**
+     * \brief Checks if a field exists in the passed fields of the class, const modifiers are ignored
+     * \tparam TField Field to check for
+     */
+    template <ComponentFieldType TField>
+    using FieldExists = typename ItemHelper<TFields...>::template ItemExists<TField>;
+
+    /**
+     * \brief Finds the index of a field, const modifiers are ignored
+     * \tparam TField Field to find. This field must exist in the passed fields
+     */
+    template <ComponentFieldType TField> requires FieldExists<TField>::value
+    using FieldIndex = typename ItemHelper<TFields...>::template ItemIndex<TField>;
+};
+
+END_RUKEN_NAMESPACE

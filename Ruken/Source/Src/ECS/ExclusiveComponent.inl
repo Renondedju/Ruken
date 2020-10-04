@@ -22,27 +22,20 @@
  *  SOFTWARE.
  */
 
-#pragma once
+template <ComponentFieldType ... TFields>
+ExclusiveComponent<TFields...>::ExclusiveComponent() noexcept:
+    ComponentBase {nullptr}
+{ }
 
-#include <type_traits>
+#pragma warning(push)
+#pragma warning(disable : 4702) // unreachable code
 
-#include "Build/Namespace.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-class ComponentBase;
-
-/**
- * \brief Checks if the passed type is a component, of any type
- * \tparam TType Type to check
- */
-template <typename TType>
-struct IsComponent
+template <ComponentFieldType ... TFields>
+RkSize ExclusiveComponent<TFields...>::EnsureStorageSpace(RkSize) noexcept
 {
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
-};
+    RUKEN_ASSERT_MESSAGE(false, "This method should never be called on an ExclusiveComponent");
 
-template <typename TComponent>
-concept ComponentType = IsComponent<TComponent>::value;
+    return 0ULL;
+}
 
-END_RUKEN_NAMESPACE
+#pragma warning(pop)

@@ -24,25 +24,30 @@
 
 #pragma once
 
-#include <type_traits>
+#include <tuple>
 
 #include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class ComponentBase;
+template<template <typename> typename TConcept, typename TTuple, typename TValidatedTuple>
+struct TupleSubsetImplementation;
 
-/**
- * \brief Checks if the passed type is a component, of any type
- * \tparam TType Type to check
- */
-template <typename TType>
-struct IsComponent
+template<template <typename TType> typename TConcept, typename TTestedArg, typename... TArgs, typename... TValidatedArgs>
+struct TupleSubsetImplementation<TConcept, std::tuple<TTestedArg, TArgs...>, std::tuple<TValidatedArgs...>>:
+    TupleSubsetImplementation<TConcept, std::tuple<TArgs...>, std::conditional_t<TConcept<TTestedArg>::value, std::tuple<TTestedArg, TValidatedArgs...>, std::tuple<TValidatedArgs...>>>
+{ };
+
+template<template <typename> typename TConcept, typename... TValidatedArgs>
+struct TupleSubsetImplementation<TConcept, std::tuple<>, std::tuple<TValidatedArgs...>>
 {
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
+    using ValidatedTuple = std::tuple<TValidatedArgs...>;
 };
 
-template <typename TComponent>
-concept ComponentType = IsComponent<TComponent>::value;
+template<template <typename> typename TConcept, typename... TArgs>
+struct TupleSubset
+{
+    using Type = typename TupleSubsetImplementation<TConcept, std::tuple<TArgs...>, std::tuple<>>::ValidatedTuple;
+};
 
 END_RUKEN_NAMESPACE

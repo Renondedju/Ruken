@@ -22,27 +22,27 @@
  *  SOFTWARE.
  */
 
-#pragma once
+template <ComponentFieldType... TMembers>
+SparseComponent<TMembers...>::SparseComponent(Archetype const& in_owning_archetype) noexcept:
+    ComponentBase {&in_owning_archetype}
+{ }  
 
-#include <type_traits>
-
-#include "Build/Namespace.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-class ComponentBase;
-
-/**
- * \brief Checks if the passed type is a component, of any type
- * \tparam TType Type to check
- */
-template <typename TType>
-struct IsComponent
+template <ComponentFieldType... TMembers>
+RkSize SparseComponent<TMembers...>::EnsureStorageSpace(RkSize const in_size) noexcept
 {
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
-};
+    return Layout::EnsureStorageSpace(m_storage, in_size);
+}
 
-template <typename TComponent>
-concept ComponentType = IsComponent<TComponent>::value;
+template <ComponentFieldType... TMembers>
+template <ViewType TView>
+TView SparseComponent<TMembers...>::GetView() noexcept
+{
+    return Layout::template GetView<TView>(m_storage, *m_owning_archetype);
+}
 
-END_RUKEN_NAMESPACE
+template <ComponentFieldType... TMembers>
+template <ReadonlyViewType TView>
+TView SparseComponent<TMembers...>::GetView() const noexcept
+{
+    return Layout::template GetView<TView>(m_storage, *m_owning_archetype);
+}

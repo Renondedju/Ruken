@@ -36,6 +36,7 @@
 
 #include "ECS/Safety/SystemType.hpp"
 #include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -50,8 +51,9 @@ class EntityAdmin
 
         #pragma region Members
 
-        std::vector       <std::unique_ptr<SystemBase>>                      m_systems    {};
-        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes {};
+        std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
+        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
+        std::unordered_map<RkSize, std::unique_ptr<ComponentBase>>           m_exclusive_components {};
         
         #pragma endregion 
 
@@ -101,6 +103,14 @@ class EntityAdmin
          */
         template <ComponentType... TComponents>
         Entity CreateEntity() noexcept;
+
+        /**
+         * \brief Returns an exclusive component or instantiate it if needed
+         * \tparam TComponent Component to access
+         * \return Exclusive component reference
+         */
+        template <ExclusiveComponentType TComponent>
+        TComponent& GetExclusiveComponent() noexcept;
 
         #pragma endregion
 

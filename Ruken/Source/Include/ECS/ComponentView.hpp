@@ -30,11 +30,10 @@
 
 #include "Meta/PassConst.hpp"
 #include "Meta/CopyConst.hpp"
-#include "Meta/TupleIndex.hpp"
-#include "Meta/TupleHasType.hpp"
 
 #include "ECS/Range.hpp"
-#include "ECS/Safety/FieldType.hpp"
+#include "ECS/Meta/FieldHelper.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
 
 #include "Containers/LinkedChunkListNode.hpp"
 
@@ -47,36 +46,30 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TFields Member types to create a reference onto
  *                 Fields can be constant, meaning that they will be forced to be readonly on every fetch
  */
-template <typename TPack, FieldType... TFields>
+template <typename TPack, ComponentFieldType... TFields>
 class ComponentView;
 
-template <template <RkSize...> class TPack, RkSize... TIndices, FieldType... TFields>
+template <template <RkSize...> class TPack, RkSize... TIndices, ComponentFieldType... TFields>
 class ComponentView<TPack<TIndices...>, TFields...>
 {
+    using Helper = FieldHelper<TFields...>;
+
     public:
 
         #pragma region Usings
 
-        using IsReadonly         = std::conjunction<std::is_const<TFields>...>;
+        using IsReadonly         = typename Helper::Readonly;
         using FieldIndexSequence = std::index_sequence<TIndices...>;
 
-        template <FieldType TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
-        template <FieldType TField> using FieldExists   = TupleHasType<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
-        template <FieldType TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
-
-        /**
-         * \brief Finds the index of a field in the view, regardless of the constness of the field
-         * \tparam TField Field to find
-         */
-        template <FieldType TField> requires FieldExists<TField>::value
-        using FieldIndex  = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TFields>...>>;
+        template <ComponentFieldType TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
+        template <ComponentFieldType TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
 
         /**
          * \brief Returns the access type of the field
          * \tparam TField Field to look for
          */
-        template <FieldType TField> requires FieldExists<TField>::value
-        using FieldAccess = CopyConst<PassConst<TField, std::tuple_element_t<FieldIndex<TField>::value, std::tuple<TFields...>>>, typename TField::Type>;
+        template <ComponentFieldType TField> requires Helper::template FieldExists<TField>::value
+        using FieldAccess = CopyConst<PassConst<TField, std::tuple_element_t<Helper::template FieldIndex<TField>::value, std::tuple<TFields...>>>, typename TField::Type>;
 
         #pragma endregion 
 
@@ -131,7 +124,7 @@ class ComponentView<TPack<TIndices...>, TFields...>
          * \tparam TField Field type, must be contained in the view
          * \return Reference to the entity field
          */
-        template <FieldType TField>
+        template <ComponentFieldType TField>
         [[nodiscard]] FieldAccess<TField>& Fetch() const noexcept;
 
         #pragma endregion 

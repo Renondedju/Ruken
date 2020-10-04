@@ -28,11 +28,11 @@
 
 #include "Build/Namespace.hpp"
 #include "Meta/IsInstance.hpp"
-#include "ECS/Safety/FieldType.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TPack, FieldType... TFields>
+template <typename TPack, ComponentFieldType... TFields>
 class ComponentView;
 
 /**
@@ -40,12 +40,34 @@ class ComponentView;
  *        The passed type must:
  *        - Be a direct instance of the ComponentView class
  *        - Not be volatile
+ *
  * \tparam TType Type to check
  */
 template <typename TType>
-concept ViewType = IsInstance<TType, ComponentView>::value && !std::is_volatile<TType>::value;
+struct IsView
+{
+    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, ComponentView>::value && !std::is_volatile<std::remove_const_t<TType>>::value;
+};
 
 template <typename TType>
-concept ReadonlyViewType = ViewType<TType> && TType::IsReadonly::value;
+concept ViewType = IsView<TType>::value;
+
+/**
+ * \brief Checks if the passed type is a valid view
+ *        The passed type must:
+ *        - Be a direct instance of the ComponentView class
+ *        - Not be volatile
+ *        - Be readonly (aka. have every field marked as const)
+ *
+ * \tparam TType Type to check
+ */
+template <typename TType>
+struct IsReadonlyView
+{
+    static constexpr RkBool value = IsView<TType>::value && TType::IsReadonly::value;
+};
+
+template <typename TType>
+concept ReadonlyViewType = IsReadonlyView<TType>::value;
 
 END_RUKEN_NAMESPACE

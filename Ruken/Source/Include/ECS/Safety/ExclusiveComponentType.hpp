@@ -24,27 +24,27 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Build/Namespace.hpp"
-
 #include "Meta/IsInstance.hpp"
-#include "Meta/IsBaseOfTemplate.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TDataType>
-struct ComponentField;
+template <ComponentFieldType... TFields>
+class ExclusiveComponent;
 
 /**
- * \brief Checks if the passed type is a valid field
- *        The passed type must:
- *        - Be a direct inheritance from the ComponentField class
- *        - Not be a direct instance of the ComponentField class
- *        - Not be volatile
+ * \brief Checks if the passed component is an exclusive component
  * \tparam TType Type to check
  */
 template <typename TType>
-concept FieldType = IsBaseOfTemplate<ComponentField, TType>::value && !IsInstance<TType, ComponentField>::value && !std::is_volatile<TType>::value;
+struct IsExclusiveComponent
+{
+    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, ExclusiveComponent>::value;
+};
+
+template <typename TType>
+concept ExclusiveComponentType = IsExclusiveComponent<TType>::value;
 
 END_RUKEN_NAMESPACE

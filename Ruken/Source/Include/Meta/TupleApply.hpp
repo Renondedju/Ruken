@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +24,24 @@
 
 #pragma once
 
-#include <type_traits>
+#include <tuple>
 
 #include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class ComponentBase;
-
 /**
- * \brief Checks if the passed type is a component, of any type
- * \tparam TType Type to check
+ * \brief Applies all the tuple types to a host class
+ * \tparam THost Host class
+ * \tparam TTuple Original tuple
  */
-template <typename TType>
-struct IsComponent
-{
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
-};
+template <template <typename ...> class THost, typename TTuple>
+struct TupleApply;
 
-template <typename TComponent>
-concept ComponentType = IsComponent<TComponent>::value;
+template <template <typename ...> class THost, typename... TTypes>
+struct TupleApply<THost, std::tuple<TTypes...>>
+{
+    using Type = THost<TTypes...>;
+};
 
 END_RUKEN_NAMESPACE

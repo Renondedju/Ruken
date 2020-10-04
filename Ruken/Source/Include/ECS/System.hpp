@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <tuple>
 #include <vector>
 
 #include "Build/Namespace.hpp"
@@ -32,7 +33,17 @@
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
 
+#include "Meta/PassConst.hpp"
+#include "Meta/TupleApply.hpp"
+#include "Meta/TupleSubset.hpp"
+#include "Meta/TupleHasType.hpp"
+
+#include "Types/FundamentalTypes.hpp"
+
+#include "ECS/Meta/ComponentHelper.hpp"
 #include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/SparseComponentType.hpp"
+#include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -56,13 +67,33 @@ class System : public SystemBase
 {
     protected:
 
+        #pragma region Usings
+
+        // Tuples containing a specific type of component
+        using SparseComponents    = typename TupleSubset<IsSparseComponent   , TComponents...>::Type;
+        using ExclusiveComponents = typename TupleSubset<IsExclusiveComponent, TComponents...>::Type;
+
+        // For now non exclusive components only consists of SparseComponents
+        using IterativeComponents      = decltype(std::tuple_cat(std::declval<SparseComponents>()));
+        using IterativeComponentsGroup = typename TupleApply<Group, IterativeComponents>::Type;
+
+        /**
+         * \brief Returns the access type of the exclusive component based on the input component constness (system template) and on the actual component passed (TComponent)
+         *        If one of the 2 is const, the return type will be const
+         * \tparam TComponent Component to look for
+         */
+        template <ExclusiveComponentType TComponent> requires ComponentHelper<ExclusiveComponents>::template ComponentExists<TComponent>::value
+        using ExclusiveComponentAccess = PassConst<TComponent, std::tuple_element_t<ComponentHelper<ExclusiveComponents>::template ComponentIndex<TComponent>::value, ExclusiveComponents>>;
+
+        #pragma endregion
+
         #pragma region Members
 
         // This vector stores every group we wish to read/write
         // You really should not try to edit the vector itself yourself.
         // Instead, use it for iteration purposes only !
-        std::vector<Group<TComponents...>> m_groups {};
-        EntityAdmin&                       m_admin;
+        std::vector<IterativeComponentsGroup> m_groups {};
+        EntityAdmin&                          m_admin;
 
         #pragma endregion
 
@@ -71,7 +102,6 @@ class System : public SystemBase
         #pragma region Constructors
 
         System(EntityAdmin&  in_admin) noexcept;
-
         System(System const& in_copy) = default;
         System(System&&      in_move) = default;
         virtual ~System() override    = default;
@@ -87,6 +117,15 @@ class System : public SystemBase
          * \param in_archetype Referenced archetype of the group to create 
          */
         virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept override final;
+
+        /**
+         * \brief Returns a reference onto the requested exclusive component
+         * \note If this is the first access to the designated exclusive component, this method will allocate the component
+         * \tparam TExclusiveComponent exclusive component type
+         * \return Exclusive component reference
+         */
+        template <ExclusiveComponentType TExclusiveComponent>
+        ExclusiveComponentAccess<TExclusiveComponent>& GetExclusiveComponent() noexcept;
 
         #pragma endregion
 
