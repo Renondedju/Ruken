@@ -33,10 +33,11 @@
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
 
+#include "Meta/Assert.hpp"
 #include "Meta/PassConst.hpp"
 #include "Meta/TupleApply.hpp"
 #include "Meta/TupleSubset.hpp"
-#include "Meta/TupleHasType.hpp"
+#include "Meta/UniqueTypes.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 
@@ -65,6 +66,8 @@ class EntityAdmin;
 template <ComponentType... TComponents>
 class System : public SystemBase
 {
+    RUKEN_STATIC_ASSERT(UniqueTypes<std::remove_const_t<TComponents>...>::value, "Systems must not have duplicate components");
+
     protected:
 
         #pragma region Usings

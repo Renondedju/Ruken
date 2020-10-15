@@ -194,6 +194,7 @@
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleSubset.hpp" />
+    <ClInclude Include="Source\Include\Meta\UniqueTypes.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
