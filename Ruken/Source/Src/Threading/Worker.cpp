@@ -26,46 +26,6 @@
 
 USING_RUKEN_NAMESPACE
 
-// Label enabled code
-#ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
-
-Worker::Worker(RkChar const* in_label) noexcept:
-    m_thread {},
-    m_label  {in_label}
-{}
-
-Worker::Worker() noexcept:
-    m_thread {},
-    m_label  {"Unlabeled"}
-{}
-
-std::string const& Worker::Label() const noexcept
-{
-    return m_label;
-}
-
-std::string& Worker::Label() noexcept
-{
-    return m_label;
-}
-
-#else // Label disabled code
-
-Worker::Worker(RkChar const*) noexcept:
-    m_thread {}
-{}
-
-Worker::Worker() noexcept:
-    m_thread {}
-{}
-
-std::string Worker::Label() const noexcept
-{
-    return "";
-}
-
-#endif
-
 Worker::~Worker() noexcept
 {
     if (m_thread.joinable())

@@ -25,7 +25,6 @@
 #pragma once
 
 #include <thread>
-#include <string>
 
 #include "Build/Namespace.hpp"
 
@@ -40,11 +39,7 @@ class Worker : NonCopyable
 
         #pragma region Variables
 
-        std::thread m_thread;
-
-        #ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
-            std::string m_label;
-        #endif
+        std::thread m_thread {};
 
         #pragma endregion
 
@@ -52,39 +47,14 @@ class Worker : NonCopyable
 
         #pragma region Constructors
 
-        Worker(RkChar const* in_label) noexcept;
-        Worker()                        noexcept;
-
-        Worker(Worker const& in_copy)    noexcept = delete;
-        Worker(Worker&&         in_move)    noexcept = default;
-        ~Worker()                        noexcept;
+        Worker()                      = default;
+        Worker(Worker const& in_copy) = delete;
+        Worker(Worker&&      in_move) = default;
+        ~Worker() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
-
-        #ifdef RUKEN_THREADING_ENABLE_THREAD_LABELS
-
-        /**
-         * \brief Label getter. If RUKEN_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
-         * \return Worker's label
-         */
-        [[nodiscard]]
-        std::string const& Label() const noexcept;
-        
-        [[nodiscard]]
-        std::string&          Label() noexcept;
-
-        #else
-
-        /**
-         * \brief Label getter. If RUKEN_DISABLE_ENABLE_THREAD_LABELS is defined, then this method will return an empty string
-         * \return Worker's label
-         */
-        [[nodiscard]]
-        std::string Label() const noexcept;
-
-        #endif
 
         /**
          * \brief Checks if the worker is busy or not 
@@ -113,7 +83,7 @@ class Worker : NonCopyable
 
         /**
          * \brief Locks the current thread until the current job has been done.
-         * \brief If there was no job currently executed, this method has no effect.
+         *        If there was no job currently executed, this method has no effect.
          */
         RkVoid WaitForAvailability() noexcept;
 
@@ -140,7 +110,7 @@ class Worker : NonCopyable
         #pragma region Operators
 
         Worker& operator=(Worker const& in_copy) noexcept = delete;
-        Worker& operator=(Worker&&        in_move) noexcept = default;
+        Worker& operator=(Worker&&      in_move) noexcept = default;
 
         #pragma endregion
 

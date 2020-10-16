@@ -54,12 +54,6 @@
     #define RUKEN_MULTITHREAD_STATUS_STR "Disabled"
 #endif
 
-#if defined(RUKEN_CONFIG_DEBUG)
-    #define RUKEN_THREADING_ENABLE_THREAD_LABELS
-#else
-    #define RUKEN_THREADING_DISABLE_THREAD_LABELS
-#endif
-
 // ------------------------------
 //       Resource management
 

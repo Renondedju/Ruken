@@ -40,12 +40,8 @@ Scheduler::Scheduler(ServiceProvider& in_service_provider, RkUint16 const in_wor
 
     #endif
 
-    RkUint16 index = 0;
     for (Worker& worker : m_workers)
-    {
-        worker.Label() = "Scheduler worker " + std::to_string(index++);
         worker.Execute(&Scheduler::WorkersJob, this);
-    }
 }
 
 Scheduler::~Scheduler()
