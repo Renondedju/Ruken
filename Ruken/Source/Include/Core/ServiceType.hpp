@@ -22,30 +22,18 @@
  *  SOFTWARE.
  */
 
-template <ServiceType TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool>>
-TService* ServiceProvider::ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
-{
-    TService* new_service = new TService(*this, std::forward<TArgs>(in_args)...);
+#pragma once
 
-    if (new_service->InitializationSucceeded())
-    {
-        m_services[TService::ServiceID()] = reinterpret_cast<ServiceBase*>(new_service);
-        m_services_order.push(TService::ServiceID());
-    }
+#include <type_traits>
 
-    return new_service;
-}
+#include "Build/Namespace.hpp"
 
-template <ServiceType TService>
-TService* ServiceProvider::LocateService() noexcept
-{
-    // Locating the service
-    auto it = m_services.find(TService::ServiceID());
+BEGIN_RUKEN_NAMESPACE
 
-    // If the service hasn't been found, returning nullptr
-    if (it == m_services.end())
-        return nullptr;
+template <typename TCrtp>
+class Service;
 
-    // Otherwise returning the service address 
-    return reinterpret_cast<TService*>(it->second);
-}
+template <typename TType>
+concept ServiceType = std::is_base_of_v<Service<TType>, TType>;
+
+END_RUKEN_NAMESPACE

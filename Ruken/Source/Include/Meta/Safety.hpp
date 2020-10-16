@@ -22,30 +22,21 @@
  *  SOFTWARE.
  */
 
-template <ServiceType TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool>>
-TService* ServiceProvider::ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
-{
-    TService* new_service = new TService(*this, std::forward<TArgs>(in_args)...);
+#pragma once
 
-    if (new_service->InitializationSucceeded())
-    {
-        m_services[TService::ServiceID()] = reinterpret_cast<ServiceBase*>(new_service);
-        m_services_order.push(TService::ServiceID());
-    }
+/**
+ * \brief Allows to call a method on a pointer safely
+ * \param in_instance instance to call the method onto
+ */
+#define RUKEN_SAFE_POINTER_CALL(in_instance, ...) if (in_instance != nullptr) { in_instance->__VA_ARGS__; }
 
-    return new_service;
-}
-
-template <ServiceType TService>
-TService* ServiceProvider::LocateService() noexcept
-{
-    // Locating the service
-    auto it = m_services.find(TService::ServiceID());
-
-    // If the service hasn't been found, returning nullptr
-    if (it == m_services.end())
-        return nullptr;
-
-    // Otherwise returning the service address 
-    return reinterpret_cast<TService*>(it->second);
-}
+/**
+ * \brief Safely calls a logging instance
+ * \param in_instance logger
+ * \note This macro will automatically optimize out logger calls if logging has been disabled in build
+ */
+#if defined(RUKEN_LOGGING_ENABLED)
+    #define RUKEN_SAFE_LOGGER_CALL(in_instance, ...) RUKEN_SAFE_POINTER_CALL(in_instance, __VA_ARGS__)
+#else
+    #define RUKEN_SAFE_LOGGER_CALL(in_instance, ...)
+#endif

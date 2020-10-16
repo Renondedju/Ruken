@@ -132,9 +132,11 @@
     <ClInclude Include="Source\Include\Build\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
+    <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
     <ClInclude Include="Source\Include\Core\Service.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceBase.hpp" />
+    <ClInclude Include="Source\Include\Core\ServiceType.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\ConsoleFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\FileFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\ConsoleHandler.hpp" />
@@ -189,6 +191,7 @@
     <ClInclude Include="Source\Include\Meta\IsInstance.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Meta\PassConst.hpp" />
+    <ClInclude Include="Source\Include\Meta\Safety.hpp" />
     <ClInclude Include="Source\Include\Meta\Tag.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleApply.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />

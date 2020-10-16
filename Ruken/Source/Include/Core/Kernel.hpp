@@ -48,22 +48,12 @@ class Kernel
 
         #pragma region Members
 
-        ServiceProvider m_service_provider;
+        ServiceProvider     m_service_provider   {};
 
-        // Logging
-        Logger&        m_logger;
-        ConsoleHandler m_console_handler;
-
-        // Lifetime maintenance
-        std::atomic<RkBool> m_shutdown_requested;
-        RkInt               m_exit_code;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        RkVoid SetupServices  () noexcept;
-        RkVoid DestroyServices() noexcept;
+        Logger*             m_logger             {nullptr};
+        RkInt               m_exit_code          {0};
+        ConsoleHandler      m_console_handler    {};
+        std::atomic<RkBool> m_shutdown_requested {false};
 
         #pragma endregion
 
@@ -73,8 +63,8 @@ class Kernel
 
         Kernel();
         Kernel(Kernel const& in_copy) = delete;
-        Kernel(Kernel&&      in_move) = delete;
-        ~Kernel()                     = default;
+        Kernel(Kernel&& in_move)      = delete;
+        ~Kernel();
 
         #pragma endregion
 
@@ -106,7 +96,7 @@ class Kernel
         #pragma region Operators
 
         Kernel& operator=(Kernel const& in_copy) = delete;
-        Kernel& operator=(Kernel&&      in_move) = delete;
+        Kernel& operator=(Kernel&& in_move)      = delete;
 
         #pragma endregion
 };

@@ -24,13 +24,15 @@
 
 #pragma once
 
+#include <stack>
 #include <type_traits>
 #include <unordered_map>
 
 #include "Build/Namespace.hpp"
+
 #include "Core/Service.hpp"
 #include "Core/ServiceBase.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include "Core/ServiceType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -45,6 +47,7 @@ class ServiceProvider
 
         // Provided services key = service id, value = service pointer
         std::unordered_map<RkSize, ServiceBase*> m_services;
+        std::stack<RkSize>                       m_services_order;
 
         #pragma endregion
 
@@ -70,24 +73,15 @@ class ServiceProvider
          *          will override the previous instance without destroying it, leading to memory leaks
          * \return New service instance
          */
-        template <typename TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool> = true>
+        template <ServiceType TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool> = true>
         TService* ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>);
-
-        /**
-         * \brief Forces the destruction of a service prematurely.
-         *        This is useful to enforce a given destruction order.
-         * \note Any left over services will be cleaned up anyway in the destructor of the provider but the destruction order is not guaranteed 
-         * \tparam TService Service type
-         */
-        template <typename TService>
-        RkVoid DestroyService() noexcept;
 
         /**
          * \brief Locates a service. This service could be unavailable or unprovided yet, if this is the case, a nullptr will be returned
          * \tparam TService Service type, must inherit from the Service class
          * \return Located service, could be null if the service is unavailable or unprovided.
          */
-        template <typename TService>
+        template <ServiceType TService>
         [[nodiscard]] TService* LocateService() noexcept;
 
         #pragma endregion

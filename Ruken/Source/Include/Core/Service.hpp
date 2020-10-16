@@ -37,7 +37,7 @@ class ServiceProvider;
  * \tparam TCrtp This class uses the Curiously Recurring Template Pattern. This type must be the actual service implementation class.
  */
 template <typename TCrtp>
-class Service : ServiceBase
+class Service : public ServiceBase
 {
     protected:
 
