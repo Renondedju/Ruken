@@ -32,6 +32,10 @@ TService* ServiceProvider::ProvideService(TArgs&&... in_args) noexcept(std::is_n
         m_services[TService::ServiceID()] = reinterpret_cast<ServiceBase*>(new_service);
         m_services_order.push(TService::ServiceID());
     }
+    else
+    {
+        delete new_service;
+    }
 
     return new_service;
 }
