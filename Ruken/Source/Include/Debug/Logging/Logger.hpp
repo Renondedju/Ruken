@@ -83,12 +83,10 @@ class Logger final: public Service<Logger>
 
         #pragma region Constructors
 
-        using Service<Logger>::Service;
-
-        explicit Logger(ServiceProvider& in_service_provider,
-                        std::string_view in_name,
-                        ELogLevel        in_level  = ELogLevel::Debug,
-                        Logger const*    in_parent = nullptr) noexcept;
+        Logger(ServiceProvider& in_service_provider,
+               std::string_view in_name,
+               ELogLevel        in_level  = ELogLevel::Debug,
+               Logger const*    in_parent = nullptr) noexcept;
 
         Logger(Logger const& in_copy) = delete;
         Logger(Logger&&      in_move) noexcept;

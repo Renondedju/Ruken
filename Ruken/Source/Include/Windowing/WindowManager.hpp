@@ -38,9 +38,9 @@ class Logger;
  */
 class WindowManager final: public Service<WindowManager>
 {
-    private:
+    using Service::Service;
 
-        using Service<WindowManager>::Service;
+    private:
 
         #pragma region Members
 
