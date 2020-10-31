@@ -26,10 +26,10 @@
 
 #include <forward_list>
 
+#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
 
 #include "Debug/Logging/Filters/LogFilter.hpp"
-
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -71,6 +71,9 @@ class Logger final: public Service<Logger>
     public:
 
         #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(Logger);
 
         /**
          * \brief If this attribute evaluates to true, events logged to this logger will be passed to the handlers of higher level loggers,

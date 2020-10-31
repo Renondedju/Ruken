@@ -65,6 +65,13 @@ class Service : public ServiceBase
 
         #pragma endregion
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = "Unknown";
+
+        #pragma endregion
+
         #pragma region Methods
 
         /**

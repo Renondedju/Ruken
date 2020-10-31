@@ -83,16 +83,7 @@ class ServiceBase
          * \return Service status, will be EInitializationStatus::Succeeded if everything is fine, EInitializationStatus::Failed otherwise
          */
         [[nodiscard]]
-        EInitializationStatus CheckInitializationStatus(std::string_view& out_reason) const noexcept;
-
-        /**
-         * \brief Checks if the service is initialized and can be used
-         *        If the service is not available, please use the CheckInitializationStatus method for more detailed information
-         *
-         * \return True if the service is available, false otherwise
-         */
-        [[nodiscard]]
-        RkBool InitializationSucceeded() const noexcept;
+        EInitializationStatus CheckInitializationStatus(std::string& out_reason) const noexcept;
 
         #pragma endregion
 

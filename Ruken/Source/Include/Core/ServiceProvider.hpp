@@ -66,15 +66,17 @@ class ServiceProvider
 
         /**
          * \brief Provides and holds a service to allow others parts of the code to locate it later on if needed
+         *
          * \tparam TService Service type, must inherit from the Service class
          * \tparam TArgs TService constructor types, excluding the service provider instance type
          * \param in_args Arguments to pass to the TService constructor, excluding the service provider instance
+         * \param out_failure_reason Reason of the failure if an error occurred when initializing the service
          * \warning Providing a service that has already been provided
          *          will override the previous instance without destroying it, leading to memory leaks
-         * \return New service instance
+         * \return New service instance or nullptr if the service failed to be initialized properly
          */
         template <ServiceType TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool> = true>
-        TService* ProvideService(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>);
+        TService* ProvideService(std::string& out_failure_reason, TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>);
 
         /**
          * \brief Locates a service. This service could be unavailable or unprovided yet, if this is the case, a nullptr will be returned

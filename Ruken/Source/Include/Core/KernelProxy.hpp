@@ -25,6 +25,8 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
+
+#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
 #include "Types/Unique.hpp"
 
@@ -59,11 +61,22 @@ class KernelProxy final: public Service<KernelProxy>, Unique
 
         #pragma endregion
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(KernelProxy);
+
+        #pragma endregion
+
+        #pragma region Methods
+
         /**
          * \brief Returns the kernel reference
          * \return Kernel reference
          */
         Kernel& GetKernelReference() const noexcept;
+
+        #pragma endregion
 
         #pragma region Operators
         

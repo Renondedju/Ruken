@@ -133,6 +133,7 @@
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
     <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
+    <ClInclude Include="Source\Include\Core\ServiceLoader.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
     <ClInclude Include="Source\Include\Core\Service.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceBase.hpp" />
@@ -299,6 +300,7 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
+    <None Include="Source\Src\Core\Kernel.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
     <None Include="Source\Src\Core\Service.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />

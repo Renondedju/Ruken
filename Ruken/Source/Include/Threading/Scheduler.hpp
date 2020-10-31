@@ -71,6 +71,13 @@ class Scheduler final: public Service<Scheduler>, Unique
 
     public:
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(Scheduler);
+
+        #pragma endregion
+
         #pragma region Constructors
 
         /**
@@ -78,7 +85,7 @@ class Scheduler final: public Service<Scheduler>, Unique
          * \param in_service_provider Service provider
          * \param in_workers_count Number of managed workers
          */
-        Scheduler(ServiceProvider& in_service_provider, RkUint16 in_workers_count = 0u);
+        Scheduler(ServiceProvider& in_service_provider, RkUint16 in_workers_count = 0U);
 
         Scheduler(Scheduler const& in_copy)     = delete;
         Scheduler(Scheduler&& in_move) noexcept = delete;

@@ -39,14 +39,9 @@ RkVoid ServiceBase::SignalServiceInitializationFailure(std::string&& in_reason) 
     m_failure_reason = std::forward<std::string>(in_reason);
 }
 
-EInitializationStatus ServiceBase::CheckInitializationStatus(std::string_view& out_reason) const noexcept
+EInitializationStatus ServiceBase::CheckInitializationStatus(std::string& out_reason) const noexcept
 {
     out_reason = m_failure_reason;
 
     return m_status;
-}
-
-RkBool ServiceBase::InitializationSucceeded() const noexcept
-{
-    return m_status == EInitializationStatus::Succeeded;
 }

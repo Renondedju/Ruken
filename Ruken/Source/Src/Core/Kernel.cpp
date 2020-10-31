@@ -22,6 +22,8 @@
  *  SOFTWARE.
  */
 
+#include <iostream>
+
 #include "Build/Info.hpp"
 #include "Build/Build.hpp"
 #include "Build/Config.hpp"
@@ -39,52 +41,33 @@
 
 USING_RUKEN_NAMESPACE
 
-/**
- * \brief Simple boilerplate code helper to initialize a service
- * \param in_service_type Type name of the service
- * \param in_required Whether or not the service is required to run
- */
-#define INIT_SERVICE(in_service_type, in_required, ...)\
-    {\
-        in_service_type* service {m_service_provider.ProvideService<in_service_type>(__VA_ARGS__)};\
-        std::string_view reason  {};\
-\
-        if (service->CheckInitializationStatus(reason) == EInitializationStatus::Failed)\
-        {\
-            if (in_required)\
-            {\
-                RUKEN_SAFE_LOGGER_CALL(m_logger, Error("The required \"" RUKEN_STRING(in_service_type) "\" service failed to initialize for the following reason:"))\
-                RUKEN_SAFE_LOGGER_CALL(m_logger, Error(reason))\
-                RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Shutting down kernel with error code 1000"))\
-                m_exit_code = 1000;\
-                return;\
-            }\
-            else\
-            {\
-                RUKEN_SAFE_LOGGER_CALL(m_logger, Warning("The \"" RUKEN_STRING(in_service_type) "\" service will not be available due to the following reason:"))\
-                RUKEN_SAFE_LOGGER_CALL(m_logger, Warning(reason))\
-            }\
-        }\
-    }
-
 Kernel::Kernel()
 {
     #if defined(RUKEN_LOGGING_ENABLED)
 
-        m_logger = m_service_provider.ProvideService<Logger>("Root", ELogLevel::Debug);
+    std::string failure_reason;
+    m_logger = m_service_provider.ProvideService<Logger>(failure_reason, "Root", ELogLevel::Debug);
 
+    if (m_logger)
+    {
         m_logger->AddHandler(&m_console_handler);
         m_logger->Info("Booting up " RUKEN_BUILD_INFO);
         m_logger->Info(RUKEN_LICENSE_STR " " RUKEN_COPYRIGHT_STR " (" RUKEN_URL ")");
+    }
+    else
+    {
+        std::cerr << "The logging service failed to initialize for the following reason: " << failure_reason
+                  << "\nBecause of that, logging will be unavailable for this session."    << std::endl;
+    }
 
     #endif
 
-    INIT_SERVICE(KernelProxy, true, *this)
+    SetupService<KernelProxy>(true, *this);
 
-    INIT_SERVICE(Scheduler      , true)
-    INIT_SERVICE(ResourceManager, true)
-    INIT_SERVICE(WindowManager  , true)
-    INIT_SERVICE(Renderer       , true)
+    SetupService<Scheduler>      (true);
+    SetupService<WindowManager>  (true);
+    SetupService<Renderer>       (true);
+    SetupService<ResourceManager>(true);
 
     m_console_handler.Flush();
 }

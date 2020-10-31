@@ -29,6 +29,7 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
 #include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
@@ -124,6 +125,13 @@ class ResourceManager final: public Service<ResourceManager>, Unique
         #pragma endregion
 
     public:
+
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(ResourceManager);
+
+        #pragma endregion
 
         #pragma region Constructors
 
