@@ -46,7 +46,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class ResourceManager final: public Service<ResourceManager>, Unique
+class ResourceManager final: public Service<ResourceManager>
 {
     private:
 

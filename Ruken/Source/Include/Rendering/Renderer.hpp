@@ -76,11 +76,10 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Constructors
 
-        explicit Renderer(ServiceProvider& in_service_provider) noexcept;
+        Renderer(ServiceProvider& in_service_provider) noexcept;
 
         Renderer(Renderer const& in_copy) = delete;
         Renderer(Renderer&&      in_move) = delete;
-
         ~Renderer() noexcept;
 
         #pragma endregion

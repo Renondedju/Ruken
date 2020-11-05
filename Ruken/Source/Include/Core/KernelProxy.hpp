@@ -25,10 +25,8 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-
-#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
-#include "Types/Unique.hpp"
+#include "Meta/Meta.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -39,7 +37,7 @@ class ServiceProvider;
  * \brief The kernel proxy is a simple class allowing access to the main Kernel class
  *        via the ServiceProvider
  */
-class KernelProxy final: public Service<KernelProxy>, Unique
+class KernelProxy final: public Service<KernelProxy>
 {
     private:
 

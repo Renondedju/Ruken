@@ -238,8 +238,6 @@
     <ClInclude Include="Source\Include\Time\Sleep.hpp" />
     <ClInclude Include="Source\Include\Meta\CopyConst.hpp" />
     <ClInclude Include="Source\Include\Types\FundamentalTypes.hpp" />
-    <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
-    <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
     <ClInclude Include="Source\Include\Meta\Meta.hpp" />
     <ClInclude Include="Source\Include\Meta\MinimumType.hpp" />
     <ClInclude Include="source\include\resource\ResourceLoadingDescriptor.hpp" />
@@ -257,7 +255,6 @@
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\Worker.hpp" />
-    <ClInclude Include="Source\Include\Types\Unique.hpp" />
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />

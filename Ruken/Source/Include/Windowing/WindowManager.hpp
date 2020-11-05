@@ -76,11 +76,10 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Constructors
 
-        explicit WindowManager(ServiceProvider& in_service_provider) noexcept;
+        WindowManager(ServiceProvider& in_service_provider) noexcept;
         
         WindowManager(WindowManager const& in_copy) = delete;
         WindowManager(WindowManager&&      in_move) = delete;
-
         ~WindowManager() noexcept;
 
         #pragma endregion
