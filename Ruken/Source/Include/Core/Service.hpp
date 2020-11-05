@@ -37,7 +37,7 @@ class ServiceProvider;
  * \tparam TCrtp This class uses the Curiously Recurring Template Pattern. This type must be the actual service implementation class.
  */
 template <typename TCrtp>
-class Service : ServiceBase
+class Service : public ServiceBase
 {
     protected:
 
@@ -62,6 +62,13 @@ class Service : ServiceBase
         Service(Service const& in_copy) = default;
         Service(Service&&      in_move) = default;
         virtual ~Service()              = default;
+
+        #pragma endregion
+
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = "Unknown";
 
         #pragma endregion
 

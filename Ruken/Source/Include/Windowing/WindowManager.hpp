@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
 
 #include "Windowing/Screen.hpp"
@@ -39,8 +40,6 @@ class Logger;
 class WindowManager final: public Service<WindowManager>
 {
     private:
-
-        using Service<WindowManager>::Service;
 
         #pragma region Members
 
@@ -61,6 +60,13 @@ class WindowManager final: public Service<WindowManager>
 
     public:
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(WindowManager);
+
+        #pragma endregion
+
         #pragma region Events
 
         Event<Window&> on_window_created   {};
@@ -70,11 +76,10 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Constructors
 
-        explicit WindowManager(ServiceProvider& in_service_provider) noexcept;
+        WindowManager(ServiceProvider& in_service_provider) noexcept;
         
         WindowManager(WindowManager const& in_copy) = delete;
         WindowManager(WindowManager&&      in_move) = delete;
-
         ~WindowManager() noexcept;
 
         #pragma endregion

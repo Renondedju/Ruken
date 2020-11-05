@@ -26,6 +26,7 @@
 
 #include <vector>
 
+#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
 
 #include "Rendering/RenderContext.hpp"
@@ -33,7 +34,6 @@
 #include "Vulkan/Core/VulkanDevice.hpp"
 #include "Vulkan/Core/VulkanInstance.hpp"
 #include "Vulkan/Core/VulkanPhysicalDevice.hpp"
-
 #include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -67,13 +67,19 @@ class Renderer final : public Service<Renderer>
 
     public:
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(Renderer);
+
+        #pragma endregion
+
         #pragma region Constructors
 
-        explicit Renderer(ServiceProvider& in_service_provider) noexcept;
+        Renderer(ServiceProvider& in_service_provider) noexcept;
 
         Renderer(Renderer const& in_copy) = delete;
         Renderer(Renderer&&      in_move) = delete;
-
         ~Renderer() noexcept;
 
         #pragma endregion

@@ -26,10 +26,10 @@
 
 #include <forward_list>
 
+#include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
 
 #include "Debug/Logging/Filters/LogFilter.hpp"
-
 #include "Debug/Logging/Handlers/LogHandler.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -72,6 +72,9 @@ class Logger final: public Service<Logger>
 
         #pragma region Members
 
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(Logger);
+
         /**
          * \brief If this attribute evaluates to true, events logged to this logger will be passed to the handlers of higher level loggers,
          *        in addition to any handlers attached to this logger. Messages are passed directly to the parent loggersÅ' handlers,
@@ -83,12 +86,10 @@ class Logger final: public Service<Logger>
 
         #pragma region Constructors
 
-        using Service<Logger>::Service;
-
-        explicit Logger(ServiceProvider& in_service_provider,
-                        std::string_view in_name,
-                        ELogLevel        in_level  = ELogLevel::Debug,
-                        Logger const*    in_parent = nullptr) noexcept;
+        Logger(ServiceProvider& in_service_provider,
+               std::string_view in_name,
+               ELogLevel        in_level  = ELogLevel::Debug,
+               Logger const*    in_parent = nullptr) noexcept;
 
         Logger(Logger const& in_copy) = delete;
         Logger(Logger&&      in_move) noexcept;

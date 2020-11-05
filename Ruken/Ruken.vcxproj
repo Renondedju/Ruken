@@ -132,9 +132,12 @@
     <ClInclude Include="Source\Include\Build\Config.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
+    <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
+    <ClInclude Include="Source\Include\Core\ServiceLoader.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
     <ClInclude Include="Source\Include\Core\Service.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceBase.hpp" />
+    <ClInclude Include="Source\Include\Core\ServiceType.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\ConsoleFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Formatters\FileFormatter.hpp" />
     <ClInclude Include="Source\Include\Debug\Logging\Handlers\ConsoleHandler.hpp" />
@@ -189,6 +192,7 @@
     <ClInclude Include="Source\Include\Meta\IsInstance.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
     <ClInclude Include="Source\Include\Meta\PassConst.hpp" />
+    <ClInclude Include="Source\Include\Meta\Safety.hpp" />
     <ClInclude Include="Source\Include\Meta\Tag.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleApply.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
@@ -235,8 +239,6 @@
     <ClInclude Include="Source\Include\Time\Sleep.hpp" />
     <ClInclude Include="Source\Include\Meta\CopyConst.hpp" />
     <ClInclude Include="Source\Include\Types\FundamentalTypes.hpp" />
-    <ClInclude Include="Source\Include\Types\NonCopyable.hpp" />
-    <ClInclude Include="Source\Include\Types\NonMovable.hpp" />
     <ClInclude Include="Source\Include\Meta\Meta.hpp" />
     <ClInclude Include="Source\Include\Meta\MinimumType.hpp" />
     <ClInclude Include="source\include\resource\ResourceLoadingDescriptor.hpp" />
@@ -254,7 +256,6 @@
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
     <ClInclude Include="Source\Include\Threading\Worker.hpp" />
-    <ClInclude Include="Source\Include\Types\Unique.hpp" />
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
@@ -297,6 +298,7 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
+    <None Include="Source\Src\Core\Kernel.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
     <None Include="Source\Src\Core\Service.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />

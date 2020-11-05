@@ -26,7 +26,7 @@
 
 #include "Build/Namespace.hpp"
 #include "Core/Service.hpp"
-#include "Types/Unique.hpp"
+#include "Meta/Meta.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -37,7 +37,7 @@ class ServiceProvider;
  * \brief The kernel proxy is a simple class allowing access to the main Kernel class
  *        via the ServiceProvider
  */
-class KernelProxy final: public Service<KernelProxy>, Unique
+class KernelProxy final: public Service<KernelProxy>
 {
     private:
 
@@ -59,11 +59,22 @@ class KernelProxy final: public Service<KernelProxy>, Unique
 
         #pragma endregion
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(KernelProxy);
+
+        #pragma endregion
+
+        #pragma region Methods
+
         /**
          * \brief Returns the kernel reference
          * \return Kernel reference
          */
         Kernel& GetKernelReference() const noexcept;
+
+        #pragma endregion
 
         #pragma region Operators
         

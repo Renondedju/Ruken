@@ -24,19 +24,16 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#include <type_traits>
 
-#include "Types/NonCopyable.hpp"
-#include "Types/NonMovable.hpp"
+#include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief This is a helper class for the creation of unique objects by inheriting from it.
- * 
- * This class cannot be moved or copied.
- */
-struct Unique : NonCopyable, NonMovable
-{};
+template <typename TCrtp>
+class Service;
+
+template <typename TType>
+concept ServiceType = std::is_base_of_v<Service<TType>, TType>;
 
 END_RUKEN_NAMESPACE

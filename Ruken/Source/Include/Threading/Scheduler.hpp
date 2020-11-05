@@ -28,15 +28,11 @@
 #include <vector>
 #include <functional>
 
-#include "Build/Namespace.hpp"
-
 #include "Core/Service.hpp"
-#include "Debug/Logging/Logger.hpp"
-
-#include "Types/Unique.hpp"
-#include "Types/FundamentalTypes.hpp"
-
+#include "Build/Namespace.hpp"
 #include "Threading/Worker.hpp"
+#include "Debug/Logging/Logger.hpp"
+#include "Types/FundamentalTypes.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -44,7 +40,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief This class is responsible for the repartition of different tasks between workers
  */
-class Scheduler final: public Service<Scheduler>, Unique
+class Scheduler final: public Service<Scheduler>
 {
     public: using Job = std::function<RkVoid()>;
 
@@ -71,6 +67,13 @@ class Scheduler final: public Service<Scheduler>, Unique
 
     public:
 
+        #pragma region Members
+
+        // Static name of the service, used by the kernel to report service errors
+        constexpr static const RkChar* service_name = RUKEN_STRING(Scheduler);
+
+        #pragma endregion
+
         #pragma region Constructors
 
         /**
@@ -78,10 +81,10 @@ class Scheduler final: public Service<Scheduler>, Unique
          * \param in_service_provider Service provider
          * \param in_workers_count Number of managed workers
          */
-        Scheduler(ServiceProvider& in_service_provider, RkUint16 in_workers_count = 0u);
+        Scheduler(ServiceProvider& in_service_provider, RkUint16 in_workers_count = 0U) noexcept;
 
-        Scheduler(Scheduler const& in_copy)     = delete;
-        Scheduler(Scheduler&& in_move) noexcept = delete;
+        Scheduler(Scheduler const& in_copy) = delete;
+        Scheduler(Scheduler&&      in_move) = delete;
         ~Scheduler();
 
         #pragma endregion

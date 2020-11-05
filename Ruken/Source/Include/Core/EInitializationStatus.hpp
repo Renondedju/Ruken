@@ -29,39 +29,12 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief This is a helper class for the creation of non movable objects by inheriting from it.
+ * \brief Defines the status of a service
  */
-class NonMovable
+enum class EInitializationStatus
 {
-    private:  // Emphasizes that the following members are private
-
-        #pragma region Constructors
-        
-        NonMovable(NonMovable&& in_move) = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        NonMovable& operator=(NonMovable&& in_move) = default;
-
-        #pragma endregion
-
-    protected:
-        
-        #pragma region Constructors
-
-        NonMovable ()                           = default;
-        NonMovable (NonMovable const& in_copy)  = default;
-        ~NonMovable()                           = default;
-        
-        #pragma endregion
-
-        #pragma region Operators
-
-        NonMovable& operator=(NonMovable const& in_copy) = default;
-
-        #pragma endregion
+    Succeeded,
+    Failed
 };
 
 END_RUKEN_NAMESPACE

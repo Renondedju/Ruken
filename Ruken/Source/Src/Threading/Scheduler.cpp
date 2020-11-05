@@ -22,6 +22,7 @@
  *  SOFTWARE.
  */
 
+#include "Build/Config.hpp"
 #include "Threading/Scheduler.hpp"
 #include "Core/ServiceProvider.hpp"
 
@@ -29,20 +30,18 @@ USING_RUKEN_NAMESPACE
 
 Scheduler::Scheduler(ServiceProvider& in_service_provider, RkUint16 const in_workers_count):
     Service<Scheduler> {in_service_provider},
-    m_workers   {in_workers_count == 0u ? std::thread::hardware_concurrency() - 1 : in_workers_count},
-    m_running   {true},
-    m_job_queue {}
+    m_workers          {in_workers_count == 0U ? std::thread::hardware_concurrency() - 1 : in_workers_count},
+    m_running          {true}
 {
-    m_logger = m_service_provider.LocateService<Logger>()->AddChild("scheduler");
-    if (m_logger)
+    #if defined(RUKEN_LOGGING_ENABLED)
+
+        m_logger = m_service_provider.LocateService<Logger>()->AddChild("scheduler");
         m_logger->Info("Spawning " + std::to_string(m_workers.size()) + " workers");
 
-    RkUint16 index = 0;
+    #endif
+
     for (Worker& worker : m_workers)
-    {
-        worker.Label() = "Scheduler worker " + std::to_string(index++);
         worker.Execute(&Scheduler::WorkersJob, this);
-    }
 }
 
 Scheduler::~Scheduler()

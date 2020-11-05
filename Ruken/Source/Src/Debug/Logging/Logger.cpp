@@ -36,19 +36,17 @@ Logger::Logger(ServiceProvider&        in_service_provider,
     m_name   {in_name},
     m_level  {in_level},
     m_parent {in_parent}
-{
-    
-}
+{ }
 
 Logger::Logger(Logger&& in_move) noexcept:
-    Service     {std::move(in_move)},
-    m_name      {std::move(in_move.m_name)},
-    m_level     {in_move.m_level},
-    m_parent    {in_move.m_parent},
-    m_children  {std::move(in_move.m_children)},
-    m_handlers  {std::move(in_move.m_handlers)},
-    m_filters   {std::move(in_move.m_filters)},
-    propagate   {in_move.propagate}
+    Service    {std::move(in_move)},
+    m_name     {std::move(in_move.m_name)},
+    m_level    {in_move.m_level},
+    m_parent   {in_move.m_parent},
+    m_children {std::move(in_move.m_children)},
+    m_handlers {std::move(in_move.m_handlers)},
+    m_filters  {std::move(in_move.m_filters)},
+    propagate  {in_move.propagate}
 {
     for (auto& child : m_children)
         child.m_parent = this;

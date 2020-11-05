@@ -28,6 +28,10 @@
 
 #include "Build/Namespace.hpp"
 
+// Used in the inlined file
+#include "Meta/Meta.hpp"
+#include "Meta/Safety.hpp"
+
 #include "Core/Service.hpp"
 #include "Core/ServiceProvider.hpp"
 
@@ -48,22 +52,12 @@ class Kernel
 
         #pragma region Members
 
-        ServiceProvider m_service_provider;
+        ServiceProvider m_service_provider {};
 
-        // Logging
-        Logger&        m_logger;
-        ConsoleHandler m_console_handler;
-
-        // Lifetime maintenance
-        std::atomic<RkBool> m_shutdown_requested;
-        RkInt               m_exit_code;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        RkVoid SetupServices  () noexcept;
-        RkVoid DestroyServices() noexcept;
+        Logger*             m_logger             {nullptr};
+        RkInt               m_exit_code          {0};
+        ConsoleHandler      m_console_handler    {};
+        std::atomic<RkBool> m_shutdown_requested {false};
 
         #pragma endregion
 
@@ -73,8 +67,8 @@ class Kernel
 
         Kernel();
         Kernel(Kernel const& in_copy) = delete;
-        Kernel(Kernel&&      in_move) = delete;
-        ~Kernel()                     = default;
+        Kernel(Kernel&& in_move)      = delete;
+        ~Kernel();
 
         #pragma endregion
 
@@ -101,14 +95,30 @@ class Kernel
          */
         RkVoid RequestShutdown(RkInt in_exit_code) noexcept;
 
+        /**
+         * \brief Attempts to setup a service to the service provider
+         * \note If a required service fails, any consequent call to this method will be ignored to allow
+         *       the kernel to cleanup as fast as possible without generating any more errors
+         *
+         * \tparam TService Service type to setup
+         * \tparam TArgs Constructor argument types of the service
+         * \param in_required If set to true, the service will be considered as required and will automatically kill the kernel in case of failure
+         * \param in_args Arguments to be forwarded to the service constructor
+         * \return True if the service successfully initialized, false otherwise
+         */
+        template <ServiceType TService, typename... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool> = true>
+        RkBool SetupService(RkBool in_required, TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>);
+
         #pragma endregion
 
         #pragma region Operators
 
         Kernel& operator=(Kernel const& in_copy) = delete;
-        Kernel& operator=(Kernel&&      in_move) = delete;
+        Kernel& operator=(Kernel&& in_move)      = delete;
 
         #pragma endregion
 };
+
+#include "Core/Kernel.inl"
 
 END_RUKEN_NAMESPACE
