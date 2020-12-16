@@ -60,9 +60,8 @@ struct CounterSystem final: public System<CounterComponent, ExclusiveComponentTe
 
     /**
      * \brief Called every frame
-     * \param in_time_step Time passed in seconds since the last frame
      */
-    RkVoid OnUpdate([[maybe_unused]] RkFloat in_time_step) noexcept override
+    RkVoid OnUpdate() noexcept override
     {
         RkSize total = 0;
 

@@ -30,9 +30,14 @@
 
 #include "Build/Namespace.hpp"
 
+#include "Core/Service.hpp"
+
 #include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/SystemBase.hpp"
+
+#include "Threading/Scheduler.hpp"
+#include "Threading/ExecutionPlan.hpp"
 
 #include "ECS/Safety/SystemType.hpp"
 #include "ECS/Safety/ComponentType.hpp"
@@ -45,7 +50,7 @@ BEGIN_RUKEN_NAMESPACE
  *        Each admin can be described as a simulation containing entities
  *        and a group of system to maintain and update theses entities.
  */
-class EntityAdmin
+class EntityAdmin final: public Service<EntityAdmin>
 {
     private:
 
@@ -54,7 +59,11 @@ class EntityAdmin
         std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
         std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
         std::unordered_map<RkSize, std::unique_ptr<ComponentBase>>           m_exclusive_components {};
-        
+
+        // Update related
+        ExecutionPlan m_update_plan {};
+        Scheduler*    m_scheduler   {nullptr};
+
         #pragma endregion 
 
         #pragma region Methods
@@ -66,15 +75,21 @@ class EntityAdmin
         template <ComponentType... TComponents>
         Archetype* CreateArchetype() noexcept;
 
+        /**
+         * \brief Builds or rebuilds the update plan
+         */
+        RkVoid BuildUpdatePlan() noexcept;
+
         #pragma endregion 
 
     public:
 
         #pragma region Constructors
 
-        EntityAdmin()                           = default;
-        EntityAdmin(EntityAdmin const& in_copy) = default;
-        EntityAdmin(EntityAdmin&&      in_move) = default;
+        EntityAdmin(ServiceProvider& in_service_provider) noexcept;
+
+        EntityAdmin(EntityAdmin const& in_copy) = delete;
+        EntityAdmin(EntityAdmin&&      in_move) = delete;
         ~EntityAdmin()                          = default;
 
         #pragma endregion
@@ -116,8 +131,8 @@ class EntityAdmin
 
         #pragma region Operators
 
-        EntityAdmin& operator=(EntityAdmin const& in_copy) = default;
-        EntityAdmin& operator=(EntityAdmin&&      in_move) = default;
+        EntityAdmin& operator=(EntityAdmin const& in_copy) = delete;
+        EntityAdmin& operator=(EntityAdmin&&      in_move) = delete;
 
         #pragma endregion
 };

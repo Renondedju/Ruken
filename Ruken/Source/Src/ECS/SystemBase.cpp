@@ -34,7 +34,7 @@ ComponentQuery const& SystemBase::GetQuery() const noexcept
 RkVoid SystemBase::OnStart() noexcept
 {}
 
-RkVoid SystemBase::OnUpdate(RkFloat) noexcept
+RkVoid SystemBase::OnUpdate() noexcept
 {}
 
 RkVoid SystemBase::OnEnd() noexcept

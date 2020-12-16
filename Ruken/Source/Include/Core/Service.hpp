@@ -59,8 +59,8 @@ class Service : public ServiceBase
          */
         Service(ServiceProvider& in_service_provider) noexcept;
 
-        Service(Service const& in_copy) = default;
-        Service(Service&&      in_move) = default;
+        Service(Service const& in_copy) = delete;
+        Service(Service&&      in_move) = delete;
         virtual ~Service()              = default;
 
         #pragma endregion
@@ -84,8 +84,8 @@ class Service : public ServiceBase
 
         #pragma region Operators
         
-        Service& operator=(Service const& in_copy) = default;
-        Service& operator=(Service&&      in_move) = default;
+        Service& operator=(Service const& in_copy) = delete;
+        Service& operator=(Service&&      in_move) = delete;
 
         #pragma endregion
 };

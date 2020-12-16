@@ -85,9 +85,8 @@ class SystemBase
 
         /**
          * \brief Called every frame
-         * \param in_time_step Time passed in seconds since the last frame
          */
-        virtual RkVoid OnUpdate(RkFloat in_time_step) noexcept;
+        virtual RkVoid OnUpdate() noexcept;
 
         /**
          * \brief Called once at the end of a simulation
