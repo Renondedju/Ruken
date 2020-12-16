@@ -40,7 +40,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief This class is responsible for the repartition of different tasks between workers
  */
-class Scheduler final: public Service<Scheduler>
+class Scheduler final : public Service<Scheduler>
 {
     public: using Job = std::function<RkVoid()>;
 
@@ -115,8 +115,8 @@ class Scheduler final: public Service<Scheduler>
 
         #pragma region Operators
 
-        Scheduler& operator=(Scheduler const& in_copy)        = delete;
-        Scheduler& operator=(Scheduler&& in_move) noexcept    = delete;
+        Scheduler& operator=(Scheduler const& in_copy) = delete;
+        Scheduler& operator=(Scheduler&&      in_move) = delete;
 
         #pragma endregion
 };
