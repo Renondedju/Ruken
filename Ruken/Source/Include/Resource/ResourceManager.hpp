@@ -31,7 +31,6 @@
 
 #include "Meta/Meta.hpp"
 #include "Core/Service.hpp"
-#include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #include "Threading/Scheduler.hpp"

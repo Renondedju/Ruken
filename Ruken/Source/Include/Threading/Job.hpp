@@ -22,20 +22,15 @@
  *  SOFTWARE.
  */
 
-#include "ECS/SystemBase.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include <functional>
 
-ComponentQuery const& SystemBase::GetQuery() const noexcept
-{
-    return m_query;
-}
+#include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-RkVoid SystemBase::OnStart() noexcept
-{}
+BEGIN_RUKEN_NAMESPACE
 
-RkVoid SystemBase::OnUpdate() noexcept
-{}
+using Job = std::function<RkVoid()>;
 
-RkVoid SystemBase::OnEnd() noexcept
-{}
+END_RUKEN_NAMESPACE

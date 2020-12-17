@@ -203,6 +203,8 @@
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderView.hpp" />
+    <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
+    <ClInclude Include="Source\Include\Threading\Job.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
@@ -326,6 +328,7 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Threading\ExecutionPlan.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
     <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />

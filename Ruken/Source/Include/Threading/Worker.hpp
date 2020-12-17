@@ -27,13 +27,11 @@
 #include <thread>
 
 #include "Build/Namespace.hpp"
-
-#include "Types/NonCopyable.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class Worker : NonCopyable
+class Worker
 {
     private:
 
@@ -109,8 +107,8 @@ class Worker : NonCopyable
 
         #pragma region Operators
 
-        Worker& operator=(Worker const& in_copy) noexcept = delete;
-        Worker& operator=(Worker&&      in_move) noexcept = default;
+        Worker& operator=(Worker const& in_copy) = delete;
+        Worker& operator=(Worker&&      in_move) = default;
 
         #pragma endregion
 

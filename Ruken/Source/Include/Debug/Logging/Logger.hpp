@@ -92,9 +92,8 @@ class Logger final: public Service<Logger>
                Logger const*    in_parent = nullptr) noexcept;
 
         Logger(Logger const& in_copy) = delete;
-        Logger(Logger&&      in_move) noexcept;
-
-        ~Logger() = default;
+        Logger(Logger&&      in_move) = delete;
+        ~Logger()                     = default;
 
         #pragma endregion
 

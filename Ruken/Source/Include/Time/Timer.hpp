@@ -26,12 +26,11 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Types/Unique.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class Timer : Unique
+class Timer
 {
     private:
 
@@ -41,10 +40,10 @@ class Timer : Unique
 
         #pragma region Constructors
 
-        Timer ()                     noexcept;
-        Timer (Timer const& in_copy) noexcept = delete;
-        Timer (Timer&&      in_move) noexcept = delete;
-        ~Timer()                     noexcept;
+        Timer () noexcept;
+        Timer (Timer const& in_copy) = delete;
+        Timer (Timer&&      in_move) = delete;
+        ~Timer() noexcept;
 
         #pragma endregion
 
@@ -67,8 +66,8 @@ class Timer : Unique
 
         #pragma region Operators
 
-        Timer& operator=(Timer const& in_copy) noexcept = delete;
-        Timer& operator=(Timer&&      in_move) noexcept = delete;
+        Timer& operator=(Timer const& in_copy) = delete;
+        Timer& operator=(Timer&&      in_move) = delete;
 
         #pragma endregion
 };
