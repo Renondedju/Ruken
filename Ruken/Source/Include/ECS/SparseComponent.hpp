@@ -57,7 +57,7 @@ class SparseComponent final : public ComponentBase
 
         SparseComponent(SparseComponent const& in_copy) = default;
         SparseComponent(SparseComponent&&      in_move) = default;
-        virtual ~SparseComponent() override       = default;
+        virtual ~SparseComponent() override             = default;
 
         #pragma endregion
 

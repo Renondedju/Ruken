@@ -25,56 +25,63 @@
 #pragma once
 
 #include "ECS/System.hpp"
+#include "ECS/EventHandler.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final: public System<CounterComponent, ExclusiveComponentTest>
+struct CounterSystem final: public System
 {
     using System::System;
-
-    using CountView = CounterComponent::Layout::MakeView<CountField>;
+    
+    CounterSystem(EntityAdmin& in_admin) : System(in_admin)
+    {
+        // Setup of the different event handlers
+        SetupEventHandler<OnStart >();
+        SetupEventHandler<OnUpdate>();
+    }
 
     #pragma region Methods
 
     /**
-     * \brief Called once at the start of a simulation
-     * \note This method could be called multiple times for the same
-     *       instance if the simulation is restated without reloading the whole ECS 
+     * \brief Start event dispatcher
+     *
+     * Called once at the start of the simulation
+     * This method could be called multiple times for the same
+     * instance if the simulation is restated without reloading the whole ECS 
      */
-    RkVoid OnStart() noexcept override
+    struct OnStart final: StartEventHandler<CounterComponent>
     {
-        RkSize count = 0ULL;
+        // Views
+        using CounterView = CounterComponent::Layout::MakeView<CountField>;
 
-        auto& test = GetExclusiveComponent<ExclusiveComponentTest>();
-        test.Fetch<TestField>() = 3ULL;
-
-        // Iterating over every entity
-        for (auto& group: m_groups)
-        for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
+        // Actual event dispatcher method
+        RkVoid Execute() noexcept override
         {
-            // Setting the "CounterComponent::Count" variable
-            view.Fetch<CountField>() = count++;
+            for (auto group : m_groups)
+            {
+                CounterView view = group.GetComponent<CounterComponent>().GetView<CounterView>();
+            }
+
+            // Setup stuff
         }
-    }
+    };
 
     /**
-     * \brief Called every frame
+     * \brief Update event dispatcher
+     *
+     * This event is called once per frame while the scene is active
+     * The "OnStart" event is always called before the first call to this event
+     * and the "OnEnd" event is always fired after the last call to this event
      */
-    RkVoid OnUpdate() noexcept override
+    struct OnUpdate final: UpdateEventHandler<const CounterComponent>
     {
-        RkSize total = 0;
-
-        std::cout << GetExclusiveComponent<ExclusiveComponentTest>().Fetch<TestField>();
-
-        // Iterating over every entity
-        for (auto& group: m_groups)
-        for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
+        // Actual event dispatcher method
+        RkVoid Execute() noexcept override
         {
-            // Incrementing the total count
-            total += view.Fetch<CountField const>();
+            // Update stuff
         }
-    }
+    };
 
-    #pragma endregion 
+    #pragma endregion
 };

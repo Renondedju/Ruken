@@ -3,26 +3,20 @@
 
 #include "Build/Namespace.hpp"
 
+#include "ECS/EEventName.hpp"
 #include "ECS/ComponentQuery.hpp"
+#include "ECS/EventHandlerBase.hpp"
+
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class SystemBase
 {
-    protected:
-
-        #pragma region Mebers
-
-        ComponentQuery m_query {};
-
-        #pragma endregion
-
     public:
 
         #pragma region Members
 
-        RkBool enabled {true};
 
         #pragma endregion
 
@@ -37,12 +31,6 @@ class SystemBase
 
         #pragma region Methods
 
-        /**
-         * \brief Returns the component query of the system
-         * \return Component query
-         */
-        ComponentQuery const& GetQuery() const noexcept;
-
         // --- Virtual
 
         /**
@@ -52,25 +40,6 @@ class SystemBase
          * \param in_archetype Referenced archetype of the group to create 
          */
         virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
-
-        /**
-         * \brief Called once at the start of a simulation
-         * \note This method could be called multiple times for the same
-         *       instance if the simulation is restated without reloading the whole ECS 
-         */
-        virtual RkVoid OnStart() noexcept;
-
-        /**
-         * \brief Called every frame
-         */
-        virtual RkVoid OnUpdate() noexcept;
-
-        /**
-         * \brief Called once at the end of a simulation
-         * \note This method could be called multiple times for the same
-         *       instance if the simulation is restated without reloading the whole ECS 
-         */
-        virtual RkVoid OnEnd() noexcept;
 
         #pragma endregion
 

@@ -2,43 +2,47 @@
 #include "ECS/EntityAdmin.hpp"
 #include "Core/ServiceProvider.hpp"
 
+#include "ECS/System.hpp"
+
 USING_RUKEN_NAMESPACE
-
-RkVoid EntityAdmin::BuildUpdatePlan() noexcept
-{
-    m_update_plan.ResetPlan();
-
-    for (auto& system: m_systems)
-    {
-        m_update_plan.AddInstruction([&system] { system->OnUpdate(); });
-        m_update_plan.EndInstructionPack();
-    }
-}
 
 EntityAdmin::EntityAdmin(ServiceProvider& in_service_provider) noexcept:
     Service     {in_service_provider},
     m_scheduler {m_service_provider.LocateService<Scheduler>()}
-{
-    // The entity admin requires a scheduler to be able to work
-    if (!m_scheduler)
-        SignalServiceInitializationFailure("The entity admin requires a scheduler to be able to work, updates are asynchronous");
-}
+{ }
 
-RkVoid EntityAdmin::StartSimulation() noexcept
+RkVoid EntityAdmin::BuildEventExecutionPlan(EEventName const in_event_name) noexcept
 {
-    // Simulation start is synchronous for now
+    std::unique_ptr<ExecutionPlan>& execution_plan = m_execution_plans[in_event_name];
+
+    if (execution_plan == nullptr)
+        execution_plan = std::make_unique<ExecutionPlan>();
+
+    execution_plan->ResetPlan();
+
+    // FIXME: This current implementation does not take care of the potential optimizations that could be made
+    // by taking into account component read and writes
     for (auto& system: m_systems)
-        system->OnStart();
+    {
+        EventHandlerBase* event_handler = system->GetEventHandler(in_event_name);
+        if (event_handler == nullptr)
+            continue;
+
+        execution_plan->AddInstruction([&event_handler] { event_handler->Execute(); });
+        execution_plan->EndInstructionPack();
+    }
 }
 
-RkVoid EntityAdmin::UpdateSimulation() noexcept
+RkVoid EntityAdmin::ExecuteEvent(EEventName const in_event_name) noexcept
 {
-    m_update_plan.ExecutePlanAsynchronously(*m_scheduler);
-}
+    if (m_execution_plans[in_event_name] == nullptr)
+        BuildEventExecutionPlan(in_event_name);
 
-RkVoid EntityAdmin::EndSimulation() noexcept
-{
-    // Simulation end is synchronous for now
-    for (auto& system: m_systems)
-        system->OnEnd();
+    std::unique_ptr<ExecutionPlan>& execution_plan = m_execution_plans.at(in_event_name);
+
+    // If multithreading is available
+    if (m_scheduler)
+        execution_plan->ExecutePlanAsynchronously(*m_scheduler);
+    else
+        execution_plan->ExecutePlanSynchronously();
 }

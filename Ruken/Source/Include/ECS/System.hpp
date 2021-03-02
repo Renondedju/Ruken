@@ -1,79 +1,65 @@
 
 #pragma once
 
-#include <tuple>
-#include <vector>
+#include <memory>
+#include <unordered_map>
 
 #include "Build/Namespace.hpp"
 
-#include "ECS/Group.hpp"
-#include "ECS/Archetype.hpp"
-#include "ECS/SystemBase.hpp"
-
-#include "Meta/Assert.hpp"
-#include "Meta/PassConst.hpp"
-#include "Meta/TupleApply.hpp"
-#include "Meta/TupleSubset.hpp"
-#include "Meta/UniqueTypes.hpp"
-
+#include "ECS/EEventName.hpp"
 #include "Types/FundamentalTypes.hpp"
-
-#include "ECS/Meta/ComponentHelper.hpp"
-#include "ECS/Safety/ComponentType.hpp"
-#include "ECS/Safety/SparseComponentType.hpp"
-#include "ECS/Safety/ExclusiveComponentType.hpp"
+#include "ECS/Safety/EventHandlerType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class EntityAdmin;
+class EventHandlerBase;
 
 /**
  * \brief Systems transform data. They implement the logic that modifies the components.
+ * \note Systems are a way to logically order event handlers, to treat a particular type of data
+ * \see System::EventHandler
  *
  * It is important to notice that for lots of actions, you don’t care about the specific type of an entity;
  * what you care about is specific properties of these entities.
  * E.g. for rendering all you need is a mesh and a transform matrix; you don’t care if the entity is a player or a tree.
- *
- * \tparam TComponents Required components for the system to operate
- * \note Passing a component type with a const modifier will notify the ECS that this component is readonly for this system
- *       Meaning that the ECS can enforce constant access to every field of the component via the ComponentViews.
- *       This will also notify the ECS update manager that a potential optimization can be done when updating systems,
- *       using multithreading, reducing frame times further along.
  */
-template <ComponentType... TComponents>
-class System : public SystemBase
+class System
 {
-    RUKEN_STATIC_ASSERT(UniqueTypes<std::remove_const_t<TComponents>...>::value, "Systems must not have duplicate components");
+    public:
 
-    protected:
+        // Helpers, allows for shorter declarations later on
+        template <ComponentType... TComponents> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TComponents...>;
+        template <ComponentType... TComponents> using StartEventHandler  = EventHandler<EEventName::OnStart , TComponents...>;
+        template <ComponentType... TComponents> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TComponents...>;
 
-        #pragma region Usings
-
-        // Tuples containing a specific type of component
-        using SparseComponents    = typename TupleSubset<IsSparseComponent   , TComponents...>::Type;
-        using ExclusiveComponents = typename TupleSubset<IsExclusiveComponent, TComponents...>::Type;
-
-        // For now non exclusive components only consists of SparseComponents
-        using IterativeComponents      = decltype(std::tuple_cat(std::declval<SparseComponents>()));
-        using IterativeComponentsGroup = typename TupleApply<Group, IterativeComponents>::Type;
-
-        /**
-         * \brief Returns the access type of the exclusive component based on the input component constness (system template) and on the actual component passed (TComponent)
-         *        If one of the 2 is const, the return type will be const
-         * \tparam TComponent Component to look for
-         */
-        template <ExclusiveComponentType TComponent> requires ComponentHelper<ExclusiveComponents>::template ComponentExists<TComponent>::value
-        using ExclusiveComponentAccess = PassConst<TComponent, std::tuple_element_t<ComponentHelper<ExclusiveComponents>::template ComponentIndex<TComponent>::value, ExclusiveComponents>>;
-
-        #pragma endregion
+    private:
 
         #pragma region Members
 
-        // This vector stores every group we wish to read/write
-        // You really should not try to edit the vector itself yourself.
-        // Instead, use it for iteration purposes only !
-        std::vector<IterativeComponentsGroup> m_groups {};
-        EntityAdmin&                          m_admin;
+        // Event handlers, used for the update of the system
+        std::unordered_map<EEventName, std::unique_ptr<EventHandlerBase>> m_handlers {};
+
+        #pragma endregion
+
+    protected:
+
+        #pragma region Members
+
+        EntityAdmin& m_admin;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Setups an event handler in the system.
+         *        Note that only one event handler for each event type is currently handled,
+         *        setting multiple ones will simply override the previous one
+         * \tparam TEventHandler Event handler type, must inherit from System::EventHandler
+         */
+        template <EventHandlerType TEventHandler>
+        RkVoid SetupEventHandler() noexcept;
 
         #pragma endregion
 
@@ -84,28 +70,18 @@ class System : public SystemBase
         System(EntityAdmin&  in_admin) noexcept;
         System(System const& in_copy) = default;
         System(System&&      in_move) = default;
-        virtual ~System() override    = default;
+        virtual ~System()             = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         /**
-         * \brief Adds a component reference group to the system.
-         *        This is called by the entity admin at the creation of a new archetype
-         *        if the component query of this archetype and the system matches
-         * \param in_archetype Referenced archetype of the group to create 
+         * \brief Returns the setup event handler for the passed event (if any) 
+         * \param in_event_name Event name
+         * \return Event handler instance or nullptr
          */
-        virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept override final;
-
-        /**
-         * \brief Returns a reference onto the requested exclusive component
-         * \note If this is the first access to the designated exclusive component, this method will allocate the component
-         * \tparam TExclusiveComponent exclusive component type
-         * \return Exclusive component reference
-         */
-        template <ExclusiveComponentType TExclusiveComponent>
-        ExclusiveComponentAccess<TExclusiveComponent>& GetExclusiveComponent() noexcept;
+        EventHandlerBase* GetEventHandler(EEventName in_event_name) const noexcept;
 
         #pragma endregion
 

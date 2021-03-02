@@ -5,6 +5,11 @@ RkVoid EntityAdmin::CreateSystem() noexcept
     std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
 
     m_systems.emplace_back(std::move(system));
+
+    // Registering matching archetypes to that system
+    for (auto&& archetype : m_archetypes)
+        if (system->GetQuery().Match(archetype))
+            system->AddReferenceGroup(archetype);
 }
 
 template <ComponentType... TComponents>
@@ -20,7 +25,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
     m_archetypes[targeted_fingerprint] = std::move(new_archetype);
 
     // Setup
-    for (std::unique_ptr<SystemBase>& system: m_systems)
+    for (auto&& system: m_systems)
         if (system->GetQuery().Match(*archetype_ptr))
             system->AddReferenceGroup(*archetype_ptr);
 
