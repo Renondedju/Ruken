@@ -13,13 +13,12 @@
 #include "ECS/System.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/EEventName.hpp"
-#include "ECS/SystemBase.hpp"
 
 #include "Threading/Scheduler.hpp"
 #include "Threading/ExecutionPlan.hpp"
 
 #include "ECS/Safety/SystemType.hpp"
-#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
 #include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -50,7 +49,7 @@ class EntityAdmin final: public Service<EntityAdmin>
          * \brief Creates a new archetype and handles any setup co-routine
          * \tparam TComponents Component types
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         Archetype* CreateArchetype() noexcept;
 
         #pragma endregion 
@@ -97,7 +96,7 @@ class EntityAdmin final: public Service<EntityAdmin>
          * \tparam TComponents Components to attach to the new entity
          * \return Created entity id
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         Entity CreateEntity() noexcept;
 
         /**

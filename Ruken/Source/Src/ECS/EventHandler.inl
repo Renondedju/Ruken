@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-template <EEventName TEventName, ComponentType ... TComponents>
+template <EEventName TEventName, AnyComponentType ... TComponents>
 EventHandler<TEventName, TComponents...>::EventHandler() noexcept
 {
     // This lambda just helps unwrapping the IterativeComponents tuple into the SetupInclusionQuery function call
@@ -31,13 +31,7 @@ EventHandler<TEventName, TComponents...>::EventHandler() noexcept
     }(std::make_index_sequence<std::tuple_size_v<IterativeComponents>>());
 }
 
-template <EEventName TEventName, ComponentType ... TComponents>
-ComponentQuery const& EventHandler<TEventName, TComponents...>::GetQuery() const noexcept
-{
-    return m_query;
-}
-
-template <EEventName TEventName, ComponentType ... TComponents>
+template <EEventName TEventName, AnyComponentType ... TComponents>
 RkVoid EventHandler<TEventName, TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
 {
     // This lambda just helps unwrapping the IterativeComponents tuple into the CreateGroupReference function call
@@ -46,7 +40,7 @@ RkVoid EventHandler<TEventName, TComponents...>::AddReferenceGroup(Archetype& in
     }(std::make_index_sequence<std::tuple_size_v<IterativeComponents>>());
 }
 
-template <EEventName TEventName, ComponentType ... TComponents>
+template <EEventName TEventName, AnyComponentType ... TComponents>
 EEventName EventHandler<TEventName, TComponents...>::GetHandledEvent() noexcept
 {
     return TEventName;

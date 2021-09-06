@@ -31,7 +31,8 @@
 #include "Meta/CopyConst.hpp"
 #include "Meta/TupleIndex.hpp"
 
-#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/ViewType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -46,15 +47,15 @@ class Archetype;
  *        
  * \tparam TComponents Component types to keep a reference onto
  */
-template <ComponentType... TComponents>
+template <AnyComponentType... TComponents>
 class Group
 {
     // If a component has been passed as const, those helpers will ensure that the
     // GetComponent method will return a constant reference onto the returned component
     // thus, enforcing the usage of readonly views to access any field of the component
 
-    template <ComponentType TComponent> using ComponentIndex     = TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>;
-    template <ComponentType TComponent> using ComponentReference = CopyConst<std::tuple_element_t<ComponentIndex<TComponent>::value, std::tuple<TComponents...>>, TComponent>&;
+    template <AnyComponentType TComponent> using ComponentIndex     = TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>;
+    template <AnyComponentType TComponent> using ComponentReference = CopyConst<std::tuple_element_t<ComponentIndex<TComponent>::value, std::tuple<TComponents...>>, TComponent>&;
 
     private:
 
@@ -83,6 +84,23 @@ class Group
         #pragma endregion
 
         /**
+         * \brief Returns a view containing all the requested fields
+         * \tparam TFields Requested fields of the view
+         * \return View containing all the requested fields
+         */
+        template <ComponentFieldType... TFields>
+        [[nodiscard]] ComponentView<TFields...> GetView() noexcept;
+
+        /**
+         * \brief Returns a view containing all the requested fields
+         * \note If the component is constant, this overload ensures that any view referencing it is readonly
+         * \tparam TFields Requested fields of the view
+         * \return View containing all the requested fields
+         */
+        template <ComponentFieldType... TFields>
+        [[nodiscard]] ComponentView<TFields...> GetView() const noexcept;
+
+        /**
          * \brief Returns the referenced archetype
          * \return Referenced archetype
          */
@@ -93,7 +111,7 @@ class Group
          * \tparam TComponent Component type to return
          * \return Component reference
          */
-        template<ComponentType TComponent>
+        template<AnyComponentType TComponent>
         ComponentReference<TComponent> GetComponent() noexcept
         {
             // Bug: Because of a MSVC bug, this method has to be inlined in the header for some weird reason

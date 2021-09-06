@@ -23,12 +23,20 @@
  */
 
 #include "ECS/System.hpp"
+#include "ECS/EventHandlerBase.hpp"
 
 USING_RUKEN_NAMESPACE
 
 System::System(EntityAdmin& in_admin) noexcept:
     m_admin {in_admin}
 { }
+
+RkVoid System::BindArchetype(Archetype& in_archetype) noexcept
+{
+    for(auto&& [event_type, event_handler] : m_handlers)
+        if (event_handler->GetQuery().Match(in_archetype))
+            event_handler->AddReferenceGroup(in_archetype);
+}
 
 EventHandlerBase* System::GetEventHandler(EEventName const in_event_name) const noexcept
 {

@@ -62,7 +62,7 @@ class Archetype
 
         #pragma region Constructors
 
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         Archetype(Tag<TComponents...>) noexcept;
 
         Archetype(Archetype const& in_copy) = default;
@@ -84,7 +84,7 @@ class Archetype
          * \note Passing a component type that does not exists in this archetype will result in a crash
          * \return Found component
          */
-        template<ComponentType TComponent>
+        template<AnyComponentType TComponent>
         [[nodiscard]]
         TComponent& GetComponent() noexcept;
 
@@ -109,7 +109,7 @@ class Archetype
          * \tparam TComponents Components to include in the group
          * \return Newly created reference group
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         [[nodiscard]]
         Group<TComponents...> CreateGroupReference() noexcept;
 

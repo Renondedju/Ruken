@@ -8,7 +8,7 @@
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 
-#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -34,7 +34,7 @@ class ArchetypeFingerprint : public SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / 64, 
         /**
          * \brief Creates a new fingerprint and setups traits based on the passed components
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         static ArchetypeFingerprint CreateFingerPrintFrom() noexcept;
 
         #pragma endregion

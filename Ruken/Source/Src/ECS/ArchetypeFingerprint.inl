@@ -1,5 +1,5 @@
 
-template <ComponentType... TComponents>
+template <AnyComponentType... TComponents>
 ArchetypeFingerprint ArchetypeFingerprint::CreateFingerPrintFrom() noexcept
 {
     ArchetypeFingerprint fingerprint;

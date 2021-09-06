@@ -22,13 +22,20 @@
  *  SOFTWARE.
  */
 
-template <ComponentType... TComponents>
+template <AnyComponentType... TComponents>
 Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_components) noexcept
     : m_archetype  {in_archetype},
       m_components {std::forward_as_tuple(in_components...)}
 {}
 
-template <ComponentType... TComponents>
+template <AnyComponentType... TComponents>
+template <ComponentFieldType... TFields>
+ComponentView<TFields...> Group<TComponents...>::GetView() noexcept
+{
+    return ComponentView { *this, std::get<typename TFields::Component&>(m_components).template GetFieldContainer<TFields>().GetHead()... };
+}
+
+template <AnyComponentType... TComponents>
 Archetype& Group<TComponents...>::GetReferencedArchetype() const noexcept
 {
     return m_archetype;

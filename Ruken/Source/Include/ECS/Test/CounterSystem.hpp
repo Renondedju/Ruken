@@ -26,6 +26,7 @@
 
 #include "ECS/System.hpp"
 #include "ECS/EventHandler.hpp"
+#include "ECS/ComponentView.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
 USING_RUKEN_NAMESPACE
@@ -52,16 +53,12 @@ struct CounterSystem final: public System
      */
     struct OnStart final: StartEventHandler<CounterComponent>
     {
-        // Views
-        using CounterView = CounterComponent::Layout::MakeView<CountField>;
+        using CountView = MakeView<CounterComponent::CountField>;
 
         // Actual event dispatcher method
         RkVoid Execute() noexcept override
         {
-            for (auto group : m_groups)
-            {
-                CounterView view = group.GetComponent<CounterComponent>().GetView<CounterView>();
-            }
+            //FieldAccess<CounterComponent::TestPaddingField> test;
 
             // Setup stuff
         }
@@ -76,6 +73,8 @@ struct CounterSystem final: public System
      */
     struct OnUpdate final: UpdateEventHandler<const CounterComponent>
     {
+        using CountView = MakeView<CounterComponent::CountField>;
+
         // Actual event dispatcher method
         RkVoid Execute() noexcept override
         {

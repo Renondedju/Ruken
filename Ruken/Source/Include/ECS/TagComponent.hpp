@@ -42,9 +42,9 @@ class TagComponent: public ComponentBase
 
         /**
          * \brief Default constructor
-         * \param in_owning_archetype Owning archetype
+         * \param in_owning_archetype Owning archetype pointer
          */
-        TagComponent(Archetype const& in_owning_archetype) noexcept;
+        TagComponent(Archetype const* in_owning_archetype) noexcept;
 
         TagComponent(TagComponent const& in_copy) = default;
         TagComponent(TagComponent&&      in_move) = default;
@@ -79,7 +79,7 @@ class TagComponent: public ComponentBase
  * \brief Shorthand to declare a tag component named "in_component_name"
  * \param in_component_name Name of the component as defined in the component table
  */
-#define RUKEN_DEFINE_TAG_COMPONENT(in_component_name) struct in_component_name final: TagComponent\
-    { using TagComponent::TagComponent; using TagComponent::operator=; RUKEN_DEFINE_COMPONENT_ID_DECLARATION };
+#define RUKEN_DECLARE_TAG_COMPONENT(in_component_name) struct in_component_name final: TagComponent\
+    { using TagComponent::TagComponent; using TagComponent::operator=; RUKEN_DEFINE_COMPONENT_ID_DECLARATION }
 
 END_RUKEN_NAMESPACE

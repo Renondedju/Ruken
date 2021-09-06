@@ -9,7 +9,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TPack, ComponentFieldType... TFields>
+template <ComponentFieldType... TFields>
 class ComponentView;
 
 /**

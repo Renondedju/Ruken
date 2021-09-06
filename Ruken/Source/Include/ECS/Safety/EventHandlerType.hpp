@@ -26,11 +26,11 @@
 
 #include "Build/Namespace.hpp"
 #include "Meta/IsBaseOfTemplate.hpp"
-#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <EEventName TEventName, ComponentType... TComponents>
+template <EEventName TEventName, AnyComponentType... TComponents>
 class EventHandler;
 
 template <template <EEventName, typename...> class TBase, typename TDerived>

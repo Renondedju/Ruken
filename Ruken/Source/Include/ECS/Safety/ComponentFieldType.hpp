@@ -5,13 +5,11 @@
 
 #include "Build/Namespace.hpp"
 
+#include "ECS/ComponentField.hpp"
 #include "Meta/IsInstance.hpp"
 #include "Meta/IsBaseOfTemplate.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-
-template <typename TDataType>
-struct ComponentField;
 
 /**
  * \brief Checks if the passed type is a valid field

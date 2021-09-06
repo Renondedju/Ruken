@@ -1,25 +1,25 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class ComponentBase;
+template <ComponentFieldType... TFields>
+class Component;
 
 /**
- * \brief Checks if the passed type is a component, of any type
+ * \brief Checks if the passed type is a component
  * \tparam TType Type to check
  */
-template <typename TType>
+template <class TType>
 struct IsComponent
 {
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
+    static constexpr RkBool value = IsBaseOfTemplate<Component, TType>::value;
 };
 
-template <typename TComponent>
-concept ComponentType = IsComponent<TComponent>::value;
+template <typename TType>
+concept ComponentType = IsComponent<TType>::value;
 
 END_RUKEN_NAMESPACE

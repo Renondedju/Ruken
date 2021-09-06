@@ -2,8 +2,6 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Meta/IsInstance.hpp"
-#include "ECS/Safety/ComponentFieldType.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -18,7 +16,7 @@ class ExclusiveComponent;
 template <typename TType>
 struct IsExclusiveComponent
 {
-    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, ExclusiveComponent>::value;
+    static constexpr RkBool value = IsBaseOfTemplate<ExclusiveComponent, TType>::value;
 };
 
 template <typename TType>

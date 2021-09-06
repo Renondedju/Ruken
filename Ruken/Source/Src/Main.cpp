@@ -10,6 +10,9 @@
 #include "Core/ExecutiveSystem/CPU/Awaitables/Algorythms/WhenAll.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
+#include "ECS/EntityAdmin.hpp"
+#include "ECS/Test/CounterSystem.hpp"
+
 USING_RUKEN_NAMESPACE
 
 struct MainQueue final: CPUQueueHandle<MainQueue, 4096> {};
@@ -75,23 +78,23 @@ Task<MainQueue> RunJobs(std::stop_source& in_exit_signal, RkSize const in_size)
 
 int main()
 {
-    // CPU will slowly start threads and create workers if the machine has at least 2 logic cores.
-    // Any async call can be ran from any other thread, synchronously or not without blocking the
-    // current process
-    CentralProcessingUnit cpu {};
-    cpu.RegisterQueue(MainQueue::instance);
+    ServiceProvider service_provider {};
+    std::string     failure_reason   {};
 
-    RUKEN_BENCHMARK("Main")
-    {
-        // However, if the main thread exits right away, the cpu will be destroyed, resulting
-        // in halting any ongoing task and killing all the workers.
-        // To avoid this issue, a stop source is passed to the async function that will signal it upon completion.
-        std::stop_source stop_signal;
+    Scheduler*   scheduler    {service_provider.ProvideService<Scheduler  >(failure_reason)};
+    EntityAdmin* entity_admin {service_provider.ProvideService<EntityAdmin>(failure_reason)};
 
-        RunJobs(stop_signal, 1000000); // < asynchronous call, does not block the thread
+    entity_admin->CreateSystem<CounterSystem>();
 
-        // Finally we can actually wait for the signal by making this thread
-        // available to the CPU until a stop is requested
-        cpu.CallerAsWorker(stop_signal.get_token());
-    }
+    for (int index = 0; index < 10000000; ++index)
+        entity_admin->CreateEntity<CounterComponent>();
+
+    entity_admin->ExecuteEvent(EEventName::OnStart);
+    entity_admin->ExecuteEvent(EEventName::OnUpdate);
+
+    /*
+    Kernel kernel;
+
+    return kernel.Run();
+    */
 }

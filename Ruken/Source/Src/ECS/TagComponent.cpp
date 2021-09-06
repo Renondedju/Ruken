@@ -26,8 +26,8 @@
 
 USING_RUKEN_NAMESPACE
 
-TagComponent::TagComponent(Archetype const& in_owning_archetype) noexcept:
-    ComponentBase {&in_owning_archetype}
+TagComponent::TagComponent(Archetype const* in_owning_archetype) noexcept:
+    ComponentBase {in_owning_archetype}
 { }
 
 RkSize TagComponent::EnsureStorageSpace(RkSize) noexcept

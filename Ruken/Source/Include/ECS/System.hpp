@@ -6,6 +6,7 @@
 
 #include "Build/Namespace.hpp"
 
+#include "ECS/Archetype.hpp"
 #include "ECS/EEventName.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "ECS/Safety/EventHandlerType.hpp"
@@ -29,9 +30,9 @@ class System
     public:
 
         // Helpers, allows for shorter declarations later on
-        template <ComponentType... TComponents> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TComponents...>;
-        template <ComponentType... TComponents> using StartEventHandler  = EventHandler<EEventName::OnStart , TComponents...>;
-        template <ComponentType... TComponents> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TComponents...>;
+        template <AnyComponentType... TComponents> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TComponents...>;
+        template <AnyComponentType... TComponents> using StartEventHandler  = EventHandler<EEventName::OnStart , TComponents...>;
+        template <AnyComponentType... TComponents> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TComponents...>;
 
     private:
 
@@ -75,6 +76,12 @@ class System
         #pragma endregion
 
         #pragma region Methods
+
+        /**
+         * \brief Binds the passed archetype with the setuped event handlers of that system
+         * \param in_archetype Archetype to bind
+         */
+        RkVoid BindArchetype(Archetype& in_archetype) noexcept;
 
         /**
          * \brief Returns the setup event handler for the passed event (if any) 

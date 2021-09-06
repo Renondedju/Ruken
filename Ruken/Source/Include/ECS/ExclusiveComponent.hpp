@@ -14,18 +14,12 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Exclusive components are a type of component where only one instance of the component exists in the whole ECS
- * \note Exclusive Components have templates for 2 main reason
- *         - First, it allows for a bit more consistency when declaring components, all you have to do to change a component to an
- *       exclusive component, is add one word in the helper macro declaring your component.
- *         - Secondly, this way, each new specialization of the template will automatically create a new unique id for this component,
- *       avoiding the programmer the pain to having to inherit from this class just to paste the "RUKEN_DEFINE_COMPONENT_ID_DECLARATION" in an empty body
- *       Compilation times might be slowed by a bit, but only when compiling the component for the first time, this does not impact the iteration times
- *
- * \tparam TFields Fields of the component
  */
 template <ComponentFieldType... TFields>
-class ExclusiveComponent final: public ComponentBase
+class ExclusiveComponent : public ComponentCounter
 {
+    RUKEN_STATIC_ASSERT(sizeof...(TFields) > 0, "An exclusive component must have at least one field, use a TagComponent instead.");
+
     using Helper = FieldHelper<TFields...>;
 
     private:
@@ -40,28 +34,16 @@ class ExclusiveComponent final: public ComponentBase
 
         #pragma region Constructors
 
-        ExclusiveComponent() noexcept;
+        ExclusiveComponent()                                  = default;
         ExclusiveComponent(ExclusiveComponent const& in_copy) = default;
         ExclusiveComponent(ExclusiveComponent&&      in_move) = default;
-        virtual ~ExclusiveComponent() override                = default;
+        ~ExclusiveComponent() override                        = default;
 
         #pragma endregion
 
         #pragma region Methods
 
         RUKEN_DEFINE_COMPONENT_ID_DECLARATION
-
-        /**
-         * \note This method is never called since exclusive components do not live in archetypes
-         *
-         * \brief Ensures that the component has enough storage space for a given amount of entities
-         *        If this is not the case, containers will be allocated
-         * \param in_size Size to ensure
-         * \return Minimum number of elements allocated by one of the containers in the layout
-         *         This can be useful to avoid having to call back this function when no new allocation is needed
-         */
-        [[nodiscard]] 
-        virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
 
         /**
          * \brief Fetches a field from the component
@@ -91,13 +73,11 @@ class ExclusiveComponent final: public ComponentBase
         #pragma endregion
 };
 
-#include "ECS/ExclusiveComponent.inl"
-
 /**
- * \brief Shorthand to declare an exclusive component named "in_component_name"
- * \param in_component_name Name of the component
- * \param ... Fields of the component. Theses must inherit from the ComponentField class
+ * \brief Declares an ECS component
+ * \param in_component_name Name of the component class
+ * \param ... Fields of the component. Must be declared with the "RUKEN_DECLARE_FIELD" macro
  */
-#define RUKEN_DEFINE_EXCLUSIVE_COMPONENT(in_component_name, ...) using in_component_name = ExclusiveComponent<__VA_ARGS__>
+#define RUKEN_DECLARE_EXCLUSIVE_COMPONENT(in_component_name, ...) RUKEN_INTERNAL_DECLARE_COMPONENT(in_component_name, ExclusiveComponent, __VA_ARGS__)
 
 END_RUKEN_NAMESPACE

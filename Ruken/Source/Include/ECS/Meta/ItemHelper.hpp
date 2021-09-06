@@ -22,10 +22,10 @@ struct ItemHelper
 
     /**
      * \brief Returns the index of an item from the passed items in the class
-     * \tparam TField Item to look for
+     * \tparam TItem Item to look for
      */
-    template <typename TField> requires ItemExists<TField>::value
-    using ItemIndex = TupleIndex<std::remove_const_t<TField>, std::tuple<std::remove_const_t<TItems>...>>;
+    template <typename TItem> requires ItemExists<TItem>::value
+    using ItemIndex = TupleIndex<std::remove_const_t<TItem>, std::tuple<std::remove_const_t<TItems>...>>;
 };
 
 

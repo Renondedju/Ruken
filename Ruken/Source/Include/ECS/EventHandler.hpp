@@ -35,12 +35,13 @@
 
 #include "ECS/Group.hpp"
 #include "ECS/EEventName.hpp"
-#include "ECS/ComponentQuery.hpp"
+#include "ECS/ComponentView.hpp"
 #include "ECS/EventHandlerBase.hpp"
 
 #include "ECS/Meta/ComponentHelper.hpp"
 #include "ECS/Safety/ComponentType.hpp"
-#include "ECS/Safety/SparseComponentType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
 #include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -56,30 +57,49 @@ BEGIN_RUKEN_NAMESPACE
  *       This will also notify the ECS update manager that a potential optimization can be done when updating systems,
  *       using multithreading, reducing frame times further along. 
  */
-template <EEventName TEventName, ComponentType... TComponents>
+template <EEventName TEventName, AnyComponentType... TComponents>
 class EventHandler : public EventHandlerBase
 {
     RUKEN_STATIC_ASSERT(UniqueTypes<std::remove_const_t<TComponents>...>::value, "Duplicate components are not allowed and would cause a loss in performance (System::EventHandler)");
-
-    private:
-
-        #pragma region Members
-
-        ComponentQuery m_query {};
-
-        #pragma endregion 
 
     protected:
 
         #pragma region Usings
 
         // Tuples containing a specific type of component
-        using SparseComponents    = typename TupleSubset<IsSparseComponent   , TComponents...>::Type;
+        using SparseComponents    = typename TupleSubset<IsComponent         , TComponents...>::Type;
         using ExclusiveComponents = typename TupleSubset<IsExclusiveComponent, TComponents...>::Type;
 
         // For now non exclusive components only consists of SparseComponents
         using IterativeComponents      = decltype(std::tuple_cat(std::declval<SparseComponents>()));
         using IterativeComponentsGroup = typename TupleApply<Group, IterativeComponents>::Type;
+
+        /**
+         * \brief Checks if the passed field is reachable.
+         *        If not, you need to add the owning component of that field to the list of reachable components of the handler (TComponents)
+         * \tparam TSelectedField Field to operate the check on
+         */
+        template <ComponentFieldType TSelectedField>
+        using FieldIsReachable = TupleHasType<std::remove_const_t<typename TSelectedField::Component>, std::tuple<std::remove_const_t<TComponents>...>>;
+
+        /**
+         * \brief Returns the access type of a passed field
+         * \tparam TSelectedField Selected field
+         */
+        template <ComponentFieldType TSelectedField> requires FieldIsReachable<TSelectedField>::value
+        using FieldAccess = CopyConst<
+            PassConst<
+                std::tuple_element_t<
+                    TupleIndex<
+                        std::remove_const_t<typename TSelectedField::Component>,
+                        std::tuple<std::remove_const_t<TComponents>...>>::value,
+                    std::tuple<TComponents...>>,
+                TSelectedField>,
+            typename TSelectedField::Type>;
+
+        // View type helpers
+        template <ComponentFieldType... TSelectedFields> using MakeView         = ComponentView<TSelectedFields...>;
+        template <ComponentFieldType... TSelectedFields> using MakeReadonlyView = ComponentView<TSelectedFields const...>;
 
         /**
          * \brief Returns the access type of the exclusive component based on the input component constness (system template) and on the actual component passed (TComponent)
@@ -107,7 +127,7 @@ class EventHandler : public EventHandlerBase
         EventHandler() noexcept;
         EventHandler(EventHandler const& in_copy) = default;
         EventHandler(EventHandler&&      in_move) = default;
-        virtual ~EventHandler() override          = default;
+        ~EventHandler() override                  = default;
 
         #pragma endregion
 
@@ -117,13 +137,7 @@ class EventHandler : public EventHandlerBase
          * \brief Returns the name of the handled event
          * \return Event name
          */
-        constexpr EEventName GetHandledEvent() noexcept override final;
-
-        /**
-         * \brief Returns the component query of the event handler
-         * \return Component query
-         */
-        ComponentQuery const& GetQuery() const noexcept;
+        EEventName GetHandledEvent() noexcept final;
 
         /**
          * \brief Adds a component reference group to the event handler.
@@ -131,7 +145,7 @@ class EventHandler : public EventHandlerBase
          *        if the component query of this archetype and the system matches
          * \param in_archetype Referenced archetype of the group to create 
          */
-        RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept;
+        RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept final;
 
         /**
          * \brief Returns a reference onto the requested exclusive component

@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Build/Namespace.hpp"
 
 #include "Meta/PassConst.hpp"
@@ -11,7 +9,6 @@
 #include "ECS/Range.hpp"
 #include "ECS/Meta/FieldHelper.hpp"
 #include "ECS/Safety/ComponentFieldType.hpp"
-
 #include "Containers/LinkedChunkListNode.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -19,15 +16,11 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief Allows to fetch only the required fields in a component, saving on data bus bandwidth and cache
  * \note All instances of this class are generated via the item type of each component
- * \tparam TPack Index pack enumerating the index of the members to fetch
  * \tparam TFields Member types to create a reference onto
  *                 Fields can be constant, meaning that they will be forced to be readonly on every fetch
  */
-template <typename TPack, ComponentFieldType... TFields>
-class ComponentView;
-
-template <template <RkSize...> class TPack, RkSize... TIndices, ComponentFieldType... TFields>
-class ComponentView<TPack<TIndices...>, TFields...>
+template <ComponentFieldType... TFields>
+class ComponentView
 {
     using Helper = FieldHelper<TFields...>;
 
@@ -35,8 +28,7 @@ class ComponentView<TPack<TIndices...>, TFields...>
 
         #pragma region Usings
 
-        using IsReadonly         = typename Helper::Readonly;
-        using FieldIndexSequence = std::index_sequence<TIndices...>;
+        using IsReadonly = typename Helper::Readonly;
 
         template <ComponentFieldType TField> using FieldChunk    = LinkedChunkListNode<typename TField::Type>;
         template <ComponentFieldType TField> using ReferencePair = std::pair<RkSize, FieldChunk<TField>*>;
@@ -56,7 +48,7 @@ class ComponentView<TPack<TIndices...>, TFields...>
 
         // Stores a tuple of
         // - An index containing the current node index of field container
-        // - A pointer to the actual field node container 
+        // - A pointer to the actual field node container
         std::tuple<ReferencePair<TFields>...> m_fields_references;
 
         // Reference to the next empty range of the archetype

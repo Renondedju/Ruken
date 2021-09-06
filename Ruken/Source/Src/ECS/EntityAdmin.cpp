@@ -1,5 +1,7 @@
 
 #include "ECS/EntityAdmin.hpp"
+#include "ECS/EventHandlerBase.hpp"
+
 #include "Core/ServiceProvider.hpp"
 
 #include "ECS/System.hpp"

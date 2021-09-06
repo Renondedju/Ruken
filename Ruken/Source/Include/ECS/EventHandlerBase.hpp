@@ -25,6 +25,8 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
+#include "ECS/ComponentQuery.hpp"
+#include "ECS/EEventName.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -34,6 +36,14 @@ BEGIN_RUKEN_NAMESPACE
  */
 class EventHandlerBase
 {
+    protected:
+
+        #pragma region Members
+
+        ComponentQuery m_query {};
+
+        #pragma endregion 
+
     public:
 
         #pragma region Constructors
@@ -48,10 +58,24 @@ class EventHandlerBase
         #pragma region Methods
 
         /**
+         * \brief Returns the component query of the event handler
+         * \return Component query
+         */
+        ComponentQuery const& GetQuery() const noexcept;
+
+        /**
          * \brief Returns the name of the handled event
          * \return Event name
          */
         virtual EEventName GetHandledEvent() noexcept = 0;
+
+        /**
+         * \brief Adds a component reference group to the event handler.
+         *        This is called by the entity admin at the creation of a new archetype
+         *        if the component query of this archetype and the system matches
+         * \param in_archetype Referenced archetype of the group to create 
+         */
+        virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
 
         /**
          * \brief Execution method of the handler
