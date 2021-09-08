@@ -81,9 +81,10 @@ int main()
     ServiceProvider service_provider {};
     std::string     failure_reason   {};
 
+    Logger*      logger       {service_provider.ProvideService<Logger     >(failure_reason, "Ruken")};
     Scheduler*   scheduler    {service_provider.ProvideService<Scheduler  >(failure_reason)};
     EntityAdmin* entity_admin {service_provider.ProvideService<EntityAdmin>(failure_reason)};
-
+    
     entity_admin->CreateSystem<CounterSystem>();
 
     for (int index = 0; index < 10000000; ++index)
@@ -91,7 +92,7 @@ int main()
 
     entity_admin->ExecuteEvent(EEventName::OnStart);
     entity_admin->ExecuteEvent(EEventName::OnUpdate);
-
+    
     /*
     Kernel kernel;
 

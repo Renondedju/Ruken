@@ -8,7 +8,6 @@
 
 #include "ECS/Archetype.hpp"
 #include "ECS/EEventName.hpp"
-#include "Types/FundamentalTypes.hpp"
 #include "ECS/Safety/EventHandlerType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -68,7 +67,8 @@ class System
 
         #pragma region Constructors
 
-        System(EntityAdmin&  in_admin) noexcept;
+        System(EntityAdmin& in_admin) noexcept;
+
         System(System const& in_copy) = default;
         System(System&&      in_move) = default;
         virtual ~System()             = default;

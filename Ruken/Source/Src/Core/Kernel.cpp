@@ -23,7 +23,7 @@ Kernel::Kernel()
     #if defined(RUKEN_LOGGING_ENABLED)
 
     std::string failure_reason;
-    m_logger = m_service_provider.ProvideService<Logger>(failure_reason, "Root", ELogLevel::Debug);
+    m_logger = m_service_provider.ProvideService<Logger>(failure_reason, "Ruken", ELogLevel::Debug);
 
     if (m_logger)
     {

@@ -1,10 +1,9 @@
 
+#include "ECS/System.hpp"
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/EventHandlerBase.hpp"
 
 #include "Core/ServiceProvider.hpp"
-
-#include "ECS/System.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -23,14 +22,14 @@ RkVoid EntityAdmin::BuildEventExecutionPlan(EEventName const in_event_name) noex
     execution_plan->ResetPlan();
 
     // FIXME: This current implementation does not take care of the potential optimizations that could be made
-    // by taking into account component read and writes
-    for (auto& system: m_systems)
+    // by taking into account component read and writes (aka. multithreading)
+    for (auto const& system: m_systems)
     {
         EventHandlerBase* event_handler = system->GetEventHandler(in_event_name);
         if (event_handler == nullptr)
             continue;
 
-        execution_plan->AddInstruction([&event_handler] { event_handler->Execute(); });
+        execution_plan->AddInstruction([event_handler] { event_handler->Execute(); });
         execution_plan->EndInstructionPack();
     }
 }
@@ -40,7 +39,7 @@ RkVoid EntityAdmin::ExecuteEvent(EEventName const in_event_name) noexcept
     if (m_execution_plans[in_event_name] == nullptr)
         BuildEventExecutionPlan(in_event_name);
 
-    std::unique_ptr<ExecutionPlan>& execution_plan = m_execution_plans.at(in_event_name);
+    std::unique_ptr<ExecutionPlan> const& execution_plan = m_execution_plans.at(in_event_name);
 
     // If multithreading is available
     if (m_scheduler)

@@ -455,7 +455,6 @@
     <None Include="Source\Src\ECS\ComponentLayout.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentView.inl" />
-    <None Include="Source\Src\ECS\System.cpp" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
     <None Include="Source\Src\ECS\Group.inl" />
     <None Include="Source\Src\ECS\System.inl" />
@@ -484,6 +483,7 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EventHandlerBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
+    <ClCompile Include="Source\Src\ECS\System.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
     <ClCompile Include="Source\Src\Maths\Easing.cpp" />
     <ClCompile Include="Source\Src\Maths\Math.cpp" />

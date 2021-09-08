@@ -7,7 +7,7 @@ RkVoid EntityAdmin::CreateSystem() noexcept
     m_systems.emplace_back(std::move(system));
 
     // Binding relevant archetypes
-    for (auto&& [fingerprint, archetype_ptr] : m_archetypes)
+    for (auto& archetype_ptr: m_archetypes | std::views::values)
         system->BindArchetype(*archetype_ptr);
 }
 

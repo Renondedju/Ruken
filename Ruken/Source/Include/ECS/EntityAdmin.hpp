@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <ranges>
 #include <unordered_map>
 
 #include "Build/Namespace.hpp"

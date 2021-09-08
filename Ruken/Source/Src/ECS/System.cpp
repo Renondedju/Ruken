@@ -22,6 +22,8 @@
  *  SOFTWARE.
  */
 
+#include <ranges>
+
 #include "ECS/System.hpp"
 #include "ECS/EventHandlerBase.hpp"
 
@@ -33,7 +35,7 @@ System::System(EntityAdmin& in_admin) noexcept:
 
 RkVoid System::BindArchetype(Archetype& in_archetype) noexcept
 {
-    for(auto&& [event_type, event_handler] : m_handlers)
+    for(auto const& event_handler: m_handlers | std::views::values)
         if (event_handler->GetQuery().Match(in_archetype))
             event_handler->AddReferenceGroup(in_archetype);
 }
