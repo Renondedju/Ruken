@@ -30,9 +30,16 @@ Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_compone
 
 template <AnyComponentType... TComponents>
 template <ComponentFieldType... TFields>
-ComponentView<TFields...> Group<TComponents...>::GetView() noexcept
+ComponentView<TFields...> Group<TComponents...>::GetViewInternal(Tag<ComponentView<TFields...>>) noexcept
 {
-    return ComponentView { *this, std::get<typename TFields::Component&>(m_components).template GetFieldContainer<TFields>().GetHead()... };
+    return ComponentView<TFields...> (m_archetype, std::get<typename TFields::Component&>(m_components).template GetFieldContainer<TFields>().GetHead()...);
+}
+
+template <AnyComponentType... TComponents>
+template <ViewType TView>
+TView Group<TComponents...>::GetView() noexcept
+{
+    return GetViewInternal(Tag<TView>{}); // This trick is used to extract the fields for the requested view
 }
 
 template <AnyComponentType... TComponents>

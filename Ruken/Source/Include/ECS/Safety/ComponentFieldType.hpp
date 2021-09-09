@@ -23,9 +23,10 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TType>
 struct IsComponentField
 {
-    static constexpr RkBool value = IsBaseOfTemplate<ComponentField, std::remove_const_t<TType>>::value &&
-        !IsInstance<std::remove_const_t<TType>, ComponentField>::value &&
-        !std::is_volatile<std::remove_const_t<TType>>::value;
+    static constexpr RkBool value = 
+        IsBaseOfTemplate<ComponentField, std::remove_const_t<TType>>::value &&
+        !IsInstance<std::remove_const_t<TType>, ComponentField>::value      &&
+        !std::is_volatile_v<std::remove_const_t<TType>>;
 };
 
 template <typename TType>

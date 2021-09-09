@@ -48,7 +48,7 @@ class TagComponent: public ComponentBase
 
         TagComponent(TagComponent const& in_copy) = default;
         TagComponent(TagComponent&&      in_move) = default;
-        virtual ~TagComponent() override          = default;
+        ~TagComponent() override                  = default;
 
         #pragma endregion
 
@@ -63,7 +63,7 @@ class TagComponent: public ComponentBase
          * \return Minimum number of elements allocated by one of the containers in the component layout
          *         This can be useful to avoid having to call back this function when no new allocation is needed
          */
-        virtual RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
+        RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
 
         #pragma endregion 
 

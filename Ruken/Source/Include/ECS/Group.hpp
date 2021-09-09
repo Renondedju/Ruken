@@ -66,6 +66,18 @@ class Group
 
         #pragma endregion
 
+        #pragma region Methods
+
+        /**
+         * \brief Returns a view containing all the requested fields
+         * \tparam TFields Requested fields
+         * \return View containing all the requested fields
+         */
+        template <ComponentFieldType... TFields>
+        [[nodiscard]] ComponentView<TFields...> GetViewInternal(Tag<ComponentView<TFields...>>) noexcept;
+
+        #pragma endregion
+
     public:
 
         #pragma region Constructors
@@ -85,20 +97,11 @@ class Group
 
         /**
          * \brief Returns a view containing all the requested fields
-         * \tparam TFields Requested fields of the view
+         * \tparam TView Requested view
          * \return View containing all the requested fields
          */
-        template <ComponentFieldType... TFields>
-        [[nodiscard]] ComponentView<TFields...> GetView() noexcept;
-
-        /**
-         * \brief Returns a view containing all the requested fields
-         * \note If the component is constant, this overload ensures that any view referencing it is readonly
-         * \tparam TFields Requested fields of the view
-         * \return View containing all the requested fields
-         */
-        template <ComponentFieldType... TFields>
-        [[nodiscard]] ComponentView<TFields...> GetView() const noexcept;
+        template <ViewType TView>
+        [[nodiscard]] TView GetView() noexcept;
 
         /**
          * \brief Returns the referenced archetype
@@ -111,11 +114,10 @@ class Group
          * \tparam TComponent Component type to return
          * \return Component reference
          */
-        template<AnyComponentType TComponent>
+        template <AnyComponentType TComponent>
         ComponentReference<TComponent> GetComponent() noexcept
         {
-            // Bug: Because of a MSVC bug, this method has to be inlined in the header for some weird reason
-
+            // BUG: This method has to be inlined because of a msvc bug (fix your shit Microsoft please)
             return std::get<TupleIndex<std::remove_const_t<TComponent>, std::tuple<std::remove_const_t<TComponents>...>>::value>(m_components);
         }
 

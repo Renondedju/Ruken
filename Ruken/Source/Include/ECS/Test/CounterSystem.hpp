@@ -58,9 +58,11 @@ struct CounterSystem final: public System
         // Actual event dispatcher method
         RkVoid Execute() noexcept override
         {
-            //FieldAccess<CounterComponent::TestPaddingField> test;
+            RkSize value {0ULL};
 
-            // Setup stuff
+            for (auto&& group : m_groups)
+                for (CountView view = group.GetView<CountView>(); view.FindNextEntity();)
+                    view.Fetch<CounterComponent::CountField>() = value++;
         }
     };
 

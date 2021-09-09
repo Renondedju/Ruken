@@ -452,7 +452,6 @@
     <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
     <None Include="Source\Src\ECS\EventHandler.inl" />
     <None Include="Source\Src\ECS\Component.inl" />
-    <None Include="Source\Src\ECS\ComponentLayout.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentView.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />

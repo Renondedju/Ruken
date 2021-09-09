@@ -35,7 +35,7 @@ enum class EEventName
 {
     OnStart,
     OnUpdate,
-    OnEnd
+    OnEnd,
 };
 
 END_RUKEN_NAMESPACE

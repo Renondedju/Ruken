@@ -32,7 +32,7 @@ RkSize Component<TFields...>::EnsureStorageSpaceHelper(RkSize in_size, std::inde
             {
                 // Computes the chunk id required to store all the requested data
                 RkSize const chunk_id      { in_size / in_list.chunk_element_count };
-                RkSize const chunk_missing { (chunk_id + 1) - in_list.GetSize() };
+                RkSize const chunk_missing { chunk_id + 1 - in_list.GetSize() };
 
                 // If the size isn't big enough, allocating some more nodes to fit everything
                 for (RkSize index = 0; index < chunk_missing; ++index)

@@ -13,6 +13,8 @@
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
+#include "Utility/Benchmark.hpp"
+
 USING_RUKEN_NAMESPACE
 
 struct MainQueue final: CPUQueueHandle<MainQueue, 4096> {};
@@ -87,12 +89,16 @@ int main()
     
     entity_admin->CreateSystem<CounterSystem>();
 
-    for (int index = 0; index < 10000000; ++index)
+    for (int index = 0; index < 6553500; ++index)
         entity_admin->CreateEntity<CounterComponent>();
 
-    entity_admin->ExecuteEvent(EEventName::OnStart);
-    entity_admin->ExecuteEvent(EEventName::OnUpdate);
-    
+    LOOPED_BENCHMARK("OnStart", 1000)
+    {
+        entity_admin->ExecuteEvent(EEventName::OnStart);
+    }
+
+    //entity_admin->ExecuteEvent(EEventName::OnUpdate);
+
     /*
     Kernel kernel;
 
