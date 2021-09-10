@@ -33,13 +33,11 @@ USING_RUKEN_NAMESPACE
 
 struct CounterSystem final: public System
 {
-    using System::System;
-    
     CounterSystem(EntityAdmin& in_admin) : System(in_admin)
     {
         // Setup of the different event handlers
-        SetupEventHandler<OnStart >();
-        SetupEventHandler<OnUpdate>();
+        SetupEventHandler<StartHandler >();
+        SetupEventHandler<UpdateHandler>();
     }
 
     #pragma region Methods
@@ -49,9 +47,9 @@ struct CounterSystem final: public System
      *
      * Called once at the start of the simulation
      * This method could be called multiple times for the same
-     * instance if the simulation is restated without reloading the whole ECS 
+     * instance if the simulation is restarted without reloading the whole ECS 
      */
-    struct OnStart final: StartEventHandler<CounterComponent>
+    struct StartHandler final: StartEventHandler<CounterComponent>
     {
         using CountView = MakeView<CounterComponent::CountField>;
 
@@ -61,8 +59,12 @@ struct CounterSystem final: public System
             RkSize value {0ULL};
 
             for (auto&& group : m_groups)
+            {
                 for (CountView view = group.GetView<CountView>(); view.FindNextEntity();)
                     view.Fetch<CounterComponent::CountField>() = value++;
+            }
+
+            std::cout << "updated " << value << " entities\n"; 
         }
     };
 
@@ -73,14 +75,16 @@ struct CounterSystem final: public System
      * The "OnStart" event is always called before the first call to this event
      * and the "OnEnd" event is always fired after the last call to this event
      */
-    struct OnUpdate final: UpdateEventHandler<const CounterComponent>
+    struct UpdateHandler final: UpdateEventHandler<CounterComponent>
     {
         using CountView = MakeView<CounterComponent::CountField>;
 
         // Actual event dispatcher method
         RkVoid Execute() noexcept override
         {
-            // Update stuff
+            for (auto&& group : m_groups)
+            for (CountView view = group.GetView<CountView>(); view.FindNextEntity();)
+                view.Fetch<CounterComponent::CountField>()++;
         }
     };
 

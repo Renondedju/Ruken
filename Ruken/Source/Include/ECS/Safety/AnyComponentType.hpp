@@ -16,7 +16,7 @@ class ComponentBase;
 template <typename TType>
 struct IsAnyComponent
 {
-    static constexpr RkBool value = std::is_base_of<ComponentBase, std::remove_const_t<TType>>::value;
+    static constexpr RkBool value = std::is_base_of_v<ComponentBase, std::remove_const_t<TType>>;
 };
 
 template <typename TComponent>

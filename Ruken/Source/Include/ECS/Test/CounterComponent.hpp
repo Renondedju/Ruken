@@ -12,7 +12,7 @@ USING_RUKEN_NAMESPACE
 // Creating a component
 RUKEN_DECLARE_COMPONENT(CounterComponent,
     RUKEN_DECLARE_FIELD(CountField, RkSize),
-    RUKEN_DECLARE_FIELD(TestPaddingField, std::array<RkSize, 10>)
+    RUKEN_DECLARE_FIELD(TestPaddingField, std::array<RkSize, 50>)
 );
 
 // Creating the associated component

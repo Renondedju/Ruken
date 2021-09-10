@@ -40,6 +40,7 @@
 
 #include "ECS/Meta/ComponentHelper.hpp"
 #include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/TagComponentType.hpp"
 #include "ECS/Safety/AnyComponentType.hpp"
 #include "ECS/Safety/ComponentFieldType.hpp"
 #include "ECS/Safety/ExclusiveComponentType.hpp"
@@ -67,12 +68,12 @@ class EventHandler : public EventHandlerBase
         #pragma region Usings
 
         // Tuples containing a specific type of component
-        using SparseComponents    = typename TupleSubset<IsComponent         , TComponents...>::Type;
+        using Components          = typename TupleSubset<IsComponent         , TComponents...>::Type;
+        using TagComponents       = typename TupleSubset<IsTagComponent      , TComponents...>::Type;
         using ExclusiveComponents = typename TupleSubset<IsExclusiveComponent, TComponents...>::Type;
 
-        // For now non exclusive components only consists of SparseComponents
-        using IterativeComponents      = decltype(std::tuple_cat(std::declval<SparseComponents>()));
-        using IterativeComponentsGroup = typename TupleApply<Group, IterativeComponents>::Type;
+        // Component types that should be included in the component query (Archetype query) 
+        using QueryComponents = decltype(std::tuple_cat(std::declval<Components>(), std::declval<TagComponents>()));
 
         /**
          * \brief Checks if the passed field is reachable.
@@ -116,7 +117,7 @@ class EventHandler : public EventHandlerBase
         // This vector stores every group we wish to read/write
         // You really should not try to edit the vector itself yourself.
         // Instead, use it for iteration purposes only !
-        std::vector<IterativeComponentsGroup> m_groups {};
+        std::vector<typename TupleApply<Group, Components>::Type> m_groups {};
 
         #pragma endregion
 

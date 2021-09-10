@@ -22,22 +22,29 @@
  *  SOFTWARE.
  */
 
-template <EEventName TEventName, AnyComponentType ... TComponents>
+template <EEventName TEventName, AnyComponentType... TComponents>
 EventHandler<TEventName, TComponents...>::EventHandler() noexcept
 {
     // This lambda just helps unwrapping the IterativeComponents tuple into the SetupInclusionQuery function call
     [&]<RkSize... TIds>(std::index_sequence<TIds...>){
-        m_query.SetupInclusionQuery<std::tuple_element_t<TIds, IterativeComponents>...>();
-    }(std::make_index_sequence<std::tuple_size_v<IterativeComponents>>());
+        m_query.SetupInclusionQuery<std::tuple_element_t<TIds, QueryComponents>...>();
+    }(std::make_index_sequence<std::tuple_size_v<QueryComponents>>());
 }
 
-template <EEventName TEventName, AnyComponentType ... TComponents>
+template <EEventName TEventName, AnyComponentType... TComponents>
 RkVoid EventHandler<TEventName, TComponents...>::AddReferenceGroup(Archetype& in_archetype) noexcept
 {
-    // This lambda just helps unwrapping the IterativeComponents tuple into the CreateGroupReference function call
+    // This lambda just helps unwrapping the IterativeComponents tuple into the CreateGroupReference function call (iterable components)
     [&]<RkSize... TIds>(std::index_sequence<TIds...>){
-        m_groups.emplace_back(in_archetype.CreateGroupReference<std::tuple_element_t<TIds, IterativeComponents>...>());
-    }(std::make_index_sequence<std::tuple_size_v<IterativeComponents>>());
+        m_groups.emplace_back(in_archetype.CreateGroupReference<std::tuple_element_t<TIds, Components>...>());
+    }(std::make_index_sequence<std::tuple_size_v<Components>>());
+}
+
+template <EEventName TEventName, AnyComponentType... TComponents>
+template <ExclusiveComponentType TExclusiveComponent>
+typename EventHandler<TEventName, TComponents...>::template ExclusiveComponentAccess<TExclusiveComponent>& EventHandler<TEventName, TComponents...>::GetExclusiveComponent() noexcept
+{
+    
 }
 
 template <EEventName TEventName, AnyComponentType ... TComponents>

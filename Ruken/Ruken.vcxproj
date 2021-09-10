@@ -219,6 +219,7 @@
     <ClInclude Include="Source\Include\ECS\Safety\AnyComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ExclusiveComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\SystemType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\TagComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ViewType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ComponentFieldType.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
