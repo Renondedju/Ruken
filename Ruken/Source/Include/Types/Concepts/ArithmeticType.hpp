@@ -1,4 +1,4 @@
-﻿/*
+/**
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,41 +24,13 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#include <type_traits>
 
-#include "Maths/Vector/Vector.hpp"
+#include "Build/Namespace.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-struct Vertex
-{
-    public:
-
-        #pragma region Members
-
-        Vector3f position;
-        Vector3f normal;
-        Vector2f uv;
-
-        #pragma endregion
-
-        #pragma region Constructors and Destructor
-
-        Vertex() = default;
-
-        Vertex(Vertex const&    in_copy) = default;
-        Vertex(Vertex&&         in_move) = default;
-
-        ~Vertex() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Vertex& operator=(Vertex const& in_copy) = default;
-        Vertex& operator=(Vertex&&      in_move) = default;
-
-        #pragma endregion
-};
+template<typename TType>
+concept ArithmeticType = std::is_arithmetic_v<TType>;
 
 END_RUKEN_NAMESPACE

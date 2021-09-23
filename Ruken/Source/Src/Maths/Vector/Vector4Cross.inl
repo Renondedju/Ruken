@@ -1,4 +1,4 @@
-﻿/*
+/**
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,41 +24,22 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#pragma region Operators
 
-#include "Maths/Vector/Vector.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-
-struct Vertex
+template <ArithmeticType TType>
+constexpr Vector4<TType>::operator Vector2<TType>() const noexcept
 {
-    public:
+    TType divisor = w == 0 ? 1 : w;
 
-        #pragma region Members
+    return Vector2<TType>(x / divisor, y / divisor);
+}
 
-        Vector3f position;
-        Vector3f normal;
-        Vector2f uv;
+template <ArithmeticType TType>
+constexpr Vector4<TType>::operator Vector3<TType>() const noexcept
+{
+    TType divisor = w == 0 ? 1 : w;
 
-        #pragma endregion
+    return Vector3<TType>(x / divisor, y / divisor, z / divisor);
+}
 
-        #pragma region Constructors and Destructor
-
-        Vertex() = default;
-
-        Vertex(Vertex const&    in_copy) = default;
-        Vertex(Vertex&&         in_move) = default;
-
-        ~Vertex() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Vertex& operator=(Vertex const& in_copy) = default;
-        Vertex& operator=(Vertex&&      in_move) = default;
-
-        #pragma endregion
-};
-
-END_RUKEN_NAMESPACE
+#pragma endregion

@@ -27,7 +27,7 @@
 #include <mutex>
 #include <vector>
 
-#include "Vector/Vector.hpp"
+#include "Maths/Vector/Vector.hpp"
 
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 

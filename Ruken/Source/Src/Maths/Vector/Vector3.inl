@@ -1,4 +1,4 @@
-﻿/*
+/**
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,41 +24,41 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#pragma region Constructors
 
-#include "Maths/Vector/Vector.hpp"
+template <ArithmeticType TType>
+constexpr Vector3<TType>::Vector3(TType const in_x, TType const in_y, TType const in_z) noexcept:
+    x {in_x},
+    y {in_y},
+    z {in_z}
+{}
 
-BEGIN_RUKEN_NAMESPACE
-
-struct Vertex
+template <ArithmeticType TType>
+constexpr Vector3<TType>::Vector3(BaseVector<Vector3<TType>, 3UI64, TType> const& in_copy) noexcept
 {
-    public:
+    *this = static_cast<Vector3>(in_copy);
+}
 
-        #pragma region Members
+template <ArithmeticType TType>
+constexpr Vector3<TType>::Vector3(BaseVector<Vector3<TType>, 3UI64, TType>&& in_move) noexcept
+{
+    *this = std::forward(static_cast<Vector3&&>(in_move));
+}
 
-        Vector3f position;
-        Vector3f normal;
-        Vector2f uv;
+#pragma endregion
 
-        #pragma endregion
+#pragma region Operators
 
-        #pragma region Constructors and Destructor
+template <ArithmeticType TType>
+constexpr Vector3<TType>& Vector3<TType>::operator=(BaseVector<Vector3<TType>, 3UI64, TType> const& in_copy) noexcept
+{
+    return *this = static_cast<Vector3>(in_copy);
+}
 
-        Vertex() = default;
+template <ArithmeticType TType>
+constexpr Vector3<TType>& Vector3<TType>::operator=(BaseVector<Vector3<TType>, 3UI64, TType>&& in_move) noexcept
+{
+    return *this = std::forward(static_cast<Vector3&&>(in_move));
+}
 
-        Vertex(Vertex const&    in_copy) = default;
-        Vertex(Vertex&&         in_move) = default;
-
-        ~Vertex() = default;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        Vertex& operator=(Vertex const& in_copy) = default;
-        Vertex& operator=(Vertex&&      in_move) = default;
-
-        #pragma endregion
-};
-
-END_RUKEN_NAMESPACE
+#pragma endregion
