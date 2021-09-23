@@ -62,8 +62,8 @@
     <Link>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -109,8 +109,8 @@
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -185,6 +185,11 @@
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
     <ClInclude Include="Source\Include\Core\Kernel.hpp" />
     <ClInclude Include="Source\Include\Core\KernelProxy.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\BaseVector.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Vector.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Vector2.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Vector3.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Vector4.hpp" />
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
@@ -205,6 +210,7 @@
     <ClInclude Include="Source\Include\Rendering\RenderView.hpp" />
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
     <ClInclude Include="Source\Include\Threading\Job.hpp" />
+    <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
@@ -316,6 +322,13 @@
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
+    <None Include="Source\Src\Maths\Vector\BaseVector.inl" />
+    <None Include="Source\Src\Maths\Vector\Vector2.inl" />
+    <None Include="Source\Src\Maths\Vector\Vector2Cross.inl" />
+    <None Include="Source\Src\Maths\Vector\Vector3.inl" />
+    <None Include="Source\Src\Maths\Vector\Vector3Cross.inl" />
+    <None Include="Source\Src\Maths\Vector\Vector4.inl" />
+    <None Include="Source\Src\Maths\Vector\Vector4Cross.inl" />
     <None Include="Source\Src\Resource\Handle.inl" />
     <None Include="Source\Src\Resource\ResourceManager.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
