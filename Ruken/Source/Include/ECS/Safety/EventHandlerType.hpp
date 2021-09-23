@@ -25,12 +25,11 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Meta/IsBaseOfTemplate.hpp"
-#include "ECS/Safety/AnyComponentType.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <EEventName TEventName, AnyComponentType... TComponents>
+template <EEventName TEventName, ComponentFieldType... TFields>
 class EventHandler;
 
 template <template <EEventName, typename...> class TBase, typename TDerived>

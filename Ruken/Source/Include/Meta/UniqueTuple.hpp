@@ -22,28 +22,25 @@
  *  SOFTWARE.
  */
 
-template <AnyComponentType... TComponents>
-Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_components) noexcept
-    : m_archetype  {in_archetype},
-      m_components {std::forward_as_tuple(in_components...)}
-{}
+#pragma once
 
-template <AnyComponentType... TComponents>
-template <ComponentFieldType... TFields>
-ComponentView<TFields...> Group<TComponents...>::GetViewInternal(Tag<ComponentView<TFields...>>) noexcept
-{
-    return ComponentView<TFields...> (m_archetype, std::get<typename TFields::Component&>(m_components).template GetFieldContainer<TFields>().GetHead()...);
-}
+#include <tuple>
+#include <type_traits>
 
-template <AnyComponentType... TComponents>
-template <ViewType TView>
-TView Group<TComponents...>::GetView() noexcept
-{
-    return GetViewInternal(Tag<TView>{}); // This trick is used to extract the fields for the requested view
-}
+#include "Build/Namespace.hpp"
 
-template <AnyComponentType... TComponents>
-Archetype& Group<TComponents...>::GetReferencedArchetype() const noexcept
-{
-    return m_archetype;
-}
+BEGIN_RUKEN_NAMESPACE
+
+template <typename TTuple, typename... TTypes>
+struct UniqueTupleImpl : std::type_identity<TTuple> {};
+
+template <typename... TTypes, typename TCurrentType, typename... TFilteredTypes>
+struct UniqueTupleImpl<std::tuple<TTypes...>, TCurrentType, TFilteredTypes...>
+    : std::conditional_t<(std::is_same_v<TCurrentType, TTypes> || ...)
+                       , UniqueTupleImpl<std::tuple<TTypes...>, TFilteredTypes...>
+                       , UniqueTupleImpl<std::tuple<TTypes..., TCurrentType>, TFilteredTypes...>> {};
+
+template <typename... TTypes>
+using UniqueTuple = typename UniqueTupleImpl<std::tuple<>, TTypes...>::type;
+
+END_RUKEN_NAMESPACE

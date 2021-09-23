@@ -42,7 +42,7 @@ class EventHandlerBase
 
         ComponentQuery m_query {};
 
-        #pragma endregion 
+        #pragma endregion
 
     public:
 
@@ -70,15 +70,16 @@ class EventHandlerBase
         virtual EEventName GetHandledEvent() noexcept = 0;
 
         /**
-         * \brief Adds a component reference group to the event handler.
+         * \brief Adds an archetype reference to the event handler.
+         * \note The passed archetype must be compatible with the event handler component query
          *        This is called by the entity admin at the creation of a new archetype
          *        if the component query of this archetype and the system matches
          * \param in_archetype Referenced archetype of the group to create 
          */
-        virtual RkVoid AddReferenceGroup(Archetype& in_archetype) noexcept = 0;
+        virtual RkVoid AddArchetypeReference(Archetype& in_archetype) noexcept = 0;
 
         /**
-         * \brief Execution method of the handler
+         * \brief Runs the event handler
          */
         virtual RkVoid Execute() noexcept = 0;
 

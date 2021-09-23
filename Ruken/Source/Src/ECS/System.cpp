@@ -37,7 +37,7 @@ RkVoid System::BindArchetype(Archetype& in_archetype) noexcept
 {
     for(auto const& event_handler: m_handlers | std::views::values)
         if (event_handler->GetQuery().Match(in_archetype))
-            event_handler->AddReferenceGroup(in_archetype);
+            event_handler->AddArchetypeReference(in_archetype);
 }
 
 EventHandlerBase* System::GetEventHandler(EEventName const in_event_name) const noexcept

@@ -29,9 +29,9 @@ class System
     public:
 
         // Helpers, allows for shorter declarations later on
-        template <AnyComponentType... TComponents> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TComponents...>;
-        template <AnyComponentType... TComponents> using StartEventHandler  = EventHandler<EEventName::OnStart , TComponents...>;
-        template <AnyComponentType... TComponents> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TComponents...>;
+        template <ComponentFieldType... TFields> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TFields...>;
+        template <ComponentFieldType... TFields> using StartEventHandler  = EventHandler<EEventName::OnStart , TFields...>;
+        template <ComponentFieldType... TFields> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TFields...>;
 
     private:
 

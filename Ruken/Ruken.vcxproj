@@ -72,6 +72,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
+      <Profile>true</Profile>
     </Link>
     <ClCompile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -224,7 +225,6 @@
     <ClInclude Include="Source\Include\ECS\Safety\ComponentFieldType.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
-    <ClInclude Include="Source\Include\ECS\Group.hpp" />
     <ClInclude Include="Source\Include\ECS\TagComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterSystem.hpp" />
@@ -295,6 +295,7 @@
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleRemoveLast.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleSubset.hpp" />
+    <ClInclude Include="Source\Include\Meta\UniqueTuple.hpp" />
     <ClInclude Include="Source\Include\Meta\UniqueTypes.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
@@ -456,7 +457,6 @@
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentView.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
-    <None Include="Source\Src\ECS\Group.inl" />
     <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />

@@ -7,12 +7,6 @@ Archetype::Archetype(Tag<TComponents...>) noexcept:
     (m_components.try_emplace(TComponents::GetId(), std::make_unique<TComponents>(this)), ...);
 }
 
-template <AnyComponentType... TComponents>
-Group<TComponents...> Archetype::CreateGroupReference() noexcept
-{
-    return Group<TComponents...>(*this, GetComponent<TComponents>()...);
-}
-
 template <AnyComponentType TComponent>
 TComponent& Archetype::GetComponent() noexcept
 {

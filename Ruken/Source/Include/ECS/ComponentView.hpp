@@ -51,9 +51,8 @@ class ComponentView
         // - A pointer to the actual field node container
         std::tuple<ReferencePair<TFields>...> m_fields_references;
 
-        // Reference to the next empty range of the archetype
-        // This is used to skip de-allocated entities when iterating
-        std::list<Range>::const_iterator m_next_empty_range;
+        // This is used to skip unused entities when iterating
+        std::list<Range>::const_iterator m_current_entity_range;
 
         // Actual owning archetype of the data we want to iterate
         Archetype const& m_component_archetype;
@@ -70,9 +69,8 @@ class ComponentView
         /**
          * \brief Default constructor
          * \param in_archetype Iterated component archetype. This is used to automatically skip de-allocated entities 
-         * \param in_fields Fields to iterate on
          */
-        ComponentView(Archetype const& in_archetype, FieldChunk<TFields>*... in_fields) noexcept;
+        ComponentView(Archetype& in_archetype) noexcept;
 
         ComponentView(ComponentView const& in_copy) = default;
         ComponentView(ComponentView&&      in_move) = default;
@@ -84,9 +82,13 @@ class ComponentView
 
         /**
          * \brief Updates the view to reference the next entity found, if the view found nothing, false is returned
-         * \return True if the next entity has been found, false otherwise
          */
-        [[nodiscard]] RkBool FindNextEntity() noexcept;
+        RkVoid FindNextEntity() noexcept;
+
+        /**
+         * \brief Returns false while the iteration is not done 
+         */
+        RkBool IterationDone() const noexcept;
 
         /**
          * \brief Fetches a field of the currently referenced entity

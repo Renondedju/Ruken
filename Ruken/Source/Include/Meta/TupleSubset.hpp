@@ -27,4 +27,10 @@ struct TupleSubset
     using Type = typename TupleSubsetImplementation<TConcept, std::tuple<TArgs...>, std::tuple<>>::ValidatedTuple;
 };
 
+template<template <typename> typename TConcept, typename... TArgs>
+struct TupleSubset<TConcept, std::tuple<TArgs...>>
+{
+    using Type = typename TupleSubsetImplementation<TConcept, std::tuple<TArgs...>, std::tuple<>>::ValidatedTuple;
+};
+
 END_RUKEN_NAMESPACE
