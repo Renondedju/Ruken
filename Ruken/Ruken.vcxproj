@@ -214,6 +214,16 @@
     <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\FloatingPointType.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\FundamentalType.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Addition.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Decrement.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Division.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Increment.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Modulo.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Multiplication.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Subtraction.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\UnaryMinus.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\UnaryPlus.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongType.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
