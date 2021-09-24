@@ -341,6 +341,9 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Maths\Vector\Vector2.cpp" />
+    <ClCompile Include="Source\Src\Maths\Vector\Vector3.cpp" />
+    <ClCompile Include="Source\Src\Maths\Vector\Vector4.cpp" />
     <ClCompile Include="Source\Src\Threading\ExecutionPlan.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />

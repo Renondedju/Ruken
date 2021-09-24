@@ -43,7 +43,7 @@ constexpr Vector4<TType>::Vector4(BaseVector<Vector4<TType>, 4UI64, TType> const
 template <ArithmeticType TType>
 constexpr Vector4<TType>::Vector4(BaseVector<Vector4<TType>, 4UI64, TType>&& in_move) noexcept
 {
-    *this = std::forward(static_cast<Vector4&&>(in_move));
+    *this = std::forward<Vector4>(static_cast<Vector4&&>(in_move));
 }
 
 #pragma endregion
@@ -59,7 +59,7 @@ constexpr Vector4<TType>& Vector4<TType>::operator=(BaseVector<Vector4<TType>, 4
 template <ArithmeticType TType>
 constexpr Vector4<TType>& Vector4<TType>::operator=(BaseVector<Vector4<TType>, 4UI64, TType>&& in_move) noexcept
 {
-    return *this = std::forward(static_cast<Vector4&&>(in_move));
+    return *this = std::forward<Vector4>(static_cast<Vector4&&>(in_move));
 }
 
 #pragma endregion

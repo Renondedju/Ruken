@@ -22,43 +22,10 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include "Maths/Vector/Vector.hpp"
 
-#pragma region Constructors
+USING_RUKEN_NAMESPACE
 
-template <ArithmeticType TType>
-constexpr Vector3<TType>::Vector3(TType const in_x, TType const in_y, TType const in_z) noexcept:
-    x {in_x},
-    y {in_y},
-    z {in_z}
-{}
-
-template <ArithmeticType TType>
-constexpr Vector3<TType>::Vector3(BaseVector<Vector3<TType>, 3UI64, TType> const& in_copy) noexcept
-{
-    *this = static_cast<Vector3>(in_copy);
-}
-
-template <ArithmeticType TType>
-constexpr Vector3<TType>::Vector3(BaseVector<Vector3<TType>, 3UI64, TType>&& in_move) noexcept
-{
-    *this = std::forward<Vector3&&>(static_cast<Vector3&&>(in_move));
-}
-
-#pragma endregion
-
-#pragma region Operators
-
-template <ArithmeticType TType>
-constexpr Vector3<TType>& Vector3<TType>::operator=(BaseVector<Vector3<TType>, 3UI64, TType> const& in_copy) noexcept
-{
-    return *this = static_cast<Vector3>(in_copy);
-}
-
-template <ArithmeticType TType>
-constexpr Vector3<TType>& Vector3<TType>::operator=(BaseVector<Vector3<TType>, 3UI64, TType>&& in_move) noexcept
-{
-    return *this = std::forward<Vector3&&>(static_cast<Vector3&&>(in_move));
-}
-
-#pragma endregion
+// Pre instantiation
+template struct Vector3<RkInt>;
+template struct Vector3<RkFloat>;
