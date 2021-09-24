@@ -1,100 +1,268 @@
 
 #include "Rendering/Renderer.hpp"
-
-#include "Core/Kernel.hpp"
-#include "Core/KernelProxy.hpp"
-
+#include "Core/ServiceProvider.hpp"
+#include "Meta/Safety.hpp"
+#include "Windowing/WindowManager.hpp"
 #include "Threading/Scheduler.hpp"
 
-#include "Windowing/WindowManager.hpp"
-
-#include "Vulkan/Utilities/VulkanDebug.hpp"
-#include "Vulkan/Utilities/VulkanLoader.hpp"
+#include "Rendering/Resources/Model.hpp"
+#include "Rendering/Resources/Shader.hpp"
 
 USING_RUKEN_NAMESPACE
 
+vk::RenderPass          Renderer::render_pass;
+vk::Pipeline            Renderer::pipeline;
+vk::PipelineLayout      Renderer::pipeline_layout;
+vk::DescriptorSetLayout Renderer::descriptor_set_layout;
+vk::CommandPool         Renderer::command_pool;
+
 #pragma region Constructors
 
-Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
-    Service<Renderer> {in_service_provider},
-    m_scheduler       {in_service_provider.LocateService<Scheduler>()}
+Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Renderer> {in_service_provider}
 {
-    auto& kernel         = in_service_provider.LocateService<KernelProxy>  ()->GetKernelReference();
-    auto* window_manager = in_service_provider.LocateService<WindowManager>();
-    auto* root_logger    = in_service_provider.LocateService<Logger>       ();
-
-    if (root_logger)
+    if (Logger* root_logger = m_service_provider.LocateService<Logger>())
         m_logger = root_logger->AddChild("Rendering");
 
-    VulkanDebug::Initialize(m_logger);
+    m_context = std::make_unique<RenderContext>(m_logger);
+    m_device  = std::make_unique<RenderDevice> (*m_context, m_logger);
 
-    if (!VulkanLoader::Initialize())
-    {
-        kernel.RequestShutdown(1);
-        return;
+    if (WindowManager* window_manager = m_service_provider.LocateService<WindowManager>())
+    { 
+        window_manager->on_window_created  .Subscribe([this] (Window& in_window) { OnWindowCreated  (in_window); });
+        window_manager->on_window_destroyed.Subscribe([this] (Window& in_window) { OnWindowDestroyed(in_window); });
     }
 
-    if ((m_instance         = std::make_unique<VulkanInstance>       ())                  ->IsValid() &&
-        (m_physical_device  = std::make_unique<VulkanPhysicalDevice> ())                  ->IsValid() &&
-        (m_device           = std::make_unique<VulkanDevice>         (*m_scheduler,
-                                                                      *m_physical_device))->IsValid() &&
-        (m_device_allocator = std::make_unique<VulkanDeviceAllocator>(*m_physical_device))->IsValid())
-    {
-        window_manager->on_window_created += [this](Window& in_window)
+    Shader  shader (m_device.get(), "Data/");
+
+    vk::AttachmentReference color_attachment_reference = {
+        .attachment = 0,
+        .layout = vk::ImageLayout::eColorAttachmentOptimal
+    };
+
+    vk::AttachmentReference depth_attachment_reference = {
+        .attachment = 1,
+        .layout = vk::ImageLayout::eDepthStencilAttachmentOptimal
+    };
+
+    vk::SubpassDescription subpass = {
+        .pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
+        .colorAttachmentCount = 1,
+        .pColorAttachments = &color_attachment_reference,
+        .pDepthStencilAttachment = &depth_attachment_reference
+    };
+
+    std::array<vk::AttachmentDescription, 2> attachments = {
         {
-            MakeContext(in_window);
-        };
+            {
+                .format = vk::Format::eB8G8R8A8Unorm,
+                .samples = vk::SampleCountFlagBits::e1,
+                .loadOp = vk::AttachmentLoadOp::eClear,
+                .storeOp = vk::AttachmentStoreOp::eStore,
+                .stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
+                .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+                .initialLayout = vk::ImageLayout::eUndefined,
+                .finalLayout = vk::ImageLayout::ePresentSrcKHR
+            },
+            {
+                .format = vk::Format::eD32Sfloat,
+                .samples = vk::SampleCountFlagBits::e1,
+                .loadOp = vk::AttachmentLoadOp::eClear,
+                .storeOp = vk::AttachmentStoreOp::eDontCare,
+                .stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
+                .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+                .initialLayout = vk::ImageLayout::eUndefined,
+                .finalLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal
+            }
+        }
+    };
 
-        if (m_logger)
-            m_logger->Info("Renderer initialized.");
-    }
+    vk::SubpassDependency dependency = {
+        .srcSubpass = VK_SUBPASS_EXTERNAL,
+        .dstSubpass = 0,
+        .srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
+        .dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
+        .srcAccessMask = vk::AccessFlagBits::eNoneKHR,
+        .dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite
+    };
 
-    else
-        kernel.RequestShutdown(1);
+    vk::RenderPassCreateInfo render_pass_info = {
+        .attachmentCount = static_cast<uint32_t>(attachments.size()),
+        .pAttachments = attachments.data(),
+        .subpassCount = 1,
+        .pSubpasses = &subpass,
+        .dependencyCount = 1,
+        .pDependencies = &dependency
+    };
+
+    render_pass = m_device->GetLogicalDevice().createRenderPass(render_pass_info).value;
+
+    vk::DescriptorSetLayoutBinding bindings[2] = {
+        {
+            .binding = 0,
+            .descriptorType = vk::DescriptorType::eUniformBuffer,
+            .descriptorCount = 1,
+            .stageFlags = vk::ShaderStageFlagBits::eVertex
+        },
+        {
+            .binding = 1,
+            .descriptorType = vk::DescriptorType::eCombinedImageSampler,
+            .descriptorCount = 1,
+            .stageFlags = vk::ShaderStageFlagBits::eFragment
+        }
+    };
+
+    vk::DescriptorSetLayoutCreateInfo set_layout_info = {
+        .bindingCount = 2,
+        .pBindings = bindings
+    };
+
+    descriptor_set_layout = m_device->GetLogicalDevice().createDescriptorSetLayout(set_layout_info).value;
+
+    vk::PipelineLayoutCreateInfo layout_info = {
+        .setLayoutCount = 1,
+        .pSetLayouts = &descriptor_set_layout
+    };
+
+    pipeline_layout = m_device->GetLogicalDevice().createPipelineLayout(layout_info).value;
+
+    auto shader_stages = shader.GetShaderStages();
+
+    auto binding_description    = Vertex::get_binding_description();
+    auto attribute_descriptions = Vertex::get_attribute_descriptions();
+
+    vk::PipelineVertexInputStateCreateInfo vertex_input_state = {
+        .vertexBindingDescriptionCount = 1,
+        .pVertexBindingDescriptions = &binding_description,
+        .vertexAttributeDescriptionCount = 3,
+        .pVertexAttributeDescriptions = attribute_descriptions.data()
+    };
+
+    vk::PipelineInputAssemblyStateCreateInfo input_assembly_state = {
+        .topology = vk::PrimitiveTopology::eTriangleList,
+        .primitiveRestartEnable = VK_FALSE
+    };
+
+    vk::PipelineViewportStateCreateInfo viewport_state = {
+        .viewportCount = 1,
+        .scissorCount = 1,
+    };
+
+    vk::PipelineRasterizationStateCreateInfo rasterization_state = {
+        .polygonMode = vk::PolygonMode::eFill,
+        .cullMode = vk::CullModeFlagBits::eBack,
+        .frontFace = vk::FrontFace::eCounterClockwise,
+        .lineWidth = 1.0F
+    };
+
+    vk::PipelineMultisampleStateCreateInfo multisample_state = {
+
+    };
+
+    vk::PipelineDepthStencilStateCreateInfo depth_stencil_state = {
+        .depthTestEnable = VK_TRUE,
+        .depthWriteEnable = VK_TRUE,
+        .depthCompareOp = vk::CompareOp::eLess,
+        .depthBoundsTestEnable = VK_FALSE,
+        .stencilTestEnable = VK_FALSE
+    };
+
+    vk::PipelineColorBlendAttachmentState color_blend_attachment = {
+        .colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eA
+    };
+
+    vk::PipelineColorBlendStateCreateInfo color_blend_state = {
+        .attachmentCount = 1,
+        .pAttachments = &color_blend_attachment
+    };
+
+    std::array dynamic_states = {
+        vk::DynamicState::eViewport, vk::DynamicState::eScissor
+    };
+
+    vk::PipelineDynamicStateCreateInfo dynamic_state_create_info = {
+        .dynamicStateCount = static_cast<RkUint32>(dynamic_states.size()),
+        .pDynamicStates    = dynamic_states.data()
+    };
+
+    vk::GraphicsPipelineCreateInfo pipeline_info = {
+        .stageCount = static_cast<RkUint32>(shader_stages.size()),
+        .pStages = shader_stages.data(),
+        .pVertexInputState = &vertex_input_state,
+        .pInputAssemblyState = &input_assembly_state,
+        .pViewportState = &viewport_state,
+        .pRasterizationState = &rasterization_state,
+        .pMultisampleState = &multisample_state,
+        .pDepthStencilState = &depth_stencil_state,
+        .pColorBlendState = &color_blend_state,
+        .pDynamicState = &dynamic_state_create_info,
+        .layout = pipeline_layout,
+        .renderPass = render_pass,
+        .subpass = 0
+    };
+
+    pipeline = m_device->GetLogicalDevice().createGraphicsPipeline(VK_NULL_HANDLE, pipeline_info).value;
+
+    vk::CommandPoolCreateInfo command_pool_info = {
+        .flags            = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+        .queueFamilyIndex = 0U
+    };
+
+    command_pool = m_device->GetLogicalDevice().createCommandPool(command_pool_info).value;
+
+    RUKEN_SAFE_LOGGER_CALL(m_logger, Info("Renderer initialized."))
 }
 
 Renderer::~Renderer() noexcept
 {
-    if (m_device)
-        m_device->WaitIdle();
+    m_render_windows.clear();
 
-    m_render_contexts .clear();
-    m_device_allocator.reset();
-    m_device          .reset();
-    m_physical_device .reset();
-    m_instance        .reset();
+    m_device->GetLogicalDevice().destroy(descriptor_set_layout);
+    m_device->GetLogicalDevice().destroy(pipeline);
+    m_device->GetLogicalDevice().destroy(pipeline_layout);
+    m_device->GetLogicalDevice().destroy(render_pass);
 
-    if (m_logger)
-        m_logger->Info("Renderer shutdown.");
+    m_device .reset();
+    m_context.reset();
+
+    RUKEN_SAFE_LOGGER_CALL(m_logger, Info("Renderer shutdown."))
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-RkVoid Renderer::MakeContext(Window& in_window) noexcept
+void Renderer::OnWindowCreated(Window& in_window)
 {
-    m_render_contexts.emplace_back(*this, *m_scheduler, in_window);
+    m_render_windows.emplace_back(in_window, m_context.get(), m_device.get(), m_logger);
 }
 
-VulkanInstance& Renderer::GetInstance() const noexcept
+void Renderer::OnWindowDestroyed(Window& in_window)
 {
-    return *m_instance;
+    for (auto it = m_render_windows.cbegin(); it != m_render_windows.cend(); ++it)
+    {
+        if (!it->IsValid())
+            m_render_windows.erase(it);
+    }
 }
 
-VulkanPhysicalDevice& Renderer::GetPhysicalDevice() const noexcept
+RkVoid Renderer::Update()
 {
-    return *m_physical_device;
+    for (auto& render_window : m_render_windows)
+    {
+        render_window.Begin();
+        render_window.Render();
+        render_window.End();
+    }
 }
 
-VulkanDevice& Renderer::GetDevice() const noexcept
+RenderContext const* Renderer::GetContext() const noexcept
 {
-    return *m_device;
+    return m_context.get();
 }
 
-VulkanDeviceAllocator& Renderer::GetDeviceAllocator() const noexcept
+RenderDevice const* Renderer::GetDevice() const noexcept
 {
-    return *m_device_allocator;
+    return m_device.get();
 }
 
 #pragma endregion

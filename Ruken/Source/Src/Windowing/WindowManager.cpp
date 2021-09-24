@@ -1,8 +1,6 @@
 
 #include "Windowing/WindowManager.hpp"
 
-#include <GLFW/glfw3.h>
-
 #include "Core/Kernel.hpp"
 #include "Core/KernelProxy.hpp"
 
@@ -75,7 +73,7 @@ RkVoid WindowManager::Update() const noexcept
 
 Window& WindowManager::CreateWindow(WindowParams const& in_params) noexcept
 {
-    Window window(m_logger, in_params);
+    Window window(in_params, m_logger);
 
     auto& new_window = m_windows.emplace_back(std::move(window));
 
@@ -86,7 +84,7 @@ Window& WindowManager::CreateWindow(WindowParams const& in_params) noexcept
 
 RkVoid WindowManager::DestroyWindow(Window const& in_window) noexcept
 {
-    auto const it = std::find(m_windows.cbegin(), m_windows.cend(), in_window);
+    auto const it = std::ranges::find(std::as_const(m_windows), in_window);
 
     if (it != m_windows.cend())
         m_windows.erase(it);

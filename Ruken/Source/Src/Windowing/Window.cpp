@@ -1,24 +1,17 @@
 
 #include "Windowing/Window.hpp"
 
-#ifdef RUKEN_OS_WINDOWS
-    #define GLFW_EXPOSE_NATIVE_WIN32
-#endif
-
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-
-#undef CreateWindow
-
 #include "Debug/Logging/Logger.hpp"
+
+#include "Rendering/RenderContext.hpp"
 
 USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-Window::Window(Logger* in_logger, WindowParams const& in_params) noexcept:
-    m_logger    {in_logger},
-    m_name      {in_params.name}
+Window::Window(WindowParams const& in_params, Logger* in_logger) noexcept:
+    m_logger  {in_logger},
+    m_name    {in_params.name}
 {
     CreateWindow  (in_params);
     SetupCallbacks();
@@ -45,10 +38,8 @@ Window::Window(Window&& in_move) noexcept:
 
 Window::~Window() noexcept
 {
-    if (!m_handle)
-        return;
-
-    glfwDestroyWindow(m_handle);
+    if (m_handle)
+        glfwDestroyWindow(m_handle);
 }
 
 #pragma endregion
@@ -409,15 +400,6 @@ RkBool Window::IsValid() const noexcept
 {
     return m_handle != nullptr;
 }
-
-#ifdef RUKEN_OS_WINDOWS
-
-HWND Window::GetWin32Window() const noexcept
-{
-    return glfwGetWin32Window(m_handle);
-}
-
-#endif
 
 #pragma endregion
 

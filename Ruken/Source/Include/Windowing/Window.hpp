@@ -2,22 +2,20 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Build/OperatingSystem.hpp"
 
 #include "Functional/Event.hpp"
 
 #include "Windowing/Utilities.hpp"
 #include "Windowing/WindowParams.hpp"
 
-#ifdef RUKEN_OS_WINDOWS
-    typedef struct HWND__* HWND;
-#endif
+#define GLFW_INCLUDE_NONE
 
-struct GLFWwindow;
+#include <GLFW/glfw3.h>
 
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
+class RenderContext;
 
 /**
  * \brief Manages a GLFW window.
@@ -33,15 +31,16 @@ class Window
 
         #pragma region Members
 
-        Logger*     m_logger {nullptr};
-        GLFWwindow* m_handle {nullptr};
-        std::string m_name   {};
+        Logger* m_logger  {nullptr};
+
+        GLFWwindow*    m_handle  {nullptr};
+        std::string    m_name    {};
 
         #pragma endregion
 
         #pragma region Constructors
 
-        explicit Window(Logger* in_logger, WindowParams const& in_params) noexcept;
+        explicit Window(WindowParams const& in_params, Logger* in_logger = nullptr) noexcept;
 
         #pragma endregion
 
@@ -261,8 +260,11 @@ class Window
 
         #pragma region Getters
 
-        [[nodiscard]] GLFWwindow*        GetHandle() const noexcept;
-        [[nodiscard]] std::string const& GetName  () const noexcept;
+        [[nodiscard]]
+        GLFWwindow* GetHandle() const noexcept;
+
+        [[nodiscard]]
+        std::string const& GetName() const noexcept;
 
         /**
          * \return The value of the close flag of the window. 
@@ -387,15 +389,6 @@ class Window
          */
         [[nodiscard]]
         RkBool IsValid() const noexcept;
-
-        #ifdef RUKEN_OS_WINDOWS
-
-        /**
-         * \return The HWND of the specified window, or NULL if an error occurred.
-         */
-        HWND GetWin32Window() const noexcept;
-
-        #endif
 
         #pragma endregion
 

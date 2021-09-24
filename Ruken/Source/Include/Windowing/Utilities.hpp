@@ -1,8 +1,6 @@
 ﻿
 #pragma once
 
-#define GLFW_INCLUDE_NONE
-
 #include <string>
 
 #include "Types/FundamentalTypes.hpp"

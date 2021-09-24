@@ -1,23 +1,20 @@
 
 #pragma once
 
-#include <vector>
-
 #include "Meta/Meta.hpp"
+
 #include "Core/Service.hpp"
 
 #include "Rendering/RenderContext.hpp"
-
-#include "Vulkan/Core/VulkanDevice.hpp"
-#include "Vulkan/Core/VulkanInstance.hpp"
-#include "Vulkan/Core/VulkanPhysicalDevice.hpp"
-#include "Vulkan/Utilities/VulkanDeviceAllocator.hpp"
+#include "Rendering/RenderDevice.hpp"
+#include "Rendering/RenderWindow.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 class Window;
-class Scheduler;
+
+
 
 class Renderer final : public Service<Renderer>
 {
@@ -25,24 +22,29 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Members
 
-        Logger*    m_logger    {nullptr};
-        Scheduler* m_scheduler {nullptr};
+        Logger* m_logger {nullptr};
 
-        std::unique_ptr<VulkanInstance>        m_instance         {};
-        std::unique_ptr<VulkanPhysicalDevice>  m_physical_device  {};
-        std::unique_ptr<VulkanDevice>          m_device           {};
-        std::unique_ptr<VulkanDeviceAllocator> m_device_allocator {};
-        std::vector    <RenderContext>         m_render_contexts  {};
+        std::unique_ptr<RenderContext> m_context;
+        std::unique_ptr<RenderDevice>  m_device;
+
+        std::vector<RenderWindow> m_render_windows;
 
         #pragma endregion
 
         #pragma region Methods
 
-        RkVoid MakeContext(Window& in_window) noexcept;
+        void OnWindowCreated  (Window& in_window);
+        void OnWindowDestroyed(Window& in_window);
 
         #pragma endregion
 
     public:
+
+        static vk::RenderPass render_pass;
+        static vk::Pipeline pipeline;
+        static vk::PipelineLayout pipeline_layout;
+        static vk::DescriptorSetLayout descriptor_set_layout;
+        static vk::CommandPool command_pool;
 
         #pragma region Members
 
@@ -57,16 +59,17 @@ class Renderer final : public Service<Renderer>
 
         Renderer(Renderer const& in_copy) = delete;
         Renderer(Renderer&&      in_move) = delete;
-        ~Renderer() noexcept;
+
+        ~Renderer() noexcept override;
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]] VulkanInstance&        GetInstance       () const noexcept;
-        [[nodiscard]] VulkanPhysicalDevice&  GetPhysicalDevice () const noexcept;
-        [[nodiscard]] VulkanDevice&          GetDevice         () const noexcept;
-        [[nodiscard]] VulkanDeviceAllocator& GetDeviceAllocator() const noexcept;
+        RkVoid Update();
+
+        RenderContext const* GetContext() const noexcept;
+        RenderDevice  const* GetDevice () const noexcept;
 
         #pragma endregion
 

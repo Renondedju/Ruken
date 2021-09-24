@@ -1,33 +1,27 @@
-﻿
 #pragma once
 
-#include <memory>
-#include <vector>
-
-#include "Vulkan/FencePool.hpp"
-#include "Vulkan/SemaphorePool.hpp"
-#include "Vulkan/CommandPool.hpp"
-
-#include "Rendering/RenderView.hpp"
-#include "Rendering/RenderTarget.hpp"
+#include "Rendering/Resources/Texture.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class Renderer;
-class Scheduler;
+class Logger;
+class RenderDevice;
 
 class RenderFrame
 {
+    friend class RenderWindow;
+
     private:
 
         #pragma region Members
 
-        std::unique_ptr<FencePool>     m_fence_pool;
-        std::unique_ptr<SemaphorePool> m_semaphore_pool;
-        std::unique_ptr<CommandPool>   m_graphics_command_pool;
-        std::unique_ptr<CommandPool>   m_compute_command_pool;
-        std::unique_ptr<RenderTarget>  m_render_target;
-        std::vector    <RenderView>    m_render_views;
+        Logger*       m_logger;
+        RenderDevice* m_device;
+
+        vk::CommandBuffer m_command_buffer;
+        vk::Fence         m_fence;
+        vk::Semaphore     m_image_semaphore;
+        vk::Semaphore     m_present_semaphore;
 
         #pragma endregion
 
@@ -35,32 +29,25 @@ class RenderFrame
 
         #pragma region Constructors
 
-        RenderFrame(Renderer& in_renderer, Scheduler& in_scheduler) noexcept;
+        RenderFrame(RenderDevice* in_device, Logger* in_logger = nullptr) noexcept;
 
         RenderFrame(RenderFrame const& in_copy) = delete;
-        RenderFrame(RenderFrame&&      in_move) noexcept;
+        RenderFrame(RenderFrame&&      in_move) = default;
 
-        ~RenderFrame() = default;
+        ~RenderFrame() noexcept;
 
         #pragma endregion
 
         #pragma region Methods
 
-        [[nodiscard]]
-        RkBool Reset() noexcept;
 
-        [[nodiscard]] FencePool&     GetFencePool          () const noexcept;
-        [[nodiscard]] SemaphorePool& GetSemaphorePool      () const noexcept;
-        [[nodiscard]] CommandPool&   GetGraphicsCommandPool() const noexcept;
-        [[nodiscard]] CommandPool&   GetComputeCommandPool () const noexcept;
-        [[nodiscard]] RenderTarget&  GetRenderTarget       () const noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
         RenderFrame& operator=(RenderFrame const& in_copy) = delete;
-        RenderFrame& operator=(RenderFrame&&      in_move) = delete;
+        RenderFrame& operator=(RenderFrame&&      in_move) = default;
 
         #pragma endregion
 };
