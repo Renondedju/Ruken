@@ -212,6 +212,8 @@
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
     <ClInclude Include="Source\Include\Threading\Job.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\StrongType.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
@@ -337,6 +339,7 @@
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
     <None Include="Source\Src\Threading\Worker.inl" />
+    <None Include="Source\Src\Types\StrongType\StrongType.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
