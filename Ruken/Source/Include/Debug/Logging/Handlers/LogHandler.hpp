@@ -33,7 +33,7 @@ class __declspec(novtable) LogHandler
         LogHandler(LogHandler const& in_copy) = delete;
         LogHandler(LogHandler&&      in_move) = delete;
 
-        virtual ~LogHandler() = default;
+        virtual ~LogHandler() = 0;
 
         #pragma endregion
 
@@ -55,5 +55,7 @@ class __declspec(novtable) LogHandler
 
         #pragma endregion
 };
+
+inline LogHandler::~LogHandler() = default;
 
 END_RUKEN_NAMESPACE

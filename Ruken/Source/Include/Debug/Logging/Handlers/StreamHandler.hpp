@@ -29,7 +29,7 @@ class StreamHandler : public LogHandler
         StreamHandler(StreamHandler const& in_copy) = delete;
         StreamHandler(StreamHandler&&      in_move) = delete;
 
-        ~StreamHandler() = default;
+        ~StreamHandler() override;
 
         #pragma endregion
 
@@ -39,7 +39,7 @@ class StreamHandler : public LogHandler
          * \brief Empties the entire queue to the stream.
          * \note  This method must not be called on multiple threads at a time.
          */
-        RkVoid Flush() override;
+        RkVoid Flush() final;
 
         #pragma endregion
 

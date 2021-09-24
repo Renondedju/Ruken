@@ -49,12 +49,6 @@ Kernel::Kernel()
     m_console_handler.Flush();
 }
 
-Kernel::~Kernel()
-{
-    // Flushing the console handler one last time to make sure every log has been displayed
-    m_console_handler.Flush();
-}
-
 RkInt Kernel::Run() noexcept
 {
     // If some required service failed to be initialized
@@ -63,7 +57,9 @@ RkInt Kernel::Run() noexcept
         return m_exit_code;
 
     auto& window_manager = *m_service_provider.LocateService<WindowManager>();
-    auto& window         = window_manager.CreateWindow({
+    auto& renderer = *m_service_provider.LocateService<Renderer>();
+
+    auto& window = window_manager.CreateWindow({
         .name = RUKEN_PROJECT_NAME,
         .size = {
             .width  = 1600,
@@ -76,6 +72,7 @@ RkInt Kernel::Run() noexcept
     {
         // Updating services that needs to
         window_manager.Update();
+        renderer.Update();
 
         if (window.ShouldClose())
             RequestShutdown(0);

@@ -29,12 +29,12 @@ class Kernel
 
         #pragma region Members
 
-        ServiceProvider m_service_provider {};
-
         Logger*             m_logger             {nullptr};
         RkInt               m_exit_code          {0};
         ConsoleHandler      m_console_handler    {};
         std::atomic<RkBool> m_shutdown_requested {false};
+
+        ServiceProvider m_service_provider {};
 
         #pragma endregion
 
@@ -45,7 +45,8 @@ class Kernel
         Kernel();
         Kernel(Kernel const& in_copy) = delete;
         Kernel(Kernel&& in_move)      = delete;
-        ~Kernel();
+
+        ~Kernel() = default;
 
         #pragma endregion
 

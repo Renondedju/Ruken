@@ -12,6 +12,11 @@ StreamHandler::StreamHandler(LogFormatter const& in_formatter, std::ostream cons
 
 }
 
+StreamHandler::~StreamHandler()
+{
+    Flush();
+}
+
 #pragma endregion
 
 #pragma region Methods

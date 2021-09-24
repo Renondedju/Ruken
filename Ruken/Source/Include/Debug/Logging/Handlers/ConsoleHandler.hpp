@@ -38,7 +38,7 @@ class ConsoleHandler final : public StreamHandler
         ConsoleHandler(ConsoleHandler const& in_copy) = delete;
         ConsoleHandler(ConsoleHandler&&      in_move) = delete;
 
-        ~ConsoleHandler() = default;
+        ~ConsoleHandler() override = default;
 
         #pragma endregion
 
