@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
     <ClInclude Include="Source\Include\Core\Kernel.hpp" />
     <ClInclude Include="Source\Include\Core\KernelProxy.hpp" />
+    <ClInclude Include="Source\Include\Maths\Constants.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\BaseVector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector2.hpp" />
