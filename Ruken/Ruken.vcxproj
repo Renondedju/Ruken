@@ -231,6 +231,14 @@
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\Or.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\RightShift.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\Xor.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Equal.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Greater.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\GreaterEqual.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Less.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\LessEqual.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\NotEqual.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Spaceship.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalAnd.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalNot.hpp" />
