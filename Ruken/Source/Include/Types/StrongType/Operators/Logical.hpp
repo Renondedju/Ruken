@@ -32,8 +32,8 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common logical operators
- * \tparam TStrongType Base NamedType
- * \see NamedType
+ * \tparam TStrongType Base StrongType
+ * \see StrongType
  */
 template <typename TStrongType>
 struct Logical: LogicalOr <TStrongType>,

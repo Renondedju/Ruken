@@ -35,8 +35,8 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common bitwise operators
- * \tparam TStrongType Base NamedType
- * \see NamedType
+ * \tparam TStrongType Base StrongType
+ * \see StrongType
  */
 template <typename TStrongType>
 struct Bitwise: Or        <TStrongType>,

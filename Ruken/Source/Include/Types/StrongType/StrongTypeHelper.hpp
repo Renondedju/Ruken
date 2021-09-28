@@ -52,7 +52,7 @@ class StrongTypeHelper
          * This methods avoids the issue of ill-formed types.
          * 
          * \see This wonderful article, where everything is nicely explained : https://foonathan.net/blog/2016/10/19/strong-typedefs.html
-         * \tparam TStrongType Base type of the NamedType
+         * \tparam TStrongType Base type of the StrongType
          */
         template <typename TStrongType>
         using UnderlyingType = decltype(UnderlyingTypeImpl(std::declval<TStrongType>()));

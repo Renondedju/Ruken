@@ -38,8 +38,8 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common arithmetic operators
- * \tparam TStrongType Base NamedType
- * \see NamedType
+ * \tparam TStrongType Base StrongType
+ * \see StrongType
  */
 template <typename TStrongType>
 struct Arithmetic: Modulo        <TStrongType>,

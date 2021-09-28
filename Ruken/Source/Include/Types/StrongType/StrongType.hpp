@@ -36,14 +36,14 @@ BEGIN_RUKEN_NAMESPACE
  * 
  * Every method is constexpr and noexcept if the base type is noexcept as well
  * 
- * To create a "complex" NamedType, simply inherit from this class and overload all the required operators.
+ * To create a "complex" StrongType, simply inherit from this class and overload all the required operators.
  * Do note that every operator class like Addition or Modulo, can also be inherited to save you some time.
  * 
  * Example :
  * 
  * // This class is strongly typed and only has the addition and subtraction operators available
- * struct Meter : NamedType<float, Meter>, Addition<Meter>, Subtraction<Meter>
- * { using NamedType::NamedType };
+ * struct Meter : StrongType<float, Meter>, Addition<Meter>, Subtraction<Meter>
+ * { using StrongType::StrongType };
  * 
  * \tparam TBase Base type, could be any fundamental type
  * \tparam TUniquePhantom Phantom type, this should be unique for each type

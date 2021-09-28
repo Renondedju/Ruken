@@ -32,12 +32,12 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief Bitwise AND operator class
  * 
- * This class is meant to be used in conjunction with the NamedType class.
+ * This class is meant to be used in conjunction with the StrongType class.
  * This allows for better and quicker operator integrations to named types.
  * 
- * \tparam TStrongType Base NamedType
+ * \tparam TStrongType Base StrongType
  *
- * \see NamedType
+ * \see StrongType
  */
 template <typename TStrongType>
 class And

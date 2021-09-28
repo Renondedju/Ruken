@@ -32,7 +32,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief Addition operator class
  * 
- * This class is meant to be used in conjunction with the NamedType class.
+ * This class is meant to be used in conjunction with the StrongType class.
  * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongType Base StrongType
