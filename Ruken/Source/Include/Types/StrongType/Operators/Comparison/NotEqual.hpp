@@ -56,7 +56,7 @@ struct NotEqual
          *
          * \return True if the left operand is not equal to the right operand, false otherwise.
          */
-        friend constexpr bool operator<=(TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
+        friend constexpr bool operator!=(TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
         {
             return static_cast<Type const&>(in_lhs) != static_cast<Type const&>(in_rhs);
         }
