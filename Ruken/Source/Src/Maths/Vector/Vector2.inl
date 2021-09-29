@@ -35,7 +35,7 @@ constexpr Vector2<TType>::Vector2(TType const in_x, TType const in_y) noexcept:
 template <ArithmeticType TType>
 constexpr Vector2<TType>::Vector2(BaseVector<Vector2<TType>, 2UI64, TType> const& in_copy) noexcept
 {
-    *this = static_cast<Vector2>(in_copy);
+    *this = static_cast<Vector2 const&>(in_copy);
 }
 
 template <ArithmeticType TType>
