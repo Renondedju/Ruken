@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Build/Namespace.hpp"
 #include "Types/Concepts/FundamentalType.hpp"
 
@@ -68,9 +66,10 @@ class StrongType
         explicit constexpr StrongType(TBase const& in_copy) noexcept;
         explicit constexpr StrongType(TBase&&      in_move) noexcept;
 
-        explicit constexpr StrongType (StrongType const& in_copy) = default;
-        explicit constexpr StrongType (StrongType&&      in_move) = default;
-                           ~StrongType()                          = default;
+        constexpr StrongType()                           = default;
+        constexpr StrongType (StrongType const& in_copy) = default;
+        constexpr StrongType (StrongType&&      in_move) = default;
+                 ~StrongType()                           = default;
 
         #pragma endregion
 

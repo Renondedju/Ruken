@@ -26,7 +26,6 @@
 #pragma once
 
 #include "Types/StrongType/StrongType.hpp"
-#include "Types/Concepts/FundamentalType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -38,8 +37,8 @@ class StrongTypeHelper
      * \tparam TUniquePhantomType Phantom type of the StrongType
      * \return Base type of the StrongType
      */
-    template <FundamentalType TBaseType, typename TUniquePhantomType>
-    constexpr TBaseType UnderlyingTypeImpl(ruken::StrongType<TBaseType, TUniquePhantomType>);
+    template <typename TBaseType, typename TUniquePhantomType>
+    static constexpr TBaseType UnderlyingTypeImpl(StrongType<TBaseType, TUniquePhantomType>);
 
     public:
 
