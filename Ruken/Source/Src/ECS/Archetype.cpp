@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-#include <Common/Numerics.hpp>
+#include "Maths/MinMax.hpp"
 
 #include "ECS/Range.hpp"
 #include "ECS/Archetype.hpp"
