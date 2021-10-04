@@ -202,6 +202,7 @@
     <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
     <ClInclude Include="Source\Include\Maths\Utility.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\BaseVector.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\GenericVector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector2.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector3.hpp" />
