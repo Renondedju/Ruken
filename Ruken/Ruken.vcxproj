@@ -188,6 +188,15 @@
     <ClInclude Include="Source\Include\Maths\Constants.hpp" />
     <ClInclude Include="Source\Include\Maths\Easing.hpp" />
     <ClInclude Include="Source\Include\Maths\Math.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\GenericMatrix.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix1X4.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix2X2.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix3X3.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix3X4.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix4X1.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix4X3.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix4X4.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\SquareMatrix.hpp" />
     <ClInclude Include="Source\Include\Maths\MinMax.hpp" />
     <ClInclude Include="Source\Include\Maths\Quaternion\Quaternion.hpp" />
     <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
@@ -371,6 +380,8 @@
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
     <None Include="Source\Src\Maths\Easing.inl" />
+    <None Include="Source\Src\Maths\Matrix\GenericMatrix.inl" />
+    <None Include="Source\Src\Maths\Matrix\SquareMatrix.inl" />
     <None Include="Source\Src\Maths\MinMax.inl" />
     <None Include="Source\Src\Maths\Trigonometry.inl" />
     <None Include="Source\Src\Maths\Utility.inl" />
@@ -397,6 +408,7 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Maths\Matrix\Matrix4X4.cpp" />
     <ClCompile Include="Source\Src\Maths\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Source\Src\Maths\Vector\Vector2.cpp" />
     <ClCompile Include="Source\Src\Maths\Vector\Vector3.cpp" />
