@@ -248,6 +248,9 @@
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalAnd.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalNot.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalOr.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream\InputStream.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream\OutputStream.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongType.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\Angle.hpp" />

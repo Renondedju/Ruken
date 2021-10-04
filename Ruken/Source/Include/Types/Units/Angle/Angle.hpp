@@ -27,6 +27,7 @@
 #include "Types/StrongType/StrongType.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
 #include "Types/StrongType/Operators/Comparison.hpp"
+#include "Types/StrongType/Operators/Stream.hpp"
 
 #include "Maths/Constants.hpp"
 #include "Types/Units/Angle/EAngleUnit.hpp"
@@ -40,7 +41,8 @@ BEGIN_RUKEN_NAMESPACE
 template<EAngleUnit TUnitType>
 class Angle final: public StrongType<RkFloat, struct AnglePhantom>,
                    public Arithmetic<Angle<TUnitType>>,
-                   public Comparison<Angle<TUnitType>>
+                   public Comparison<Angle<TUnitType>>,
+                   public Stream    <Angle<TUnitType>>
 {
     public:
 
@@ -62,17 +64,15 @@ class Angle final: public StrongType<RkFloat, struct AnglePhantom>,
 
         /**
          * \brief Degree angle conversion
-         * \tparam TOtherType New precision
          */
         [[nodiscard]]
-        explicit constexpr operator Angle<EAngleUnit::Degree>() const noexcept;
+        constexpr operator Angle<EAngleUnit::Degree>() const noexcept;
 
         /**
          * \brief Radian angle conversion
-         * \tparam TOtherType New precision
          */
         [[nodiscard]]
-        explicit constexpr operator Angle<EAngleUnit::Radian>() const noexcept;
+        constexpr operator Angle<EAngleUnit::Radian>() const noexcept;
 
         #pragma endregion
 };

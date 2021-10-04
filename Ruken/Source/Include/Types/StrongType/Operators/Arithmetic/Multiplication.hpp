@@ -36,10 +36,11 @@ BEGIN_RUKEN_NAMESPACE
  * This allows for better and quicker operator integrations to named types.
  * 
  * \tparam TStrongType Base StrongType
+ * \tparam TAllowUnderlyingCooperation If set to true, the operators will also work directly with the underlying type. Defaults to false
  *
  * \see StrongType
  */
-template <typename TStrongType>
+template <typename TStrongType, RkBool TAllowUnderlyingCooperation = true>
 class Multiplication
 {
     using Type = StrongTypeHelper::UnderlyingType<TStrongType>;
@@ -64,6 +65,22 @@ class Multiplication
         }
 
         /**
+         * \brief Multiplication assignment operator
+         *
+         * \param in_lhs Left-hand side operand
+         * \param in_rhs Right-hand side operand
+         *
+         * \return Reference to the instance
+         */
+        template<std::enable_if_t<TAllowUnderlyingCooperation, RkBool> = true>
+        friend constexpr TStrongType& operator*=(TStrongType& in_lhs, Type const& in_rhs) noexcept
+        {
+            static_cast<Type&>(in_lhs) /= in_rhs;
+
+            return in_lhs;
+        }
+
+        /**
          * \brief Multiplication operator
          *
          * \param in_lhs Left-hand side operand
@@ -74,6 +91,34 @@ class Multiplication
         friend constexpr TStrongType operator*(TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
         {
             return TStrongType(static_cast<Type const&>(in_lhs) * static_cast<Type const&>(in_rhs));
+        }
+
+        /**
+         * \brief Multiplication operator
+         *
+         * \param in_lhs Left-hand side operand
+         * \param in_rhs Right-hand side operand
+         *
+         * \return Value of the new instance
+         */
+        template<std::enable_if_t<TAllowUnderlyingCooperation, RkBool> = true>
+        friend constexpr TStrongType operator*(TStrongType const& in_lhs, Type const& in_rhs) noexcept
+        {
+            return TStrongType(static_cast<Type const&>(in_lhs) * in_rhs);
+        }
+
+        /**
+         * \brief Multiplication operator
+         *
+         * \param in_lhs Left-hand side operand
+         * \param in_rhs Right-hand side operand
+         *
+         * \return Value of the new instance
+         */
+        template<std::enable_if_t<TAllowUnderlyingCooperation, RkBool> = true>
+        friend constexpr TStrongType operator*(Type const& in_lhs, TStrongType const& in_rhs) noexcept
+        {
+            return TStrongType(in_lhs * static_cast<Type const&>(in_rhs));
         }
 
         #pragma endregion
