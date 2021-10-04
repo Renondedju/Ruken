@@ -26,33 +26,16 @@
 
 #pragma region Operators
 
-// For some reason, MSVC considers that if this if constexpr is never used, the following return statement is unreachable code
-#pragma warning(push)
-#pragma warning(disable : 4702) // Unreachable code
-
-template <EAngleUnit TUnitType, ArithmeticType TType>
-template <ArithmeticType TOtherType>
-constexpr Angle<TUnitType, TType>::operator Angle<EAngleUnit::Degree, TOtherType>() const noexcept
+template <EAngleUnit TUnitType>
+constexpr Angle<TUnitType>::operator Angle<EAngleUnit::Degree>() const noexcept
 {
-    TOtherType value = static_cast<TOtherType>(*this);
-
-    if constexpr (TUnitType == EAngleUnit::Radian)
-        return Angle<EAngleUnit::Degree, TOtherType>(value * static_cast<TOtherType>(180.0 / g_pi));
-
-    return Angle<EAngleUnit::Degree, TOtherType>(value);
+    return Angle<EAngleUnit::Degree>(static_cast<UnderlyingType>(*this) * 180.0F / g_pi);
 }
 
-template <EAngleUnit TUnitType, ArithmeticType TType>
-template <ArithmeticType TOtherType>
-constexpr Angle<TUnitType, TType>::operator Angle<EAngleUnit::Radian, TOtherType>() const noexcept
+template <EAngleUnit TUnitType>
+constexpr Angle<TUnitType>::operator Angle<EAngleUnit::Radian>() const noexcept
 {
-    TOtherType value = static_cast<TOtherType>(*this);
-
-    if constexpr (TUnitType == EAngleUnit::Degree)
-        return Angle<EAngleUnit::Radian, TOtherType>(value * static_cast<TOtherType>(g_pi / 180.0F));
-
-    return Angle<EAngleUnit::Radian, TOtherType>(value);
+    return Angle<EAngleUnit::Radian>(static_cast<UnderlyingType>(*this) * g_pi / 180.0F);
 }
 
-#pragma warning(pop)
 #pragma endregion

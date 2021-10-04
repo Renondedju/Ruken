@@ -30,25 +30,23 @@
 
 #include "Maths/Constants.hpp"
 #include "Types/Units/Angle/EAngleUnit.hpp"
-#include "Types/Concepts/ArithmeticType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Strongly typed angle type
  * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
- * \tparam TType Underlying type of the angle, defaults to RkFloat
  */
-template<EAngleUnit TUnitType, ArithmeticType TType = RkFloat>
-class Angle final: public StrongType<TType, struct AnglePhantom>,
-                   public Arithmetic<Angle<TUnitType, TType>>,
-                   public Comparison<Angle<TUnitType, TType>>
+template<EAngleUnit TUnitType>
+class Angle final: public StrongType<RkFloat, struct AnglePhantom>,
+                   public Arithmetic<Angle<TUnitType>>,
+                   public Comparison<Angle<TUnitType>>
 {
     public:
 
         #pragma region Constructors
 
-        using StrongType<TType, struct AnglePhantom>::StrongType;
+        using StrongType<RkFloat, struct AnglePhantom>::StrongType;
 
         constexpr Angle()                     = default;
         constexpr Angle(Angle const& in_copy) = default;
@@ -66,17 +64,15 @@ class Angle final: public StrongType<TType, struct AnglePhantom>,
          * \brief Degree angle conversion
          * \tparam TOtherType New precision
          */
-        template <ArithmeticType TOtherType>
         [[nodiscard]]
-        explicit constexpr operator Angle<EAngleUnit::Degree, TOtherType>() const noexcept;
+        explicit constexpr operator Angle<EAngleUnit::Degree>() const noexcept;
 
         /**
          * \brief Radian angle conversion
          * \tparam TOtherType New precision
          */
-        template <ArithmeticType TOtherType>
         [[nodiscard]]
-        explicit constexpr operator Angle<EAngleUnit::Radian, TOtherType>() const noexcept;
+        explicit constexpr operator Angle<EAngleUnit::Radian>() const noexcept;
 
         #pragma endregion
 };

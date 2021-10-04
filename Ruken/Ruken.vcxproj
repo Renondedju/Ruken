@@ -186,6 +186,11 @@
     <ClInclude Include="Source\Include\Core\Kernel.hpp" />
     <ClInclude Include="Source\Include\Core\KernelProxy.hpp" />
     <ClInclude Include="Source\Include\Maths\Constants.hpp" />
+    <ClInclude Include="Source\Include\Maths\Easing.hpp" />
+    <ClInclude Include="Source\Include\Maths\Math.hpp" />
+    <ClInclude Include="Source\Include\Maths\MinMax.hpp" />
+    <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
+    <ClInclude Include="Source\Include\Maths\Utility.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\BaseVector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector2.hpp" />
@@ -319,6 +324,7 @@
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDeviceAllocator.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanShaderModule.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
+    <ClInclude Include="Source\Src\Maths\Math.inl" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -360,6 +366,10 @@
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
+    <None Include="Source\Src\Maths\Easing.inl" />
+    <None Include="Source\Src\Maths\MinMax.inl" />
+    <None Include="Source\Src\Maths\Trigonometry.inl" />
+    <None Include="Source\Src\Maths\Utility.inl" />
     <None Include="Source\Src\Maths\Vector\BaseVector.inl" />
     <None Include="Source\Src\Maths\Vector\Vector2.inl" />
     <None Include="Source\Src\Maths\Vector\Vector2Cross.inl" />

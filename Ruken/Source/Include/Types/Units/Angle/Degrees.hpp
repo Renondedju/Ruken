@@ -28,11 +28,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template<ArithmeticType TType = RkFloat>
-using Degrees = Angle<EAngleUnit::Degree, TType>;
+using Degrees = Angle<EAngleUnit::Degree>;
 
-constexpr Degrees<RkFloat> operator"" _deg(RkLdouble in_angle) noexcept;
-constexpr Degrees<RkFloat> operator"" _deg(RkSize    in_angle) noexcept;
+constexpr Degrees operator"" _deg(RkLdouble in_angle) noexcept;
+constexpr Degrees operator"" _deg(RkSize    in_angle) noexcept;
 
 #include "Types/Units/Angle/Degrees.inl"
 

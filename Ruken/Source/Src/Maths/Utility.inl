@@ -24,12 +24,44 @@
 
 #pragma once
 
-constexpr Radians operator"" _rad(RkLdouble const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType Abs(TType in_value) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return (in_value < 0) ? -in_value : in_value;
 }
 
-constexpr Radians operator"" _rad(RkSize const in_angle) noexcept
+template <FloatingPointType TType>
+constexpr TType Ceil(TType in_value) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return static_cast<TType>(std::ceil(in_value));
+}
+
+template <ArithmeticType TType>
+constexpr TType Clamp(TType in_value, TType in_min, TType in_max) noexcept
+{
+    return (in_value < in_min) ? in_min : (in_value > in_max) ? in_max : in_value;
+}
+
+template <FloatingPointType TType>
+constexpr TType Clamp01(TType in_value) noexcept
+{
+    return (in_value < static_cast<TType>(0)) ? static_cast<TType>(0) : (in_value > static_cast<TType>(1)) ? static_cast<TType>(1) : in_value;
+}
+
+template <FloatingPointType TType>
+constexpr TType Round(TType in_value) noexcept
+{
+    return static_cast<TType>(std::round(in_value));
+}
+
+template <FloatingPointType TType>
+constexpr TType Floor(TType in_value) noexcept
+{
+    return static_cast<TType>(std::floor(in_value));
+}
+
+template <ArithmeticType TType>
+constexpr TType CopySign(TType in_value, TType in_sign) noexcept
+{
+    return static_cast<TType>(std::copysign(in_value, in_sign));
 }

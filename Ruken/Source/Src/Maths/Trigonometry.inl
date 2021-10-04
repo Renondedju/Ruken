@@ -24,12 +24,38 @@
 
 #pragma once
 
-constexpr Radians operator"" _rad(RkLdouble const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType Cos(Radians const in_angle) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return static_cast<TType>(std::cos(static_cast<TType>(in_angle)));
 }
 
-constexpr Radians operator"" _rad(RkSize const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType ArcCos(Radians const in_angle) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return static_cast<TType>(std::acos(static_cast<TType>(in_angle)));
+}
+
+template <ArithmeticType TType>
+constexpr TType Sin(Radians const in_angle) noexcept
+{
+    return static_cast<TType>(std::sin(static_cast<TType>(in_angle)));
+}
+
+template <ArithmeticType TType>
+constexpr TType ArcSin(Radians in_angle) noexcept
+{
+    return static_cast<TType>(std::asin(static_cast<TType>(in_angle)));
+}
+
+template <ArithmeticType TType>
+constexpr TType Tan(Radians const in_angle) noexcept
+{
+    return static_cast<TType>(std::tan(static_cast<TType>(in_angle)));
+}
+
+template <ArithmeticType TType>
+constexpr TType ArcTan(Radians in_angle) noexcept
+{
+    return static_cast<TType>(std::atan(static_cast<TType>(in_angle)));
 }

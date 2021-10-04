@@ -24,12 +24,12 @@
 
 #pragma once
 
-constexpr Degrees<RkFloat> operator"" _deg(RkLdouble const in_angle) noexcept
+constexpr Degrees operator"" _deg(RkLdouble const in_angle) noexcept
 {
-	return Degrees<RkFloat>(static_cast<RkFloat>(in_angle));
+	return Degrees(static_cast<RkFloat>(in_angle));
 }
 
-constexpr Degrees<RkFloat> operator"" _deg(RkSize const in_angle) noexcept
+constexpr Degrees operator"" _deg(RkSize const in_angle) noexcept
 {
-	return Degrees<RkFloat>(static_cast<RkFloat>(in_angle));
+	return Degrees(static_cast<RkFloat>(in_angle));
 }

@@ -24,12 +24,33 @@
 
 #pragma once
 
-constexpr Radians operator"" _rad(RkLdouble const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType Min(TType in_lhs, TType in_rhs) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return (in_lhs > in_rhs) ? in_rhs : in_lhs;
 }
 
-constexpr Radians operator"" _rad(RkSize const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType MinExceptZero(TType in_lhs, TType in_rhs) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    if (in_lhs == static_cast<TType>(0))
+        return in_rhs;
+
+    return Min<TType>(in_lhs, in_rhs);
+}
+
+template <ArithmeticType TType>
+constexpr TType MinExceptZero(std::initializer_list<TType> in_list) noexcept
+{
+    TType count = std::numeric_limits<TType>::max();
+    for (TType const& element: in_list)
+        count = MinExceptZero<TType>(count, element);
+
+    return count;
+}
+
+template <ArithmeticType TType>
+constexpr TType Max(TType in_lhs, TType in_rhs) noexcept
+{
+    return (in_lhs < in_rhs) ? in_rhs : in_lhs;
 }

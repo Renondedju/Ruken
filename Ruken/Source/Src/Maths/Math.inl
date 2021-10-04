@@ -24,12 +24,44 @@
 
 #pragma once
 
-constexpr Radians operator"" _rad(RkLdouble const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType Pow(TType in_value, TType in_exponent) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return static_cast<TType>(std::pow(in_value, in_exponent));
 }
 
-constexpr Radians operator"" _rad(RkSize const in_angle) noexcept
+template <ArithmeticType TType>
+constexpr TType Exp(TType in_value) noexcept
 {
-	return Radians(static_cast<RkFloat>(in_angle));
+    return static_cast<TType>(std::exp(in_value));
+}
+
+template <ArithmeticType TType>
+constexpr TType Exp2(TType in_value) noexcept
+{
+    return static_cast<TType>(std::exp2(in_value));
+}
+
+template <ArithmeticType TType>
+constexpr TType Mod(TType in_value, TType in_modulo) noexcept
+{
+    return static_cast<TType>(std::modf(in_value, &in_modulo));
+}
+
+template <ArithmeticType TType>
+constexpr TType Frac(TType in_value) noexcept
+{
+    return in_value - Floor<TType>(in_value);
+}
+
+template <ArithmeticType TType>
+constexpr TType Sqrt(TType in_value) noexcept
+{
+    return static_cast<TType>(std::sqrt(in_value));
+}
+
+template <ArithmeticType TType>
+constexpr TType InvSqrt(TType in_value) noexcept
+{
+    return static_cast<TType>(1) / Sqrt<TType>(in_value);
 }

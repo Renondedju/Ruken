@@ -28,11 +28,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template<ArithmeticType TType = RkFloat>
-using Radians = Angle<EAngleUnit::Radian, TType>;
+using Radians = Angle<EAngleUnit::Radian>;
 
-constexpr Radians<RkFloat> operator"" _rad(RkLdouble in_angle) noexcept;
-constexpr Radians<RkFloat> operator"" _rad(RkSize    in_angle) noexcept;
+constexpr Radians operator"" _rad(RkLdouble in_angle) noexcept;
+constexpr Radians operator"" _rad(RkSize    in_angle) noexcept;
 
 #include "Types/Units/Angle/Radians.inl"
 
