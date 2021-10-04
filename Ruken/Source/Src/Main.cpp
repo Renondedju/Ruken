@@ -22,23 +22,23 @@
  *  SOFTWARE.
  */
 
+#include <iostream>
+
 #include "Core/Kernel.hpp"
-#include "Maths/Vector/Vector.hpp"
+
+#include "Types/Units/Angle/Radians.hpp"
+#include "Types/Units/Angle/Degrees.hpp"
 
 USING_RUKEN_NAMESPACE
 
 int main()
 {
-    Vector2f vector2 {};
-    Vector3f vector3 {};
+    Radians angle = 180_deg / 2.0F;
 
-    vector2.x = 0.2F;
-    vector2.y = 0.4F;
+    std::cout << angle << std::endl;
+    std::cin >> angle;
 
-    vector2 = vector2 + vector2;
-    vector3 = static_cast<Vector3f>(vector2);
+    std::cout << angle << std::endl;
 
-    Kernel kernel;
-
-    return kernel.Run();
+    return 0;
 }

@@ -80,7 +80,7 @@ constexpr TType BaseVector<TDerived, TLength, TType>
     ::SqrLength() const noexcept
 {
     TDerived const& derived = static_cast<TDerived const&>(*this);
-    RkSize sqr_length = 0;
+    TType sqr_length = 0;
 
     for (RkSize i = 0; i < TLength; ++i)
         sqr_length += derived.data[i] * derived.data[i];

@@ -27,7 +27,7 @@
 #pragma region Operators
 
 template <ArithmeticType TType>
-constexpr                 Vector2<TType>::operator Vector3<TType>() const noexcept
+constexpr Vector2<TType>::operator Vector3<TType>() const noexcept
 {
     return Vector3<TType>(x, y, static_cast<TType>(0));
 }
