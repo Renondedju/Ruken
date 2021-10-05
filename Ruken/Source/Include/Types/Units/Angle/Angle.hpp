@@ -39,42 +39,40 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
  */
 template<EAngleUnit TUnitType>
-class Angle final: public StrongType<RkFloat, struct AnglePhantom>,
-                   public Arithmetic<Angle<TUnitType>>,
-                   public Comparison<Angle<TUnitType>>,
-                   public Stream    <Angle<TUnitType>>
+struct Angle final: StrongType<RkFloat, struct AnglePhantom>,
+                    Arithmetic<Angle<TUnitType>>,
+                    Comparison<Angle<TUnitType>>,
+                    Stream    <Angle<TUnitType>>
 {
-    public:
+    #pragma region Constructors
 
-        #pragma region Constructors
+    using StrongType<RkFloat, struct AnglePhantom>::StrongType;
 
-        using StrongType<RkFloat, struct AnglePhantom>::StrongType;
+    constexpr Angle()                     = default;
+    constexpr Angle(Angle const& in_copy) = default;
+    constexpr Angle(Angle&&      in_move) = default;
+             ~Angle()                     = default;
 
-        constexpr Angle()                     = default;
-        constexpr Angle(Angle const& in_copy) = default;
-        constexpr Angle(Angle&&      in_move) = default;
-                 ~Angle()                     = default;
+    #pragma endregion
 
-        #pragma endregion
+    #pragma region Operators
 
-        #pragma region Operators
+    constexpr Angle& operator=(Angle const& in_copy) = default;
+    constexpr Angle& operator=(Angle&&		in_move) = default;
 
-        constexpr Angle& operator=(Angle const& in_copy) = default;
-        constexpr Angle& operator=(Angle&&		in_move) = default;
+    /**
+     * \brief Degree angle conversion
+     */
+    [[nodiscard]]
+    constexpr operator Angle<EAngleUnit::Degree>() const noexcept;
 
-        /**
-         * \brief Degree angle conversion
-         */
-        [[nodiscard]]
-        constexpr operator Angle<EAngleUnit::Degree>() const noexcept;
+    /**
+     * \brief Radian angle conversion
+     */
+    [[nodiscard]]
+    constexpr operator Angle<EAngleUnit::Radian>() const noexcept;
 
-        /**
-         * \brief Radian angle conversion
-         */
-        [[nodiscard]]
-        constexpr operator Angle<EAngleUnit::Radian>() const noexcept;
-
-        #pragma endregion
+    #pragma endregion
 };
 
 #include "Types/Units/Angle/Angle.inl"
