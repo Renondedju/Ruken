@@ -44,7 +44,7 @@ constexpr Matrix4X4 Matrix4X4::TranslationMatrix(Vector3f const& in_translation)
                      0.0F,  0.0F,  0.0F,  1.0F); 
 }
 
-constexpr Matrix4X4 Matrix4X4::RotationMatrixX(Radians const in_angle) noexcept
+Matrix4X4 Matrix4X4::RotationMatrixX(Radians const in_angle) noexcept
 {
     RkFloat const cos = Cos(in_angle);
     RkFloat const sin = Sin(in_angle);
@@ -55,7 +55,7 @@ constexpr Matrix4X4 Matrix4X4::RotationMatrixX(Radians const in_angle) noexcept
                      0.0F,  0.0F,  0.0F,  1.0F); 
 }
 
-constexpr Matrix4X4 Matrix4X4::RotationMatrixY(Radians const in_angle) noexcept
+Matrix4X4 Matrix4X4::RotationMatrixY(Radians const in_angle) noexcept
 {
     RkFloat const cos = Cos(in_angle);
     RkFloat const sin = Sin(in_angle);
@@ -66,7 +66,7 @@ constexpr Matrix4X4 Matrix4X4::RotationMatrixY(Radians const in_angle) noexcept
                      0.0F,  0.0F,  0.0F,  1.0F); 
 }
 
-constexpr Matrix4X4 Matrix4X4::RotationMatrixZ(Radians const in_angle) noexcept
+Matrix4X4 Matrix4X4::RotationMatrixZ(Radians const in_angle) noexcept
 {
     RkFloat const cos = Cos(in_angle);
     RkFloat const sin = Sin(in_angle);
@@ -77,7 +77,7 @@ constexpr Matrix4X4 Matrix4X4::RotationMatrixZ(Radians const in_angle) noexcept
                      0.0F,  0.0F,  0.0F,  1.0F); 
 }
 
-constexpr Matrix4X4 Matrix4X4::RotationMatrix(
+Matrix4X4 Matrix4X4::RotationMatrix(
     Radians const in_angle_x,
     Radians const in_angle_y,
     Radians const in_angle_z) noexcept
@@ -93,17 +93,17 @@ constexpr Matrix4X4 Matrix4X4::ScaleMatrix(Vector3f const& in_scale) noexcept
                      0.0F      ,  0.0F      ,  0.0F      ,  1.0F); 
 }
 
-constexpr Matrix4X4 Matrix4X4::PerspectiveProjectionMatrix(Degrees const in_fov,
-                                                           RkFloat const in_aspect,
-                                                           RkFloat const in_near,
-                                                           RkFloat const in_far) noexcept
+Matrix4X4 Matrix4X4::PerspectiveProjectionMatrix(Degrees const in_fov,
+                                                 RkFloat const in_aspect,
+                                                 RkFloat const in_near,
+                                                 RkFloat const in_far) noexcept
 {
-    RkFloat const scale = 1.0F / Tan(static_cast<Radians>(in_fov / 2.0_deg));
+    RkFloat const scale = 1.0F / Tan(in_fov / 2.0F);
 
-    return Matrix4X4(scale / in_aspect,  0.0F , 0.0F                                   ,  0.0F,
-                     0.0F             , -scale, 0.0F                                   ,  0.0F,
-                     0.0F             ,  0.0F , in_far / (in_near - in_far)            , -1.0F,
-                     0.0F             ,  0.0F , (in_near * in_far) / (in_near - in_far),  0.0F);
+    return Matrix4X4(scale / in_aspect,  0.0F , 0.0F                                 ,  0.0F,
+                     0.0F             , -scale, 0.0F                                 ,  0.0F,
+                     0.0F             ,  0.0F , in_far / (in_near - in_far)          , -1.0F,
+                     0.0F             ,  0.0F , in_near * in_far / (in_near - in_far),  0.0F);
 }
 
 constexpr Matrix4X4 Matrix4X4::OrthogonalProjectionMatrix(

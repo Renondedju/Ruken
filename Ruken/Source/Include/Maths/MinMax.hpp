@@ -24,60 +24,48 @@
 
 #pragma once
 
-#include <limits>
+#include <initializer_list>
 
 #include "Build/Namespace.hpp"
-#include "Types/Concepts/ArithmeticType.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Returns the minimum of the 2 passed values
  *
- * \tparam TType Type to operate with
  * \param in_lhs Left hand side operand
  * \param in_rhs Right hand side operand
  *
  * \return Minimum value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType Min(TType in_lhs, TType in_rhs) noexcept;
+[[nodiscard]] RkFloat Minimum(RkFloat in_lhs, RkFloat in_rhs) noexcept;
 
 /**
  * \brief Returns the minimum of the 2 passed values except if one of the 2 is zero (then the other one is returned instead)
  *
- * \tparam TType Type to operate with
  * \param in_lhs Left hand side operand
  * \param in_rhs Right hand side operand
  *
  * \return Minimum except 0 value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType MinExceptZero(TType in_lhs, TType in_rhs) noexcept;
+[[nodiscard]] RkFloat MinExceptZero(RkFloat in_lhs, RkFloat in_rhs) noexcept;
 
 /**
  * \brief Returns the minimum of the 2 passed values except if one of the 2 is zero (then the other one is returned instead)
- *
- * \tparam TType Type to operate with
  * \param in_list Operands
- *
  * \return Minimum except 0 value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType MinExceptZero(std::initializer_list<TType> in_list) noexcept;
+[[nodiscard]] RkFloat MinExceptZero(std::initializer_list<RkFloat> in_list) noexcept;
 
 /**
  * \brief Returns the maximum of the 2 passed values
  *
- * \tparam TType Type to operate with
  * \param in_lhs Left hand side operand
  * \param in_rhs Right hand side operand
  *
  * \return Maximum value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType Max(TType in_lhs, TType in_rhs) noexcept;
-
-#include "Maths/MinMax.inl"
+[[nodiscard]] RkFloat Maximum(RkFloat in_lhs, RkFloat in_rhs) noexcept;
 
 END_RUKEN_NAMESPACE

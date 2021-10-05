@@ -22,40 +22,43 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include <cmath>
 
-template <ArithmeticType TType>
-constexpr TType Cos(Radians const in_angle) noexcept
+#include "Maths/Utility.hpp"
+
+USING_RUKEN_NAMESPACE
+
+RkFloat RUKEN_NAMESPACE::Abs(RkFloat const in_value) noexcept
 {
-    return static_cast<TType>(std::cos(static_cast<TType>(in_angle)));
+    return in_value < 0.0F ? -in_value : in_value;
 }
 
-template <ArithmeticType TType>
-constexpr TType ArcCos(Radians const in_angle) noexcept
+RkFloat RUKEN_NAMESPACE::Ceil(RkFloat const in_value) noexcept
 {
-    return static_cast<TType>(std::acos(static_cast<TType>(in_angle)));
+    return std::ceilf(in_value);
 }
 
-template <ArithmeticType TType>
-constexpr TType Sin(Radians const in_angle) noexcept
+RkFloat RUKEN_NAMESPACE::Clamp(RkFloat const in_value, RkFloat const in_min, RkFloat const in_max) noexcept
 {
-    return static_cast<TType>(std::sin(static_cast<TType>(in_angle)));
+    return in_value < in_min ? in_min : in_value > in_max ? in_max : in_value;
 }
 
-template <ArithmeticType TType>
-constexpr TType ArcSin(Radians in_angle) noexcept
+RkFloat RUKEN_NAMESPACE::Clamp01(RkFloat const in_value) noexcept
 {
-    return static_cast<TType>(std::asin(static_cast<TType>(in_angle)));
+    return in_value < 0.0F ? 0.0F : in_value > 1.0F ? 1.0F : in_value;
 }
 
-template <ArithmeticType TType>
-constexpr TType Tan(Radians const in_angle) noexcept
+RkFloat RUKEN_NAMESPACE::Round(RkFloat const in_value) noexcept
 {
-    return static_cast<TType>(std::tan(static_cast<TType>(in_angle)));
+    return std::roundf(in_value);
 }
 
-template <ArithmeticType TType>
-constexpr TType ArcTan(Radians in_angle) noexcept
+RkFloat RUKEN_NAMESPACE::Floor(RkFloat const in_value) noexcept
 {
-    return static_cast<TType>(std::atan(static_cast<TType>(in_angle)));
+    return std::floorf(in_value);
+}
+
+RkFloat RUKEN_NAMESPACE::CopySign(RkFloat const in_value, RkFloat const in_sign) noexcept
+{
+    return std::copysignf(in_value, in_sign);
 }

@@ -338,7 +338,6 @@
     <ClInclude Include="Source\Include\Vulkan\Utilities\VulkanDeviceAllocator.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanShaderModule.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
-    <ClInclude Include="Source\Src\Maths\Math.inl" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\ipch\3aa6fd5e6f46509e\mmap_address.bin" />
@@ -380,12 +379,8 @@
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
-    <None Include="Source\Src\Maths\Easing.inl" />
     <None Include="Source\Src\Maths\Matrix\GenericMatrix.inl" />
     <None Include="Source\Src\Maths\Matrix\SquareMatrix.inl" />
-    <None Include="Source\Src\Maths\MinMax.inl" />
-    <None Include="Source\Src\Maths\Trigonometry.inl" />
-    <None Include="Source\Src\Maths\Utility.inl" />
     <None Include="Source\Src\Maths\Vector\BaseVector.inl" />
     <None Include="Source\Src\Maths\Vector\Vector2.inl" />
     <None Include="Source\Src\Maths\Vector\Vector2Cross.inl" />
@@ -409,8 +404,13 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Maths\Easing.cpp" />
+    <ClCompile Include="Source\Src\Maths\Math.cpp" />
     <ClCompile Include="Source\Src\Maths\Matrix\Matrix4X4.cpp" />
+    <ClCompile Include="Source\Src\Maths\MinMax.cpp" />
     <ClCompile Include="Source\Src\Maths\Quaternion\Quaternion.cpp" />
+    <ClCompile Include="Source\Src\Maths\Trigonometry.cpp" />
+    <ClCompile Include="Source\Src\Maths\Utility.cpp" />
     <ClCompile Include="Source\Src\Maths\Vector\Vector2.cpp" />
     <ClCompile Include="Source\Src\Maths\Vector\Vector3.cpp" />
     <ClCompile Include="Source\Src\Maths\Vector\Vector4.cpp" />

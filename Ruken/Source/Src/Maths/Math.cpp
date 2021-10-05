@@ -22,35 +22,44 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include <complex>
 
-template <ArithmeticType TType>
-constexpr TType Min(TType in_lhs, TType in_rhs) noexcept
+#include "Maths/Math.hpp"
+#include "Maths/Utility.hpp"
+
+USING_RUKEN_NAMESPACE
+
+RkFloat RUKEN_NAMESPACE::Pow(RkFloat const in_value, RkFloat const in_exponent) noexcept
 {
-    return (in_lhs > in_rhs) ? in_rhs : in_lhs;
+    return std::powf(in_value, in_exponent);
 }
 
-template <ArithmeticType TType>
-constexpr TType MinExceptZero(TType in_lhs, TType in_rhs) noexcept
+RkFloat RUKEN_NAMESPACE::Exp(RkFloat const in_value) noexcept
 {
-    if (in_lhs == static_cast<TType>(0))
-        return in_rhs;
-
-    return Min<TType>(in_lhs, in_rhs);
+    return std::expf(in_value);
 }
 
-template <ArithmeticType TType>
-constexpr TType MinExceptZero(std::initializer_list<TType> in_list) noexcept
+RkFloat RUKEN_NAMESPACE::Exp2(RkFloat const in_value) noexcept
 {
-    TType count = std::numeric_limits<TType>::max();
-    for (TType const& element: in_list)
-        count = MinExceptZero<TType>(count, element);
-
-    return count;
+    return std::exp2f(in_value);
 }
 
-template <ArithmeticType TType>
-constexpr TType Max(TType in_lhs, TType in_rhs) noexcept
+RkFloat RUKEN_NAMESPACE::Mod(RkFloat const in_value, RkFloat in_modulo) noexcept
 {
-    return (in_lhs < in_rhs) ? in_rhs : in_lhs;
+    return std::modf(in_value, &in_modulo);
+}
+
+RkFloat RUKEN_NAMESPACE::Frac(RkFloat const in_value) noexcept
+{
+    return in_value - Floor(in_value);
+}
+
+RkFloat RUKEN_NAMESPACE::Sqrt(RkFloat const in_value) noexcept
+{
+    return std::sqrtf(in_value);
+}
+
+RkFloat RUKEN_NAMESPACE::InvSqrt(RkFloat const in_value) noexcept
+{
+    return 1.0F / Sqrt(in_value);
 }

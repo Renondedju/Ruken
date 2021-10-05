@@ -24,80 +24,51 @@
 
 #pragma once
 
-#include <cmath>
-
 #include "Build/Namespace.hpp"
 #include "Types/Units/Angle/Radians.hpp"
-#include "Types/Concepts/ArithmeticType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Compute the cosine of an angle given in radians
- *
- * \tparam TType Type to operate with
  * \param in_angle Input angle
- *
  * \return Cosine of in_value
  */
-template <ArithmeticType TType = RkFloat>
-[[nodiscard]] constexpr TType Cos(Radians in_angle) noexcept;
+[[nodiscard]] RkFloat Cos(Radians in_angle) noexcept;
 
 /**
  * \brief Compute the arc cosine of an angle given in radians
- *
- * \tparam TType Type to operate with
  * \param in_angle Input angle
- *
  * \return Arc cosine of in_value
  */
-template <ArithmeticType TType = RkFloat>
-[[nodiscard]] constexpr TType ArcCos(Radians in_angle) noexcept;
+[[nodiscard]] RkFloat ArcCos(Radians in_angle) noexcept;
 
 /**
  * \brief Compute the sine of an angle given in radians
- *
- * \tparam TType Type to operate with
  * \param in_angle Input angle
- *
  * \return Sinus of in_value
  */
-template <ArithmeticType TType = RkFloat>
-[[nodiscard]] constexpr TType Sin(Radians in_angle) noexcept;
+[[nodiscard]] RkFloat Sin(Radians in_angle) noexcept;
 
 /**
  * \brief Compute the arc sine of an angle given in radians
- *
- * \tparam TType Type to operate with
  * \param in_angle Input angle
- *
  * \return Sinus of in_value
  */
-template <ArithmeticType TType = RkFloat>
-[[nodiscard]] constexpr TType ArcSin(Radians in_angle) noexcept;
+[[nodiscard]] RkFloat ArcSin(Radians in_angle) noexcept;
 
 /**
  * \brief Compute the tangent of an angle given in radians
- *
- * \tparam TType Type to operate with
  * \param in_angle Input angle
- *
  * \return The tangent of in_value
  */
-template <ArithmeticType TType = RkFloat>
-[[nodiscard]] constexpr TType Tan(Radians in_angle) noexcept;
+[[nodiscard]] RkFloat Tan(Radians in_angle) noexcept;
 
 /**
  * \brief Compute the arc tangent of an angle given in radians
- *
- * \tparam TType Type to operate with
  * \param in_angle Input angle
- *
  * \return The tangent of in_value
  */
-template <ArithmeticType TType = RkFloat>
-[[nodiscard]] constexpr TType ArcTan(Radians in_angle) noexcept;
-
-#include "Maths/Trigonometry.inl"
+[[nodiscard]] RkFloat ArcTan(Radians in_angle) noexcept;
 
 END_RUKEN_NAMESPACE

@@ -22,46 +22,38 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include <cmath>
 
-template <ArithmeticType TType>
-constexpr TType Pow(TType in_value, TType in_exponent) noexcept
+#include "Maths/Trigonometry.hpp"
+
+USING_RUKEN_NAMESPACE
+
+RkFloat RUKEN_NAMESPACE::Cos(Radians const in_angle) noexcept
 {
-    return static_cast<TType>(std::pow(in_value, in_exponent));
+    return std::cosf(static_cast<RkFloat>(in_angle));
 }
 
-template <ArithmeticType TType>
-constexpr TType Exp(TType in_value) noexcept
+RkFloat RUKEN_NAMESPACE::ArcCos(Radians const in_angle) noexcept
 {
-    return static_cast<TType>(std::exp(in_value));
+    return std::acosf(static_cast<RkFloat>(in_angle));
 }
 
-template <ArithmeticType TType>
-constexpr TType Exp2(TType in_value) noexcept
+RkFloat RUKEN_NAMESPACE::Sin(Radians const in_angle) noexcept
 {
-    return static_cast<TType>(std::exp2(in_value));
+    return std::sinf(static_cast<RkFloat>(in_angle));
 }
 
-template <ArithmeticType TType>
-constexpr TType Mod(TType in_value, TType in_modulo) noexcept
+RkFloat RUKEN_NAMESPACE::ArcSin(Radians in_angle) noexcept
 {
-    return static_cast<TType>(std::modf(in_value, &in_modulo));
+    return std::asinf(static_cast<RkFloat>(in_angle));
 }
 
-template <ArithmeticType TType>
-constexpr TType Frac(TType in_value) noexcept
+RkFloat RUKEN_NAMESPACE::Tan(Radians const in_angle) noexcept
 {
-    return in_value - Floor<TType>(in_value);
+    return std::tanf(static_cast<RkFloat>(in_angle));
 }
 
-template <ArithmeticType TType>
-constexpr TType Sqrt(TType in_value) noexcept
+RkFloat RUKEN_NAMESPACE::ArcTan(Radians in_angle) noexcept
 {
-    return static_cast<TType>(std::sqrt(in_value));
-}
-
-template <ArithmeticType TType>
-constexpr TType InvSqrt(TType in_value) noexcept
-{
-    return static_cast<TType>(1) / Sqrt<TType>(in_value);
+    return std::atanf(static_cast<RkFloat>(in_angle));
 }

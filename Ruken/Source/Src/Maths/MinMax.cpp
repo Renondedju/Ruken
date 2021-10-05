@@ -22,46 +22,35 @@
  *  SOFTWARE.
  */
 
-#pragma once
+#include <limits>
 
-template <ArithmeticType TType>
-constexpr TType Abs(TType in_value) noexcept
+#include "Maths/MinMax.hpp"
+
+USING_RUKEN_NAMESPACE
+
+RkFloat RUKEN_NAMESPACE::MinExceptZero(RkFloat const in_lhs, RkFloat const in_rhs) noexcept
 {
-    return (in_value < 0) ? -in_value : in_value;
+    if (in_lhs == .0F)
+        return in_rhs;
+
+    return Minimum(in_lhs, in_rhs);
 }
 
-template <FloatingPointType TType>
-constexpr TType Ceil(TType in_value) noexcept
+RkFloat RUKEN_NAMESPACE::Maximum(RkFloat const in_lhs, RkFloat const in_rhs) noexcept
 {
-    return static_cast<TType>(std::ceil(in_value));
+    return in_lhs < in_rhs ? in_rhs : in_lhs;
 }
 
-template <ArithmeticType TType>
-constexpr TType Clamp(TType in_value, TType in_min, TType in_max) noexcept
+RkFloat RUKEN_NAMESPACE::Minimum(RkFloat const in_lhs, RkFloat const in_rhs) noexcept
 {
-    return (in_value < in_min) ? in_min : (in_value > in_max) ? in_max : in_value;
+    return in_lhs > in_rhs ? in_rhs : in_lhs;
 }
 
-template <FloatingPointType TType>
-constexpr TType Clamp01(TType in_value) noexcept
+RkFloat RUKEN_NAMESPACE::MinExceptZero(std::initializer_list<RkFloat> const in_list) noexcept
 {
-    return (in_value < static_cast<TType>(0)) ? static_cast<TType>(0) : (in_value > static_cast<TType>(1)) ? static_cast<TType>(1) : in_value;
-}
+    RkFloat count = std::numeric_limits<RkFloat>::max();
+    for (RkFloat const& element: in_list)
+        count = MinExceptZero(count, element);
 
-template <FloatingPointType TType>
-constexpr TType Round(TType in_value) noexcept
-{
-    return static_cast<TType>(std::round(in_value));
-}
-
-template <FloatingPointType TType>
-constexpr TType Floor(TType in_value) noexcept
-{
-    return static_cast<TType>(std::floor(in_value));
-}
-
-template <ArithmeticType TType>
-constexpr TType CopySign(TType in_value, TType in_sign) noexcept
-{
-    return static_cast<TType>(std::copysign(in_value, in_sign));
+    return count;
 }

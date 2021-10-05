@@ -91,7 +91,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return X axis rotation matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 RotationMatrixX(Radians in_angle) noexcept;
+        static Matrix4X4 RotationMatrixX(Radians in_angle) noexcept;
 
         /**
          * \brief Creates a rotation matrix for the Y axis
@@ -99,7 +99,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Y axis rotation matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 RotationMatrixY(Radians in_angle) noexcept;
+        static Matrix4X4 RotationMatrixY(Radians in_angle) noexcept;
 
         /**
          * \brief Creates a rotation matrix for the Z axis
@@ -107,7 +107,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Z axis rotation matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 RotationMatrixZ(Radians in_angle) noexcept;
+        static Matrix4X4 RotationMatrixZ(Radians in_angle) noexcept;
 
         /**
          * \brief Creates a rotation matrix
@@ -119,7 +119,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Rotation matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 RotationMatrix(
+        static Matrix4X4 RotationMatrix(
             Radians in_angle_x,
             Radians in_angle_y,
             Radians in_angle_z) noexcept;
@@ -143,7 +143,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return New perspective projection matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 PerspectiveProjectionMatrix(
+        static Matrix4X4 PerspectiveProjectionMatrix(
             Degrees in_fov,
             RkFloat in_aspect,
             RkFloat in_near,

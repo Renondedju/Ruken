@@ -64,7 +64,7 @@ class Quaternion
          * \param in_y y component of the quaternion
          * \param in_z z component of the quaternion
          */
-        constexpr Quaternion(RkFloat in_w, RkFloat in_x, RkFloat in_y, RkFloat in_z) noexcept;
+        Quaternion(RkFloat in_w, RkFloat in_x, RkFloat in_y, RkFloat in_z) noexcept;
 
         /**
          * \brief Creates a quaternion with the given rotations (using euler angles)
@@ -73,7 +73,7 @@ class Quaternion
          * \param in_angle_y Angle to rotate around the y axis (in degrees)
          * \param in_angle_z Angle to rotate around the z axis (in degrees)
          */
-        constexpr Quaternion(Degrees in_angle_x, Degrees in_angle_y, Degrees in_angle_z) noexcept;
+        Quaternion(Degrees in_angle_x, Degrees in_angle_y, Degrees in_angle_z) noexcept;
 
         #pragma endregion
 
@@ -91,7 +91,7 @@ class Quaternion
          * \return A new quaternion which is the result of the linear interpolation between in_lhs and in_rhs at in_ratio
          */
         template <RkBool TShortestPath = true>
-        static constexpr Quaternion Lerp(Quaternion const& in_lhs, Quaternion const& in_rhs, float in_ratio) noexcept;
+        static Quaternion Lerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
 
         /**
          * \brief Quaternion spherical interpolation
@@ -105,7 +105,7 @@ class Quaternion
          * \return A new quaternion which is the result of the spherical linear interpolation between in_lhs and in_rhs at in_ratio
          */
         template <RkBool TShortestPath = true>
-        static constexpr Quaternion Slerp(Quaternion const& in_lhs, Quaternion const& in_rhs, float in_ratio) noexcept;
+        static Quaternion Slerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
 
         /**
          * \brief Computes the dot product between two quaternions
@@ -115,7 +115,7 @@ class Quaternion
          * 
          * \return The resulting dot product
          */
-        static constexpr RkFloat Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
+        static RkFloat Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
 
         /**
          * \brief Normalizes a quaternion
@@ -123,7 +123,7 @@ class Quaternion
          * \param in_quaternion Quaternion to be normalized
          * \return Normalized quaternion
          */
-        static constexpr Quaternion Normalize(Quaternion const& in_quaternion) noexcept;
+        static Quaternion Normalize(Quaternion const& in_quaternion) noexcept;
 
         /**
          * \brief Computes the square length of the quaternion
@@ -131,7 +131,7 @@ class Quaternion
          * \param in_quaternion Quaternion instance
          * \return Squared length of the quaternion
          */
-        static constexpr RkFloat SqrLength(Quaternion const& in_quaternion) noexcept;
+        static RkFloat SqrLength(Quaternion const& in_quaternion) noexcept;
 
         /**
          * \brief Computes the length of the quaternion
@@ -139,7 +139,7 @@ class Quaternion
          * \param in_quaternion Quaternion instance
          * \return Length of the quaternion
          */
-        static constexpr RkFloat Length(Quaternion const& in_quaternion) noexcept;
+        static RkFloat Length(Quaternion const& in_quaternion) noexcept;
 
         /**
          * \brief Inverts the passed quaternion
@@ -147,7 +147,7 @@ class Quaternion
          * \param in_quaternion Quaternion instance
          * \return Inverted quaternion
          */
-        static constexpr Quaternion Invert(Quaternion const& in_quaternion) noexcept;
+        static Quaternion Invert(Quaternion const& in_quaternion) noexcept;
 
         /**
          * \brief Multiplies 2 quaternions together. This effectively represents composing the two rotations.
@@ -155,7 +155,7 @@ class Quaternion
          * \param in_rhs Right hand side quaternion
          * \return Resulting quaternion
          */
-        static constexpr Quaternion Multiply(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
+        static Quaternion Multiply(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
 
         /**
          * \brief Scales all components of a quaternion by a coefficient
@@ -163,7 +163,7 @@ class Quaternion
          * \param in_coefficient Coefficient
          * \return Scaled quaternion
          */
-        static constexpr Quaternion Scale(Quaternion const& in_quaternion, RkFloat in_coefficient) noexcept;
+        static Quaternion Scale(Quaternion const& in_quaternion, RkFloat in_coefficient) noexcept;
 
         /**
          * \brief Adds all the components of the quaternions together
@@ -171,14 +171,14 @@ class Quaternion
          * \param in_rhs Right hand side quaternion
          * \return Resulting quaternion 
          */
-        static constexpr Quaternion Add(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept; 
+        static Quaternion Add(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept; 
 
         /**
          * \brief Computes an homogenous rotation 3x3 matrix for a given quaternion
          * \param in_quaternion Quaternion to compute the rotation matrix for
          * \return Homogenous 3x3 rotation matrix
          */
-        static constexpr Matrix3X3 RotationMatrix(Quaternion const& in_quaternion) noexcept;
+        static Matrix3X3 RotationMatrix(Quaternion const& in_quaternion) noexcept;
 
         #pragma endregion
 

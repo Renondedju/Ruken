@@ -33,10 +33,7 @@ USING_RUKEN_NAMESPACE
 
 int main()
 {
-    Radians angle = 180_deg / 2.0F;
-
-    std::cout << angle << std::endl;
-    std::cin >> angle;
+    Radians const angle = 180_deg / 2.0F + 50_deg;
 
     std::cout << angle << std::endl;
 

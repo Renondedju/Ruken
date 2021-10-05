@@ -31,28 +31,31 @@
 
 USING_RUKEN_NAMESPACE
 
-constexpr Quaternion::Quaternion(RkFloat const in_w, RkFloat const in_x, RkFloat const in_y, RkFloat const in_z) noexcept:
+Quaternion::Quaternion(RkFloat const in_w,
+                                 RkFloat const in_x,
+                                 RkFloat const in_y,
+                                 RkFloat const in_z) noexcept:
     w {in_w},
     x {in_x},
     y {in_y},
     z {in_z}
 {}
 
-constexpr Quaternion::Quaternion(Degrees const in_angle_x,
-                                 Degrees const in_angle_y,
-                                 Degrees const in_angle_z) noexcept
+Quaternion::Quaternion(Degrees const in_angle_x,
+                       Degrees const in_angle_y,
+                       Degrees const in_angle_z) noexcept
 {
-    Radians const half_x_angle = static_cast<Radians>(in_angle_x) / 2.0_rad;
-    Radians const half_y_angle = static_cast<Radians>(in_angle_y) / 2.0_rad;
-    Radians const half_z_angle = static_cast<Radians>(in_angle_z) / 2.0_rad;
+    Radians const half_x_angle = in_angle_x / 2.0F;
+    Radians const half_y_angle = in_angle_y / 2.0F;
+    Radians const half_z_angle = in_angle_z / 2.0F;
 
-    RkFloat const cos_x = Cos<RkFloat>(half_x_angle);
-    RkFloat const cos_y = Cos<RkFloat>(half_y_angle);
-    RkFloat const cos_z = Cos<RkFloat>(half_z_angle);
+    RkFloat const cos_x = Cos(half_x_angle);
+    RkFloat const cos_y = Cos(half_y_angle);
+    RkFloat const cos_z = Cos(half_z_angle);
 
-    RkFloat const sin_x = Sin<RkFloat>(half_x_angle);
-    RkFloat const sin_y = Sin<RkFloat>(half_y_angle);
-    RkFloat const sin_z = Sin<RkFloat>(half_z_angle);
+    RkFloat const sin_x = Sin(half_x_angle);
+    RkFloat const sin_y = Sin(half_y_angle);
+    RkFloat const sin_z = Sin(half_z_angle);
 
     w = cos_x * cos_y * cos_z - sin_x * sin_y * sin_z;
     x = sin_x * cos_y * cos_z + cos_x * sin_y * sin_z;
@@ -61,7 +64,9 @@ constexpr Quaternion::Quaternion(Degrees const in_angle_x,
 }
 
 template <RkBool TShortestPath>
-constexpr Quaternion Quaternion::Lerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat const in_ratio) noexcept
+Quaternion Quaternion::Lerp(Quaternion const& in_lhs,
+                                      Quaternion const& in_rhs,
+                                      RkFloat    const  in_ratio) noexcept
 {
     RkFloat const conjugate_ratio = 1.0F - in_ratio;
 
@@ -82,54 +87,65 @@ constexpr Quaternion Quaternion::Lerp(Quaternion const& in_lhs, Quaternion const
 }
 
 template <RkBool TShortestPath>
-constexpr Quaternion Quaternion::Slerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat const in_ratio) noexcept
+Quaternion Quaternion::Slerp(Quaternion const& in_lhs,
+                             Quaternion const& in_rhs,
+                             RkFloat    const  in_ratio) noexcept
 {
     RkFloat const dot_result {Quaternion::Dot(in_lhs, in_rhs)};
     Radians const abs_dot    {Abs   (dot_result)};
     Radians const theta      {ArcCos(abs_dot)};
     RkFloat const sin_theta  {Sin   (theta)};
 
-    Quaternion const a = Quaternion::Scale(in_lhs, Sin<RkFloat>(static_cast<Radians>(1.0F - in_ratio)) * static_cast<RkFloat>(theta) / sin_theta);
+    Quaternion const a = Quaternion::Scale(in_lhs, Sin(static_cast<Radians>(1.0F - in_ratio)) * static_cast<RkFloat>(theta) / sin_theta);
+
     if constexpr (TShortestPath)
     {
         RkFloat    const sign = dot_result < 0.0F ? -1.0F : 1.0F;
-        Quaternion const b    = Quaternion::Scale(in_rhs, Sin<RkFloat>(static_cast<Radians>(sign * in_ratio) * theta) / sin_theta);
+        Quaternion const b    = Quaternion::Scale(in_rhs, Sin(static_cast<Radians>(sign * in_ratio) * theta) / sin_theta);
 
         return Quaternion::Normalize(Quaternion::Add(a, b));
     }
 
-    Quaternion const b = Quaternion::Scale(in_rhs, Sin<RkFloat>(static_cast<Radians>(in_ratio) * theta) / sin_theta);
+    Quaternion const b = Quaternion::Scale(in_rhs, Sin(static_cast<Radians>(in_ratio) * theta) / sin_theta);
 
     return Quaternion::Normalize(Quaternion::Add(a, b));
 }
 
-constexpr RkFloat Quaternion::Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
+RkFloat Quaternion::Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
 {
     return in_lhs.w * in_rhs.w + in_lhs.x * in_rhs.x + in_lhs.y * in_rhs.y + in_lhs.z * in_rhs.z;
 }
 
-constexpr Quaternion Quaternion::Normalize(Quaternion const& in_quaternion) noexcept
+Quaternion Quaternion::Normalize(Quaternion const& in_quaternion) noexcept
 {
     RkFloat const length = Quaternion::Length(in_quaternion);
-    return Quaternion(in_quaternion.w / length, in_quaternion.x / length, in_quaternion.y / length, in_quaternion.z / length);
+
+    return Quaternion(
+        in_quaternion.w / length,
+        in_quaternion.x / length,
+        in_quaternion.y / length,
+        in_quaternion.z / length);
 }
 
-constexpr RkFloat Quaternion::SqrLength(Quaternion const& in_quaternion) noexcept
+RkFloat Quaternion::SqrLength(Quaternion const& in_quaternion) noexcept
 {
-    return in_quaternion.w * in_quaternion.w + in_quaternion.x * in_quaternion.x + in_quaternion.y * in_quaternion.y + in_quaternion.z * in_quaternion.z;
+    return in_quaternion.w * in_quaternion.w +
+           in_quaternion.x * in_quaternion.x +
+           in_quaternion.y * in_quaternion.y +
+           in_quaternion.z * in_quaternion.z;
 }
 
-constexpr RkFloat Quaternion::Length(Quaternion const& in_quaternion) noexcept
+RkFloat Quaternion::Length(Quaternion const& in_quaternion) noexcept
 {
     return Sqrt(Quaternion::SqrLength(in_quaternion));
 }
 
-constexpr Quaternion Quaternion::Invert(Quaternion const& in_quaternion) noexcept
+Quaternion Quaternion::Invert(Quaternion const& in_quaternion) noexcept
 {
     return Quaternion(in_quaternion.w, -in_quaternion.x, -in_quaternion.y, -in_quaternion.z);
 }
 
-constexpr Quaternion Quaternion::Multiply(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
+Quaternion Quaternion::Multiply(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
 {
     return Quaternion(in_lhs.w * in_rhs.w - (in_lhs.x * in_rhs.x + in_lhs.y * in_rhs.y + in_lhs.z * in_rhs.z),
                       in_lhs.w * in_rhs.x + in_rhs.w * in_lhs.x + (in_lhs.y * in_rhs.z - in_rhs.y * in_lhs.z),
@@ -137,7 +153,7 @@ constexpr Quaternion Quaternion::Multiply(Quaternion const& in_lhs, Quaternion c
                       in_lhs.w * in_rhs.z + in_rhs.w * in_lhs.z + (in_lhs.x * in_rhs.y - in_rhs.x * in_lhs.y));
 }
 
-constexpr Quaternion Quaternion::Scale(Quaternion const& in_quaternion, RkFloat const in_coefficient) noexcept
+Quaternion Quaternion::Scale(Quaternion const& in_quaternion, RkFloat const in_coefficient) noexcept
 {
     return Quaternion(
         in_quaternion.w * in_coefficient,
@@ -146,7 +162,7 @@ constexpr Quaternion Quaternion::Scale(Quaternion const& in_quaternion, RkFloat 
         in_quaternion.z * in_coefficient);
 }
 
-constexpr Quaternion Quaternion::Add(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
+Quaternion Quaternion::Add(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
 {
     return Quaternion(
         in_lhs.w + in_rhs.w,
@@ -155,7 +171,7 @@ constexpr Quaternion Quaternion::Add(Quaternion const& in_lhs, Quaternion const&
         in_lhs.z + in_rhs.z);
 }
 
-constexpr Matrix3X3 Quaternion::RotationMatrix(Quaternion const& in_quaternion) noexcept
+Matrix3X3 Quaternion::RotationMatrix(Quaternion const& in_quaternion) noexcept
 {
     RkFloat const sqr_x (in_quaternion.x * in_quaternion.x);
     RkFloat const sqr_y (in_quaternion.y * in_quaternion.y);

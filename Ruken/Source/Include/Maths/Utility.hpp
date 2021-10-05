@@ -24,94 +24,65 @@
 
 #pragma once
 
-#include <cmath>
-
 #include "Build/Namespace.hpp"
-#include "Types/Concepts/ArithmeticType.hpp"
-#include "Types/Concepts/FloatingPointType.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Absolute value function
- *
- * \tparam TType Type to operate with
  * \param in_value Value to get the absolute of
- *
  * \return Absolute value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType Abs(TType in_value) noexcept;
+[[nodiscard]] RkFloat Abs(RkFloat in_value) noexcept;
 
 /**
  * \brief Converts a value given to the nearest greater or equal integer.
- *
- * \tparam TType Type to operate with
  * \param in_value Input value
- *
  * \return Ceiled value
  */
-template <FloatingPointType TType>
-[[nodiscard]] constexpr TType Ceil(TType in_value) noexcept;
+[[nodiscard]] RkFloat Ceil(RkFloat in_value) noexcept;
 
 /**
  * \brief Clamps the value given between two value given min and max included
  *
- * \tparam TType Type to operate with
  * \param in_value Input value
  * \param in_min Minimum value
  * \param in_max Maximum value
  *
  * \return Clamped value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType Clamp(TType in_value, TType in_min, TType in_max) noexcept;
+[[nodiscard]] RkFloat Clamp(RkFloat in_value, RkFloat in_min, RkFloat in_max) noexcept;
 
 /**
  * \brief Clamps the value given between 0 and 1 included
- *
- * \tparam TType Type to operate with
  * \param in_value Input value
- *
  * \return Clamped value
  */
-template <FloatingPointType TType>
-[[nodiscard]] constexpr TType Clamp01(TType in_value) noexcept;
+[[nodiscard]] RkFloat Clamp01(RkFloat in_value) noexcept;
 
 /**
  * \brief Converts a value to the nearest integer. Rounds up when the fraction is .5
- *
- * \tparam TType Type to operate with
  * \param in_value Input value
- *
  * \return Rounded value
  */
-template <FloatingPointType TType>
-[[nodiscard]] constexpr TType Round(TType in_value) noexcept;
+[[nodiscard]] RkFloat Round(RkFloat in_value) noexcept;
 
 /**
  * \brief Converts a value given to the nearest less or equal integer.
- *
- * \tparam TType Type to operate with
  * \param in_value Input value
- *
  * \return Floored value
  */
-template <FloatingPointType TType>
-[[nodiscard]] constexpr TType Floor(TType in_value) noexcept;
+[[nodiscard]] RkFloat Floor(RkFloat in_value) noexcept;
 
 /**
  * \brief Compute a value with the magnitude of first argument and the sign of the second.
  *
- * \tparam TType Type to operate with
  * \param in_value Input value
  * \param in_sign Sign value
  *
  * \return Signed value
  */
-template <ArithmeticType TType>
-[[nodiscard]] constexpr TType CopySign(TType in_value, TType in_sign) noexcept;
-
-#include "Maths/Utility.inl"
+[[nodiscard]] RkFloat CopySign(RkFloat in_value, RkFloat in_sign) noexcept;
 
 END_RUKEN_NAMESPACE
