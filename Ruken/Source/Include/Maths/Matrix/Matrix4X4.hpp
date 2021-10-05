@@ -47,10 +47,10 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
 
         using Parent::Parent;
 
-        constexpr Matrix4X4()                           = default;
-        constexpr Matrix4X4(Matrix4X4 const& in_matrix) = default;
-        constexpr Matrix4X4(Matrix4X4&&      in_matrix) = default;
-                 ~Matrix4X4()                           = default;
+        Matrix4X4()                           = default;
+        Matrix4X4(Matrix4X4 const& in_matrix) = default;
+        Matrix4X4(Matrix4X4&&      in_matrix) = default;
+       ~Matrix4X4()                           = default;
 
         DECLARE_MATRIX_COMPATIBILITY_COPY_CONSTRUCTOR(Matrix4X4, Parent)
         DECLARE_MATRIX_COMPATIBILITY_MOVE_CONSTRUCTOR(Matrix4X4, Parent)
@@ -75,7 +75,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Vulkan clip space matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 ClipSpace() noexcept;
+        static Matrix4X4 ClipSpace() noexcept;
 
         /**
          * \brief Generates a translation matrix.
@@ -83,7 +83,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Translation matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 TranslationMatrix(Vector3f const& in_translation) noexcept;
+        static Matrix4X4 TranslationMatrix(Vector3f const& in_translation) noexcept;
 
         /**
          * \brief Creates a rotation matrix for the X axis
@@ -130,7 +130,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Scale matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 ScaleMatrix(Vector3f const& in_scale) noexcept;
+        static Matrix4X4 ScaleMatrix(Vector3f const& in_scale) noexcept;
 
         /**
          * \brief Creates a perspective projection matrix
@@ -162,7 +162,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Orthogonal projection matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 OrthogonalProjectionMatrix(
+        static Matrix4X4 OrthogonalProjectionMatrix(
                 RkFloat in_left  , RkFloat in_right, 
                 RkFloat in_bottom, RkFloat in_top, 
                 RkFloat in_near  , RkFloat in_far) noexcept;
@@ -177,7 +177,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Look at matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 LookAtMatrix(
+        static Matrix4X4 LookAtMatrix(
                 Vector3f const& in_from,
                 Vector3f const& in_to,
                 Vector3f const& in_up) noexcept;
@@ -192,7 +192,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Model (TRS) matrix
          */
         [[nodiscard]]
-        static constexpr Matrix4X4 ModelMatrix(
+        static Matrix4X4 ModelMatrix(
                 Vector3f   const& in_position,
                 Quaternion const& in_rotation,
                 Vector3f   const& in_scale) noexcept;
@@ -201,8 +201,8 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
 
         #pragma region Operators
 
-        constexpr Matrix4X4& operator=(Matrix4X4 const& in_other) noexcept = default;
-        constexpr Matrix4X4& operator=(Matrix4X4&&	    in_other) noexcept = default;
+        Matrix4X4& operator=(Matrix4X4 const& in_other) noexcept = default;
+        Matrix4X4& operator=(Matrix4X4&&	    in_other) noexcept = default;
 
         DECLARE_MATRIX_COMPATIBILITY_COPY_OPERATOR(Matrix4X4, Parent)
         DECLARE_MATRIX_COMPATIBILITY_MOVE_OPERATOR(Matrix4X4, Parent)

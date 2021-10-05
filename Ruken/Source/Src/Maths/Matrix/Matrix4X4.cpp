@@ -28,7 +28,7 @@
 
 USING_RUKEN_NAMESPACE
 
-constexpr Matrix4X4 Matrix4X4::ClipSpace() noexcept
+Matrix4X4 Matrix4X4::ClipSpace() noexcept
 {
     return Matrix4X4(1.0F,  0.0F,  0.0F,  0.0F,
                      0.0F, -1.0F,  0.0F,  0.0F,
@@ -36,7 +36,7 @@ constexpr Matrix4X4 Matrix4X4::ClipSpace() noexcept
                      0.0F,  0.0F,  0.0F,  1.0F); 
 }
 
-constexpr Matrix4X4 Matrix4X4::TranslationMatrix(Vector3f const& in_translation) noexcept
+Matrix4X4 Matrix4X4::TranslationMatrix(Vector3f const& in_translation) noexcept
 {
     return Matrix4X4(1.0F,  0.0F,  0.0F,  in_translation.x,
                      0.0F,  1.0F,  0.0F,  in_translation.y,
@@ -85,7 +85,7 @@ Matrix4X4 Matrix4X4::RotationMatrix(
     return RotationMatrixZ(in_angle_x).GetMultiplied(RotationMatrixY(in_angle_y)).GetMultiplied(RotationMatrixX(in_angle_z));
 }
 
-constexpr Matrix4X4 Matrix4X4::ScaleMatrix(Vector3f const& in_scale) noexcept
+Matrix4X4 Matrix4X4::ScaleMatrix(Vector3f const& in_scale) noexcept
 {
     return Matrix4X4(in_scale.x,  0.0F      ,  0.0F      ,  0.0F,
                      0.0F      ,  in_scale.y,  0.0F      ,  0.0F,
@@ -106,7 +106,7 @@ Matrix4X4 Matrix4X4::PerspectiveProjectionMatrix(Degrees const in_fov,
                      0.0F             ,  0.0F , in_near * in_far / (in_near - in_far),  0.0F);
 }
 
-constexpr Matrix4X4 Matrix4X4::OrthogonalProjectionMatrix(
+Matrix4X4 Matrix4X4::OrthogonalProjectionMatrix(
         RkFloat const in_left, RkFloat const in_right, RkFloat const in_bottom,
         RkFloat const in_top,  RkFloat const in_near , RkFloat const in_far) noexcept
 {
@@ -131,7 +131,7 @@ constexpr Matrix4X4 Matrix4X4::OrthogonalProjectionMatrix(
       1.0F);
 }
 
-constexpr Matrix4X4 Matrix4X4::LookAtMatrix(
+Matrix4X4 Matrix4X4::LookAtMatrix(
         Vector3f const& in_from,
         Vector3f const& in_to,
         Vector3f const& in_up) noexcept
@@ -149,7 +149,7 @@ constexpr Matrix4X4 Matrix4X4::LookAtMatrix(
     );
 }
 
-constexpr Matrix4X4 Matrix4X4::ModelMatrix(
+Matrix4X4 Matrix4X4::ModelMatrix(
         Vector3f   const& in_position,
         Quaternion const& in_rotation,
         Vector3f   const& in_scale) noexcept

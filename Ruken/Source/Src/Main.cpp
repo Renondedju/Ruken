@@ -24,18 +24,23 @@
 
 #include <iostream>
 
-#include "Core/Kernel.hpp"
-
-#include "Types/Units/Angle/Radians.hpp"
+#include "Maths/Vector/New/Vector3.hpp"
 #include "Types/Units/Angle/Degrees.hpp"
 
 USING_RUKEN_NAMESPACE
 
 int main()
 {
-    Radians const angle = 180_deg / 2.0F + 50_deg;
-
+    Vector3<Degrees> constexpr angle (50_deg, 20_rad, 3_rad);
     std::cout << angle << std::endl;
 
-    return 0;
+    Vector3f constexpr vector  (1, 1, 1);
+    Vector3f constexpr vector3 (2, 3, 5);
+
+    vector *= 2.0F;
+
+    std::cout << vector + vector3 << std::endl;
+    std::cout << Vector3f::Lerp(vector, vector3, 0.7F) << std::endl;
+
+    return EXIT_SUCCESS;
 }

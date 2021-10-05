@@ -65,7 +65,7 @@ class __declspec(novtable) GenericMatrix
          */
         template<typename... TValues> requires (sizeof...(TValues) == TRows * TColumns)
         constexpr GenericMatrix(TValues... in_values) noexcept:
-            data {in_values...}
+            data {static_cast<RkFloat>(in_values)...}
         {}
 
         /**

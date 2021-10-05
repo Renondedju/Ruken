@@ -203,6 +203,9 @@
     <ClInclude Include="Source\Include\Maths\Utility.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\BaseVector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\GenericVector.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\New\Vector.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\New\Vector2.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\New\Vector3.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector2.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector3.hpp" />
@@ -382,6 +385,7 @@
     <None Include="Source\Src\Maths\Matrix\GenericMatrix.inl" />
     <None Include="Source\Src\Maths\Matrix\SquareMatrix.inl" />
     <None Include="Source\Src\Maths\Vector\BaseVector.inl" />
+    <None Include="Source\Src\Maths\Vector\New\Vector.inl" />
     <None Include="Source\Src\Maths\Vector\Vector2.inl" />
     <None Include="Source\Src\Maths\Vector\Vector2Cross.inl" />
     <None Include="Source\Src\Maths\Vector\Vector3.inl" />

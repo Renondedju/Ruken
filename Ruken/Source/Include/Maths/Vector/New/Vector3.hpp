@@ -24,42 +24,60 @@
 
 #pragma once
 
-#include "Maths/Matrix/GenericMatrix.hpp"
+#include "Maths/Vector/New/Vector.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief 4x1 Matrix class
+ * \brief Vector 3 data layout
+ * \tparam TDataType Underlying data type
  */
-class __declspec(novtable) Matrix4X1 final: public GenericMatrix<4, 1>
+template <typename TDataType>
+struct Vector3Layout
 {
-    using Parent = GenericMatrix<4, 1>;
+    using UnderlyingType = TDataType;
+    static constexpr RkSize dimensions = 3ULL;
 
-    public:
+    #pragma warning(push)
+    #pragma warning(disable : 4201) // Warning C4201 nonstandard extension used: nameless struct/union
 
-        #pragma region Constructors
+    union
+    {
+        TDataType data[3] {0, 0, 0};
 
-        using Parent::Parent;
+        struct
+        {
+            TDataType x;
+            TDataType y;
+            TDataType z;
+        };
+    };
 
-        constexpr Matrix4X1()                           = default;
-        constexpr Matrix4X1(Matrix4X1 const& in_matrix) = default;
-        constexpr Matrix4X1(Matrix4X1&&      in_matrix) = default;
-                 ~Matrix4X1()                           = default;
+    #pragma warning(pop)
 
-        DECLARE_MATRIX_COMPATIBILITY_COPY_CONSTRUCTOR(Matrix4X1, Parent)
-        DECLARE_MATRIX_COMPATIBILITY_MOVE_CONSTRUCTOR(Matrix4X1, Parent)
+    /**
+     * \brief Generic constructor
+     * \tparam TValuesType Type of passed values
+     * \param in_values Values to init the vector with
+     */
+    template <typename... TValuesType> requires (sizeof...(TValuesType) == dimensions)
+    constexpr Vector3Layout(TValuesType... in_values) noexcept:
+        data {static_cast<UnderlyingType>(in_values)...}
+    {}
 
-        #pragma endregion
-
-        #pragma region Operators
-
-        constexpr Matrix4X1& operator=(Matrix4X1 const& in_other) noexcept = default;
-        constexpr Matrix4X1& operator=(Matrix4X1&&	    in_other) noexcept = default;
-
-        DECLARE_MATRIX_COMPATIBILITY_COPY_OPERATOR(Matrix4X1, Parent)
-        DECLARE_MATRIX_COMPATIBILITY_MOVE_OPERATOR(Matrix4X1, Parent)
-
-        #pragma endregion
+    constexpr Vector3Layout() noexcept:
+        data {0, 0, 0}
+    {}
 };
+
+/**
+ * \brief Vector 3 class
+ * \tparam TDataType Underlying data type
+ */
+template <typename TDataType>
+using Vector3 = Vector<Vector3Layout<TDataType>>;
+
+using Vector3i = Vector3<RkInt>;
+using Vector3f = Vector3<RkFloat>;
 
 END_RUKEN_NAMESPACE
