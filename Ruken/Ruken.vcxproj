@@ -271,6 +271,7 @@
     <ClInclude Include="Source\Include\Types\Units\Angle\Degrees.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\EAngleUnit.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\Radians.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Pixels.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
