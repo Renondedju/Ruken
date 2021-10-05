@@ -3,6 +3,9 @@
 #include <tinyobjloader/tiny_obj_loader.h>
 
 #include "Rendering/Resources/Model.hpp"
+
+#include "Ext/Vulkan/Ext.hpp"
+
 #include "Rendering/Resources/Texture.hpp"
 
 #include "Rendering/Renderer.hpp"
@@ -13,6 +16,8 @@ static std::unique_ptr<Texture> g_texture;
 
 Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept: DeviceObjectBase(in_device)
 {
+    g_texture = std::make_unique<Texture>(m_device, "Data/viking_room.png");
+
     tinyobj::attrib_t                attribute;
     std::vector<tinyobj::shape_t>    shapes;
     std::vector<tinyobj::material_t> materials;
@@ -50,36 +55,44 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept: Device
         }
     }
 
-    vk::AllocationCreateInfo allocation_info = {
-        .flags = vk::AllocationCreateFlagBits::eMapped,
-        .usage = vk::MemoryUsage::eCpuToGpu
+    vk::AllocationCreateInfo allocation_create_info = {
+        .usage = vk::MemoryUsage::eGpuOnly
     };
 
-    vk::BufferCreateInfo buffer_info = {
+    vk::BufferCreateInfo buffer_create_info = {
         .size  = vertices.size() * sizeof(Vertex) + indices.size() * sizeof(RkUint32),
-        .usage = vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer,
+        .usage = vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
     };
 
-    auto [result, value] = m_device->GetAllocator().createBuffer(buffer_info, allocation_info, m_allocation_info);
+    auto [result, value] = m_device->GetAllocator().createBuffer(buffer_create_info, allocation_create_info, m_allocation_info);
 
     std::tie(m_buffer, m_allocation) = value;
 
     m_offset = vertices.size() * sizeof(Vertex);
     m_count  = indices .size();
 
-    memcpy(m_allocation_info.pMappedData,            vertices.data(), vertices.size() * sizeof(Vertex));
-    // memcpy(m_allocation_info.pMappedData + m_offset, indices .data(), indices .size() * sizeof(RkUint32));
+    buffer_create_info.usage = vk::BufferUsageFlagBits::eTransferSrc;
+
+    allocation_create_info.flags = vk::AllocationCreateFlagBits::eMapped;
+    allocation_create_info.usage = vk::MemoryUsage::eCpuOnly;
+
+    vk::AllocationInfo allocation_info;
+
+    std::tie(result, value) = m_device->GetAllocator().createBuffer(buffer_create_info, allocation_create_info, allocation_info);;
+
+    auto [staging_buffer, staging_allocation] = value;
+
+    memcpy(allocation_info.pMappedData,                                  vertices.data(), vertices.size() * sizeof(Vertex));
+    memcpy(static_cast<RkByte*>(allocation_info.pMappedData) + m_offset, indices .data(), indices .size() * sizeof(RkUint32));
 
     vk::BufferCreateInfo uniform_buffer_info = {
-        .size = sizeof(UniformBufferObject),
+        .size  = sizeof(UniformBufferObject),
         .usage = vk::BufferUsageFlagBits::eUniformBuffer,
     };
 
-    std::tie(result, value) =  m_device->GetAllocator().createBuffer(uniform_buffer_info, allocation_info);
+    std::tie(result, value) = m_device->GetAllocator().createBuffer(uniform_buffer_info, allocation_create_info, allocation_info);
 
     std::tie(m_uniform_buffer, m_uniform_allocation) = value;
-
-    g_texture = std::make_unique<Texture>(m_device, "Data/viking_room.png");
 
     vk::DescriptorPoolSize pool_sizes[2] = {
         {
@@ -142,11 +155,35 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept: Device
     };
 
     m_device->GetLogicalDevice().updateDescriptorSets(write_descriptors, VK_NULL_HANDLE);
+
+    auto command_buffer = m_device->GetTransferQueue().AcquireSingleUseCommandBuffer();
+
+    vk::BufferCopy buffer_copy = {
+        .size = buffer_create_info.size
+    };
+
+    command_buffer.copyBuffer(staging_buffer, m_buffer, buffer_copy);
+
+    m_device->GetTransferQueue().ReleaseSingleUseCommandBuffer(command_buffer);
+
+    m_device->GetAllocator().destroyBuffer(staging_buffer, staging_allocation);
+
+    UniformBufferObject ubo = {
+        .model = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+        .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+        .proj = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.1f, 10.0f)
+    };
+
+    ubo.proj[1][1] *= -1;
+
+    memcpy(allocation_info.pMappedData, &ubo, sizeof(UniformBufferObject));
 }
 
 Model::~Model() noexcept
 {
     g_texture.reset();
+
+    m_device->GetLogicalDevice().destroy(m_descriptor_pool);
 
     m_device->GetAllocator().destroyBuffer(m_buffer, m_allocation);
     m_device->GetAllocator().destroyBuffer(m_uniform_buffer, m_uniform_allocation);

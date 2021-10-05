@@ -4,6 +4,8 @@
 #include <forward_list>
 
 #include "Meta/Meta.hpp"
+#include "Meta/Safety.hpp"
+
 #include "Core/Service.hpp"
 
 #include "Debug/Logging/Filters/LogFilter.hpp"

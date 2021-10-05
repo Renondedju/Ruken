@@ -1,22 +1,12 @@
 #include "Rendering/RenderWindow.hpp"
-
-#include "Debug/Logging/Logger.hpp"
-
-#include "Rendering/RenderContext.hpp"
-#include "Rendering/RenderDevice.hpp"
+#include "Rendering/RenderFrame.hpp"
+#include "Rendering/Renderer.hpp"
 
 #include "Windowing/Window.hpp"
 
-#include "Meta/Safety.hpp"
-
-#include "Rendering/Renderer.hpp"
-
-#include "Rendering/Resources/Model.hpp"
-#include "Rendering/Resources/Texture.hpp"
+#include "Debug/Logging/Logger.hpp"
 
 USING_RUKEN_NAMESPACE
-
-static std::unique_ptr<Model> g_model;
 
 RkVoid RenderWindow::CreateSurface(Window const& in_window) noexcept
 {
@@ -32,27 +22,24 @@ RkVoid RenderWindow::CreateSurface(Window const& in_window) noexcept
 
 RkVoid RenderWindow::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
 {
-    auto [result, value] = m_device->GetPhysicalDevice().getSurfaceSupportKHR(0U, m_surface);
+    auto [result, value] = m_device->GetPhysicalDevice().getSurfaceSupportKHR(m_device->GetGraphicsFamilyIndex(), m_surface);
 
     if (!value)
         return;
         
     vk::SwapchainCreateInfoKHR swapchain_create_info = {
-        .surface               = m_surface,
-        .minImageCount         = m_image_count,
-        .imageFormat           = m_image_format,
-        .imageColorSpace       = m_color_space,
-        .imageExtent           = m_image_extent,
-        .imageArrayLayers      = 1U,
-        .imageUsage            = vk::ImageUsageFlagBits::eColorAttachment,
-        .imageSharingMode      = vk::SharingMode::eExclusive,
-        .queueFamilyIndexCount = 0U,
-        .pQueueFamilyIndices   = {},
-        .preTransform          = vk::SurfaceTransformFlagBitsKHR::eIdentity,
-        .compositeAlpha        = vk::CompositeAlphaFlagBitsKHR::eOpaque,
-        .presentMode           = m_present_mode,
-        .clipped               = VK_TRUE,
-        .oldSwapchain          = in_old_swapchain
+        .surface          = m_surface,
+        .minImageCount    = m_image_count,
+        .imageFormat      = m_image_format,
+        .imageColorSpace  = m_color_space,
+        .imageExtent      = m_image_extent,
+        .imageArrayLayers = 1U,
+        .imageUsage       = vk::ImageUsageFlagBits::eTransferDst,
+        .preTransform     = vk::SurfaceTransformFlagBitsKHR::eIdentity,
+        .compositeAlpha   = vk::CompositeAlphaFlagBitsKHR::eOpaque,
+        .presentMode      = m_present_mode,
+        .clipped          = VK_TRUE,
+        .oldSwapchain     = in_old_swapchain
     };
 
     std::tie(result, m_swapchain) = m_device->GetLogicalDevice().createSwapchainKHR(swapchain_create_info);
@@ -63,7 +50,7 @@ RkVoid RenderWindow::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
 
         std::tie(result, m_images) = m_device->GetLogicalDevice().getSwapchainImagesKHR(m_swapchain);
 
-        for (auto const& image : m_images)
+        /*for (auto const& image : m_images)
         {
             vk::ImageViewCreateInfo image_view_info = {
                 .image = image,
@@ -77,23 +64,7 @@ RkVoid RenderWindow::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
             };
 
             m_image_views.push_back(m_device->GetLogicalDevice().createImageView(image_view_info).value);
-
-            std::vector attachments = {
-                m_image_views.back(),
-                m_depth_view
-            };
-
-            vk::FramebufferCreateInfo framebuffer_create_info = {
-                .renderPass = Renderer::render_pass,
-                .attachmentCount = static_cast<uint32_t>(attachments.size()),
-                .pAttachments = attachments.data(),
-                .width = m_image_extent.width,
-                .height = m_image_extent.height,
-                .layers = 1
-            };
-
-            m_framebuffers.push_back(m_device->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value);
-        }
+        }*/
     }
 
     else
@@ -141,7 +112,7 @@ RkVoid RenderWindow::PickSwapchainPresentMode()
     m_present_mode = present_modes[0];
 }
 
-RenderWindow::RenderWindow(Window& in_window, RenderContext* in_context, RenderDevice* in_device, Logger* in_logger) noexcept:
+RenderWindow::RenderWindow(Logger* in_logger, RenderContext* in_context, RenderDevice* in_device, Window& in_window) noexcept:
     m_logger  {in_logger},
     m_context {in_context},
     m_device  {in_device}
@@ -151,42 +122,6 @@ RenderWindow::RenderWindow(Window& in_window, RenderContext* in_context, RenderD
     PickSwapchainExtent(in_window.GetFramebufferSize().width, in_window.GetFramebufferSize().height);
     PickSwapchainFormat();
     PickSwapchainPresentMode();
-
-    vk::AllocationCreateInfo allocation_info = {
-        .usage = vk::MemoryUsage::eGpuOnly
-    };
-
-    vk::ImageCreateInfo image_create_info = {
-        .imageType = vk::ImageType::e2D,
-        .format = vk::Format::eD32Sfloat,
-        .extent = {
-            .width = m_image_extent.width,
-            .height = m_image_extent.height,
-            .depth = 1
-        },
-        .mipLevels = 1,
-        .arrayLayers = 1,
-        .usage = vk::ImageUsageFlagBits::eDepthStencilAttachment
-    };
-
-
-    auto [result, value] = m_device->GetAllocator().createImage(image_create_info, allocation_info);
-
-    std::tie(m_depth, m_depth_allocation) = value;
-
-    vk::ImageViewCreateInfo depth_view_info = {
-        .image = m_depth,
-        .viewType = vk::ImageViewType::e2D,
-        .format = vk::Format::eD32Sfloat,
-        .subresourceRange = {
-            .aspectMask = vk::ImageAspectFlagBits::eDepth,
-            .levelCount = 1,
-            .layerCount = 1
-        }
-    };
-
-    std::tie(result, m_depth_view) = m_device->GetLogicalDevice().createImageView(depth_view_info);
-
     CreateSwapchain();
 
     in_window.on_framebuffer_resized.Subscribe([this] (RkInt32 const in_width, RkInt32 const in_height)
@@ -199,20 +134,14 @@ RenderWindow::RenderWindow(Window& in_window, RenderContext* in_context, RenderD
     {
         m_valid = false;
     });
-
-    for (RkUint32 i = 0U; i < 2U; ++i)
-    {
-        m_render_frames.emplace_back(m_device, m_logger);
-    }
-
-    g_model = std::make_unique<Model>(m_device, "Data/viking_room.obj");
 }
 
 RenderWindow::~RenderWindow() noexcept
 {
-    g_model.reset();
-
-    m_device->GetAllocator().destroyImage(m_depth, m_depth_allocation);
+    for (RkUint32 i = 0U; i < m_image_count; ++i)
+    {
+        //m_device->GetLogicalDevice().destroy(m_image_views[i]);
+    }
 
     if (m_swapchain)
         m_device->GetLogicalDevice().destroySwapchainKHR(m_swapchain);
@@ -251,93 +180,160 @@ RkBool RenderWindow::IsValid() const noexcept
     return m_valid;
 }
 
-RkVoid RenderWindow::Begin()
+RkVoid RenderWindow::Present(RenderFrame& in_frame) noexcept
 {
-    m_current_frame = (m_current_frame + 1) % 2;
+    m_image_index = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, in_frame.GetImageSemaphore()).value;
 
-    m_device->GetLogicalDevice().waitForFences(1, &m_render_frames[m_current_frame].m_fence, VK_FALSE, UINT64_MAX);
+    auto const& command_buffer = in_frame.RequestCommandBuffer();
 
-    m_render_frames[m_current_frame].m_command_buffer.reset(vk::CommandBufferResetFlagBits::eReleaseResources);
-
+    // TODO : Execute final pass.
     vk::CommandBufferBeginInfo command_buffer_begin_info = {
 
     };
 
-    m_render_frames[m_current_frame].m_command_buffer.begin(command_buffer_begin_info);
+    command_buffer.begin(command_buffer_begin_info);
+    {
+        vk::ImageMemoryBarrier render_target_barrier = {
+            .srcAccessMask    = vk::AccessFlagBits::eColorAttachmentWrite,
+            .dstAccessMask    = vk::AccessFlagBits::eTransferRead,
+            .oldLayout        = vk::ImageLayout::eColorAttachmentOptimal,
+            .newLayout        = vk::ImageLayout::eTransferSrcOptimal,
+            .image            = in_frame.GetColorTarget().GetImage(),
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1
+            }
+        };
 
-    vk::Viewport viewport = {
-        .width    = static_cast<RkFloat>(m_image_extent.width),
-        .height   = static_cast<RkFloat>(m_image_extent.height),
-        .minDepth = 0.0f,
-        .maxDepth = 1.0f
-    };
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            render_target_barrier);
 
-    vk::Rect2D scissor = {
-        .extent = m_image_extent
-    };
+        vk::ImageMemoryBarrier swapchain_barrier = {
+            .srcAccessMask    = vk::AccessFlagBits::eNoneKHR,
+            .dstAccessMask    = vk::AccessFlagBits::eTransferWrite,
+            .oldLayout        = vk::ImageLayout::eUndefined,
+            .newLayout        = vk::ImageLayout::eTransferDstOptimal,
+            .image            = m_images[m_image_index],
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1
+            }
+        };
 
-    m_render_frames[m_current_frame].m_command_buffer.setViewport(0, viewport);
-    m_render_frames[m_current_frame].m_command_buffer.setScissor (0, scissor);
-}
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTopOfPipe,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            swapchain_barrier);
 
-RkVoid RenderWindow::Render()
-{
-    m_image_index = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, m_render_frames[m_current_frame].m_image_semaphore).value;
+        vk::ImageBlit image_blit = {
+            .srcSubresource = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .layerCount = 1
+            },
+            .dstSubresource = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .layerCount = 1
+            }
+        };
 
-    vk::ClearValue clear_color = { .color = std::array<RkFloat, 4>{0.0f, 0.0f, 0.0f, 1.0f} };
+        image_blit.srcOffsets[1].x = in_frame.GetColorTarget().GetExtent().width;
+        image_blit.srcOffsets[1].y = in_frame.GetColorTarget().GetExtent().height;
+        image_blit.srcOffsets[1].z = 1U;
+        image_blit.dstOffsets[1].x = m_image_extent.width / 2.0f;
+        image_blit.dstOffsets[1].y = m_image_extent.height;
+        image_blit.dstOffsets[1].z = 1U;
 
-    vk::ClearValue clear_stencil { .depthStencil = {1, 0} };
+        command_buffer.blitImage(
+            in_frame.GetColorTarget().GetImage(),
+            vk::ImageLayout::eTransferSrcOptimal,
+            m_images[m_image_index],
+            vk::ImageLayout::eTransferDstOptimal,
+            1U,
+            &image_blit,
+            vk::Filter::eLinear);
 
-    std::vector clear_values = {
-        clear_color, clear_stencil
-    };
+        render_target_barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+        render_target_barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+        render_target_barrier.oldLayout     = vk::ImageLayout::eTransferSrcOptimal;
+        render_target_barrier.newLayout     = vk::ImageLayout::eColorAttachmentOptimal;
+        
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            render_target_barrier);
 
-    vk::RenderPassBeginInfo render_pass_begin_info = {
-        .renderPass = Renderer::render_pass,
-        .framebuffer = m_framebuffers[m_image_index],
-        .renderArea = {
-            .extent = m_image_extent
+        swapchain_barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+        swapchain_barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead;
+        swapchain_barrier.oldLayout     = vk::ImageLayout::eTransferDstOptimal;
+        swapchain_barrier.newLayout     = vk::ImageLayout::ePresentSrcKHR;
+        
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eBottomOfPipe,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            swapchain_barrier);
+    }
+    command_buffer.end();
+
+    std::vector<vk::SemaphoreSubmitInfoKHR> wait_semaphores_submit_infos = {
+        {
+            .semaphore = in_frame.GetImageSemaphore()
         },
-        .clearValueCount = static_cast<uint32_t>(clear_values.size()),
-        .pClearValues = clear_values.data()
+        {
+            .semaphore = in_frame.GetTimelineSemaphore(),
+            .value     = in_frame.GetTimelineSemaphoreValue()
+        }
     };
 
-    m_render_frames[m_current_frame].m_command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
-
-    m_render_frames[m_current_frame].m_command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, Renderer::pipeline);
-
-    g_model->Render(m_render_frames[m_current_frame].m_command_buffer);
-
-    m_render_frames[m_current_frame].m_command_buffer.endRenderPass();
-}
-
-RkVoid RenderWindow::End()
-{
-    m_render_frames[m_current_frame].m_command_buffer.end();
-
-    vk::PipelineStageFlags stage_mask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-
-    vk::SubmitInfo submit_info = {
-        .waitSemaphoreCount = 1,
-        .pWaitSemaphores = &m_render_frames[m_current_frame].m_image_semaphore,
-        .pWaitDstStageMask = &stage_mask,
-        .commandBufferCount = 1,
-        .pCommandBuffers = &m_render_frames[m_current_frame].m_command_buffer,
-        .signalSemaphoreCount = 1,
-        .pSignalSemaphores = &m_render_frames[m_current_frame].m_present_semaphore
+    std::vector<vk::CommandBufferSubmitInfoKHR> command_buffer_submit_infos = {
+        {
+            .commandBuffer = command_buffer
+        }
     };
 
-    m_device->GetLogicalDevice().resetFences(1, &m_render_frames[m_current_frame].m_fence);
+    std::vector<vk::SemaphoreSubmitInfoKHR> signal_semaphores_submit_infos = {
+        {
+            .semaphore = in_frame.GetPresentSemaphore()
+        },
+        {
+            .semaphore = in_frame.GetTimelineSemaphore(),
+            .value     = in_frame.IncrementTimelineSemaphoreValue()
+        }
+    };
 
-    m_device->GetTestQueue().submit(submit_info, m_render_frames[m_current_frame].m_fence);
+    vk::SubmitInfo2KHR submit_info = {
+        .waitSemaphoreInfoCount   = static_cast<RkUint32>(wait_semaphores_submit_infos.size()),
+        .pWaitSemaphoreInfos      = wait_semaphores_submit_infos.data(),
+        .commandBufferInfoCount   = static_cast<RkUint32>(command_buffer_submit_infos.size()),
+        .pCommandBufferInfos      = command_buffer_submit_infos.data(),
+        .signalSemaphoreInfoCount = static_cast<RkUint32>(signal_semaphores_submit_infos.size()),
+        .pSignalSemaphoreInfos    = signal_semaphores_submit_infos.data()
+    };
+
+    m_device->GetGraphicsQueue().Submit(submit_info);
 
     vk::PresentInfoKHR present_info = {
         .waitSemaphoreCount = 1,
-        .pWaitSemaphores = &m_render_frames[m_current_frame].m_present_semaphore,
-        .swapchainCount = 1,
-        .pSwapchains = &m_swapchain,
-        .pImageIndices = &m_image_index
+        .pWaitSemaphores    = &in_frame.GetPresentSemaphore(),
+        .swapchainCount     = 1,
+        .pSwapchains        = &m_swapchain,
+        .pImageIndices      = &m_image_index
     };
 
-    m_device->GetTestQueue().presentKHR(present_info);
+    m_device->GetGraphicsQueue().Present(present_info);
 }

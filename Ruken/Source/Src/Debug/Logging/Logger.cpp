@@ -1,6 +1,9 @@
 
 #include "Debug/Logging/Logger.hpp"
 
+#include "Core/Kernel.hpp"
+#include "Core/KernelProxy.hpp"
+
 USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
@@ -74,6 +77,8 @@ RkVoid Logger::Error(std::string_view const in_message) const noexcept
 RkVoid Logger::Fatal(std::string_view const in_message) const noexcept
 {
     Log(ELogLevel::Fatal, in_message);
+
+    m_service_provider.LocateService<KernelProxy>()->GetKernelReference().RequestShutdown(EXIT_FAILURE);
 }
 
 RkVoid Logger::AddFilter(LogFilter const* in_filter) noexcept

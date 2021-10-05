@@ -2,16 +2,20 @@
 
 #include "Rendering/Resources/DeviceObjectBase.hpp"
 
-#include "Vector/Vector.hpp"
-#include "Matrix/Matrix4x4.hpp"
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
+#include <glm/glm/glm.hpp>
+
+#include <glm/glm/gtc/matrix_transform.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
 struct Vertex
 {
-    Vector3f position;
-    Vector3f color;
-    Vector2f uv;
+    glm::vec3 position;
+    glm::vec3 color;
+    glm::vec2 uv;
 
     static vk::VertexInputBindingDescription get_binding_description()
     {
@@ -50,9 +54,9 @@ struct Vertex
 };
 
 struct UniformBufferObject {
-    Matrix4x4f model;
-    Matrix4x4f view;
-    Matrix4x4f proj;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
 };
 
 class Model : public DeviceObjectBase

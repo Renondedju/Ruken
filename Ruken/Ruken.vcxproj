@@ -247,6 +247,10 @@
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleSubset.hpp" />
     <ClInclude Include="Source\Include\Meta\UniqueTypes.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderGraph.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderQueue.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderSystem.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\DeviceObjectBase.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Model.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
@@ -398,6 +402,10 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderGraph.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderQueue.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderSystem.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderTarget.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\Model.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderDevice.cpp" />

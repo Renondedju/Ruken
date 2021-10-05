@@ -3,56 +3,175 @@
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/RenderContext.hpp"
 
+#include "Debug/Logging/Logger.hpp"
+
 USING_RUKEN_NAMESPACE
 
+#pragma region Static Variables
+
 constexpr std::array g_enabled_extensions = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
 };
 
-RenderDevice::RenderDevice(RenderContext const& in_context, Logger* in_logger) noexcept: m_logger {in_logger}
+#pragma endregion
+
+#pragma region Constructors
+
+RenderDevice::RenderDevice(Logger* in_logger, RenderContext* in_context) noexcept:
+    m_logger  {in_logger},
+    m_context {in_context}
 {
-    auto [result, physical_devices] = in_context.GetInstance().enumeratePhysicalDevices();
+    if (!in_context->GetInstance() || !PickPhysicalDevice() || !CreateLogicalDevice())
+        return;
 
-    m_physical_device = physical_devices[0];
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_logical_device);
 
+    CreateDeviceAllocator();
+}
+
+RenderDevice::~RenderDevice() noexcept
+{
+    if (!m_logical_device)
+        return;
+
+    if (m_allocator)
+        m_allocator.destroy();
+
+    m_graphics_queue.reset();
+    m_compute_queue .reset();
+    m_transfer_queue.reset();
+
+    m_logical_device.destroy();
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+RkBool RenderDevice::PickPhysicalDevice() noexcept
+{
+    auto [result, value] = m_context->GetInstance().enumeratePhysicalDevices();
+
+    if (result == vk::Result::eSuccess)
+    {
+        // TODO : Select best physical device here.
+        m_physical_device = value[0];
+    }
+
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("No suitable physical device available : " + vk::to_string(result)))
+
+    return result == vk::Result::eSuccess;
+}
+
+RkBool RenderDevice::CreateLogicalDevice() noexcept
+{
     auto const queue_families = m_physical_device.getQueueFamilyProperties();
-
-    std::vector<vk::DeviceQueueCreateInfo> queue_create_infos(queue_families.size());
-
-    std::vector<std::vector<RkFloat>> queue_priorities(queue_families.size());
 
     for (RkUint32 index = 0U; index < queue_families.size(); ++index)
     {
-       queue_priorities[index].resize(queue_families[index].queueCount, 1.0F);
+        vk::QueueFlags flags = queue_families[index].queueFlags;
 
-        queue_create_infos[index].queueFamilyIndex = index;
-        queue_create_infos[index].queueCount       = queue_families[index].queueCount;
-        queue_create_infos[index].pQueuePriorities = queue_priorities[index].data();
+        if (flags & vk::QueueFlagBits::eTransfer && !(flags & vk::QueueFlagBits::eGraphics) && !(flags & vk::QueueFlagBits::eCompute))
+        {
+            m_transfer_family_index = index;
+        }
+
+        if (flags & vk::QueueFlagBits::eCompute && !(flags & vk::QueueFlagBits::eGraphics))
+        {
+            m_compute_family_index = index;
+        }
+
+        if (flags & vk::QueueFlagBits::eGraphics)
+        {
+            m_graphics_family_index = index;
+        }
     }
 
+    if (m_compute_family_index  == UINT32_MAX)
+        m_compute_family_index  = m_graphics_family_index;
+    if (m_transfer_family_index == UINT32_MAX)
+        m_transfer_family_index = m_graphics_family_index;
+
+    std::vector<vk::DeviceQueueCreateInfo> queue_create_infos;
+
+    RkFloat queue_priority = 1.0F;
+
+    vk::DeviceQueueCreateInfo graphics_queue_create_info = {
+        .queueFamilyIndex = m_graphics_family_index,
+        .queueCount       = 1U,
+        .pQueuePriorities = &queue_priority
+    };
+
+    queue_create_infos.emplace_back(graphics_queue_create_info);
+
+    if (HasDedicatedComputeQueue())
+    {
+        vk::DeviceQueueCreateInfo compute_queue_create_info = {
+            .queueFamilyIndex = m_compute_family_index,
+            .queueCount       = 1U,
+            .pQueuePriorities = &queue_priority
+        };
+
+        queue_create_infos.emplace_back(compute_queue_create_info);
+    }
+
+    if (HasDedicatedTransferQueue())
+    {
+        vk::DeviceQueueCreateInfo transfer_queue_create_info = {
+            .queueFamilyIndex = m_transfer_family_index,
+            .queueCount       = 1U,
+            .pQueuePriorities = &queue_priority
+        };
+
+        queue_create_infos.emplace_back(transfer_queue_create_info);
+    }
+
+    vk::PhysicalDeviceTimelineSemaphoreFeatures timeline_semaphore_features = {
+        .timelineSemaphore = VK_TRUE
+    };
+
+    vk::PhysicalDeviceSynchronization2FeaturesKHR synchronization_features = {
+        .pNext            = &timeline_semaphore_features,
+        .synchronization2 = VK_TRUE
+    };
+
+    auto features = m_physical_device.getFeatures2();
+
+    features.pNext = &synchronization_features;
+
     vk::DeviceCreateInfo device_create_info = {
+        .pNext                   = &features,
         .queueCreateInfoCount    = static_cast<RkUint32>(queue_create_infos.size()),
         .pQueueCreateInfos       = queue_create_infos.data(),
         .enabledExtensionCount   = static_cast<RkUint32>(g_enabled_extensions.size()),
         .ppEnabledExtensionNames = g_enabled_extensions.data()
     };
 
-    std::tie(result, m_logical_device) = m_physical_device.createDevice(device_create_info);
+    auto [result, value] = m_physical_device.createDevice(device_create_info);
 
-    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_logical_device);
-     
-    m_queues.resize(queue_families.size());
-
-    for (RkUint32 queue_family_index = 0U; queue_family_index < queue_families.size(); ++queue_family_index)
+    if (result == vk::Result::eSuccess)
     {
-        m_queues[queue_family_index].resize(queue_families[queue_family_index].queueCount);
+        m_logical_device = value;
 
-        for (RkUint32 queue_index = 0U; queue_index < queue_families[queue_family_index].queueCount; ++queue_index)
-        {
-            m_queues[queue_family_index][queue_index] = m_logical_device.getQueue(queue_family_index, queue_index);
-        }
+        m_graphics_queue = std::make_unique<RenderQueue>(m_logger, this, m_graphics_family_index, 0U);
+
+        if (HasDedicatedComputeQueue())
+            m_compute_queue = std::make_unique<RenderQueue>(m_logger, this, m_compute_family_index, 0U);
+
+        if (HasDedicatedTransferQueue())
+            m_transfer_queue = std::make_unique<RenderQueue>(m_logger, this, m_transfer_family_index, 0U);
     }
 
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan device : " + vk::to_string(result)))
+
+    return result == vk::Result::eSuccess;
+}
+
+RkBool RenderDevice::CreateDeviceAllocator() noexcept
+{
     vk::VulkanFunctions functions = {
         .vkGetPhysicalDeviceProperties           = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties,
         .vkGetPhysicalDeviceMemoryProperties     = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceMemoryProperties,
@@ -82,17 +201,18 @@ RenderDevice::RenderDevice(RenderContext const& in_context, Logger* in_logger) n
         .physicalDevice   = m_physical_device,
         .device           = m_logical_device,
         .pVulkanFunctions = &functions,
-        .instance         = in_context.GetInstance(),
+        .instance         = m_context->GetInstance(),
         .vulkanApiVersion = VK_API_VERSION_1_1
     };
 
-    std::tie(result, m_allocator) = createAllocator(allocator_create_info);
-}
+    auto [result, value] = createAllocator(allocator_create_info);
 
-RenderDevice::~RenderDevice() noexcept
-{
-    m_allocator     .destroy();
-    m_logical_device.destroy();
+    if (result == vk::Result::eSuccess)
+        m_allocator = value;
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan device allocator : " + vk::to_string(result)))
+
+    return result == vk::Result::eSuccess;
 }
 
 vk::PhysicalDevice const& RenderDevice::GetPhysicalDevice() const noexcept
@@ -110,7 +230,44 @@ vk::Allocator const& RenderDevice::GetAllocator() const noexcept
     return m_allocator;
 }
 
-vk::Queue const& RenderDevice::GetTestQueue() const noexcept
+RkUint32 RenderDevice::GetGraphicsFamilyIndex() const noexcept
 {
-    return m_queues[0][0];
+    return m_graphics_family_index;
 }
+
+RkUint32 RenderDevice::GetComputeFamilyIndex() const noexcept
+{
+    return m_compute_family_index;
+}
+
+RkUint32 RenderDevice::GetTransferFamilyIndex() const noexcept
+{
+    return m_transfer_family_index;
+}
+
+RenderQueue& RenderDevice::GetGraphicsQueue() const noexcept
+{
+    return *m_graphics_queue;
+}
+
+RenderQueue& RenderDevice::GetComputeQueue() const noexcept
+{
+    return HasDedicatedComputeQueue() ? *m_compute_queue : *m_graphics_queue;
+}
+
+RenderQueue& RenderDevice::GetTransferQueue() const noexcept
+{
+    return HasDedicatedTransferQueue() ? *m_transfer_queue : *m_graphics_queue;
+}
+
+RkBool RenderDevice::HasDedicatedComputeQueue() const noexcept
+{
+    return m_compute_family_index != m_graphics_family_index;
+}
+
+RkBool RenderDevice::HasDedicatedTransferQueue() const noexcept
+{
+    return m_transfer_family_index != m_graphics_family_index;
+}
+
+#pragma endregion

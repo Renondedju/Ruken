@@ -8,13 +8,12 @@
 #include "Rendering/RenderContext.hpp"
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/RenderWindow.hpp"
+#include "Rendering/RenderGraph.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 class Window;
-
-
 
 class Renderer final : public Service<Renderer>
 {
@@ -26,6 +25,7 @@ class Renderer final : public Service<Renderer>
 
         std::unique_ptr<RenderContext> m_context;
         std::unique_ptr<RenderDevice>  m_device;
+        std::unique_ptr<RenderGraph>   m_graph;
 
         std::vector<RenderWindow> m_render_windows;
 
@@ -40,11 +40,14 @@ class Renderer final : public Service<Renderer>
 
     public:
 
-        static vk::RenderPass render_pass;
-        static vk::Pipeline pipeline;
-        static vk::PipelineLayout pipeline_layout;
+        #pragma region Static Members
+
+        static vk::RenderPass          render_pass;
         static vk::DescriptorSetLayout descriptor_set_layout;
-        static vk::CommandPool command_pool;
+        static vk::PipelineLayout      pipeline_layout;
+        static vk::Pipeline            pipeline;
+
+        #pragma endregion
 
         #pragma region Members
 
@@ -66,10 +69,10 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Methods
 
-        RkVoid Update();
-
-        RenderContext const* GetContext() const noexcept;
-        RenderDevice  const* GetDevice () const noexcept;
+        RenderContext* GetContext() const noexcept;
+        RenderDevice*  GetDevice () const noexcept;
+        RenderGraph*   GetGraph  () const noexcept;
+        RenderWindow&  GetMainWindow() noexcept;
 
         #pragma endregion
 

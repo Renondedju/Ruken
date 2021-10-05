@@ -4,6 +4,7 @@
 #include <atomic>
 
 #include "Build/Namespace.hpp"
+#include "Build/Config.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceStatus.hpp"
 #include "Resource/Enums/EResourceGCStrategy.hpp"

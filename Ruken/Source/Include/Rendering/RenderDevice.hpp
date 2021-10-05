@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/RenderDefines.hpp"
+#include "Rendering/RenderQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -13,13 +13,28 @@ class RenderDevice
 
         #pragma region Members
 
-        Logger* m_logger;
+        Logger*        m_logger  {nullptr};
+        RenderContext* m_context {nullptr};
 
-        vk::PhysicalDevice m_physical_device;
-        vk::Device         m_logical_device;
-        vk::Allocator      m_allocator;
+        vk::PhysicalDevice m_physical_device {};
+        vk::Device         m_logical_device  {};
+        vk::Allocator      m_allocator       {};
 
-        std::vector<std::vector<vk::Queue>> m_queues;
+        RkUint32 m_graphics_family_index {UINT32_MAX};
+        RkUint32 m_compute_family_index  {UINT32_MAX};
+        RkUint32 m_transfer_family_index {UINT32_MAX};
+
+        std::unique_ptr<RenderQueue> m_graphics_queue;
+        std::unique_ptr<RenderQueue> m_compute_queue;
+        std::unique_ptr<RenderQueue> m_transfer_queue;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        RkBool PickPhysicalDevice   () noexcept;
+        RkBool CreateLogicalDevice  () noexcept;
+        RkBool CreateDeviceAllocator() noexcept;
 
         #pragma endregion
 
@@ -27,7 +42,7 @@ class RenderDevice
 
         #pragma region Constructors
 
-        RenderDevice(RenderContext const& in_context, Logger* in_logger = nullptr) noexcept;
+        RenderDevice(Logger* in_logger, RenderContext* in_context) noexcept;
 
         RenderDevice(RenderDevice const& in_copy) = delete;
         RenderDevice(RenderDevice&&      in_move) = delete;
@@ -38,11 +53,17 @@ class RenderDevice
 
         #pragma region Methods
 
-        vk::PhysicalDevice const& GetPhysicalDevice () const noexcept;
-        vk::Device         const& GetLogicalDevice  () const noexcept;
-        vk::Allocator      const& GetAllocator      () const noexcept;
-
-        vk::Queue const& GetTestQueue() const noexcept;
+        vk::PhysicalDevice const& GetPhysicalDevice        () const noexcept;
+        vk::Device         const& GetLogicalDevice         () const noexcept;
+        vk::Allocator      const& GetAllocator             () const noexcept;
+        RkUint32                  GetGraphicsFamilyIndex   () const noexcept;
+        RkUint32                  GetComputeFamilyIndex    () const noexcept;
+        RkUint32                  GetTransferFamilyIndex   () const noexcept;
+        RenderQueue&              GetGraphicsQueue         () const noexcept;
+        RenderQueue&              GetComputeQueue          () const noexcept;
+        RenderQueue&              GetTransferQueue         () const noexcept;
+        RkBool                    HasDedicatedComputeQueue () const noexcept;
+        RkBool                    HasDedicatedTransferQueue() const noexcept;
 
         #pragma endregion
 

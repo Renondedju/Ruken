@@ -1,20 +1,25 @@
 
 #include "Rendering/Renderer.hpp"
-#include "Core/ServiceProvider.hpp"
-#include "Meta/Safety.hpp"
+
 #include "Windowing/WindowManager.hpp"
-#include "Threading/Scheduler.hpp"
+
+#include "Core/ServiceProvider.hpp"
 
 #include "Rendering/Resources/Model.hpp"
 #include "Rendering/Resources/Shader.hpp"
 
+#include "Debug/Logging/Logger.hpp"
+
 USING_RUKEN_NAMESPACE
 
+#pragma region Static Variables
+
 vk::RenderPass          Renderer::render_pass;
-vk::Pipeline            Renderer::pipeline;
-vk::PipelineLayout      Renderer::pipeline_layout;
 vk::DescriptorSetLayout Renderer::descriptor_set_layout;
-vk::CommandPool         Renderer::command_pool;
+vk::PipelineLayout      Renderer::pipeline_layout;
+vk::Pipeline            Renderer::pipeline;
+
+#pragma endregion
 
 #pragma region Constructors
 
@@ -24,7 +29,11 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Rende
         m_logger = root_logger->AddChild("Rendering");
 
     m_context = std::make_unique<RenderContext>(m_logger);
-    m_device  = std::make_unique<RenderDevice> (*m_context, m_logger);
+    m_device  = std::make_unique<RenderDevice> (m_logger, m_context.get());
+    m_graph   = std::make_unique<RenderGraph>  (m_logger, m_device .get());
+
+    if (!m_context->GetInstance() || !m_device->GetLogicalDevice())
+        return;
 
     if (WindowManager* window_manager = m_service_provider.LocateService<WindowManager>())
     { 
@@ -32,7 +41,7 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Rende
         window_manager->on_window_destroyed.Subscribe([this] (Window& in_window) { OnWindowDestroyed(in_window); });
     }
 
-    Shader  shader (m_device.get(), "Data/");
+    Shader shader(m_device.get(), "Data/");
 
     vk::AttachmentReference color_attachment_reference = {
         .attachment = 0,
@@ -54,17 +63,17 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Rende
     std::array<vk::AttachmentDescription, 2> attachments = {
         {
             {
-                .format = vk::Format::eB8G8R8A8Unorm,
+                .format = vk::Format::eR8G8B8A8Unorm,
                 .samples = vk::SampleCountFlagBits::e1,
                 .loadOp = vk::AttachmentLoadOp::eClear,
                 .storeOp = vk::AttachmentStoreOp::eStore,
                 .stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
                 .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
                 .initialLayout = vk::ImageLayout::eUndefined,
-                .finalLayout = vk::ImageLayout::ePresentSrcKHR
+                .finalLayout = vk::ImageLayout::eColorAttachmentOptimal
             },
             {
-                .format = vk::Format::eD32Sfloat,
+                .format = vk::Format::eD24UnormS8Uint,
                 .samples = vk::SampleCountFlagBits::e1,
                 .loadOp = vk::AttachmentLoadOp::eClear,
                 .storeOp = vk::AttachmentStoreOp::eDontCare,
@@ -202,25 +211,27 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Rende
 
     pipeline = m_device->GetLogicalDevice().createGraphicsPipeline(VK_NULL_HANDLE, pipeline_info).value;
 
-    vk::CommandPoolCreateInfo command_pool_info = {
-        .flags            = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-        .queueFamilyIndex = 0U
-    };
-
-    command_pool = m_device->GetLogicalDevice().createCommandPool(command_pool_info).value;
-
     RUKEN_SAFE_LOGGER_CALL(m_logger, Info("Renderer initialized."))
 }
 
 Renderer::~Renderer() noexcept
 {
+    if (!m_device->GetLogicalDevice())
+        return;
+
+    vk::Result const result = m_device->GetLogicalDevice().waitIdle();
+
+    if (result != vk::Result::eSuccess)
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to shutdown renderer : " + vk::to_string(result)))
+
     m_render_windows.clear();
 
-    m_device->GetLogicalDevice().destroy(descriptor_set_layout);
     m_device->GetLogicalDevice().destroy(pipeline);
     m_device->GetLogicalDevice().destroy(pipeline_layout);
+    m_device->GetLogicalDevice().destroy(descriptor_set_layout);
     m_device->GetLogicalDevice().destroy(render_pass);
 
+    m_graph  .reset();
     m_device .reset();
     m_context.reset();
 
@@ -233,7 +244,7 @@ Renderer::~Renderer() noexcept
 
 void Renderer::OnWindowCreated(Window& in_window)
 {
-    m_render_windows.emplace_back(in_window, m_context.get(), m_device.get(), m_logger);
+    m_render_windows.emplace_back(m_logger, m_context.get(), m_device.get(), in_window);
 }
 
 void Renderer::OnWindowDestroyed(Window& in_window)
@@ -245,24 +256,24 @@ void Renderer::OnWindowDestroyed(Window& in_window)
     }
 }
 
-RkVoid Renderer::Update()
-{
-    for (auto& render_window : m_render_windows)
-    {
-        render_window.Begin();
-        render_window.Render();
-        render_window.End();
-    }
-}
-
-RenderContext const* Renderer::GetContext() const noexcept
+RenderContext* Renderer::GetContext() const noexcept
 {
     return m_context.get();
 }
 
-RenderDevice const* Renderer::GetDevice() const noexcept
+RenderDevice* Renderer::GetDevice() const noexcept
 {
     return m_device.get();
+}
+
+RenderGraph* Renderer::GetGraph() const noexcept
+{
+    return m_graph.get();
+}
+
+RenderWindow& Renderer::GetMainWindow() noexcept
+{
+    return m_render_windows[0];
 }
 
 #pragma endregion

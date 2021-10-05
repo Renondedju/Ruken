@@ -12,6 +12,8 @@
 #include "Meta/Safety.hpp"
 
 #include "Rendering/Renderer.hpp"
+#include "Rendering/RenderSystem.hpp"
+
 #include "Threading/Scheduler.hpp"
 #include "Windowing/WindowManager.hpp"
 #include "Resource/ResourceManager.hpp"
@@ -41,10 +43,10 @@ Kernel::Kernel()
 
     SetupService<KernelProxy>(true, *this);
 
-    SetupService<Scheduler>      (true);
+    // SetupService<Scheduler>      (true);
     SetupService<WindowManager>  (true);
     SetupService<Renderer>       (true);
-    SetupService<ResourceManager>(true);
+    // SetupService<ResourceManager>(true);
 
     m_console_handler.Flush();
 }
@@ -67,19 +69,24 @@ RkInt Kernel::Run() noexcept
         }
     });
 
+    RenderSystem system(renderer.GetDevice(), &renderer);
+
     // Main kernel loop
     while (!m_shutdown_requested.load(std::memory_order_acquire))
     {
         // Updating services that needs to
         window_manager.Update();
-        renderer.Update();
 
         if (window.ShouldClose())
             RequestShutdown(0);
 
+        system.Render();
+
         // Displaying logs to the console
         m_console_handler.Flush();
     }
+
+    renderer.GetDevice()->GetLogicalDevice().waitIdle();
 
     // Exit
     RUKEN_SAFE_LOGGER_CALL(m_logger, Info("Cleanup done, exiting application"))

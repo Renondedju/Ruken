@@ -12,11 +12,18 @@ class RenderContext
 
         #pragma region Members
 
-        Logger* m_logger;
+        Logger* m_logger {nullptr};
 
-        vk::DynamicLoader          m_loader;
-        vk::Instance               m_instance;
-        vk::DebugUtilsMessengerEXT m_messenger;
+        vk::DynamicLoader          m_dynamic_loader        {};
+        vk::Instance               m_instance              {};
+        vk::DebugUtilsMessengerEXT m_debug_utils_messenger {};
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        RkBool CreateInstance           () noexcept;
+        RkVoid CreateDebugUtilsMessenger() noexcept;
 
         #pragma endregion
 

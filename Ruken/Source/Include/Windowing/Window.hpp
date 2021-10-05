@@ -1,21 +1,18 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
+#define GLFW_INCLUDE_NONE
+
+#include <GLFW/glfw3.h>
 
 #include "Functional/Event.hpp"
 
 #include "Windowing/Utilities.hpp"
 #include "Windowing/WindowParams.hpp"
 
-#define GLFW_INCLUDE_NONE
-
-#include <GLFW/glfw3.h>
-
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
-class RenderContext;
 
 /**
  * \brief Manages a GLFW window.
