@@ -7,8 +7,6 @@
 
 #include "Rendering/RenderContext.hpp"
 #include "Rendering/RenderDevice.hpp"
-#include "Rendering/RenderWindow.hpp"
-#include "Rendering/RenderGraph.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -25,16 +23,6 @@ class Renderer final : public Service<Renderer>
 
         std::unique_ptr<RenderContext> m_context;
         std::unique_ptr<RenderDevice>  m_device;
-        std::unique_ptr<RenderGraph>   m_graph;
-
-        std::vector<RenderWindow> m_render_windows;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        void OnWindowCreated  (Window& in_window);
-        void OnWindowDestroyed(Window& in_window);
 
         #pragma endregion
 
@@ -71,8 +59,6 @@ class Renderer final : public Service<Renderer>
 
         RenderContext* GetContext() const noexcept;
         RenderDevice*  GetDevice () const noexcept;
-        RenderGraph*   GetGraph  () const noexcept;
-        RenderWindow&  GetMainWindow() noexcept;
 
         #pragma endregion
 

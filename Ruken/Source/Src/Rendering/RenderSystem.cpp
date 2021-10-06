@@ -2,15 +2,19 @@
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/Renderer.hpp"
 
+#include "Core/ServiceProvider.hpp"
+
+#include "Windowing/WindowManager.hpp"
+
 #include "Rendering/Resources/Model.hpp"
 
 USING_RUKEN_NAMESPACE
 
 static std::unique_ptr<Model> g_model;
 
-RenderSystem::RenderSystem(RenderDevice* in_device, Renderer* in_renderer) noexcept:
-    m_device {in_device},
-    m_renderer {in_renderer}
+RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
+    m_device {in_service_provider.LocateService<Renderer>     ()->GetDevice    ()},
+    m_window {in_service_provider.LocateService<WindowManager>()->GetMainWindow()}
 {
     for (RkUint32 i = 0U; i < 2U; ++i)
     {
@@ -22,10 +26,12 @@ RenderSystem::RenderSystem(RenderDevice* in_device, Renderer* in_renderer) noexc
 
 RenderSystem::~RenderSystem() noexcept
 {
+    m_device->GetLogicalDevice().waitIdle();
+
     g_model.reset();
 }
 
-RkVoid RenderSystem::Render()
+RkVoid RenderSystem::Update() noexcept
 {
     m_current_frame = (m_current_frame + 1) % 2;
 
@@ -107,5 +113,5 @@ RkVoid RenderSystem::Render()
 
     m_device->GetGraphicsQueue().Submit(submit_info);
 
-    m_renderer->GetMainWindow().Present(frame);
+    m_window->Present(frame);
 }

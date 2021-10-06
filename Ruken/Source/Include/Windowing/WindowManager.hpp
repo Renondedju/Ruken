@@ -20,9 +20,11 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma region Members
 
-        Logger*             m_logger  {nullptr};
-        std::vector<Window> m_windows {};
-        std::vector<Screen> m_screens {};
+        Logger* m_logger      {nullptr};
+        Window* m_main_window {nullptr};
+
+        std::vector<std::unique_ptr<Window>> m_windows {};
+        std::vector<std::unique_ptr<Screen>> m_screens {};
 
         #pragma endregion
 
@@ -44,20 +46,14 @@ class WindowManager final: public Service<WindowManager>
 
         #pragma endregion
 
-        #pragma region Events
-
-        Event<Window&> on_window_created   {};
-        Event<Window&> on_window_destroyed {};
-
-        #pragma endregion
-
         #pragma region Constructors
 
         WindowManager(ServiceProvider& in_service_provider) noexcept;
         
         WindowManager(WindowManager const& in_copy) = delete;
         WindowManager(WindowManager&&      in_move) = delete;
-        ~WindowManager() noexcept;
+
+        ~WindowManager() noexcept override;
 
         #pragma endregion
 
@@ -71,12 +67,14 @@ class WindowManager final: public Service<WindowManager>
         /**
          * \return A reference to the newly created window.
          */
-        Window& CreateWindow(WindowParams const& in_params) noexcept;
+        Window* CreateWindow(WindowParams const& in_params) noexcept;
 
         /**
          * \brief Destroys the specified window if it is managed by the WindowManager.
          */
         RkVoid DestroyWindow(Window const& in_window) noexcept;
+
+        Window* GetMainWindow() const noexcept;
 
         #pragma endregion
 

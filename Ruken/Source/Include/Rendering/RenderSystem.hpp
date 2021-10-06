@@ -4,15 +4,16 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+class Window;
 class RenderDevice;
-class Renderer;
+class ServiceProvider;
 
 class RenderSystem
 {
     private:
 
         RenderDevice* m_device;
-        Renderer* m_renderer;
+        Window* m_window;
 
         RkUint32 m_current_frame {0U};
 
@@ -20,14 +21,14 @@ class RenderSystem
 
     public:
 
-        RenderSystem(RenderDevice* in_device, Renderer* in_renderer) noexcept;
+        RenderSystem(ServiceProvider& in_service_provider) noexcept;
 
         RenderSystem(RenderSystem const& in_copy) = delete;
         RenderSystem(RenderSystem&&      in_move) = delete;
 
         ~RenderSystem() noexcept;
 
-        RkVoid Render();
+        RkVoid Update() noexcept;
 
         #pragma region Operators
 

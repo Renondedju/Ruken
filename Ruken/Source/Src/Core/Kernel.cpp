@@ -43,10 +43,10 @@ Kernel::Kernel()
 
     SetupService<KernelProxy>(true, *this);
 
-    // SetupService<Scheduler>      (true);
-    SetupService<WindowManager>  (true);
+    //SetupService<Scheduler>      (true);
     SetupService<Renderer>       (true);
-    // SetupService<ResourceManager>(true);
+    SetupService<WindowManager>  (true);
+    //SetupService<ResourceManager>(true);
 
     m_console_handler.Flush();
 }
@@ -59,34 +59,19 @@ RkInt Kernel::Run() noexcept
         return m_exit_code;
 
     auto& window_manager = *m_service_provider.LocateService<WindowManager>();
-    auto& renderer = *m_service_provider.LocateService<Renderer>();
 
-    auto& window = window_manager.CreateWindow({
-        .name = RUKEN_PROJECT_NAME,
-        .size = {
-            .width  = 1600,
-            .height = 900
-        }
-    });
-
-    RenderSystem system(renderer.GetDevice(), &renderer);
+    RenderSystem render_system(m_service_provider);
 
     // Main kernel loop
     while (!m_shutdown_requested.load(std::memory_order_acquire))
     {
         // Updating services that needs to
         window_manager.Update();
-
-        if (window.ShouldClose())
-            RequestShutdown(0);
-
-        system.Render();
+        render_system .Update();
 
         // Displaying logs to the console
         m_console_handler.Flush();
     }
-
-    renderer.GetDevice()->GetLogicalDevice().waitIdle();
 
     // Exit
     RUKEN_SAFE_LOGGER_CALL(m_logger, Info("Cleanup done, exiting application"))

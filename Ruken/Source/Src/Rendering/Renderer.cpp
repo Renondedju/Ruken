@@ -30,16 +30,9 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Rende
 
     m_context = std::make_unique<RenderContext>(m_logger);
     m_device  = std::make_unique<RenderDevice> (m_logger, m_context.get());
-    m_graph   = std::make_unique<RenderGraph>  (m_logger, m_device .get());
 
     if (!m_context->GetInstance() || !m_device->GetLogicalDevice())
         return;
-
-    if (WindowManager* window_manager = m_service_provider.LocateService<WindowManager>())
-    { 
-        window_manager->on_window_created  .Subscribe([this] (Window& in_window) { OnWindowCreated  (in_window); });
-        window_manager->on_window_destroyed.Subscribe([this] (Window& in_window) { OnWindowDestroyed(in_window); });
-    }
 
     Shader shader(m_device.get(), "Data/");
 
@@ -224,14 +217,11 @@ Renderer::~Renderer() noexcept
     if (result != vk::Result::eSuccess)
         RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to shutdown renderer : " + vk::to_string(result)))
 
-    m_render_windows.clear();
-
     m_device->GetLogicalDevice().destroy(pipeline);
     m_device->GetLogicalDevice().destroy(pipeline_layout);
     m_device->GetLogicalDevice().destroy(descriptor_set_layout);
     m_device->GetLogicalDevice().destroy(render_pass);
 
-    m_graph  .reset();
     m_device .reset();
     m_context.reset();
 
@@ -242,20 +232,6 @@ Renderer::~Renderer() noexcept
 
 #pragma region Methods
 
-void Renderer::OnWindowCreated(Window& in_window)
-{
-    m_render_windows.emplace_back(m_logger, m_context.get(), m_device.get(), in_window);
-}
-
-void Renderer::OnWindowDestroyed(Window& in_window)
-{
-    for (auto it = m_render_windows.cbegin(); it != m_render_windows.cend(); ++it)
-    {
-        if (!it->IsValid())
-            m_render_windows.erase(it);
-    }
-}
-
 RenderContext* Renderer::GetContext() const noexcept
 {
     return m_context.get();
@@ -264,16 +240,6 @@ RenderContext* Renderer::GetContext() const noexcept
 RenderDevice* Renderer::GetDevice() const noexcept
 {
     return m_device.get();
-}
-
-RenderGraph* Renderer::GetGraph() const noexcept
-{
-    return m_graph.get();
-}
-
-RenderWindow& Renderer::GetMainWindow() noexcept
-{
-    return m_render_windows[0];
 }
 
 #pragma endregion

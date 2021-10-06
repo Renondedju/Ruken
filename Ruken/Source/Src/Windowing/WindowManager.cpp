@@ -1,8 +1,12 @@
 
 #include "Windowing/WindowManager.hpp"
 
+#include "Build/Info.hpp"
+
 #include "Core/Kernel.hpp"
 #include "Core/KernelProxy.hpp"
+
+#include "Rendering/Renderer.hpp"
 
 #include "Debug/Logging/Logger.hpp"
 
@@ -33,7 +37,15 @@ WindowManager::WindowManager(ServiceProvider& in_service_provider) noexcept:
 
     SetupScreens();
 
-    // TODO : SetMonitorCallback
+    WindowParams params = {
+        .name = RUKEN_PROJECT_NAME,
+        .size = {
+            .width  = 1600,
+            .height = 900
+        }
+    };
+
+    m_main_window = CreateWindow(params);
 }
 
 WindowManager::~WindowManager() noexcept
@@ -53,41 +65,48 @@ WindowManager::~WindowManager() noexcept
 
 RkVoid WindowManager::SetupScreens() noexcept
 {
-    auto        count    = 0;
-    auto* const monitors = glfwGetMonitors(&count);
+    RkInt32       count    = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&count);
 
-    m_screens.reserve(count);
-
-    for (auto i = 0; i < count; ++i)
+    for (RkInt32 i = 0; i < count; ++i)
     {
-        Screen screen(m_logger, monitors[i]);
-
-        m_screens.emplace_back(std::move(screen));
+        m_screens.emplace_back(new Screen(m_logger, monitors[i]));
     }
 }
 
 RkVoid WindowManager::Update() const noexcept
 {
     glfwPollEvents();
+
+    if (m_main_window->ShouldClose())
+    {
+        m_service_provider.LocateService<KernelProxy>()->GetKernelReference().RequestShutdown(1);
+    }
 }
 
-Window& WindowManager::CreateWindow(WindowParams const& in_params) noexcept
+Window* WindowManager::CreateWindow(WindowParams const& in_params) noexcept
 {
-    Window window(in_params, m_logger);
+    Renderer const* renderer = m_service_provider.LocateService<Renderer>();
 
-    auto& new_window = m_windows.emplace_back(std::move(window));
-
-    on_window_created.Invoke(new_window);
-
-    return new_window;
+    return m_windows.emplace_back(new Window(m_logger, renderer->GetContext(), renderer->GetDevice(), in_params)).get();
 }
 
 RkVoid WindowManager::DestroyWindow(Window const& in_window) noexcept
 {
-    auto const it = std::ranges::find(std::as_const(m_windows), in_window);
+    for (auto it = m_windows.cbegin(); it != m_windows.cend(); ++it)
+    {
+        if ((**it).GetHandle() != in_window.GetHandle())
+            continue;
 
-    if (it != m_windows.cend())
         m_windows.erase(it);
+
+        return;
+    }
+}
+
+Window* WindowManager::GetMainWindow() const noexcept
+{
+    return m_main_window;
 }
 
 #pragma endregion

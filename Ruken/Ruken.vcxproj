@@ -256,7 +256,6 @@
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderDevice.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
-    <ClInclude Include="Source\Include\Rendering\RenderWindow.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Shader.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Texture.hpp" />
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
@@ -410,7 +409,6 @@
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderDevice.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderFrame.cpp" />
-    <ClCompile Include="Source\Src\Rendering\RenderWindow.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\Shader.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\Texture.cpp" />
     <ClCompile Include="Source\Src\Maths\Easing.cpp" />

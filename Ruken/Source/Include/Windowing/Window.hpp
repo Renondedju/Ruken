@@ -7,12 +7,16 @@
 
 #include "Functional/Event.hpp"
 
-#include "Windowing/Utilities.hpp"
 #include "Windowing/WindowParams.hpp"
+
+#include "Rendering/RenderDefines.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
+class RenderContext;
+class RenderDevice;
+class RenderFrame;
 
 /**
  * \brief Manages a GLFW window.
@@ -28,16 +32,29 @@ class Window
 
         #pragma region Members
 
-        Logger* m_logger  {nullptr};
+        Logger*        m_logger  {nullptr};
+        RenderContext* m_context {nullptr};
+        RenderDevice*  m_device  {nullptr};
 
-        GLFWwindow*    m_handle  {nullptr};
-        std::string    m_name    {};
+        GLFWwindow* m_handle {nullptr};
+        std::string m_name   {};
+
+        vk::SurfaceKHR     m_surface;
+        vk::SwapchainKHR   m_swapchain;
+        RkUint32           m_image_index;
+        RkUint32           m_image_count;
+        vk::Extent2D       m_image_extent;
+        vk::Format         m_image_format;
+        vk::ColorSpaceKHR  m_color_space;
+        vk::PresentModeKHR m_present_mode;
+
+        std::vector<vk::Image> m_images;
 
         #pragma endregion
 
         #pragma region Constructors
 
-        explicit Window(WindowParams const& in_params, Logger* in_logger = nullptr) noexcept;
+        explicit Window(Logger* in_logger, RenderContext* in_context, RenderDevice* in_device, WindowParams const& in_params) noexcept;
 
         #pragma endregion
 
@@ -59,8 +76,15 @@ class Window
 
         static Window* GetWindowUserPointer(GLFWwindow* in_window) noexcept;
         
-        RkVoid CreateWindow  (WindowParams const& in_params) noexcept;
-        RkVoid SetupCallbacks()                              noexcept;
+        RkVoid CreateWindow   (WindowParams const& in_params)                      noexcept;
+        RkVoid CreateSurface  ()                                                   noexcept;
+        RkVoid CreateSwapchain(vk::SwapchainKHR in_old_swapchain = VK_NULL_HANDLE) noexcept;
+        RkVoid SetupCallbacks ()                                                   noexcept;
+
+        RkVoid PickSwapchainImageCount ();
+        RkVoid PickSwapchainExtent     ();
+        RkVoid PickSwapchainFormat     ();
+        RkVoid PickSwapchainPresentMode();
 
         #pragma endregion
 
@@ -110,8 +134,10 @@ class Window
 
         #pragma region Constructors
 
+        Window() = delete;
+
         Window(Window const& in_copy) = delete;
-        Window(Window&&      in_move) noexcept;
+        Window(Window&&      in_move) = delete;
 
         ~Window() noexcept;
 
@@ -381,21 +407,16 @@ class Window
         [[nodiscard]]
         RkBool IsFocusedOnShow() const noexcept;
 
-        /**
-         * \return True if the window is valid, else False.
-         */
-        [[nodiscard]]
-        RkBool IsValid() const noexcept;
+        #pragma endregion
+
+        RkVoid Present(RenderFrame& in_frame) noexcept;
 
         #pragma endregion
 
         #pragma region Operators
 
         Window& operator=(Window const& in_copy) = delete;
-        Window& operator=(Window&&      in_move) noexcept;
-
-        RkBool operator==(Window const& in_other) const noexcept;
-        RkBool operator!=(Window const& in_other) const noexcept;
+        Window& operator=(Window&&      in_move) = delete;
 
         #pragma endregion
 };

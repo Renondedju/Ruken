@@ -1,43 +1,40 @@
 
+#include "Rendering/RenderContext.hpp"
+#include "Rendering/RenderDevice.hpp"
+#include "Rendering/RenderFrame.hpp"
+
 #include "Windowing/Window.hpp"
 
 #include "Debug/Logging/Logger.hpp"
-
-#include "Rendering/RenderContext.hpp"
 
 USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-Window::Window(WindowParams const& in_params, Logger* in_logger) noexcept:
+Window::Window( Logger* in_logger, RenderContext* in_context, RenderDevice* in_device, WindowParams const& in_params) noexcept:
     m_logger  {in_logger},
+    m_context {in_context},
+    m_device  {in_device},
     m_name    {in_params.name}
 {
-    CreateWindow  (in_params);
+    CreateWindow(in_params);
     SetupCallbacks();
-}
-
-Window::Window(Window&& in_move) noexcept:
-    m_logger                {in_move.m_logger},
-    m_handle                {in_move.m_handle},
-    m_name                  {std::move(in_move.m_name)},
-    on_closed               {std::move(in_move.on_closed)},
-    on_refreshed            {std::move(in_move.on_refreshed)},
-    on_moved                {std::move(in_move.on_moved)},
-    on_resized              {std::move(in_move.on_resized)},
-    on_focused              {std::move(in_move.on_focused)},
-    on_iconified            {std::move(in_move.on_iconified)},
-    on_maximized            {std::move(in_move.on_maximized)},
-    on_framebuffer_resized  {std::move(in_move.on_framebuffer_resized)},
-    on_content_rescaled     {std::move(in_move.on_content_rescaled)}
-{
-    in_move.m_handle = nullptr;
-
-    glfwSetWindowUserPointer(m_handle, this);
+    CreateSurface();
+    PickSwapchainImageCount();
+    PickSwapchainExtent();
+    PickSwapchainFormat();
+    PickSwapchainPresentMode();
+    CreateSwapchain();
 }
 
 Window::~Window() noexcept
 {
+    if (m_swapchain)
+        m_device->GetLogicalDevice().destroy(m_swapchain);
+
+    if (m_surface)
+        m_context->GetInstance().destroy(m_surface);
+
     if (m_handle)
         glfwDestroyWindow(m_handle);
 }
@@ -93,7 +90,12 @@ RkVoid Window::WindowMaximizeCallback(GLFWwindow* in_window, RkInt32 const in_ma
 RkVoid Window::FramebufferSizeCallback(GLFWwindow* in_window, RkInt32 const in_width, RkInt32 const in_height) noexcept
 {
     if (auto* window = GetWindowUserPointer(in_window))
+    {
+        window->PickSwapchainExtent();
+        window->CreateSwapchain    (window->m_swapchain);
+
         window->on_framebuffer_resized.Invoke(in_width, in_height);
+    }
 }
 
 RkVoid Window::WindowContentScaleCallback(GLFWwindow* in_window, RkFloat const in_x_scale, RkFloat const in_y_scale) noexcept
@@ -144,6 +146,62 @@ RkVoid Window::CreateWindow(WindowParams const& in_params) noexcept
     glfwSetWindowOpacity    (m_handle, in_params.opacity);
 }
 
+RkVoid Window::CreateSurface() noexcept
+{
+    VkSurfaceKHR surface;
+    
+    vk::Result const result = static_cast<vk::Result>(glfwCreateWindowSurface(m_context->GetInstance(), m_handle, nullptr, &surface));
+
+    if (result == vk::Result::eSuccess)
+    {
+        auto [result, value] = m_device->GetPhysicalDevice().getSurfaceSupportKHR(m_device->GetGraphicsFamilyIndex(), surface);
+
+        if (!value)
+            RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create surface!"))
+
+        m_surface = surface;
+        
+    }
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create surface!"))
+}
+
+RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
+{
+    if (IsIconified())
+        return;
+
+    vk::SwapchainCreateInfoKHR swapchain_create_info = {
+        .surface          = m_surface,
+        .minImageCount    = m_image_count,
+        .imageFormat      = m_image_format,
+        .imageColorSpace  = m_color_space,
+        .imageExtent      = m_image_extent,
+        .imageArrayLayers = 1U,
+        .imageUsage       = vk::ImageUsageFlagBits::eTransferDst,
+        .preTransform     = vk::SurfaceTransformFlagBitsKHR::eIdentity,
+        .compositeAlpha   = vk::CompositeAlphaFlagBitsKHR::eOpaque,
+        .presentMode      = m_present_mode,
+        .clipped          = VK_TRUE,
+        .oldSwapchain     = in_old_swapchain
+    };
+
+    auto [result, value] = m_device->GetLogicalDevice().createSwapchainKHR(swapchain_create_info);
+
+    if (result == vk::Result::eSuccess)
+    {
+        m_swapchain = value;
+
+        std::tie(result, m_images) = m_device->GetLogicalDevice().getSwapchainImagesKHR(m_swapchain);
+    }
+
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create swapchain!"))
+
+    if (in_old_swapchain)
+        m_device->GetLogicalDevice().destroySwapchainKHR(in_old_swapchain);
+}
+
 RkVoid Window::SetupCallbacks() noexcept
 {
     glfwSetWindowPosCallback         (m_handle, &WindowPosCallback);
@@ -155,6 +213,46 @@ RkVoid Window::SetupCallbacks() noexcept
     glfwSetWindowMaximizeCallback    (m_handle, &WindowMaximizeCallback);
     glfwSetFramebufferSizeCallback   (m_handle, &FramebufferSizeCallback);
     glfwSetWindowContentScaleCallback(m_handle, &WindowContentScaleCallback);
+}
+
+RkVoid Window::PickSwapchainImageCount()
+{
+    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
+
+    m_image_count = capabilities.minImageCount + 1;
+
+    if (capabilities.maxImageCount > 0 && m_image_count > capabilities.maxImageCount)
+        m_image_count = capabilities.maxImageCount;
+}
+
+RkVoid Window::PickSwapchainExtent()
+{
+    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
+
+    auto extent = GetFramebufferSize();
+
+    if (capabilities.currentExtent.width != UINT32_MAX)
+        m_image_extent = capabilities.currentExtent;
+    else
+    {
+        m_image_extent.width  = std::clamp(static_cast<RkUint32>(extent.width),  capabilities.minImageExtent.width,  capabilities.maxImageExtent.width);
+        m_image_extent.height = std::clamp(static_cast<RkUint32>(extent.height), capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+    }
+}
+
+RkVoid Window::PickSwapchainFormat()
+{
+    auto [result, formats] = m_device->GetPhysicalDevice().getSurfaceFormatsKHR(m_surface);
+
+    m_image_format = formats[0].format;
+    m_color_space  = formats[0].colorSpace;
+}
+
+RkVoid Window::PickSwapchainPresentMode()
+{
+    auto [result, present_modes] =  m_device->GetPhysicalDevice().getSurfacePresentModesKHR(m_surface);
+
+    m_present_mode = present_modes[0];
 }
 
 #pragma region Setters
@@ -396,47 +494,167 @@ RkBool Window::IsFocusedOnShow() const noexcept
     return glfwGetWindowAttrib(m_handle, GLFW_FOCUS_ON_SHOW);
 }
 
-RkBool Window::IsValid() const noexcept
+RkVoid Window::Present(RenderFrame& in_frame) noexcept
 {
-    return m_handle != nullptr;
+    if (IsIconified())
+        return;
+
+    m_image_index = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, in_frame.GetImageSemaphore()).value;
+
+    auto const& command_buffer = in_frame.RequestCommandBuffer();
+
+    // TODO : Execute final pass.
+    vk::CommandBufferBeginInfo command_buffer_begin_info = {
+
+    };
+
+    command_buffer.begin(command_buffer_begin_info);
+    {
+        vk::ImageMemoryBarrier render_target_barrier = {
+            .srcAccessMask    = vk::AccessFlagBits::eColorAttachmentWrite,
+            .dstAccessMask    = vk::AccessFlagBits::eTransferRead,
+            .oldLayout        = vk::ImageLayout::eColorAttachmentOptimal,
+            .newLayout        = vk::ImageLayout::eTransferSrcOptimal,
+            .image            = in_frame.GetColorTarget().GetImage(),
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1
+            }
+        };
+
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            render_target_barrier);
+
+        vk::ImageMemoryBarrier swapchain_barrier = {
+            .srcAccessMask    = vk::AccessFlagBits::eNoneKHR,
+            .dstAccessMask    = vk::AccessFlagBits::eTransferWrite,
+            .oldLayout        = vk::ImageLayout::eUndefined,
+            .newLayout        = vk::ImageLayout::eTransferDstOptimal,
+            .image            = m_images[m_image_index],
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1
+            }
+        };
+
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTopOfPipe,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            swapchain_barrier);
+
+        vk::ImageBlit image_blit = {
+            .srcSubresource = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .layerCount = 1
+            },
+            .dstSubresource = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .layerCount = 1
+            }
+        };
+
+        image_blit.srcOffsets[1].x = in_frame.GetColorTarget().GetExtent().width;
+        image_blit.srcOffsets[1].y = in_frame.GetColorTarget().GetExtent().height;
+        image_blit.srcOffsets[1].z = 1U;
+        image_blit.dstOffsets[1].x = m_image_extent.width;
+        image_blit.dstOffsets[1].y = m_image_extent.height;
+        image_blit.dstOffsets[1].z = 1U;
+
+        command_buffer.blitImage(
+            in_frame.GetColorTarget().GetImage(),
+            vk::ImageLayout::eTransferSrcOptimal,
+            m_images[m_image_index],
+            vk::ImageLayout::eTransferDstOptimal,
+            1U,
+            &image_blit,
+            vk::Filter::eLinear);
+
+        render_target_barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+        render_target_barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+        render_target_barrier.oldLayout     = vk::ImageLayout::eTransferSrcOptimal;
+        render_target_barrier.newLayout     = vk::ImageLayout::eColorAttachmentOptimal;
+        
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            render_target_barrier);
+
+        swapchain_barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+        swapchain_barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead;
+        swapchain_barrier.oldLayout     = vk::ImageLayout::eTransferDstOptimal;
+        swapchain_barrier.newLayout     = vk::ImageLayout::ePresentSrcKHR;
+        
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eBottomOfPipe,
+            vk::DependencyFlagBits::eByRegion,
+            nullptr,
+            nullptr,
+            swapchain_barrier);
+    }
+    command_buffer.end();
+
+    std::vector<vk::SemaphoreSubmitInfoKHR> wait_semaphores_submit_infos = {
+        {
+            .semaphore = in_frame.GetImageSemaphore()
+        },
+        {
+            .semaphore = in_frame.GetTimelineSemaphore(),
+            .value     = in_frame.GetTimelineSemaphoreValue()
+        }
+    };
+
+    std::vector<vk::CommandBufferSubmitInfoKHR> command_buffer_submit_infos = {
+        {
+            .commandBuffer = command_buffer
+        }
+    };
+
+    std::vector<vk::SemaphoreSubmitInfoKHR> signal_semaphores_submit_infos = {
+        {
+            .semaphore = in_frame.GetPresentSemaphore()
+        },
+        {
+            .semaphore = in_frame.GetTimelineSemaphore(),
+            .value     = in_frame.IncrementTimelineSemaphoreValue()
+        }
+    };
+
+    vk::SubmitInfo2KHR submit_info = {
+        .waitSemaphoreInfoCount   = static_cast<RkUint32>(wait_semaphores_submit_infos.size()),
+        .pWaitSemaphoreInfos      = wait_semaphores_submit_infos.data(),
+        .commandBufferInfoCount   = static_cast<RkUint32>(command_buffer_submit_infos.size()),
+        .pCommandBufferInfos      = command_buffer_submit_infos.data(),
+        .signalSemaphoreInfoCount = static_cast<RkUint32>(signal_semaphores_submit_infos.size()),
+        .pSignalSemaphoreInfos    = signal_semaphores_submit_infos.data()
+    };
+
+    m_device->GetGraphicsQueue().Submit(submit_info);
+
+    vk::PresentInfoKHR present_info = {
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores    = &in_frame.GetPresentSemaphore(),
+        .swapchainCount     = 1,
+        .pSwapchains        = &m_swapchain,
+        .pImageIndices      = &m_image_index
+    };
+
+    m_device->GetGraphicsQueue().Present(present_info);
 }
 
 #pragma endregion
-
-#pragma endregion
-
-#pragma region Operators
-
-Window& Window::operator=(Window&& in_move) noexcept
-{
-    m_logger               = in_move.m_logger;
-    m_handle               = in_move.m_handle;
-    m_name                 = std::move(in_move.m_name);
-    on_closed              = std::move(in_move.on_closed);
-    on_refreshed           = std::move(in_move.on_refreshed);
-    on_moved               = std::move(in_move.on_moved);
-    on_resized             = std::move(in_move.on_resized);
-    on_focused             = std::move(in_move.on_focused);
-    on_iconified           = std::move(in_move.on_iconified);
-    on_maximized           = std::move(in_move.on_maximized);
-    on_framebuffer_resized = std::move(in_move.on_framebuffer_resized);
-    on_content_rescaled    = std::move(in_move.on_content_rescaled);
-
-    in_move.m_handle = nullptr;
-
-    glfwSetWindowUserPointer(m_handle, this);
-
-    return *this;
-}
-
-RkBool Window::operator==(Window const& in_other) const noexcept
-{
-    return m_handle == in_other.m_handle;
-}
-
-RkBool Window::operator!=(Window const& in_other) const noexcept
-{
-    return m_handle != in_other.m_handle;
-}
 
 #pragma endregion
