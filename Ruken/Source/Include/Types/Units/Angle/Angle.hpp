@@ -39,14 +39,14 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
  */
 template<EAngleUnit TUnitType>
-struct Angle final: StrongType<RkFloat, struct AnglePhantom>,
+struct Angle final: StrongType<RkFloat, Angle<TUnitType>>,
                     Arithmetic<Angle<TUnitType>>,
                     Comparison<Angle<TUnitType>>,
                     Stream    <Angle<TUnitType>>
 {
     #pragma region Constructors
 
-    using StrongType<RkFloat, struct AnglePhantom>::StrongType;
+    using StrongType<RkFloat, Angle<TUnitType>>::StrongType;
 
     constexpr Angle()                     = default;
     constexpr Angle(Angle const& in_copy) = default;

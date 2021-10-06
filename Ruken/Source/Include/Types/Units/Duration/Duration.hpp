@@ -38,14 +38,14 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
  */
 template<EDurationUnit TUnitType>
-struct Duration final: StrongType<RkFloat, struct DurationPhantom>,
+struct Duration final: StrongType<RkFloat, Duration<TUnitType>>,
                        Arithmetic<Duration<TUnitType>>,
                        Comparison<Duration<TUnitType>>,
                        Stream    <Duration<TUnitType>>
 {
     #pragma region Constructors
 
-    using StrongType<RkFloat, struct DurationPhantom>::StrongType;
+    using StrongType<RkFloat, Duration<TUnitType>>::StrongType;
 
     constexpr Duration()                        = default;
     constexpr Duration(Duration const& in_copy) = default;

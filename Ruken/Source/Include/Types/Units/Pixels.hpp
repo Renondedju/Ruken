@@ -31,12 +31,12 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-struct Pixels final: StrongType<RkInt32, struct Pixels>,
+struct Pixels final: StrongType<RkInt32, Pixels>,
                      Arithmetic<Pixels>,
                      Comparison<Pixels>,
                      Stream    <Pixels>
 {
-    using StrongType<RkInt32, struct Pixels>::StrongType;
+    using StrongType<RkInt32, Pixels>::StrongType;
 };
 
 constexpr Pixels operator"" _px(RkSize const in_pixels) noexcept
