@@ -1,4 +1,4 @@
-/*
+/**
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -22,11 +22,17 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
-//USING_RUKEN_NAMESPACE
+#include "Types/Units/Distance/Distance.hpp"
 
-int main()
-{
-    return EXIT_SUCCESS;
-}
+BEGIN_RUKEN_NAMESPACE
+
+using Meters = Distance<EDistanceUnit::Meters>;
+
+constexpr Meters operator"" _m(RkLdouble in_distance) noexcept;
+constexpr Meters operator"" _m(RkSize    in_distance) noexcept;
+
+#include "Types/Units/Distance/Meters.inl"
+
+END_RUKEN_NAMESPACE

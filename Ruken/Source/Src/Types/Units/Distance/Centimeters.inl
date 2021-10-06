@@ -1,4 +1,4 @@
-/*
+/**
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -22,11 +22,18 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
-//USING_RUKEN_NAMESPACE
+#pragma region Operators
 
-int main()
+constexpr Centimeters operator"" _cm(RkLdouble const in_distance) noexcept
 {
-    return EXIT_SUCCESS;
+    return Centimeters(static_cast<Centimeters::UnderlyingType>(in_distance));
 }
+
+constexpr Centimeters operator"" _cm(RkSize const in_distance) noexcept
+{
+    return Centimeters(static_cast<Centimeters::UnderlyingType>(in_distance));
+}
+
+#pragma endregion

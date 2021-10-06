@@ -1,4 +1,4 @@
-/*
+/**
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -22,11 +22,17 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
-//USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
 
-int main()
+BEGIN_RUKEN_NAMESPACE
+
+enum class EDistanceUnit
 {
-    return EXIT_SUCCESS;
-}
+    Kilometers,
+    Meters,
+    Centimeters
+};
+
+END_RUKEN_NAMESPACE
