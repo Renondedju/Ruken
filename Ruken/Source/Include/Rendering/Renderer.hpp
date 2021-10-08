@@ -28,15 +28,6 @@ class Renderer final : public Service<Renderer>
 
     public:
 
-        #pragma region Static Members
-
-        static vk::RenderPass          render_pass;
-        static vk::DescriptorSetLayout descriptor_set_layout;
-        static vk::PipelineLayout      pipeline_layout;
-        static vk::Pipeline            pipeline;
-
-        #pragma endregion
-
         #pragma region Members
 
         // Static name of the service, used by the kernel to report service errors

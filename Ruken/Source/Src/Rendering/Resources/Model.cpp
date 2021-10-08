@@ -4,27 +4,33 @@
 
 #include "Rendering/Resources/Model.hpp"
 
-#include "Ext/Vulkan/Ext.hpp"
+#include "Core/ServiceProvider.hpp"
 
 #include "Rendering/Resources/Texture.hpp"
 
-#include "Rendering/Renderer.hpp"
+#include "Rendering/RenderDevice.hpp"
+
+#include "Rendering/Passes/ForwardPass.hpp"
+
+#include "Resource/ResourceManager.hpp"
 
 USING_RUKEN_NAMESPACE
 
 static std::unique_ptr<Texture> g_texture;
 
-Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept: DeviceObjectBase(in_device)
+Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
+    m_device {in_device}
 {
     g_texture = std::make_unique<Texture>(m_device, "Data/viking_room.png");
 
-    tinyobj::attrib_t                attribute;
-    std::vector<tinyobj::shape_t>    shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string                      warn, err;
+    tinyobj::ObjReader       reader;
+    tinyobj::ObjReaderConfig config;
 
-    if (!LoadObj(&attribute, &shapes, &materials, &warn, &err, in_path.data()))
-        return;
+    reader.ParseFromFile(in_path.data(), config);
+
+    auto& attribute = reader.GetAttrib   ();
+    auto& shapes    = reader.GetShapes   ();
+    auto& materials = reader.GetMaterials();
 
     std::vector<Vertex>   vertices;
     std::vector<RkUint32> indices;
@@ -116,7 +122,7 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept: Device
     vk::DescriptorSetAllocateInfo descriptor_set_allocate_info = {
         .descriptorPool     = m_descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &Renderer::descriptor_set_layout
+        .pSetLayouts        = &ForwardPass::g_descriptor_set_layout
     };
 
     m_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(descriptor_set_allocate_info).value.front();
@@ -156,15 +162,16 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept: Device
 
     m_device->GetLogicalDevice().updateDescriptorSets(write_descriptors, VK_NULL_HANDLE);
 
-    auto command_buffer = m_device->GetTransferQueue().AcquireSingleUseCommandBuffer();
+    if (auto command_buffer = m_device->GetTransferQueue().RequestCommandBuffer())
+    {
+        vk::BufferCopy buffer_copy = {
+            .size = buffer_create_info.size
+        };
 
-    vk::BufferCopy buffer_copy = {
-        .size = buffer_create_info.size
-    };
+        command_buffer.copyBuffer(staging_buffer, m_buffer, buffer_copy);
 
-    command_buffer.copyBuffer(staging_buffer, m_buffer, buffer_copy);
-
-    m_device->GetTransferQueue().ReleaseSingleUseCommandBuffer(command_buffer);
+        m_device->GetTransferQueue().ReleaseCommandBuffer(std::move(command_buffer));
+    }
 
     m_device->GetAllocator().destroyBuffer(staging_buffer, staging_allocation);
 
@@ -191,7 +198,7 @@ Model::~Model() noexcept
 
 RkVoid Model::Render(vk::CommandBuffer const& in_command_buffer)
 {
-    in_command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, Renderer::pipeline_layout, 0, m_descriptor_set, nullptr);
+    in_command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, ForwardPass::g_pipeline_layout, 0, m_descriptor_set, nullptr);
 
     vk::DeviceSize offset = 0;
 
@@ -200,4 +207,19 @@ RkVoid Model::Render(vk::CommandBuffer const& in_command_buffer)
     in_command_buffer.bindIndexBuffer(m_buffer, m_offset, vk::IndexType::eUint32);
 
     in_command_buffer.drawIndexed(static_cast<RkUint32>(m_count), 1, 0, 0, 0);
+}
+
+RkVoid Model::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
+{
+
+}
+
+RkVoid Model::Reload(ResourceManager& in_manager)
+{
+    
+}
+
+RkVoid Model::Unload(ResourceManager& in_manager) noexcept
+{
+    
 }

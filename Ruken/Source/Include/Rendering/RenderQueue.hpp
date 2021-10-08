@@ -5,6 +5,8 @@
 
 #include "Rendering/RenderDefines.hpp"
 
+#include "Rendering/RenderObjects/CommandPool.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
@@ -24,13 +26,8 @@ class RenderQueue
         RkUint32  m_family_index;
         vk::Queue m_queue;
 
-        std::unordered_map<std::thread::id, vk::CommandPool> m_command_pools;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-
+        std::unordered_map<std::thread::id, std::unique_ptr<CommandPool>> m_command_pools;
+        std::unordered_map<std::thread::id, vk::Fence>                    m_fences;
 
         #pragma endregion
 
@@ -49,12 +46,12 @@ class RenderQueue
 
         #pragma region Methods
 
-        RkVoid Submit  (vk::SubmitInfo     const& in_submit_info)  noexcept;
-        RkVoid Submit  (vk::SubmitInfo2KHR const& in_submit_info)  noexcept;
-        RkVoid Present (vk::PresentInfoKHR const& in_present_info) noexcept;
-        RkVoid WaitIdle()                                          noexcept;
-        vk::CommandBuffer AcquireSingleUseCommandBuffer() noexcept;
-        RkVoid            ReleaseSingleUseCommandBuffer(vk::CommandBuffer const& in_command_buffer) noexcept;
+        RkVoid            Submit              (vk::SubmitInfo     const& in_submit_info)  noexcept;
+        RkVoid            Submit              (vk::SubmitInfo2KHR const& in_submit_info)  noexcept;
+        RkVoid            Present             (vk::PresentInfoKHR const& in_present_info) noexcept;
+        RkVoid            WaitIdle            ()                                          noexcept;
+        vk::CommandBuffer RequestCommandBuffer()                                          noexcept;
+        RkVoid            ReleaseCommandBuffer(vk::CommandBuffer&& in_command_buffer)     noexcept;
 
         #pragma endregion
 

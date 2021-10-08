@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Meta/Safety.hpp"
+
+#include "Types/FundamentalTypes.hpp"
+
 #define VK_NO_PROTOTYPES
 
 #define VULKAN_HPP_NO_EXCEPTIONS 
@@ -14,8 +18,12 @@
 
 #include <vma/vk_mem_alloc.hpp>
 
-#include "Meta/Safety.hpp"
+BEGIN_RUKEN_NAMESPACE
 
-#include "Types/FundamentalTypes.hpp"
+struct VkScale2D
+{
+    RkFloat x;
+    RkFloat y;
+};
 
-#define RUKEN_SAFE_LOGGER_RETURN_CALL(in_instance, ...) { RUKEN_SAFE_LOGGER_CALL(in_instance, __VA_ARGS__) return; }
+END_RUKEN_NAMESPACE

@@ -1,8 +1,7 @@
 #include "Build/Info.hpp"
 #include "Build/Build.hpp"
 
-#include "Vulkan/Core/VulkanSwapchain.hpp"
-#ifdef RUKEN_OS_WINDOWS
+#if defined(RUKEN_OS_WINDOWS)
     #define VK_USE_PLATFORM_WIN32_KHR
 
     #include "Utility/WindowsOS.hpp"
@@ -20,6 +19,9 @@ USING_RUKEN_NAMESPACE
 #pragma region Static Variables
 
 constexpr std::array g_required_extensions = {
+    VK_KHR_DISPLAY_EXTENSION_NAME,
+    VK_KHR_GET_DISPLAY_PROPERTIES_2_EXTENSION_NAME,
+    VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME,
     VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef RUKEN_OS_WINDOWS
     VK_KHR_WIN32_SURFACE_EXTENSION_NAME,

@@ -1,16 +1,20 @@
 #pragma once
 
-#include "Rendering/Resources/DeviceObjectBase.hpp"
+#include "Rendering/RenderDefines.hpp"
+
+#include "Resource/IResource.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class RenderDevice;
 
-class Texture : public DeviceObjectBase
+class Texture final : public IResource
 {
     private:
 
         #pragma region Members
+
+        RenderDevice* m_device;
 
         vk::Image          m_image;
         vk::ImageView      m_image_view;
@@ -32,6 +36,10 @@ class Texture : public DeviceObjectBase
         ~Texture() noexcept override;
 
         #pragma endregion
+
+        RkVoid Load  (ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        RkVoid Reload(ResourceManager& in_manager)                                                 override;
+        RkVoid Unload(ResourceManager& in_manager)                                                 noexcept override;
 
         vk::Image     const& GetImage       () const noexcept;
         vk::ImageView const& GetImageView   () const noexcept;

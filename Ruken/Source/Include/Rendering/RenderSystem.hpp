@@ -1,21 +1,25 @@
 #pragma once
 
-#include "Rendering/RenderFrame.hpp"
+#include "Rendering/RenderDefines.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
+class ServiceProvider;
 class Window;
 class RenderDevice;
-class ServiceProvider;
+class RenderFrame;
+class RenderGraph;
 
 class RenderSystem
 {
     private:
 
         RenderDevice* m_device;
-        Window* m_window;
+        Window*       m_window;
 
         RkUint32 m_current_frame {0U};
+
+        std::unique_ptr<RenderGraph> m_graph;
 
         std::vector<std::unique_ptr<RenderFrame>> m_frames;
 

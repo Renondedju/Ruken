@@ -1,13 +1,15 @@
 #pragma once
 
-#include "Rendering/Resources/DeviceObjectBase.hpp"
-
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
-#include <glm/glm/glm.hpp>
+#include <glm/glm.hpp>
 
-#include <glm/glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "Rendering/Resources/Material.hpp"
+
+#include "Resource/IResource.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -59,11 +61,15 @@ struct UniformBufferObject {
     glm::mat4 proj;
 };
 
-class Model : public DeviceObjectBase
+class RenderDevice;
+
+class Model final : public IResource
 {
     private:
 
         #pragma region Members
+
+        RenderDevice* m_device;
 
         vk::DeviceSize m_offset;
         vk::DeviceSize m_count;
@@ -76,6 +82,8 @@ class Model : public DeviceObjectBase
         vk::DescriptorPool m_descriptor_pool;
         vk::DescriptorSet  m_descriptor_set;
 
+        std::unique_ptr<Material> m_material;
+
         #pragma endregion
 
     public:
@@ -84,8 +92,8 @@ class Model : public DeviceObjectBase
 
         Model(RenderDevice* in_device, std::string_view in_path) noexcept;
 
-        Model(Model const& in_copy) = default;
-        Model(Model&&      in_move) = default;
+        Model(Model const& in_copy) = delete;
+        Model(Model&&      in_move) = delete;
 
         ~Model() noexcept override;
 
@@ -93,10 +101,14 @@ class Model : public DeviceObjectBase
 
         RkVoid Render(vk::CommandBuffer const& in_command_buffer);
 
+        RkVoid Load  (ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        RkVoid Reload(ResourceManager& in_manager)                                                 override;
+        RkVoid Unload(ResourceManager& in_manager)                                                 noexcept override;
+
         #pragma region Operators
 
-        Model& operator=(Model const& in_copy) = default;
-        Model& operator=(Model&&      in_move) = default;
+        Model& operator=(Model const& in_copy) = delete;
+        Model& operator=(Model&&      in_move) = delete;
 
         #pragma endregion
 };

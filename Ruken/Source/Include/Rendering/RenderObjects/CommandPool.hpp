@@ -1,0 +1,42 @@
+#pragma once
+
+#include "Rendering/RenderObjectPool.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+class CommandPool final : public RenderObjectPool<vk::CommandBuffer>
+{
+    private:
+
+        vk::CommandPool m_handle;
+
+        RkVoid Grow() override;
+
+    public:
+
+        #pragma region Constructors
+
+        CommandPool(RenderDevice* in_device, vk::CommandPoolCreateFlags in_flags, RkUint32 in_family_index) noexcept;
+
+        CommandPool(CommandPool const& in_copy) = delete;
+        CommandPool(CommandPool&&      in_move) = delete;
+
+        ~CommandPool() noexcept override;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        RkVoid Reset() override;
+
+        #pragma endregion
+
+        #pragma region Operators
+
+        CommandPool& operator=(CommandPool const& in_copy) = delete;
+        CommandPool& operator=(CommandPool&&      in_move) = delete;
+
+        #pragma endregion
+};
+
+END_RUKEN_NAMESPACE

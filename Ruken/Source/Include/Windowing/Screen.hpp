@@ -4,11 +4,14 @@
 #include <string>
 #include <vector>
 
-#include "Windowing/Metrics.hpp"
+#define GLFW_INCLUDE_NONE
+
+#include <GLFW/glfw3.h>
+
 #include "Windowing/GammaRamp.hpp"
 #include "Windowing/VideoMode.hpp"
 
-struct GLFWmonitor;
+#include "Rendering/RenderDefines.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -51,8 +54,10 @@ class Screen
 
         #pragma region Constructors
 
+        Screen() = delete;
+
         Screen(Screen const& in_copy) = delete;
-        Screen(Screen&&      in_move) noexcept;
+        Screen(Screen&&      in_move) = delete;
 
         ~Screen() = default;
 
@@ -68,7 +73,7 @@ class Screen
          * \return The position, in screen coordinates, of the upper-left corner of the monitor.
          */
         [[nodiscard]]
-        Position2D GetPosition() const noexcept;
+        VkOffset2D GetPosition() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the work area of the monitor
@@ -77,7 +82,7 @@ class Screen
          *         If no task bar exists then the work area is the monitor resolution in screen coordinates.
          */
         [[nodiscard]]
-        Rect2D GetWorkArea() const noexcept;
+        VkRect2D GetWorkArea() const noexcept;
 
         /**
          * \return The size, in millimeters, of the display area of the monitor.
@@ -85,7 +90,7 @@ class Screen
          *         either because the monitor EDID data is incorrect or because the driver does not report it accurately.
          */
         [[nodiscard]]
-        Extent2D GetPhysicalSize() const noexcept;
+        VkExtent2D GetPhysicalSize() const noexcept;
 
         /**
          * \brief  The content scale is the ratio between the current DPI and the platform's default DPI.
@@ -95,7 +100,7 @@ class Screen
          *         It may be very different from the raw DPI calculated from the physical size and current resolution.
          */
         [[nodiscard]]
-        Scale2D GetContentScale() const noexcept;
+        VkScale2D GetContentScale() const noexcept;
 
         /**
          * \return The current video mode of the specified monitor.
@@ -124,29 +129,12 @@ class Screen
          */
         RkVoid SetGammaRamp(GammaRamp const& in_gamma_ramp) const noexcept;
 
-        #ifdef RUKEN_OS_WINDOWS
-
-        /**
-         * \brief The UTF-8 encoded adapter device name (for example \\.\DISPLAY1) of the specified monitor, or NULL if an error occurred.
-         */
-        RkChar const* GetWin32Adapter() const noexcept;
-
-        /**
-         * \brief The UTF-8 encoded display device name (for example \\.\DISPLAY1\Monitor0) of the specified monitor, or NULL if an error occurred.
-         */
-        RkChar const* GetWin32Monitor() const noexcept;
-
-        #endif
-
         #pragma endregion
 
         #pragma region Operators
 
         Screen& operator=(Screen const& in_copy) = delete;
-        Screen& operator=(Screen&&      in_move) noexcept;
-
-        RkBool operator==(Screen const& in_other) const noexcept;
-        RkBool operator!=(Screen const& in_other) const noexcept;
+        Screen& operator=(Screen&&      in_move) = delete;
 
         #pragma endregion
 };

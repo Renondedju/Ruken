@@ -1,13 +1,17 @@
 #include "Rendering/RenderFrame.hpp"
 #include "Rendering/RenderDevice.hpp"
 
-#include "Rendering/Renderer.hpp"
+#include "Rendering/Passes/ForwardPass.hpp"
 
 USING_RUKEN_NAMESPACE
 
 RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
-    m_logger {in_logger},
-    m_device {in_device}
+    m_logger                {in_logger},
+    m_device                {in_device},
+    m_graphics_command_pool {in_device, {}, in_device->GetGraphicsFamilyIndex()},
+    m_compute_command_pool  {in_device, {}, in_device->GetComputeFamilyIndex ()},
+    m_transfer_command_pool {in_device, {}, in_device->GetTransferFamilyIndex()},
+    m_semaphore_pool        {in_device}
 {
     m_color_target = std::make_unique<RenderTarget>(m_device, 1920, 1080, vk::Format::eR8G8B8A8Unorm,  vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc);
     m_depth_target = std::make_unique<RenderTarget>(m_device, 1920, 1080, vk::Format::eD24UnormS8Uint, vk::ImageUsageFlagBits::eDepthStencilAttachment);
@@ -18,7 +22,7 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
     };
 
     vk::FramebufferCreateInfo framebuffer_create_info = {
-        .renderPass      = Renderer::render_pass,
+        .renderPass      = ForwardPass::g_render_pass,
         .attachmentCount = static_cast<RkUint32>(attachments.size()),
         .pAttachments    = attachments.data(),
         .width           = 1920,
@@ -27,20 +31,6 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
     };
 
     m_framebuffer = m_device->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value;
-
-    vk::CommandPoolCreateInfo command_pool_create_info = {
-        .queueFamilyIndex = m_device->GetGraphicsFamilyIndex()
-    };
-
-    m_command_pool = m_device->GetLogicalDevice().createCommandPool(command_pool_create_info).value;
-
-    vk::CommandBufferAllocateInfo command_buffer_allocate_info = {
-        .commandPool        = m_command_pool,
-        .level              = vk::CommandBufferLevel::ePrimary,
-        .commandBufferCount = 4U
-    };
-
-    m_command_buffers = m_device->GetLogicalDevice().allocateCommandBuffers(command_buffer_allocate_info).value;
 
     vk::SemaphoreTypeCreateInfo semaphore_type_create_info = {
         .semaphoreType = vk::SemaphoreType::eTimeline,
@@ -52,11 +42,6 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
     };
 
     m_timeline_semaphore = m_device->GetLogicalDevice().createSemaphore(semaphore_create_info).value;
-
-    semaphore_type_create_info.semaphoreType = vk::SemaphoreType::eBinary;
-
-    m_image_semaphore   = m_device->GetLogicalDevice().createSemaphore(semaphore_create_info).value;
-    m_present_semaphore = m_device->GetLogicalDevice().createSemaphore(semaphore_create_info).value;
 }
 
 RenderFrame::~RenderFrame() noexcept
@@ -65,10 +50,7 @@ RenderFrame::~RenderFrame() noexcept
     m_depth_target.reset();
 
     m_device->GetLogicalDevice().destroy(m_framebuffer);
-    m_device->GetLogicalDevice().destroy(m_command_pool);
     m_device->GetLogicalDevice().destroy(m_timeline_semaphore);
-    m_device->GetLogicalDevice().destroy(m_image_semaphore);
-    m_device->GetLogicalDevice().destroy(m_present_semaphore);
 }
 
 RkVoid RenderFrame::Reset() noexcept
@@ -81,19 +63,15 @@ RkVoid RenderFrame::Reset() noexcept
 
     m_device->GetLogicalDevice().waitSemaphores(semaphore_wait_info, UINT64_MAX);
 
-    m_device->GetLogicalDevice().resetCommandPool(m_command_pool);
-
-    m_command_buffer_index = 0U;
+    m_graphics_command_pool.Reset();
+    m_compute_command_pool .Reset();
+    m_transfer_command_pool.Reset();
+    m_semaphore_pool       .Reset();
 }
 
 RkUint64 RenderFrame::IncrementTimelineSemaphoreValue() noexcept
 {
     return ++m_semaphore_value;
-}
-
-vk::CommandBuffer const& RenderFrame::RequestCommandBuffer() noexcept
-{
-    return m_command_buffers[m_command_buffer_index++];
 }
 
 RenderTarget const& RenderFrame::GetColorTarget() const noexcept
@@ -121,13 +99,23 @@ vk::Semaphore const& RenderFrame::GetTimelineSemaphore() const noexcept
     return m_timeline_semaphore;
 }
 
-vk::Semaphore const& RenderFrame::GetImageSemaphore() const noexcept
+CommandPool& RenderFrame::GetGraphicsCommandPool() noexcept
 {
-    return m_image_semaphore;
+    return m_graphics_command_pool;
 }
 
-vk::Semaphore const& RenderFrame::GetPresentSemaphore() const noexcept
+CommandPool& RenderFrame::GetComputeCommandPool() noexcept
 {
-    return m_present_semaphore;
+    return m_compute_command_pool;
+}
+
+CommandPool& RenderFrame::GetTransferCommandPool() noexcept
+{
+    return m_transfer_command_pool;
+}
+
+SemaphorePool& RenderFrame::GetSemaphorePool() noexcept
+{
+    return m_semaphore_pool;
 }
 }

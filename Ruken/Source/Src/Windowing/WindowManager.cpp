@@ -40,9 +40,12 @@ WindowManager::WindowManager(ServiceProvider& in_service_provider) noexcept:
     WindowParams params = {
         .name = RUKEN_PROJECT_NAME,
         .size = {
-            .width  = 1600,
-            .height = 900
-        }
+            .width  = 1600U,
+            .height = 900U
+        },
+        .decorated = true,
+        .focused   = true,
+        .maximized = true
     };
 
     m_main_window = CreateWindow(params);
@@ -95,7 +98,7 @@ RkVoid WindowManager::DestroyWindow(Window const& in_window) noexcept
 {
     for (auto it = m_windows.cbegin(); it != m_windows.cend(); ++it)
     {
-        if ((**it).GetHandle() != in_window.GetHandle())
+        if ((**it).m_handle != in_window.m_handle)
             continue;
 
         m_windows.erase(it);

@@ -1,3 +1,5 @@
+#include <ranges>
+
 #include "Rendering/RenderQueue.hpp"
 #include "Rendering/RenderDevice.hpp"
 
@@ -15,10 +17,9 @@ RenderQueue::RenderQueue(Logger* in_logger, RenderDevice* in_device, RkUint32 co
 
 RenderQueue::~RenderQueue() noexcept
 {
-    for (auto const& command_pool : m_command_pools)
+    for (auto const& fence : m_fences | std::views::values)
     {
-        if (command_pool.second)
-            m_device->GetLogicalDevice().destroy(command_pool.second);
+        m_device->GetLogicalDevice().destroy(fence);
     }
 }
 
@@ -50,51 +51,51 @@ RkVoid RenderQueue::WaitIdle() noexcept
     auto result = m_queue.waitIdle();
 }
 
-vk::CommandBuffer RenderQueue::AcquireSingleUseCommandBuffer() noexcept
+vk::CommandBuffer RenderQueue::RequestCommandBuffer() noexcept
 {
     if (!m_command_pools.contains(std::this_thread::get_id()))
     {
-        vk::CommandPoolCreateInfo command_pool_create_info = {
-            .flags            = vk::CommandPoolCreateFlagBits::eTransient,
-            .queueFamilyIndex = m_family_index
-        };
+        vk::FenceCreateInfo fence_create_info = {};
 
-        auto [result, value] = m_device->GetLogicalDevice().createCommandPool(command_pool_create_info);
+        if (auto [result, value] = m_device->GetLogicalDevice().createFence(fence_create_info); result == vk::Result::eSuccess)
+        {
+            m_fences[std::this_thread::get_id()] = value;
+        }
 
-        if (result == vk::Result::eSuccess)
-           m_command_pools[std::this_thread::get_id()] = value;
-        else
-            RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan command pool : " + vk::to_string(result)))
+        m_command_pools[std::this_thread::get_id()] = std::make_unique<CommandPool>(m_device, vk::CommandPoolCreateFlagBits::eResetCommandBuffer, m_family_index);
     }
 
-    vk::CommandBufferAllocateInfo command_buffer_allocate_info = {
-        .commandPool        = m_command_pools[std::this_thread::get_id()],
-        .level              = vk::CommandBufferLevel::ePrimary,
-        .commandBufferCount = 1U
-    };
+    auto command_buffer = m_command_pools[std::this_thread::get_id()]->Request();
 
-    auto [result, value] = m_device->GetLogicalDevice().allocateCommandBuffers(command_buffer_allocate_info);
-
-    vk::CommandBufferBeginInfo begin_info = {
+    vk::CommandBufferBeginInfo command_buffer_begin_info = {
         .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit
     };
+    
+    command_buffer.begin(command_buffer_begin_info);
 
-    value.front().begin(begin_info);
-
-    return value.front();
+    return command_buffer;
 }
 
-RkVoid RenderQueue::ReleaseSingleUseCommandBuffer(vk::CommandBuffer const& in_command_buffer) noexcept
+RkVoid RenderQueue::ReleaseCommandBuffer(vk::CommandBuffer&& in_command_buffer) noexcept
 {
     in_command_buffer.end();
 
-    vk::SubmitInfo submit_info = {
-        .commandBufferCount = 1,
-        .pCommandBuffers = &in_command_buffer
+    vk::CommandBufferSubmitInfoKHR command_buffer_submit_info = {
+        .commandBuffer = in_command_buffer
     };
 
-    m_queue.submit(submit_info);
-    m_queue.waitIdle();
+    vk::SubmitInfo2KHR submit_info = {
+        .commandBufferInfoCount = 1U,
+        .pCommandBufferInfos    = &command_buffer_submit_info
+    };
 
-    m_device->GetLogicalDevice().freeCommandBuffers(m_command_pools[std::this_thread::get_id()], in_command_buffer);
+    if (m_queue.submit2KHR(submit_info, m_fences[std::this_thread::get_id()]) == vk::Result::eSuccess)
+    {
+        if (m_device->GetLogicalDevice().waitForFences(m_fences[std::this_thread::get_id()], VK_TRUE, UINT64_MAX) == vk::Result::eSuccess)
+        {
+            m_device->GetLogicalDevice().resetFences(m_fences[std::this_thread::get_id()]);
+        }
+    }
+
+    m_command_pools[std::this_thread::get_id()]->Release(std::move(in_command_buffer));
 }

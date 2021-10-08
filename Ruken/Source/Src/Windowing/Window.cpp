@@ -14,24 +14,23 @@ USING_RUKEN_NAMESPACE
 Window::Window( Logger* in_logger, RenderContext* in_context, RenderDevice* in_device, WindowParams const& in_params) noexcept:
     m_logger  {in_logger},
     m_context {in_context},
-    m_device  {in_device},
-    m_name    {in_params.name}
+    m_device  {in_device}
 {
     CreateWindow(in_params);
-    SetupCallbacks();
     CreateSurface();
     PickSwapchainImageCount();
     PickSwapchainExtent();
     PickSwapchainFormat();
     PickSwapchainPresentMode();
-    CreateSwapchain();
+    CreateSwapchain(VK_NULL_HANDLE);
+    SetupCallbacks();
 }
 
 Window::~Window() noexcept
 {
     if (m_swapchain)
         m_device->GetLogicalDevice().destroy(m_swapchain);
-
+    
     if (m_surface)
         m_context->GetInstance().destroy(m_surface);
 
@@ -41,7 +40,7 @@ Window::~Window() noexcept
 
 #pragma endregion
 
-#pragma region Methods
+#pragma region Static Methods
 
 #pragma region Callbacks
 
@@ -111,6 +110,10 @@ Window* Window::GetWindowUserPointer(GLFWwindow* in_window) noexcept
     return static_cast<Window*>(glfwGetWindowUserPointer(in_window));
 }
 
+#pragma endregion
+
+#pragma region Methods
+
 RkVoid Window::CreateWindow(WindowParams const& in_params) noexcept
 {
     glfwDefaultWindowHints();
@@ -133,14 +136,21 @@ RkVoid Window::CreateWindow(WindowParams const& in_params) noexcept
 
     if (in_params.fullscreen)
     {
-        auto* const        monitor    = glfwGetPrimaryMonitor();
-        auto  const* const video_mode = glfwGetVideoMode     (monitor);
+        GLFWmonitor*       monitor    = glfwGetPrimaryMonitor();
+        GLFWvidmode const* video_mode = glfwGetVideoMode     (monitor);
 
-        m_handle = glfwCreateWindow(video_mode->width, video_mode->height, m_name.c_str(), monitor, nullptr);
+        m_handle = glfwCreateWindow(video_mode->width, video_mode->height, in_params.name, monitor, nullptr);
     }
 
     else
-        m_handle = glfwCreateWindow(in_params.size.width, in_params.size.height, m_name.c_str(), nullptr, nullptr);
+    {
+        m_handle = glfwCreateWindow(
+            static_cast<RkInt32>(in_params.size.width),
+            static_cast<RkInt32>(in_params.size.height),
+            in_params.name,
+            nullptr,
+            nullptr);
+    }
 
     glfwSetWindowUserPointer(m_handle, this);
     glfwSetWindowOpacity    (m_handle, in_params.opacity);
@@ -166,9 +176,49 @@ RkVoid Window::CreateSurface() noexcept
         RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create surface!"))
 }
 
+RkVoid Window::PickSwapchainImageCount() noexcept
+{
+    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
+
+    m_image_count = capabilities.minImageCount + 1;
+
+    if (capabilities.maxImageCount > 0 && m_image_count > capabilities.maxImageCount)
+        m_image_count = capabilities.maxImageCount;
+}
+
+RkVoid Window::PickSwapchainExtent() noexcept
+{
+    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
+
+    auto extent = GetFramebufferSize();
+
+    if (capabilities.currentExtent.width != UINT32_MAX)
+        m_image_extent = capabilities.currentExtent;
+    else
+    {
+        m_image_extent.width  = std::clamp(extent.width,  capabilities.minImageExtent.width,  capabilities.maxImageExtent.width);
+        m_image_extent.height = std::clamp(extent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+    }
+}
+
+RkVoid Window::PickSwapchainFormat() noexcept
+{
+    auto [result, formats] = m_device->GetPhysicalDevice().getSurfaceFormatsKHR(m_surface);
+
+    m_image_format = formats[0].format;
+    m_color_space  = formats[0].colorSpace;
+}
+
+RkVoid Window::PickSwapchainPresentMode() noexcept
+{
+    auto [result, present_modes] =  m_device->GetPhysicalDevice().getSurfacePresentModesKHR(m_surface);
+
+    m_present_mode = present_modes[0];
+}
+
 RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
 {
-    if (IsIconified())
+    if (m_image_extent.width == 0 || m_image_extent.height == 0)
         return;
 
     vk::SwapchainCreateInfoKHR swapchain_create_info = {
@@ -202,7 +252,7 @@ RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
         m_device->GetLogicalDevice().destroySwapchainKHR(in_old_swapchain);
 }
 
-RkVoid Window::SetupCallbacks() noexcept
+RkVoid Window::SetupCallbacks() const noexcept
 {
     glfwSetWindowPosCallback         (m_handle, &WindowPosCallback);
     glfwSetWindowSizeCallback        (m_handle, &WindowSizeCallback);
@@ -215,293 +265,17 @@ RkVoid Window::SetupCallbacks() noexcept
     glfwSetWindowContentScaleCallback(m_handle, &WindowContentScaleCallback);
 }
 
-RkVoid Window::PickSwapchainImageCount()
-{
-    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
-
-    m_image_count = capabilities.minImageCount + 1;
-
-    if (capabilities.maxImageCount > 0 && m_image_count > capabilities.maxImageCount)
-        m_image_count = capabilities.maxImageCount;
-}
-
-RkVoid Window::PickSwapchainExtent()
-{
-    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
-
-    auto extent = GetFramebufferSize();
-
-    if (capabilities.currentExtent.width != UINT32_MAX)
-        m_image_extent = capabilities.currentExtent;
-    else
-    {
-        m_image_extent.width  = std::clamp(static_cast<RkUint32>(extent.width),  capabilities.minImageExtent.width,  capabilities.maxImageExtent.width);
-        m_image_extent.height = std::clamp(static_cast<RkUint32>(extent.height), capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
-    }
-}
-
-RkVoid Window::PickSwapchainFormat()
-{
-    auto [result, formats] = m_device->GetPhysicalDevice().getSurfaceFormatsKHR(m_surface);
-
-    m_image_format = formats[0].format;
-    m_color_space  = formats[0].colorSpace;
-}
-
-RkVoid Window::PickSwapchainPresentMode()
-{
-    auto [result, present_modes] =  m_device->GetPhysicalDevice().getSurfacePresentModesKHR(m_surface);
-
-    m_present_mode = present_modes[0];
-}
-
-#pragma region Setters
-
-RkVoid Window::SetName(RkChar const* in_name) noexcept
-{
-    m_name = in_name;
-
-    glfwSetWindowTitle(m_handle, in_name);
-}
-
-RkVoid Window::SetPosition(Position2D const& in_position) const noexcept
-{
-    glfwSetWindowPos(m_handle, in_position.x, in_position.y);
-}
-
-RkVoid Window::SetSizeLimits(Extent2D const& in_min_size, Extent2D const& in_max_size) const noexcept
-{
-    glfwSetWindowSizeLimits(m_handle, in_min_size.width, in_min_size.height,
-                                      in_max_size.width, in_max_size.height);
-}
-
-RkVoid Window::SetAspectRatio(RkInt32 const in_numerator, RkInt32 const in_denominator) const noexcept
-{
-    glfwSetWindowAspectRatio(m_handle, in_numerator, in_denominator);
-}
-
-RkVoid Window::SetSize(Extent2D const& in_size) const noexcept
-{
-    glfwSetWindowSize(m_handle, in_size.width, in_size.height);
-}
-
-RkVoid Window::SetOpacity(RkFloat const in_opacity) const noexcept
-{
-    glfwSetWindowOpacity(m_handle, in_opacity);
-}
-
-RkVoid Window::Iconify() const noexcept
-{
-    glfwIconifyWindow(m_handle);
-}
-
-RkVoid Window::Restore() const noexcept
-{
-    glfwRestoreWindow(m_handle);
-}
-
-RkVoid Window::Maximize() const noexcept
-{
-    glfwMaximizeWindow(m_handle);
-}
-
-RkVoid Window::Show() const noexcept
-{
-    glfwShowWindow(m_handle);
-}
-
-RkVoid Window::Hide() const noexcept
-{
-    glfwHideWindow(m_handle);
-}
-
-RkVoid Window::Focus() const noexcept
-{
-    glfwFocusWindow(m_handle);
-}
-
-RkVoid Window::RequestAttention() const noexcept
-{
-    glfwRequestWindowAttention(m_handle);
-}
-
-RkVoid Window::SetFullscreen(RkBool const in_fullscreen) const noexcept
-{
-    auto* const  monitor    = glfwGetPrimaryMonitor();
-    auto  const* video_mode = glfwGetVideoMode     (monitor);
-
-    if (in_fullscreen)
-        glfwSetWindowMonitor(m_handle, monitor, 0, 0, video_mode->width, video_mode->height, GLFW_DONT_CARE);
-    else
-        glfwSetWindowMonitor(m_handle, nullptr, 0, 0, video_mode->width, video_mode->height, GLFW_DONT_CARE);
-}
-
-RkVoid Window::SetDecorated(RkBool const in_decorated) const noexcept
-{
-    glfwSetWindowAttrib(m_handle, GLFW_DECORATED, in_decorated);
-}
-
-RkVoid Window::SetResizable(RkBool const in_resizable) const noexcept
-{
-    glfwSetWindowAttrib(m_handle, GLFW_RESIZABLE, in_resizable);
-}
-
-RkVoid Window::SetFloating(RkBool const in_floating) const noexcept
-{
-    glfwSetWindowAttrib(m_handle, GLFW_FLOATING, in_floating);
-}
-
-RkVoid Window::SetAutoIconified(RkBool const in_auto_iconified) const noexcept
-{
-    glfwSetWindowAttrib(m_handle, GLFW_AUTO_ICONIFY, in_auto_iconified);
-}
-
-RkVoid Window::SetFocusedOnShow(RkBool const in_focused_on_show) const noexcept
-{
-    glfwSetWindowAttrib(m_handle, GLFW_FOCUS_ON_SHOW, in_focused_on_show);
-}
-
-#pragma endregion
-
-#pragma region Getters
-
-GLFWwindow* Window::GetHandle() const noexcept
-{
-    return m_handle;
-}
-
-std::string const& Window::GetName() const noexcept
-{
-    return m_name;
-}
-
-RkBool Window::ShouldClose() const noexcept
-{
-    return glfwWindowShouldClose(m_handle) == GLFW_TRUE;
-}
-
-Position2D Window::GetPosition() const noexcept
-{
-    Position2D position = {};
-
-    glfwGetWindowPos(m_handle, &position.x, &position.y);
-
-    return position;
-}
-
-Extent2D Window::GetSize() const noexcept
-{
-    Extent2D size = {};
-
-    glfwGetWindowSize(m_handle, &size.width, &size.height);
-
-    return size;
-}
-
-Extent2D Window::GetFramebufferSize() const noexcept
-{
-    Extent2D size = {};
-
-    glfwGetFramebufferSize(m_handle, &size.width, &size.height);
-
-    return size;
-}
-
-Rect2D Window::GetFrameSize() const noexcept
-{
-    Rect2D frame = {};
-
-    glfwGetWindowFrameSize(m_handle, 
-                           &frame.position.x,
-                           &frame.position.y,
-                           &frame.extent.width,
-                           &frame.extent.height);
-
-    return frame;
-}
-
-Scale2D Window::GetContentScale() const noexcept
-{
-    Scale2D scale = {};
-
-    glfwGetWindowContentScale(m_handle, &scale.x, &scale.y);
-
-    return scale;
-}
-
-RkFloat Window::GetOpacity() const noexcept
-{
-    return glfwGetWindowOpacity(m_handle);
-}
-
-RkBool Window::IsFullscreen() const noexcept
-{
-    return glfwGetWindowMonitor(m_handle) != nullptr;
-}
-
-RkBool Window::IsFocused() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_FOCUSED);
-}
-
-RkBool Window::IsIconified() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_ICONIFIED);
-}
-
-RkBool Window::IsMaximized() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_MAXIMIZED);
-}
-
-RkBool Window::IsHovered() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_HOVERED);
-}
-
-RkBool Window::IsVisible() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_VISIBLE);
-}
-
-RkBool Window::IsResizable() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_RESIZABLE);
-}
-
-RkBool Window::IsDecorated() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_DECORATED);
-}
-
-RkBool Window::IsAutoIconified() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_AUTO_ICONIFY);
-}
-
-RkBool Window::IsFloating() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_FLOATING);
-}
-
-RkBool Window::IsFramebufferTransparent() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_TRANSPARENT_FRAMEBUFFER);
-}
-
-RkBool Window::IsFocusedOnShow() const noexcept
-{
-    return glfwGetWindowAttrib(m_handle, GLFW_FOCUS_ON_SHOW);
-}
-
 RkVoid Window::Present(RenderFrame& in_frame) noexcept
 {
-    if (IsIconified())
+    if (m_image_extent.width == 0 || m_image_extent.height == 0)
         return;
 
-    m_image_index = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, in_frame.GetImageSemaphore()).value;
+    auto image_semaphore   = in_frame.GetSemaphorePool().Request();
+    auto present_semaphore = in_frame.GetSemaphorePool().Request();
 
-    auto const& command_buffer = in_frame.RequestCommandBuffer();
+    m_image_index = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, image_semaphore).value;
+
+    auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
 
     // TODO : Execute final pass.
     vk::CommandBufferBeginInfo command_buffer_begin_info = {
@@ -609,7 +383,7 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
 
     std::vector<vk::SemaphoreSubmitInfoKHR> wait_semaphores_submit_infos = {
         {
-            .semaphore = in_frame.GetImageSemaphore()
+            .semaphore = image_semaphore
         },
         {
             .semaphore = in_frame.GetTimelineSemaphore(),
@@ -625,7 +399,7 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
 
     std::vector<vk::SemaphoreSubmitInfoKHR> signal_semaphores_submit_infos = {
         {
-            .semaphore = in_frame.GetPresentSemaphore()
+            .semaphore = present_semaphore
         },
         {
             .semaphore = in_frame.GetTimelineSemaphore(),
@@ -646,13 +420,239 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
 
     vk::PresentInfoKHR present_info = {
         .waitSemaphoreCount = 1,
-        .pWaitSemaphores    = &in_frame.GetPresentSemaphore(),
+        .pWaitSemaphores    = &present_semaphore,
         .swapchainCount     = 1,
         .pSwapchains        = &m_swapchain,
         .pImageIndices      = &m_image_index
     };
 
     m_device->GetGraphicsQueue().Present(present_info);
+
+    in_frame.GetSemaphorePool      ().Release(std::move(image_semaphore));
+    in_frame.GetSemaphorePool      ().Release(std::move(present_semaphore));
+    in_frame.GetGraphicsCommandPool().Release(std::move(command_buffer));
+}
+
+#pragma region Setters
+
+RkVoid Window::SetPosition(VkOffset2D const& in_position) const noexcept
+{
+    glfwSetWindowPos(m_handle, in_position.x, in_position.y);
+}
+
+RkVoid Window::SetSizeLimits(VkExtent2D const& in_min_size, VkExtent2D const& in_max_size) const noexcept
+{
+    glfwSetWindowSizeLimits(m_handle, in_min_size.width, in_min_size.height,
+                                      in_max_size.width, in_max_size.height);
+}
+
+RkVoid Window::SetAspectRatio(RkInt32 const in_numerator, RkInt32 const in_denominator) const noexcept
+{
+    glfwSetWindowAspectRatio(m_handle, in_numerator, in_denominator);
+}
+
+RkVoid Window::SetSize(VkExtent2D const& in_size) const noexcept
+{
+    glfwSetWindowSize(m_handle, in_size.width, in_size.height);
+}
+
+RkVoid Window::SetOpacity(RkFloat const in_opacity) const noexcept
+{
+    glfwSetWindowOpacity(m_handle, in_opacity);
+}
+
+RkVoid Window::Iconify() const noexcept
+{
+    glfwIconifyWindow(m_handle);
+}
+
+RkVoid Window::Restore() const noexcept
+{
+    glfwRestoreWindow(m_handle);
+}
+
+RkVoid Window::Maximize() const noexcept
+{
+    glfwMaximizeWindow(m_handle);
+}
+
+RkVoid Window::Show() const noexcept
+{
+    glfwShowWindow(m_handle);
+}
+
+RkVoid Window::Hide() const noexcept
+{
+    glfwHideWindow(m_handle);
+}
+
+RkVoid Window::Focus() const noexcept
+{
+    glfwFocusWindow(m_handle);
+}
+
+RkVoid Window::RequestAttention() const noexcept
+{
+    glfwRequestWindowAttention(m_handle);
+}
+
+RkVoid Window::SetFullscreen(RkBool const in_fullscreen) const noexcept
+{
+    GLFWmonitor*       monitor    = glfwGetPrimaryMonitor();
+    GLFWvidmode const* video_mode = glfwGetVideoMode     (monitor);
+
+    if (in_fullscreen)
+        glfwSetWindowMonitor(m_handle, monitor, 0, 0, video_mode->width, video_mode->height, GLFW_DONT_CARE);
+    else
+        glfwSetWindowMonitor(m_handle, nullptr, 0, 0, video_mode->width, video_mode->height, GLFW_DONT_CARE);
+}
+
+RkVoid Window::SetDecorated(RkBool const in_decorated) const noexcept
+{
+    glfwSetWindowAttrib(m_handle, GLFW_DECORATED, in_decorated);
+}
+
+RkVoid Window::SetResizable(RkBool const in_resizable) const noexcept
+{
+    glfwSetWindowAttrib(m_handle, GLFW_RESIZABLE, in_resizable);
+}
+
+RkVoid Window::SetFloating(RkBool const in_floating) const noexcept
+{
+    glfwSetWindowAttrib(m_handle, GLFW_FLOATING, in_floating);
+}
+
+RkVoid Window::SetAutoIconified(RkBool const in_auto_iconified) const noexcept
+{
+    glfwSetWindowAttrib(m_handle, GLFW_AUTO_ICONIFY, in_auto_iconified);
+}
+
+RkVoid Window::SetFocusedOnShow(RkBool const in_focused_on_show) const noexcept
+{
+    glfwSetWindowAttrib(m_handle, GLFW_FOCUS_ON_SHOW, in_focused_on_show);
+}
+
+#pragma endregion
+
+#pragma region Getters
+
+RkBool Window::ShouldClose() const noexcept
+{
+    return glfwWindowShouldClose(m_handle) == GLFW_TRUE;
+}
+
+VkOffset2D Window::GetPosition() const noexcept
+{
+    VkOffset2D position = {};
+
+    glfwGetWindowPos(m_handle, &position.x, &position.y);
+
+    return position;
+}
+
+VkExtent2D Window::GetSize() const noexcept
+{
+    VkExtent2D size = {};
+
+    glfwGetWindowSize(m_handle, reinterpret_cast<RkInt32*>(&size.width), reinterpret_cast<RkInt32*>(&size.height));
+
+    return size;
+}
+
+VkExtent2D Window::GetFramebufferSize() const noexcept
+{
+    VkExtent2D size = {};
+
+    glfwGetFramebufferSize(m_handle, reinterpret_cast<RkInt32*>(&size.width), reinterpret_cast<RkInt32*>(&size.height));
+
+    return size;
+}
+
+VkRect2D Window::GetFrameSize() const noexcept
+{
+    VkRect2D frame = {};
+
+    glfwGetWindowFrameSize(m_handle, 
+                           &frame.offset.x,
+                           &frame.offset.y,
+                           reinterpret_cast<RkInt32*>(&frame.extent.width),
+                           reinterpret_cast<RkInt32*>(&frame.extent.height));
+
+    return frame;
+}
+
+VkScale2D Window::GetContentScale() const noexcept
+{
+    VkScale2D scale = {};
+
+    glfwGetWindowContentScale(m_handle, &scale.x, &scale.y);
+
+    return scale;
+}
+
+RkFloat Window::GetOpacity() const noexcept
+{
+    return glfwGetWindowOpacity(m_handle);
+}
+
+RkBool Window::IsFullscreen() const noexcept
+{
+    return glfwGetWindowMonitor(m_handle) != nullptr;
+}
+
+RkBool Window::IsFocused() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_FOCUSED);
+}
+
+RkBool Window::IsIconified() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_ICONIFIED);
+}
+
+RkBool Window::IsMaximized() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_MAXIMIZED);
+}
+
+RkBool Window::IsHovered() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_HOVERED);
+}
+
+RkBool Window::IsVisible() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_VISIBLE);
+}
+
+RkBool Window::IsResizable() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_RESIZABLE);
+}
+
+RkBool Window::IsDecorated() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_DECORATED);
+}
+
+RkBool Window::IsAutoIconified() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_AUTO_ICONIFY);
+}
+
+RkBool Window::IsFloating() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_FLOATING);
+}
+
+RkBool Window::IsFramebufferTransparent() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_TRANSPARENT_FRAMEBUFFER);
+}
+
+RkBool Window::IsFocusedOnShow() const noexcept
+{
+    return glfwGetWindowAttrib(m_handle, GLFW_FOCUS_ON_SHOW);
 }
 
 #pragma endregion

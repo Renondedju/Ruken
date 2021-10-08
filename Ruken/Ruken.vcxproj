@@ -62,8 +62,8 @@
     <Link>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(VULKAN_SDK)\Lib;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;PotatoMaths.lib;spirv-cross-core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -74,13 +74,13 @@
     <ClCompile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(VULKAN_SDK)\Include;$(VULKAN_SDK)\Third-Party\Include;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <StringPooling>true</StringPooling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableModules>false</EnableModules>
       <SDLCheck>true</SDLCheck>
       <OmitFramePointers>false</OmitFramePointers>
@@ -102,7 +102,7 @@
       <WarningLevel>Level4</WarningLevel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <EnableModules>false</EnableModules>
       <SDLCheck>true</SDLCheck>
       <OmitFramePointers>false</OmitFramePointers>
@@ -111,8 +111,8 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(VULKAN_SDK)\Lib;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;PotatoMaths.lib;spirv-cross-cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -247,11 +247,17 @@
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleSubset.hpp" />
     <ClInclude Include="Source\Include\Meta\UniqueTypes.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderObjects\CommandPool.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderObjectPool.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderObjects\FencePool.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderObjects\SemaphorePool.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Passes\ForwardPass.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderGraph.hpp" />
+    <ClInclude Include="Source\Include\Rendering\RenderPass.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderQueue.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderSystem.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
-    <ClInclude Include="Source\Include\Rendering\Resources\DeviceObjectBase.hpp" />
+    <ClInclude Include="Source\Include\Rendering\Resources\Material.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Model.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderDevice.hpp" />
@@ -336,9 +342,7 @@
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
     <ClInclude Include="Source\Include\Time\Timer.hpp" />
     <ClInclude Include="Source\Include\Windowing\GammaRamp.hpp" />
-    <ClInclude Include="Source\Include\Windowing\Metrics.hpp" />
     <ClInclude Include="Source\Include\Windowing\Screen.hpp" />
-    <ClInclude Include="Source\Include\Windowing\Utilities.hpp" />
     <ClInclude Include="Source\Include\Windowing\VideoMode.hpp" />
     <ClInclude Include="Source\Include\Windowing\WindowParams.hpp" />
     <ClInclude Include="Source\Include\Windowing\Window.hpp" />
@@ -401,10 +405,16 @@
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderObjects\CommandPool.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderObjects\FencePool.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderObjects\SemaphorePool.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Passes\ForwardPass.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderGraph.cpp" />
+    <ClCompile Include="Source\Src\Rendering\RenderPass.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderQueue.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderSystem.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderTarget.cpp" />
+    <ClCompile Include="Source\Src\Rendering\Resources\Material.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\Model.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderContext.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderDevice.cpp" />
@@ -419,7 +429,6 @@
     <ClCompile Include="Source\Src\Maths\Utility.cpp" />
     <ClCompile Include="Source\Src\Threading\ExecutionPlan.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />
-    <ClCompile Include="Source\Src\Windowing\Utilities.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceBase.cpp" />
     <ClCompile Include="Source\Src\Core\ServiceProvider.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Formatters\ConsoleFormatter.cpp" />

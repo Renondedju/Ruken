@@ -9,8 +9,6 @@
 
 #include "Windowing/WindowParams.hpp"
 
-#include "Rendering/RenderDefines.hpp"
-
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
@@ -35,9 +33,7 @@ class Window
         Logger*        m_logger  {nullptr};
         RenderContext* m_context {nullptr};
         RenderDevice*  m_device  {nullptr};
-
-        GLFWwindow* m_handle {nullptr};
-        std::string m_name   {};
+        GLFWwindow*    m_handle  {nullptr};
 
         vk::SurfaceKHR     m_surface;
         vk::SwapchainKHR   m_swapchain;
@@ -58,33 +54,36 @@ class Window
 
         #pragma endregion
 
-        #pragma region Methods
+        #pragma region Static Methods
 
         #pragma region Callbacks
         
         static RkVoid WindowPosCallback         (GLFWwindow* in_window, RkInt32 in_x_pos, RkInt32 in_y_pos)     noexcept;
         static RkVoid WindowSizeCallback        (GLFWwindow* in_window, RkInt32 in_width, RkInt32 in_height)    noexcept;
-        static RkVoid WindowCloseCallback       (GLFWwindow* in_window)                                           noexcept;
-        static RkVoid WindowRefreshCallback     (GLFWwindow* in_window)                                           noexcept;
-        static RkVoid WindowFocusCallback       (GLFWwindow* in_window, RkInt32 in_focused)                      noexcept;
-        static RkVoid WindowIconifyCallback     (GLFWwindow* in_window, RkInt32 in_iconified)                    noexcept;
-        static RkVoid WindowMaximizeCallback    (GLFWwindow* in_window, RkInt32 in_maximized)                    noexcept;
+        static RkVoid WindowCloseCallback       (GLFWwindow* in_window)                                         noexcept;
+        static RkVoid WindowRefreshCallback     (GLFWwindow* in_window)                                         noexcept;
+        static RkVoid WindowFocusCallback       (GLFWwindow* in_window, RkInt32 in_focused)                     noexcept;
+        static RkVoid WindowIconifyCallback     (GLFWwindow* in_window, RkInt32 in_iconified)                   noexcept;
+        static RkVoid WindowMaximizeCallback    (GLFWwindow* in_window, RkInt32 in_maximized)                   noexcept;
         static RkVoid FramebufferSizeCallback   (GLFWwindow* in_window, RkInt32 in_width,   RkInt32 in_height)  noexcept;
         static RkVoid WindowContentScaleCallback(GLFWwindow* in_window, RkFloat in_x_scale, RkFloat in_y_scale) noexcept;
 
         #pragma endregion
 
         static Window* GetWindowUserPointer(GLFWwindow* in_window) noexcept;
-        
-        RkVoid CreateWindow   (WindowParams const& in_params)                      noexcept;
-        RkVoid CreateSurface  ()                                                   noexcept;
-        RkVoid CreateSwapchain(vk::SwapchainKHR in_old_swapchain = VK_NULL_HANDLE) noexcept;
-        RkVoid SetupCallbacks ()                                                   noexcept;
 
-        RkVoid PickSwapchainImageCount ();
-        RkVoid PickSwapchainExtent     ();
-        RkVoid PickSwapchainFormat     ();
-        RkVoid PickSwapchainPresentMode();
+        #pragma endregion
+
+        #pragma region Methods
+
+        RkVoid CreateWindow            (WindowParams const& in_params)      noexcept;
+        RkVoid CreateSurface           ()                                   noexcept;
+        RkVoid PickSwapchainImageCount ()                                   noexcept;
+        RkVoid PickSwapchainExtent     ()                                   noexcept;
+        RkVoid PickSwapchainFormat     ()                                   noexcept;
+        RkVoid PickSwapchainPresentMode()                                   noexcept;
+        RkVoid CreateSwapchain         (vk::SwapchainKHR in_old_swapchain ) noexcept;
+        RkVoid SetupCallbacks          ()                                   const noexcept;
 
         #pragma endregion
 
@@ -145,18 +144,15 @@ class Window
 
         #pragma region Methods
 
-        #pragma region Setters
+        RkVoid Present(RenderFrame& in_frame) noexcept;
 
-        /**
-         * \brief This function sets the window title, encoded as UTF-8, of the specified window.
-         */
-        RkVoid SetName(RkChar const* in_name) noexcept;
+        #pragma region Setters
 
         /**
          * \brief Sets the position, in screen coordinates, of the upper-left corner of the content area of the window.
          * \note  If the window is a full screen window, this function does nothing.
          */
-        RkVoid SetPosition(Position2D const& in_position) const noexcept;
+        RkVoid SetPosition(VkOffset2D const& in_position) const noexcept;
 
         /**
          * \brief Sets the size limits of the content area of the window.
@@ -166,7 +162,7 @@ class Window
          *        If the window is not resizable, this function does nothing.
          *        The size limits are applied immediately to a windowed mode window and may cause it to be resized.
          */
-        RkVoid SetSizeLimits(Extent2D const& in_min_size, Extent2D const& in_max_size) const noexcept;
+        RkVoid SetSizeLimits(VkExtent2D const& in_min_size, VkExtent2D const& in_max_size) const noexcept;
 
         /**
          * \brief Sets the required aspect ratio of the content area of the window.
@@ -182,7 +178,7 @@ class Window
          * \note  For full screen windows, this function updates the resolution of its desired video mode
          *        and switches to the video mode closest to it, without affecting the window's context.
          */
-        RkVoid SetSize(Extent2D const& in_size) const noexcept;
+        RkVoid SetSize(VkExtent2D const& in_size) const noexcept;
 
         /**
          * \brief Sets the opacity of the window, including any decorations.
@@ -283,12 +279,6 @@ class Window
 
         #pragma region Getters
 
-        [[nodiscard]]
-        GLFWwindow* GetHandle() const noexcept;
-
-        [[nodiscard]]
-        std::string const& GetName() const noexcept;
-
         /**
          * \return The value of the close flag of the window. 
          */
@@ -299,26 +289,26 @@ class Window
          * \return The position, in screen coordinates, of the upper-left corner of the content area of the window.
          */
         [[nodiscard]]
-        Position2D GetPosition() const noexcept;
+        VkOffset2D GetPosition() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of the content area of the window.
          */
         [[nodiscard]]
-        Extent2D GetSize() const noexcept;
+        VkExtent2D GetSize() const noexcept;
 
         /**
          * \return The size, in pixels, of the framebuffer of the window.
          */
         [[nodiscard]]
-        Extent2D GetFramebufferSize() const noexcept;
+        VkExtent2D GetFramebufferSize() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of each edge of the frame of the window.
          * \note   This size includes the title bar, if the window has one.
          */
         [[nodiscard]]
-        Rect2D GetFrameSize() const noexcept;
+        VkRect2D GetFrameSize() const noexcept;
 
         /**
          * \return The content scale for the window (the ratio between the current DPI and the platform's default DPI).
@@ -326,7 +316,7 @@ class Window
          *         on which monitor the system considers the window to be on.
          */
         [[nodiscard]]
-        Scale2D GetContentScale() const noexcept;
+        VkScale2D GetContentScale() const noexcept;
 
         /**
          * \return The opacity of the window, including any decorations (between 0 and 1).
@@ -408,8 +398,6 @@ class Window
         RkBool IsFocusedOnShow() const noexcept;
 
         #pragma endregion
-
-        RkVoid Present(RenderFrame& in_frame) noexcept;
 
         #pragma endregion
 

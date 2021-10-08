@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Rendering/RenderDefines.hpp"
+#include "Rendering/RenderPass.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 class RenderDevice;
+class RenderFrame;
 
 class RenderGraph
 {
@@ -14,9 +15,11 @@ class RenderGraph
         Logger*       m_logger;
         RenderDevice* m_device;
 
-        std::vector<vk::RenderPass> m_render_passes;
+        std::vector<std::unique_ptr<RenderPass>> m_render_passes;
 
     public:
+
+        #pragma region Constructors
 
         RenderGraph(Logger* in_logger, RenderDevice* in_device) noexcept;
 
@@ -25,8 +28,19 @@ class RenderGraph
 
         ~RenderGraph() noexcept;
 
-        RkVoid AddPass();
-        RkVoid Execute();
+        #pragma endregion
+
+        #pragma region Methods
+
+        RkVoid Execute(RenderFrame& in_frame) noexcept;
+
+        template<RenderPassType T, typename... TArgs> requires std::is_constructible_v<T, TArgs...>
+        RkVoid AddRenderPass(TArgs&&... in_args) noexcept
+        {
+            m_render_passes.emplace_back(std::make_unique<T>(std::forward<TArgs>(in_args)...));
+        }
+
+        #pragma endregion
 
         #pragma region Operators
 

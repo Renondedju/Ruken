@@ -1,14 +1,20 @@
 #pragma once
 
-#include "Rendering/Resources/DeviceObjectBase.hpp"
+#include "Rendering/RenderDefines.hpp"
+
+#include "Resource/IResource.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class Shader : public DeviceObjectBase
+class RenderDevice;
+
+class Shader final : public IResource
 {
     private:
 
         #pragma region Members
+
+        RenderDevice* m_device;
 
         vk::ShaderModule m_vertex_module;
         vk::ShaderModule m_fragment_module;
@@ -27,6 +33,10 @@ class Shader : public DeviceObjectBase
         ~Shader() noexcept override;
 
         #pragma endregion
+
+        RkVoid Load  (ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
+        RkVoid Reload(ResourceManager& in_manager)                                                 override;
+        RkVoid Unload(ResourceManager& in_manager)                                                 noexcept override;
 
         std::vector<vk::PipelineShaderStageCreateInfo> GetShaderStages() const;
 

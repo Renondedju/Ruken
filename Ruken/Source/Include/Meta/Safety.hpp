@@ -16,6 +16,8 @@
  */
 #if defined(RUKEN_LOGGING_ENABLED)
     #define RUKEN_SAFE_LOGGER_CALL(in_instance, ...) { RUKEN_SAFE_POINTER_CALL(in_instance, __VA_ARGS__) }
+    #define RUKEN_SAFE_LOGGER_RETURN_CALL(in_instance, ...) { RUKEN_SAFE_POINTER_CALL(in_instance, __VA_ARGS__) return; }
 #else
     #define RUKEN_SAFE_LOGGER_CALL(in_instance, ...) {}
+    #define RUKEN_SAFE_LOGGER_RETURN_CALL(in_instance, ...) {}
 #endif
