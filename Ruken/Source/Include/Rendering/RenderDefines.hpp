@@ -14,6 +14,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+#define VMA_HPP_NO_STRUCT_CONSTRUCTORS
+
 #define VMA_HPP_NAMESPACE VULKAN_HPP_NAMESPACE
 
 #include <vma/vk_mem_alloc.hpp>
