@@ -31,8 +31,6 @@
 #include "Maths/Vector/Layouts/VectorLayout.hpp"
 #include "Maths/Vector/Layouts/DistanceLayout.hpp"
 
-#include "Types/Units/Distance/Meters.hpp"
-
 BEGIN_RUKEN_NAMESPACE
 
 /**
@@ -93,7 +91,14 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      */
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
     constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType>& GetLargestVector(
-        Vector<TOtherDimensions, TOtherUnderlyingType>& in_vector) const noexcept
+        Vector<TOtherDimensions, TOtherUnderlyingType>& in_vector) noexcept
+    {
+        return TDimensions >= TOtherDimensions ? *this : in_vector;
+    }
+
+    template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
+    constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetLargestVector(
+        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept
     {
         return TDimensions >= TOtherDimensions ? *this : in_vector;
     }
@@ -107,6 +112,13 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      * \param in_vector Other vector reference
      * \return Reference of the smallest vector
      */
+    template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
+    constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType>& GetSmallestVector(
+        Vector<TOtherDimensions, TOtherUnderlyingType>& in_vector) noexcept
+    {
+        return TDimensions < TOtherDimensions ? *this : in_vector;
+    }
+
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
     constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetSmallestVector(
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept
@@ -311,8 +323,8 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
     constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)(                    \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept                                  \
     {                                                                                                                    \
-        auto        largest  {GetLargestVector (in_vector)};                                                             \
-        auto const& smallest {GetSmallestVector(in_vector)};                                                             \
+        LargestVector <TOtherDimensions, TOtherUnderlyingType>        largest  {GetLargestVector (in_vector)};           \
+        SmallestVector<TOtherDimensions, TOtherUnderlyingType> const& smallest {GetSmallestVector(in_vector)};           \
                                                                                                                          \
         for (RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)                              \
             largest.data[index] RUKEN_GLUE(in_operator,=) smallest.data[index];                                          \

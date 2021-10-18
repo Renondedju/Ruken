@@ -36,7 +36,7 @@ Matrix4X4 Matrix4X4::ClipSpace() noexcept
                      0.0F,  0.0F,  0.0F,  1.0F); 
 }
 
-Matrix4X4 Matrix4X4::TranslationMatrix(Vector3f const& in_translation) noexcept
+Matrix4X4 Matrix4X4::TranslationMatrix(Vector3m const& in_translation) noexcept
 {
     return Matrix4X4(1.0F,  0.0F,  0.0F,  in_translation.x,
                      0.0F,  1.0F,  0.0F,  in_translation.y,
@@ -85,7 +85,7 @@ Matrix4X4 Matrix4X4::RotationMatrix(
     return RotationMatrixZ(in_angle_x).GetMultiplied(RotationMatrixY(in_angle_y)).GetMultiplied(RotationMatrixX(in_angle_z));
 }
 
-Matrix4X4 Matrix4X4::ScaleMatrix(Vector3f const& in_scale) noexcept
+Matrix4X4 Matrix4X4::ScaleMatrix(Vector3m const& in_scale) noexcept
 {
     return Matrix4X4(in_scale.x,  0.0F      ,  0.0F      ,  0.0F,
                      0.0F      ,  in_scale.y,  0.0F      ,  0.0F,
@@ -132,13 +132,13 @@ Matrix4X4 Matrix4X4::OrthogonalProjectionMatrix(
 }
 
 Matrix4X4 Matrix4X4::LookAtMatrix(
-        Vector3f const& in_from,
-        Vector3f const& in_to,
-        Vector3f const& in_up) noexcept
+        Vector3m const& in_from,
+        Vector3m const& in_to,
+        Vector3m const& in_up) noexcept
 {
-    Vector3f const forward   ((in_to - in_from   ).GetNormalized());
-    Vector3f const right     (in_up.Cross(forward).GetNormalized());
-    Vector3f const up        (forward.Cross(right));
+    Vector3m const forward   ((in_to - in_from   ).Normalized());
+    Vector3m const right     (in_up.Cross(forward).Normalized());
+    Vector3m const up        (forward.Cross(right));
 
     return Matrix4X4
     (
@@ -150,9 +150,9 @@ Matrix4X4 Matrix4X4::LookAtMatrix(
 }
 
 Matrix4X4 Matrix4X4::ModelMatrix(
-        Vector3f   const& in_position,
+        Vector3m   const& in_position,
         Quaternion const& in_rotation,
-        Vector3f   const& in_scale) noexcept
+        Vector3m   const& in_scale) noexcept
 {
     RkFloat const sqr_x (in_rotation.x * in_rotation.x);
     RkFloat const sqr_y (in_rotation.y * in_rotation.y);

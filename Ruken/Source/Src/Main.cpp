@@ -25,10 +25,15 @@
 #include <iostream>
 
 #include "Build/Namespace.hpp"
+#include "Maths/Vector/Vector.hpp"
 
 USING_RUKEN_NAMESPACE
 
 int main()
 {
+    Degrees test = 542_deg;
+
+    test = test / 5;
+
     return EXIT_SUCCESS;
 }

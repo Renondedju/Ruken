@@ -27,14 +27,12 @@
 #include "Maths/Trigonometry.hpp"
 #include "Maths/Quaternion/Quaternion.hpp"
 
-#include "Types/Units/Angle/Radians.hpp"
-
 USING_RUKEN_NAMESPACE
 
 Quaternion::Quaternion(RkFloat const in_w,
-                                 RkFloat const in_x,
-                                 RkFloat const in_y,
-                                 RkFloat const in_z) noexcept:
+                       RkFloat const in_x,
+                       RkFloat const in_y,
+                       RkFloat const in_z) noexcept:
     w {in_w},
     x {in_x},
     y {in_y},
@@ -65,8 +63,8 @@ Quaternion::Quaternion(Degrees const in_angle_x,
 
 template <RkBool TShortestPath>
 Quaternion Quaternion::Lerp(Quaternion const& in_lhs,
-                                      Quaternion const& in_rhs,
-                                      RkFloat    const  in_ratio) noexcept
+                            Quaternion const& in_rhs,
+                            RkFloat    const  in_ratio) noexcept
 {
     RkFloat const conjugate_ratio = 1.0F - in_ratio;
 

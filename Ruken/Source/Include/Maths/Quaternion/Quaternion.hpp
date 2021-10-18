@@ -25,7 +25,7 @@
 #pragma once
 
 #include "Maths/Matrix/Matrix3X3.hpp"
-#include "Types/Units/Angle/Degrees.hpp"
+#include "Types/Units/Angle/Angle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

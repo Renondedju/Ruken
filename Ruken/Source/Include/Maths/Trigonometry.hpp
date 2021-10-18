@@ -25,7 +25,7 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Types/Units/Angle/Radians.hpp"
+#include "Types/Units/Angle/Angle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

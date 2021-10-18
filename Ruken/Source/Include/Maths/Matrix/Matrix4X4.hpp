@@ -27,8 +27,7 @@
 #include "Maths/Vector/Vector.hpp"
 #include "Maths/Matrix/SquareMatrix.hpp"
 
-#include "Types/Units/Angle/Degrees.hpp"
-#include "Types/Units/Angle/Radians.hpp"
+#include "Types/Units/Angle/Angle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -83,7 +82,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Translation matrix
          */
         [[nodiscard]]
-        static Matrix4X4 TranslationMatrix(Vector3f const& in_translation) noexcept;
+        static Matrix4X4 TranslationMatrix(Vector3m const& in_translation) noexcept;
 
         /**
          * \brief Creates a rotation matrix for the X axis
@@ -130,7 +129,7 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          * \return Scale matrix
          */
         [[nodiscard]]
-        static Matrix4X4 ScaleMatrix(Vector3f const& in_scale) noexcept;
+        static Matrix4X4 ScaleMatrix(Vector3m const& in_scale) noexcept;
 
         /**
          * \brief Creates a perspective projection matrix
@@ -178,9 +177,9 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          */
         [[nodiscard]]
         static Matrix4X4 LookAtMatrix(
-                Vector3f const& in_from,
-                Vector3f const& in_to,
-                Vector3f const& in_up) noexcept;
+                Vector3m const& in_from,
+                Vector3m const& in_to,
+                Vector3m const& in_up) noexcept;
 
         /**
          * \brief Model matrix, also called TRS
@@ -193,9 +192,9 @@ class __declspec(novtable) Matrix4X4 final : public SquareMatrix<4>
          */
         [[nodiscard]]
         static Matrix4X4 ModelMatrix(
-                Vector3f   const& in_position,
+                Vector3m   const& in_position,
                 Quaternion const& in_rotation,
-                Vector3f   const& in_scale) noexcept;
+                Vector3m   const& in_scale) noexcept;
 
         #pragma endregion
 
