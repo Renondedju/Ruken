@@ -24,18 +24,14 @@
 
 #pragma once
 
-#pragma region Operators
+#include "Maths/Vector/Vector.hpp"
+#include "Maths/Vector/Layouts/AngleLayout.hpp"
 
-template <ArithmeticType TType>
-constexpr Vector2<TType>::operator Vector3<TType>() const noexcept
-{
-    return Vector3<TType>(x, y, static_cast<TType>(0));
-}
+BEGIN_RUKEN_NAMESPACE
 
-template <ArithmeticType TType>
-constexpr Vector2<TType>::operator Vector4<TType>() const noexcept
-{
-    return Vector4<TType>(x, y, static_cast<TType>(0), static_cast<TType>(1));
-}
+using Vector2rad = Vector<2, Angle<EAngleUnit::Radian>>;
+using Vector2deg = Vector<2, Angle<EAngleUnit::Degree>>;
+using Vector3rad = Vector<3, Angle<EAngleUnit::Radian>>;
+using Vector3deg = Vector<3, Angle<EAngleUnit::Degree>>;
 
-#pragma endregion
+END_RUKEN_NAMESPACE

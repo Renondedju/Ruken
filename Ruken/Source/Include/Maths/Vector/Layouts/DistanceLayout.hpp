@@ -24,22 +24,55 @@
 
 #pragma once
 
-#pragma region Operators
+#include "Build/Namespace.hpp"
+#include "Types/Units/Distance/Distance.hpp"
+#include "Maths/Vector/Layouts/VectorLayout.hpp"
 
-template <ArithmeticType TType>
-constexpr Vector4<TType>::operator Vector2<TType>() const noexcept
+BEGIN_RUKEN_NAMESPACE
+
+#pragma warning(push)
+#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+
+template <EDistanceUnit TDistanceUnit>
+struct VectorLayout<2, Distance<TDistanceUnit>>
 {
-    TType divisor = w == 0 ? 1 : w;
+    union
+	{
+	    Distance<TDistanceUnit> data[2] {};
+	    struct
+	    {
+	        Distance<TDistanceUnit> x;
+			Distance<TDistanceUnit> y;
+	    };
+		struct
+	    {
+	        Distance<TDistanceUnit> width;
+			Distance<TDistanceUnit> height;
+	    };
+	};
+};
 
-    return Vector2<TType>(x / divisor, y / divisor);
-}
-
-template <ArithmeticType TType>
-constexpr Vector4<TType>::operator Vector3<TType>() const noexcept
+template <EDistanceUnit TDistanceUnit>
+struct VectorLayout<3, Distance<TDistanceUnit>>
 {
-    TType divisor = w == 0 ? 1 : w;
+	union
+	{
+	    Distance<TDistanceUnit> data[3] {};
+	    struct
+	    {
+	        Distance<TDistanceUnit> x;
+			Distance<TDistanceUnit> y;
+			Distance<TDistanceUnit> z;
+	    };
+		struct
+	    {
+	        Distance<TDistanceUnit> width;
+			Distance<TDistanceUnit> height;
+			Distance<TDistanceUnit> depth;
+	    };
+	};
+};
 
-    return Vector3<TType>(x / divisor, y / divisor, z / divisor);
-}
+#pragma warning(pop)
 
-#pragma endregion
+END_RUKEN_NAMESPACE

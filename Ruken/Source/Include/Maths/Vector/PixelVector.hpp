@@ -24,40 +24,12 @@
 
 #pragma once
 
-#pragma region Constructors
+#include "Maths/Vector/Vector.hpp"
+#include "Maths/Vector/Layouts/PixelLayout.hpp"
 
-template <ArithmeticType TType>
-constexpr Vector2<TType>::Vector2(TType const in_x, TType const in_y) noexcept:
-    x {in_x},
-    y {in_y}
-{}
+BEGIN_RUKEN_NAMESPACE
 
-template <ArithmeticType TType>
-constexpr Vector2<TType>::Vector2(BaseVector<Vector2<TType>, 2UI64, TType> const& in_copy) noexcept
-{
-    *this = static_cast<Vector2 const&>(in_copy);
-}
+using Vector2px = Vector<2, Pixels>;
+using Vector3px = Vector<3, Pixels>;
 
-template <ArithmeticType TType>
-constexpr Vector2<TType>::Vector2(BaseVector<Vector2<TType>, 2, TType>&& in_move) noexcept
-{
-    *this = std::forward<Vector2>(static_cast<Vector2&&>(in_move));
-}
-
-#pragma endregion
-
-#pragma region Operators
-
-template <ArithmeticType TType>
-constexpr Vector2<TType>& Vector2<TType>::operator=(BaseVector<Vector2<TType>, 2, TType> const& in_copy) noexcept
-{
-    return *this = static_cast<Vector2>(in_copy);
-}
-
-template <ArithmeticType TType>
-constexpr Vector2<TType>& Vector2<TType>::operator=(BaseVector<Vector2<TType>, 2, TType>&& in_move) noexcept
-{
-    return *this = std::forward<Vector2>(static_cast<Vector2&&>(in_move));
-}
-
-#pragma endregion
+END_RUKEN_NAMESPACE

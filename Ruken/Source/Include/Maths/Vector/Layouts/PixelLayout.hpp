@@ -22,10 +22,58 @@
  *  SOFTWARE.
  */
 
-#include "Maths/Vector/Vector.hpp"
+#pragma once
 
-USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
+#include "Types/Units/Angle/Angle.hpp"
+#include "Maths/Vector/Layouts/VectorLayout.hpp"
 
-// Pre instantiation
-template struct Vector4<RkInt>;
-template struct Vector4<RkFloat>;
+#include "Types/Units/Pixels.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+#pragma warning(push)
+#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+
+template <>
+struct VectorLayout<2, Pixels>
+{
+    union
+	{
+	    Pixels data[2] {};
+	    struct
+	    {
+	        Pixels x;
+			Pixels y;
+	    };
+		struct
+	    {
+	        Pixels width;
+			Pixels height;
+	    };
+	};
+};
+
+template <>
+struct VectorLayout<3, Pixels>
+{
+    union
+	{
+	    Pixels data[3] {};
+	    struct
+	    {
+	        Pixels x;
+			Pixels y;
+			Pixels z;
+	    };
+		struct
+	    {
+	        Pixels width;
+			Pixels height;
+			Pixels depth;
+	    };
+	};
+};
+
+#pragma warning(pop)
+
+END_RUKEN_NAMESPACE

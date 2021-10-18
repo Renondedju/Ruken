@@ -24,60 +24,62 @@
 
 #pragma once
 
-#include "Maths/Vector/New/Vector.hpp"
+#include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
+#pragma warning(push)
+#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+
 /**
- * \brief Vector 3 data layout
- * \tparam TDataType Underlying data type
+ * \brief Generic vector layout
+ * \tparam TDimensions Number of dimensions of the vector
+ * \tparam TUnderlyingType Underlying type of the vector
  */
-template <typename TDataType>
-struct Vector3Layout
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorLayout
 {
-    using UnderlyingType = TDataType;
-    static constexpr RkSize dimensions = 3ULL;
-
-    #pragma warning(push)
-    #pragma warning(disable : 4201) // Warning C4201 nonstandard extension used: nameless struct/union
-
-    union
-    {
-        TDataType data[3] {0, 0, 0};
-
-        struct
-        {
-            TDataType x;
-            TDataType y;
-            TDataType z;
-        };
-    };
-
-    #pragma warning(pop)
-
-    /**
-     * \brief Generic constructor
-     * \tparam TValuesType Type of passed values
-     * \param in_values Values to init the vector with
-     */
-    template <typename... TValuesType> requires (sizeof...(TValuesType) == dimensions)
-    constexpr Vector3Layout(TValuesType... in_values) noexcept:
-        data {static_cast<UnderlyingType>(in_values)...}
-    {}
-
-    constexpr Vector3Layout() noexcept:
-        data {0, 0, 0}
-    {}
+    TUnderlyingType data[TDimensions] {};
 };
 
 /**
- * \brief Vector 3 class
- * \tparam TDataType Underlying data type
+ * \brief Generic two dimensional vector
+ * \tparam TUnderlyingType Underlying type of the vector
  */
-template <typename TDataType>
-using Vector3 = Vector<Vector3Layout<TDataType>>;
+template <typename TUnderlyingType>
+struct VectorLayout<2, TUnderlyingType>
+{
+    union
+    {
+        TUnderlyingType data[2] {};
+        struct
+        {
+            TUnderlyingType x;
+            TUnderlyingType y;
+        };
+    };
+};
 
-using Vector3i = Vector3<RkInt>;
-using Vector3f = Vector3<RkFloat>;
+/**
+ * \brief Generic three dimensional vector
+ * \tparam TUnderlyingType Underlying type of the vector
+ */
+template <typename TUnderlyingType>
+struct VectorLayout<3, TUnderlyingType>
+{
+    union
+    {
+        TUnderlyingType data[3] {};
+        struct
+        {
+            TUnderlyingType x;
+            TUnderlyingType y;
+            TUnderlyingType z;
+        };
+    };
+};
+
+#pragma warning(pop)
 
 END_RUKEN_NAMESPACE

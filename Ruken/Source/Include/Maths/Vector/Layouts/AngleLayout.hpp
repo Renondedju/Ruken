@@ -24,59 +24,55 @@
 
 #pragma once
 
-#include "Maths/Vector/New/Vector.hpp"
+#include "Build/Namespace.hpp"
+#include "Types/Units/Angle/Angle.hpp"
+#include "Maths/Vector/Layouts/VectorLayout.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief Vector 2 data layout
- * \tparam TDataType Underlying data type
- */
-template <typename TDataType>
-struct Vector2Layout
+#pragma warning(push)
+#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+
+template <EAngleUnit TAngleUnit>
+struct VectorLayout<2, Angle<TAngleUnit>>
 {
-    using UnderlyingType = TDataType;
-    static constexpr RkSize dimensions = 2ULL;
-
-    #pragma warning(push)
-    #pragma warning(disable : 4201) // Warning C4201 nonstandard extension used: nameless struct/union
-
     union
-    {
-        TDataType data[2] {0, 0};
-
-        struct
-        {
-            TDataType x;
-            TDataType y;
-        };
-    };
-
-    #pragma warning(pop)
-
-    /**
-     * \brief Generic constructor
-     * \tparam TValuesType Type of passed values
-     * \param in_values Values to init the vector with
-     */
-    template <typename... TValuesType> requires (sizeof...(TValuesType) == dimensions)
-    constexpr Vector2Layout(TValuesType... in_values) noexcept:
-        data {static_cast<UnderlyingType>(in_values)...}
-    {}
-
-    constexpr Vector2Layout() noexcept:
-        data {0, 0}
-    {}
+	{
+	    Angle<TAngleUnit> data[2] {};
+	    struct
+	    {
+	        Angle<TAngleUnit> x;
+			Angle<TAngleUnit> y;
+	    };
+		struct
+	    {
+	        Angle<TAngleUnit> pitch;
+			Angle<TAngleUnit> yaw;
+	    };
+	};
 };
 
-/**
- * \brief Vector 2 class
- * \tparam TDataType Underlying data type
- */
-template <typename TDataType>
-using Vector2 = Vector<Vector2Layout<TDataType>>;
+template <EAngleUnit TAngleUnit>
+struct VectorLayout<3, Angle<TAngleUnit>>
+{
+	union
+	{
+	    Angle<TAngleUnit> data[3] {};
+	    struct
+	    {
+	        Angle<TAngleUnit> x;
+			Angle<TAngleUnit> y;
+			Angle<TAngleUnit> z;
+	    };
+		struct
+	    {
+	        Angle<TAngleUnit> pitch;
+			Angle<TAngleUnit> yaw;
+			Angle<TAngleUnit> roll;
+	    };
+	};
+};
 
-using Vector2i = Vector2<RkInt>;
-using Vector2f = Vector2<RkFloat>;
+#pragma warning(pop)
 
 END_RUKEN_NAMESPACE
