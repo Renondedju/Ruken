@@ -2,8 +2,10 @@
 
 #include "Rendering/RenderTarget.hpp"
 
-#include "Rendering/RenderObjects/CommandPool.hpp"
-#include "Rendering/RenderObjects/SemaphorePool.hpp"
+#include "Rendering/RenderObjects/TimelineSemaphore.hpp"
+
+#include "Rendering/RenderObjectPools/CommandPool.hpp"
+#include "Rendering/RenderObjectPools/SemaphorePool.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -19,17 +21,16 @@ class RenderFrame
         Logger*       m_logger {nullptr};
         RenderDevice* m_device {nullptr};
 
-        std::unique_ptr<RenderTarget>    m_color_target         {};
-        std::unique_ptr<RenderTarget>    m_depth_target         {};
+        std::unique_ptr<RenderTarget> m_color_target {};
+        std::unique_ptr<RenderTarget> m_depth_target {};
 
-        vk::Framebuffer m_framebuffer          {};
-        RkUint64        m_semaphore_value      {0ULL};
-        vk::Semaphore   m_timeline_semaphore   {};
+        vk::Framebuffer m_framebuffer {};
 
-        CommandPool   m_graphics_command_pool;
-        CommandPool   m_compute_command_pool;
-        CommandPool   m_transfer_command_pool;
-        SemaphorePool m_semaphore_pool;
+        TimelineSemaphore m_timeline_semaphore;
+        SemaphorePool     m_semaphore_pool;
+        CommandPool       m_graphics_command_pool;
+        CommandPool       m_compute_command_pool;
+        CommandPool       m_transfer_command_pool;
 
         #pragma endregion
 
@@ -48,19 +49,17 @@ class RenderFrame
 
         #pragma region Methods
 
-        RkVoid                   Reset                          () noexcept;
-        RkUint64                 IncrementTimelineSemaphoreValue() noexcept;
+        RkVoid Reset() noexcept;
 
-        RenderTarget    const& GetColorTarget           () const noexcept;
-        RenderTarget    const& GetDepthTarget           () const noexcept;
-        vk::Framebuffer const& GetFramebuffer           () const noexcept;
-        RkUint64        const& GetTimelineSemaphoreValue() const noexcept;
-        vk::Semaphore   const& GetTimelineSemaphore     () const noexcept;
+        RenderTarget    const& GetColorTarget() const noexcept;
+        RenderTarget    const& GetDepthTarget() const noexcept;
+        vk::Framebuffer const& GetFramebuffer() const noexcept;
 
-        CommandPool&   GetGraphicsCommandPool() noexcept;
-        CommandPool&   GetComputeCommandPool () noexcept;
-        CommandPool&   GetTransferCommandPool() noexcept;
-        SemaphorePool& GetSemaphorePool      () noexcept;
+        TimelineSemaphore& GetTimelineSemaphore  () noexcept;
+        SemaphorePool&     GetSemaphorePool      () noexcept;
+        CommandPool&       GetGraphicsCommandPool() noexcept;
+        CommandPool&       GetComputeCommandPool () noexcept;
+        CommandPool&       GetTransferCommandPool() noexcept;
 
         #pragma endregion
 

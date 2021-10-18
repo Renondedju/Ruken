@@ -44,7 +44,7 @@ Shader::Shader(RenderDevice* in_device, std::string_view in_path) noexcept:
 
     m_fragment_module = m_device->GetLogicalDevice().createShaderModule(shader_module_create_info).value;
 
-    spirv_cross::Compiler vertex_compiler(std::move(vertex_code));
+    /*spirv_cross::Compiler vertex_compiler(std::move(vertex_code));
 
     auto vertex_resources = vertex_compiler.get_shader_resources();
 
@@ -64,7 +64,7 @@ Shader::Shader(RenderDevice* in_device, std::string_view in_path) noexcept:
         RkUint32 set      = fragment_compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
         RkUint32 binding  = fragment_compiler.get_decoration(resource.id, spv::DecorationBinding);
         RkUint32 location = fragment_compiler.get_decoration(resource.id, spv::DecorationLocation);
-    }
+    }*/
 }
 
 Shader::~Shader() noexcept
@@ -75,17 +75,18 @@ Shader::~Shader() noexcept
 
 RkVoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-    
+    (void)in_manager;
+    (void)in_descriptor;
 }
 
 RkVoid Shader::Reload(ResourceManager& in_manager)
 {
-    
+    (void)in_manager;
 }
 
 RkVoid Shader::Unload(ResourceManager& in_manager) noexcept
 {
-    
+    (void)in_manager;
 }
 
 std::vector<vk::PipelineShaderStageCreateInfo> Shader::GetShaderStages() const

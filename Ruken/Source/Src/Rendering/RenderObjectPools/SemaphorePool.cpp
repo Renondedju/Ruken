@@ -1,4 +1,4 @@
-#include "Rendering/RenderObjects/SemaphorePool.hpp"
+#include "Rendering/RenderObjectPools/SemaphorePool.hpp"
 
 #include "Rendering/RenderDevice.hpp"
 

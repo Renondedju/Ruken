@@ -75,110 +75,31 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
 
     memcpy(allocation_info.pMappedData, pixels, allocation_info.size);
 
-    /*if (m_device->HasDedicatedTransferQueue())
+    if (auto transfer_command_buffer = m_device->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
-        if (auto command_buffer = m_device->GetTransferQueue().RequestCommandBuffer())
-        {
-            vk::ImageMemoryBarrier barrier = {
-                .srcAccessMask    = vk::AccessFlagBits::eNoneKHR,
-                .dstAccessMask    = vk::AccessFlagBits::eTransferWrite,
-                .oldLayout        = vk::ImageLayout::eUndefined,
-                .newLayout        = vk::ImageLayout::eTransferDstOptimal,
-                .image            = m_image,
-                .subresourceRange = {
-                    .aspectMask = vk::ImageAspectFlagBits::eColor,
-                    .levelCount = 1,
-                    .layerCount = 1
-                }
-            };
-
-            command_buffer.pipelineBarrier(
-                vk::PipelineStageFlagBits::eTopOfPipe,
-                vk::PipelineStageFlagBits::eTransfer,
-                vk::DependencyFlagBits::eByRegion,
-                nullptr,
-                nullptr,
-                barrier);
-
-            vk::BufferImageCopy buffer_image_copy = {
-                .imageSubresource = {
-                    .aspectMask = vk::ImageAspectFlagBits::eColor,
-                    .layerCount = 1
-                },
-                .imageExtent = image_create_info.extent
-            };
-
-            command_buffer.copyBufferToImage(staging_buffer.first, m_image, vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
-
-            barrier.srcAccessMask       = vk::AccessFlagBits::eTransferWrite;
-            barrier.dstAccessMask       = vk::AccessFlagBits::eNoneKHR;
-            barrier.oldLayout           = vk::ImageLayout::eTransferDstOptimal;
-            barrier.newLayout           = vk::ImageLayout::eShaderReadOnlyOptimal;
-            barrier.srcQueueFamilyIndex = m_device->GetTransferFamilyIndex();
-            barrier.dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex();
-            
-            command_buffer.pipelineBarrier(
-                vk::PipelineStageFlagBits::eTransfer,
-                vk::PipelineStageFlagBits::eBottomOfPipe,
-                vk::DependencyFlagBits::eByRegion,
-                nullptr,
-                nullptr,
-                barrier);
-
-            m_device->GetTransferQueue().ReleaseCommandBuffer(std::move(command_buffer));
-        }
-
-        if (auto command_buffer = m_device->GetGraphicsQueue().RequestCommandBuffer())
-        {
-            vk::ImageMemoryBarrier barrier = {
-                .srcAccessMask       = vk::AccessFlagBits::eNoneKHR,
-                .dstAccessMask       = vk::AccessFlagBits::eShaderRead,
-                .oldLayout           = vk::ImageLayout::eTransferDstOptimal,
-                .newLayout           = vk::ImageLayout::eShaderReadOnlyOptimal,
-                .srcQueueFamilyIndex = m_device->GetTransferFamilyIndex(),
-                .dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex(),
-                .image               = m_image,
-                .subresourceRange    = {
-                    .aspectMask = vk::ImageAspectFlagBits::eColor,
-                    .levelCount = 1,
-                    .layerCount = 1
-                }
-            };
-
-            command_buffer.pipelineBarrier(
-                vk::PipelineStageFlagBits::eTopOfPipe,
-                vk::PipelineStageFlagBits::eFragmentShader,
-                vk::DependencyFlagBits::eByRegion,
-                nullptr,
-                nullptr,
-                barrier);
-
-            m_device->GetGraphicsQueue().ReleaseCommandBuffer(std::move(command_buffer));
-        }
-    }
-
-    else */if (auto command_buffer = m_device->GetTransferQueue().RequestCommandBuffer())
-    {
-        vk::ImageMemoryBarrier barrier = {
-            .srcAccessMask = vk::AccessFlagBits::eNoneKHR,
-            .dstAccessMask = vk::AccessFlagBits::eTransferWrite,
-            .oldLayout = vk::ImageLayout::eUndefined,
-            .newLayout = vk::ImageLayout::eTransferDstOptimal,
-            .image = m_image,
-            .subresourceRange = {
+        vk::ImageMemoryBarrier2KHR image_memory_barrier = {
+            .srcStageMask        = vk::PipelineStageFlagBits2KHR::eNone,
+            .srcAccessMask       = vk::AccessFlagBits2KHR::eNone,
+            .dstStageMask        = vk::PipelineStageFlagBits2KHR::eTransfer,
+            .dstAccessMask       = vk::AccessFlagBits2KHR::eMemoryWrite,
+            .oldLayout           = vk::ImageLayout::eUndefined,
+            .newLayout           = vk::ImageLayout::eTransferDstOptimal,
+            .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+            .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+            .image               = m_image,
+            .subresourceRange =  {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .levelCount = 1,
-                .layerCount = 1
+                .levelCount = 1U,
+                .layerCount = 1U
             }
         };
 
-        command_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTopOfPipe,
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::DependencyFlagBits::eByRegion,
-            nullptr,
-            nullptr,
-            barrier);
+        vk::DependencyInfoKHR dependency_info = {
+            .imageMemoryBarrierCount = 1,
+            .pImageMemoryBarriers    = &image_memory_barrier
+        };
+
+        transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
 
         vk::BufferImageCopy buffer_image_copy = {
             .imageSubresource = {
@@ -188,22 +109,48 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
             .imageExtent = image_create_info.extent
         };
 
-        command_buffer.copyBufferToImage(staging_buffer.first, m_image, vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
+        transfer_command_buffer.copyBufferToImage(staging_buffer.first, m_image, vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
 
-        barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-        barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead;
-        barrier.oldLayout     = vk::ImageLayout::eTransferDstOptimal;
-        barrier.newLayout     = vk::ImageLayout::eShaderReadOnlyOptimal;
+        image_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eTransfer;
+        image_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eMemoryWrite;
+        image_memory_barrier.dstStageMask  = vk::PipelineStageFlagBits2KHR::eNone;
+        image_memory_barrier.dstAccessMask = vk::AccessFlagBits2KHR::eNone;
+        image_memory_barrier.oldLayout     = vk::ImageLayout::eTransferDstOptimal;
+        image_memory_barrier.newLayout     = vk::ImageLayout::eReadOnlyOptimalKHR;
 
-        command_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eBottomOfPipe,
-            vk::DependencyFlagBits::eByRegion,
-            nullptr,
-            nullptr,
-            barrier);
+        if (m_device->HasDedicatedTransferQueue())
+        {
+            image_memory_barrier.srcQueueFamilyIndex = m_device->GetTransferFamilyIndex();
+            image_memory_barrier.dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex();
 
-        m_device->GetTransferQueue().ReleaseCommandBuffer(std::move(command_buffer));
+            transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
+
+            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+
+            if (auto graphics_command_buffer = m_device->GetGraphicsQueue().BeginSingleUseCommandBuffer())
+            {
+                image_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eNone;
+                image_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eNone;
+                image_memory_barrier.dstStageMask  = vk::PipelineStageFlagBits2KHR::eFragmentShader;
+                image_memory_barrier.dstAccessMask = vk::AccessFlagBits2KHR::eShaderRead;
+
+                graphics_command_buffer.pipelineBarrier2KHR(dependency_info);
+
+                m_device->GetGraphicsQueue().EndSingleUseCommandBuffer(graphics_command_buffer);
+            }
+        }
+
+        else
+        {
+            image_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eNone;
+            image_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eNone;
+            image_memory_barrier.dstStageMask  = vk::PipelineStageFlagBits2KHR::eFragmentShader;
+            image_memory_barrier.dstAccessMask = vk::AccessFlagBits2KHR::eShaderRead;
+
+            transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
+
+            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+        }
     }
 
     m_device->GetAllocator().destroyBuffer(staging_buffer.first, staging_buffer.second);
@@ -220,17 +167,18 @@ Texture::~Texture() noexcept
 
 RkVoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-    
+    (void)in_manager;
+    (void)in_descriptor;
 }
 
 RkVoid Texture::Reload(ResourceManager& in_manager)
 {
-    
+    (void)in_manager;
 }
 
 RkVoid Texture::Unload(ResourceManager& in_manager) noexcept
 {
-    
+    (void)in_manager;
 }
 
 vk::Image const& Texture::GetImage() const noexcept

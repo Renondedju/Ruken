@@ -67,8 +67,8 @@ RkVoid RenderGraph::Execute(RenderFrame& in_frame) noexcept
         };
 
         vk::SemaphoreSubmitInfoKHR timeline_semaphore_submit_info = {
-            .semaphore = in_frame.GetTimelineSemaphore(),
-            .value     = in_frame.IncrementTimelineSemaphoreValue()
+            .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
+            .value     = in_frame.GetTimelineSemaphore().NextValue()
         };
 
         vk::SubmitInfo2KHR submit_info = {
@@ -80,6 +80,6 @@ RkVoid RenderGraph::Execute(RenderFrame& in_frame) noexcept
 
         m_device->GetGraphicsQueue().Submit(submit_info);
 
-        in_frame.GetGraphicsCommandPool().Release(std::move(command_buffer));
+        in_frame.GetGraphicsCommandPool().Release(command_buffer);
     }
 }

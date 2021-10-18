@@ -21,37 +21,44 @@ RenderQueue::~RenderQueue() noexcept
     {
         m_device->GetLogicalDevice().destroy(fence);
     }
-}
 
-RkVoid RenderQueue::Submit(vk::SubmitInfo const& in_submit_info) noexcept
-{
-    std::lock_guard lock(m_mutex);
-
-    auto result = m_queue.submit(in_submit_info);
+    for (auto const& command_pool : m_command_pools | std::views::values)
+    {
+        m_device->GetLogicalDevice().destroy(command_pool);
+    }
 }
 
 RkVoid RenderQueue::Submit(vk::SubmitInfo2KHR const& in_submit_info) noexcept
 {
     std::lock_guard lock(m_mutex);
 
-    auto result = m_queue.submit2KHR(in_submit_info);
+    if (m_queue.submit2KHR(in_submit_info) != vk::Result::eSuccess)
+    {
+
+    }
 }
 
 RkVoid RenderQueue::Present(vk::PresentInfoKHR const& in_present_info) noexcept
 {
     std::lock_guard lock(m_mutex);
 
-    auto result = m_queue.presentKHR(in_present_info);
+    if (m_queue.presentKHR(in_present_info) != vk::Result::eSuccess)
+    {
+        
+    }
 }
 
 RkVoid RenderQueue::WaitIdle() noexcept
 {
     std::lock_guard lock(m_mutex);
 
-    auto result = m_queue.waitIdle();
+    if (m_queue.waitIdle() != vk::Result::eSuccess)
+    {
+        
+    }
 }
 
-vk::CommandBuffer RenderQueue::RequestCommandBuffer() noexcept
+vk::CommandBuffer RenderQueue::BeginSingleUseCommandBuffer() noexcept
 {
     if (!m_command_pools.contains(std::this_thread::get_id()))
     {
@@ -62,40 +69,63 @@ vk::CommandBuffer RenderQueue::RequestCommandBuffer() noexcept
             m_fences[std::this_thread::get_id()] = value;
         }
 
-        m_command_pools[std::this_thread::get_id()] = std::make_unique<CommandPool>(m_device, vk::CommandPoolCreateFlagBits::eResetCommandBuffer, m_family_index);
-    }
+        vk::CommandPoolCreateInfo command_pool_create_info = {
+            .flags            = vk::CommandPoolCreateFlagBits::eTransient,
+            .queueFamilyIndex = m_family_index
+        };
 
-    auto command_buffer = m_command_pools[std::this_thread::get_id()]->Request();
-
-    vk::CommandBufferBeginInfo command_buffer_begin_info = {
-        .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit
-    };
-    
-    command_buffer.begin(command_buffer_begin_info);
-
-    return command_buffer;
-}
-
-RkVoid RenderQueue::ReleaseCommandBuffer(vk::CommandBuffer&& in_command_buffer) noexcept
-{
-    in_command_buffer.end();
-
-    vk::CommandBufferSubmitInfoKHR command_buffer_submit_info = {
-        .commandBuffer = in_command_buffer
-    };
-
-    vk::SubmitInfo2KHR submit_info = {
-        .commandBufferInfoCount = 1U,
-        .pCommandBufferInfos    = &command_buffer_submit_info
-    };
-
-    if (m_queue.submit2KHR(submit_info, m_fences[std::this_thread::get_id()]) == vk::Result::eSuccess)
-    {
-        if (m_device->GetLogicalDevice().waitForFences(m_fences[std::this_thread::get_id()], VK_TRUE, UINT64_MAX) == vk::Result::eSuccess)
+        if (auto [result, value] = m_device->GetLogicalDevice().createCommandPool(command_pool_create_info); result == vk::Result::eSuccess)
         {
-            m_device->GetLogicalDevice().resetFences(m_fences[std::this_thread::get_id()]);
+            m_command_pools[std::this_thread::get_id()] = value;
         }
     }
 
-    m_command_pools[std::this_thread::get_id()]->Release(std::move(in_command_buffer));
+    vk::CommandBufferAllocateInfo command_buffer_allocate_info = {
+        .commandPool        = m_command_pools[std::this_thread::get_id()],
+        .level              = vk::CommandBufferLevel::ePrimary,
+        .commandBufferCount = 1U
+    };
+
+    if (auto [result, value] = m_device->GetLogicalDevice().allocateCommandBuffers(command_buffer_allocate_info); result == vk::Result::eSuccess)
+    {
+        auto const command_buffer = value.front();
+
+        vk::CommandBufferBeginInfo command_buffer_begin_info = {
+            .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+        };
+        
+        if (command_buffer.begin(command_buffer_begin_info) == vk::Result::eSuccess)
+        {
+            return command_buffer;
+        }
+
+        EndSingleUseCommandBuffer(command_buffer);
+    }
+
+    return VK_NULL_HANDLE;
+}
+
+RkVoid RenderQueue::EndSingleUseCommandBuffer(vk::CommandBuffer const& in_command_buffer) const noexcept
+{
+    if (in_command_buffer.end() == vk::Result::eSuccess)
+    {
+        vk::CommandBufferSubmitInfoKHR command_buffer_submit_info = {
+            .commandBuffer = in_command_buffer
+        };
+
+        vk::SubmitInfo2KHR submit_info = {
+            .commandBufferInfoCount = 1U,
+            .pCommandBufferInfos    = &command_buffer_submit_info
+        };
+
+        if (auto const& fence = m_fences.at(std::this_thread::get_id()); m_queue.submit2KHR(submit_info, fence) == vk::Result::eSuccess)
+        {
+            if (m_device->GetLogicalDevice().waitForFences(fence, VK_TRUE, UINT64_MAX) == vk::Result::eSuccess)
+            {
+                m_device->GetLogicalDevice().resetFences(fence);
+            }
+        }
+    }
+
+    m_device->GetLogicalDevice().freeCommandBuffers(m_command_pools.at(std::this_thread::get_id()), in_command_buffer);
 }

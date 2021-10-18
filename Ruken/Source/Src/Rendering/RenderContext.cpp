@@ -19,9 +19,6 @@ USING_RUKEN_NAMESPACE
 #pragma region Static Variables
 
 constexpr std::array g_required_extensions = {
-    VK_KHR_DISPLAY_EXTENSION_NAME,
-    VK_KHR_GET_DISPLAY_PROPERTIES_2_EXTENSION_NAME,
-    VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME,
     VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef RUKEN_OS_WINDOWS
     VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
@@ -36,7 +33,6 @@ constexpr std::array g_required_layers = {
 
 constexpr std::array g_enabled_validation_features = {
     vk::ValidationFeatureEnableEXT::eBestPractices,
-    vk::ValidationFeatureEnableEXT::eDebugPrintf,
     vk::ValidationFeatureEnableEXT::eSynchronizationValidation
 };
 
@@ -50,6 +46,8 @@ static RkUint32 DebugCallback(
     VkDebugUtilsMessengerCallbackDataEXT   const* in_callback_data,
     RkVoid*                                       in_user_data)
 {
+    (void)in_message_type;
+
     Logger const* logger = static_cast<Logger*>(in_user_data);
 
     if (!logger)

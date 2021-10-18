@@ -160,20 +160,18 @@ RkVoid Window::CreateSurface() noexcept
 {
     VkSurfaceKHR surface;
     
-    vk::Result const result = static_cast<vk::Result>(glfwCreateWindowSurface(m_context->GetInstance(), m_handle, nullptr, &surface));
+    if (static_cast<vk::Result>(glfwCreateWindowSurface(m_context->GetInstance(), m_handle, nullptr, &surface)) != vk::Result::eSuccess)
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to create glfw surface!"))
 
-    if (result == vk::Result::eSuccess)
-    {
-        auto [result, value] = m_device->GetPhysicalDevice().getSurfaceSupportKHR(m_device->GetGraphicsFamilyIndex(), surface);
+    auto [result, value] = m_device->GetPhysicalDevice().getSurfaceSupportKHR(m_device->GetGraphicsFamilyIndex(), surface);
 
-        if (!value)
-            RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create surface!"))
+    if (result != vk::Result::eSuccess)
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to query GLFW surface support!"))
 
-        m_surface = surface;
-        
-    }
-    else
-        RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create surface!"))
+    if (!value)
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Created GLFW surface is not supported!"))
+
+    m_surface = surface;
 }
 
 RkVoid Window::PickSwapchainImageCount() noexcept
@@ -213,7 +211,7 @@ RkVoid Window::PickSwapchainPresentMode() noexcept
 {
     auto [result, present_modes] =  m_device->GetPhysicalDevice().getSurfacePresentModesKHR(m_surface);
 
-    m_present_mode = present_modes[0];
+    m_present_mode = vk::PresentModeKHR::eMailbox;
 }
 
 RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
@@ -282,7 +280,7 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
 
     };
 
-    command_buffer.begin(command_buffer_begin_info);
+    if (command_buffer.begin(command_buffer_begin_info) == vk::Result::eSuccess)
     {
         vk::ImageMemoryBarrier render_target_barrier = {
             .srcAccessMask    = vk::AccessFlagBits::eColorAttachmentWrite,
@@ -378,16 +376,20 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
             nullptr,
             nullptr,
             swapchain_barrier);
+
+        if (command_buffer.end() == vk::Result::eSuccess)
+        {
+            
+        }
     }
-    command_buffer.end();
 
     std::vector<vk::SemaphoreSubmitInfoKHR> wait_semaphores_submit_infos = {
         {
             .semaphore = image_semaphore
         },
         {
-            .semaphore = in_frame.GetTimelineSemaphore(),
-            .value     = in_frame.GetTimelineSemaphoreValue()
+            .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
+            .value     = in_frame.GetTimelineSemaphore().GetValue ()
         }
     };
 
@@ -402,8 +404,8 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
             .semaphore = present_semaphore
         },
         {
-            .semaphore = in_frame.GetTimelineSemaphore(),
-            .value     = in_frame.IncrementTimelineSemaphoreValue()
+            .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
+            .value     = in_frame.GetTimelineSemaphore().NextValue()
         }
     };
 
@@ -428,9 +430,9 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
 
     m_device->GetGraphicsQueue().Present(present_info);
 
-    in_frame.GetSemaphorePool      ().Release(std::move(image_semaphore));
-    in_frame.GetSemaphorePool      ().Release(std::move(present_semaphore));
-    in_frame.GetGraphicsCommandPool().Release(std::move(command_buffer));
+    in_frame.GetSemaphorePool      ().Release(image_semaphore);
+    in_frame.GetSemaphorePool      ().Release(present_semaphore);
+    in_frame.GetGraphicsCommandPool().Release(command_buffer);
 }
 
 #pragma region Setters
@@ -453,7 +455,7 @@ RkVoid Window::SetAspectRatio(RkInt32 const in_numerator, RkInt32 const in_denom
 
 RkVoid Window::SetSize(VkExtent2D const& in_size) const noexcept
 {
-    glfwSetWindowSize(m_handle, in_size.width, in_size.height);
+    glfwSetWindowSize(m_handle, static_cast<RkInt32>(in_size.width), static_cast<RkInt32>(in_size.height));
 }
 
 RkVoid Window::SetOpacity(RkFloat const in_opacity) const noexcept

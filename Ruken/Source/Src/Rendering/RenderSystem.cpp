@@ -24,7 +24,10 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
 
 RenderSystem::~RenderSystem() noexcept
 {
-    m_device->GetLogicalDevice().waitIdle();
+    if (m_device->GetLogicalDevice().waitIdle() != vk::Result::eSuccess)
+    {
+        
+    }
 
     m_graph.reset();
 }

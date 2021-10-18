@@ -1,4 +1,4 @@
-#include "Rendering/RenderObjects/CommandPool.hpp"
+#include "Rendering/RenderObjectPools/CommandPool.hpp"
 
 #include "Rendering/RenderDevice.hpp"
 

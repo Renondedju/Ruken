@@ -35,7 +35,8 @@ class RenderObjectPool
         #pragma region Methods
 
         T      Request();
-        RkVoid Release(T&& in_object);
+        RkVoid Release(T const& in_object);
+        RkVoid Release(T&&      in_object);
 
         virtual RkVoid Reset() = 0;
 
@@ -67,6 +68,12 @@ T RenderObjectPool<T>::Request()
     m_objects.pop_front();
 
     return object;
+}
+
+template <typename T>
+RkVoid RenderObjectPool<T>::Release(T const& in_object)
+{
+    m_objects.emplace_back(in_object);
 }
 
 template <typename T>

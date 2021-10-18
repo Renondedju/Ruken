@@ -28,9 +28,8 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
     reader.ParseFromFile(in_path.data(), config);
 
-    auto& attribute = reader.GetAttrib   ();
-    auto& shapes    = reader.GetShapes   ();
-    auto& materials = reader.GetMaterials();
+    auto& attribute = reader.GetAttrib();
+    auto& shapes    = reader.GetShapes();
 
     std::vector<Vertex>   vertices;
     std::vector<RkUint32> indices;
@@ -162,15 +161,67 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
     m_device->GetLogicalDevice().updateDescriptorSets(write_descriptors, VK_NULL_HANDLE);
 
-    if (auto command_buffer = m_device->GetTransferQueue().RequestCommandBuffer())
+    if (auto transfer_command_buffer = m_device->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
         vk::BufferCopy buffer_copy = {
             .size = buffer_create_info.size
         };
 
-        command_buffer.copyBuffer(staging_buffer, m_buffer, buffer_copy);
+        transfer_command_buffer.copyBuffer(staging_buffer, m_buffer, buffer_copy);
 
-        m_device->GetTransferQueue().ReleaseCommandBuffer(std::move(command_buffer));
+        if (m_device->HasDedicatedTransferQueue())
+        {
+            vk::BufferMemoryBarrier2KHR buffer_memory_barrier = {
+                .srcStageMask        = vk::PipelineStageFlagBits2KHR::eTransfer,
+                .srcAccessMask       = vk::AccessFlagBits2KHR::eMemoryWrite,
+                .dstStageMask        = vk::PipelineStageFlagBits2KHR::eNone,
+                .dstAccessMask       = vk::AccessFlagBits2KHR::eNone,
+                .srcQueueFamilyIndex = m_device->GetTransferFamilyIndex(),
+                .dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex(),
+                .buffer              = m_buffer,
+                .size                = VK_WHOLE_SIZE 
+            };
+
+            vk::DependencyInfoKHR dependency_info = {
+                .bufferMemoryBarrierCount = 1,
+                .pBufferMemoryBarriers    = &buffer_memory_barrier
+            };
+
+            transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
+
+            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+
+            if (auto graphics_command_buffer = m_device->GetGraphicsQueue().BeginSingleUseCommandBuffer())
+            {
+                buffer_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eNone;
+                buffer_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eNone;
+                buffer_memory_barrier.dstStageMask  = vk::PipelineStageFlagBits2KHR::eVertexAttributeInput | vk::PipelineStageFlagBits2KHR::eIndexInput;
+                buffer_memory_barrier.dstAccessMask = vk::AccessFlagBits2KHR::eMemoryRead;
+
+                graphics_command_buffer.pipelineBarrier2KHR(dependency_info);
+
+                m_device->GetGraphicsQueue().EndSingleUseCommandBuffer(graphics_command_buffer);
+            }
+        }
+
+        else
+        {
+            vk::MemoryBarrier2KHR memory_barrier = {
+                .srcStageMask  = vk::PipelineStageFlagBits2KHR::eTransfer,
+                .srcAccessMask = vk::AccessFlagBits2KHR::eMemoryWrite,
+                .dstStageMask  = vk::PipelineStageFlagBits2KHR::eVertexAttributeInput | vk::PipelineStageFlagBits2KHR::eIndexInput,
+                .dstAccessMask = vk::AccessFlagBits2KHR::eMemoryRead
+            };
+
+            vk::DependencyInfoKHR dependency_info = {
+                .memoryBarrierCount = 1,
+                .pMemoryBarriers    = &memory_barrier
+            };
+
+            transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
+
+            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+        }
     }
 
     m_device->GetAllocator().destroyBuffer(staging_buffer, staging_allocation);
@@ -211,15 +262,16 @@ RkVoid Model::Render(vk::CommandBuffer const& in_command_buffer)
 
 RkVoid Model::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
 {
-
+    (void)in_manager;
+    (void)in_descriptor;
 }
 
 RkVoid Model::Reload(ResourceManager& in_manager)
 {
-    
+    (void)in_manager;
 }
 
 RkVoid Model::Unload(ResourceManager& in_manager) noexcept
 {
-    
+    (void)in_manager;
 }

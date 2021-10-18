@@ -1,4 +1,4 @@
-#include "Rendering/RenderObjects/FencePool.hpp"
+#include "Rendering/RenderObjectPools/FencePool.hpp"
 
 #include "Rendering/RenderDevice.hpp"
 
