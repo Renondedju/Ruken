@@ -75,6 +75,14 @@ struct Angle final: StrongType<RkFloat, Angle<TUnitType>>,
     #pragma endregion
 };
 
+using Degrees = Angle<EAngleUnit::Degree>;
+using Radians = Angle<EAngleUnit::Radian>;
+
+constexpr Degrees operator"" _deg(RkLdouble in_angle) noexcept;
+constexpr Degrees operator"" _deg(RkSize    in_angle) noexcept;
+constexpr Radians operator"" _rad(RkLdouble in_angle) noexcept;
+constexpr Radians operator"" _rad(RkSize    in_angle) noexcept;
+
 #include "Types/Units/Angle/Angle.inl"
 
 END_RUKEN_NAMESPACE

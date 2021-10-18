@@ -266,9 +266,7 @@
     <ClInclude Include="Source\Include\Types\StrongType\StrongType.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\Angle.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Angle\Degrees.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\EAngleUnit.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Angle\Radians.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Distance\Centimeters.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Distance\Distance.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Distance\EDistanceUnit.hpp" />
@@ -402,8 +400,6 @@
     <None Include="Source\Src\Threading\Worker.inl" />
     <None Include="Source\Src\Types\StrongType\StrongType.inl" />
     <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
-    <None Include="Source\Src\Types\Units\Angle\Degrees.inl" />
-    <None Include="Source\Src\Types\Units\Angle\Radians.inl" />
     <None Include="Source\Src\Types\Units\Distance\Centimeters.inl" />
     <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
     <None Include="Source\Src\Types\Units\Distance\Kilometers.inl" />
