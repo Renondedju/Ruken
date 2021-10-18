@@ -62,4 +62,36 @@ constexpr Duration<EDurationUnit::Minute>::operator Duration<EDurationUnit::Mill
     return Duration<EDurationUnit::Millisecond>(static_cast<UnderlyingType>(*this) * 60'000.0F);
 }
 
+// Type literals
+
+constexpr Milliseconds operator"" _ms(RkLdouble const in_duration) noexcept
+{
+    return Milliseconds(static_cast<Milliseconds::UnderlyingType>(in_duration));
+}
+
+constexpr Milliseconds operator"" _ms(RkSize const in_duration) noexcept
+{
+    return Milliseconds(static_cast<Milliseconds::UnderlyingType>(in_duration));
+}
+
+constexpr Seconds operator"" _sec(RkLdouble const in_duration) noexcept
+{
+    return Seconds(static_cast<Seconds::UnderlyingType>(in_duration));
+}
+
+constexpr Seconds operator"" _sec(RkSize const in_duration) noexcept
+{
+    return Seconds(static_cast<Seconds::UnderlyingType>(in_duration));
+}
+
+constexpr Minutes operator"" _min(RkLdouble const in_duration) noexcept
+{
+    return Minutes(static_cast<Minutes::UnderlyingType>(in_duration));
+}
+
+constexpr Minutes operator"" _min(RkSize const in_duration) noexcept
+{
+    return Minutes(static_cast<Minutes::UnderlyingType>(in_duration));
+}
+
 #pragma endregion

@@ -80,6 +80,17 @@ struct Duration final: StrongType<RkFloat, Duration<TUnitType>>,
     #pragma endregion
 };
 
+using Milliseconds = Duration<EDurationUnit::Millisecond>;
+using Seconds      = Duration<EDurationUnit::Second>;
+using Minutes      = Duration<EDurationUnit::Minute>;
+
+constexpr Milliseconds operator"" _ms (RkLdouble in_duration) noexcept;
+constexpr Milliseconds operator"" _ms (RkSize    in_duration) noexcept;
+constexpr Seconds      operator"" _sec(RkLdouble in_duration) noexcept;
+constexpr Seconds      operator"" _sec(RkSize    in_duration) noexcept;
+constexpr Minutes      operator"" _min(RkLdouble in_duration) noexcept;
+constexpr Minutes      operator"" _min(RkSize    in_duration) noexcept;
+
 #include "Types/Units/Duration/Duration.inl"
 
 END_RUKEN_NAMESPACE

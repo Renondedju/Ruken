@@ -271,9 +271,6 @@
     <ClInclude Include="Source\Include\Types\Units\Distance\EDistanceUnit.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Duration\Duration.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Duration\EDurationUnit.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Duration\Milliseconds.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Duration\Minutes.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Duration\Seconds.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Pixels.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
@@ -399,9 +396,6 @@
     <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
     <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
-    <None Include="Source\Src\Types\Units\Duration\Milliseconds.inl" />
-    <None Include="Source\Src\Types\Units\Duration\Minutes.inl" />
-    <None Include="Source\Src\Types\Units\Duration\Seconds.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
