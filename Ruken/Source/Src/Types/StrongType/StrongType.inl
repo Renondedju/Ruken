@@ -37,19 +37,3 @@ constexpr StrongType<TBase, TUniquePhantom>::StrongType(TBase&& in_move) noexcep
 {}
 
 #pragma endregion
-
-#pragma region Operators
-
-template <FundamentalType TBase, typename TUniquePhantom>
-constexpr StrongType<TBase, TUniquePhantom>::operator TBase&() noexcept
-{
-    return m_value;
-}
-
-template <FundamentalType TBase, typename TUniquePhantom>
-constexpr StrongType<TBase, TUniquePhantom>::operator TBase const&() const noexcept
-{
-    return m_value;
-}
-
-#pragma endregion

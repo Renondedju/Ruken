@@ -66,17 +66,20 @@ class StrongType
         explicit constexpr StrongType(TBase const& in_copy) noexcept;
         explicit constexpr StrongType(TBase&&      in_move) noexcept;
 
-        constexpr StrongType()                           = default;
-        constexpr StrongType (StrongType const& in_copy) = default;
-        constexpr StrongType (StrongType&&      in_move) = default;
-                 ~StrongType()                           = default;
+        constexpr StrongType()                          = default;
+        constexpr StrongType(StrongType const& in_copy) = default;
+        constexpr StrongType(StrongType&&      in_move) = default;
+                 ~StrongType()                          = default;
 
         #pragma endregion
 
         #pragma region Operators
 
-        explicit constexpr operator TBase&      ()       noexcept;
-        explicit constexpr operator TBase const&() const noexcept;
+        template <typename TType> requires std::is_convertible_v<TBase, TType>
+        explicit constexpr operator TType() const noexcept
+        {
+            return static_cast<TType>(m_value);
+        }
 
         constexpr StrongType& operator=(StrongType const& in_copy) = default;
         constexpr StrongType& operator=(StrongType&&      in_move) = default;
