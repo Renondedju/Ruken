@@ -24,7 +24,9 @@
 
 #include <iostream>
 
-//USING_RUKEN_NAMESPACE
+#include "Build/Namespace.hpp"
+
+USING_RUKEN_NAMESPACE
 
 int main()
 {

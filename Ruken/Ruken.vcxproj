@@ -267,11 +267,8 @@
     <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\Angle.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\EAngleUnit.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Distance\Centimeters.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Distance\Distance.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Distance\EDistanceUnit.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Distance\Kilometers.hpp" />
-    <ClInclude Include="Source\Include\Types\Units\Distance\Meters.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Duration\Duration.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Duration\EDurationUnit.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Duration\Milliseconds.hpp" />
@@ -400,10 +397,7 @@
     <None Include="Source\Src\Threading\Worker.inl" />
     <None Include="Source\Src\Types\StrongType\StrongType.inl" />
     <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
-    <None Include="Source\Src\Types\Units\Distance\Centimeters.inl" />
     <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
-    <None Include="Source\Src\Types\Units\Distance\Kilometers.inl" />
-    <None Include="Source\Src\Types\Units\Distance\Meters.inl" />
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
     <None Include="Source\Src\Types\Units\Duration\Milliseconds.inl" />
     <None Include="Source\Src\Types\Units\Duration\Minutes.inl" />
