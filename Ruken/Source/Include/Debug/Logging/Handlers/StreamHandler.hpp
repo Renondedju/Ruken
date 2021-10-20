@@ -41,6 +41,8 @@ class StreamHandler : public LogHandler
          */
         RkVoid Flush() final;
 
+        RkVoid Handle(LogRecord const& in_record) noexcept final;
+
         #pragma endregion
 
         #pragma region Operators

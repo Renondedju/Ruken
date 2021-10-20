@@ -7,6 +7,12 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+enum class EHandlingMode
+{
+    Immediate,
+    Deferred
+};
+
 /**
  * \brief This is the base class responsible for dispatching the appropriate log messages
  *        (based on the log messagesÅ' severity) to the handlerÅ's specified destination.
@@ -19,6 +25,8 @@ class __declspec(novtable) LogHandler
         #pragma region Members
 
         LogFormatter const& m_formatter {};
+
+        EHandlingMode m_mode {EHandlingMode::Immediate};
 
         ThreadSafeLockQueue<LogRecord> m_records {};
 
@@ -44,7 +52,17 @@ class __declspec(novtable) LogHandler
         /**
          * \brief Adds the specified record to a thread safe queue.
          */
-        RkVoid Handle(LogRecord const& in_record) noexcept;
+        virtual RkVoid Handle(LogRecord const& in_record) noexcept;
+
+        /**
+         * \brief ...
+         */
+        RkVoid SetHandlingMode(EHandlingMode in_mode) noexcept;
+
+        /**
+         * \brief ...
+         */
+        EHandlingMode GetHandlingMode() const noexcept;
 
         #pragma endregion
 

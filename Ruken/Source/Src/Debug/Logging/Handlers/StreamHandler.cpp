@@ -33,4 +33,15 @@ RkVoid StreamHandler::Flush()
     }
 }
 
+RkVoid StreamHandler::Handle(LogRecord const& in_record) noexcept
+{
+    if (m_mode == EHandlingMode::Immediate)
+    {
+        m_stream << m_formatter.Format(in_record);
+    }
+
+    else
+        LogHandler::Handle(in_record);
+}
+
 #pragma endregion

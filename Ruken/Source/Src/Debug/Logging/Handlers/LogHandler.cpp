@@ -17,7 +17,18 @@ LogHandler::LogHandler(LogFormatter const& in_formatter) noexcept:
 
 RkVoid LogHandler::Handle(LogRecord const& in_record) noexcept
 {
-    m_records.Enqueue(LogRecord(in_record));
+    if (m_mode == EHandlingMode::Deferred)
+        m_records.Enqueue(LogRecord(in_record));
+}
+
+RkVoid LogHandler::SetHandlingMode(EHandlingMode in_mode) noexcept
+{
+    m_mode = in_mode;
+}
+
+EHandlingMode LogHandler::GetHandlingMode() const noexcept
+{
+    return m_mode;
 }
 
 #pragma endregion
