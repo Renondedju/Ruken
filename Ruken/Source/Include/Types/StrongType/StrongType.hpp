@@ -86,6 +86,7 @@ class StrongType
         {
             return static_cast<TType const&>(m_value);
         }
+        
 
         constexpr StrongType& operator=(StrongType const& in_copy) = default;
         constexpr StrongType& operator=(StrongType&&      in_move) = default;

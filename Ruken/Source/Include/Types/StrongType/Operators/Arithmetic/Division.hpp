@@ -106,7 +106,7 @@ class Division
         friend constexpr TStrongType operator/(TStrongType const& in_lhs, Type const& in_rhs) noexcept
         requires TAllowUnderlyingCooperation
         {
-            return TStrongType(static_cast<Type const&>(in_lhs) / in_rhs);
+            return in_lhs / TStrongType(in_rhs);
         }
 
         /**
@@ -120,7 +120,7 @@ class Division
         friend constexpr TStrongType operator/(Type const& in_lhs, TStrongType const& in_rhs) noexcept
         requires TAllowUnderlyingCooperation
         {
-            return TStrongType(in_lhs / static_cast<Type const&>(in_rhs));
+            return TStrongType(in_lhs) / in_rhs;
         }
 
         #pragma endregion

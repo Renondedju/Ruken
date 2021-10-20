@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <concepts>
+
 #include "Build/Namespace.hpp"
 #include "Types/StrongType/StrongTypeHelper.hpp"
 
@@ -72,10 +74,10 @@ class Multiplication
          *
          * \return Reference to the instance
          */
-        template<std::enable_if_t<TAllowUnderlyingCooperation, RkBool> = true>
         friend constexpr TStrongType& operator*=(TStrongType& in_lhs, Type const& in_rhs) noexcept
+        requires TAllowUnderlyingCooperation
         {
-            static_cast<Type&>(in_lhs) /= in_rhs;
+            static_cast<Type&>(in_lhs) *= in_rhs;
 
             return in_lhs;
         }
@@ -101,10 +103,10 @@ class Multiplication
          *
          * \return Value of the new instance
          */
-        template<std::enable_if_t<TAllowUnderlyingCooperation, RkBool> = true>
         friend constexpr TStrongType operator*(TStrongType const& in_lhs, Type const& in_rhs) noexcept
+        requires TAllowUnderlyingCooperation
         {
-            return TStrongType(static_cast<Type const&>(in_lhs) * in_rhs);
+            return in_lhs * TStrongType(in_rhs);
         }
 
         /**
@@ -115,10 +117,10 @@ class Multiplication
          *
          * \return Value of the new instance
          */
-        template<std::enable_if_t<TAllowUnderlyingCooperation, RkBool> = true>
         friend constexpr TStrongType operator*(Type const& in_lhs, TStrongType const& in_rhs) noexcept
+        requires TAllowUnderlyingCooperation
         {
-            return TStrongType(in_lhs * static_cast<Type const&>(in_rhs));
+            return TStrongType(in_lhs) * in_rhs;
         }
 
         #pragma endregion
