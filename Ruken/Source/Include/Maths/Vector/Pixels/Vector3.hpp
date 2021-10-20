@@ -24,8 +24,9 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include "Types/Units/Pixels.hpp"
+#include "Maths/Vector/BaseVector.hpp"
+#include "Maths/Vector/VectorLayout.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -33,53 +34,40 @@ BEGIN_RUKEN_NAMESPACE
 #pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
 
 /**
- * \brief Generic vector layout
- * \tparam TDimensions Number of dimensions of the vector
- * \tparam TUnderlyingType Underlying type of the vector
+ * \brief Three dimensional pixel vector layout 
  */
-template <RkSize TDimensions, typename TUnderlyingType>
-struct VectorLayout
-{
-    TUnderlyingType data[TDimensions] {};
-};
-
-/**
- * \brief Generic two dimensional vector
- * \tparam TUnderlyingType Underlying type of the vector
- */
-template <typename TUnderlyingType>
-struct VectorLayout<2, TUnderlyingType>
+template <>
+struct VectorLayout<3, Pixels>
 {
     union
-    {
-        TUnderlyingType data[2] {};
-        struct
-        {
-            TUnderlyingType x;
-            TUnderlyingType y;
-        };
-    };
-};
-
-/**
- * \brief Generic three dimensional vector
- * \tparam TUnderlyingType Underlying type of the vector
- */
-template <typename TUnderlyingType>
-struct VectorLayout<3, TUnderlyingType>
-{
-    union
-    {
-        TUnderlyingType data[3] {};
-        struct
-        {
-            TUnderlyingType x;
-            TUnderlyingType y;
-            TUnderlyingType z;
-        };
-    };
+	{
+	    Pixels data[3] {};
+	    struct
+	    {
+	        Pixels x;
+			Pixels y;
+			Pixels z;
+	    };
+		struct
+	    {
+	        Pixels width;
+			Pixels height;
+			Pixels depth;
+	    };
+	};
 };
 
 #pragma warning(pop)
+
+/**
+ * \brief Three dimensional pixel vector
+ */
+template <>
+struct Vector<3, Pixels> : BaseVector<3, Pixels>
+{
+	using BaseVector<3, Pixels>::BaseVector;
+};
+
+using Vector3px = Vector<3, Pixels>;
 
 END_RUKEN_NAMESPACE

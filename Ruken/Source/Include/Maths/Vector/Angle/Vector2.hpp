@@ -24,55 +24,53 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-#include "Types/Units/Distance/Distance.hpp"
-#include "Maths/Vector/Layouts/VectorLayout.hpp"
+#include "Maths/Vector/BaseVector.hpp"
+#include "Maths/Vector/VectorLayout.hpp"
+
+#include "Types/Units/Angle/Angle.hpp"
+#include "Types/Units/Angle/EAngleUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 #pragma warning(push)
 #pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
 
-template <EDistanceUnit TDistanceUnit>
-struct VectorLayout<2, Distance<TDistanceUnit>>
+/**
+ * \brief Two dimensional angle vector layout 
+ * \tparam TAngleUnit Angle unit of the vector
+ */
+template <EAngleUnit TAngleUnit>
+struct VectorLayout<2, Angle<TAngleUnit>>
 {
     union
 	{
-	    Distance<TDistanceUnit> data[2] {};
+	    Angle<TAngleUnit> data[2] {};
 	    struct
 	    {
-	        Distance<TDistanceUnit> x;
-			Distance<TDistanceUnit> y;
+	        Angle<TAngleUnit> x;
+			Angle<TAngleUnit> y;
 	    };
 		struct
 	    {
-	        Distance<TDistanceUnit> width;
-			Distance<TDistanceUnit> height;
-	    };
-	};
-};
-
-template <EDistanceUnit TDistanceUnit>
-struct VectorLayout<3, Distance<TDistanceUnit>>
-{
-	union
-	{
-	    Distance<TDistanceUnit> data[3] {};
-	    struct
-	    {
-	        Distance<TDistanceUnit> x;
-			Distance<TDistanceUnit> y;
-			Distance<TDistanceUnit> z;
-	    };
-		struct
-	    {
-	        Distance<TDistanceUnit> width;
-			Distance<TDistanceUnit> height;
-			Distance<TDistanceUnit> depth;
+	        Angle<TAngleUnit> pitch;
+			Angle<TAngleUnit> yaw;
 	    };
 	};
 };
 
 #pragma warning(pop)
+
+/**
+ * \brief Two dimensional distance vector
+ * \tparam TAngleUnit Distance unit of the vector
+ */
+template <EAngleUnit TAngleUnit>
+struct Vector<2, Angle<TAngleUnit>> : BaseVector<2, Angle<TAngleUnit>>
+{
+    using BaseVector<2, Angle<TAngleUnit>>::BaseVector;
+};
+
+using Vector2rad = Vector<2, Radians>;
+using Vector2deg = Vector<2, Degrees>;
 
 END_RUKEN_NAMESPACE

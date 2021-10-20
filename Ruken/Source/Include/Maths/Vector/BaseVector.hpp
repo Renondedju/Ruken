@@ -25,33 +25,38 @@
 #pragma once
 
 #include "Meta/Meta.hpp"
+#include "Meta/CommonTypeFallback.hpp"
+
+#include "Types/FundamentalTypes.hpp"
+
 #include "Maths/Math.hpp"
 #include "Maths/Trigonometry.hpp"
-#include "Types/FundamentalTypes.hpp"
-#include "Maths/Vector/Layouts/VectorLayout.hpp"
-#include "Maths/Vector/Layouts/DistanceLayout.hpp"
+#include "Maths/Vector/VectorLayout.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+template <RkSize TDimensions, typename TUnderlyingType>
+struct Vector;
 
 /**
  * \brief Generic representation of x dimensional vectors and points in space
  *
  * Fundamental types are allowed as underlying types but are not recommended (such as float or int) !
- * Please use the various specializations to keep your code explicit and readable
- * Type aliases are provided: see Vector2m, Vector3px, Vector2deg ect...
- *
+ * 
+ * \note This base vector type is only used to implement every common vector operations, use the inheriting vector class instead
  * \tparam TDimensions Number of dimensions (or size) of the vector 
  * \tparam TUnderlyingType Underlying type of the vector
  */
 template <RkSize TDimensions, typename TUnderlyingType>
-struct Vector : VectorLayout<TDimensions, TUnderlyingType>
+struct BaseVector : VectorLayout<TDimensions, TUnderlyingType>
 {
     #pragma region Usings
 
     /**
      * \brief Underlying layout of the vector
      */
-    using Layout = VectorLayout<TDimensions, TUnderlyingType>;
+    using Layout        = VectorLayout<TDimensions, TUnderlyingType>;
+    using DerivedVector = Vector<TDimensions, TUnderlyingType>;
 
     /**
      * \brief Returns the largest common vector type
@@ -59,7 +64,7 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      * \tparam TOtherUnderlyingType Underlying type of the other vector
      */
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    using LargestVector = Vector<std::max(TDimensions, TOtherDimensions), std::common_type_t<TUnderlyingType, TOtherUnderlyingType>>;
+    using LargestVector = Vector<std::max(TDimensions, TOtherDimensions), CommonTypeFallback<TUnderlyingType, TUnderlyingType, TOtherUnderlyingType>>;
 
     /**
      * \brief Returns the smallest common vector type
@@ -67,14 +72,36 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      * \tparam TOtherUnderlyingType Underlying type of the other vector
      */
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    using SmallestVector = Vector<std::min(TDimensions, TOtherDimensions), std::common_type_t<TUnderlyingType, TOtherUnderlyingType>>;
+    using SmallestVector = Vector<std::min(TDimensions, TOtherDimensions), CommonTypeFallback<TUnderlyingType, TUnderlyingType, TOtherUnderlyingType>>;
 
     /**
      * \brief Returns a common vector type for 2 vectors of the same size 
      * \tparam TOtherUnderlyingType Underlying type of the other vector
      */
     template <typename TOtherUnderlyingType>
-    using CommonSizedVector = Vector<TDimensions, std::common_type_t<TUnderlyingType, TOtherUnderlyingType>>;
+    using CommonSizedVector = Vector<TDimensions, CommonTypeFallback<TUnderlyingType, TUnderlyingType, TOtherUnderlyingType>>;
+
+    #pragma endregion
+
+    #pragma region Constructors
+
+    BaseVector():
+        VectorLayout<TDimensions, TUnderlyingType>()
+    {}
+
+    BaseVector(TUnderlyingType in_value)
+    {
+        for (RkSize index {0ULL}; index < TDimensions; ++index)
+            Layout::data[index] = in_value;
+    }
+
+    template <typename... TTypes>
+    requires (sizeof...(TTypes) == TDimensions)
+    BaseVector(TTypes... in_values):
+        Layout::data {in_values...}
+    {
+        
+    }
 
     #pragma endregion
 
@@ -163,14 +190,14 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      * If the vector is too small to be normalized this method set the vector to 0.
      */
     [[nodiscard]]
-    constexpr Vector Normalized() noexcept
+    constexpr DerivedVector Normalized() noexcept
     requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
     {
         TUnderlyingType length = Length();
         if (length == TUnderlyingType())
-            return Vector {};
+            return BaseVector {};
 
-        Vector result {*this};
+        BaseVector result {*this};
         for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
             result.data[index] /= length;
 
@@ -189,10 +216,10 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      */
     template<typename TOtherUnderlyingType>
     [[nodiscard]]
-    constexpr std::common_type_t<TUnderlyingType, TOtherUnderlyingType> Dot(
+    constexpr CommonTypeFallback<TUnderlyingType, TUnderlyingType, TOtherUnderlyingType> Dot(
         Vector<TDimensions, TOtherUnderlyingType> const& in_vector)
     {
-        std::common_type_t<TUnderlyingType, TOtherUnderlyingType> dot {};
+        CommonTypeFallback<TUnderlyingType, TUnderlyingType, TOtherUnderlyingType> dot {};
 
         for (RkSize index = 0; index < TDimensions; index++)
             dot += Layout::data[index] * in_vector.data[index];
@@ -282,7 +309,7 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
     template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]] constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> Lerp(
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector,
-        RkFloat                                        const  in_ratio) const noexcept
+        RkFloat                                          const  in_ratio) const noexcept
     {
         return *this + in_ratio * (in_vector - *this);
     }
@@ -298,10 +325,10 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
     template<RkSize TRhsDimensions, typename TRhsUnderlyingType>
     [[nodiscard]] constexpr LargestVector<TRhsDimensions, TRhsUnderlyingType> Slerp(
         Vector<TRhsDimensions, TRhsUnderlyingType> const& in_vector,
-        RkFloat                                    const  in_ratio)
+        RkFloat                                      const  in_ratio)
     {
-        std::common_type_t<TUnderlyingType, TRhsUnderlyingType> const dot   = Dot(in_vector);
-        Radians                                                 const theta = ArcCos(dot) * in_ratio;
+        CommonTypeFallback<TUnderlyingType, TUnderlyingType, TRhsUnderlyingType> const dot   = Dot(in_vector);
+        Radians                                                            const theta = ArcCos(dot) * in_ratio;
 
         return *this * Cos(theta) + (*this - in_vector * dot).Normalized() * Sin(theta);
     }
@@ -339,7 +366,7 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
     #define RUKEN_VECTOR_ASSIGNMENT_OPERATOR_MIXIN(in_operator) \
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>                                                    \
     requires requires (TUnderlyingType in_lhs, TOtherUnderlyingType in_rhs) { in_lhs RUKEN_GLUE(in_operator,=) in_rhs; } \
-    constexpr Vector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(                                                    \
+    constexpr DerivedVector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(                                             \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) noexcept                                        \
     {                                                                                                                    \
         for (RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)                              \
@@ -373,7 +400,7 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
     #define RUKEN_VECTOR_ASSIGNMENT_OPERATOR_SCALAR_MIXIN(in_operator) \
     template <typename TScalarType>                                                                                         \
     requires requires (TUnderlyingType in_vector, TScalarType in_scalar) { in_vector RUKEN_GLUE(in_operator,=) in_scalar; } \
-    constexpr Vector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(TScalarType const& in_scalar) noexcept                 \
+    constexpr DerivedVector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(TScalarType const& in_scalar) noexcept          \
     {                                                                                                                       \
         for (RkSize index {0ULL}; index < TDimensions; ++index)                                                             \
             Layout::data[index] RUKEN_GLUE(in_operator,=) in_scalar;                                                        \
@@ -418,10 +445,10 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
      * \brief Inverts the content of the vector (unary -)
      * \return Inverted vector
      */
-    [[nodiscard]] constexpr Vector<TDimensions, TUnderlyingType> operator-()
+    [[nodiscard]] constexpr DerivedVector operator-()
     requires requires(TUnderlyingType in_a) { -in_a; }
     {
-        Vector vector;
+        DerivedVector vector;
 
         for(RkSize index {0ULL}; index < TDimensions; ++index)
             vector.data[index] = -Layout::data[index];
@@ -452,23 +479,12 @@ struct Vector : VectorLayout<TDimensions, TUnderlyingType>
 };
 
 /**
- * \brief Two dimensional distance vector
- * \tparam TDistanceUnit Underlying distance unit of the vector
+ * \brief Base un-specialized vector class (should not be used)
+ * \tparam TDimensions Number of dimensions (or size) of the vector
+ * \tparam TUnderlyingType Underlying type of the vector
  */
-template <EDistanceUnit TDistanceUnit = EDistanceUnit::Meters>
-using Vector2   = Vector<2, Distance<TDistanceUnit>>;
-using Vector2cm = Vector2<EDistanceUnit::Centimeters>;
-using Vector2m  = Vector2<EDistanceUnit::Meters>;
-using Vector2km = Vector2<EDistanceUnit::Kilometers>;
-
-/**
- * \brief Three dimensional distance vector
- * \tparam TDistanceUnit Underlying distance unit of the vector
- */
-template <EDistanceUnit TDistanceUnit = EDistanceUnit::Meters>
-using Vector3   = Vector<3, Distance<TDistanceUnit>>;
-using Vector3cm = Vector3<EDistanceUnit::Centimeters>;
-using Vector3m  = Vector3<EDistanceUnit::Meters>;
-using Vector3km = Vector3<EDistanceUnit::Kilometers>;
+template <RkSize TDimensions, typename TUnderlyingType>
+struct Vector : BaseVector<TDimensions, TUnderlyingType>
+{};
 
 END_RUKEN_NAMESPACE

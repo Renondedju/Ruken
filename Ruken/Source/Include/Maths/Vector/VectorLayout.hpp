@@ -25,55 +25,19 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Types/Units/Angle/Angle.hpp"
-#include "Maths/Vector/Layouts/VectorLayout.hpp"
-
-#include "Types/Units/Pixels.hpp"
+#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-#pragma warning(push)
-#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
 
-template <>
-struct VectorLayout<2, Pixels>
+/**
+ * \brief Generic vector layout, responsible of implementing the underlying data structure of the vector
+ * \tparam TDimensions Number of dimensions of the vector
+ * \tparam TUnderlyingType Underlying type of the vector
+ */
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorLayout
 {
-    union
-	{
-	    Pixels data[2] {};
-	    struct
-	    {
-	        Pixels x;
-			Pixels y;
-	    };
-		struct
-	    {
-	        Pixels width;
-			Pixels height;
-	    };
-	};
+    TUnderlyingType data[TDimensions] {};
 };
-
-template <>
-struct VectorLayout<3, Pixels>
-{
-    union
-	{
-	    Pixels data[3] {};
-	    struct
-	    {
-	        Pixels x;
-			Pixels y;
-			Pixels z;
-	    };
-		struct
-	    {
-	        Pixels width;
-			Pixels height;
-			Pixels depth;
-	    };
-	};
-};
-
-#pragma warning(pop)
 
 END_RUKEN_NAMESPACE

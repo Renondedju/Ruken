@@ -24,12 +24,55 @@
 
 #pragma once
 
-#include "Maths/Vector/Vector.hpp"
-#include "Maths/Vector/Layouts/PixelLayout.hpp"
+#include "Maths/Vector/BaseVector.hpp"
+#include "Maths/Vector/VectorLayout.hpp"
+
+#include "Types/Units/Angle/Angle.hpp"
+#include "Types/Units/Angle/EAngleUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-using Vector2px = Vector<2, Pixels>;
-using Vector3px = Vector<3, Pixels>;
+#pragma warning(push)
+#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+
+/**
+ * \brief Three dimensional angle vector layout 
+ * \tparam TAngleUnit Angle unit of the vector
+ */
+template <EAngleUnit TAngleUnit>
+struct VectorLayout<3, Angle<TAngleUnit>>
+{
+    union
+	{
+	    Angle<TAngleUnit> data[3] {};
+	    struct
+	    {
+	        Angle<TAngleUnit> x;
+			Angle<TAngleUnit> y;
+			Angle<TAngleUnit> z;
+	    };
+		struct
+	    {
+	        Angle<TAngleUnit> pitch;
+			Angle<TAngleUnit> yaw;
+			Angle<TAngleUnit> roll;
+	    };
+	};
+};
+
+#pragma warning(pop)
+
+/**
+ * \brief Two dimensional distance vector
+ * \tparam TAngleUnit Distance unit of the vector
+ */
+template <EAngleUnit TAngleUnit>
+struct Vector<3, Angle<TAngleUnit>> : BaseVector<3, Angle<TAngleUnit>>
+{
+    using BaseVector<3, Angle<TAngleUnit>>::BaseVector;
+};
+
+using Vector3rad = Vector<3, Radians>;
+using Vector3deg = Vector<3, Degrees>;
 
 END_RUKEN_NAMESPACE

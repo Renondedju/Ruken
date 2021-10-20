@@ -24,55 +24,59 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-#include "Types/Units/Angle/Angle.hpp"
-#include "Maths/Vector/Layouts/VectorLayout.hpp"
+#include "Maths/Vector/BaseVector.hpp"
+#include "Maths/Vector/VectorLayout.hpp"
+
+#include "Types/Units/Distance/Distance.hpp"
+#include "Types/Units/Distance/EDistanceUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 #pragma warning(push)
 #pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
 
-template <EAngleUnit TAngleUnit>
-struct VectorLayout<2, Angle<TAngleUnit>>
+/**
+ * \brief Two dimensional distance vector layout 
+ * \tparam TDistanceUnit Distance unit of the vector
+ */
+template <EDistanceUnit TDistanceUnit>
+struct VectorLayout<2, Distance<TDistanceUnit>>
 {
     union
 	{
-	    Angle<TAngleUnit> data[2] {};
+	    Distance<TDistanceUnit> data[2] {};
 	    struct
 	    {
-	        Angle<TAngleUnit> x;
-			Angle<TAngleUnit> y;
+	        Distance<TDistanceUnit> x;
+			Distance<TDistanceUnit> y;
 	    };
 		struct
 	    {
-	        Angle<TAngleUnit> pitch;
-			Angle<TAngleUnit> yaw;
-	    };
-	};
-};
-
-template <EAngleUnit TAngleUnit>
-struct VectorLayout<3, Angle<TAngleUnit>>
-{
-	union
-	{
-	    Angle<TAngleUnit> data[3] {};
-	    struct
-	    {
-	        Angle<TAngleUnit> x;
-			Angle<TAngleUnit> y;
-			Angle<TAngleUnit> z;
-	    };
-		struct
-	    {
-	        Angle<TAngleUnit> pitch;
-			Angle<TAngleUnit> yaw;
-			Angle<TAngleUnit> roll;
+	        Distance<TDistanceUnit> width;
+			Distance<TDistanceUnit> height;
 	    };
 	};
 };
 
 #pragma warning(pop)
+
+/**
+ * \brief Two dimensional distance vector
+ * \tparam TDistanceUnit Distance unit of the vector
+ */
+template <EDistanceUnit TDistanceUnit>
+struct Vector<2, Distance<TDistanceUnit>> : BaseVector<2, Distance<TDistanceUnit>>
+{
+	using BaseVector<2, Distance<TDistanceUnit>>::BaseVector;
+
+	static constexpr Vector right {Distance<TDistanceUnit>( 1.0F), Distance<TDistanceUnit>( 0.0F)};
+	static constexpr Vector left  {Distance<TDistanceUnit>(-1.0F), Distance<TDistanceUnit>( 0.0F)};
+	static constexpr Vector up    {Distance<TDistanceUnit>( 0.0F), Distance<TDistanceUnit>( 1.0F)};
+	static constexpr Vector down  {Distance<TDistanceUnit>( 0.0F), Distance<TDistanceUnit>(-1.0F)};
+};
+
+using Vector2cm = Vector<2, Centimeters>;
+using Vector2m  = Vector<2, Meters>;
+using Vector2km = Vector<2, Kilometers>;
 
 END_RUKEN_NAMESPACE
