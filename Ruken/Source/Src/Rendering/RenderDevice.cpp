@@ -1,3 +1,5 @@
+#include <set>
+
 #define VMA_IMPLEMENTATION
 
 #include "Rendering/RenderDevice.hpp"
@@ -9,7 +11,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Static Variables
 
-constexpr std::array g_enabled_extensions = {
+constexpr std::array g_required_extensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
 };
@@ -22,12 +24,21 @@ RenderDevice::RenderDevice(Logger* in_logger, RenderContext* in_context) noexcep
     m_logger  {in_logger},
     m_context {in_context}
 {
-    if (!in_context->GetInstance() || !PickPhysicalDevice() || !CreateLogicalDevice())
+    if (!in_context->GetInstance())
         return;
+
+    if (!PickPhysicalDevice())
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to find a suitable physical device!"))
+
+    FindQueueFamilies();
+
+    if (!CreateLogicalDevice())
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to create logical device!"))
 
     VULKAN_HPP_DEFAULT_DISPATCHER.init(m_logical_device);
 
-    CreateDeviceAllocator();
+    if (!CreateDeviceAllocator())
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to create device allocator!"))
 }
 
 RenderDevice::~RenderDevice() noexcept
@@ -51,21 +62,34 @@ RenderDevice::~RenderDevice() noexcept
 
 RkBool RenderDevice::PickPhysicalDevice() noexcept
 {
-    auto [result, value] = m_context->GetInstance().enumeratePhysicalDevices();
-
-    if (result == vk::Result::eSuccess)
+    if (auto [result, physical_devices] = m_context->GetInstance().enumeratePhysicalDevices(); result == vk::Result::eSuccess)
     {
-        // TODO : Select best physical device here.
-        m_physical_device = value[0];
+        for (auto const& physical_device : physical_devices)
+        {
+            auto [result2, extensions] = physical_device.enumerateDeviceExtensionProperties();
+
+            if (result2 != vk::Result::eSuccess)
+                continue;
+
+            std::set<std::string> required_extensions(g_required_extensions.begin(), g_required_extensions.end());
+
+            for (auto const& [extensionName, specVersion] : extensions)
+            {
+                required_extensions.erase(extensionName);
+            }
+
+            if (required_extensions.empty())
+                m_physical_device = physical_device;
+        }
     }
 
     else
-        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("No suitable physical device available : " + vk::to_string(result)))
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to enumerate physical devices : " + vk::to_string(result)))
 
-    return result == vk::Result::eSuccess;
+    return m_physical_device;
 }
 
-RkBool RenderDevice::CreateLogicalDevice() noexcept
+RkVoid RenderDevice::FindQueueFamilies() noexcept
 {
     auto const queue_families = m_physical_device.getQueueFamilyProperties();
 
@@ -93,7 +117,10 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
         m_compute_family_index  = m_graphics_family_index;
     if (m_transfer_family_index == UINT32_MAX)
         m_transfer_family_index = m_graphics_family_index;
+}
 
+RkBool RenderDevice::CreateLogicalDevice() noexcept
+{
     std::vector<vk::DeviceQueueCreateInfo> queue_create_infos;
 
     RkFloat queue_priority = 1.0F;
@@ -128,7 +155,15 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
         queue_create_infos.emplace_back(transfer_queue_create_info);
     }
 
+    vk::PhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features = {
+        .shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+        .descriptorBindingPartiallyBound           = VK_TRUE,
+        .descriptorBindingVariableDescriptorCount  = VK_TRUE,
+        .runtimeDescriptorArray                    = VK_TRUE,
+    };
+
     vk::PhysicalDeviceTimelineSemaphoreFeatures timeline_semaphore_features = {
+        .pNext             = &descriptor_indexing_features,
         .timelineSemaphore = VK_TRUE
     };
 
@@ -145,8 +180,8 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
         .pNext                   = &features,
         .queueCreateInfoCount    = static_cast<RkUint32>(queue_create_infos.size()),
         .pQueueCreateInfos       = queue_create_infos.data(),
-        .enabledExtensionCount   = static_cast<RkUint32>(g_enabled_extensions.size()),
-        .ppEnabledExtensionNames = g_enabled_extensions.data()
+        .enabledExtensionCount   = static_cast<RkUint32>(g_required_extensions.size()),
+        .ppEnabledExtensionNames = g_required_extensions.data()
     };
 
     auto [result, value] = m_physical_device.createDevice(device_create_info);

@@ -176,35 +176,47 @@ RkVoid Window::CreateSurface() noexcept
 
 RkVoid Window::PickSwapchainImageCount() noexcept
 {
-    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
+    vk::PhysicalDeviceSurfaceInfo2KHR surface_info = {
+        .surface = m_surface
+    };
 
-    m_image_count = capabilities.minImageCount + 1;
+    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilities2KHR(surface_info);
 
-    if (capabilities.maxImageCount > 0 && m_image_count > capabilities.maxImageCount)
-        m_image_count = capabilities.maxImageCount;
+    m_image_count = capabilities.surfaceCapabilities.minImageCount + 1;
+
+    if (capabilities.surfaceCapabilities.maxImageCount > 0 && m_image_count > capabilities.surfaceCapabilities.maxImageCount)
+        m_image_count = capabilities.surfaceCapabilities.maxImageCount;
 }
 
 RkVoid Window::PickSwapchainExtent() noexcept
 {
-    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilitiesKHR(m_surface);
+    vk::PhysicalDeviceSurfaceInfo2KHR surface_info = {
+        .surface = m_surface
+    };
+
+    auto [result, capabilities] =  m_device->GetPhysicalDevice().getSurfaceCapabilities2KHR(surface_info);
 
     auto extent = GetFramebufferSize();
 
-    if (capabilities.currentExtent.width != UINT32_MAX)
-        m_image_extent = capabilities.currentExtent;
+    if (capabilities.surfaceCapabilities.currentExtent.width != UINT32_MAX)
+        m_image_extent = capabilities.surfaceCapabilities.currentExtent;
     else
     {
-        m_image_extent.width  = std::clamp(extent.width,  capabilities.minImageExtent.width,  capabilities.maxImageExtent.width);
-        m_image_extent.height = std::clamp(extent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+        m_image_extent.width  = std::clamp(extent.width,  capabilities.surfaceCapabilities.minImageExtent.width,  capabilities.surfaceCapabilities.maxImageExtent.width);
+        m_image_extent.height = std::clamp(extent.height, capabilities.surfaceCapabilities.minImageExtent.height, capabilities.surfaceCapabilities.maxImageExtent.height);
     }
 }
 
 RkVoid Window::PickSwapchainFormat() noexcept
 {
-    auto [result, formats] = m_device->GetPhysicalDevice().getSurfaceFormatsKHR(m_surface);
+    vk::PhysicalDeviceSurfaceInfo2KHR surface_info = {
+        .surface = m_surface
+    };
 
-    m_image_format = formats[0].format;
-    m_color_space  = formats[0].colorSpace;
+    auto [result, formats] = m_device->GetPhysicalDevice().getSurfaceFormats2KHR(surface_info);
+
+    m_image_format = formats[0].surfaceFormat.format;
+    m_color_space  = formats[0].surfaceFormat.colorSpace;
 }
 
 RkVoid Window::PickSwapchainPresentMode() noexcept

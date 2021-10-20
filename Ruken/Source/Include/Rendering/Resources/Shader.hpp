@@ -16,8 +16,7 @@ class Shader final : public IResource
 
         RenderDevice* m_device;
 
-        vk::ShaderModule m_vertex_module;
-        vk::ShaderModule m_fragment_module;
+        vk::ShaderModule m_module;
 
         #pragma endregion
 
@@ -38,7 +37,7 @@ class Shader final : public IResource
         RkVoid Reload(ResourceManager& in_manager)                                                 override;
         RkVoid Unload(ResourceManager& in_manager)                                                 noexcept override;
 
-        std::vector<vk::PipelineShaderStageCreateInfo> GetShaderStages() const;
+        vk::PipelineShaderStageCreateInfo GetShaderStage() const noexcept;
 
         #pragma region Operators
 

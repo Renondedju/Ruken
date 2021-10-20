@@ -9,6 +9,12 @@ BEGIN_RUKEN_NAMESPACE
 
 class RenderDevice;
 
+struct MaterialData
+{
+    RkUint32 albedo_texture;
+    RkUint32 normal_texture;
+};
+
 class Material final : public IResource
 {
     protected:

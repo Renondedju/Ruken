@@ -4,7 +4,7 @@
 
 USING_RUKEN_NAMESPACE
 
-FencePool::FencePool(RenderDevice* in_device) noexcept: RenderObjectPool<vk::Fence>(in_device)
+FencePool::FencePool(RenderDevice* in_device) noexcept:RenderObjectPool<vk::Fence>(in_device)
 {
     Grow();
 }

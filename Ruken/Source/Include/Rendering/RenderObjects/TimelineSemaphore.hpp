@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Rendering/RenderObjectPool.hpp"
+#include "Rendering/RenderDefines.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+class RenderDevice;
 
 class TimelineSemaphore final
 {
@@ -20,7 +22,7 @@ class TimelineSemaphore final
         TimelineSemaphore(RenderDevice* in_device) noexcept;
 
         TimelineSemaphore(TimelineSemaphore const& in_copy) = delete;
-        TimelineSemaphore(TimelineSemaphore&&      in_move) noexcept;
+        TimelineSemaphore(TimelineSemaphore&&      in_move) = delete;
 
         ~TimelineSemaphore() noexcept;
 
@@ -39,7 +41,7 @@ class TimelineSemaphore final
         #pragma region Operators
 
         TimelineSemaphore& operator=(TimelineSemaphore const& in_copy) = delete;
-        TimelineSemaphore& operator=(TimelineSemaphore&&      in_move) noexcept;
+        TimelineSemaphore& operator=(TimelineSemaphore&&      in_move) = delete;
 
         #pragma endregion
 };

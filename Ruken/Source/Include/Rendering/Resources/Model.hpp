@@ -63,6 +63,17 @@ struct UniformBufferObject {
 
 class RenderDevice;
 
+struct TransformData
+{
+    glm::mat4 model;
+};
+
+struct DrawData
+{
+    RkUint32 material_index;
+    RkUint32 transform_index;
+};
+
 class Model final : public IResource
 {
     private:
@@ -77,10 +88,6 @@ class Model final : public IResource
         vk::Buffer         m_buffer;
         vk::Allocation     m_allocation;
         vk::AllocationInfo m_allocation_info;
-        vk::Buffer         m_uniform_buffer;
-        vk::Allocation     m_uniform_allocation;
-        vk::DescriptorPool m_descriptor_pool;
-        vk::DescriptorSet  m_descriptor_set;
 
         std::unique_ptr<Material> m_material;
 

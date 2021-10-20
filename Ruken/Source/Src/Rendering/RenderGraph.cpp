@@ -1,39 +1,38 @@
 #include "Rendering/RenderGraph.hpp"
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/RenderFrame.hpp"
-#include "Rendering/Renderer.hpp"
-
-#include "Rendering/Resources/Model.hpp"
-
-#include "Rendering/Passes/ForwardPass.hpp"
 
 USING_RUKEN_NAMESPACE
-
-static std::unique_ptr<Model> g_model;
 
 RenderGraph::RenderGraph(Logger* in_logger, RenderDevice* in_device) noexcept:
     m_logger {in_logger},
     m_device {in_device}
 {
-    AddRenderPass<ForwardPass>(in_logger, in_device);
 
-    g_model = std::make_unique<Model>(m_device, "Data/viking_room.obj");
 }
 
 RenderGraph::~RenderGraph() noexcept
 {
-    g_model.reset();
+
+}
+
+RkVoid RenderGraph::Bake() noexcept
+{
+    for (auto const& render_pass: m_render_passes)
+    {
+        (void)render_pass;
+    }
 }
 
 RkVoid RenderGraph::Execute(RenderFrame& in_frame) noexcept
 {
-    for (auto const& render_pass: m_render_passes)
-    {
-        auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
+    auto command_buffers = in_frame.GetGraphicsCommandPool().Request(m_render_passes.size());
 
+    for (RkSize i = 0; i < m_render_passes.size(); ++i)
+    {
         vk::CommandBufferBeginInfo command_buffer_begin_info = {};
 
-        if (command_buffer.begin(command_buffer_begin_info) != vk::Result::eSuccess)
+        if (command_buffers[i].begin(command_buffer_begin_info) != vk::Result::eSuccess)
             continue;
 
         vk::Viewport viewport = {
@@ -50,20 +49,16 @@ RkVoid RenderGraph::Execute(RenderFrame& in_frame) noexcept
             }
         };
 
-        command_buffer.setViewport(0, viewport);
-        command_buffer.setScissor (0, scissor);
+        command_buffers[i].setViewport(0, viewport);
+        command_buffers[i].setScissor (0, scissor);
 
-        render_pass->Begin(command_buffer, in_frame);
+        m_render_passes[i]->Execute(command_buffers[i], in_frame);
 
-        g_model->Render(command_buffer);
-
-        render_pass->End(command_buffer);
-
-        if (command_buffer.end() != vk::Result::eSuccess)
+        if (command_buffers[i].end() != vk::Result::eSuccess)
             continue;
 
         vk::CommandBufferSubmitInfoKHR command_buffer_submit_info = {
-            .commandBuffer = command_buffer
+            .commandBuffer = command_buffers[i]
         };
 
         vk::SemaphoreSubmitInfoKHR timeline_semaphore_submit_info = {
@@ -79,7 +74,23 @@ RkVoid RenderGraph::Execute(RenderFrame& in_frame) noexcept
         };
 
         m_device->GetGraphicsQueue().Submit(submit_info);
-
-        in_frame.GetGraphicsCommandPool().Release(command_buffer);
     }
+
+    in_frame.GetGraphicsCommandPool().Release(std::move(command_buffers));
+}
+
+RenderPass& RenderGraph::AddRenderPass(std::string const& in_name) noexcept
+{
+    return *m_render_passes.emplace_back(std::make_unique<RenderPass>(m_logger, m_device, this, in_name));
+}
+
+RenderPass* RenderGraph::GetRenderPass(std::string const& in_name) const noexcept
+{
+    for (auto const& render_pass : m_render_passes)
+    {
+        if (render_pass->GetName() == in_name)
+            return render_pass.get();
+    }
+
+    return nullptr;
 }

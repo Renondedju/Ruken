@@ -38,6 +38,10 @@ class RenderObjectPool
         RkVoid Release(T const& in_object);
         RkVoid Release(T&&      in_object);
 
+        std::vector<T> Request(RkSize                in_count);
+        RkVoid         Release(std::vector<T> const& in_objects);
+        RkVoid         Release(std::vector<T>&&      in_objects);
+
         virtual RkVoid Reset() = 0;
 
         #pragma endregion
@@ -80,6 +84,31 @@ template <typename T>
 RkVoid RenderObjectPool<T>::Release(T&& in_object)
 {
     m_objects.emplace_back(std::move(in_object));
+}
+
+template <typename T>
+std::vector<T> RenderObjectPool<T>::Request(RkSize const in_count)
+{
+    std::vector<T> objects;
+
+    while (objects.size() < in_count)
+    {
+        objects.emplace_back(Request());
+    }
+
+    return objects;
+}
+
+template <typename T>
+RkVoid RenderObjectPool<T>::Release(std::vector<T> const& in_objects)
+{
+    m_objects.insert(m_objects.end(), in_objects.begin(), in_objects.end());
+}
+
+template <typename T>
+RkVoid RenderObjectPool<T>::Release(std::vector<T>&& in_objects)
+{
+    m_objects.insert(m_objects.end(), std::make_move_iterator(in_objects.begin()), std::make_move_iterator(in_objects.end()));
 }
 
 END_RUKEN_NAMESPACE

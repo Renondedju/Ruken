@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/RenderObjectPool.hpp"
+#include "Rendering/RenderObjectPools/RenderObjectPool.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -16,7 +16,7 @@ class CommandPool final : public RenderObjectPool<vk::CommandBuffer>
 
         #pragma region Constructors
 
-        CommandPool(RenderDevice* in_device, vk::CommandPoolCreateFlags in_flags, RkUint32 in_family_index) noexcept;
+        CommandPool(RenderDevice* in_device, RkUint32 in_family_index, vk::CommandPoolCreateFlags in_flags = {}) noexcept;
 
         CommandPool(CommandPool const& in_copy) = delete;
         CommandPool(CommandPool&&      in_move) = delete;

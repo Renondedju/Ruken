@@ -4,7 +4,8 @@
 
 USING_RUKEN_NAMESPACE
 
-CommandPool::CommandPool(RenderDevice* in_device, vk::CommandPoolCreateFlags in_flags, RkUint32 in_family_index) noexcept: RenderObjectPool<vk::CommandBuffer>(in_device)
+CommandPool::CommandPool(RenderDevice* in_device, RkUint32 in_family_index, vk::CommandPoolCreateFlags in_flags) noexcept:
+    RenderObjectPool<vk::CommandBuffer>(in_device)
 {
     vk::CommandPoolCreateInfo command_pool_create_info = {
         .flags            = in_flags,

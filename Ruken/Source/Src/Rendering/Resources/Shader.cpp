@@ -26,51 +26,34 @@ static std::vector<RkUint32> ReadFile(const std::string& in_filename)
     return buffer;
 }
 
-Shader::Shader(RenderDevice* in_device, std::string_view in_path) noexcept:
+Shader::Shader(RenderDevice* in_device, std::string_view const in_path) noexcept:
     m_device {in_device}
 {
-    auto vertex_code   = ReadFile(std::string(in_path) + "vert.spv");
-    auto fragment_code = ReadFile(std::string(in_path) + "frag.spv");
+    auto shader_code = ReadFile(in_path.data());
 
     vk::ShaderModuleCreateInfo shader_module_create_info = {
-        .codeSize = vertex_code.size() * sizeof(RkUint32),
-        .pCode    = vertex_code.data()
+        .codeSize = shader_code.size() * sizeof(RkUint32),
+        .pCode    = shader_code.data()
     };
 
-    m_vertex_module = m_device->GetLogicalDevice().createShaderModule(shader_module_create_info).value;
+    m_module = m_device->GetLogicalDevice().createShaderModule(shader_module_create_info).value;
 
-    shader_module_create_info.codeSize = fragment_code.size() * sizeof(RkUint32);
-    shader_module_create_info.pCode    = fragment_code.data();
+    /*spirv_cross::Compiler compiler(std::move(shader_code));
 
-    m_fragment_module = m_device->GetLogicalDevice().createShaderModule(shader_module_create_info).value;
-
-    /*spirv_cross::Compiler vertex_compiler(std::move(vertex_code));
-
-    auto vertex_resources = vertex_compiler.get_shader_resources();
+    auto shader_resources = vertex_compiler.get_shader_resources();
 
     for (auto const& resource : vertex_resources.sampled_images)
     {
         RkUint32 set      = vertex_compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
         RkUint32 binding  = vertex_compiler.get_decoration(resource.id, spv::DecorationBinding);
         RkUint32 location = vertex_compiler.get_decoration(resource.id, spv::DecorationLocation);
-    }
-
-    spirv_cross::Compiler fragment_compiler(std::move(fragment_code));
-
-    auto fragment_resources = fragment_compiler.get_shader_resources();
-
-    for (auto const& resource : fragment_resources.sampled_images)
-    {
-        RkUint32 set      = fragment_compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        RkUint32 binding  = fragment_compiler.get_decoration(resource.id, spv::DecorationBinding);
-        RkUint32 location = fragment_compiler.get_decoration(resource.id, spv::DecorationLocation);
     }*/
 }
 
 Shader::~Shader() noexcept
 {
-    m_device->GetLogicalDevice().destroyShaderModule(m_vertex_module);
-    m_device->GetLogicalDevice().destroyShaderModule(m_fragment_module);
+    if (m_module)
+        m_device->GetLogicalDevice().destroyShaderModule(m_module);
 }
 
 RkVoid Shader::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
@@ -89,29 +72,13 @@ RkVoid Shader::Unload(ResourceManager& in_manager) noexcept
     (void)in_manager;
 }
 
-std::vector<vk::PipelineShaderStageCreateInfo> Shader::GetShaderStages() const
+vk::PipelineShaderStageCreateInfo Shader::GetShaderStage() const noexcept
 {
-    std::vector<vk::PipelineShaderStageCreateInfo> shader_stage_create_infos;
+    vk::PipelineShaderStageCreateInfo shader_stage_create_info = {
+        .stage  = vk::ShaderStageFlagBits::eVertex,
+        .module = m_module,
+        .pName  = "main"
+    };
 
-    if (m_vertex_module)
-    {
-        shader_stage_create_infos.push_back(
-        {
-            .stage  = vk::ShaderStageFlagBits::eVertex,
-            .module = m_vertex_module,
-            .pName  = "main"
-        });
-    }
-
-    if (m_fragment_module)
-    {
-        shader_stage_create_infos.push_back(
-        {
-            .stage  = vk::ShaderStageFlagBits::eFragment,
-            .module = m_fragment_module,
-            .pName  = "main"
-        });
-    }
-
-    return shader_stage_create_infos;
+    return shader_stage_create_info;
 }

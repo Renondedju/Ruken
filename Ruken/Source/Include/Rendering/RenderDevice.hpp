@@ -33,6 +33,7 @@ class RenderDevice
         #pragma region Methods
 
         RkBool PickPhysicalDevice   () noexcept;
+        RkVoid FindQueueFamilies    () noexcept;
         RkBool CreateLogicalDevice  () noexcept;
         RkBool CreateDeviceAllocator() noexcept;
 

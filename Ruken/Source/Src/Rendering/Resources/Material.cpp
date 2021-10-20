@@ -1,8 +1,10 @@
 #include "Rendering/Resources/Material.hpp"
 
+#include "Resource/ResourceManager.hpp"
+
 USING_RUKEN_NAMESPACE
 
-Material::Material(RenderDevice* in_device, std::string_view in_path) noexcept:
+Material::Material(RenderDevice* in_device, std::string_view const in_path) noexcept:
     m_device {in_device}
 {
     (void)in_path;
@@ -10,7 +12,7 @@ Material::Material(RenderDevice* in_device, std::string_view in_path) noexcept:
 
 Material::~Material() noexcept
 {
-    
+
 }
 
 RkVoid Material::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)

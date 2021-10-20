@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Meta/Safety.hpp"
-
 #include "Types/FundamentalTypes.hpp"
 
 #define VK_NO_PROTOTYPES

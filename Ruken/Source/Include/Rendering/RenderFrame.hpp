@@ -1,7 +1,15 @@
 #pragma once
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
+#include <glm/glm.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Rendering/RenderTarget.hpp"
 
+#include "Rendering/RenderObjects/Buffer.hpp"
 #include "Rendering/RenderObjects/TimelineSemaphore.hpp"
 
 #include "Rendering/RenderObjectPools/CommandPool.hpp"
@@ -11,6 +19,12 @@ BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 class RenderDevice;
+
+struct CameraData
+{
+    glm::mat4 view;
+    glm::mat4 proj;
+};
 
 class RenderFrame
 {
@@ -31,6 +45,14 @@ class RenderFrame
         CommandPool       m_graphics_command_pool;
         CommandPool       m_compute_command_pool;
         CommandPool       m_transfer_command_pool;
+        Buffer            m_draw_storage_buffer;
+        Buffer            m_material_storage_buffer;
+        Buffer            m_transform_storage_buffer;
+        Buffer            m_camera_uniform_buffer;
+
+        vk::DescriptorPool m_global_descriptor_pool;
+        vk::DescriptorSet  m_global_descriptor_set;
+        vk::DescriptorSet  m_camera_descriptor_set;
 
         #pragma endregion
 

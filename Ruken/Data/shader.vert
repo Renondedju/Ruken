@@ -1,10 +1,32 @@
 #version 450
 
-layout(binding = 0) uniform UniformBufferObject {
+struct TransformData
+{
     mat4 model;
+};
+
+struct DrawData
+{
+    uint materialIndex;
+    uint transformIndex;
+};
+
+layout(set = 0, binding = 0) readonly buffer DrawBuffer {
+    DrawData drawData[];
+};
+
+layout(set = 0, binding = 1) readonly buffer TransformBuffer {
+    TransformData transformData[];
+};
+
+layout(set = 1, binding = 0) uniform CameraData {
     mat4 view;
     mat4 proj;
-} ubo;
+} cameraData;
+
+layout(push_constant) uniform ObjectData {
+    uint index;
+} objectData;
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inColor;
@@ -15,7 +37,10 @@ layout(location = 1) out vec2 fragUV;
 
 void main()
 {
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    DrawData      dd = drawData[objectData.index];
+    TransformData td = transformData[dd.transformIndex];
+
+    gl_Position = cameraData.proj * cameraData.view * td.model * vec4(inPosition, 1.0);
 	
     fragColor = inColor;
 	fragUV    = inUV;

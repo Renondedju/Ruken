@@ -32,13 +32,11 @@ class RenderGraph
 
         #pragma region Methods
 
+        RkVoid Bake() noexcept;
         RkVoid Execute(RenderFrame& in_frame) noexcept;
 
-        template<RenderPassType T, typename... TArgs> requires std::is_constructible_v<T, TArgs...>
-        RkVoid AddRenderPass(TArgs&&... in_args) noexcept
-        {
-            m_render_passes.emplace_back(std::make_unique<T>(std::forward<TArgs>(in_args)...));
-        }
+        RenderPass& AddRenderPass(std::string const& in_name) noexcept;
+        RenderPass* GetRenderPass(std::string const& in_name) const noexcept;
 
         #pragma endregion
 

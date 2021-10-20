@@ -8,13 +8,25 @@
 
 #include "Windowing/WindowManager.hpp"
 
+#include "Rendering/Resources/Model.hpp"
+
 USING_RUKEN_NAMESPACE
+
+static std::unique_ptr<Model> g_model;
 
 RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
     m_device {in_service_provider.LocateService<Renderer>     ()->GetDevice    ()},
     m_window {in_service_provider.LocateService<WindowManager>()->GetMainWindow()}
 {
     m_graph = std::make_unique<RenderGraph>(nullptr, m_device);
+
+    auto& forward_pass = m_graph->AddRenderPass("forward");
+
+    forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer) {
+        g_model->Render(in_command_buffer);
+    });
+
+    g_model = std::make_unique<Model>(m_device, "Data/viking_room.obj");
 
     for (RkUint32 i = 0U; i < 2U; ++i)
     {
@@ -29,6 +41,7 @@ RenderSystem::~RenderSystem() noexcept
         
     }
 
+    g_model.reset();
     m_graph.reset();
 }
 

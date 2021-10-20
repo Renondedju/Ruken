@@ -22,14 +22,6 @@ TimelineSemaphore::TimelineSemaphore(RenderDevice* in_device) noexcept:
     }
 }
 
-TimelineSemaphore::TimelineSemaphore(TimelineSemaphore&& in_move) noexcept:
-    m_device {in_move.m_device},
-    m_handle {in_move.m_handle},
-    m_value  {in_move.m_value}
-{
-    in_move.m_handle = VK_NULL_HANDLE;
-}
-
 TimelineSemaphore::~TimelineSemaphore() noexcept
 {
     if (m_handle)
@@ -63,15 +55,4 @@ vk::Semaphore const& TimelineSemaphore::GetHandle() const noexcept
 RkUint64 const& TimelineSemaphore::GetValue() const noexcept
 {
     return m_value;
-}
-
-TimelineSemaphore& TimelineSemaphore::operator=(TimelineSemaphore&& in_move) noexcept
-{
-    m_device = in_move.m_device;
-    m_handle = in_move.m_handle;
-    m_value  = in_move.m_value;
-
-    in_move.m_handle = VK_NULL_HANDLE;
-
-    return *this;
 }
