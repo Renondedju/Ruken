@@ -209,6 +209,8 @@
     <ClInclude Include="Source\Include\Maths\Vector\PixelVector.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\Vector.hpp" />
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
+    <ClInclude Include="Source\Include\Meta\CommonTypeFallback.hpp" />
+    <ClInclude Include="Source\Include\Meta\HasCommonType.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
     <ClInclude Include="Source\Include\Meta\IsBaseOfTemplate.hpp" />
