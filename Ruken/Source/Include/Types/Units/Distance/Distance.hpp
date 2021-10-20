@@ -34,8 +34,8 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Strongly typed angle type
- * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
+ * \brief Strongly typed distance type
+ * \tparam TUnitType Unit type of the distance, must be either Kilometers, Meters or Centimeters
  */
 template<EDistanceUnit TUnitType>
 struct Distance final: StrongType<RkFloat, Distance<TUnitType>>,
