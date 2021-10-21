@@ -1,4 +1,4 @@
-/**
+/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -24,53 +24,66 @@
 
 #pragma once
 
-#include "Maths/Vector/BaseVector.hpp"
-#include "Maths/Vector/VectorLayout.hpp"
-
 #include "Types/Units/Angle/Angle.hpp"
-#include "Types/Units/Angle/EAngleUnit.hpp"
+#include "Maths/Vector/Helper/VectorForward.hpp"
+
+#include "Maths/Vector/Operations/VectorOperators.hpp"
+#include "Maths/Vector/Operations/VectorMinMax.hpp"
+#include "Maths/Vector/Operations/VectorSlerp.hpp"
+#include "Maths/Vector/Operations/VectorLerp.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-#pragma warning(push)
-#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+using Vector3deg = Vector<3, Degrees>;
+using Vector3rad = Vector<3, Radians>;
 
 /**
- * \brief Two dimensional angle vector layout 
- * \tparam TAngleUnit Angle unit of the vector
+ * \brief Two dimensional angle vector
  */
 template <EAngleUnit TAngleUnit>
-struct VectorLayout<2, Angle<TAngleUnit>>
+struct Vector<3, Angle<TAngleUnit>> final:
+    VectorOperators<Vector<3, Angle<TAngleUnit>>>,
+    VectorMinMax   <Vector<3, Angle<TAngleUnit>>>,
+    VectorSlerp    <Vector<3, Angle<TAngleUnit>>>,
+    VectorLerp     <Vector<3, Angle<TAngleUnit>>>
 {
+    #pragma region Members
+
     union
 	{
-	    Angle<TAngleUnit> data[2] {};
+	    Angle<TAngleUnit> data[3];
+
 	    struct
 	    {
 	        Angle<TAngleUnit> x;
 			Angle<TAngleUnit> y;
+			Angle<TAngleUnit> z;
 	    };
 		struct
 	    {
 	        Angle<TAngleUnit> pitch;
 			Angle<TAngleUnit> yaw;
+			Angle<TAngleUnit> roll;
 	    };
 	};
+
+    #pragma endregion
+
+    #pragma region Constructors
+
+	constexpr Vector() noexcept:
+	    data {Angle<TAngleUnit>(0),
+	          Angle<TAngleUnit>(0),
+	          Angle<TAngleUnit>(0)}
+	{}
+
+    constexpr Vector(Angle<TAngleUnit> const in_pitch,
+                     Angle<TAngleUnit> const in_yaw,
+                     Angle<TAngleUnit> const in_roll) noexcept:
+		data {in_pitch, in_yaw, in_roll}
+	{}
+
+    #pragma endregion
 };
-
-#pragma warning(pop)
-
-/**
- * \brief Two dimensional distance vector
- * \tparam TAngleUnit Distance unit of the vector
- */
-template <EAngleUnit TAngleUnit>
-struct Vector<2, Angle<TAngleUnit>> : BaseVector<2, Angle<TAngleUnit>>
-{
-    using BaseVector<2, Angle<TAngleUnit>>::BaseVector;
-};
-
-using Vector2rad = Vector<2, Radians>;
-using Vector2deg = Vector<2, Degrees>;
 
 END_RUKEN_NAMESPACE

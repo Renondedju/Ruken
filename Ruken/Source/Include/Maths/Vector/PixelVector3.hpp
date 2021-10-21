@@ -1,4 +1,4 @@
-/**
+/*
  *  MIT License
  *
  *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
@@ -25,23 +25,30 @@
 #pragma once
 
 #include "Types/Units/Pixels.hpp"
-#include "Maths/Vector/BaseVector.hpp"
-#include "Maths/Vector/VectorLayout.hpp"
+#include "Maths/Vector/Helper/VectorForward.hpp"
+#include "Maths/Vector/Operations/VectorLerp.hpp"
+#include "Maths/Vector/Operations/VectorMinMax.hpp"
+#include "Maths/Vector/Operations/VectorOperators.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-#pragma warning(push)
-#pragma warning(disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
+using Vector3px = Vector<3, Pixels>;
 
 /**
- * \brief Three dimensional pixel vector layout 
+ * \brief Two dimensional pixel vector
  */
 template <>
-struct VectorLayout<3, Pixels>
+struct Vector<3, Pixels> final:
+    VectorOperators<Vector3px>,
+    VectorMinMax   <Vector3px>,
+    VectorLerp     <Vector3px>
 {
+    #pragma region Members
+
     union
 	{
-	    Pixels data[3] {};
+	    Pixels data[3];
+
 	    struct
 	    {
 	        Pixels x;
@@ -55,19 +62,20 @@ struct VectorLayout<3, Pixels>
 			Pixels depth;
 	    };
 	};
+
+    #pragma endregion
+
+    #pragma region Constructors
+
+	constexpr Vector() noexcept:
+	    data {0_px, 0_px, 0_px}
+	{}
+
+	constexpr Vector(Pixels const in_width, Pixels const in_height, Pixels const in_depth) noexcept:
+		data {in_width, in_height, in_depth}
+	{}
+
+    #pragma endregion
 };
-
-#pragma warning(pop)
-
-/**
- * \brief Three dimensional pixel vector
- */
-template <>
-struct Vector<3, Pixels> : BaseVector<3, Pixels>
-{
-	using BaseVector<3, Pixels>::BaseVector;
-};
-
-using Vector3px = Vector<3, Pixels>;
 
 END_RUKEN_NAMESPACE
