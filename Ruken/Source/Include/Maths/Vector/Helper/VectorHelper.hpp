@@ -97,8 +97,8 @@ struct VectorHelper
 
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
     static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetLargestVector(
-        Vector<TDimensions     , TUnderlyingType>&      in_vector,
-        Vector<TOtherDimensions, TOtherUnderlyingType>& in_other_vector) noexcept
+        Vector<TDimensions     , TUnderlyingType>      const& in_vector,
+        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_other_vector) noexcept
     {
         return TDimensions >= TOtherDimensions ? in_vector : in_other_vector;
     }
@@ -114,7 +114,7 @@ struct VectorHelper
      * \return Reference of the smallest vector
      */
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType>& GetSmallestVector(
+    static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType>& GetSmallestVector(
         Vector<TDimensions     , TUnderlyingType>&      in_vector,
         Vector<TOtherDimensions, TOtherUnderlyingType>& in_other_vector) noexcept
     {
@@ -122,9 +122,9 @@ struct VectorHelper
     }
 
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetSmallestVector(
-        Vector<TDimensions     , TUnderlyingType>&      in_vector,
-        Vector<TOtherDimensions, TOtherUnderlyingType>& in_other_vector) const noexcept
+    static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetSmallestVector(
+        Vector<TDimensions     , TUnderlyingType>      const& in_vector,
+        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_other_vector) noexcept
     {
         return TDimensions < TOtherDimensions ? in_vector : in_other_vector;
     }
