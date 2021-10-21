@@ -156,10 +156,11 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
     }
 
     vk::PhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features = {
-        .shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
-        .descriptorBindingPartiallyBound           = VK_TRUE,
-        .descriptorBindingVariableDescriptorCount  = VK_TRUE,
-        .runtimeDescriptorArray                    = VK_TRUE,
+        .shaderSampledImageArrayNonUniformIndexing    = VK_TRUE,
+        .descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
+        .descriptorBindingPartiallyBound              = VK_TRUE,
+        .descriptorBindingVariableDescriptorCount     = VK_TRUE,
+        .runtimeDescriptorArray                       = VK_TRUE,
     };
 
     vk::PhysicalDeviceTimelineSemaphoreFeatures timeline_semaphore_features = {

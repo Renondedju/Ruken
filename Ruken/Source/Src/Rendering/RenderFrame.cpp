@@ -13,9 +13,9 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
     m_compute_command_pool     {in_device, in_device->GetComputeFamilyIndex ()},
     m_transfer_command_pool    {in_device, in_device->GetTransferFamilyIndex()},
     m_draw_storage_buffer      {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_material_storage_buffer  {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
     m_transform_storage_buffer {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_camera_uniform_buffer    {in_device, 0ULL, vk::BufferUsageFlagBits::eUniformBuffer}
+    m_material_storage_buffer  {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_camera_uniform_buffer    {in_device, sizeof(CameraData), vk::BufferUsageFlagBits::eUniformBuffer}
 {
     m_color_target = std::make_unique<RenderTarget>(m_device, 1920, 1080, vk::Format::eR8G8B8A8Unorm,  vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc);
     m_depth_target = std::make_unique<RenderTarget>(m_device, 1920, 1080, vk::Format::eD24UnormS8Uint, vk::ImageUsageFlagBits::eDepthStencilAttachment);
@@ -56,6 +56,7 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
     };
 
     vk::DescriptorPoolCreateInfo descriptor_pool_info = {
+        .flags         = vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind,
         .maxSets       = 100U,
         .poolSizeCount = 4U,
         .pPoolSizes    = pool_sizes
@@ -63,7 +64,15 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
 
     m_global_descriptor_pool = m_device->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
 
+    RkUint32 count = 1U;
+
+    vk::DescriptorSetVariableDescriptorCountAllocateInfo set_variable_descriptor_count_allocate_info = {
+        .descriptorSetCount = 1U,
+        .pDescriptorCounts  = &count
+    };
+
     vk::DescriptorSetAllocateInfo global_descriptor_set_allocate_info = {
+        .pNext              = &set_variable_descriptor_count_allocate_info,
         .descriptorPool     = m_global_descriptor_pool,
         .descriptorSetCount = 1U,
         .pSetLayouts        = &RenderPass::g_descriptor_set_layouts[0]
@@ -78,68 +87,33 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
     m_global_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(global_descriptor_set_allocate_info).value.front();
     m_camera_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(camera_descriptor_set_allocate_info).value.front();
 
-    vk::DescriptorBufferInfo draw_descriptor_buffer_info = {
-        .buffer = m_draw_storage_buffer.GetHandle(),
-        .offset = 0ULL,
-        .range  = sizeof(CameraData)
-    };
-
-    vk::DescriptorBufferInfo material_descriptor_buffer_info = {
-        .buffer = m_material_storage_buffer.GetHandle(),
-        .offset = 0ULL,
-        .range  = sizeof(CameraData)
-    };
-
-    vk::DescriptorBufferInfo transform_descriptor_buffer_info = {
-        .buffer = m_transform_storage_buffer.GetHandle(),
-        .offset = 0ULL,
-        .range  = sizeof(CameraData)
-    };
-
     vk::DescriptorBufferInfo camera_descriptor_buffer_info = {
         .buffer = m_camera_uniform_buffer.GetHandle(),
         .offset = 0ULL,
         .range  = sizeof(CameraData)
     };
 
-    std::array<vk::WriteDescriptorSet, 4> write_descriptors = {
-        {
-            {
-                .dstSet = m_global_descriptor_set,
-                .dstBinding = 0,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = vk::DescriptorType::eStorageBuffer,
-                .pBufferInfo = &draw_descriptor_buffer_info
-            },
-            {
-                .dstSet = m_global_descriptor_set,
-                .dstBinding = 1,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = vk::DescriptorType::eStorageBuffer,
-                .pBufferInfo = &material_descriptor_buffer_info
-            },
-            {
-                .dstSet = m_global_descriptor_set,
-                .dstBinding = 2,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = vk::DescriptorType::eStorageBuffer,
-                .pBufferInfo = &transform_descriptor_buffer_info
-            },
-            {
-                .dstSet = m_camera_descriptor_set,
-                .dstBinding = 0,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = vk::DescriptorType::eUniformBuffer,
-                .pBufferInfo = &camera_descriptor_buffer_info
-            }
-        }
+    vk::WriteDescriptorSet write_descriptor = {
+        .dstSet = m_camera_descriptor_set,
+        .dstBinding = 0,
+        .dstArrayElement = 0,
+        .descriptorCount = 1,
+        .descriptorType = vk::DescriptorType::eUniformBuffer,
+        .pBufferInfo = &camera_descriptor_buffer_info
     };
 
-    m_device->GetLogicalDevice().updateDescriptorSets(write_descriptors, VK_NULL_HANDLE);
+    m_device->GetLogicalDevice().updateDescriptorSets(write_descriptor, VK_NULL_HANDLE);
+
+    CameraData ubo = {
+        .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+        .proj = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.1f, 10.0f)
+    };
+
+    ubo.proj[1][1] *= -1;
+
+    memcpy(m_camera_uniform_buffer.Map(), &ubo, sizeof(CameraData));
+
+    m_camera_uniform_buffer.UnMap();
 }
 
 RenderFrame::~RenderFrame() noexcept
@@ -148,6 +122,7 @@ RenderFrame::~RenderFrame() noexcept
     m_depth_target.reset();
 
     m_device->GetLogicalDevice().destroy(m_framebuffer);
+    m_device->GetLogicalDevice().destroy(m_global_descriptor_pool);
 }
 
 RkVoid RenderFrame::Reset() noexcept
@@ -169,6 +144,15 @@ RkVoid RenderFrame::Reset() noexcept
     m_transfer_command_pool.Reset();
 }
 
+RkVoid RenderFrame::Bind(vk::CommandBuffer const& in_command_buffer) noexcept
+{
+    std::vector descriptor_sets = {
+        m_global_descriptor_set, m_camera_descriptor_set
+    };
+
+    in_command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, RenderPass::g_pipeline_layout, 0U, descriptor_sets, nullptr);
+}
+
 RenderTarget const& RenderFrame::GetColorTarget() const noexcept
 {
     return *m_color_target;
@@ -182,6 +166,11 @@ RenderTarget const& RenderFrame::GetDepthTarget() const noexcept
 vk::Framebuffer const& RenderFrame::GetFramebuffer() const noexcept
 {
     return m_framebuffer;
+}
+
+vk::DescriptorSet const& RenderFrame::GetGlobalDescriptorSet() const noexcept
+{
+    return m_global_descriptor_set;
 }
 
 TimelineSemaphore& RenderFrame::GetTimelineSemaphore() noexcept
@@ -207,4 +196,20 @@ CommandPool& RenderFrame::GetComputeCommandPool() noexcept
 CommandPool& RenderFrame::GetTransferCommandPool() noexcept
 {
     return m_transfer_command_pool;
+}
+
+Buffer& RenderFrame::GetDrawStorageBuffer() noexcept
+{
+    return m_draw_storage_buffer;
+}
+
+Buffer& RenderFrame::GetMaterialStorageBuffer() noexcept
+{
+    return m_material_storage_buffer;
+}
+
+Buffer& RenderFrame::GetTransformStorageBuffer() noexcept
+{
+    return m_transform_storage_buffer;
+}
 }

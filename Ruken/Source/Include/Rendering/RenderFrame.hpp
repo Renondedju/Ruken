@@ -46,8 +46,8 @@ class RenderFrame
         CommandPool       m_compute_command_pool;
         CommandPool       m_transfer_command_pool;
         Buffer            m_draw_storage_buffer;
-        Buffer            m_material_storage_buffer;
         Buffer            m_transform_storage_buffer;
+        Buffer            m_material_storage_buffer;
         Buffer            m_camera_uniform_buffer;
 
         vk::DescriptorPool m_global_descriptor_pool;
@@ -72,16 +72,21 @@ class RenderFrame
         #pragma region Methods
 
         RkVoid Reset() noexcept;
+        RkVoid Bind(vk::CommandBuffer const& in_command_buffer) noexcept;
 
         RenderTarget    const& GetColorTarget() const noexcept;
         RenderTarget    const& GetDepthTarget() const noexcept;
         vk::Framebuffer const& GetFramebuffer() const noexcept;
+        vk::DescriptorSet const& GetGlobalDescriptorSet() const noexcept;
 
-        TimelineSemaphore& GetTimelineSemaphore  () noexcept;
-        SemaphorePool&     GetSemaphorePool      () noexcept;
-        CommandPool&       GetGraphicsCommandPool() noexcept;
-        CommandPool&       GetComputeCommandPool () noexcept;
-        CommandPool&       GetTransferCommandPool() noexcept;
+        TimelineSemaphore& GetTimelineSemaphore     () noexcept;
+        SemaphorePool&     GetSemaphorePool         () noexcept;
+        CommandPool&       GetGraphicsCommandPool   () noexcept;
+        CommandPool&       GetComputeCommandPool    () noexcept;
+        CommandPool&       GetTransferCommandPool   () noexcept;
+        Buffer&            GetDrawStorageBuffer     () noexcept;
+        Buffer&            GetMaterialStorageBuffer () noexcept;
+        Buffer&            GetTransformStorageBuffer() noexcept;
 
         #pragma endregion
 

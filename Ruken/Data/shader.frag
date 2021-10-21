@@ -22,9 +22,7 @@ layout(set = 0, binding = 2) readonly buffer MaterialBuffer {
     MaterialData materialData[];
 };
 
-layout(set = 0, binding = 3) uniform texture2D materialTextures[];
-
-layout(set = 2, binding = 0) uniform sampler texSampler;
+layout(set = 0, binding = 3) uniform sampler2D materialTextures[];
 
 layout(push_constant) uniform ObjectData {
     uint index;
@@ -40,5 +38,5 @@ void main()
     DrawData     dd = drawData[objectData.index];
     MaterialData md = materialData[dd.materialIndex];
 
-    outColor = vec4(fragColor * texture(sampler2D(materialTextures[md.albedoTexture], texSampler), fragUV).rgb, 1.0);
+    outColor = vec4(fragColor * texture(materialTextures[md.albedoTexture], fragUV).rgb, 1.0);
 }

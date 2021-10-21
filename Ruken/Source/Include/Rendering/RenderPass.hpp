@@ -24,7 +24,7 @@ class RenderPass
     public:
 
         static vk::RenderPass          g_render_pass;
-        static std::array<vk::DescriptorSetLayout, 3> g_descriptor_set_layouts;
+        static std::array<vk::DescriptorSetLayout, 2> g_descriptor_set_layouts;
         static vk::PipelineLayout      g_pipeline_layout;
         static vk::Pipeline            g_pipeline;
 

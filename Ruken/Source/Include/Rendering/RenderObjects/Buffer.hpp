@@ -31,6 +31,10 @@ class Buffer
 
         #pragma region Methods
 
+        RkVoid Resize(VkDeviceSize in_size, vk::BufferUsageFlags in_usage) noexcept;
+        RkVoid* Map() const noexcept;
+        RkVoid UnMap() const noexcept;
+
         vk::Buffer const& GetHandle() const noexcept;
 
         #pragma endregion

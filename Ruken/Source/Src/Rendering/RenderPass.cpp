@@ -9,7 +9,7 @@
 USING_RUKEN_NAMESPACE
 
 vk::RenderPass          RenderPass::g_render_pass;
-std::array<vk::DescriptorSetLayout, 3> RenderPass::g_descriptor_set_layouts;
+std::array<vk::DescriptorSetLayout, 2> RenderPass::g_descriptor_set_layouts;
 vk::PipelineLayout      RenderPass::g_pipeline_layout;
 vk::Pipeline            RenderPass::g_pipeline;
 
@@ -104,7 +104,7 @@ RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* 
         },
         {
             .binding         = 3U,
-            .descriptorType  = vk::DescriptorType::eSampledImage,
+            .descriptorType  = vk::DescriptorType::eCombinedImageSampler,
             .descriptorCount = 1U,
             .stageFlags      = vk::ShaderStageFlagBits::eFragment
         }
@@ -119,37 +119,27 @@ RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* 
         }
     };
 
-    vk::DescriptorSetLayoutBinding third_bindings[1] = {
-        {
-            .binding         = 0U,
-            .descriptorType  = vk::DescriptorType::eSampler,
-            .descriptorCount = 1U,
-            .stageFlags      = vk::ShaderStageFlagBits::eFragment
-        }
-    };
-
     vk::DescriptorBindingFlags binding_flags[4];
 
-    binding_flags[3] = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
+    binding_flags[3] = vk::DescriptorBindingFlagBits::eUpdateAfterBind
+                     | vk::DescriptorBindingFlagBits::ePartiallyBound
+                     | vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
 
     vk::DescriptorSetLayoutBindingFlagsCreateInfo binding_flags_create_info = {
         .bindingCount  = 4U,
         .pBindingFlags = binding_flags
     };
 
-    vk::DescriptorSetLayoutCreateInfo set_layout_infos[3] = {
+    vk::DescriptorSetLayoutCreateInfo set_layout_infos[2] = {
         {
             .pNext        = &binding_flags_create_info,
+            .flags        = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool,
             .bindingCount = 4U,
             .pBindings    = first_bindings
         },
         {
             .bindingCount = 1U,
             .pBindings    = second_bindings
-        },
-        {
-            .bindingCount = 1U,
-            .pBindings    = third_bindings
         }
     };
 
@@ -160,10 +150,9 @@ RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* 
 
     g_descriptor_set_layouts[0] = m_device->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[0]).value;
     g_descriptor_set_layouts[1] = m_device->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[1]).value;
-    g_descriptor_set_layouts[2] = m_device->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[2]).value;
 
     vk::PipelineLayoutCreateInfo layout_info = {
-        .setLayoutCount         = 3U,
+        .setLayoutCount         = 2U,
         .pSetLayouts            = g_descriptor_set_layouts.data(),
         .pushConstantRangeCount = 1U,
         .pPushConstantRanges    = &push_constant_range

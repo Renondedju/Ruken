@@ -12,13 +12,9 @@
 
 USING_RUKEN_NAMESPACE
 
-static std::unique_ptr<Texture> g_texture;
-
 Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
     m_device {in_device}
 {
-    g_texture = std::make_unique<Texture>(m_device, "Data/viking_room.png");
-
     tinyobj::ObjReader       reader;
     tinyobj::ObjReaderConfig config;
 
@@ -154,8 +150,6 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
 Model::~Model() noexcept
 {
-    g_texture.reset();
-
     m_device->GetAllocator().destroyBuffer(m_buffer, m_allocation);
 }
 
