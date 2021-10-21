@@ -125,17 +125,17 @@ RkFloat RUKEN_NAMESPACE::QuinticEaseInOut(RkFloat const in_p) noexcept
 
 RkFloat RUKEN_NAMESPACE::SineEaseIn(RkFloat const in_p) noexcept
 {
-    return Sin(Radians(in_p - 1.0F * g_pi_2)) + 1.0F;
+    return Sin(Radians(in_p - 1.0F * Constants<RkFloat>::pi_2)) + 1.0F;
 }
 
 RkFloat RUKEN_NAMESPACE::SineEaseOut(RkFloat const in_p) noexcept
 {
-    return Sin(Radians(in_p * g_pi_2));
+    return Sin(Radians(in_p * Constants<RkFloat>::pi_2));
 }
 
 RkFloat RUKEN_NAMESPACE::SineEaseInOut(RkFloat const in_p) noexcept
 {
-    return 0.5F * (1.0F - Cos(Radians(in_p * g_pi)));
+    return 0.5F * (1.0F - Cos(Radians(in_p * Constants<RkFloat>::pi)));
 }
 
 RkFloat RUKEN_NAMESPACE::CircularEaseIn(RkFloat const in_p) noexcept
@@ -179,31 +179,31 @@ RkFloat RUKEN_NAMESPACE::ExponentialEaseInOut(RkFloat const in_p) noexcept
 
 RkFloat RUKEN_NAMESPACE::ElasticEaseIn(RkFloat const in_p) noexcept
 {
-    return Sin(Radians(13.0F * g_pi_2 * in_p)) * Pow(2.0F, 10.0F * (in_p - 1.0F));
+    return Sin(Radians(13.0F * Constants<RkFloat>::pi_2 * in_p)) * Pow(2.0F, 10.0F * (in_p - 1.0F));
 }
 
 RkFloat RUKEN_NAMESPACE::ElasticEaseOut(RkFloat const in_p) noexcept
 {
-    return Sin(Radians(-13.0F * g_pi_2 * (in_p + 1.0F))) * Pow(2.0F, -10.0F * in_p) + 1.0F;
+    return Sin(Radians(-13.0F * Constants<RkFloat>::pi_2 * (in_p + 1.0F))) * Pow(2.0F, -10.0F * in_p) + 1.0F;
 }
 
 RkFloat RUKEN_NAMESPACE::ElasticEaseInOut(RkFloat const in_p) noexcept
 {
     if (in_p < 0.5F)
-        return 0.5F * Sin(Radians(13.0F * g_pi_2 * (2.0F * in_p))) * Pow(2.0F, 10.0F * ((2.0F * in_p) - 1.0F));
+        return 0.5F * Sin(Radians(13.0F * Constants<RkFloat>::pi_2 * (2.0F * in_p))) * Pow(2.0F, 10.0F * ((2.0F * in_p) - 1.0F));
 
-    return 0.5F * (Sin(Radians(-13.0F * g_pi_2 * ((2.0F * in_p - 1.0F) + 1.0F))) * Pow(2.0F, -10.0F * (2.0F * in_p - 1.0F)) + 2.0F);
+    return 0.5F * (Sin(Radians(-13.0F * Constants<RkFloat>::pi_2 * ((2.0F * in_p - 1.0F) + 1.0F))) * Pow(2.0F, -10.0F * (2.0F * in_p - 1.0F)) + 2.0F);
 }
 
 RkFloat RUKEN_NAMESPACE::BackEaseIn(RkFloat const in_p) noexcept
 {
-    return in_p * in_p * in_p - in_p * Sin(Radians(in_p * g_pi));
+    return in_p * in_p * in_p - in_p * Sin(Radians(in_p * Constants<RkFloat>::pi));
 }
 
 RkFloat RUKEN_NAMESPACE::BackEaseOut(RkFloat const in_p) noexcept
 {
     RkFloat f = (1.0F - in_p);
-    return 1.0F - (f * f * f - f * Sin(Radians(f * g_pi)));
+    return 1.0F - (f * f * f - f * Sin(Radians(f * Constants<RkFloat>::pi)));
 }
 
 RkFloat RUKEN_NAMESPACE::BackEaseInOut(RkFloat const in_p) noexcept
@@ -211,11 +211,11 @@ RkFloat RUKEN_NAMESPACE::BackEaseInOut(RkFloat const in_p) noexcept
     if (in_p < 0.5F)
     {
         RkFloat f = 2.0F * in_p;
-        return 0.5F * (f * f * f - f * Sin(Radians(f * g_pi)));
+        return 0.5F * (f * f * f - f * Sin(Radians(f * Constants<RkFloat>::pi)));
     }
 
     RkFloat f = (1.0F - (2.0F * in_p - 1.0F));
-    return 0.5F * (1.0F - (f * f * f - f * Sin(Radians(f * g_pi)))) + 0.5F;
+    return 0.5F * (1.0F - (f * f * f - f * Sin(Radians(f * Constants<RkFloat>::pi)))) + 0.5F;
 }
 
 RkFloat RUKEN_NAMESPACE::BounceEaseIn(RkFloat const in_p) noexcept
