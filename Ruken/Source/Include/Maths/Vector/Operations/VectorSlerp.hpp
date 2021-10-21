@@ -24,26 +24,28 @@
 
 #pragma once
 
-#include "Meta/IsInstance.hpp"
-
 #include "Maths/Trigonometry.hpp"
 #include "Maths/Vector/Helper/VectorHelper.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorSlerp;
+
+/**
  * \brief Implements vector Slerp method
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value  &&    // TVector must be a vector type
-requires (TVector in_vector) { in_vector.Dot(); } // And requires the implementation of the Dot method
-struct VectorSlerp
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorSlerp<Vector<TDimensions, TUnderlyingType>>
 {
-    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
+    using TVector = Vector<TDimensions, TUnderlyingType>;
+    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
 
     #pragma region Methods
 
@@ -56,6 +58,7 @@ struct VectorSlerp
      * \return Circularly interpolated vector
      */
     template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
+    requires requires (Vector<TDimensions, TUnderlyingType> in_vector) { in_vector.Dot(); } // Requires the implementation of the Dot method
     [[nodiscard]]
     constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Slerp(
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector,

@@ -30,15 +30,19 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorMinMax;
+
+/**
  * \brief Implements vector Min and Max methods
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value // TVector must be a vector type
-struct VectorMinMax
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorMinMax<Vector<TDimensions, TUnderlyingType>>
 {
     using Helper = VectorHelper<TDimensions, TUnderlyingType>;
 

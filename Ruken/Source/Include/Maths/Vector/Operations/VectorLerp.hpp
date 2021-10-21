@@ -30,15 +30,19 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorLerp;
+
+/**
  * \brief Implements vector Lerp method
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value // TVector must be a vector type
-struct VectorLerp
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorLerp<Vector<TDimensions, TUnderlyingType>>
 {
     using Helper = VectorHelper<TDimensions, TUnderlyingType>;
 
@@ -57,7 +61,7 @@ struct VectorLerp
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector,
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_other_vector,
         RkFloat                                        const  in_ratio)
-    { in_vector + in_ratio * (in_vector - in_vector); }
+    { in_vector + in_ratio * (in_other_vector - in_vector); }
     [[nodiscard]]
     constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Lerp(
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector,

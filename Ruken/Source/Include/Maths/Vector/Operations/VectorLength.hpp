@@ -24,24 +24,28 @@
 
 #pragma once
 
-#include "Meta/IsInstance.hpp"
-
 #include "Maths/Math.hpp"
 #include "Maths/Vector/Helper/VectorForward.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorLength;
+
+/**
  * \brief Implements vector Length and SqrLength methods
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value // TVector must be a vector type
-struct VectorLength
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorLength<Vector<TDimensions, TUnderlyingType>>
 {
+    using TVector = Vector<TDimensions, TUnderlyingType>;
+
     #pragma region Methods
 
     /**
@@ -55,7 +59,7 @@ struct VectorLength
         TUnderlyingType square_length {};
                                                                                                                                                                                                              
         for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
-            square_length += static_cast<TVector*>(this)->data[index] * static_cast<TVector*>(this)->data[index];                                                                                                                               
+            square_length += static_cast<TVector const*>(this)->data[index] * static_cast<TVector const*>(this)->data[index];                                                                                                                               
                                                                                                                                                                                                              
         return square_length;                                                                                                                                                                                       
     }

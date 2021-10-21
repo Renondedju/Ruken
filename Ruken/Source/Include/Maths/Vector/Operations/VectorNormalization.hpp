@@ -24,24 +24,27 @@
 
 #pragma once
 
-#include "Meta/IsInstance.hpp"
 #include "Maths/Vector/Helper/VectorHelper.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+/**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorNormalization;
 
 /**
  * \brief Implements vector Normalize and Normalized methods
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value &&        // TVector must be a vector type
-requires (TVector in_vector) { in_vector.Length(); } // And requires the implementation of the Length method
-struct VectorNormalization
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorNormalization<Vector<TDimensions, TUnderlyingType>>
 {
-    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
+    using TVector = Vector<TDimensions, TUnderlyingType>;
+    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
 
     #pragma region Methods
 
@@ -52,7 +55,7 @@ struct VectorNormalization
      */
     [[nodiscard]]
     constexpr TVector Normalized() const noexcept
-    requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
+    requires requires(TUnderlyingType in_a, TUnderlyingType in_b, TVector in_vector) { in_a == in_b; in_a /= in_b; in_vector.Length(); }
     {
         TUnderlyingType length = static_cast<TVector*>(this)->Length();
         if (length == TUnderlyingType())
@@ -70,21 +73,19 @@ struct VectorNormalization
      * If the vector is too small to be normalized this method set the vector to 0.
      */
     constexpr RkVoid Normalize() noexcept
-    requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
+    requires requires(TUnderlyingType in_a, TUnderlyingType in_b, TVector in_vector) { in_a == in_b; in_a /= in_b; in_vector.Length(); }
     {
         TUnderlyingType length = static_cast<TVector*>(this)->Length();
         if (length == TUnderlyingType())
         {
             for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
-                static_cast<TVector*>(this)->data[index] = 0;
+                static_cast<TVector*>(this)->data[index] = TUnderlyingType();
 
             return;
         }
 
         for(RkSize index {0ULL}; index < TDimensions; ++index)
             static_cast<TVector*>(this)->data[index] /= length;
-
-        return;
     }
 
     #pragma endregion

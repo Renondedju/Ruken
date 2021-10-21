@@ -24,23 +24,27 @@
 
 #pragma once
 
-#include "Meta/IsInstance.hpp"
 #include "Maths/Vector/Helper/VectorHelper.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+/**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorCross;
 
 /**
  * \brief Implements vector Cross method
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value // TVector must be a vector type
-struct VectorCross
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorCross<Vector<TDimensions, TUnderlyingType>>
 {
-    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
+    using TVector = Vector<TDimensions, TUnderlyingType>;
+    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
 
     #pragma region Methods
 

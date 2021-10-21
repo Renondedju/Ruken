@@ -25,11 +25,15 @@
 #pragma once
 
 #include "Meta/Meta.hpp"
-#include "Meta/IsInstance.hpp"
-
 #include "Maths/Vector/Helper/VectorHelper.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+/**
+ * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
+ */
+template <typename TVector>
+struct VectorOperators;
 
 /**
  * \brief Implements every common vector operator
@@ -39,13 +43,12 @@ BEGIN_RUKEN_NAMESPACE
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
  */
-template <RkSize TDimensions, typename TUnderlyingType, typename TVector>
-requires IsInstance<TVector, Vector>::value // TVector must be a vector type
-struct VectorOperators
+template <RkSize TDimensions, typename TUnderlyingType>
+struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
 {
-    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
+    using TVector = Vector<TDimensions, TUnderlyingType>;
+    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
 
     #pragma region Meta
 
@@ -57,11 +60,11 @@ struct VectorOperators
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>                                                    \
     requires requires (TUnderlyingType in_lhs, TOtherUnderlyingType in_rhs) { in_lhs RUKEN_GLUE(in_operator,=) in_rhs; } \
     [[nodiscard]]                                                                                                        \
-    constexpr Helper::LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)(            \
+    constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)( \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept                                  \
     {                                                                                                                    \
-        auto        largest  {Helper::GetLargestVector (*this, in_vector)};                                              \
-        auto const& smallest {Helper::GetSmallestVector(*this, in_vector)};                                              \
+        auto        largest  {Helper::GetLargestVector (*static_cast<TVector const*>(this), in_vector)};                 \
+        auto const& smallest {Helper::GetSmallestVector(*static_cast<TVector const*>(this), in_vector)};                 \
                                                                                                                          \
         for (RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)                              \
             largest.data[index] RUKEN_GLUE(in_operator,=) smallest.data[index];                                          \
@@ -82,7 +85,7 @@ struct VectorOperators
         for (RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)                              \
             static_cast<TVector*>(this)->data[index] RUKEN_GLUE(in_operator,=) in_vector.data[index];                    \
                                                                                                                          \
-        return *this;                                                                                                    \
+        return *static_cast<TVector*>(this);                                                                             \
     }
 
     /**
@@ -90,18 +93,18 @@ struct VectorOperators
      * \param in_operator Operator to implement
      */
     #define RUKEN_VECTOR_OPERATOR_SCALAR_MIXIN(in_operator) \
-    template <typename TScalarType>                                                                                        \
-    requires requires (TUnderlyingType in_vector, TScalarType in_scalar) { in_vector in_operator in_scalar; }              \
-    [[nodiscard]]                                                                                                          \
-    constexpr Helper::CommonSizedVector<TScalarType> RUKEN_GLUE(operator,in_operator)(                                     \
-        TScalarType const& in_scalar) const noexcept                                                                       \
-    {                                                                                                                      \
-        Helper::CommonSizedVector<TScalarType> result {};                                                                  \
-                                                                                                                           \
-        for (RkSize index {0ULL}; index < TDimensions; ++index)                                                            \
-            result.data[index] = static_cast<TVector*>(this)->data[index] in_operator in_scalar;                           \
-                                                                                                                           \
-        return result;                                                                                                     \
+    template <typename TScalarType>                                                                           \
+    requires requires (TUnderlyingType in_vector, TScalarType in_scalar) { in_vector in_operator in_scalar; } \
+    [[nodiscard]]                                                                                             \
+    constexpr typename Helper::template CommonSizedVector<TScalarType> RUKEN_GLUE(operator,in_operator)(      \
+        TScalarType const& in_scalar) const noexcept                                                          \
+    {                                                                                                         \
+        typename Helper::template CommonSizedVector<TScalarType> result {};                                   \
+                                                                                                              \
+        for (RkSize index {0ULL}; index < TDimensions; ++index)                                               \
+            result.data[index] = static_cast<TVector*>(this)->data[index] in_operator in_scalar;              \
+                                                                                                              \
+        return result;                                                                                        \
     }
 
     /**
@@ -116,7 +119,7 @@ struct VectorOperators
         for (RkSize index {0ULL}; index < TDimensions; ++index)                                                             \
             static_cast<TVector*>(this)->data[index] RUKEN_GLUE(in_operator,=) in_scalar;                                   \
                                                                                                                             \
-        return *this;                                                                                                       \
+        return *static_cast<TVector*>(this);                                                                                \
     }
 
     #pragma endregion
@@ -183,10 +186,10 @@ struct VectorOperators
      * \tparam TOtherUnderlyingType Underlying type to convert from
      */
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    requires requires (TUnderlyingType in_lhs, TOtherUnderlyingType in_rhs) { in_lhs = static_cast<TUnderlyingType>(in_rhs); }
+    requires   std::is_convertible_v<TOtherUnderlyingType, TUnderlyingType>
     explicit (!std::is_convertible_v<TUnderlyingType, TOtherUnderlyingType>)
     [[nodiscard]]
-    constexpr operator Vector<TOtherDimensions, TOtherUnderlyingType>() noexcept(noexcept(std::is_nothrow_convertible_v<TUnderlyingType, TOtherUnderlyingType>))
+    constexpr operator Vector<TOtherDimensions, TOtherUnderlyingType>() const noexcept(noexcept(std::is_nothrow_convertible_v<TUnderlyingType, TOtherUnderlyingType>))
     {
         Vector<TOtherDimensions, TOtherUnderlyingType> vector {};
 
