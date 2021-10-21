@@ -92,6 +92,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,6 +108,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
