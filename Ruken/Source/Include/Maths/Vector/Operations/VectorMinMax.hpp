@@ -44,7 +44,8 @@ struct VectorMinMax;
 template <RkSize TDimensions, typename TUnderlyingType>
 struct VectorMinMax<Vector<TDimensions, TUnderlyingType>>
 {
-    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
+    using TVector = Vector<TDimensions, TUnderlyingType>;
+    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
 
     #pragma region Methods
 
@@ -62,11 +63,20 @@ struct VectorMinMax<Vector<TDimensions, TUnderlyingType>>
     [[nodiscard]] constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Max(
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept
     {
-        auto const& smallest {Helper::GetSmallestVector(*this, in_vector)};
-        auto        vector   {Helper::GetLargestVector (*this, in_vector)};
+        if constexpr (TDimensions >= TOtherDimensions)
+        {
+            auto vector {*static_cast<TVector const*>(this)};
 
-        for(RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)
-            vector.data[index] = std::max(vector.data[index], smallest.data[index]);
+            for(RkSize index {0ULL}; index < TOtherDimensions; ++index)
+                vector.data[index] = std::max(vector.data[index], in_vector.data[index]);
+
+            return vector;
+        }
+
+        auto vector {in_vector};
+
+        for(RkSize index {0ULL}; index < TDimensions; ++index)
+            vector.data[index] = std::max(vector.data[index], static_cast<TVector const*>(this)->data[index]);
 
         return vector;
     }
@@ -85,11 +95,20 @@ struct VectorMinMax<Vector<TDimensions, TUnderlyingType>>
     [[nodiscard]] constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Min(
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept
     {
-        auto const& smallest {Helper::GetSmallestVector(*this, in_vector)};
-        auto        vector   {Helper::GetLargestVector (*this, in_vector)};
+        if constexpr (TDimensions >= TOtherDimensions)
+        {
+            auto vector {*static_cast<TVector const*>(this)};
 
-        for(RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)
-            vector.data[index] = std::min(vector.data[index], smallest.data[index]);
+            for(RkSize index {0ULL}; index < TOtherDimensions; ++index)
+                vector.data[index] = std::min(vector.data[index], in_vector.data[index]);
+
+            return vector;
+        }
+
+        auto vector {in_vector};
+
+        for(RkSize index {0ULL}; index < TDimensions; ++index)
+            vector.data[index] = std::min(vector.data[index], static_cast<TVector const*>(this)->data[index]);
 
         return vector;
     }

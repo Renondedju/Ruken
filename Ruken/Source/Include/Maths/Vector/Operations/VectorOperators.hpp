@@ -63,13 +63,22 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)( \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept                                  \
     {                                                                                                                    \
-        auto        largest  {Helper::GetLargestVector (*static_cast<TVector const*>(this), in_vector)};                 \
-        auto const& smallest {Helper::GetSmallestVector(*static_cast<TVector const*>(this), in_vector)};                 \
+        if constexpr (TDimensions >= TOtherDimensions)                                                                   \
+        {                                                                                                                \
+            auto vector {*static_cast<TVector const*>(this)};                                                            \
                                                                                                                          \
-        for (RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)                              \
-            largest.data[index] RUKEN_GLUE(in_operator,=) smallest.data[index];                                          \
+            for (RkSize index {0ULL}; index < TOtherDimensions; ++index)                                                 \
+                vector.data[index] RUKEN_GLUE(in_operator,=) in_vector.data[index];                                      \
                                                                                                                          \
-        return largest;                                                                                                  \
+            return vector;                                                                                               \
+        }                                                                                                                \
+                                                                                                                         \
+        auto vector {in_vector};                                                                                         \
+                                                                                                                         \
+        for (RkSize index {0ULL}; index < TDimensions; ++index)                                                          \
+            vector.data[index] RUKEN_GLUE(in_operator,=) static_cast<TVector const*>(this)->data[index];                 \
+                                                                                                                         \
+        return vector;                                                                                                   \
     }
 
     /**
@@ -102,7 +111,7 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
         typename Helper::template CommonSizedVector<TScalarType> result {};                                   \
                                                                                                               \
         for (RkSize index {0ULL}; index < TDimensions; ++index)                                               \
-            result.data[index] = static_cast<TVector*>(this)->data[index] in_operator in_scalar;              \
+            result.data[index] = static_cast<TVector const*>(this)->data[index] in_operator in_scalar;        \
                                                                                                               \
         return result;                                                                                        \
     }
@@ -189,12 +198,13 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     requires   std::is_convertible_v<TOtherUnderlyingType, TUnderlyingType>
     explicit (!std::is_convertible_v<TUnderlyingType, TOtherUnderlyingType>)
     [[nodiscard]]
-    constexpr operator Vector<TOtherDimensions, TOtherUnderlyingType>() const noexcept(noexcept(std::is_nothrow_convertible_v<TUnderlyingType, TOtherUnderlyingType>))
+    constexpr operator Vector<TOtherDimensions, TOtherUnderlyingType>() const noexcept(
+        noexcept(std::is_nothrow_convertible_v<TUnderlyingType, TOtherUnderlyingType>))
     {
         Vector<TOtherDimensions, TOtherUnderlyingType> vector {};
 
-        for (RkSize index; index < std::min(TOtherDimensions, TDimensions); ++index)
-            vector.data[index] = static_cast<TOtherUnderlyingType>(static_cast<TVector*>(this)->data[index]);
+        for (RkSize index {0ULL}; index < std::min(TOtherDimensions, TDimensions); ++index)
+            vector.data[index] = static_cast<TOtherUnderlyingType>(static_cast<TVector const*>(this)->data[index]);
 
         return vector;
     }

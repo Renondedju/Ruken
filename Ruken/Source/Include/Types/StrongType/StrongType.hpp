@@ -76,17 +76,18 @@ class StrongType
         #pragma region Operators
 
         template <typename TType>
+        requires std::is_convertible_v<TBase, TType>
         explicit constexpr operator TType&() noexcept
         {
-            return static_cast<TType&>(m_value);
+            return m_value;
         }
 
         template <typename TType>
+        requires std::is_convertible_v<TBase, TType>
         explicit constexpr operator TType const&() const noexcept
         {
-            return static_cast<TType const&>(m_value);
+            return m_value;
         }
-        
 
         constexpr StrongType& operator=(StrongType const& in_copy) = default;
         constexpr StrongType& operator=(StrongType&&      in_move) = default;

@@ -74,62 +74,6 @@ struct VectorHelper
     >;
 
     #pragma endregion
-
-    #pragma region Methods
-
-    /**
-     * \brief Returns a reference onto the largest of the two vectors
-     * If the 2 passed vectors have the same size, then in_other_vector will be returned
-     *
-     * \tparam TOtherDimensions Dimensions or size of the other vector
-     * \tparam TOtherUnderlyingType Underlying type of the other vector
-     * \param in_vector Vector reference
-     * \param in_other_vector Other vector reference
-     * \return Reference of the largest vector
-     */
-    template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType>& GetLargestVector(
-        Vector<TDimensions     , TUnderlyingType>&      in_vector,
-        Vector<TOtherDimensions, TOtherUnderlyingType>& in_other_vector) noexcept
-    {
-        return TDimensions >= TOtherDimensions ? in_vector : in_other_vector;
-    }
-
-    template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetLargestVector(
-        Vector<TDimensions     , TUnderlyingType>      const& in_vector,
-        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_other_vector) noexcept
-    {
-        return TDimensions >= TOtherDimensions ? in_vector : in_other_vector;
-    }
-
-    /**
-     * \brief Returns a reference onto the smallest of the two vectors
-     * If the 2 passed vectors have the same size, then in_vector will be returned
-     *
-     * \tparam TOtherDimensions Dimensions or size of the other vector
-     * \tparam TOtherUnderlyingType Underlying type of the other vector
-     * \param in_vector Vector reference
-     * \param in_other_vector Other vector reference
-     * \return Reference of the smallest vector
-     */
-    template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType>& GetSmallestVector(
-        Vector<TDimensions     , TUnderlyingType>&      in_vector,
-        Vector<TOtherDimensions, TOtherUnderlyingType>& in_other_vector) noexcept
-    {
-        return TDimensions < TOtherDimensions ? in_vector : in_other_vector;
-    }
-
-    template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    static constexpr LargestVector<TOtherDimensions, TOtherUnderlyingType> const& GetSmallestVector(
-        Vector<TDimensions     , TUnderlyingType>      const& in_vector,
-        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_other_vector) noexcept
-    {
-        return TDimensions < TOtherDimensions ? in_vector : in_other_vector;
-    }
-
-    #pragma endregion
 };
 
 END_RUKEN_NAMESPACE
