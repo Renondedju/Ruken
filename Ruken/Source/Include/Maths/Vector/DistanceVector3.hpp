@@ -103,6 +103,18 @@ struct Vector<3, Distance<TDistanceUnit>> final:
 template <EDistanceUnit TDistanceUnit>
 struct Constants<Vector<3, Distance<TDistanceUnit>>>
 {
+	static constexpr Vector<3, Distance<TDistanceUnit>> one {
+		Distance<TDistanceUnit>(1.0F),
+		Distance<TDistanceUnit>(1.0F),
+		Distance<TDistanceUnit>(1.0F)
+	};
+
+	static constexpr Vector<3, Distance<TDistanceUnit>> zero {
+		Distance<TDistanceUnit>(.0F),
+		Distance<TDistanceUnit>(.0F),
+		Distance<TDistanceUnit>(.0F)
+	};
+
 	static constexpr Vector<3, Distance<TDistanceUnit>> right {
 		Distance<TDistanceUnit>(1.0F),
         Distance<TDistanceUnit>(0.0F),
