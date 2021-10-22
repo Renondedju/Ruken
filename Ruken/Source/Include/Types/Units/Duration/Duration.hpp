@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Types/StrongType/StrongType.hpp"
+#include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
 #include "Types/StrongType/Operators/Comparison.hpp"
 #include "Types/StrongType/Operators/Stream.hpp"
@@ -80,9 +81,34 @@ struct Duration final: StrongType<RkFloat, Duration<TUnitType>>,
     #pragma endregion
 };
 
+// Type aliases
+
 using Milliseconds = Duration<EDurationUnit::Millisecond>;
 using Seconds      = Duration<EDurationUnit::Second>;
 using Minutes      = Duration<EDurationUnit::Minute>;
+
+// Suffixes
+
+template<>
+struct StrongTypeSuffix<Milliseconds>
+{
+    static constexpr const RkChar* suffix = " ms";
+};
+
+template<>
+struct StrongTypeSuffix<Seconds>
+{
+    static constexpr const RkChar* suffix = " sec";
+};
+
+template<>
+struct StrongTypeSuffix<Minutes>
+{
+    static constexpr const RkChar* suffix = " min";
+};
+
+
+// Type literals
 
 constexpr Milliseconds operator"" _ms (RkLdouble in_duration) noexcept;
 constexpr Milliseconds operator"" _ms (RkSize    in_duration) noexcept;

@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Types/StrongType/StrongType.hpp"
+#include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
 #include "Types/StrongType/Operators/Comparison.hpp"
 #include "Types/StrongType/Operators/Stream.hpp"
@@ -37,6 +38,14 @@ struct Pixels final: StrongType<RkInt32, Pixels>,
                      Stream    <Pixels>
 {
     using StrongType<RkInt32, Pixels>::StrongType;
+};
+
+// Suffixes
+
+template<>
+struct StrongTypeSuffix<Pixels>
+{
+    static constexpr const RkChar* suffix = " px";
 };
 
 constexpr Pixels operator"" _px(RkSize const in_pixels) noexcept

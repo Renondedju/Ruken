@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Types/StrongType/StrongType.hpp"
+#include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
 #include "Types/StrongType/Operators/Comparison.hpp"
 #include "Types/StrongType/Operators/Stream.hpp"
@@ -80,9 +81,33 @@ struct Distance final: StrongType<RkFloat, Distance<TUnitType>>,
     #pragma endregion
 };
 
+// Type aliases
+
 using Centimeters = Distance<EDistanceUnit::Centimeters>;
 using Meters      = Distance<EDistanceUnit::Meters>;
 using Kilometers  = Distance<EDistanceUnit::Kilometers>;
+
+// Suffixes
+
+template<>
+struct StrongTypeSuffix<Centimeters>
+{
+    static constexpr const RkChar* suffix = " cm";
+};
+
+template<>
+struct StrongTypeSuffix<Meters>
+{
+    static constexpr const RkChar* suffix = " m";
+};
+
+template<>
+struct StrongTypeSuffix<Kilometers>
+{
+    static constexpr const RkChar* suffix = " km";
+};
+
+// Type literals
 
 constexpr Centimeters operator"" _cm(RkLdouble in_distance) noexcept;
 constexpr Centimeters operator"" _cm(RkSize    in_distance) noexcept;

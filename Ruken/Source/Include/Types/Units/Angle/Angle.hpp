@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Types/StrongType/StrongType.hpp"
+#include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
 #include "Types/StrongType/Operators/Comparison.hpp"
 #include "Types/StrongType/Operators/Stream.hpp"
@@ -75,8 +76,26 @@ struct Angle final: StrongType<RkFloat, Angle<TUnitType>>,
     #pragma endregion
 };
 
+// Type aliases
+
 using Degrees = Angle<EAngleUnit::Degree>;
 using Radians = Angle<EAngleUnit::Radian>;
+
+// Suffixes
+
+template<>
+struct StrongTypeSuffix<Degrees>
+{
+    static constexpr const RkChar* suffix = " deg";
+};
+
+template<>
+struct StrongTypeSuffix<Radians>
+{
+    static constexpr const RkChar* suffix = " rad";
+};
+
+// Type literals
 
 constexpr Degrees operator"" _deg(RkLdouble in_angle) noexcept;
 constexpr Degrees operator"" _deg(RkSize    in_angle) noexcept;

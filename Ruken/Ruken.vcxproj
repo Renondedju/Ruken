@@ -280,6 +280,7 @@
     <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream\OutputStream.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongType.hpp" />
     <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\StrongTypeSuffix.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\Angle.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Angle\EAngleUnit.hpp" />
     <ClInclude Include="Source\Include\Types\Units\Distance\Distance.hpp" />
