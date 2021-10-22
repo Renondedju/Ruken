@@ -47,6 +47,8 @@ class __declspec(novtable) GenericMatrix
 
         #pragma region Members
 
+        static constexpr RkSize elements = TRows * TColumns;
+
         RkFloat data[TRows * TColumns] {.0F};
 
         #pragma endregion
@@ -76,17 +78,6 @@ class __declspec(novtable) GenericMatrix
 
         #pragma endregion
 
-        #pragma region Static Methods
-
-        /**
-         * \brief Gets the number of elements stored in the matrix
-         * \return Elements count of the matrix
-         */
-        [[nodiscard]]
-        static constexpr RkSize Elements() noexcept;
-
-        #pragma endregion 
-    
         #pragma region Methods
     
         /**

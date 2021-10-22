@@ -84,9 +84,9 @@ constexpr void SquareMatrix<TSize>::LUDecomposition(SquareMatrix<TSize>& out_l_m
 }
 
 template<RkSize TSize>
-constexpr Vector<TSize, RkFloat> SquareMatrix<TSize>::ForwardSubstitution(Vector<TSize, RkFloat> const& in_vector) const noexcept
+constexpr std::array<RkFloat, TSize> SquareMatrix<TSize>::ForwardSubstitution(std::array<RkFloat, TSize> const& in_vector) const noexcept
 {
-    Vector<TSize, RkFloat> output;
+    std::array<RkFloat, TSize> output;
 
     RkFloat sum;
     for(RkSize row = 0; row < TSize; ++row)
@@ -103,9 +103,9 @@ constexpr Vector<TSize, RkFloat> SquareMatrix<TSize>::ForwardSubstitution(Vector
 
 // FIXME: Not working yet
 template<RkSize TSize>
-constexpr Vector<TSize, RkFloat> SquareMatrix<TSize>::BackwardSubstitution(Vector<TSize, RkFloat> const& in_vector) const noexcept
+constexpr std::array<RkFloat, TSize> SquareMatrix<TSize>::BackwardSubstitution(std::array<RkFloat, TSize> const& in_vector) const noexcept
 {
-    Vector<TSize, RkFloat> output;
+    std::array<RkFloat, TSize> output;
 
     output[TSize-1] = in_vector[TSize-1] / Parent::At(TSize-1, TSize-1);
 
@@ -135,7 +135,7 @@ constexpr SquareMatrix<TSize> SquareMatrix<TSize>::GetInverted() const noexcept
 
     for (RkSize column = 0ULL; column < TSize; ++column)
     {
-        Vector<TSize, RkFloat> vector = u_matrix.BackwardSubstitution(
+        std::array<RkFloat, TSize> vector = u_matrix.BackwardSubstitution(
             l_matrix.ForwardSubstitution(
                 GenericVector<TSize>(&identity.data[column * TSize])
             )

@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include "Maths/Vector/Vector.hpp"
 #include "Maths/Matrix/SquareMatrix.hpp"
+#include "Maths/Vector/DistanceVector3.hpp"
 
 #include "Types/Units/Angle/Angle.hpp"
 

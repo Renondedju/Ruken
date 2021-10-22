@@ -37,18 +37,12 @@ constexpr GenericMatrix<TRows, TColumns>::GenericMatrix(RkFloat const (&in_value
 #pragma region Methods
 
 template <RkSize TRows, RkSize TColumns>
-constexpr size_t GenericMatrix<TRows, TColumns>::Elements() noexcept
-{
-    return TRows * TColumns;
-}
-
-template <RkSize TRows, RkSize TColumns>
 constexpr GenericMatrix<TColumns, TRows> GenericMatrix<TRows, TColumns>::GetTransposed() const noexcept
 {
     GenericMatrix<TColumns, TRows> transposed;
 
-    for (RkSize i = 0ULL; i < Elements() / 2ULL; ++i)
-        transposed.data[i] = data[Elements() - i];
+    for (RkSize i = 0ULL; i < elements / 2ULL; ++i)
+        transposed.data[i] = data[elements - i];
 
     return transposed;
 }

@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include "Maths/Vector/Vector.hpp"
+#include <array>
+
 #include "Maths/Matrix/GenericMatrix.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -81,14 +82,14 @@ class __declspec(novtable) SquareMatrix : public GenericMatrix<TSize, TSize>
          * \param in_vector The b operand in Ax = b
          * \return The resultant x vector
          */
-        constexpr Vector<TSize, RkFloat> ForwardSubstitution(Vector<TSize, RkFloat> const& in_vector) const noexcept;
+        constexpr std::array<RkFloat, TSize> ForwardSubstitution(std::array<RkFloat, TSize> const& in_vector) const noexcept;
 
         /**
          * \brief Solves Ax = b where A is a upper triangular matrix with non-zero diagonal elements.
          * \param in_vector The b operand in Ax = b
          * \return The resultant x vector
          */
-        constexpr Vector<TSize, RkFloat> BackwardSubstitution(Vector<TSize, RkFloat> const& in_vector) const noexcept;
+        constexpr std::array<RkFloat, TSize> BackwardSubstitution(std::array<RkFloat, TSize> const& in_vector) const noexcept;
 
         /**
          * \brief Inverts this matrix and returns the result

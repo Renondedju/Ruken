@@ -67,8 +67,8 @@ struct VectorCross<Vector<TDimensions, TUnderlyingType>>
         typename Helper::template CommonSizedVector<TOtherUnderlyingType> cross;
 
         for (RkSize index {0ULL}; index < TDimensions; ++index)
-            cross.data[index] = static_cast<TVector*>(this)->data[(index + 1) % TDimensions] * in_vector.data[(index + 2) % TDimensions] -
-                                in_vector.data[(index + 1) % TDimensions] * static_cast<TVector*>(this)->data[(index + 2) % TDimensions];
+            cross.data[index] = static_cast<TVector const*>(this)->data[(index + 1) % TDimensions] * in_vector.data[(index + 2) % TDimensions] -
+                                in_vector.data[(index + 1) % TDimensions] * static_cast<TVector const*>(this)->data[(index + 2) % TDimensions];
 
         return cross;
     }

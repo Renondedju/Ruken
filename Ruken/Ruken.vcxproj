@@ -203,6 +203,7 @@
     <ClInclude Include="Source\Include\Maths\Quaternion\Quaternion.hpp" />
     <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
     <ClInclude Include="Source\Include\Maths\Utility.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector4f.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\AngleVector2.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\AngleVector3.hpp" />
     <ClInclude Include="Source\Include\Maths\Vector\DistanceVector2.hpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderView.hpp" />
+    <ClInclude Include="Source\Include\Rendering\UV.hpp" />
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
     <ClInclude Include="Source\Include\Threading\Job.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />

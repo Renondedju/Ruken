@@ -57,11 +57,11 @@ struct VectorNormalization<Vector<TDimensions, TUnderlyingType>>
     constexpr TVector Normalized() const noexcept
     requires requires(TUnderlyingType in_a, TUnderlyingType in_b, TVector in_vector) { in_a == in_b; in_a /= in_b; in_vector.Length(); }
     {
-        TUnderlyingType length = static_cast<TVector*>(this)->Length();
+        TUnderlyingType length = static_cast<TVector const*>(this)->Length();
         if (length == TUnderlyingType())
             return {};
 
-        TVector result {*this};
+        TVector result {*static_cast<TVector const*>(this)};
         for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
             result.data[index] /= length;
 

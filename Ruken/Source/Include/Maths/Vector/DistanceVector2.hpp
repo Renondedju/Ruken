@@ -115,7 +115,6 @@ struct Constants<Vector<2, Distance<TDistanceUnit>>>
         Distance<TDistanceUnit>( 0.0F),
 		Distance<TDistanceUnit>(-1.0F)
 	};
-
 };
 
 END_RUKEN_NAMESPACE

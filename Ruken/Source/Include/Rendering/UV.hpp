@@ -22,34 +22,16 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
+#pragma once
 
-#include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-#include "Maths/Vector/AngleVector2.hpp"
-#include "Maths/Vector/DistanceVector2.hpp"
-#include "Maths/Vector/DistanceVector3.hpp"
-#include "Maths/Vector/PixelVector2.hpp"
-#include "Maths/Vector/PixelVector3.hpp"
+BEGIN_RUKEN_NAMESPACE
 
-USING_RUKEN_NAMESPACE
-
-int main()
+struct UV
 {
-    Vector3m const distance {3_cm, 3_m, 3_km};
-    Vector3m const result   {distance * Constants<Vector3cm>::forward};
+    RkFloat u;
+    RkFloat v;
+};
 
-    Vector3cm const test  = Constants<Vector2km>::up;
-    Vector2cm const test2 = test * 2;
-
-    Vector2rad angle = Vector2deg{};
-
-    Vector2px resolution  {Vector3px{10_px, 10_px, 10_px}};
-    Vector3cm resolution2 {Vector2cm{10_m, 10_m}};
-    Vector3cm centimeters {Constants<Vector3km>::up * 2};
-
-    Vector2km map_bounds {2.54_km, 2.587_km};
-    map_bounds.Normalize();
-
-    return EXIT_SUCCESS;
-}
+END_RUKEN_NAMESPACE
