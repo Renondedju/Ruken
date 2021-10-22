@@ -34,6 +34,9 @@ BEGIN_RUKEN_NAMESPACE
 
 using Vector3px = Vector<3, Pixels>;
 
+#pragma warning( push )
+#pragma warning( disable:4201 )
+
 /**
  * \brief Two dimensional pixel vector
  */
@@ -77,5 +80,7 @@ struct Vector<3, Pixels> final:
 
     #pragma endregion
 };
+
+#pragma warning( pop )
 
 END_RUKEN_NAMESPACE

@@ -37,6 +37,9 @@ BEGIN_RUKEN_NAMESPACE
 
 using Vector2px = Vector<2, Pixels>;
 
+#pragma warning( push )
+#pragma warning( disable:4201 )
+
 /**
  * \brief Two dimensional pixel vector
  */
@@ -78,6 +81,8 @@ struct Vector<2, Pixels> final:
 
     #pragma endregion
 };
+
+#pragma warning( pop )
 
 template <>
 struct Constants<Vector2px>

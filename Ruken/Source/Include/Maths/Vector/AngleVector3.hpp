@@ -37,6 +37,9 @@ BEGIN_RUKEN_NAMESPACE
 using Vector3deg = Vector<3, Degrees>;
 using Vector3rad = Vector<3, Radians>;
 
+#pragma warning( push )
+#pragma warning( disable:4201 )
+
 /**
  * \brief Two dimensional angle vector
  */
@@ -85,5 +88,7 @@ struct Vector<3, Angle<TAngleUnit>> final:
 
     #pragma endregion
 };
+
+#pragma warning( pop )
 
 END_RUKEN_NAMESPACE

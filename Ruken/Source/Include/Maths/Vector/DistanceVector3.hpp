@@ -42,6 +42,9 @@ using Vector3cm = Vector<3, Centimeters>;
 using Vector3m  = Vector<3, Meters>;
 using Vector3km = Vector<3, Kilometers>;
 
+#pragma warning( push )
+#pragma warning( disable:4201 )
+
 /**
  * \brief Three dimensional distance vector
  */
@@ -94,6 +97,8 @@ struct Vector<3, Distance<TDistanceUnit>> final:
 
     #pragma endregion
 };
+
+#pragma warning( pop )
 
 template <EDistanceUnit TDistanceUnit>
 struct Constants<Vector<3, Distance<TDistanceUnit>>>

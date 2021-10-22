@@ -44,6 +44,9 @@ using Vector2cm = Vector<2, Centimeters>;
 using Vector2m  = Vector<2, Meters>;
 using Vector2km = Vector<2, Kilometers>;
 
+#pragma warning( push )
+#pragma warning( disable:4201 )
+
 /**
  * \brief Two dimensional distance vector
  */
@@ -92,6 +95,8 @@ struct Vector<2, Distance<TDistanceUnit>> final:
 
     #pragma endregion
 };
+
+#pragma warning( pop )
 
 template <EDistanceUnit TDistanceUnit>
 struct Constants<Vector<2, Distance<TDistanceUnit>>>

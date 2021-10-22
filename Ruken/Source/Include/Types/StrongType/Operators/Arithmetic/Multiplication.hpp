@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <concepts>
-
 #include "Build/Namespace.hpp"
 #include "Types/StrongType/StrongTypeHelper.hpp"
 
