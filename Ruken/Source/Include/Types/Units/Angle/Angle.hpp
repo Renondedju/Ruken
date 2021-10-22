@@ -104,4 +104,15 @@ constexpr Radians operator"" _rad(RkSize    in_angle) noexcept;
 
 #include "Types/Units/Angle/Angle.inl"
 
+
+// Constants
+
+template <>
+struct Constants<Radians>
+{
+    static constexpr Radians pi   = 3.14159265358979323846_rad;
+    static constexpr Radians pi_2 = 1.57079632679489661923_rad; // pi / 2
+    static constexpr Radians pi_4 = 0.78539816339744830962_rad; // pi / 4
+};
+
 END_RUKEN_NAMESPACE
