@@ -8,6 +8,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 class RenderDevice;
+class RenderFrame;
 
 struct MaterialData
 {
@@ -20,6 +21,8 @@ class Material final : public IResource
     protected:
 
         RenderDevice* m_device;
+
+        vk::Pipeline m_pipeline;
 
         std::vector<std::unique_ptr<Shader>>  m_shaders;
         std::vector<std::unique_ptr<Texture>> m_textures;
@@ -38,6 +41,8 @@ class Material final : public IResource
         #pragma endregion
 
         #pragma region Methods
+
+        RkVoid Bind(vk::CommandBuffer const& in_command_buffer) const noexcept;
 
         RkVoid Load  (ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor) override;
         RkVoid Reload(ResourceManager& in_manager)                                                 override;
