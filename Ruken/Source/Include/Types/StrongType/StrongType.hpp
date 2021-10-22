@@ -63,8 +63,17 @@ class StrongType
 
         #pragma region Constructors
 
-        explicit constexpr StrongType(TBase const& in_copy) noexcept;
-        explicit constexpr StrongType(TBase&&      in_move) noexcept;
+        template<typename TType>
+        requires std::is_convertible_v<TType, TBase>
+        explicit constexpr StrongType(TType const& in_copy) noexcept:
+            m_value {static_cast<TBase>(in_copy)}
+        {}
+
+        template<typename TType>
+        requires std::is_convertible_v<TType, TBase>
+        explicit constexpr StrongType(TType&& in_move) noexcept:
+            m_value {static_cast<TBase>(std::forward<TType>(in_move))}
+        {}
 
         constexpr StrongType()                          = default;
         constexpr StrongType(StrongType const& in_copy) = default;
@@ -94,7 +103,5 @@ class StrongType
 
         #pragma endregion
 };
-
-#include "Types/StrongType/StrongType.inl"
 
 END_RUKEN_NAMESPACE

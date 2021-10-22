@@ -63,7 +63,7 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)( \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept                                  \
     {                                                                                                                    \
-        if (TDimensions >= TOtherDimensions)                                                                             \
+        if constexpr (TDimensions >= TOtherDimensions)                                                                   \
         {                                                                                                                \
             auto vector {*static_cast<TVector const*>(this)};                                                            \
                                                                                                                          \
@@ -108,10 +108,12 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     constexpr typename Helper::template CommonSizedVector<TScalarType> RUKEN_GLUE(operator,in_operator)(      \
         TScalarType const& in_scalar) const noexcept                                                          \
     {                                                                                                         \
+        using Type = CommonTypeFallback<TUnderlyingType, TUnderlyingType, TScalarType>;                       \
         typename Helper::template CommonSizedVector<TScalarType> result {};                                   \
                                                                                                               \
         for (RkSize index {0ULL}; index < TDimensions; ++index)                                               \
-            result.data[index] = static_cast<TVector const*>(this)->data[index] in_operator in_scalar;        \
+            result.data[index] = static_cast<Type>(static_cast<TVector const*>(this)->data[index]                               \
+                in_operator static_cast<Type>(in_scalar));                                                     \
                                                                                                               \
         return result;                                                                                        \
     }
@@ -135,6 +137,9 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
 
     #pragma region Operators
 
+    #pragma warning( push )
+    #pragma warning( disable:4702 ) // Unreachable code (due to if constexpr)
+
     // Vector - Vector operators
 
     RUKEN_VECTOR_OPERATOR_MIXIN(+)
@@ -142,6 +147,8 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     RUKEN_VECTOR_OPERATOR_MIXIN(/)
     RUKEN_VECTOR_OPERATOR_MIXIN(*)
     RUKEN_VECTOR_OPERATOR_MIXIN(%)
+
+    #pragma warning( pop )
 
     // Vector - Scalar operators
 

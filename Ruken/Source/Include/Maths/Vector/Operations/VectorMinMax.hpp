@@ -49,6 +49,9 @@ struct VectorMinMax<Vector<TDimensions, TUnderlyingType>>
 
     #pragma region Static Methods
 
+    #pragma warning( push )
+    #pragma warning( disable:4702 ) // Unreachable code (due to if constexpr)
+
     /**
      * \brief Returns a vector that is made from the largest components of two vectors
      *
@@ -118,6 +121,8 @@ struct VectorMinMax<Vector<TDimensions, TUnderlyingType>>
 
         return vector;
     }
+
+    #pragma warning( pop )
 
     #pragma endregion
 

@@ -408,7 +408,6 @@
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
     <None Include="Source\Src\Threading\Worker.inl" />
-    <None Include="Source\Src\Types\StrongType\StrongType.inl" />
     <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
     <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
