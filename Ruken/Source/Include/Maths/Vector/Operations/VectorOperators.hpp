@@ -63,7 +63,7 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)( \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept                                  \
     {                                                                                                                    \
-        if constexpr (TDimensions >= TOtherDimensions)                                                                   \
+        if (TDimensions >= TOtherDimensions)                                                                             \
         {                                                                                                                \
             auto vector {*static_cast<TVector const*>(this)};                                                            \
                                                                                                                          \
@@ -126,7 +126,7 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
     constexpr TVector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(TScalarType const& in_scalar) noexcept                \
     {                                                                                                                       \
         for (RkSize index {0ULL}; index < TDimensions; ++index)                                                             \
-            static_cast<TVector*>(this)->data[index] RUKEN_GLUE(in_operator,=) in_scalar;                                   \
+            static_cast<TVector*>(this)->data[index] RUKEN_GLUE(in_operator,=) static_cast<TUnderlyingType>(in_scalar);     \
                                                                                                                             \
         return *static_cast<TVector*>(this);                                                                                \
     }
@@ -186,6 +186,24 @@ struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
             vector.data[index] = -static_cast<TVector*>(this)->data[index];
 
         return vector;
+    }
+
+    /**
+     * \brief Right shift ostream operator
+     * \param in_stream Output stream to write to
+     * \param in_vector Vector instance to write
+     * \return Output stream reference
+     */
+    friend std::ostream& operator<<(std::ostream& in_stream, TVector const& in_vector) noexcept
+    {
+        in_stream << '(';
+        for (RkSize index {0ULL}; index < TDimensions; ++index)
+            if (index < TDimensions - 1)
+                in_stream << in_vector.data[index] << ", ";
+            else
+                in_stream << in_vector.data[index];
+
+        return in_stream << ')';
     }
 
     /**
