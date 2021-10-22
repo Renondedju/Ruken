@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Maths/Vector/Helper/VectorHelper.hpp"
+#include "Maths/Vector/Operations/VectorLength.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -43,8 +44,33 @@ struct VectorNormalization;
 template <RkSize TDimensions, typename TUnderlyingType>
 struct VectorNormalization<Vector<TDimensions, TUnderlyingType>>
 {
-    using TVector = Vector<TDimensions, TUnderlyingType>;
-    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
+    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
+
+    #pragma region Static Methods
+
+    /**
+     * \brief Returns the nomalized vector (with a length of 1)
+     * If the vector is too small to be normalized a vector zero will be returned instead.
+     *
+     * \param in_vector Vector instance
+     * \returns Normalized version of the vector 
+     */
+    [[nodiscard]]
+    static constexpr Vector<TDimensions, TUnderlyingType> Normalized(Vector<TDimensions, TUnderlyingType> const& in_vector) noexcept
+    requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
+    {
+        TUnderlyingType length = VectorLength<Vector<TDimensions, TUnderlyingType>>::Length(in_vector);
+        if (length == TUnderlyingType())
+            return {};
+
+        Vector<TDimensions, TUnderlyingType> result {in_vector};
+        for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
+            result.data[index] /= length;
+
+        return result;
+    }
+
+    #pragma endregion
 
     #pragma region Methods
 
@@ -54,38 +80,20 @@ struct VectorNormalization<Vector<TDimensions, TUnderlyingType>>
      * \returns Normalized version of the vector 
      */
     [[nodiscard]]
-    constexpr TVector Normalized() const noexcept
-    requires requires(TUnderlyingType in_a, TUnderlyingType in_b, TVector in_vector) { in_a == in_b; in_a /= in_b; in_vector.Length(); }
+    constexpr auto Normalized() const noexcept
+    requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
     {
-        TUnderlyingType length = static_cast<TVector const*>(this)->Length();
-        if (length == TUnderlyingType())
-            return {};
-
-        TVector result {*static_cast<TVector const*>(this)};
-        for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
-            result.data[index] /= length;
-
-        return result;
+        return Normalized(*static_cast<Vector<TDimensions, TUnderlyingType> const*>(this));
     }
 
     /**
      * \brief Normalizes the vector (with a length of 1)
      * If the vector is too small to be normalized this method set the vector to 0.
      */
-    constexpr RkVoid Normalize() noexcept
-    requires requires(TUnderlyingType in_a, TUnderlyingType in_b, TVector in_vector) { in_a == in_b; in_a /= in_b; in_vector.Length(); }
+    constexpr Vector<TDimensions, TUnderlyingType>& Normalize() noexcept
+    requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
     {
-        TUnderlyingType length = static_cast<TVector*>(this)->Length();
-        if (length == TUnderlyingType())
-        {
-            for(RkSize index {0ULL}; index < TDimensions; ++index)                                                                                                                  
-                static_cast<TVector*>(this)->data[index] = TUnderlyingType();
-
-            return;
-        }
-
-        for(RkSize index {0ULL}; index < TDimensions; ++index)
-            static_cast<TVector*>(this)->data[index] /= length;
+        return *static_cast<Vector<TDimensions, TUnderlyingType>*>(this) = Normalized(*static_cast<Vector<TDimensions, TUnderlyingType> const*>(this));
     }
 
     #pragma endregion
