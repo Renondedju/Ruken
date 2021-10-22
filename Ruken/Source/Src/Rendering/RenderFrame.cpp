@@ -36,55 +36,38 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device) noexcept:
 
     m_framebuffer = m_device->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value;
 
-    vk::DescriptorPoolSize pool_sizes[4] = {
+    vk::DescriptorPoolSize pool_sizes[2] = {
         {
             .type            = vk::DescriptorType::eStorageBuffer,
-            .descriptorCount = 10U
-        },
-        {
-            .type            = vk::DescriptorType::eSampledImage,
-            .descriptorCount = 10U
+            .descriptorCount = 3U
         },
         {
             .type            = vk::DescriptorType::eUniformBuffer,
-            .descriptorCount = 10U
-        },
-        {
-            .type            = vk::DescriptorType::eCombinedImageSampler,
-            .descriptorCount = 10U
+            .descriptorCount = 1U
         }
     };
 
     vk::DescriptorPoolCreateInfo descriptor_pool_info = {
-        .flags         = vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind,
-        .maxSets       = 100U,
-        .poolSizeCount = 4U,
+        .maxSets       = 2U,
+        .poolSizeCount = 1U,
         .pPoolSizes    = pool_sizes
     };
 
-    m_global_descriptor_pool = m_device->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
-
-    RkUint32 count = 1U;
-
-    vk::DescriptorSetVariableDescriptorCountAllocateInfo set_variable_descriptor_count_allocate_info = {
-        .descriptorSetCount = 1U,
-        .pDescriptorCounts  = &count
-    };
+    m__descriptor_pool = m_device->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
 
     vk::DescriptorSetAllocateInfo global_descriptor_set_allocate_info = {
-        .pNext              = &set_variable_descriptor_count_allocate_info,
-        .descriptorPool     = m_global_descriptor_pool,
+        .descriptorPool     = m__descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &RenderPass::g_descriptor_set_layouts[0]
+        .pSetLayouts        = &RenderPass::g_frame_descriptor_set_layout
     };
 
     vk::DescriptorSetAllocateInfo camera_descriptor_set_allocate_info = {
-        .descriptorPool     = m_global_descriptor_pool,
+        .descriptorPool     = m__descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &RenderPass::g_descriptor_set_layouts[1]
+        .pSetLayouts        = &RenderPass::g_camera_descriptor_set_layout
     };
 
-    m_global_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(global_descriptor_set_allocate_info).value.front();
+    m_frame_descriptor_set  = m_device->GetLogicalDevice().allocateDescriptorSets(global_descriptor_set_allocate_info).value.front();
     m_camera_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(camera_descriptor_set_allocate_info).value.front();
 
     vk::DescriptorBufferInfo camera_descriptor_buffer_info = {
@@ -122,7 +105,7 @@ RenderFrame::~RenderFrame() noexcept
     m_depth_target.reset();
 
     m_device->GetLogicalDevice().destroy(m_framebuffer);
-    m_device->GetLogicalDevice().destroy(m_global_descriptor_pool);
+    m_device->GetLogicalDevice().destroy(m__descriptor_pool);
 }
 
 RkVoid RenderFrame::Reset() noexcept
@@ -147,7 +130,7 @@ RkVoid RenderFrame::Reset() noexcept
 RkVoid RenderFrame::Bind(vk::CommandBuffer const& in_command_buffer) noexcept
 {
     std::vector descriptor_sets = {
-        m_global_descriptor_set, m_camera_descriptor_set
+        m_device->GetTextureDescriptorSet(), m_frame_descriptor_set, m_camera_descriptor_set
     };
 
     in_command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, RenderPass::g_pipeline_layout, 0U, descriptor_sets, nullptr);
@@ -168,9 +151,9 @@ vk::Framebuffer const& RenderFrame::GetFramebuffer() const noexcept
     return m_framebuffer;
 }
 
-vk::DescriptorSet const& RenderFrame::GetGlobalDescriptorSet() const noexcept
+vk::DescriptorSet const& RenderFrame::GetFrameDescriptorSet() const noexcept
 {
-    return m_global_descriptor_set;
+    return m_frame_descriptor_set;
 }
 
 TimelineSemaphore& RenderFrame::GetTimelineSemaphore() noexcept

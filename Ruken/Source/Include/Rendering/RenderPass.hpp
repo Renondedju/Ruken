@@ -24,9 +24,9 @@ class RenderPass
     public:
 
         static vk::RenderPass          g_render_pass;
-        static std::array<vk::DescriptorSetLayout, 2> g_descriptor_set_layouts;
+        static vk::DescriptorSetLayout g_frame_descriptor_set_layout;
+        static vk::DescriptorSetLayout g_camera_descriptor_set_layout;
         static vk::PipelineLayout      g_pipeline_layout;
-        static vk::Pipeline            g_pipeline;
 
         #pragma region Constructors
 

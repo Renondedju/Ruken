@@ -12,8 +12,9 @@
 
 USING_RUKEN_NAMESPACE
 
-static std::unique_ptr<Model>   g_model;
-static std::unique_ptr<Texture> g_texture;
+static std::unique_ptr<Model>    g_model;
+static std::unique_ptr<Texture>  g_texture;
+static std::unique_ptr<Material> g_material;
 
 RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
     m_device {in_service_provider.LocateService<Renderer>     ()->GetDevice    ()},
@@ -25,17 +26,15 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
 
     forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer) {
 
-        RkUint32 index = 0U;
-
-        in_command_buffer.pushConstants(RenderPass::g_pipeline_layout, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0U, 4U, &index);
-
         m_frames[m_current_frame]->Bind(in_command_buffer);
 
-        g_model->Render(in_command_buffer);
+        g_material->Bind  (in_command_buffer);
+        g_model   ->Render(in_command_buffer);
     });
 
-    g_model   = std::make_unique<Model>  (m_device, "Data/viking_room.obj");
-    g_texture = std::make_unique<Texture>(m_device, "Data/viking_room.png");
+    g_model    = std::make_unique<Model>   (m_device, "Data/viking_room.obj");
+    g_texture  = std::make_unique<Texture> (m_device, "Data/viking_room.png");
+    g_material = std::make_unique<Material>(m_device, "");
 
     for (RkUint32 i = 0U; i < 2U; ++i)
     {
@@ -50,9 +49,10 @@ RenderSystem::~RenderSystem() noexcept
         
     }
 
-    g_texture.reset();
-    g_model  .reset();
-    m_graph  .reset();
+    g_material.reset();
+    g_texture .reset();
+    g_model   .reset();
+    m_graph   .reset();
 }
 
 RkVoid RenderSystem::Update() noexcept
@@ -121,7 +121,7 @@ RkVoid RenderSystem::Update() noexcept
     std::array<vk::WriteDescriptorSet, 4> write_descriptors = {
         {
             {
-                .dstSet = frame.GetGlobalDescriptorSet(),
+                .dstSet = frame.GetFrameDescriptorSet(),
                 .dstBinding = 0,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
@@ -129,7 +129,7 @@ RkVoid RenderSystem::Update() noexcept
                 .pBufferInfo = &draw_descriptor_buffer_info
             },
             {
-                .dstSet = frame.GetGlobalDescriptorSet(),
+                .dstSet = frame.GetFrameDescriptorSet(),
                 .dstBinding = 1,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
@@ -137,7 +137,7 @@ RkVoid RenderSystem::Update() noexcept
                 .pBufferInfo = &transform_descriptor_buffer_info
             },
             {
-                .dstSet = frame.GetGlobalDescriptorSet(),
+                .dstSet = frame.GetFrameDescriptorSet(),
                 .dstBinding = 2,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
@@ -145,8 +145,8 @@ RkVoid RenderSystem::Update() noexcept
                 .pBufferInfo = &material_descriptor_buffer_info
             },
             {
-                .dstSet = frame.GetGlobalDescriptorSet(),
-                .dstBinding = 3,
+                .dstSet = m_device->GetTextureDescriptorSet(),
+                .dstBinding = 0,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
                 .descriptorType = vk::DescriptorType::eCombinedImageSampler,

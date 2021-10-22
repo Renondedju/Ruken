@@ -14,15 +14,15 @@ struct DrawData
     uint transformIndex;
 };
 
-layout(set = 0, binding = 0) readonly buffer DrawBuffer {
+layout(set = 0, binding = 0) uniform sampler2D materialTextures[];
+
+layout(set = 1, binding = 0) readonly buffer DrawBuffer {
     DrawData drawData[];
 };
 
-layout(set = 0, binding = 2) readonly buffer MaterialBuffer {
+layout(set = 1, binding = 2) readonly buffer MaterialBuffer {
     MaterialData materialData[];
 };
-
-layout(set = 0, binding = 3) uniform sampler2D materialTextures[];
 
 layout(push_constant) uniform ObjectData {
     uint index;

@@ -11,15 +11,15 @@ struct DrawData
     uint transformIndex;
 };
 
-layout(set = 0, binding = 0) readonly buffer DrawBuffer {
+layout(set = 1, binding = 0) readonly buffer DrawBuffer {
     DrawData drawData[];
 };
 
-layout(set = 0, binding = 1) readonly buffer TransformBuffer {
+layout(set = 1, binding = 1) readonly buffer TransformBuffer {
     TransformData transformData[];
 };
 
-layout(set = 1, binding = 0) uniform CameraData {
+layout(set = 2, binding = 0) uniform CameraData {
     mat4 view;
     mat4 proj;
 } cameraData;

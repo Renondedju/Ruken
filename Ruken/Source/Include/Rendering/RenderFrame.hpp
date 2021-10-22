@@ -50,8 +50,8 @@ class RenderFrame
         Buffer            m_material_storage_buffer;
         Buffer            m_camera_uniform_buffer;
 
-        vk::DescriptorPool m_global_descriptor_pool;
-        vk::DescriptorSet  m_global_descriptor_set;
+        vk::DescriptorPool m__descriptor_pool;
+        vk::DescriptorSet  m_frame_descriptor_set;
         vk::DescriptorSet  m_camera_descriptor_set;
 
         #pragma endregion
@@ -74,10 +74,10 @@ class RenderFrame
         RkVoid Reset() noexcept;
         RkVoid Bind(vk::CommandBuffer const& in_command_buffer) noexcept;
 
-        RenderTarget    const& GetColorTarget() const noexcept;
-        RenderTarget    const& GetDepthTarget() const noexcept;
-        vk::Framebuffer const& GetFramebuffer() const noexcept;
-        vk::DescriptorSet const& GetGlobalDescriptorSet() const noexcept;
+        RenderTarget      const& GetColorTarget       () const noexcept;
+        RenderTarget      const& GetDepthTarget       () const noexcept;
+        vk::Framebuffer   const& GetFramebuffer       () const noexcept;
+        vk::DescriptorSet const& GetFrameDescriptorSet() const noexcept;
 
         TimelineSemaphore& GetTimelineSemaphore     () noexcept;
         SemaphorePool&     GetSemaphorePool         () noexcept;
