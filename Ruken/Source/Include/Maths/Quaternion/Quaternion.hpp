@@ -118,7 +118,7 @@ class Quaternion
         static RkFloat Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
 
         /**
-         * \brief Normalizes a quaternion
+         * \brief Returns a new quaternion with the same orientation but with a magnitude of 1
          *
          * \param in_quaternion Quaternion to be normalized
          * \return Normalized quaternion

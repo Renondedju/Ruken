@@ -50,13 +50,13 @@ constexpr GenericMatrix<TColumns, TRows> GenericMatrix<TRows, TColumns>::GetTran
 template <RkSize TRows, RkSize TColumns>
 constexpr RkFloat const& GenericMatrix<TRows, TColumns>::At(RkSize const in_row, RkSize const in_column) const noexcept
 {
-    return data[TRows * in_row + in_column];
+    return data[(TColumns * in_row) + in_column];
 }
 
 template <RkSize TRows, RkSize TColumns>
 constexpr RkFloat& GenericMatrix<TRows, TColumns>::At(RkSize const in_row, RkSize const in_column) noexcept
 {
-    return data[TRows * in_row + in_column];
+    return data[(TColumns * in_row) + in_column];
 }
 
 #pragma endregion

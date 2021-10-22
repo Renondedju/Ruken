@@ -25,12 +25,10 @@
 #pragma once
 
 #include <ostream>
+#include <iostream>
 #include <iomanip>
 
-#include "Build/Namespace.hpp"
-
 #include "Types/FundamentalTypes.hpp"
-#include "Types/Concepts/ArithmeticType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -100,14 +98,12 @@ class __declspec(novtable) GenericMatrix
         {
             GenericMatrix<TRows, TOtherColumns> new_matrix;
 
-            for (RkSize row = 0ULL; row < TRows; ++row)
+            for (RkSize row    {0ULL}; row    < TRows;         ++row)
+            for (RkSize column {0ULL}; column < TOtherColumns; ++column)
             {
-                for (RkSize column = 0ULL; column < TOtherColumns; ++column)
-                {
-                    new_matrix.At(row, column) = .0F;
-                    for (RkSize other_row = 0ULL; other_row < TOtherRows; ++other_row)
-                        new_matrix.At(row, column) += At(row, other_row) * in_other_matrix.At(other_row, column);
-                }
+                new_matrix.At(row, column) = .0F;
+                for (RkSize other_row {0ULL}; other_row < TOtherRows; ++other_row)
+                    new_matrix.At(row, column) += At(row, other_row) * in_other_matrix.At(other_row, column);
             }
 
             return new_matrix;
