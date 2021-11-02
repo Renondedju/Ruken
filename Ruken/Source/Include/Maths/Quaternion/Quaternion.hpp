@@ -36,158 +36,161 @@ BEGIN_RUKEN_NAMESPACE
  * Compared to Euler angles they are simpler to compose and avoid the problem of gimbal lock.
  * Compared to rotation matrices they are more compact, more numerically stable, and more efficient.
  */
-class Quaternion
+struct Quaternion
 {
-    public:
+    #pragma region Members
 
-        #pragma region Members
+    RkFloat w {1.0F};
+    RkFloat x {0.0F};
+    RkFloat y {0.0F};
+    RkFloat z {0.0F};
 
-        RkFloat w {1.0F};
-        RkFloat x {0.0F};
-        RkFloat y {0.0F};
-        RkFloat z {0.0F};
+    #pragma endregion
 
-        #pragma endregion
+    #pragma region Constructors
 
-        #pragma region Constructors
+    constexpr Quaternion()                  = default;
+    constexpr Quaternion(Quaternion const&) = default;
+    constexpr Quaternion(Quaternion&&)      = default;
+             ~Quaternion()                  = default;
 
-        constexpr Quaternion()                          = default;
-        constexpr Quaternion(Quaternion const& in_copy) = default;
-        constexpr Quaternion(Quaternion&&      in_move) = default;
-                 ~Quaternion()                          = default;
+    /**
+     * \brief Creates a quaternion with the given values
+     * 
+     * \param in_w w component of the quaternion
+     * \param in_x x component of the quaternion
+     * \param in_y y component of the quaternion
+     * \param in_z z component of the quaternion
+     */
+    constexpr Quaternion(RkFloat in_w, RkFloat in_x, RkFloat in_y, RkFloat in_z) noexcept;
 
-        /**
-         * \brief Creates a quaternion with the given values
-         * 
-         * \param in_w w component of the quaternion
-         * \param in_x x component of the quaternion
-         * \param in_y y component of the quaternion
-         * \param in_z z component of the quaternion
-         */
-        Quaternion(RkFloat in_w, RkFloat in_x, RkFloat in_y, RkFloat in_z) noexcept;
+    /**
+     * \brief Creates a quaternion with the given rotations (using euler angles)
+     * 
+     * \param in_angle_x Angle to rotate around the x axis (in degrees)
+     * \param in_angle_y Angle to rotate around the y axis (in degrees)
+     * \param in_angle_z Angle to rotate around the z axis (in degrees)
+     */
+    Quaternion(Degrees in_angle_x, Degrees in_angle_y, Degrees in_angle_z) noexcept;
 
-        /**
-         * \brief Creates a quaternion with the given rotations (using euler angles)
-         * 
-         * \param in_angle_x Angle to rotate around the x axis (in degrees)
-         * \param in_angle_y Angle to rotate around the y axis (in degrees)
-         * \param in_angle_z Angle to rotate around the z axis (in degrees)
-         */
-        Quaternion(Degrees in_angle_x, Degrees in_angle_y, Degrees in_angle_z) noexcept;
+    #pragma endregion
 
-        #pragma endregion
+    #pragma region Methods
 
-        #pragma region Static Methods
+    /**
+     * \brief Inverts the rotation
+     * \returns Quaternion instance
+     */
+    constexpr Quaternion& Invert() noexcept;
 
-        /**
-         * \brief Quaternion linear interpolation
-         * 
-         * \tparam TShortestPath True if the method should lerp from in_lhs to in_rhs using the shortest path, false otherwise
-         *
-         * \param in_lhs The start quaternion
-         * \param in_rhs The end quaternion
-         * \param in_ratio The interpolation ratio. Should be between 0 and 1
-         * 
-         * \return A new quaternion which is the result of the linear interpolation between in_lhs and in_rhs at in_ratio
-         */
-        template <RkBool TShortestPath = true>
-        static Quaternion Lerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
+    /**
+     * \brief Computes the square length of the quaternion
+     * \return Squared length of the quaternion
+     */
+    [[nodiscard]]
+    constexpr RkFloat SqrLength() const noexcept;
 
-        /**
-         * \brief Quaternion spherical interpolation
-         *
-         * \tparam TShortestPath True if the method should slerp from in_lhs to in_rhs using the shortest path, false otherwise
-         *
-         * \param in_lhs The start quaternion
-         * \param in_rhs The end quaternion
-         * \param in_ratio The interpolation ratio. Should be between 0 and 1
-         *
-         * \return A new quaternion which is the result of the spherical linear interpolation between in_lhs and in_rhs at in_ratio
-         */
-        template <RkBool TShortestPath = true>
-        static Quaternion Slerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
+    /**
+     * \brief Computes the length of the quaternion
+     * \return Length of the quaternion
+     */
+    [[nodiscard]]
+    RkFloat Length() const noexcept;
 
-        /**
-         * \brief Computes the dot product between two quaternions
-         * 
-         * \param in_lhs Left hand side quaternion
-         * \param in_rhs Right hand side quaternion
-         * 
-         * \return The resulting dot product
-         */
-        static RkFloat Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
+    /**
+     * \brief Sets the magnitude of the quaternion to 1 while keeping the original orientation
+     * \return Quaternion instance
+     */
+    Quaternion& Normalized() noexcept;
 
-        /**
-         * \brief Returns a new quaternion with the same orientation but with a magnitude of 1
-         *
-         * \param in_quaternion Quaternion to be normalized
-         * \return Normalized quaternion
-         */
-        static Quaternion Normalize(Quaternion const& in_quaternion) noexcept;
+    /**
+     * \brief Computes an homogenous rotation 3x3 matrix for a given quaternion
+     * \return Homogenous 3x3 rotation matrix
+     */
+    [[nodiscard]]
+    constexpr Matrix3X3 GetRotationMatrix() const noexcept;
 
-        /**
-         * \brief Computes the square length of the quaternion
-         *
-         * \param in_quaternion Quaternion instance
-         * \return Squared length of the quaternion
-         */
-        static RkFloat SqrLength(Quaternion const& in_quaternion) noexcept;
+    #pragma endregion
 
-        /**
-         * \brief Computes the length of the quaternion
-         *
-         * \param in_quaternion Quaternion instance
-         * \return Length of the quaternion
-         */
-        static RkFloat Length(Quaternion const& in_quaternion) noexcept;
+    #pragma region Static Methods
 
-        /**
-         * \brief Inverts the passed quaternion
-         *
-         * \param in_quaternion Quaternion instance
-         * \return Inverted quaternion
-         */
-        static Quaternion Invert(Quaternion const& in_quaternion) noexcept;
+    /**
+     * \brief Quaternion linear interpolation
+     * 
+     * \tparam TShortestPath True if the method should lerp from in_lhs to in_rhs using the shortest path, false otherwise
+     *
+     * \param in_lhs The start quaternion
+     * \param in_rhs The end quaternion
+     * \param in_ratio The interpolation ratio. Should be between 0 and 1
+     * 
+     * \return A new quaternion which is the result of the linear interpolation between in_lhs and in_rhs at in_ratio
+     */
+    template <RkBool TShortestPath = true>
+    static Quaternion Lerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
 
-        /**
-         * \brief Multiplies 2 quaternions together. This effectively represents composing the two rotations.
-         * \param in_lhs Left hand side quaternion
-         * \param in_rhs Right hand side quaternion
-         * \return Resulting quaternion
-         */
-        static Quaternion Multiply(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
+    /**
+     * \brief Quaternion spherical interpolation
+     *
+     * \tparam TShortestPath True if the method should slerp from in_lhs to in_rhs using the shortest path, false otherwise
+     *
+     * \param in_lhs The start quaternion
+     * \param in_rhs The end quaternion
+     * \param in_ratio The interpolation ratio. Should be between 0 and 1
+     *
+     * \return A new quaternion which is the result of the spherical linear interpolation between in_lhs and in_rhs at in_ratio
+     */
+    template <RkBool TShortestPath = true>
+    static Quaternion Slerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
 
-        /**
-         * \brief Scales all components of a quaternion by a coefficient
-         * \param in_quaternion Quaternion to scale
-         * \param in_coefficient Coefficient
-         * \return Scaled quaternion
-         */
-        static Quaternion Scale(Quaternion const& in_quaternion, RkFloat in_coefficient) noexcept;
+    /**
+     * \brief Computes the dot product between two quaternions
+     * 
+     * \param in_lhs Left hand side quaternion
+     * \param in_rhs Right hand side quaternion
+     * 
+     * \return The resulting dot product
+     */
+    static RkFloat Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept;
 
-        /**
-         * \brief Adds all the components of the quaternions together
-         * \param in_lhs Left hand side quaternion
-         * \param in_rhs Right hand side quaternion
-         * \return Resulting quaternion 
-         */
-        static Quaternion Add(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept; 
+    /**
+     * \brief Scales all components of a quaternion by a coefficient
+     * \param in_quaternion Quaternion to scale
+     * \param in_coefficient Coefficient
+     * \return Scaled quaternion
+     */
+    static Quaternion Scale(Quaternion const& in_quaternion, RkFloat in_coefficient) noexcept;
 
-        /**
-         * \brief Computes an homogenous rotation 3x3 matrix for a given quaternion
-         * \param in_quaternion Quaternion to compute the rotation matrix for
-         * \return Homogenous 3x3 rotation matrix
-         */
-        static Matrix3X3 RotationMatrix(Quaternion const& in_quaternion) noexcept;
+    /**
+     * \brief Adds all the components of the quaternions together
+     * \param in_lhs Left hand side quaternion
+     * \param in_rhs Right hand side quaternion
+     * \return Resulting quaternion 
+     */
+    static Quaternion Add(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept; 
 
-        #pragma endregion
+    #pragma endregion
 
-        #pragma region Operators
+    #pragma region Operators
 
-        constexpr Quaternion& operator=(Quaternion const& in_copy) = default;
-        constexpr Quaternion& operator=(Quaternion&&	  in_move) = default;
+    /**
+     * \brief Multiplies 2 quaternions together. This effectively represents combines the two rotations.
+     *
+     * Rotating by the product lhs * rhs is the same as applying the two rotations in sequence: lhs first and then rhs,
+     * relative to the reference frame resulting from lhs rotation. Note that this means rotations are not commutative,
+     * so lhs * rhs does not give the same rotation as rhs * lhs.
+     *
+     * \param in_other Right hand side quaternion
+     * \return Resulting rotation
+     */
+    [[nodiscard]]
+    constexpr Quaternion operator*(Quaternion const& in_other) const noexcept;
 
-        #pragma endregion
+    constexpr Quaternion& operator=(Quaternion const& in_copy) = default;
+    constexpr Quaternion& operator=(Quaternion&&	  in_move) = default;
+
+    #pragma endregion
 };
+
+#include "Maths/Quaternion/Quaternion.inl"
 
 END_RUKEN_NAMESPACE

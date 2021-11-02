@@ -401,6 +401,7 @@
     <None Include="Source\Src\Functional\Method.inl" />
     <None Include="Source\Src\Maths\Matrix\GenericMatrix.inl" />
     <None Include="Source\Src\Maths\Matrix\SquareMatrix.inl" />
+    <None Include="Source\Src\Maths\Quaternion\Quaternion.inl" />
     <None Include="Source\Src\Resource\Handle.inl" />
     <None Include="Source\Src\Resource\ResourceManager.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
