@@ -11,6 +11,8 @@
 
 #include "Resource/IResource.hpp"
 
+#include "Rendering/RenderObjects/Buffer.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 struct Vertex
@@ -85,9 +87,7 @@ class Model final : public IResource
         vk::DeviceSize m_offset;
         vk::DeviceSize m_count;
 
-        vk::Buffer         m_buffer;
-        vk::Allocation     m_allocation;
-        vk::AllocationInfo m_allocation_info;
+        std::unique_ptr<Buffer> m_buffer;
 
         std::unique_ptr<Material> m_material;
 

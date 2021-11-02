@@ -21,16 +21,10 @@ RenderTarget::RenderTarget(RenderDevice* in_device, RkUint32 in_width, RkUint32 
         .usage       = in_usage
     };
 
-    vk::AllocationCreateInfo allocation_create_info = {
-        .usage = vk::MemoryUsage::eGpuOnly
-    };
-
-    auto [result, value] = m_device->GetAllocator().createImage(image_create_info, allocation_create_info);
-
-    std::tie(m_image, m_allocation) = value;
+    m_image = std::make_unique<Image>(m_device, image_create_info);
 
     vk::ImageViewCreateInfo image_view_create_info = {
-        .image = m_image,
+        .image = m_image->GetHandle(),
         .viewType = vk::ImageViewType::e2D,
         .format = in_format,
         .subresourceRange = {
@@ -40,13 +34,14 @@ RenderTarget::RenderTarget(RenderDevice* in_device, RkUint32 in_width, RkUint32 
         }
     };
 
-    std::tie(result, m_image_view) = m_device->GetLogicalDevice().createImageView(image_view_create_info);
+    if (auto [result, value] = m_device->GetLogicalDevice().createImageView(image_view_create_info); result == vk::Result::eSuccess)
+    {
+        m_image_view = value;
+    }
 }
 
 RenderTarget::~RenderTarget() noexcept
 {
-    m_device->GetAllocator().destroyImage(m_image, m_allocation);
-
     m_device->GetLogicalDevice().destroy(m_image_view);
 }
 
@@ -57,7 +52,7 @@ vk::Extent3D const& RenderTarget::GetExtent() const noexcept
 
 vk::Image const& RenderTarget::GetImage() const noexcept
 {
-    return m_image;
+    return m_image->GetHandle();
 }
 
 vk::ImageView const& RenderTarget::GetImageView() const noexcept

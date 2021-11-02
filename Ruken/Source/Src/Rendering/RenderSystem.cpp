@@ -67,9 +67,9 @@ RkVoid RenderSystem::Update() noexcept
     auto& transform_buffer = frame.GetTransformStorageBuffer();
     auto& material_buffer  = frame.GetMaterialStorageBuffer ();
 
-    draw_buffer     .Resize(sizeof(DrawData),      vk::BufferUsageFlagBits::eStorageBuffer);
-    transform_buffer.Resize(sizeof(TransformData), vk::BufferUsageFlagBits::eStorageBuffer);
-    material_buffer .Resize(sizeof(MaterialData),  vk::BufferUsageFlagBits::eStorageBuffer);
+    draw_buffer     .Resize(sizeof(DrawData));
+    transform_buffer.Resize(sizeof(TransformData));
+    material_buffer .Resize(sizeof(MaterialData));
 
     DrawData draw_data = {
         .material_index  = 0U,

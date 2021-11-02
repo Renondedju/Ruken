@@ -29,16 +29,10 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         .usage       = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst
     };
 
-    vk::AllocationCreateInfo allocation_create_info = {
-        .usage = vk::MemoryUsage::eGpuOnly
-    };
-
-    auto [result, value] = m_device->GetAllocator().createImage(image_create_info, allocation_create_info, m_allocation_info);
-
-    std::tie(m_image, m_allocation) = value;
+    m_image = std::make_unique<Image>(m_device, image_create_info);
 
     vk::ImageViewCreateInfo image_view_create_info = {
-        .image = m_image,
+        .image = m_image->GetHandle(),
         .viewType = vk::ImageViewType::e2D,
         .format = vk::Format::eR8G8B8A8Unorm,
         .subresourceRange = {
@@ -48,7 +42,10 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         }
     };
 
-    std::tie(result, m_image_view) = m_device->GetLogicalDevice().createImageView(image_view_create_info);
+    if (auto [result, value] = m_device->GetLogicalDevice().createImageView(image_view_create_info); result == vk::Result::eSuccess)
+    {
+        m_image_view = value;
+    }
 
     vk::SamplerCreateInfo tex_sampler_info = {
         .magFilter = vk::Filter::eLinear,
@@ -57,23 +54,21 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         .borderColor = vk::BorderColor::eIntOpaqueBlack
     };
 
-    std::tie(result, m_image_sampler) = m_device->GetLogicalDevice().createSampler(tex_sampler_info);
+    if (auto [result, value] = m_device->GetLogicalDevice().createSampler(tex_sampler_info); result == vk::Result::eSuccess)
+    {
+        m_image_sampler = value;
+    }
 
     vk::BufferCreateInfo buffer_create_info = {
         .size  = width * height * 4ULL,
         .usage = vk::BufferUsageFlagBits::eTransferSrc
     };
 
-    allocation_create_info.flags = vk::AllocationCreateFlagBits::eMapped;
-    allocation_create_info.usage = vk::MemoryUsage::eCpuOnly;
+    Buffer staging_buffer(m_device, buffer_create_info);
 
-    vk::AllocationInfo allocation_info;
+    memcpy(staging_buffer.Map(), pixels, buffer_create_info.size);
 
-    std::pair<vk::Buffer, vk::Allocation> staging_buffer;
-
-    std::tie(result, staging_buffer) = m_device->GetAllocator().createBuffer(buffer_create_info, allocation_create_info, allocation_info);
-
-    memcpy(allocation_info.pMappedData, pixels, allocation_info.size);
+    staging_buffer.UnMap();
 
     if (auto transfer_command_buffer = m_device->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
@@ -86,7 +81,7 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
             .newLayout           = vk::ImageLayout::eTransferDstOptimal,
             .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
             .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            .image               = m_image,
+            .image               = m_image->GetHandle(),
             .subresourceRange =  {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .levelCount = 1U,
@@ -109,7 +104,7 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
             .imageExtent = image_create_info.extent
         };
 
-        transfer_command_buffer.copyBufferToImage(staging_buffer.first, m_image, vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
+        transfer_command_buffer.copyBufferToImage(staging_buffer.GetHandle(), m_image->GetHandle(), vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
 
         image_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eTransfer;
         image_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eMemoryWrite;
@@ -153,14 +148,11 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         }
     }
 
-    m_device->GetAllocator().destroyBuffer(staging_buffer.first, staging_buffer.second);
-
     stbi_image_free(pixels);
 }
 
 Texture::~Texture() noexcept
 {
-    m_device->GetAllocator    ().destroyImage    (m_image, m_allocation);
     m_device->GetLogicalDevice().destroyImageView(m_image_view);
     m_device->GetLogicalDevice().destroySampler  (m_image_sampler);
 }
@@ -183,7 +175,7 @@ RkVoid Texture::Unload(ResourceManager& in_manager) noexcept
 
 vk::Image const& Texture::GetImage() const noexcept
 {
-    return m_image;
+    return m_image->GetHandle();
 }
 
 vk::ImageView const& Texture::GetImageView() const noexcept

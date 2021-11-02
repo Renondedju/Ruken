@@ -4,6 +4,8 @@
 
 #include "Resource/IResource.hpp"
 
+#include "Rendering/RenderObjects/Image.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 class RenderDevice;
@@ -16,11 +18,9 @@ class Texture final : public IResource
 
         RenderDevice* m_device;
 
-        vk::Image          m_image;
-        vk::ImageView      m_image_view;
-        vk::Sampler        m_image_sampler;
-        vk::Allocation     m_allocation;
-        vk::AllocationInfo m_allocation_info;
+        std::unique_ptr<Image>     m_image;
+        vk::ImageView m_image_view;
+        vk::Sampler   m_image_sampler;
 
         #pragma endregion
 

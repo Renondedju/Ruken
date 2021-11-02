@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/RenderDefines.hpp"
+#include "Rendering/RenderObjects/Image.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -13,8 +13,7 @@ class RenderTarget
         RenderDevice* m_device;
 
         vk::Extent3D   m_extent;
-        vk::Image      m_image;
-        vk::Allocation m_allocation;
+        std::unique_ptr<Image>         m_image;
         vk::ImageView  m_image_view;
 
     public:

@@ -52,35 +52,26 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
         }
     }
 
-    vk::AllocationCreateInfo allocation_create_info = {
-        .usage = vk::MemoryUsage::eGpuOnly
-    };
-
     vk::BufferCreateInfo buffer_create_info = {
-        .size  = vertices.size() * sizeof(Vertex) + indices.size() * sizeof(RkUint32),
-        .usage = vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+        .size = vertices.size() * sizeof(Vertex) + indices.size() * sizeof(RkUint32),
+        .usage = vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst
     };
 
-    auto [result, value] = m_device->GetAllocator().createBuffer(buffer_create_info, allocation_create_info, m_allocation_info);
+    m_buffer = std::make_unique<Buffer>(m_device, buffer_create_info);
 
-    std::tie(m_buffer, m_allocation) = value;
-
+    m_count = indices.size();
     m_offset = vertices.size() * sizeof(Vertex);
-    m_count  = indices .size();
 
     buffer_create_info.usage = vk::BufferUsageFlagBits::eTransferSrc;
 
-    allocation_create_info.flags = vk::AllocationCreateFlagBits::eMapped;
-    allocation_create_info.usage = vk::MemoryUsage::eCpuOnly;
+    Buffer staging_buffer(m_device, buffer_create_info);
 
-    vk::AllocationInfo allocation_info;
+    RkByte* data = static_cast<RkByte*>(staging_buffer.Map());
 
-    std::tie(result, value) = m_device->GetAllocator().createBuffer(buffer_create_info, allocation_create_info, allocation_info);;
+    memcpy(data,            vertices.data(), vertices.size() * sizeof(Vertex));
+    memcpy(data + m_offset, indices .data(), indices .size() * sizeof(RkUint32));
 
-    auto [staging_buffer, staging_allocation] = value;
-
-    memcpy(allocation_info.pMappedData,                                  vertices.data(), vertices.size() * sizeof(Vertex));
-    memcpy(static_cast<RkByte*>(allocation_info.pMappedData) + m_offset, indices .data(), indices .size() * sizeof(RkUint32));
+    staging_buffer.UnMap();
 
     if (auto transfer_command_buffer = m_device->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
@@ -88,7 +79,7 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
             .size = buffer_create_info.size
         };
 
-        transfer_command_buffer.copyBuffer(staging_buffer, m_buffer, buffer_copy);
+        transfer_command_buffer.copyBuffer(staging_buffer.GetHandle(), m_buffer->GetHandle(), buffer_copy);
 
         if (m_device->HasDedicatedTransferQueue())
         {
@@ -99,7 +90,7 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
                 .dstAccessMask       = vk::AccessFlagBits2KHR::eNone,
                 .srcQueueFamilyIndex = m_device->GetTransferFamilyIndex(),
                 .dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex(),
-                .buffer              = m_buffer,
+                .buffer              = m_buffer->GetHandle(),
                 .size                = VK_WHOLE_SIZE 
             };
 
@@ -144,22 +135,20 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
             m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
         }
     }
-
-    m_device->GetAllocator().destroyBuffer(staging_buffer, staging_allocation);
 }
 
 Model::~Model() noexcept
 {
-    m_device->GetAllocator().destroyBuffer(m_buffer, m_allocation);
+
 }
 
 RkVoid Model::Render(vk::CommandBuffer const& in_command_buffer)
 {
-    vk::DeviceSize offset = 0;
+    vk::DeviceSize offset = 0U;
 
-    in_command_buffer.bindVertexBuffers(0, m_buffer, offset);
+    in_command_buffer.bindVertexBuffers(0U, m_buffer->GetHandle(), offset);
 
-    in_command_buffer.bindIndexBuffer(m_buffer, m_offset, vk::IndexType::eUint32);
+    in_command_buffer.bindIndexBuffer(m_buffer->GetHandle(), m_offset, vk::IndexType::eUint32);
 
     in_command_buffer.drawIndexed(static_cast<RkUint32>(m_count), 1, 0, 0, 0);
 }

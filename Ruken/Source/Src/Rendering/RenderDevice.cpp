@@ -54,8 +54,7 @@ RenderDevice::~RenderDevice() noexcept
     if (m_texture_descriptor_set_layout)
         m_logical_device.destroy(m_texture_descriptor_set_layout);
 
-    if (m_allocator)
-        m_allocator.destroy();
+    vmaDestroyAllocator(m_allocator);
 
     m_graphics_queue.reset();
     m_compute_queue .reset();
@@ -216,7 +215,7 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
 
 RkBool RenderDevice::CreateDeviceAllocator() noexcept
 {
-    vk::VulkanFunctions functions = {
+    VmaVulkanFunctions functions = {
         .vkGetPhysicalDeviceProperties           = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties,
         .vkGetPhysicalDeviceMemoryProperties     = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceMemoryProperties,
         .vkAllocateMemory                        = VULKAN_HPP_DEFAULT_DISPATCHER.vkAllocateMemory,
@@ -241,23 +240,23 @@ RkBool RenderDevice::CreateDeviceAllocator() noexcept
         .vkGetPhysicalDeviceMemoryProperties2KHR = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceMemoryProperties2
     };
 
-    vk::AllocatorCreateInfo allocator_create_info = {
+    VmaAllocatorCreateInfo allocator_create_info = {
         .physicalDevice   = m_physical_device,
         .device           = m_logical_device,
         .frameInUseCount  = 1U,
         .pVulkanFunctions = &functions,
         .instance         = m_context->GetInstance(),
-        .vulkanApiVersion = VK_API_VERSION_1_1,
+        .vulkanApiVersion = VK_API_VERSION_1_2,
     };
 
-    auto [result, value] = createAllocator(allocator_create_info);
+    vmaCreateAllocator(&allocator_create_info, &m_allocator);
 
-    if (result == vk::Result::eSuccess)
-        m_allocator = value;
-    else
-        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan device allocator : " + vk::to_string(result)))
+    if (vmaCreateAllocator(&allocator_create_info, &m_allocator) == VK_SUCCESS)
+       return true;
 
-    return result == vk::Result::eSuccess;
+    RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan device allocator"))
+
+    return false;
 }
 
 RkVoid RenderDevice::CreateTextureDescriptorSet() noexcept
@@ -334,7 +333,7 @@ vk::Device const& RenderDevice::GetLogicalDevice() const noexcept
     return m_logical_device;
 }
 
-vk::Allocator const& RenderDevice::GetAllocator() const noexcept
+VmaAllocator const& RenderDevice::GetAllocator() const noexcept
 {
     return m_allocator;
 }

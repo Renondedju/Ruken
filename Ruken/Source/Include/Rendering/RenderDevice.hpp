@@ -2,6 +2,8 @@
 
 #include "Rendering/RenderQueue.hpp"
 
+#include "RenderObjects/Buffer.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
@@ -18,7 +20,8 @@ class RenderDevice
 
         vk::PhysicalDevice m_physical_device {};
         vk::Device         m_logical_device  {};
-        vk::Allocator      m_allocator       {};
+
+        VmaAllocator m_allocator {};
 
         RkUint32 m_graphics_family_index {UINT32_MAX};
         RkUint32 m_compute_family_index  {UINT32_MAX};
@@ -61,7 +64,7 @@ class RenderDevice
 
         vk::PhysicalDevice      const& GetPhysicalDevice            () const noexcept;
         vk::Device              const& GetLogicalDevice             () const noexcept;
-        vk::Allocator           const& GetAllocator                 () const noexcept;
+        VmaAllocator            const& GetAllocator                 () const noexcept;
         RkUint32                       GetGraphicsFamilyIndex       () const noexcept;
         RkUint32                       GetComputeFamilyIndex        () const noexcept;
         RkUint32                       GetTransferFamilyIndex       () const noexcept;
