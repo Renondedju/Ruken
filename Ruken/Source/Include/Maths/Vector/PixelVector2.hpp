@@ -80,6 +80,19 @@ struct Vector<2, Pixels> final:
 	{}
 
     #pragma endregion
+
+    #pragma region Methods
+
+    /**
+	 * \brief Returns the aspect ratio of the vector (width/height)
+	 * \return Aspect ratio
+	 */
+	constexpr RkFloat AspectRatio() const noexcept
+	{
+	    return static_cast<RkFloat>(width) / static_cast<RkFloat>(height);
+	}
+
+    #pragma endregion
 };
 
 #pragma warning( pop )
