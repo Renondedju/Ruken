@@ -15,10 +15,8 @@ class RenderPass
         Logger*   m_logger;
         Renderer* m_renderer;
 
-        vk::RenderPass          m_handle;
-        vk::DescriptorSetLayout m_frame_descriptor_set_layout;
-        vk::DescriptorSetLayout m_camera_descriptor_set_layout;
-        vk::PipelineLayout      m_pipeline_layout;
+        vk::RenderPass     m_handle;
+        vk::PipelineLayout m_pipeline_layout;
 
         std::vector<vk::Framebuffer> m_framebuffers;
 
@@ -51,9 +49,7 @@ class RenderPass
 
         RkVoid SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept;
 
-        vk::RenderPass          const& GetHandle                   () const noexcept;
-        vk::DescriptorSetLayout const& GetFrameDescriptorSetLayout () const noexcept;
-        vk::DescriptorSetLayout const& GetCameraDescriptorSetLayout() const noexcept;
+        vk::RenderPass const& GetHandle() const noexcept;
 
         #pragma endregion
 

@@ -27,8 +27,8 @@ Material::Material(Renderer* in_renderer, std::string_view const in_path) noexce
 
     std::vector descriptor_set_layouts = {
         m_renderer->GetTextureStreamer()->GetDescriptorSetLayout(),
-        m_renderer->GetGraph()->FindOrAddRenderPass("Forward").GetFrameDescriptorSetLayout(),
-        m_renderer->GetGraph()->FindOrAddRenderPass("Forward").GetCameraDescriptorSetLayout(),
+        m_renderer->GetGraph()->GetFrameDescriptorSetLayout(),
+        m_renderer->GetGraph()->GetCameraDescriptorSetLayout(),
         m_descriptor_set_layout
     };
 

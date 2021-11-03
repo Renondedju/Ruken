@@ -15,6 +15,9 @@ class RenderGraph
         Logger*   m_logger;
         Renderer* m_renderer;
 
+        vk::DescriptorSetLayout m_frame_descriptor_set_layout;
+        vk::DescriptorSetLayout m_camera_descriptor_set_layout;
+
         std::unordered_map<std::string, std::unique_ptr<RenderPass>> m_render_passes;
 
     public:
@@ -36,6 +39,9 @@ class RenderGraph
         RkVoid Execute(RenderFrame& in_frame) noexcept;
 
         RenderPass& FindOrAddRenderPass(std::string const& in_name) noexcept;
+
+        vk::DescriptorSetLayout const& GetFrameDescriptorSetLayout () const noexcept;
+        vk::DescriptorSetLayout const& GetCameraDescriptorSetLayout() const noexcept;
 
         #pragma endregion
 

@@ -1,43 +1,23 @@
 #include "Rendering/RenderFrame.hpp"
-#include "Rendering/RenderDevice.hpp"
-#include "Rendering/RenderPass.hpp"
+#include "Rendering/Renderer.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device, RkUint32 const in_index) noexcept:
+RenderFrame::RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 const in_index) noexcept:
     m_logger                   {in_logger},
-    m_device                   {in_device},
+    m_renderer                 {in_renderer},
     m_index                    {in_index},
-    m_timeline_semaphore       {in_device},
-    m_semaphore_pool           {in_device},
-    m_graphics_command_pool    {in_device, in_device->GetGraphicsFamilyIndex()},
-    m_compute_command_pool     {in_device, in_device->GetComputeFamilyIndex ()},
-    m_transfer_command_pool    {in_device, in_device->GetTransferFamilyIndex()},
-    m_render_target_pool       {in_device},
-    m_draw_storage_buffer      {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_transform_storage_buffer {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_material_storage_buffer  {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_camera_uniform_buffer    {in_device, sizeof(CameraData), vk::BufferUsageFlagBits::eUniformBuffer}
+    m_timeline_semaphore       {in_renderer->GetDevice()},
+    m_semaphore_pool           {in_renderer->GetDevice()},
+    m_graphics_command_pool    {in_renderer->GetDevice(), in_renderer->GetDevice()->GetGraphicsFamilyIndex()},
+    m_compute_command_pool     {in_renderer->GetDevice(), in_renderer->GetDevice()->GetComputeFamilyIndex ()},
+    m_transfer_command_pool    {in_renderer->GetDevice(), in_renderer->GetDevice()->GetTransferFamilyIndex()},
+    m_render_target_pool       {in_renderer->GetDevice()},
+    m_draw_storage_buffer      {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_transform_storage_buffer {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_material_storage_buffer  {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_camera_uniform_buffer    {in_renderer->GetDevice(), sizeof(CameraData), vk::BufferUsageFlagBits::eUniformBuffer}
 {
-    //m_color_target = std::make_unique<RenderTarget>(m_device, 1920, 1080, vk::Format::eR8G8B8A8Unorm,  vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc);
-    //m_depth_target = std::make_unique<RenderTarget>(m_device, 1920, 1080, vk::Format::eD24UnormS8Uint, vk::ImageUsageFlagBits::eDepthStencilAttachment);
-
-    /*std::array attachments = {
-        m_color_target->GetImageView(),
-        m_depth_target->GetImageView()
-    };
-
-    vk::FramebufferCreateInfo framebuffer_create_info = {
-        .renderPass      = RenderPass::g_render_pass,
-        .attachmentCount = static_cast<RkUint32>(attachments.size()),
-        .pAttachments    = attachments.data(),
-        .width           = 1920,
-        .height          = 1080,
-        .layers          = 1
-    };
-
-    m_framebuffer = m_device->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value;*/
-
     vk::DescriptorPoolSize pool_sizes[2] = {
         {
             .type            = vk::DescriptorType::eStorageBuffer,
@@ -51,26 +31,26 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device, RkUint32 co
 
     vk::DescriptorPoolCreateInfo descriptor_pool_info = {
         .maxSets       = 2U,
-        .poolSizeCount = 1U,
+        .poolSizeCount = 2U,
         .pPoolSizes    = pool_sizes
     };
 
-    m__descriptor_pool = m_device->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
+    m_descriptor_pool = m_renderer->GetDevice()->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
 
-    /*vk::DescriptorSetAllocateInfo global_descriptor_set_allocate_info = {
-        .descriptorPool     = m__descriptor_pool,
+    vk::DescriptorSetAllocateInfo frame_descriptor_set_allocate_info = {
+        .descriptorPool     = m_descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &RenderPass::g_frame_descriptor_set_layout
+        .pSetLayouts        = &m_renderer->GetGraph()->GetFrameDescriptorSetLayout()
     };
 
     vk::DescriptorSetAllocateInfo camera_descriptor_set_allocate_info = {
-        .descriptorPool     = m__descriptor_pool,
+        .descriptorPool     = m_descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &RenderPass::g_camera_descriptor_set_layout
+        .pSetLayouts        = &m_renderer->GetGraph()->GetCameraDescriptorSetLayout()
     };
 
-    m_frame_descriptor_set  = m_device->GetLogicalDevice().allocateDescriptorSets(global_descriptor_set_allocate_info).value.front();
-    m_camera_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(camera_descriptor_set_allocate_info).value.front();*/
+    m_frame_descriptor_set  = m_renderer->GetDevice()->GetLogicalDevice().allocateDescriptorSets(frame_descriptor_set_allocate_info) .value.front();
+    m_camera_descriptor_set = m_renderer->GetDevice()->GetLogicalDevice().allocateDescriptorSets(camera_descriptor_set_allocate_info).value.front();
 
     vk::DescriptorBufferInfo camera_descriptor_buffer_info = {
         .buffer = m_camera_uniform_buffer.GetHandle(),
@@ -87,12 +67,12 @@ RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device, RkUint32 co
         .pBufferInfo = &camera_descriptor_buffer_info
     };
 
-    m_device->GetLogicalDevice().updateDescriptorSets(write_descriptor, VK_NULL_HANDLE);
+    m_renderer->GetDevice()->GetLogicalDevice().updateDescriptorSets(write_descriptor, VK_NULL_HANDLE);
 }
 
 RenderFrame::~RenderFrame() noexcept
 {
-    m_device->GetLogicalDevice().destroy(m__descriptor_pool);
+    m_renderer->GetDevice()->GetLogicalDevice().destroy(m_descriptor_pool);
 }
 
 RkVoid RenderFrame::Reset() noexcept
@@ -103,7 +83,7 @@ RkVoid RenderFrame::Reset() noexcept
         .pValues        = &m_timeline_semaphore.GetValue ()
     };
 
-    if (m_device->GetLogicalDevice().waitSemaphores(semaphore_wait_info, UINT64_MAX) != vk::Result::eSuccess)
+    if (m_renderer->GetDevice()->GetLogicalDevice().waitSemaphores(semaphore_wait_info, UINT64_MAX) != vk::Result::eSuccess)
     {
 
     }

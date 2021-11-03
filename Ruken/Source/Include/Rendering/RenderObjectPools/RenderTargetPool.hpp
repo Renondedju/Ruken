@@ -4,11 +4,13 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+class RenderDevice;
+
 class RenderTargetPool
 {
     private:
 
-
+        RenderDevice* m_device;
 
     public:
 

@@ -41,7 +41,7 @@ RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
                 .finalLayout = vk::ImageLayout::eColorAttachmentOptimal
             },
             {
-                .format = vk::Format::eD24UnormS8Uint,
+                .format = vk::Format::eD32Sfloat,
                 .samples = vk::SampleCountFlagBits::e1,
                 .loadOp = vk::AttachmentLoadOp::eClear,
                 .storeOp = vk::AttachmentStoreOp::eDontCare,
@@ -73,54 +73,12 @@ RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
 
     m_handle = m_renderer->GetDevice()->GetLogicalDevice().createRenderPass(render_pass_info).value;
 
-    vk::DescriptorSetLayoutBinding second_bindings[3] = {
-        {
-            .binding         = 0U,
-            .descriptorType  = vk::DescriptorType::eStorageBuffer,
-            .descriptorCount = 1U,
-            .stageFlags      = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
-        },
-        {
-            .binding         = 1U,
-            .descriptorType  = vk::DescriptorType::eStorageBuffer,
-            .descriptorCount = 1U,
-            .stageFlags      = vk::ShaderStageFlagBits::eVertex
-        },
-        {
-            .binding         = 2U,
-            .descriptorType  = vk::DescriptorType::eStorageBuffer,
-            .descriptorCount = 1U,
-            .stageFlags      = vk::ShaderStageFlagBits::eFragment
-        }
-    };
-
-    vk::DescriptorSetLayoutBinding third_bindings[1] = {
-        {
-            .binding         = 0U,
-            .descriptorType  = vk::DescriptorType::eUniformBuffer,
-            .descriptorCount = 1U,
-            .stageFlags      = vk::ShaderStageFlagBits::eVertex
-        }
-    };
-
-    vk::DescriptorSetLayoutCreateInfo set_layout_infos[2] = {
-        {
-            .bindingCount = 3U,
-            .pBindings    = second_bindings
-        },
-        {
-            .bindingCount = 1U,
-            .pBindings    = third_bindings
-        }
-    };
-
-    m_frame_descriptor_set_layout   = m_renderer->GetDevice()->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[0]).value;
-    m_camera_descriptor_set_layout  = m_renderer->GetDevice()->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[1]).value;
+    
 
     std::vector descriptor_set_layouts = {
         m_renderer->GetTextureStreamer()->GetDescriptorSetLayout(),
-        m_frame_descriptor_set_layout,
-        m_camera_descriptor_set_layout
+        m_renderer->GetGraph()->GetFrameDescriptorSetLayout(),
+        m_renderer->GetGraph()->GetCameraDescriptorSetLayout(),
     };
 
     vk::PushConstantRange push_constant_range = {
@@ -146,7 +104,7 @@ RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
             .layers     = 1U
         };
 
-        m_framebuffers.emplace_back(m_renderer->GetDevice()->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value);
+        // m_framebuffers.emplace_back(m_renderer->GetDevice()->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value);
     }
 }
 
@@ -154,10 +112,6 @@ RenderPass::~RenderPass() noexcept
 {
     if (m_handle)
         m_renderer->GetDevice()->GetLogicalDevice().destroy(m_handle);
-    if (m_frame_descriptor_set_layout)
-        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_frame_descriptor_set_layout);
-    if (m_camera_descriptor_set_layout)
-        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_camera_descriptor_set_layout);
     if (m_pipeline_layout)
         m_renderer->GetDevice()->GetLogicalDevice().destroy(m_pipeline_layout);
 }
@@ -244,7 +198,7 @@ RkVoid RenderPass::Execute(RenderFrame& in_frame) const noexcept
 
 RkVoid RenderPass::AddColorOutput(std::string const& in_name)
 {
-
+    (void)in_name;
 }
 
 RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept
@@ -255,16 +209,6 @@ RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, Re
 vk::RenderPass const& RenderPass::GetHandle() const noexcept
 {
     return m_handle;
-}
-
-vk::DescriptorSetLayout const& RenderPass::GetFrameDescriptorSetLayout() const noexcept
-{
-    return m_frame_descriptor_set_layout;
-}
-
-vk::DescriptorSetLayout const& RenderPass::GetCameraDescriptorSetLayout() const noexcept
-{
-    return m_camera_descriptor_set_layout;
 }
 
 #pragma endregion

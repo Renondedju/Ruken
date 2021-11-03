@@ -19,7 +19,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
-class RenderDevice;
+class Renderer;
 
 struct CameraData
 {
@@ -33,8 +33,8 @@ class RenderFrame
 
         #pragma region Members
 
-        Logger*       m_logger {nullptr};
-        RenderDevice* m_device {nullptr};
+        Logger*   m_logger {nullptr};
+        Renderer* m_renderer {nullptr};
 
         RkUint32          m_index;
         TimelineSemaphore m_timeline_semaphore;
@@ -48,7 +48,7 @@ class RenderFrame
         Buffer            m_material_storage_buffer;
         Buffer            m_camera_uniform_buffer;
 
-        vk::DescriptorPool m__descriptor_pool;
+        vk::DescriptorPool m_descriptor_pool;
         vk::DescriptorSet  m_frame_descriptor_set;
         vk::DescriptorSet  m_camera_descriptor_set;
 
@@ -58,7 +58,7 @@ class RenderFrame
 
         #pragma region Constructors
 
-        RenderFrame(Logger* in_logger, RenderDevice* in_device, RkUint32 in_index) noexcept;
+        RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 in_index) noexcept;
 
         RenderFrame(RenderFrame const& in_copy) = delete;
         RenderFrame(RenderFrame&&      in_move) = delete;

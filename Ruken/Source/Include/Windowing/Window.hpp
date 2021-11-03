@@ -44,6 +44,7 @@ class Window
         vk::PresentModeKHR m_present_mode;
 
         std::vector<vk::Image> m_images;
+        std::vector<vk::ImageView> m_image_views;
 
         #pragma endregion
 

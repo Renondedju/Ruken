@@ -22,17 +22,13 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
 {
     auto& forward_pass = m_renderer->GetGraph()->FindOrAddRenderPass("Forward");
 
-    forward_pass.AddColorOutput("SceneColor");
+    forward_pass.AddColorOutput("FinalColor");
 
     forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) {
+        (void)in_frame;
+
         g_material->Bind  (in_command_buffer);
         g_model   ->Render(in_command_buffer);
-    });
-
-    auto& final_pass = m_renderer->GetGraph()->FindOrAddRenderPass("Final");
-
-    final_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) {
-
     });
 
     g_model    = std::make_unique<Model>   (m_renderer, "Data/viking_room.obj");
@@ -41,7 +37,7 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
 
     for (RkUint32 i = 0U; i < 2U; ++i)
     {
-        m_frames.emplace_back(std::make_unique<RenderFrame>(nullptr, m_renderer->GetDevice(), i));
+        m_frames.emplace_back(std::make_unique<RenderFrame>(nullptr, m_renderer, i));
     }
 }
 
@@ -162,12 +158,12 @@ RkVoid RenderSystem::Update() noexcept
 
         camera_buffer.UnMap();
 
-        RkUint32 const image_index = m_window->AcquireNextImage(nullptr);
+        //RkUint32 const image_index = m_window->AcquireNextImage(nullptr);
 
         // Execute graph.
         m_renderer->GetGraph()->Execute(frame);
 
         // if renderToScreen
-        m_window->Present(nullptr, image_index);
+        //m_window->Present(nullptr, image_index);
     }
 }

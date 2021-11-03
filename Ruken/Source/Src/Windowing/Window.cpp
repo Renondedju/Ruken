@@ -223,7 +223,7 @@ RkVoid Window::PickSwapchainPresentMode() noexcept
 {
     auto [result, present_modes] =  m_device->GetPhysicalDevice().getSurfacePresentModesKHR(m_surface);
 
-    m_present_mode = vk::PresentModeKHR::eMailbox;
+    m_present_mode = present_modes.front();
 }
 
 RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
