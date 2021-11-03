@@ -29,7 +29,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 template <>
-[[deprecated]]
+[[deprecated("Just used to avoid compliation error with colors for now")]]
 struct Vector<4, RkFloat>
 {
     union 
