@@ -190,6 +190,7 @@
     <ClInclude Include="Source\Include\Maths\Constants.hpp" />
     <ClInclude Include="Source\Include\Maths\Easing.hpp" />
     <ClInclude Include="Source\Include\Maths\Math.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix.hpp" />
     <ClInclude Include="Source\Include\Maths\Matrix\MatrixForward.hpp" />
     <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixAccess.hpp" />
     <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixConversions.hpp" />
@@ -416,6 +417,7 @@
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
     <ClCompile Include="Source\Src\Maths\Easing.cpp" />
     <ClCompile Include="Source\Src\Maths\Math.cpp" />
+    <ClCompile Include="Source\Src\Maths\Matrix\Matrix.cpp" />
     <ClCompile Include="Source\Src\Maths\MinMax.cpp" />
     <ClCompile Include="Source\Src\Maths\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Source\Src\Maths\Trigonometry.cpp" />
