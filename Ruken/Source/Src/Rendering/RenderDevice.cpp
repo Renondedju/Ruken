@@ -39,20 +39,12 @@ RenderDevice::RenderDevice(Logger* in_logger, RenderContext* in_context) noexcep
 
     if (!CreateDeviceAllocator())
         RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to create device allocator!"))
-
-    CreateTextureDescriptorSet();
 }
 
 RenderDevice::~RenderDevice() noexcept
 {
     if (!m_logical_device)
         return;
-
-    if (m_texture_descriptor_pool)
-        m_logical_device.destroy(m_texture_descriptor_pool);
-
-    if (m_texture_descriptor_set_layout)
-        m_logical_device.destroy(m_texture_descriptor_set_layout);
 
     vmaDestroyAllocator(m_allocator);
 
@@ -165,9 +157,10 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
     vk::PhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features = {
         .shaderSampledImageArrayNonUniformIndexing    = VK_TRUE,
         .descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
+        .descriptorBindingUpdateUnusedWhilePending    = VK_TRUE,
         .descriptorBindingPartiallyBound              = VK_TRUE,
         .descriptorBindingVariableDescriptorCount     = VK_TRUE,
-        .runtimeDescriptorArray                       = VK_TRUE,
+        .runtimeDescriptorArray                       = VK_TRUE
     };
 
     vk::PhysicalDeviceTimelineSemaphoreFeatures timeline_semaphore_features = {
@@ -259,70 +252,6 @@ RkBool RenderDevice::CreateDeviceAllocator() noexcept
     return false;
 }
 
-RkVoid RenderDevice::CreateTextureDescriptorSet() noexcept
-{
-    vk::PhysicalDeviceDescriptorIndexingProperties descriptor_indexing_properties = {};
-
-    vk::PhysicalDeviceProperties2 properties = {
-        .pNext = &descriptor_indexing_properties
-    };
-
-    m_physical_device.getProperties2(&properties);
-
-    vk::DescriptorPoolSize descriptor_pool_size = {
-        .type            = vk::DescriptorType::eCombinedImageSampler,
-        .descriptorCount = descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSampledImages
-    };
-
-    vk::DescriptorPoolCreateInfo descriptor_pool_create_info = {
-        .flags         = vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind,
-        .maxSets       = 1U,
-        .poolSizeCount = 1U,
-        .pPoolSizes    = &descriptor_pool_size
-    };
-
-    m_texture_descriptor_pool = m_logical_device.createDescriptorPool(descriptor_pool_create_info).value;
-
-    vk::DescriptorSetLayoutBinding descriptor_set_layout_binding = {
-        .binding         = 0U,
-        .descriptorType  = vk::DescriptorType::eCombinedImageSampler,
-        .descriptorCount = descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSampledImages,
-        .stageFlags      = vk::ShaderStageFlagBits::eFragment
-    };
-
-    vk::DescriptorBindingFlags descriptor_binding_flags = vk::DescriptorBindingFlagBits::eUpdateAfterBind
-                                                        | vk::DescriptorBindingFlagBits::ePartiallyBound
-                                                        | vk::DescriptorBindingFlagBits::eVariableDescriptorCount;
-
-    vk::DescriptorSetLayoutBindingFlagsCreateInfo descriptor_set_layout_binding_flags_create_info = {
-        .bindingCount  = 1U,
-        .pBindingFlags = &descriptor_binding_flags
-    };
-
-    vk::DescriptorSetLayoutCreateInfo descriptor_set_layout_create_info = {
-        .pNext        = &descriptor_set_layout_binding_flags_create_info,
-        .flags        = vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool,
-        .bindingCount = 1U,
-        .pBindings    = &descriptor_set_layout_binding
-    };
-
-    m_texture_descriptor_set_layout = m_logical_device.createDescriptorSetLayout(descriptor_set_layout_create_info).value;
-
-    vk::DescriptorSetVariableDescriptorCountAllocateInfo descriptor_set_variable_descriptor_count_allocate_info = {
-        .descriptorSetCount = 1U,
-        .pDescriptorCounts  = &descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSampledImages
-    };
-
-    vk::DescriptorSetAllocateInfo descriptor_set_allocate_info = {
-        .pNext              = &descriptor_set_variable_descriptor_count_allocate_info,
-        .descriptorPool     = m_texture_descriptor_pool,
-        .descriptorSetCount = 1U,
-        .pSetLayouts        = &m_texture_descriptor_set_layout
-    };
-
-    m_texture_descriptor_set = m_logical_device.allocateDescriptorSets(descriptor_set_allocate_info).value.front();
-}
-
 vk::PhysicalDevice const& RenderDevice::GetPhysicalDevice() const noexcept
 {
     return m_physical_device;
@@ -376,16 +305,6 @@ RkBool RenderDevice::HasDedicatedComputeQueue() const noexcept
 RkBool RenderDevice::HasDedicatedTransferQueue() const noexcept
 {
     return m_transfer_family_index != m_graphics_family_index;
-}
-
-vk::DescriptorSetLayout const& RenderDevice::GetTextureDescriptorSetLayout() const noexcept
-{
-    return m_texture_descriptor_set_layout;
-}
-
-vk::DescriptorSet const& RenderDevice::GetTextureDescriptorSet() const noexcept
-{
-    return m_texture_descriptor_set;
 }
 
 #pragma endregion

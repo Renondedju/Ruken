@@ -57,14 +57,6 @@ struct Vertex
     }
 };
 
-struct UniformBufferObject {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
-};
-
-class RenderDevice;
-
 struct TransformData
 {
     glm::mat4 model;
@@ -76,13 +68,15 @@ struct DrawData
     RkUint32 transform_index;
 };
 
+class Renderer;
+
 class Model final : public IResource
 {
     private:
 
         #pragma region Members
 
-        RenderDevice* m_device;
+        Renderer* m_renderer;
 
         vk::DeviceSize m_offset;
         vk::DeviceSize m_count;
@@ -97,7 +91,7 @@ class Model final : public IResource
 
         #pragma region Constructors
 
-        Model(RenderDevice* in_device, std::string_view in_path) noexcept;
+        Model(Renderer* in_renderer, std::string_view in_path) noexcept;
 
         Model(Model const& in_copy) = delete;
         Model(Model&&      in_move) = delete;

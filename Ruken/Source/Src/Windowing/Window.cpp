@@ -275,17 +275,22 @@ RkVoid Window::SetupCallbacks() const noexcept
     glfwSetWindowContentScaleCallback(m_handle, &WindowContentScaleCallback);
 }
 
-RkVoid Window::Present(RenderFrame& in_frame) noexcept
+RkUint32 Window::AcquireNextImage(vk::Semaphore const& in_semaphore) const noexcept
+{
+    if (m_image_extent.width == 0 || m_image_extent.height == 0)
+        return UINT32_MAX;
+
+    auto [result, value] = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, in_semaphore);
+
+    return value;
+}
+
+RkVoid Window::Present(vk::Semaphore const& in_semaphore, RkUint32 in_image_index) noexcept
 {
     if (m_image_extent.width == 0 || m_image_extent.height == 0)
         return;
 
-    auto image_semaphore   = in_frame.GetSemaphorePool().Request();
-    auto present_semaphore = in_frame.GetSemaphorePool().Request();
-
-    m_image_index = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, image_semaphore).value;
-
-    auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
+    /*auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
 
     // TODO : Execute final pass.
     vk::CommandBufferBeginInfo command_buffer_begin_info = {
@@ -430,21 +435,27 @@ RkVoid Window::Present(RenderFrame& in_frame) noexcept
         .pSignalSemaphoreInfos    = signal_semaphores_submit_infos.data()
     };
 
-    m_device->GetGraphicsQueue().Submit(submit_info);
+    m_device->GetGraphicsQueue().Submit(submit_info);*/
 
     vk::PresentInfoKHR present_info = {
-        .waitSemaphoreCount = 1,
-        .pWaitSemaphores    = &present_semaphore,
-        .swapchainCount     = 1,
+        .waitSemaphoreCount = 1U,
+        .pWaitSemaphores    = &in_semaphore,
+        .swapchainCount     = 1U,
         .pSwapchains        = &m_swapchain,
-        .pImageIndices      = &m_image_index
+        .pImageIndices      = &in_image_index
     };
 
     m_device->GetGraphicsQueue().Present(present_info);
+}
 
-    in_frame.GetSemaphorePool      ().Release(image_semaphore);
-    in_frame.GetSemaphorePool      ().Release(present_semaphore);
-    in_frame.GetGraphicsCommandPool().Release(command_buffer);
+vk::Image const& Window::GetImage(RkUint32 const in_index) const noexcept
+{
+    return m_images[in_index];
+}
+
+vk::ImageView const& Window::GetImageView(RkUint32 in_index) const noexcept
+{
+    return m_image_views[in_index];
 }
 
 #pragma region Setters

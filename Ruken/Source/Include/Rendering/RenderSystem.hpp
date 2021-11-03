@@ -6,7 +6,7 @@ BEGIN_RUKEN_NAMESPACE
 
 class ServiceProvider;
 class Window;
-class RenderDevice;
+class Renderer;
 class RenderFrame;
 class RenderGraph;
 
@@ -14,12 +14,10 @@ class RenderSystem
 {
     private:
 
-        RenderDevice* m_device;
-        Window*       m_window;
+        Renderer* m_renderer;
+        Window*   m_window;
 
         RkUint32 m_current_frame {0U};
-
-        std::unique_ptr<RenderGraph> m_graph;
 
         std::vector<std::unique_ptr<RenderFrame>> m_frames;
 

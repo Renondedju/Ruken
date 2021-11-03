@@ -5,32 +5,36 @@
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
-class RenderDevice;
+class Renderer;
 class RenderFrame;
-class RenderGraph;
 
 class RenderPass
 {
-    protected:
+    private:
 
-        Logger*       m_logger;
-        RenderDevice* m_device;
-        RenderGraph*  m_graph;
+        Logger*   m_logger;
+        Renderer* m_renderer;
 
-        std::string m_name;
+        vk::RenderPass          m_handle;
+        vk::DescriptorSetLayout m_frame_descriptor_set_layout;
+        vk::DescriptorSetLayout m_camera_descriptor_set_layout;
+        vk::PipelineLayout      m_pipeline_layout;
 
-        std::function<RkVoid(vk::CommandBuffer const&)> m_callback;
+        std::vector<vk::Framebuffer> m_framebuffers;
+
+        std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)> m_callback;
+
+        #pragma region Methods
+
+        
+
+        #pragma endregion
 
     public:
 
-        static vk::RenderPass          g_render_pass;
-        static vk::DescriptorSetLayout g_frame_descriptor_set_layout;
-        static vk::DescriptorSetLayout g_camera_descriptor_set_layout;
-        static vk::PipelineLayout      g_pipeline_layout;
-
         #pragma region Constructors
 
-        RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* in_graph, std::string const& in_name) noexcept;
+        RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept;
 
         RenderPass(RenderPass const& in_copy) = delete;
         RenderPass(RenderPass&&      in_move) = delete;
@@ -41,23 +45,15 @@ class RenderPass
 
         #pragma region Methods
 
-        RkVoid Execute(vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) const noexcept;
+        RkVoid Execute(RenderFrame& in_frame) const noexcept;
 
-        RkVoid SetCallback(std::function<RkVoid(vk::CommandBuffer const&)>&& in_callback) noexcept;
+        RkVoid AddColorOutput(std::string const& in_name);
 
-        #pragma region Inputs
+        RkVoid SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept;
 
-        
-
-        #pragma endregion
-
-        #pragma region Outputs
-
-        RkVoid AddColorOutput(std::string const& in_name) noexcept;
-
-        #pragma endregion
-
-        std::string const& GetName() const noexcept;
+        vk::RenderPass          const& GetHandle                   () const noexcept;
+        vk::DescriptorSetLayout const& GetFrameDescriptorSetLayout () const noexcept;
+        vk::DescriptorSetLayout const& GetCameraDescriptorSetLayout() const noexcept;
 
         #pragma endregion
 

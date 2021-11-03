@@ -37,7 +37,6 @@ class Window
 
         vk::SurfaceKHR     m_surface;
         vk::SwapchainKHR   m_swapchain;
-        RkUint32           m_image_index;
         RkUint32           m_image_count;
         vk::Extent2D       m_image_extent;
         vk::Format         m_image_format;
@@ -144,7 +143,11 @@ class Window
 
         #pragma region Methods
 
-        RkVoid Present(RenderFrame& in_frame) noexcept;
+        RkUint32 AcquireNextImage(vk::Semaphore const& in_semaphore)                          const noexcept;
+        RkVoid   Present         (vk::Semaphore const& in_semaphore, RkUint32 in_image_index) noexcept;
+
+        vk::Image     const& GetImage    (RkUint32 in_index) const noexcept;
+        vk::ImageView const& GetImageView(RkUint32 in_index) const noexcept;
 
         #pragma region Setters
 

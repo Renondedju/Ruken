@@ -7,13 +7,14 @@
 #include "Core/ServiceProvider.hpp"
 
 #include "Rendering/RenderDevice.hpp"
+#include "Rendering/Renderer.hpp"
 
 #include "Resource/ResourceManager.hpp"
 
 USING_RUKEN_NAMESPACE
 
-Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
-    m_device {in_device}
+Model::Model(Renderer* in_renderer, std::string_view in_path) noexcept:
+    m_renderer {in_renderer}
 {
     tinyobj::ObjReader       reader;
     tinyobj::ObjReaderConfig config;
@@ -57,14 +58,14 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
         .usage = vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst
     };
 
-    m_buffer = std::make_unique<Buffer>(m_device, buffer_create_info);
+    m_buffer = std::make_unique<Buffer>(m_renderer->GetDevice(), buffer_create_info);
 
     m_count = indices.size();
     m_offset = vertices.size() * sizeof(Vertex);
 
     buffer_create_info.usage = vk::BufferUsageFlagBits::eTransferSrc;
 
-    Buffer staging_buffer(m_device, buffer_create_info);
+    Buffer staging_buffer(m_renderer->GetDevice(), buffer_create_info);
 
     RkByte* data = static_cast<RkByte*>(staging_buffer.Map());
 
@@ -73,7 +74,7 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
     staging_buffer.UnMap();
 
-    if (auto transfer_command_buffer = m_device->GetTransferQueue().BeginSingleUseCommandBuffer())
+    if (auto transfer_command_buffer = m_renderer->GetDevice()->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
         vk::BufferCopy buffer_copy = {
             .size = buffer_create_info.size
@@ -81,15 +82,15 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
         transfer_command_buffer.copyBuffer(staging_buffer.GetHandle(), m_buffer->GetHandle(), buffer_copy);
 
-        if (m_device->HasDedicatedTransferQueue())
+        if (m_renderer->GetDevice()->HasDedicatedTransferQueue())
         {
             vk::BufferMemoryBarrier2KHR buffer_memory_barrier = {
                 .srcStageMask        = vk::PipelineStageFlagBits2KHR::eTransfer,
                 .srcAccessMask       = vk::AccessFlagBits2KHR::eMemoryWrite,
                 .dstStageMask        = vk::PipelineStageFlagBits2KHR::eNone,
                 .dstAccessMask       = vk::AccessFlagBits2KHR::eNone,
-                .srcQueueFamilyIndex = m_device->GetTransferFamilyIndex(),
-                .dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex(),
+                .srcQueueFamilyIndex = m_renderer->GetDevice()->GetTransferFamilyIndex(),
+                .dstQueueFamilyIndex = m_renderer->GetDevice()->GetGraphicsFamilyIndex(),
                 .buffer              = m_buffer->GetHandle(),
                 .size                = VK_WHOLE_SIZE 
             };
@@ -101,9 +102,9 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
             transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
 
-            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+            m_renderer->GetDevice()->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
 
-            if (auto graphics_command_buffer = m_device->GetGraphicsQueue().BeginSingleUseCommandBuffer())
+            if (auto graphics_command_buffer = m_renderer->GetDevice()->GetGraphicsQueue().BeginSingleUseCommandBuffer())
             {
                 buffer_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eNone;
                 buffer_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eNone;
@@ -112,7 +113,7 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
                 graphics_command_buffer.pipelineBarrier2KHR(dependency_info);
 
-                m_device->GetGraphicsQueue().EndSingleUseCommandBuffer(graphics_command_buffer);
+                m_renderer->GetDevice()->GetGraphicsQueue().EndSingleUseCommandBuffer(graphics_command_buffer);
             }
         }
 
@@ -132,7 +133,7 @@ Model::Model(RenderDevice* in_device, std::string_view in_path) noexcept:
 
             transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
 
-            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+            m_renderer->GetDevice()->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
         }
     }
 }

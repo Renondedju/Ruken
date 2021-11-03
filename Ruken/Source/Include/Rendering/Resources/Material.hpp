@@ -7,7 +7,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class RenderDevice;
+class Renderer;
 class RenderFrame;
 
 struct MaterialData
@@ -20,9 +20,11 @@ class Material final : public IResource
 {
     protected:
 
-        RenderDevice* m_device;
+        Renderer* m_renderer;
 
-        vk::Pipeline m_pipeline;
+        vk::DescriptorSetLayout m_descriptor_set_layout;
+        vk::PipelineLayout      m_pipeline_layout;
+        vk::Pipeline            m_pipeline;
 
         std::vector<std::unique_ptr<Shader>>  m_shaders;
         std::vector<std::unique_ptr<Texture>> m_textures;
@@ -31,7 +33,7 @@ class Material final : public IResource
 
         #pragma region Operators
 
-        Material(RenderDevice* in_device, std::string_view in_path) noexcept;
+        Material(Renderer* in_renderer, std::string_view in_path) noexcept;
 
         Material(Material const& in_copy) = delete;
         Material(Material&&      in_move) = delete;

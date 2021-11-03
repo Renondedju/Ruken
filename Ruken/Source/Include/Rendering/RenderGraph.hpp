@@ -5,23 +5,23 @@
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
-class RenderDevice;
+class Renderer;
 class RenderFrame;
 
 class RenderGraph
 {
     private:
 
-        Logger*       m_logger;
-        RenderDevice* m_device;
+        Logger*   m_logger;
+        Renderer* m_renderer;
 
-        std::vector<std::unique_ptr<RenderPass>> m_render_passes;
+        std::unordered_map<std::string, std::unique_ptr<RenderPass>> m_render_passes;
 
     public:
 
         #pragma region Constructors
 
-        RenderGraph(Logger* in_logger, RenderDevice* in_device) noexcept;
+        RenderGraph(Logger* in_logger, Renderer* in_renderer) noexcept;
 
         RenderGraph(RenderGraph const& in_copy) = delete;
         RenderGraph(RenderGraph&&      in_move) = delete;
@@ -35,8 +35,7 @@ class RenderGraph
         RkVoid Bake() noexcept;
         RkVoid Execute(RenderFrame& in_frame) noexcept;
 
-        RenderPass& AddRenderPass(std::string const& in_name) noexcept;
-        RenderPass* GetRenderPass(std::string const& in_name) const noexcept;
+        RenderPass& FindOrAddRenderPass(std::string const& in_name) noexcept;
 
         #pragma endregion
 

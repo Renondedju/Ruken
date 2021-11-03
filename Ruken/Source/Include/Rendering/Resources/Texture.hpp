@@ -8,7 +8,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class RenderDevice;
+class Renderer;
 
 class Texture final : public IResource
 {
@@ -16,11 +16,13 @@ class Texture final : public IResource
 
         #pragma region Members
 
-        RenderDevice* m_device;
+        Renderer* m_renderer;
 
-        std::unique_ptr<Image>     m_image;
-        vk::ImageView m_image_view;
-        vk::Sampler   m_image_sampler;
+        RkUint32 m_index;
+
+        std::unique_ptr<Image> m_image;
+        vk::ImageView          m_image_view;
+        vk::Sampler            m_image_sampler;
 
         #pragma endregion
 
@@ -28,7 +30,7 @@ class Texture final : public IResource
 
         #pragma region Constructors
 
-        Texture(RenderDevice* in_device, std::string_view in_path) noexcept;
+        Texture(Renderer* in_renderer, std::string_view in_path) noexcept;
 
         Texture(Texture const& in_copy) = delete;
         Texture(Texture&&      in_move) = delete;
@@ -41,6 +43,7 @@ class Texture final : public IResource
         RkVoid Reload(ResourceManager& in_manager)                                                 override;
         RkVoid Unload(ResourceManager& in_manager)                                                 noexcept override;
 
+        RkUint32             GetIndex       () const noexcept;
         vk::Image     const& GetImage       () const noexcept;
         vk::ImageView const& GetImageView   () const noexcept;
         vk::Sampler   const& GetImageSampler() const noexcept;

@@ -5,11 +5,12 @@
 #include "Rendering/Resources/Texture.hpp"
 
 #include "Rendering/RenderDevice.hpp"
+#include "Rendering/Renderer.hpp"
 
 USING_RUKEN_NAMESPACE
 
-Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
-    m_device {in_device}
+Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
+    m_renderer {in_renderer}
 {
     int32_t width, height, channels;
 
@@ -29,7 +30,7 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         .usage       = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst
     };
 
-    m_image = std::make_unique<Image>(m_device, image_create_info);
+    m_image = std::make_unique<Image>(m_renderer->GetDevice(), image_create_info);
 
     vk::ImageViewCreateInfo image_view_create_info = {
         .image = m_image->GetHandle(),
@@ -42,7 +43,7 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         }
     };
 
-    if (auto [result, value] = m_device->GetLogicalDevice().createImageView(image_view_create_info); result == vk::Result::eSuccess)
+    if (auto [result, value] = m_renderer->GetDevice()->GetLogicalDevice().createImageView(image_view_create_info); result == vk::Result::eSuccess)
     {
         m_image_view = value;
     }
@@ -54,7 +55,7 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         .borderColor = vk::BorderColor::eIntOpaqueBlack
     };
 
-    if (auto [result, value] = m_device->GetLogicalDevice().createSampler(tex_sampler_info); result == vk::Result::eSuccess)
+    if (auto [result, value] = m_renderer->GetDevice()->GetLogicalDevice().createSampler(tex_sampler_info); result == vk::Result::eSuccess)
     {
         m_image_sampler = value;
     }
@@ -64,13 +65,13 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         .usage = vk::BufferUsageFlagBits::eTransferSrc
     };
 
-    Buffer staging_buffer(m_device, buffer_create_info);
+    Buffer staging_buffer(m_renderer->GetDevice(), buffer_create_info);
 
     memcpy(staging_buffer.Map(), pixels, buffer_create_info.size);
 
     staging_buffer.UnMap();
 
-    if (auto transfer_command_buffer = m_device->GetTransferQueue().BeginSingleUseCommandBuffer())
+    if (auto transfer_command_buffer = m_renderer->GetDevice()->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
         vk::ImageMemoryBarrier2KHR image_memory_barrier = {
             .srcStageMask        = vk::PipelineStageFlagBits2KHR::eNone,
@@ -113,16 +114,16 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
         image_memory_barrier.oldLayout     = vk::ImageLayout::eTransferDstOptimal;
         image_memory_barrier.newLayout     = vk::ImageLayout::eReadOnlyOptimalKHR;
 
-        if (m_device->HasDedicatedTransferQueue())
+        if (m_renderer->GetDevice()->HasDedicatedTransferQueue())
         {
-            image_memory_barrier.srcQueueFamilyIndex = m_device->GetTransferFamilyIndex();
-            image_memory_barrier.dstQueueFamilyIndex = m_device->GetGraphicsFamilyIndex();
+            image_memory_barrier.srcQueueFamilyIndex = m_renderer->GetDevice()->GetTransferFamilyIndex();
+            image_memory_barrier.dstQueueFamilyIndex = m_renderer->GetDevice()->GetGraphicsFamilyIndex();
 
             transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
 
-            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+            m_renderer->GetDevice()->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
 
-            if (auto graphics_command_buffer = m_device->GetGraphicsQueue().BeginSingleUseCommandBuffer())
+            if (auto graphics_command_buffer = m_renderer->GetDevice()->GetGraphicsQueue().BeginSingleUseCommandBuffer())
             {
                 image_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eNone;
                 image_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eNone;
@@ -131,7 +132,7 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
 
                 graphics_command_buffer.pipelineBarrier2KHR(dependency_info);
 
-                m_device->GetGraphicsQueue().EndSingleUseCommandBuffer(graphics_command_buffer);
+                m_renderer->GetDevice()->GetGraphicsQueue().EndSingleUseCommandBuffer(graphics_command_buffer);
             }
         }
 
@@ -144,17 +145,19 @@ Texture::Texture(RenderDevice* in_device, std::string_view in_path) noexcept:
 
             transfer_command_buffer.pipelineBarrier2KHR(dependency_info);
 
-            m_device->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
+            m_renderer->GetDevice()->GetTransferQueue().EndSingleUseCommandBuffer(transfer_command_buffer);
         }
     }
+
+    m_index = m_renderer->GetTextureStreamer()->RegisterTexture(*this);
 
     stbi_image_free(pixels);
 }
 
 Texture::~Texture() noexcept
 {
-    m_device->GetLogicalDevice().destroyImageView(m_image_view);
-    m_device->GetLogicalDevice().destroySampler  (m_image_sampler);
+    m_renderer->GetDevice()->GetLogicalDevice().destroyImageView(m_image_view);
+    m_renderer->GetDevice()->GetLogicalDevice().destroySampler  (m_image_sampler);
 }
 
 RkVoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
@@ -171,6 +174,11 @@ RkVoid Texture::Reload(ResourceManager& in_manager)
 RkVoid Texture::Unload(ResourceManager& in_manager) noexcept
 {
     (void)in_manager;
+}
+
+RkUint32 Texture::GetIndex() const noexcept
+{
+    return m_index;
 }
 
 vk::Image const& Texture::GetImage() const noexcept

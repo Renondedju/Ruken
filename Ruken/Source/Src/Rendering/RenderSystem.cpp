@@ -17,34 +17,37 @@ static std::unique_ptr<Texture>  g_texture;
 static std::unique_ptr<Material> g_material;
 
 RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
-    m_device {in_service_provider.LocateService<Renderer>     ()->GetDevice    ()},
-    m_window {in_service_provider.LocateService<WindowManager>()->GetMainWindow()}
+    m_renderer {in_service_provider.LocateService<Renderer>     ()},
+    m_window   {in_service_provider.LocateService<WindowManager>()->GetMainWindow()}
 {
-    m_graph = std::make_unique<RenderGraph>(nullptr, m_device);
+    auto& forward_pass = m_renderer->GetGraph()->FindOrAddRenderPass("Forward");
 
-    auto& forward_pass = m_graph->AddRenderPass("forward");
+    forward_pass.AddColorOutput("SceneColor");
 
-    forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer) {
-
-        m_frames[m_current_frame]->Bind(in_command_buffer);
-
+    forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) {
         g_material->Bind  (in_command_buffer);
         g_model   ->Render(in_command_buffer);
     });
 
-    g_model    = std::make_unique<Model>   (m_device, "Data/viking_room.obj");
-    g_texture  = std::make_unique<Texture> (m_device, "Data/viking_room.png");
-    g_material = std::make_unique<Material>(m_device, "");
+    auto& final_pass = m_renderer->GetGraph()->FindOrAddRenderPass("Final");
+
+    final_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) {
+
+    });
+
+    g_model    = std::make_unique<Model>   (m_renderer, "Data/viking_room.obj");
+    g_texture  = std::make_unique<Texture> (m_renderer, "Data/viking_room.png");
+    g_material = std::make_unique<Material>(m_renderer, "");
 
     for (RkUint32 i = 0U; i < 2U; ++i)
     {
-        m_frames.emplace_back(std::make_unique<RenderFrame>(nullptr, m_device));
+        m_frames.emplace_back(std::make_unique<RenderFrame>(nullptr, m_renderer->GetDevice(), i));
     }
 }
 
 RenderSystem::~RenderSystem() noexcept
 {
-    if (m_device->GetLogicalDevice().waitIdle() != vk::Result::eSuccess)
+    if (m_renderer->GetDevice()->GetLogicalDevice().waitIdle() != vk::Result::eSuccess)
     {
         
     }
@@ -52,17 +55,17 @@ RenderSystem::~RenderSystem() noexcept
     g_material.reset();
     g_texture .reset();
     g_model   .reset();
-    m_graph   .reset();
 }
 
 RkVoid RenderSystem::Update() noexcept
 {
-    m_current_frame = (m_current_frame + 1) % 2;
+    m_current_frame = (m_current_frame + 1U) % 2U;
 
     auto& frame = *m_frames[m_current_frame];
 
     frame.Reset();
 
+    // Frame data.
     auto& draw_buffer      = frame.GetDrawStorageBuffer     ();
     auto& transform_buffer = frame.GetTransformStorageBuffer();
     auto& material_buffer  = frame.GetMaterialStorageBuffer ();
@@ -112,13 +115,7 @@ RkVoid RenderSystem::Update() noexcept
         .range  = sizeof(MaterialData)
     };
 
-    vk::DescriptorImageInfo texture_descriptor_image_info = {
-        .sampler     = g_texture->GetImageSampler(),
-        .imageView   = g_texture->GetImageView(),
-        .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-    };
-
-    std::array<vk::WriteDescriptorSet, 4> write_descriptors = {
+    std::array<vk::WriteDescriptorSet, 3> write_descriptors = {
         {
             {
                 .dstSet = frame.GetFrameDescriptorSet(),
@@ -143,20 +140,34 @@ RkVoid RenderSystem::Update() noexcept
                 .descriptorCount = 1,
                 .descriptorType = vk::DescriptorType::eStorageBuffer,
                 .pBufferInfo = &material_descriptor_buffer_info
-            },
-            {
-                .dstSet = m_device->GetTextureDescriptorSet(),
-                .dstBinding = 0,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = vk::DescriptorType::eCombinedImageSampler,
-                .pImageInfo = &texture_descriptor_image_info
             }
         }
     };
 
-    m_device->GetLogicalDevice().updateDescriptorSets(write_descriptors, VK_NULL_HANDLE);
+    m_renderer->GetDevice()->GetLogicalDevice().updateDescriptorSets(write_descriptors, VK_NULL_HANDLE);
 
-    m_graph ->Execute(frame);
-    m_window->Present(frame);
+    // foreach camera
+    {
+        // Camera data.
+        auto const& camera_buffer = frame.GetCameraUniformBuffer();
+
+        CameraData ubo = {
+            .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+            .proj = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.1f, 10.0f)
+        };
+
+        ubo.proj[1][1] *= -1;
+
+        memcpy(camera_buffer.Map(), &ubo, sizeof(CameraData));
+
+        camera_buffer.UnMap();
+
+        RkUint32 const image_index = m_window->AcquireNextImage(nullptr);
+
+        // Execute graph.
+        m_renderer->GetGraph()->Execute(frame);
+
+        // if renderToScreen
+        m_window->Present(nullptr, image_index);
+    }
 }

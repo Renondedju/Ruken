@@ -1,37 +1,30 @@
 #include "Rendering/RenderPass.hpp"
 #include "Rendering/RenderDevice.hpp"
+#include "Rendering/Renderer.hpp"
 #include "Rendering/RenderFrame.hpp"
-#include "Rendering/RenderGraph.hpp"
 
 USING_RUKEN_NAMESPACE
 
-vk::RenderPass          RenderPass::g_render_pass;
-vk::DescriptorSetLayout RenderPass::g_frame_descriptor_set_layout;
-vk::DescriptorSetLayout RenderPass::g_camera_descriptor_set_layout;
-vk::PipelineLayout      RenderPass::g_pipeline_layout;
-
 #pragma region Constructors
 
-RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* in_graph, std::string const& in_name) noexcept:
-    m_logger {in_logger},
-    m_device {in_device},
-    m_graph  {in_graph},
-    m_name   {in_name}
+RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
+    m_logger   {in_logger},
+    m_renderer {in_renderer}
 {
     vk::AttachmentReference color_attachment_reference = {
         .attachment = 0,
-        .layout = vk::ImageLayout::eColorAttachmentOptimal
+        .layout     = vk::ImageLayout::eColorAttachmentOptimal
     };
 
     vk::AttachmentReference depth_attachment_reference = {
         .attachment = 1,
-        .layout = vk::ImageLayout::eDepthStencilAttachmentOptimal
+        .layout     = vk::ImageLayout::eDepthStencilAttachmentOptimal
     };
 
     vk::SubpassDescription subpass = {
-        .pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
-        .colorAttachmentCount = 1,
-        .pColorAttachments = &color_attachment_reference,
+        .pipelineBindPoint       = vk::PipelineBindPoint::eGraphics,
+        .colorAttachmentCount    = 1,
+        .pColorAttachments       = &color_attachment_reference,
         .pDepthStencilAttachment = &depth_attachment_reference
     };
 
@@ -78,7 +71,7 @@ RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* 
         .pDependencies = &dependency
     };
 
-    g_render_pass = m_device->GetLogicalDevice().createRenderPass(render_pass_info).value;
+    m_handle = m_renderer->GetDevice()->GetLogicalDevice().createRenderPass(render_pass_info).value;
 
     vk::DescriptorSetLayoutBinding second_bindings[3] = {
         {
@@ -121,13 +114,13 @@ RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* 
         }
     };
 
-    g_frame_descriptor_set_layout  = m_device->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[0]).value;
-    g_camera_descriptor_set_layout = m_device->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[1]).value;
+    m_frame_descriptor_set_layout   = m_renderer->GetDevice()->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[0]).value;
+    m_camera_descriptor_set_layout  = m_renderer->GetDevice()->GetLogicalDevice().createDescriptorSetLayout(set_layout_infos[1]).value;
 
     std::vector descriptor_set_layouts = {
-        m_device->GetTextureDescriptorSetLayout(),
-        g_frame_descriptor_set_layout,
-        g_camera_descriptor_set_layout
+        m_renderer->GetTextureStreamer()->GetDescriptorSetLayout(),
+        m_frame_descriptor_set_layout,
+        m_camera_descriptor_set_layout
     };
 
     vk::PushConstantRange push_constant_range = {
@@ -142,86 +135,136 @@ RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* 
         .pPushConstantRanges    = &push_constant_range
     };
 
-    g_pipeline_layout = m_device->GetLogicalDevice().createPipelineLayout(layout_info).value;
+    m_pipeline_layout = m_renderer->GetDevice()->GetLogicalDevice().createPipelineLayout(layout_info).value;
+
+    for (RkUint32 i = 0U; i < 2U; ++i)
+    {
+        vk::FramebufferCreateInfo framebuffer_create_info = {
+            .renderPass = m_handle,
+            .width      = 1920U,
+            .height     = 1080U,
+            .layers     = 1U
+        };
+
+        m_framebuffers.emplace_back(m_renderer->GetDevice()->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value);
+    }
 }
 
 RenderPass::~RenderPass() noexcept
 {
-    if (g_render_pass)
-        m_device->GetLogicalDevice().destroy(g_render_pass);
-    if (g_frame_descriptor_set_layout)
-        m_device->GetLogicalDevice().destroy(g_frame_descriptor_set_layout);
-    if (g_camera_descriptor_set_layout)
-        m_device->GetLogicalDevice().destroy(g_camera_descriptor_set_layout);
-    if (g_pipeline_layout)
-        m_device->GetLogicalDevice().destroy(g_pipeline_layout);
+    if (m_handle)
+        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_handle);
+    if (m_frame_descriptor_set_layout)
+        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_frame_descriptor_set_layout);
+    if (m_camera_descriptor_set_layout)
+        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_camera_descriptor_set_layout);
+    if (m_pipeline_layout)
+        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_pipeline_layout);
 }
 
 #pragma endregion
 
 #pragma region Methods
 
-RkVoid RenderPass::Execute(vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) const noexcept
+RkVoid RenderPass::Execute(RenderFrame& in_frame) const noexcept
 {
-    vk::ClearValue clear_color = {
-        .color = {
-            std::array{0.0F, 0.0F, 0.0F, 1.0F}
-        }
-    };
+    auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
 
-    vk::ClearValue clear_stencil = {
-        .depthStencil = {1, 0}
-    };
+    vk::CommandBufferBeginInfo command_buffer_begin_info = {};
 
-    std::array clear_values = {
-        clear_color,
-        clear_stencil
-    };
+    if (command_buffer.begin(command_buffer_begin_info) != vk::Result::eSuccess)
+    {
+        vk::Viewport viewport = {
+            .width = 1920.0F,
+            .height = 1080.0F,
+            .minDepth = 0.0F,
+            .maxDepth = 1.0F
+        };
 
-    vk::RenderPassBeginInfo render_pass_begin_info = {
-        .renderPass = g_render_pass,
-        .framebuffer = in_frame.GetFramebuffer(),
-        .renderArea = {
+        vk::Rect2D scissor = {
             .extent = {
-                .width  = in_frame.GetColorTarget().GetExtent().width,
-                .height = in_frame.GetColorTarget().GetExtent().height
+                1920U,
+                1080U
             }
-        },
-        .clearValueCount = static_cast<RkUint32>(clear_values.size()),
-        .pClearValues = clear_values.data()
-    };
+        };
 
-    in_command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
+        command_buffer.setViewport(0, viewport);
+        command_buffer.setScissor(0, scissor);
 
-    if (m_callback)
-        m_callback(in_command_buffer);
+        vk::RenderPassBeginInfo render_pass_begin_info = {
+            .renderPass = m_handle,
+            .framebuffer = m_framebuffers[in_frame.GetIndex()],
+            .renderArea = {
+                .extent = {
+                    .width  = 1920U,
+                    .height = 1080U
+                }
+            }
+        };
 
-    in_command_buffer.endRenderPass();
+        command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
+
+        std::vector descriptor_sets = {
+            m_renderer->GetTextureStreamer()->GetDescriptorSet(),
+            in_frame.GetFrameDescriptorSet(),
+            in_frame.GetCameraDescriptorSet()
+        };
+
+        command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline_layout, 0U, descriptor_sets, nullptr);
+
+        if (m_callback)
+            m_callback(command_buffer, in_frame);
+
+        command_buffer.endRenderPass();
+
+        if (command_buffer.end() != vk::Result::eSuccess)
+        {
+            vk::CommandBufferSubmitInfoKHR command_buffer_submit_info = {
+                .commandBuffer = command_buffer
+            };
+
+            vk::SemaphoreSubmitInfoKHR timeline_semaphore_submit_info = {
+                .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
+                .value = in_frame.GetTimelineSemaphore().NextValue()
+            };
+
+            vk::SubmitInfo2KHR submit_info = {
+                .commandBufferInfoCount = 1U,
+                .pCommandBufferInfos = &command_buffer_submit_info,
+                .signalSemaphoreInfoCount = 1U,
+                .pSignalSemaphoreInfos = &timeline_semaphore_submit_info
+            };
+
+            m_renderer->GetDevice()->GetGraphicsQueue().Submit(submit_info);
+        }
+    }
+
+    in_frame.GetGraphicsCommandPool().Release(command_buffer);
 }
 
-RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&)>&& in_callback) noexcept
+RkVoid RenderPass::AddColorOutput(std::string const& in_name)
+{
+
+}
+
+RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept
 {
     m_callback = std::move(in_callback);
 }
 
-#pragma region Inputs
-
-
-
-#pragma endregion
-
-#pragma region Outputs
-
-RkVoid RenderPass::AddColorOutput(std::string const& in_name) noexcept
+vk::RenderPass const& RenderPass::GetHandle() const noexcept
 {
-    (void)in_name;
+    return m_handle;
 }
 
-#pragma endregion
-
-std::string const& RenderPass::GetName() const noexcept
+vk::DescriptorSetLayout const& RenderPass::GetFrameDescriptorSetLayout() const noexcept
 {
-    return m_name;
+    return m_frame_descriptor_set_layout;
+}
+
+vk::DescriptorSetLayout const& RenderPass::GetCameraDescriptorSetLayout() const noexcept
+{
+    return m_camera_descriptor_set_layout;
 }
 
 #pragma endregion

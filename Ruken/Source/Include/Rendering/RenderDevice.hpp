@@ -31,10 +31,6 @@ class RenderDevice
         std::unique_ptr<RenderQueue> m_compute_queue;
         std::unique_ptr<RenderQueue> m_transfer_queue;
 
-        vk::DescriptorPool      m_texture_descriptor_pool;
-        vk::DescriptorSetLayout m_texture_descriptor_set_layout;
-        vk::DescriptorSet       m_texture_descriptor_set;
-
         #pragma endregion
 
         #pragma region Methods
@@ -43,7 +39,6 @@ class RenderDevice
         RkVoid FindQueueFamilies    () noexcept;
         RkBool CreateLogicalDevice  () noexcept;
         RkBool CreateDeviceAllocator() noexcept;
-        RkVoid CreateTextureDescriptorSet() noexcept;
 
         #pragma endregion
 
@@ -73,8 +68,6 @@ class RenderDevice
         RenderQueue&                   GetTransferQueue             () const noexcept;
         RkBool                         HasDedicatedComputeQueue     () const noexcept;
         RkBool                         HasDedicatedTransferQueue    () const noexcept;
-        vk::DescriptorSetLayout const& GetTextureDescriptorSetLayout() const noexcept;
-        vk::DescriptorSet       const& GetTextureDescriptorSet      () const noexcept;
 
         #pragma endregion
 

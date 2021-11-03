@@ -16,8 +16,10 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept: Service<Rende
     if (Logger* root_logger = m_service_provider.LocateService<Logger>())
         m_logger = root_logger->AddChild("Rendering");
 
-    m_context = std::make_unique<RenderContext>(m_logger);
-    m_device  = std::make_unique<RenderDevice> (m_logger, m_context.get());
+    m_context          = std::make_unique<RenderContext>        (m_logger);
+    m_device           = std::make_unique<RenderDevice>         (m_logger, m_context.get());
+    m_texture_streamer = std::make_unique<RenderTextureStreamer>(m_logger, m_device .get());
+    m_graph            = std::make_unique<RenderGraph>          (m_logger, this);
 
     if (!m_context->GetInstance() || !m_device->GetLogicalDevice())
         return;
@@ -35,8 +37,10 @@ Renderer::~Renderer() noexcept
     if (result != vk::Result::eSuccess)
         RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to shutdown renderer : " + vk::to_string(result)))
 
-    m_device .reset();
-    m_context.reset();
+    m_graph           .reset();
+    m_texture_streamer.reset();
+    m_device          .reset();
+    m_context         .reset();
 
     RUKEN_SAFE_LOGGER_CALL(m_logger, Info("Renderer shutdown."))
 }
@@ -53,6 +57,16 @@ RenderContext* Renderer::GetContext() const noexcept
 RenderDevice* Renderer::GetDevice() const noexcept
 {
     return m_device.get();
+}
+
+RenderTextureStreamer* Renderer::GetTextureStreamer() const noexcept
+{
+    return m_texture_streamer.get();
+}
+
+RenderGraph* Renderer::GetGraph() const noexcept
+{
+    return m_graph.get();
 }
 
 #pragma endregion
