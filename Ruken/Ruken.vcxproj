@@ -190,6 +190,7 @@
     <ClInclude Include="Source\Include\Maths\Constants.hpp" />
     <ClInclude Include="Source\Include\Maths\Easing.hpp" />
     <ClInclude Include="Source\Include\Maths\Math.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\MatrixForward.hpp" />
     <ClInclude Include="Source\Include\Maths\MinMax.hpp" />
     <ClInclude Include="Source\Include\Maths\Quaternion\Quaternion.hpp" />
     <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
