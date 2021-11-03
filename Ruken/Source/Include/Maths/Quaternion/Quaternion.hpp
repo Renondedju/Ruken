@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Maths/Matrix/Matrix3X3.hpp"
+#include "Maths/Matrix/Matrix.hpp"
 #include "Types/Units/Angle/Angle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -108,7 +108,7 @@ struct Quaternion
      * \return Homogenous 3x3 rotation matrix
      */
     [[nodiscard]]
-    constexpr Matrix3X3 GetRotationMatrix() const noexcept;
+    constexpr Matrix<3, 3> GetRotationMatrix() const noexcept;
 
     #pragma endregion
 
@@ -189,6 +189,19 @@ struct Quaternion
     constexpr Quaternion& operator=(Quaternion&&	  in_move) = default;
 
     #pragma endregion
+};
+
+template <>
+struct Constants<Quaternion>
+{
+    /**
+     * \brief The identity rotation.
+     * This quaternion corresponds to "no rotation"
+     *
+     * \note This constant is for code clarity only since the default constructor of
+     * \note a quaternion already is the identity quaternion
+     */
+    static constexpr Quaternion identity = Quaternion();
 };
 
 #include "Maths/Quaternion/Quaternion.inl"

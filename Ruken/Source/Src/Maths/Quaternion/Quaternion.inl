@@ -54,13 +54,13 @@ constexpr RkFloat Quaternion::SqrLength() const noexcept
     return w * w + x * x + y * y + z * z;
 }
 
-constexpr Matrix3X3 Quaternion::GetRotationMatrix() const noexcept
+constexpr Matrix<3, 3> Quaternion::GetRotationMatrix() const noexcept
 {
     RkFloat const sqr_x (x * x);
     RkFloat const sqr_y (y * y);
     RkFloat const sqr_z (z * z);
 
-    return Matrix3X3
+    return Matrix<3, 3>
     (
         1 - 2 * (sqr_y + sqr_z),
         2 * (x * y - z * w),
