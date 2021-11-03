@@ -191,6 +191,13 @@
     <ClInclude Include="Source\Include\Maths\Easing.hpp" />
     <ClInclude Include="Source\Include\Maths\Math.hpp" />
     <ClInclude Include="Source\Include\Maths\Matrix\MatrixForward.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixAccess.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixConversions.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixInversion.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixMultiplication.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixOstream.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixTransposition.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixUtility.hpp" />
     <ClInclude Include="Source\Include\Maths\MinMax.hpp" />
     <ClInclude Include="Source\Include\Maths\Quaternion\Quaternion.hpp" />
     <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
