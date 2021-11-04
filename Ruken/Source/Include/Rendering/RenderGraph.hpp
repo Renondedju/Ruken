@@ -18,7 +18,8 @@ class RenderGraph
         vk::DescriptorSetLayout m_frame_descriptor_set_layout;
         vk::DescriptorSetLayout m_camera_descriptor_set_layout;
 
-        std::unordered_map<std::string, std::unique_ptr<RenderPass>> m_render_passes;
+        std::unordered_map<std::string, std::unique_ptr<RenderPass>>   m_render_passes;
+        std::unordered_map<std::string, std::unique_ptr<RenderTarget>> m_render_targets;
 
     public:
 
@@ -38,7 +39,9 @@ class RenderGraph
         RkVoid Bake() noexcept;
         RkVoid Execute(RenderFrame& in_frame) noexcept;
 
-        RenderPass& FindOrAddRenderPass(std::string const& in_name) noexcept;
+        RenderPass&   FindOrAddRenderPass  (std::string const& in_name) noexcept;
+        RenderTarget& FindOrAddRenderTarget(std::string const& in_name, AttachmentInfo const& in_attachment_info) noexcept;
+        RenderTarget& FindRenderTarget     (std::string const& in_name) noexcept;
 
         vk::DescriptorSetLayout const& GetFrameDescriptorSetLayout () const noexcept;
         vk::DescriptorSetLayout const& GetCameraDescriptorSetLayout() const noexcept;

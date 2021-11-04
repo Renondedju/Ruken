@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/RenderDefines.hpp"
+#include "Rendering/RenderTarget.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -17,6 +17,12 @@ class RenderPass
 
         vk::RenderPass     m_handle;
         vk::PipelineLayout m_pipeline_layout;
+
+        std::vector<RenderTarget*> m_color_inputs;
+        std::vector<RenderTarget*> m_color_outputs;
+
+        RenderTarget* m_depth_stencil_input;
+        RenderTarget* m_depth_stencil_output;
 
         std::vector<vk::Framebuffer> m_framebuffers;
 
@@ -45,11 +51,16 @@ class RenderPass
 
         RkVoid Execute(RenderFrame& in_frame) const noexcept;
 
-        RkVoid AddColorOutput(std::string const& in_name);
+        RkVoid AddColorInput (std::string const& in_name);
+        RkVoid AddColorOutput(std::string const& in_name, AttachmentInfo const& in_attachment_info);
+
+        RkVoid SetDepthStencilInput (std::string const& in_name);
+        RkVoid SetDepthStencilOutput(std::string const& in_name, AttachmentInfo const& in_attachment_info);
 
         RkVoid SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept;
 
-        vk::RenderPass const& GetHandle() const noexcept;
+        vk::RenderPass     const& GetHandle() const noexcept;
+        vk::PipelineLayout const& GetLayout() const noexcept;
 
         #pragma endregion
 

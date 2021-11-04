@@ -6,6 +6,13 @@ BEGIN_RUKEN_NAMESPACE
 
 class RenderDevice;
 
+struct AttachmentInfo
+{
+    vk::Extent3D extent;
+    vk::Format format;
+    vk::ImageUsageFlags usage;
+};
+
 class RenderTarget
 {
     private:
@@ -20,7 +27,7 @@ class RenderTarget
 
         #pragma region Constructors
 
-        RenderTarget(RenderDevice* in_device, RkUint32 in_width, RkUint32 in_height, vk::Format in_format, vk::ImageUsageFlags in_usage) noexcept;
+        RenderTarget(RenderDevice* in_device, AttachmentInfo const& in_attachment_info) noexcept;
 
         RenderTarget(RenderTarget const& in_copy) = delete;
         RenderTarget(RenderTarget&&      in_move) = delete;

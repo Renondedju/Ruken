@@ -38,15 +38,13 @@ Shader::Shader(RenderDevice* in_device, std::string_view const in_path) noexcept
 
     m_module = m_device->GetLogicalDevice().createShaderModule(shader_module_create_info).value;
 
-    /*spirv_cross::Compiler compiler(std::move(shader_code));
+    /*spirv_cross::Compiler const compiler(std::move(shader_code));
 
-    auto shader_resources = vertex_compiler.get_shader_resources();
-
-    for (auto const& resource : vertex_resources.sampled_images)
+    for (auto const& resource : compiler.get_shader_resources())
     {
-        RkUint32 set      = vertex_compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        RkUint32 binding  = vertex_compiler.get_decoration(resource.id, spv::DecorationBinding);
-        RkUint32 location = vertex_compiler.get_decoration(resource.id, spv::DecorationLocation);
+        RkUint32 set      = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+        RkUint32 binding  = compiler.get_decoration(resource.id, spv::DecorationBinding);
+        RkUint32 location = compiler.get_decoration(resource.id, spv::DecorationLocation);
     }*/
 }
 

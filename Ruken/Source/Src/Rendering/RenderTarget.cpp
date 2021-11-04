@@ -3,22 +3,18 @@
 
 USING_RUKEN_NAMESPACE
 
-RenderTarget::RenderTarget(RenderDevice* in_device, RkUint32 in_width, RkUint32 in_height, vk::Format in_format, vk::ImageUsageFlags in_usage) noexcept:
+RenderTarget::RenderTarget(RenderDevice* in_device, AttachmentInfo const& in_attachment_info) noexcept:
     m_device {in_device},
-    m_extent {
-        .width  = in_width,
-        .height = in_height,
-        .depth  = 1U 
-    }
+    m_extent {in_attachment_info.extent}
 {
     vk::ImageCreateInfo image_create_info = {
         .imageType   = vk::ImageType::e2D,
-        .format      = in_format,
+        .format      = in_attachment_info.format,
         .extent      = m_extent,
         .mipLevels   = 1,
         .arrayLayers = 1,
         .tiling      = vk::ImageTiling::eOptimal,
-        .usage       = in_usage
+        .usage       = in_attachment_info.usage
     };
 
     m_image = std::make_unique<Image>(m_device, image_create_info);
@@ -26,9 +22,9 @@ RenderTarget::RenderTarget(RenderDevice* in_device, RkUint32 in_width, RkUint32 
     vk::ImageViewCreateInfo image_view_create_info = {
         .image = m_image->GetHandle(),
         .viewType = vk::ImageViewType::e2D,
-        .format = in_format,
+        .format = in_attachment_info.format,
         .subresourceRange = {
-            .aspectMask = in_usage & vk::ImageUsageFlagBits::eColorAttachment ? vk::ImageAspectFlagBits::eColor : vk::ImageAspectFlagBits::eDepth,
+            .aspectMask = in_attachment_info.usage & vk::ImageUsageFlagBits::eColorAttachment ? vk::ImageAspectFlagBits::eColor : vk::ImageAspectFlagBits::eDepth,
             .levelCount = 1,
             .layerCount = 1
         }

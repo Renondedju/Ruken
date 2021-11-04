@@ -21,15 +21,6 @@ struct Vertex
     glm::vec3 color;
     glm::vec2 uv;
 
-    static vk::VertexInputBindingDescription get_binding_description()
-    {
-        return {
-            .binding = 0,
-            .stride = sizeof(Vertex),
-            .inputRate = vk::VertexInputRate::eVertex
-        };
-    }
-
     static std::array<vk::VertexInputAttributeDescription, 3> get_attribute_descriptions()
     {
         return {

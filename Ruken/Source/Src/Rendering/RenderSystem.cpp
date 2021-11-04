@@ -9,12 +9,14 @@
 #include "Windowing/WindowManager.hpp"
 
 #include "Rendering/Resources/Model.hpp"
+#include "Rendering/Resources/MaterialInstance.hpp"
 
 USING_RUKEN_NAMESPACE
 
-static std::unique_ptr<Model>    g_model;
-static std::unique_ptr<Texture>  g_texture;
-static std::unique_ptr<Material> g_material;
+static std::unique_ptr<Model>            g_model;
+static std::unique_ptr<Texture>          g_texture;
+static std::unique_ptr<Material>         g_material;
+static std::unique_ptr<MaterialInstance> g_material_instance;
 
 RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
     m_renderer {in_service_provider.LocateService<Renderer>     ()},
@@ -22,18 +24,38 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
 {
     auto& forward_pass = m_renderer->GetGraph()->FindOrAddRenderPass("Forward");
 
-    forward_pass.AddColorOutput("FinalColor");
+    AttachmentInfo info = {
+        .extent = {
+            .width = 1920U,
+            .height = 1080U,
+            .depth = 1U
+        },
+        .format = vk::Format::eR8G8B8A8Unorm,
+        .usage = vk::ImageUsageFlagBits::eColorAttachment
+    };
+
+    forward_pass.AddColorOutput("FinalColor", info);
+
+    info.format = vk::Format::eD32SfloatS8Uint;
+    info.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+
+    forward_pass.AddColorOutput("DepthStencil", info);
 
     forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) {
         (void)in_frame;
+
+        RkUint32 index = 0U;
+
+        in_command_buffer.pushConstants(forward_pass.GetLayout(), vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0U, sizeof index, &index);
 
         g_material->Bind  (in_command_buffer);
         g_model   ->Render(in_command_buffer);
     });
 
-    g_model    = std::make_unique<Model>   (m_renderer, "Data/viking_room.obj");
-    g_texture  = std::make_unique<Texture> (m_renderer, "Data/viking_room.png");
-    g_material = std::make_unique<Material>(m_renderer, "");
+    g_model             = std::make_unique<Model>           (m_renderer, "Data/viking_room.obj");
+    g_texture           = std::make_unique<Texture>         (m_renderer, "Data/viking_room.png");
+    g_material          = std::make_unique<Material>        (m_renderer, "");
+    g_material_instance = std::make_unique<MaterialInstance>(m_renderer, g_material.get());
 
     for (RkUint32 i = 0U; i < 2U; ++i)
     {
@@ -48,15 +70,14 @@ RenderSystem::~RenderSystem() noexcept
         
     }
 
-    g_material.reset();
-    g_texture .reset();
-    g_model   .reset();
+    g_material_instance.reset();
+    g_material         .reset();
+    g_texture          .reset();
+    g_model            .reset();
 }
 
 RkVoid RenderSystem::Update() noexcept
 {
-    m_current_frame = (m_current_frame + 1U) % 2U;
-
     auto& frame = *m_frames[m_current_frame];
 
     frame.Reset();
@@ -158,12 +179,13 @@ RkVoid RenderSystem::Update() noexcept
 
         camera_buffer.UnMap();
 
-        //RkUint32 const image_index = m_window->AcquireNextImage(nullptr);
+        // TODO : Setup graph and target swapchain.
 
         // Execute graph.
         m_renderer->GetGraph()->Execute(frame);
 
-        // if renderToScreen
-        //m_window->Present(nullptr, image_index);
+        // TODO : Present target swapchain.
     }
+
+    m_current_frame = (m_current_frame + 1U) % static_cast<RkUint32>(m_frames.size());
 }

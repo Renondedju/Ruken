@@ -73,16 +73,33 @@ RkVoid RenderGraph::Execute(RenderFrame& in_frame) noexcept
     {
         it->second->Execute(in_frame);
     }
+
+    // TODO : Final pass to swapchain.
 }
 
 RenderPass& RenderGraph::FindOrAddRenderPass(std::string const& in_name) noexcept
 {
-    if (m_render_passes.contains(in_name))
-        return *m_render_passes.at(in_name);
-
-    m_render_passes[in_name] = std::make_unique<RenderPass>(m_logger, m_renderer);
+    if (!m_render_passes.contains(in_name))
+    {
+        m_render_passes[in_name] = std::make_unique<RenderPass>(m_logger, m_renderer);
+    }
 
     return *m_render_passes.at(in_name);
+}
+
+RenderTarget& RenderGraph::FindOrAddRenderTarget(std::string const& in_name, AttachmentInfo const& in_attachment_info) noexcept
+{
+    if (!m_render_targets.contains(in_name))
+    {
+        m_render_targets[in_name] = std::make_unique<RenderTarget>(m_renderer->GetDevice(), in_attachment_info);
+    }
+
+    return *m_render_targets.at(in_name);
+}
+
+RenderTarget& RenderGraph::FindRenderTarget(std::string const& in_name) noexcept
+{
+    return *m_render_targets.at(in_name); 
 }
 
 vk::DescriptorSetLayout const& RenderGraph::GetFrameDescriptorSetLayout() const noexcept

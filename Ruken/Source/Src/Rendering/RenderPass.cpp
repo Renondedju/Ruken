@@ -94,18 +94,6 @@ RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
     };
 
     m_pipeline_layout = m_renderer->GetDevice()->GetLogicalDevice().createPipelineLayout(layout_info).value;
-
-    for (RkUint32 i = 0U; i < 2U; ++i)
-    {
-        vk::FramebufferCreateInfo framebuffer_create_info = {
-            .renderPass = m_handle,
-            .width      = 1920U,
-            .height     = 1080U,
-            .layers     = 1U
-        };
-
-        // m_framebuffers.emplace_back(m_renderer->GetDevice()->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value);
-    }
 }
 
 RenderPass::~RenderPass() noexcept
@@ -196,9 +184,32 @@ RkVoid RenderPass::Execute(RenderFrame& in_frame) const noexcept
     in_frame.GetGraphicsCommandPool().Release(command_buffer);
 }
 
-RkVoid RenderPass::AddColorOutput(std::string const& in_name)
+RkVoid RenderPass::AddColorInput(std::string const& in_name)
 {
-    (void)in_name;
+    auto& res =  m_renderer->GetGraph()->FindRenderTarget(in_name);
+
+    m_color_inputs.push_back(&res);
+}
+
+RkVoid RenderPass::AddColorOutput(std::string const& in_name, AttachmentInfo const& in_attachment_info)
+{
+    auto& res = m_renderer->GetGraph()->FindOrAddRenderTarget(in_name, in_attachment_info);
+
+    m_color_outputs.push_back(&res);
+}
+
+RkVoid RenderPass::SetDepthStencilInput(std::string const& in_name)
+{
+    auto& res = m_renderer->GetGraph()->FindRenderTarget(in_name);
+
+    m_depth_stencil_input = &res;
+}
+
+RkVoid RenderPass::SetDepthStencilOutput(std::string const& in_name, AttachmentInfo const& in_attachment_info)
+{
+    auto& res = m_renderer->GetGraph()->FindOrAddRenderTarget(in_name, in_attachment_info);
+
+    m_depth_stencil_output = &res;
 }
 
 RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept
@@ -209,6 +220,11 @@ RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, Re
 vk::RenderPass const& RenderPass::GetHandle() const noexcept
 {
     return m_handle;
+}
+
+vk::PipelineLayout const& RenderPass::GetLayout() const noexcept
+{
+    return m_pipeline_layout;
 }
 
 #pragma endregion
