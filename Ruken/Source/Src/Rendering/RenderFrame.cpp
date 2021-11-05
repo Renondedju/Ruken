@@ -3,21 +3,25 @@
 
 USING_RUKEN_NAMESPACE
 
-RenderFrame::RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 const in_index) noexcept:
+RenderFrame::RenderFrame(Logger* in_logger, RenderDevice* in_device, RenderGraph* in_graph) noexcept:
     m_logger                   {in_logger},
-    m_renderer                 {in_renderer},
-    m_index                    {in_index},
-    m_timeline_semaphore       {in_renderer->GetDevice()},
-    m_semaphore_pool           {in_renderer->GetDevice()},
-    m_graphics_command_pool    {in_renderer->GetDevice(), in_renderer->GetDevice()->GetGraphicsFamilyIndex()},
-    m_compute_command_pool     {in_renderer->GetDevice(), in_renderer->GetDevice()->GetComputeFamilyIndex ()},
-    m_transfer_command_pool    {in_renderer->GetDevice(), in_renderer->GetDevice()->GetTransferFamilyIndex()},
-    m_draw_storage_buffer      {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_transform_storage_buffer {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_material_storage_buffer  {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
-    m_camera_uniform_buffer    {in_renderer->GetDevice(), sizeof(CameraData), vk::BufferUsageFlagBits::eUniformBuffer}
+    m_device                   {in_device},
+    m_graph                    {in_graph},
+    m_timeline_semaphore       {in_device},
+    m_semaphore_pool           {in_device},
+    m_graphics_command_pool    {in_device, in_device->GetGraphicsFamilyIndex()},
+    m_compute_command_pool     {in_device, in_device->GetComputeFamilyIndex ()},
+    m_transfer_command_pool    {in_device, in_device->GetTransferFamilyIndex()},
+    m_draw_storage_buffer      {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_transform_storage_buffer {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_material_storage_buffer  {in_device, 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
+    m_camera_uniform_buffer    {in_device, sizeof(CameraData), vk::BufferUsageFlagBits::eUniformBuffer}
 {
-    vk::DescriptorPoolSize pool_sizes[2] = {
+    std::vector<vk::DescriptorPoolSize> pool_sizes = {
+        {
+            .type            = vk::DescriptorType::eCombinedImageSampler,
+            .descriptorCount = 1000U
+        },
         {
             .type            = vk::DescriptorType::eStorageBuffer,
             .descriptorCount = 3U
@@ -29,27 +33,40 @@ RenderFrame::RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 cons
     };
 
     vk::DescriptorPoolCreateInfo descriptor_pool_info = {
-        .maxSets       = 2U,
-        .poolSizeCount = 2U,
-        .pPoolSizes    = pool_sizes
+        .maxSets       = static_cast<RkUint32>(pool_sizes.size()),
+        .poolSizeCount = static_cast<RkUint32>(pool_sizes.size()),
+        .pPoolSizes    = pool_sizes.data()
     };
 
-    m_descriptor_pool = m_renderer->GetDevice()->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
+    m_descriptor_pool = m_device->GetLogicalDevice().createDescriptorPool(descriptor_pool_info).value;
+
+    vk::DescriptorSetVariableDescriptorCountAllocateInfo descriptor_set_variable_descriptor_count_allocate_info = {
+        .descriptorSetCount = 1U,
+        .pDescriptorCounts  = &pool_sizes[0].descriptorCount
+    };
+
+    vk::DescriptorSetAllocateInfo texture_descriptor_set_allocate_info = {
+        .pNext              = &descriptor_set_variable_descriptor_count_allocate_info,
+        .descriptorPool     = m_descriptor_pool,
+        .descriptorSetCount = 1U,
+        .pSetLayouts        = &m_graph->GetTextureDescriptorSetLayout()
+    };
 
     vk::DescriptorSetAllocateInfo frame_descriptor_set_allocate_info = {
         .descriptorPool     = m_descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &m_renderer->GetGraph()->GetFrameDescriptorSetLayout()
+        .pSetLayouts        = &m_graph->GetFrameDescriptorSetLayout()
     };
 
     vk::DescriptorSetAllocateInfo camera_descriptor_set_allocate_info = {
         .descriptorPool     = m_descriptor_pool,
         .descriptorSetCount = 1U,
-        .pSetLayouts        = &m_renderer->GetGraph()->GetCameraDescriptorSetLayout()
+        .pSetLayouts        = &m_graph->GetCameraDescriptorSetLayout()
     };
 
-    m_frame_descriptor_set  = m_renderer->GetDevice()->GetLogicalDevice().allocateDescriptorSets(frame_descriptor_set_allocate_info) .value.front();
-    m_camera_descriptor_set = m_renderer->GetDevice()->GetLogicalDevice().allocateDescriptorSets(camera_descriptor_set_allocate_info).value.front();
+    m_texture_descriptor_set = m_device->GetLogicalDevice().allocateDescriptorSets(texture_descriptor_set_allocate_info).value.front();
+    m_frame_descriptor_set   = m_device->GetLogicalDevice().allocateDescriptorSets(frame_descriptor_set_allocate_info)  .value.front();
+    m_camera_descriptor_set  = m_device->GetLogicalDevice().allocateDescriptorSets(camera_descriptor_set_allocate_info) .value.front();
 
     vk::DescriptorBufferInfo camera_descriptor_buffer_info = {
         .buffer = m_camera_uniform_buffer.GetHandle(),
@@ -66,12 +83,12 @@ RenderFrame::RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 cons
         .pBufferInfo = &camera_descriptor_buffer_info
     };
 
-    m_renderer->GetDevice()->GetLogicalDevice().updateDescriptorSets(write_descriptor, VK_NULL_HANDLE);
+    m_device->GetLogicalDevice().updateDescriptorSets(write_descriptor, VK_NULL_HANDLE);
 }
 
 RenderFrame::~RenderFrame() noexcept
 {
-    m_renderer->GetDevice()->GetLogicalDevice().destroy(m_descriptor_pool);
+    m_device->GetLogicalDevice().destroy(m_descriptor_pool);
 }
 
 RkVoid RenderFrame::Reset() noexcept
@@ -82,7 +99,7 @@ RkVoid RenderFrame::Reset() noexcept
         .pValues        = &m_timeline_semaphore.GetValue ()
     };
 
-    if (m_renderer->GetDevice()->GetLogicalDevice().waitSemaphores(semaphore_wait_info, UINT64_MAX) != vk::Result::eSuccess)
+    if (m_device->GetLogicalDevice().waitSemaphores(semaphore_wait_info, UINT64_MAX) != vk::Result::eSuccess)
     {
 
     }
@@ -93,6 +110,11 @@ RkVoid RenderFrame::Reset() noexcept
     m_transfer_command_pool.Reset();
 }
 
+vk::DescriptorSet const& RenderFrame::GetTextureDescriptorSet() const noexcept
+{
+    return m_texture_descriptor_set;
+}
+
 vk::DescriptorSet const& RenderFrame::GetFrameDescriptorSet() const noexcept
 {
     return m_frame_descriptor_set;
@@ -101,11 +123,6 @@ vk::DescriptorSet const& RenderFrame::GetFrameDescriptorSet() const noexcept
 vk::DescriptorSet const& RenderFrame::GetCameraDescriptorSet() const noexcept
 {
     return m_camera_descriptor_set;
-}
-
-RkUint32 RenderFrame::GetIndex() const noexcept
-{
-    return m_index;
 }
 
 TimelineSemaphore& RenderFrame::GetTimelineSemaphore() noexcept

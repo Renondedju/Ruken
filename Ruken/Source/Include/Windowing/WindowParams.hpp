@@ -19,12 +19,12 @@ struct WindowParams
     /**
      * \brief The position, in screen coordinates, of the upper-left corner of the content area of the window.
      */
-    VkOffset2D position {};
+    vk::Offset2D position {};
 
     /**
      * \brief The size, in screen coordinates, of the content area of the window.
      */
-    VkExtent2D size {};
+    vk::Extent2D size {};
 
     /**
      * \brief The opacity (or alpha) value is a positive finite number between 0 and 1.

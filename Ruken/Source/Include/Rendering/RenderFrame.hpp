@@ -7,8 +7,6 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Rendering/RenderTarget.hpp"
-
 #include "Rendering/RenderObjects/Buffer.hpp"
 #include "Rendering/RenderObjects/TimelineSemaphore.hpp"
 
@@ -18,7 +16,8 @@
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
-class Renderer;
+class RenderDevice;
+class RenderGraph;
 
 struct CameraData
 {
@@ -32,10 +31,10 @@ class RenderFrame
 
         #pragma region Members
 
-        Logger*   m_logger {nullptr};
-        Renderer* m_renderer {nullptr};
+        Logger*       m_logger {nullptr};
+        RenderDevice* m_device {nullptr};
+        RenderGraph*  m_graph  {nullptr};
 
-        RkUint32          m_index;
         TimelineSemaphore m_timeline_semaphore;
         SemaphorePool     m_semaphore_pool;
         CommandPool       m_graphics_command_pool;
@@ -47,6 +46,7 @@ class RenderFrame
         Buffer            m_camera_uniform_buffer;
 
         vk::DescriptorPool m_descriptor_pool;
+        vk::DescriptorSet  m_texture_descriptor_set;
         vk::DescriptorSet  m_frame_descriptor_set;
         vk::DescriptorSet  m_camera_descriptor_set;
 
@@ -56,7 +56,7 @@ class RenderFrame
 
         #pragma region Constructors
 
-        RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 in_index) noexcept;
+        RenderFrame(Logger* in_logger, RenderDevice* in_device, RenderGraph* in_graph) noexcept;
 
         RenderFrame(RenderFrame const& in_copy) = delete;
         RenderFrame(RenderFrame&&      in_move) = delete;
@@ -69,10 +69,10 @@ class RenderFrame
 
         RkVoid Reset() noexcept;
 
-        vk::DescriptorSet const& GetFrameDescriptorSet () const noexcept;
-        vk::DescriptorSet const& GetCameraDescriptorSet() const noexcept;
+        vk::DescriptorSet const& GetTextureDescriptorSet() const noexcept;
+        vk::DescriptorSet const& GetFrameDescriptorSet  () const noexcept;
+        vk::DescriptorSet const& GetCameraDescriptorSet () const noexcept;
 
-        RkUint32           GetIndex                 () const noexcept;
         TimelineSemaphore& GetTimelineSemaphore     () noexcept;
         SemaphorePool&     GetSemaphorePool         () noexcept;
         CommandPool&       GetGraphicsCommandPool   () noexcept;

@@ -73,7 +73,7 @@ class Screen
          * \return The position, in screen coordinates, of the upper-left corner of the monitor.
          */
         [[nodiscard]]
-        VkOffset2D GetPosition() const noexcept;
+        vk::Offset2D GetPosition() const noexcept;
 
         /**
          * \return The position, in screen coordinates, of the upper-left corner of the work area of the monitor
@@ -82,7 +82,7 @@ class Screen
          *         If no task bar exists then the work area is the monitor resolution in screen coordinates.
          */
         [[nodiscard]]
-        VkRect2D GetWorkArea() const noexcept;
+        vk::Rect2D GetWorkArea() const noexcept;
 
         /**
          * \return The size, in millimeters, of the display area of the monitor.
@@ -90,7 +90,7 @@ class Screen
          *         either because the monitor EDID data is incorrect or because the driver does not report it accurately.
          */
         [[nodiscard]]
-        VkExtent2D GetPhysicalSize() const noexcept;
+        vk::Extent2D GetPhysicalSize() const noexcept;
 
         /**
          * \brief  The content scale is the ratio between the current DPI and the platform's default DPI.
@@ -100,7 +100,7 @@ class Screen
          *         It may be very different from the raw DPI calculated from the physical size and current resolution.
          */
         [[nodiscard]]
-        VkScale2D GetContentScale() const noexcept;
+        vk::Scale2D GetContentScale() const noexcept;
 
         /**
          * \return The current video mode of the specified monitor.

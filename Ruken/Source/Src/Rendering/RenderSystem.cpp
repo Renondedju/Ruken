@@ -22,45 +22,31 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
     m_renderer {in_service_provider.LocateService<Renderer>     ()},
     m_window   {in_service_provider.LocateService<WindowManager>()->GetMainWindow()}
 {
-    auto& forward_pass = m_renderer->GetGraph()->FindOrAddRenderPass("Forward");
+    auto& forward_pass = m_renderer->GetGraph()->AddPass("Forward");
 
-    AttachmentInfo info = {
-        .extent = {
-            .width = 1920U,
-            .height = 1080U,
-            .depth = 1U
-        },
-        .format = vk::Format::eR8G8B8A8Unorm,
-        .usage = vk::ImageUsageFlagBits::eColorAttachment
+    ImageInfo info = {
+        
     };
 
-    forward_pass.AddColorOutput("FinalColor", info);
+    forward_pass.AddColorOutput("Final", info);
 
-    info.format = vk::Format::eD32SfloatS8Uint;
-    info.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+    forward_pass.SetDepthStencilOutput("Depth", info);
 
-    forward_pass.AddColorOutput("DepthStencil", info);
-
-    forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer, RenderFrame const& in_frame) {
-        (void)in_frame;
-
+    forward_pass.SetCallback([&](vk::CommandBuffer const& in_command_buffer) {
         RkUint32 index = 0U;
 
-        in_command_buffer.pushConstants(forward_pass.GetLayout(), vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0U, sizeof index, &index);
+        in_command_buffer.pushConstants(m_renderer->GetGraph()->GetDefaultPipelineLayout(), vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0U, sizeof index, &index);
 
         g_material->Bind  (in_command_buffer);
         g_model   ->Render(in_command_buffer);
     });
 
+    m_renderer->GetGraph()->Build();
+
     g_model             = std::make_unique<Model>           (m_renderer, "Data/viking_room.obj");
     g_texture           = std::make_unique<Texture>         (m_renderer, "Data/viking_room.png");
     g_material          = std::make_unique<Material>        (m_renderer, "");
     g_material_instance = std::make_unique<MaterialInstance>(m_renderer, g_material.get());
-
-    for (RkUint32 i = 0U; i < 2U; ++i)
-    {
-        m_frames.emplace_back(std::make_unique<RenderFrame>(nullptr, m_renderer, i));
-    }
 }
 
 RenderSystem::~RenderSystem() noexcept
@@ -78,9 +64,7 @@ RenderSystem::~RenderSystem() noexcept
 
 RkVoid RenderSystem::Update() noexcept
 {
-    auto& frame = *m_frames[m_current_frame];
-
-    frame.Reset();
+    auto& frame = m_renderer->GetGraph()->BeginFrame();
 
     // Frame data.
     auto& draw_buffer      = frame.GetDrawStorageBuffer     ();
@@ -105,14 +89,15 @@ RkVoid RenderSystem::Update() noexcept
         .normal_texture = 1U
     };
 
-    memcpy(draw_buffer.Map(), &draw_data, sizeof(DrawData));
-    draw_buffer.UnMap();
+    draw_buffer     .Upload(&draw_data);
+    transform_buffer.Upload(&transform_data);
+    material_buffer .Upload(&material_data);
 
-    memcpy(transform_buffer.Map(), &transform_data, sizeof(TransformData));
-    transform_buffer.UnMap();
-
-    memcpy(material_buffer.Map(), &material_data, sizeof(MaterialData));
-    material_buffer.UnMap();
+    vk::DescriptorImageInfo texture_descriptor_image_info = {
+        .sampler     = g_texture->GetSampler(),
+        .imageView   = g_texture->GetView(),
+        .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+    };
 
     vk::DescriptorBufferInfo draw_descriptor_buffer_info = {
         .buffer = draw_buffer.GetHandle(),
@@ -132,8 +117,16 @@ RkVoid RenderSystem::Update() noexcept
         .range  = sizeof(MaterialData)
     };
 
-    std::array<vk::WriteDescriptorSet, 3> write_descriptors = {
+    std::array<vk::WriteDescriptorSet, 4> write_descriptors = {
         {
+            {
+                .dstSet = frame.GetTextureDescriptorSet(),
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = vk::DescriptorType::eCombinedImageSampler,
+                .pImageInfo = &texture_descriptor_image_info
+            },
             {
                 .dstSet = frame.GetFrameDescriptorSet(),
                 .dstBinding = 0,
@@ -180,12 +173,22 @@ RkVoid RenderSystem::Update() noexcept
         camera_buffer.UnMap();
 
         // TODO : Setup graph and target swapchain.
+        auto const image_semaphore   = frame.GetSemaphorePool().Request();
+        auto const present_semaphore = frame.GetSemaphorePool().Request();
 
-        // Execute graph.
-        m_renderer->GetGraph()->Execute(frame);
+        if (m_window->AcquireNextImage(image_semaphore))
+        {
+            m_renderer->GetGraph()->SetFinalTarget(m_window->GetImage());
 
-        // TODO : Present target swapchain.
+            m_renderer->GetGraph()->Build();
+            m_renderer->GetGraph()->Execute(image_semaphore, present_semaphore);
+
+            m_window->Present(present_semaphore);
+        }
+
+        frame.GetSemaphorePool().Release(image_semaphore);
+        frame.GetSemaphorePool().Release(present_semaphore);
     }
 
-    m_current_frame = (m_current_frame + 1U) % static_cast<RkUint32>(m_frames.size());
+    m_renderer->GetGraph()->EndFrame();
 }

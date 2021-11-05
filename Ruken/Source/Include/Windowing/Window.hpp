@@ -9,12 +9,13 @@
 
 #include "Windowing/WindowParams.hpp"
 
+#include "Rendering/RenderObjects/Image.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
 class RenderContext;
 class RenderDevice;
-class RenderFrame;
 
 /**
  * \brief Manages a GLFW window.
@@ -37,14 +38,14 @@ class Window
 
         vk::SurfaceKHR     m_surface;
         vk::SwapchainKHR   m_swapchain;
+        RkUint32           m_image_index;
         RkUint32           m_image_count;
         vk::Extent2D       m_image_extent;
         vk::Format         m_image_format;
         vk::ColorSpaceKHR  m_color_space;
         vk::PresentModeKHR m_present_mode;
 
-        std::vector<vk::Image> m_images;
-        std::vector<vk::ImageView> m_image_views;
+        std::vector<std::unique_ptr<Image>> m_images;
 
         #pragma endregion
 
@@ -83,6 +84,7 @@ class Window
         RkVoid PickSwapchainFormat     ()                                   noexcept;
         RkVoid PickSwapchainPresentMode()                                   noexcept;
         RkVoid CreateSwapchain         (vk::SwapchainKHR in_old_swapchain ) noexcept;
+        RkVoid CreateImages            ()                                   noexcept;
         RkVoid SetupCallbacks          ()                                   const noexcept;
 
         #pragma endregion
@@ -144,11 +146,10 @@ class Window
 
         #pragma region Methods
 
-        RkUint32 AcquireNextImage(vk::Semaphore const& in_semaphore)                          const noexcept;
-        RkVoid   Present         (vk::Semaphore const& in_semaphore, RkUint32 in_image_index) noexcept;
+        RkBool AcquireNextImage(vk::Semaphore const& in_semaphore) noexcept;
+        RkVoid Present         (vk::Semaphore const& in_semaphore) noexcept;
 
-        vk::Image     const& GetImage    (RkUint32 in_index) const noexcept;
-        vk::ImageView const& GetImageView(RkUint32 in_index) const noexcept;
+        Image const& GetImage() const noexcept;
 
         #pragma region Setters
 
@@ -156,7 +157,7 @@ class Window
          * \brief Sets the position, in screen coordinates, of the upper-left corner of the content area of the window.
          * \note  If the window is a full screen window, this function does nothing.
          */
-        RkVoid SetPosition(VkOffset2D const& in_position) const noexcept;
+        RkVoid SetPosition(vk::Offset2D const& in_position) const noexcept;
 
         /**
          * \brief Sets the size limits of the content area of the window.
@@ -166,7 +167,7 @@ class Window
          *        If the window is not resizable, this function does nothing.
          *        The size limits are applied immediately to a windowed mode window and may cause it to be resized.
          */
-        RkVoid SetSizeLimits(VkExtent2D const& in_min_size, VkExtent2D const& in_max_size) const noexcept;
+        RkVoid SetSizeLimits(vk::Extent2D const& in_min_size, vk::Extent2D const& in_max_size) const noexcept;
 
         /**
          * \brief Sets the required aspect ratio of the content area of the window.
@@ -182,7 +183,7 @@ class Window
          * \note  For full screen windows, this function updates the resolution of its desired video mode
          *        and switches to the video mode closest to it, without affecting the window's context.
          */
-        RkVoid SetSize(VkExtent2D const& in_size) const noexcept;
+        RkVoid SetSize(vk::Extent2D const& in_size) const noexcept;
 
         /**
          * \brief Sets the opacity of the window, including any decorations.
@@ -293,26 +294,26 @@ class Window
          * \return The position, in screen coordinates, of the upper-left corner of the content area of the window.
          */
         [[nodiscard]]
-        VkOffset2D GetPosition() const noexcept;
+        vk::Offset2D GetPosition() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of the content area of the window.
          */
         [[nodiscard]]
-        VkExtent2D GetSize() const noexcept;
+        vk::Extent2D GetSize() const noexcept;
 
         /**
          * \return The size, in pixels, of the framebuffer of the window.
          */
         [[nodiscard]]
-        VkExtent2D GetFramebufferSize() const noexcept;
+        vk::Extent2D GetFramebufferSize() const noexcept;
 
         /**
          * \return The size, in screen coordinates, of each edge of the frame of the window.
          * \note   This size includes the title bar, if the window has one.
          */
         [[nodiscard]]
-        VkRect2D GetFrameSize() const noexcept;
+        vk::Rect2D GetFrameSize() const noexcept;
 
         /**
          * \return The content scale for the window (the ratio between the current DPI and the platform's default DPI).
@@ -320,7 +321,7 @@ class Window
          *         on which monitor the system considers the window to be on.
          */
         [[nodiscard]]
-        VkScale2D GetContentScale() const noexcept;
+        vk::Scale2D GetContentScale() const noexcept;
 
         /**
          * \return The opacity of the window, including any decorations (between 0 and 1).

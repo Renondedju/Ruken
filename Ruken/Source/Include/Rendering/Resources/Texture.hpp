@@ -10,7 +10,7 @@ BEGIN_RUKEN_NAMESPACE
 
 class Renderer;
 
-class Texture final : public IResource
+class Texture final : public Image, public IResource
 {
     private:
 
@@ -18,11 +18,7 @@ class Texture final : public IResource
 
         Renderer* m_renderer;
 
-        RkUint32 m_index;
-
-        std::unique_ptr<Image> m_image;
-        vk::ImageView          m_image_view;
-        vk::Sampler            m_image_sampler;
+        vk::Sampler m_sampler;
 
         #pragma endregion
 
@@ -43,10 +39,7 @@ class Texture final : public IResource
         RkVoid Reload(ResourceManager& in_manager)                                                 override;
         RkVoid Unload(ResourceManager& in_manager)                                                 noexcept override;
 
-        RkUint32             GetIndex       () const noexcept;
-        vk::Image     const& GetImage       () const noexcept;
-        vk::ImageView const& GetImageView   () const noexcept;
-        vk::Sampler   const& GetImageSampler() const noexcept;
+        vk::Sampler const& GetSampler() const noexcept;
 
         #pragma region Operators
 

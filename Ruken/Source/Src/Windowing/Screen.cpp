@@ -54,18 +54,18 @@ std::vector<VideoMode> const& Screen::GetVideoModes() const noexcept
     return m_video_modes;
 }
 
-VkOffset2D Screen::GetPosition() const noexcept
+vk::Offset2D Screen::GetPosition() const noexcept
 {
-    VkOffset2D position = {};
+    vk::Offset2D position = {};
 
     glfwGetMonitorPos(m_handle, &position.x, &position.y);
 
     return position;
 }
 
-VkRect2D Screen::GetWorkArea() const noexcept
+vk::Rect2D Screen::GetWorkArea() const noexcept
 {
-    VkRect2D area = {};
+    vk::Rect2D area = {};
 
     glfwGetMonitorWorkarea(m_handle, &area.offset.x,
                                      &area.offset.y,
@@ -75,9 +75,9 @@ VkRect2D Screen::GetWorkArea() const noexcept
     return area;
 }
 
-VkExtent2D Screen::GetPhysicalSize() const noexcept
+vk::Extent2D Screen::GetPhysicalSize() const noexcept
 {
-    VkExtent2D extent = {};
+    vk::Extent2D extent = {};
 
     glfwGetMonitorPhysicalSize(m_handle, reinterpret_cast<RkInt32*>(&extent.width),
                                          reinterpret_cast<RkInt32*>(&extent.height));
@@ -85,9 +85,9 @@ VkExtent2D Screen::GetPhysicalSize() const noexcept
     return extent;
 }
 
-VkScale2D Screen::GetContentScale() const noexcept
+vk::Scale2D Screen::GetContentScale() const noexcept
 {
-    VkScale2D scale = {};
+    vk::Scale2D scale = {};
 
     glfwGetMonitorContentScale(m_handle, &scale.x, &scale.y);
 

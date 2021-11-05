@@ -9,7 +9,7 @@
 
 USING_RUKEN_NAMESPACE
 
-Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
+Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept: Image(in_renderer->GetDevice()),
     m_renderer {in_renderer}
 {
     int32_t width, height, channels;
@@ -30,10 +30,10 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
         .usage       = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst
     };
 
-    m_image = std::make_unique<Image>(m_renderer->GetDevice(), image_create_info);
+    CreateImage(image_create_info);
 
     vk::ImageViewCreateInfo image_view_create_info = {
-        .image = m_image->GetHandle(),
+        .image = m_handle,
         .viewType = vk::ImageViewType::e2D,
         .format = vk::Format::eR8G8B8A8Unorm,
         .subresourceRange = {
@@ -43,10 +43,7 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
         }
     };
 
-    if (auto [result, value] = m_renderer->GetDevice()->GetLogicalDevice().createImageView(image_view_create_info); result == vk::Result::eSuccess)
-    {
-        m_image_view = value;
-    }
+    CreateView(image_view_create_info);
 
     vk::SamplerCreateInfo tex_sampler_info = {
         .magFilter = vk::Filter::eLinear,
@@ -57,7 +54,7 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
 
     if (auto [result, value] = m_renderer->GetDevice()->GetLogicalDevice().createSampler(tex_sampler_info); result == vk::Result::eSuccess)
     {
-        m_image_sampler = value;
+        m_sampler = value;
     }
 
     vk::BufferCreateInfo buffer_create_info = {
@@ -67,9 +64,7 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
 
     Buffer staging_buffer(m_renderer->GetDevice(), buffer_create_info);
 
-    memcpy(staging_buffer.Map(), pixels, buffer_create_info.size);
-
-    staging_buffer.UnMap();
+    staging_buffer.Upload(pixels);
 
     if (auto transfer_command_buffer = m_renderer->GetDevice()->GetTransferQueue().BeginSingleUseCommandBuffer())
     {
@@ -82,7 +77,7 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
             .newLayout           = vk::ImageLayout::eTransferDstOptimal,
             .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
             .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            .image               = m_image->GetHandle(),
+            .image               = m_handle,
             .subresourceRange =  {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .levelCount = 1U,
@@ -105,7 +100,7 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
             .imageExtent = image_create_info.extent
         };
 
-        transfer_command_buffer.copyBufferToImage(staging_buffer.GetHandle(), m_image->GetHandle(), vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
+        transfer_command_buffer.copyBufferToImage(staging_buffer.GetHandle(), m_handle, vk::ImageLayout::eTransferDstOptimal, buffer_image_copy);
 
         image_memory_barrier.srcStageMask  = vk::PipelineStageFlagBits2KHR::eTransfer;
         image_memory_barrier.srcAccessMask = vk::AccessFlagBits2KHR::eMemoryWrite;
@@ -149,15 +144,13 @@ Texture::Texture(Renderer* in_renderer, std::string_view in_path) noexcept:
         }
     }
 
-    m_index = m_renderer->GetTextureStreamer()->RegisterTexture(*this);
-
     stbi_image_free(pixels);
 }
 
 Texture::~Texture() noexcept
 {
-    m_renderer->GetDevice()->GetLogicalDevice().destroyImageView(m_image_view);
-    m_renderer->GetDevice()->GetLogicalDevice().destroySampler  (m_image_sampler);
+    if (m_sampler)
+        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_sampler);
 }
 
 RkVoid Texture::Load(ResourceManager& in_manager, ResourceLoadingDescriptor const& in_descriptor)
@@ -176,22 +169,7 @@ RkVoid Texture::Unload(ResourceManager& in_manager) noexcept
     (void)in_manager;
 }
 
-RkUint32 Texture::GetIndex() const noexcept
+vk::Sampler const& Texture::GetSampler() const noexcept
 {
-    return m_index;
-}
-
-vk::Image const& Texture::GetImage() const noexcept
-{
-    return m_image->GetHandle();
-}
-
-vk::ImageView const& Texture::GetImageView() const noexcept
-{
-    return m_image_view;
-}
-
-vk::Sampler const& Texture::GetImageSampler() const noexcept
-{
-    return m_image_sampler;
+    return m_sampler;
 }

@@ -8,7 +8,6 @@
 #include "Rendering/RenderContext.hpp"
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/RenderGraph.hpp"
-#include "Rendering/RenderTextureStreamer.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -23,10 +22,9 @@ class Renderer final : public Service<Renderer>
 
         Logger* m_logger {nullptr};
 
-        std::unique_ptr<RenderContext>         m_context;
-        std::unique_ptr<RenderDevice>          m_device;
-        std::unique_ptr<RenderTextureStreamer> m_texture_streamer;
-        std::unique_ptr<RenderGraph>           m_graph;
+        std::unique_ptr<RenderContext> m_context;
+        std::unique_ptr<RenderDevice>  m_device;
+        std::unique_ptr<RenderGraph>   m_graph;
 
         #pragma endregion
 
@@ -52,10 +50,9 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Methods
 
-        RenderContext*         GetContext        () const noexcept;
-        RenderDevice*          GetDevice         () const noexcept;
-        RenderTextureStreamer* GetTextureStreamer() const noexcept;
-        RenderGraph*           GetGraph          () const noexcept;
+        RenderContext* GetContext() const noexcept;
+        RenderDevice*  GetDevice () const noexcept;
+        RenderGraph*   GetGraph  () const noexcept;
 
         #pragma endregion
 

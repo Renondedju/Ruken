@@ -156,15 +156,18 @@ RkBool RenderDevice::CreateLogicalDevice() noexcept
 
     vk::PhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features = {
         .shaderSampledImageArrayNonUniformIndexing    = VK_TRUE,
-        .descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
-        .descriptorBindingUpdateUnusedWhilePending    = VK_TRUE,
         .descriptorBindingPartiallyBound              = VK_TRUE,
         .descriptorBindingVariableDescriptorCount     = VK_TRUE,
         .runtimeDescriptorArray                       = VK_TRUE
     };
 
+    vk::PhysicalDeviceImagelessFramebufferFeatures imageless_framebuffer_features = {
+        .pNext                = &descriptor_indexing_features,
+        .imagelessFramebuffer = VK_TRUE
+    };
+
     vk::PhysicalDeviceTimelineSemaphoreFeatures timeline_semaphore_features = {
-        .pNext             = &descriptor_indexing_features,
+        .pNext             = &imageless_framebuffer_features,
         .timelineSemaphore = VK_TRUE
     };
 

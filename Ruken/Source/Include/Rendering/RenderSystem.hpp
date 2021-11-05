@@ -17,10 +17,6 @@ class RenderSystem
         Renderer* m_renderer;
         Window*   m_window;
 
-        RkUint32 m_current_frame {0U};
-
-        std::vector<std::unique_ptr<RenderFrame>> m_frames;
-
     public:
 
         RenderSystem(ServiceProvider& in_service_provider) noexcept;

@@ -1,7 +1,6 @@
 
 #include "Rendering/RenderContext.hpp"
 #include "Rendering/RenderDevice.hpp"
-#include "Rendering/RenderFrame.hpp"
 
 #include "Windowing/Window.hpp"
 
@@ -238,7 +237,7 @@ RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
         .imageColorSpace  = m_color_space,
         .imageExtent      = m_image_extent,
         .imageArrayLayers = 1U,
-        .imageUsage       = vk::ImageUsageFlagBits::eTransferDst,
+        .imageUsage       = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst,
         .preTransform     = vk::SurfaceTransformFlagBitsKHR::eIdentity,
         .compositeAlpha   = vk::CompositeAlphaFlagBitsKHR::eOpaque,
         .presentMode      = m_present_mode,
@@ -252,7 +251,7 @@ RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
     {
         m_swapchain = value;
 
-        std::tie(result, m_images) = m_device->GetLogicalDevice().getSwapchainImagesKHR(m_swapchain);
+        CreateImages();
     }
 
     else
@@ -260,6 +259,33 @@ RkVoid Window::CreateSwapchain(vk::SwapchainKHR in_old_swapchain) noexcept
 
     if (in_old_swapchain)
         m_device->GetLogicalDevice().destroySwapchainKHR(in_old_swapchain);
+}
+
+RkVoid Window::CreateImages() noexcept
+{
+    auto [result, images] = m_device->GetLogicalDevice().getSwapchainImagesKHR(m_swapchain);
+
+    for (auto const& image: images)
+    {
+        vk::ImageViewCreateInfo image_view_create_info = {
+            .image = image,
+            .viewType = vk::ImageViewType::e2D,
+            .format = m_image_format,
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1
+            }
+        };
+
+        vk::Extent3D extent = {
+            .width = m_image_extent.width,
+            .height = m_image_extent.height,
+            .depth = 1
+        };
+
+        m_images.push_back(std::make_unique<Image>(m_device, extent, image, m_device->GetLogicalDevice().createImageView(image_view_create_info).value));
+    }
 }
 
 RkVoid Window::SetupCallbacks() const noexcept
@@ -275,197 +301,47 @@ RkVoid Window::SetupCallbacks() const noexcept
     glfwSetWindowContentScaleCallback(m_handle, &WindowContentScaleCallback);
 }
 
-RkUint32 Window::AcquireNextImage(vk::Semaphore const& in_semaphore) const noexcept
+RkBool Window::AcquireNextImage(vk::Semaphore const& in_semaphore) noexcept
 {
     if (m_image_extent.width == 0 || m_image_extent.height == 0)
-        return UINT32_MAX;
+        return false;
 
     auto [result, value] = m_device->GetLogicalDevice().acquireNextImageKHR(m_swapchain, UINT64_MAX, in_semaphore);
 
-    return value;
+    if (result < vk::Result::eSuccess)
+        return false;
+
+    m_image_index = value;
+
+    return true;
 }
 
-RkVoid Window::Present(vk::Semaphore const& in_semaphore, RkUint32 in_image_index) noexcept
+RkVoid Window::Present(vk::Semaphore const& in_semaphore) noexcept
 {
-    if (m_image_extent.width == 0 || m_image_extent.height == 0)
-        return;
-
-    /*auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
-
-    // TODO : Execute final pass.
-    vk::CommandBufferBeginInfo command_buffer_begin_info = {
-
-    };
-
-    if (command_buffer.begin(command_buffer_begin_info) == vk::Result::eSuccess)
-    {
-        vk::ImageMemoryBarrier render_target_barrier = {
-            .srcAccessMask    = vk::AccessFlagBits::eColorAttachmentWrite,
-            .dstAccessMask    = vk::AccessFlagBits::eTransferRead,
-            .oldLayout        = vk::ImageLayout::eColorAttachmentOptimal,
-            .newLayout        = vk::ImageLayout::eTransferSrcOptimal,
-            .image            = in_frame.GetColorTarget().GetImage(),
-            .subresourceRange = {
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .levelCount = 1,
-                .layerCount = 1
-            }
-        };
-
-        command_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eColorAttachmentOutput,
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::DependencyFlagBits::eByRegion,
-            nullptr,
-            nullptr,
-            render_target_barrier);
-
-        vk::ImageMemoryBarrier swapchain_barrier = {
-            .srcAccessMask    = vk::AccessFlagBits::eNoneKHR,
-            .dstAccessMask    = vk::AccessFlagBits::eTransferWrite,
-            .oldLayout        = vk::ImageLayout::eUndefined,
-            .newLayout        = vk::ImageLayout::eTransferDstOptimal,
-            .image            = m_images[m_image_index],
-            .subresourceRange = {
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .levelCount = 1,
-                .layerCount = 1
-            }
-        };
-
-        command_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTopOfPipe,
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::DependencyFlagBits::eByRegion,
-            nullptr,
-            nullptr,
-            swapchain_barrier);
-
-        vk::ImageBlit image_blit = {
-            .srcSubresource = {
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .layerCount = 1
-            },
-            .dstSubresource = {
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .layerCount = 1
-            }
-        };
-
-        image_blit.srcOffsets[1].x = in_frame.GetColorTarget().GetExtent().width;
-        image_blit.srcOffsets[1].y = in_frame.GetColorTarget().GetExtent().height;
-        image_blit.srcOffsets[1].z = 1U;
-        image_blit.dstOffsets[1].x = m_image_extent.width;
-        image_blit.dstOffsets[1].y = m_image_extent.height;
-        image_blit.dstOffsets[1].z = 1U;
-
-        command_buffer.blitImage(
-            in_frame.GetColorTarget().GetImage(),
-            vk::ImageLayout::eTransferSrcOptimal,
-            m_images[m_image_index],
-            vk::ImageLayout::eTransferDstOptimal,
-            1U,
-            &image_blit,
-            vk::Filter::eLinear);
-
-        render_target_barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
-        render_target_barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-        render_target_barrier.oldLayout     = vk::ImageLayout::eTransferSrcOptimal;
-        render_target_barrier.newLayout     = vk::ImageLayout::eColorAttachmentOptimal;
-        
-        command_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eColorAttachmentOutput,
-            vk::DependencyFlagBits::eByRegion,
-            nullptr,
-            nullptr,
-            render_target_barrier);
-
-        swapchain_barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-        swapchain_barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead;
-        swapchain_barrier.oldLayout     = vk::ImageLayout::eTransferDstOptimal;
-        swapchain_barrier.newLayout     = vk::ImageLayout::ePresentSrcKHR;
-        
-        command_buffer.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eBottomOfPipe,
-            vk::DependencyFlagBits::eByRegion,
-            nullptr,
-            nullptr,
-            swapchain_barrier);
-
-        if (command_buffer.end() == vk::Result::eSuccess)
-        {
-            
-        }
-    }
-
-    std::vector<vk::SemaphoreSubmitInfoKHR> wait_semaphores_submit_infos = {
-        {
-            .semaphore = image_semaphore
-        },
-        {
-            .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
-            .value     = in_frame.GetTimelineSemaphore().GetValue ()
-        }
-    };
-
-    std::vector<vk::CommandBufferSubmitInfoKHR> command_buffer_submit_infos = {
-        {
-            .commandBuffer = command_buffer
-        }
-    };
-
-    std::vector<vk::SemaphoreSubmitInfoKHR> signal_semaphores_submit_infos = {
-        {
-            .semaphore = present_semaphore
-        },
-        {
-            .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
-            .value     = in_frame.GetTimelineSemaphore().NextValue()
-        }
-    };
-
-    vk::SubmitInfo2KHR submit_info = {
-        .waitSemaphoreInfoCount   = static_cast<RkUint32>(wait_semaphores_submit_infos.size()),
-        .pWaitSemaphoreInfos      = wait_semaphores_submit_infos.data(),
-        .commandBufferInfoCount   = static_cast<RkUint32>(command_buffer_submit_infos.size()),
-        .pCommandBufferInfos      = command_buffer_submit_infos.data(),
-        .signalSemaphoreInfoCount = static_cast<RkUint32>(signal_semaphores_submit_infos.size()),
-        .pSignalSemaphoreInfos    = signal_semaphores_submit_infos.data()
-    };
-
-    m_device->GetGraphicsQueue().Submit(submit_info);*/
-
     vk::PresentInfoKHR present_info = {
         .waitSemaphoreCount = 1U,
         .pWaitSemaphores    = &in_semaphore,
         .swapchainCount     = 1U,
         .pSwapchains        = &m_swapchain,
-        .pImageIndices      = &in_image_index
+        .pImageIndices      = &m_image_index
     };
 
     m_device->GetGraphicsQueue().Present(present_info);
 }
 
-vk::Image const& Window::GetImage(RkUint32 const in_index) const noexcept
+Image const& Window::GetImage() const noexcept
 {
-    return m_images[in_index];
-}
-
-vk::ImageView const& Window::GetImageView(RkUint32 in_index) const noexcept
-{
-    return m_image_views[in_index];
+    return *m_images[m_image_index];
 }
 
 #pragma region Setters
 
-RkVoid Window::SetPosition(VkOffset2D const& in_position) const noexcept
+RkVoid Window::SetPosition(vk::Offset2D const& in_position) const noexcept
 {
     glfwSetWindowPos(m_handle, in_position.x, in_position.y);
 }
 
-RkVoid Window::SetSizeLimits(VkExtent2D const& in_min_size, VkExtent2D const& in_max_size) const noexcept
+RkVoid Window::SetSizeLimits(vk::Extent2D const& in_min_size, vk::Extent2D const& in_max_size) const noexcept
 {
     glfwSetWindowSizeLimits(m_handle, in_min_size.width, in_min_size.height,
                                       in_max_size.width, in_max_size.height);
@@ -476,7 +352,7 @@ RkVoid Window::SetAspectRatio(RkInt32 const in_numerator, RkInt32 const in_denom
     glfwSetWindowAspectRatio(m_handle, in_numerator, in_denominator);
 }
 
-RkVoid Window::SetSize(VkExtent2D const& in_size) const noexcept
+RkVoid Window::SetSize(vk::Extent2D const& in_size) const noexcept
 {
     glfwSetWindowSize(m_handle, static_cast<RkInt32>(in_size.width), static_cast<RkInt32>(in_size.height));
 }
@@ -566,36 +442,36 @@ RkBool Window::ShouldClose() const noexcept
     return glfwWindowShouldClose(m_handle) == GLFW_TRUE;
 }
 
-VkOffset2D Window::GetPosition() const noexcept
+vk::Offset2D Window::GetPosition() const noexcept
 {
-    VkOffset2D position = {};
+    vk::Offset2D position = {};
 
     glfwGetWindowPos(m_handle, &position.x, &position.y);
 
     return position;
 }
 
-VkExtent2D Window::GetSize() const noexcept
+vk::Extent2D Window::GetSize() const noexcept
 {
-    VkExtent2D size = {};
+    vk::Extent2D size = {};
 
     glfwGetWindowSize(m_handle, reinterpret_cast<RkInt32*>(&size.width), reinterpret_cast<RkInt32*>(&size.height));
 
     return size;
 }
 
-VkExtent2D Window::GetFramebufferSize() const noexcept
+vk::Extent2D Window::GetFramebufferSize() const noexcept
 {
-    VkExtent2D size = {};
+    vk::Extent2D size = {};
 
     glfwGetFramebufferSize(m_handle, reinterpret_cast<RkInt32*>(&size.width), reinterpret_cast<RkInt32*>(&size.height));
 
     return size;
 }
 
-VkRect2D Window::GetFrameSize() const noexcept
+vk::Rect2D Window::GetFrameSize() const noexcept
 {
-    VkRect2D frame = {};
+    vk::Rect2D frame = {};
 
     glfwGetWindowFrameSize(m_handle, 
                            &frame.offset.x,
@@ -606,9 +482,9 @@ VkRect2D Window::GetFrameSize() const noexcept
     return frame;
 }
 
-VkScale2D Window::GetContentScale() const noexcept
+vk::Scale2D Window::GetContentScale() const noexcept
 {
-    VkScale2D scale = {};
+    vk::Scale2D scale = {};
 
     glfwGetWindowContentScale(m_handle, &scale.x, &scale.y);
 

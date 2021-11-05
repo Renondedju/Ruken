@@ -19,7 +19,7 @@ Material::Material(Renderer* in_renderer, std::string_view const in_path) noexce
     // TODO : Shaders' reflection.
 
     std::vector descriptor_set_layouts = {
-        m_renderer->GetTextureStreamer()->GetDescriptorSetLayout(),
+        m_renderer->GetGraph()->GetTextureDescriptorSetLayout(),
         m_renderer->GetGraph()->GetFrameDescriptorSetLayout(),
         m_renderer->GetGraph()->GetCameraDescriptorSetLayout()
     };
@@ -120,7 +120,7 @@ Material::Material(Renderer* in_renderer, std::string_view const in_path) noexce
         .pColorBlendState    = &m_color_blend_state,
         .pDynamicState       = &m_dynamic_state,
         .layout              = m_pipeline_layout,
-        .renderPass          = m_renderer->GetGraph()->FindOrAddRenderPass("Forward").GetHandle()
+        .renderPass          = m_renderer->GetGraph()->FindPass("Forward")->GetHandle()
     };
 
     m_pipeline = m_renderer->GetDevice()->GetLogicalDevice().createGraphicsPipeline(VK_NULL_HANDLE, pipeline_info).value;

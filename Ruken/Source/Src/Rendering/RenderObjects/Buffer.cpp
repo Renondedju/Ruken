@@ -99,6 +99,17 @@ RkVoid Buffer::Resize(VkDeviceSize const in_size) noexcept
     vmaCreateBuffer(m_device->GetAllocator(), reinterpret_cast<VkBufferCreateInfo*>(&buffer_create_info), &allocation_create_info, reinterpret_cast<VkBuffer*>(&m_handle), &m_allocation, &m_allocation_info);
 }
 
+RkVoid Buffer::Upload(RkVoid const* in_data) const noexcept
+{
+    RkVoid* data;
+
+    vmaMapMemory(m_device->GetAllocator(), m_allocation, &data);
+
+    std::memcpy(data, in_data, m_size);
+
+    vmaUnmapMemory(m_device->GetAllocator(), m_allocation);
+}
+
 RkVoid* Buffer::Map() const noexcept
 {
     RkVoid* data;

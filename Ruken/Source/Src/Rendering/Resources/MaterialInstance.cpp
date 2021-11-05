@@ -21,7 +21,7 @@ MaterialInstance::MaterialInstance(Renderer* in_renderer, Material* in_material)
         .pColorBlendState    = &in_material->GetColorBlendState(),
         .pDynamicState       = &in_material->GetDynamicState(),
         .layout              = in_material->GetPipelineLayout(),
-        .renderPass          = m_renderer->GetGraph()->FindOrAddRenderPass("Forward").GetHandle(),
+        .renderPass          = m_renderer->GetGraph()->FindPass("Forward")->GetHandle(),
         .basePipelineHandle  = in_material->GetPipeline()
     };
 

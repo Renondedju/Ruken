@@ -258,8 +258,6 @@
     <ClInclude Include="Source\Include\Rendering\RenderPass.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderQueue.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderSystem.hpp" />
-    <ClInclude Include="Source\Include\Rendering\RenderTarget.hpp" />
-    <ClInclude Include="Source\Include\Rendering\RenderTextureStreamer.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Material.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\MaterialInstance.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Model.hpp" />
@@ -419,8 +417,6 @@
     <ClCompile Include="Source\Src\Rendering\RenderPass.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderQueue.cpp" />
     <ClCompile Include="Source\Src\Rendering\RenderSystem.cpp" />
-    <ClCompile Include="Source\Src\Rendering\RenderTarget.cpp" />
-    <ClCompile Include="Source\Src\Rendering\RenderTextureStreamer.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\Material.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\MaterialInstance.cpp" />
     <ClCompile Include="Source\Src\Rendering\Resources\Model.cpp" />

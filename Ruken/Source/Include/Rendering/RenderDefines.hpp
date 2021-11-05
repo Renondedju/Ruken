@@ -17,12 +17,11 @@
 
 #include <vma/vk_mem_alloc.h>
 
-BEGIN_RUKEN_NAMESPACE
-
-struct VkScale2D
+namespace VULKAN_HPP_NAMESPACE
 {
-    RkFloat x;
-    RkFloat y;
-};
-
-END_RUKEN_NAMESPACE
+	struct Scale2D
+    {
+        RUKEN_NAMESPACE::RkFloat x;
+        RUKEN_NAMESPACE::RkFloat y;
+    };
+}

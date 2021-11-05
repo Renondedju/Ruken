@@ -7,10 +7,31 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
-    m_logger   {in_logger},
-    m_renderer {in_renderer}
+RenderPass::RenderPass(Logger* in_logger, RenderDevice* in_device, RenderGraph* in_graph) noexcept:
+    m_logger {in_logger},
+    m_device {in_device},
+    m_graph  {in_graph}
 {
+    
+}
+
+RenderPass::~RenderPass() noexcept
+{
+    if (m_handle)
+        m_device->GetLogicalDevice().destroy(m_handle);
+    if (m_framebuffer)
+        m_device->GetLogicalDevice().destroy(m_framebuffer);
+}
+
+#pragma endregion
+
+#pragma region Methods
+
+RkVoid RenderPass::Build() noexcept
+{
+    if (m_handle)
+        return;
+
     vk::AttachmentReference color_attachment_reference = {
         .attachment = 0,
         .layout     = vk::ImageLayout::eColorAttachmentOptimal
@@ -71,50 +92,59 @@ RenderPass::RenderPass(Logger* in_logger, Renderer* in_renderer) noexcept:
         .pDependencies = &dependency
     };
 
-    m_handle = m_renderer->GetDevice()->GetLogicalDevice().createRenderPass(render_pass_info).value;
+    m_handle = m_device->GetLogicalDevice().createRenderPass(render_pass_info).value;
 
-    
-
-    std::vector descriptor_set_layouts = {
-        m_renderer->GetTextureStreamer()->GetDescriptorSetLayout(),
-        m_renderer->GetGraph()->GetFrameDescriptorSetLayout(),
-        m_renderer->GetGraph()->GetCameraDescriptorSetLayout(),
+    std::vector formats = {
+        vk::Format::eR8G8B8A8Unorm,
+        vk::Format::eD32Sfloat
     };
 
-    vk::PushConstantRange push_constant_range = {
-        .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-        .size       = sizeof(RkUint32)
+    std::vector<vk::FramebufferAttachmentImageInfo> framebuffer_attachment_image_infos = {
+        vk::FramebufferAttachmentImageInfo {
+            .usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc,
+            .width = 1920,
+            .height = 1080,
+            .layerCount = 1,
+            .viewFormatCount = static_cast<RkUint32>(formats.size()),
+            .pViewFormats = formats.data()
+        },
+        vk::FramebufferAttachmentImageInfo {
+            .usage = vk::ImageUsageFlagBits::eDepthStencilAttachment,
+            .width = 1920,
+            .height = 1080,
+            .layerCount = 1,
+            .viewFormatCount = static_cast<RkUint32>(formats.size()),
+            .pViewFormats = formats.data()
+        }
     };
 
-    vk::PipelineLayoutCreateInfo layout_info = {
-        .setLayoutCount         = static_cast<RkUint32>(descriptor_set_layouts.size()),
-        .pSetLayouts            = descriptor_set_layouts.data(),
-        .pushConstantRangeCount = 1U,
-        .pPushConstantRanges    = &push_constant_range
+    vk::FramebufferAttachmentsCreateInfo framebuffer_attachments_create_info = {
+        .attachmentImageInfoCount = static_cast<RkUint32>(framebuffer_attachment_image_infos.size()),
+        .pAttachmentImageInfos    = framebuffer_attachment_image_infos.data()
     };
 
-    m_pipeline_layout = m_renderer->GetDevice()->GetLogicalDevice().createPipelineLayout(layout_info).value;
+    vk::FramebufferCreateInfo framebuffer_create_info = {
+        .pNext           = &framebuffer_attachments_create_info,
+        .flags           = vk::FramebufferCreateFlagBits::eImageless,
+        .renderPass      = m_handle,
+        .attachmentCount = static_cast<RkUint32>(framebuffer_attachment_image_infos.size()),
+        .width           = 1920,
+        .height          = 1080,
+        .layers          = 1,
+    };
+
+    m_framebuffer = m_device->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value;
 }
 
-RenderPass::~RenderPass() noexcept
+RkVoid RenderPass::Execute() const noexcept
 {
-    if (m_handle)
-        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_handle);
-    if (m_pipeline_layout)
-        m_renderer->GetDevice()->GetLogicalDevice().destroy(m_pipeline_layout);
-}
+    auto& frame = m_graph->GetCurrentFrame();
 
-#pragma endregion
-
-#pragma region Methods
-
-RkVoid RenderPass::Execute(RenderFrame& in_frame) const noexcept
-{
-    auto command_buffer = in_frame.GetGraphicsCommandPool().Request();
+    auto command_buffer = frame.GetGraphicsCommandPool().Request();
 
     vk::CommandBufferBeginInfo command_buffer_begin_info = {};
 
-    if (command_buffer.begin(command_buffer_begin_info) != vk::Result::eSuccess)
+    if (command_buffer.begin(command_buffer_begin_info) == vk::Result::eSuccess)
     {
         vk::Viewport viewport = {
             .width = 1920.0F,
@@ -133,41 +163,69 @@ RkVoid RenderPass::Execute(RenderFrame& in_frame) const noexcept
         command_buffer.setViewport(0, viewport);
         command_buffer.setScissor(0, scissor);
 
+        std::vector image_views = {
+            RenderGraph::g_color_target->GetView(),
+            RenderGraph::g_depth_target->GetView()
+        };
+
+        vk::RenderPassAttachmentBeginInfo render_pass_attachment_begin_info = {
+            .attachmentCount = static_cast<RkUint32>(image_views.size()),
+            .pAttachments    = image_views.data()
+        };
+
+        vk::ClearValue clear_color = {
+            .color = {
+                std::array{0.0F, 0.0F, 0.0F, 1.0F}
+            }
+        };
+
+        vk::ClearValue clear_stencil = {
+            .depthStencil = {1, 0}
+        };
+
+        std::vector clear_values = {
+            clear_color,
+            clear_stencil
+        };
+
         vk::RenderPassBeginInfo render_pass_begin_info = {
-            .renderPass = m_handle,
-            .framebuffer = m_framebuffers[in_frame.GetIndex()],
+            .pNext       = &render_pass_attachment_begin_info,
+            .renderPass  = m_handle,
+            .framebuffer = m_framebuffer,
             .renderArea = {
                 .extent = {
                     .width  = 1920U,
                     .height = 1080U
                 }
-            }
+            },
+            .clearValueCount = static_cast<RkUint32>(clear_values.size()),
+            .pClearValues    = clear_values.data()
         };
 
         command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
 
         std::vector descriptor_sets = {
-            m_renderer->GetTextureStreamer()->GetDescriptorSet(),
-            in_frame.GetFrameDescriptorSet(),
-            in_frame.GetCameraDescriptorSet()
+            frame.GetTextureDescriptorSet(),
+            frame.GetFrameDescriptorSet(),
+            frame.GetCameraDescriptorSet()
         };
 
-        command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline_layout, 0U, descriptor_sets, nullptr);
+        command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_graph->GetDefaultPipelineLayout(), 0U, descriptor_sets, nullptr);
 
         if (m_callback)
-            m_callback(command_buffer, in_frame);
+            m_callback(command_buffer);
 
         command_buffer.endRenderPass();
 
-        if (command_buffer.end() != vk::Result::eSuccess)
+        if (command_buffer.end() == vk::Result::eSuccess)
         {
             vk::CommandBufferSubmitInfoKHR command_buffer_submit_info = {
                 .commandBuffer = command_buffer
             };
 
             vk::SemaphoreSubmitInfoKHR timeline_semaphore_submit_info = {
-                .semaphore = in_frame.GetTimelineSemaphore().GetHandle(),
-                .value = in_frame.GetTimelineSemaphore().NextValue()
+                .semaphore = frame.GetTimelineSemaphore().GetHandle(),
+                .value     = frame.GetTimelineSemaphore().NextValue()
             };
 
             vk::SubmitInfo2KHR submit_info = {
@@ -177,42 +235,46 @@ RkVoid RenderPass::Execute(RenderFrame& in_frame) const noexcept
                 .pSignalSemaphoreInfos = &timeline_semaphore_submit_info
             };
 
-            m_renderer->GetDevice()->GetGraphicsQueue().Submit(submit_info);
+            m_device->GetGraphicsQueue().Submit(submit_info);
         }
     }
 
-    in_frame.GetGraphicsCommandPool().Release(command_buffer);
+    frame.GetGraphicsCommandPool().Release(command_buffer);
 }
 
 RkVoid RenderPass::AddColorInput(std::string const& in_name)
 {
-    auto& res =  m_renderer->GetGraph()->FindRenderTarget(in_name);
+    auto& res = m_graph->GetImageResource(in_name);
 
     m_color_inputs.push_back(&res);
 }
 
-RkVoid RenderPass::AddColorOutput(std::string const& in_name, AttachmentInfo const& in_attachment_info)
+RkVoid RenderPass::AddColorOutput(std::string const& in_name, ImageInfo const& in_image_info)
 {
-    auto& res = m_renderer->GetGraph()->FindOrAddRenderTarget(in_name, in_attachment_info);
+    (void)in_image_info;
+
+    auto& res = m_graph->GetImageResource(in_name);
 
     m_color_outputs.push_back(&res);
 }
 
 RkVoid RenderPass::SetDepthStencilInput(std::string const& in_name)
 {
-    auto& res = m_renderer->GetGraph()->FindRenderTarget(in_name);
+    auto& res = m_graph->GetImageResource(in_name);
 
     m_depth_stencil_input = &res;
 }
 
-RkVoid RenderPass::SetDepthStencilOutput(std::string const& in_name, AttachmentInfo const& in_attachment_info)
+RkVoid RenderPass::SetDepthStencilOutput(std::string const& in_name, ImageInfo const& in_image_info)
 {
-    auto& res = m_renderer->GetGraph()->FindOrAddRenderTarget(in_name, in_attachment_info);
+    (void)in_image_info;
+
+    auto& res = m_graph->GetImageResource(in_name);
 
     m_depth_stencil_output = &res;
 }
 
-RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, RenderFrame const&)>&& in_callback) noexcept
+RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&)>&& in_callback) noexcept
 {
     m_callback = std::move(in_callback);
 }
@@ -220,11 +282,6 @@ RkVoid RenderPass::SetCallback(std::function<RkVoid(vk::CommandBuffer const&, Re
 vk::RenderPass const& RenderPass::GetHandle() const noexcept
 {
     return m_handle;
-}
-
-vk::PipelineLayout const& RenderPass::GetLayout() const noexcept
-{
-    return m_pipeline_layout;
 }
 
 #pragma endregion
