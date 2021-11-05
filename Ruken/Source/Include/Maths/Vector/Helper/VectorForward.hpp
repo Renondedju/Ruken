@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Types/FundamentalTypes.hpp"
+#include "Build/Attributes/EmptyBases.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -34,6 +35,6 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnderlyingType Underlying type of the vector
  */
 template <RkSize TDimensions, typename TUnderlyingType>
-struct Vector;
+struct RUKEN_EMPTY_BASES Vector;
 
 END_RUKEN_NAMESPACE

@@ -30,19 +30,13 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
- */
-template <typename TVector>
-struct VectorNormalization;
-
-/**
  * \brief Implements vector Normalize and Normalized methods
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
  */
 template <RkSize TDimensions, typename TUnderlyingType>
-struct VectorNormalization<Vector<TDimensions, TUnderlyingType>>
+struct VectorNormalization
 {
     using Helper = VectorHelper<TDimensions, TUnderlyingType>;
 

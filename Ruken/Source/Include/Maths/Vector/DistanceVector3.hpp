@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
 #include "Types/Units/Distance/Distance.hpp"
 #include "Maths/Vector/Helper/VectorForward.hpp"
 
@@ -38,10 +39,6 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-using Vector3cm = Vector<3, Centimeters>;
-using Vector3m  = Vector<3, Meters>;
-using Vector3km = Vector<3, Kilometers>;
-
 #pragma warning( push )
 #pragma warning( disable:4201 )
 
@@ -49,15 +46,15 @@ using Vector3km = Vector<3, Kilometers>;
  * \brief Three dimensional distance vector
  */
 template <EDistanceUnit TDistanceUnit>
-struct Vector<3, Distance<TDistanceUnit>> final:
-    VectorNormalization<Vector<3, Distance<TDistanceUnit>>>,
-    VectorOperators    <Vector<3, Distance<TDistanceUnit>>>,
-    VectorMinMax       <Vector<3, Distance<TDistanceUnit>>>,
-    VectorLength       <Vector<3, Distance<TDistanceUnit>>>,
-    VectorCross        <Vector<3, Distance<TDistanceUnit>>>,
-    VectorSlerp        <Vector<3, Distance<TDistanceUnit>>>,
-    VectorLerp         <Vector<3, Distance<TDistanceUnit>>>,
-    VectorDot          <Vector<3, Distance<TDistanceUnit>>>
+struct RUKEN_EMPTY_BASES Vector<3, Distance<TDistanceUnit>> final:
+    VectorNormalization<3, Distance<TDistanceUnit>>,
+    VectorOperators    <3, Distance<TDistanceUnit>>,
+    VectorMinMax       <3, Distance<TDistanceUnit>>,
+    VectorLength       <3, Distance<TDistanceUnit>>,
+    VectorCross        <3, Distance<TDistanceUnit>>,
+    VectorSlerp        <3, Distance<TDistanceUnit>>,
+    VectorLerp         <3, Distance<TDistanceUnit>>,
+    VectorDot          <3, Distance<TDistanceUnit>>
 {
     #pragma region Members
 
@@ -99,6 +96,10 @@ struct Vector<3, Distance<TDistanceUnit>> final:
 };
 
 #pragma warning( pop )
+
+using Vector3cm = Vector<3, Centimeters>;
+using Vector3m  = Vector<3, Meters>;
+using Vector3km = Vector<3, Kilometers>;
 
 template <EDistanceUnit TDistanceUnit>
 struct Constants<Vector<3, Distance<TDistanceUnit>>>

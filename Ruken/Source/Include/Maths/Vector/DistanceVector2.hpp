@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
 #include "Types/Units/Distance/Distance.hpp"
 #include "Types/Units/Distance/EDistanceUnit.hpp"
 
@@ -40,10 +41,6 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-using Vector2cm = Vector<2, Centimeters>;
-using Vector2m  = Vector<2, Meters>;
-using Vector2km = Vector<2, Kilometers>;
-
 #pragma warning( push )
 #pragma warning( disable:4201 )
 
@@ -51,15 +48,15 @@ using Vector2km = Vector<2, Kilometers>;
  * \brief Two dimensional distance vector
  */
 template <EDistanceUnit TDistanceUnit>
-struct Vector<2, Distance<TDistanceUnit>> final:
-    VectorNormalization<Vector<2, Distance<TDistanceUnit>>>,
-    VectorOperators    <Vector<2, Distance<TDistanceUnit>>>,
-    VectorMinMax       <Vector<2, Distance<TDistanceUnit>>>,
-    VectorLength       <Vector<2, Distance<TDistanceUnit>>>,
-    VectorCross        <Vector<2, Distance<TDistanceUnit>>>,
-    VectorSlerp        <Vector<2, Distance<TDistanceUnit>>>,
-    VectorLerp         <Vector<2, Distance<TDistanceUnit>>>,
-    VectorDot          <Vector<2, Distance<TDistanceUnit>>>
+struct RUKEN_EMPTY_BASES Vector<2, Distance<TDistanceUnit>> final:
+    VectorNormalization<2, Distance<TDistanceUnit>>,
+    VectorOperators    <2, Distance<TDistanceUnit>>,
+    VectorMinMax       <2, Distance<TDistanceUnit>>,
+    VectorLength       <2, Distance<TDistanceUnit>>,
+    VectorCross        <2, Distance<TDistanceUnit>>,
+    VectorSlerp        <2, Distance<TDistanceUnit>>,
+    VectorLerp         <2, Distance<TDistanceUnit>>,
+    VectorDot          <2, Distance<TDistanceUnit>>
 {
     #pragma region Members
 
@@ -97,6 +94,10 @@ struct Vector<2, Distance<TDistanceUnit>> final:
 };
 
 #pragma warning( pop )
+
+using Vector2cm = Vector<2, Centimeters>;
+using Vector2m  = Vector<2, Meters>;
+using Vector2km = Vector<2, Kilometers>;
 
 template <EDistanceUnit TDistanceUnit>
 struct Constants<Vector<2, Distance<TDistanceUnit>>>

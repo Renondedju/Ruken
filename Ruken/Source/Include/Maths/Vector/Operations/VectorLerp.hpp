@@ -29,19 +29,13 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
- */
-template <typename TVector>
-struct VectorLerp;
-
-/**
  * \brief Implements vector Lerp method
  *
  * \tparam TDimensions Dimensions or size of the composed vector
  * \tparam TUnderlyingType Underlying type of the composed vector
  */
 template <RkSize TDimensions, typename TUnderlyingType>
-struct VectorLerp<Vector<TDimensions, TUnderlyingType>>
+struct VectorLerp
 {
     using Helper = VectorHelper<TDimensions, TUnderlyingType>;
 

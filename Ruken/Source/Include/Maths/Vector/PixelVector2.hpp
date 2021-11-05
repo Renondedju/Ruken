@@ -25,17 +25,15 @@
 #pragma once
 
 #include "Types/Units/Pixels.hpp"
-
-#include "Maths/Constants.hpp"
-#include "Maths/Vector/Helper/VectorForward.hpp"
+#include "Build/Attributes/EmptyBases.hpp"
 
 #include "Maths/Vector/Operations/VectorOperators.hpp"
 #include "Maths/Vector/Operations/VectorMinMax.hpp"
 #include "Maths/Vector/Operations/VectorLerp.hpp"
+#include "Maths/Vector/Helper/VectorForward.hpp"
+#include "Maths/Constants.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-
-using Vector2px = Vector<2, Pixels>;
 
 #pragma warning( push )
 #pragma warning( disable:4201 )
@@ -44,10 +42,10 @@ using Vector2px = Vector<2, Pixels>;
  * \brief Two dimensional pixel vector
  */
 template <>
-struct Vector<2, Pixels> final:
-    VectorOperators<Vector<2, Pixels>>,
-    VectorMinMax   <Vector<2, Pixels>>,
-    VectorLerp     <Vector<2, Pixels>>
+struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
+    VectorOperators<2, Pixels>,
+    VectorMinMax   <2, Pixels>,
+    VectorLerp     <2, Pixels>
 {
     #pragma region Members
 
@@ -96,6 +94,8 @@ struct Vector<2, Pixels> final:
 };
 
 #pragma warning( pop )
+
+using Vector2px = Vector<2, Pixels>;
 
 template <>
 struct Constants<Vector2px>

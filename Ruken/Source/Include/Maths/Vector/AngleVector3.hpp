@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Types/Units/Angle/Angle.hpp"
+#include "Build/Attributes/EmptyBases.hpp"
 #include "Maths/Vector/Helper/VectorForward.hpp"
 
 #include "Maths/Vector/Operations/VectorOperators.hpp"
@@ -34,9 +35,6 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-using Vector3deg = Vector<3, Degrees>;
-using Vector3rad = Vector<3, Radians>;
-
 #pragma warning( push )
 #pragma warning( disable:4201 )
 
@@ -44,11 +42,11 @@ using Vector3rad = Vector<3, Radians>;
  * \brief Two dimensional angle vector
  */
 template <EAngleUnit TAngleUnit>
-struct Vector<3, Angle<TAngleUnit>> final:
-    VectorOperators<Vector<3, Angle<TAngleUnit>>>,
-    VectorMinMax   <Vector<3, Angle<TAngleUnit>>>,
-    VectorSlerp    <Vector<3, Angle<TAngleUnit>>>,
-    VectorLerp     <Vector<3, Angle<TAngleUnit>>>
+struct RUKEN_EMPTY_BASES Vector<3, Angle<TAngleUnit>> final:
+    VectorOperators<3, Angle<TAngleUnit>>,
+    VectorMinMax   <3, Angle<TAngleUnit>>,
+    VectorSlerp    <3, Angle<TAngleUnit>>,
+    VectorLerp     <3, Angle<TAngleUnit>>
 {
     #pragma region Members
 
@@ -90,5 +88,8 @@ struct Vector<3, Angle<TAngleUnit>> final:
 };
 
 #pragma warning( pop )
+
+using Vector3deg = Vector<3, Degrees>;
+using Vector3rad = Vector<3, Radians>;
 
 END_RUKEN_NAMESPACE

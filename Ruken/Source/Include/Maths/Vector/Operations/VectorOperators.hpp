@@ -30,12 +30,6 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \tparam TVector Composed vector type, must inherit this class and be an instance of the Vector class
- */
-template <typename TVector>
-struct VectorOperators;
-
-/**
  * \brief Implements every common vector operator
  * Implements every common vector operator (*, -, +, / and %) between 2 vectors, a vector and a scalar type
  * as well as their corresponding assignment operators.
@@ -45,7 +39,7 @@ struct VectorOperators;
  * \tparam TUnderlyingType Underlying type of the composed vector
  */
 template <RkSize TDimensions, typename TUnderlyingType>
-struct VectorOperators<Vector<TDimensions, TUnderlyingType>>
+struct VectorOperators
 {
     using TVector = Vector<TDimensions, TUnderlyingType>;
     using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
