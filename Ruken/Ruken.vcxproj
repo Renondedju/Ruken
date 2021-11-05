@@ -124,6 +124,7 @@
     <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
     <ClInclude Include="Source\Include\Bitwise\Endian.hpp" />
     <ClInclude Include="Source\Include\Bitwise\SizedBitmask.hpp" />
+    <ClInclude Include="Source\Include\Build\Attributes\EmptyBases.hpp" />
     <ClInclude Include="Source\Include\Build\Build.hpp" />
     <ClInclude Include="Source\Include\Build\Compiler.hpp" />
     <ClInclude Include="Source\Include\Build\OperatingSystem.hpp" />
