@@ -34,7 +34,7 @@ RenderTarget::RenderTarget(RenderDevice* in_device, AttachmentInfo const& in_att
     {
         m_image_view = value;
     }
-}
+} 
 
 RenderTarget::~RenderTarget() noexcept
 {

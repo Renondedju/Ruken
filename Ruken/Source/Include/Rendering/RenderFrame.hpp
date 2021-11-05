@@ -14,7 +14,6 @@
 
 #include "Rendering/RenderObjectPools/CommandPool.hpp"
 #include "Rendering/RenderObjectPools/SemaphorePool.hpp"
-#include "Rendering/RenderObjectPools/RenderTargetPool.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -42,7 +41,6 @@ class RenderFrame
         CommandPool       m_graphics_command_pool;
         CommandPool       m_compute_command_pool;
         CommandPool       m_transfer_command_pool;
-        RenderTargetPool  m_render_target_pool;
         Buffer            m_draw_storage_buffer;
         Buffer            m_transform_storage_buffer;
         Buffer            m_material_storage_buffer;

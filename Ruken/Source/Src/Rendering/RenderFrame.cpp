@@ -12,7 +12,6 @@ RenderFrame::RenderFrame(Logger* in_logger, Renderer* in_renderer, RkUint32 cons
     m_graphics_command_pool    {in_renderer->GetDevice(), in_renderer->GetDevice()->GetGraphicsFamilyIndex()},
     m_compute_command_pool     {in_renderer->GetDevice(), in_renderer->GetDevice()->GetComputeFamilyIndex ()},
     m_transfer_command_pool    {in_renderer->GetDevice(), in_renderer->GetDevice()->GetTransferFamilyIndex()},
-    m_render_target_pool       {in_renderer->GetDevice()},
     m_draw_storage_buffer      {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
     m_transform_storage_buffer {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},
     m_material_storage_buffer  {in_renderer->GetDevice(), 0ULL, vk::BufferUsageFlagBits::eStorageBuffer},

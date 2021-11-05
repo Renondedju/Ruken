@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/RenderObjectPools/RenderObjectPool.hpp"
+#include "Rendering/RenderObjectPool.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
