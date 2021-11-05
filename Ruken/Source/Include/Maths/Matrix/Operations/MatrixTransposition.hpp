@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Maths/Matrix/MatrixForward.hpp"
+#include "Maths/Matrix/Operations/MatrixAccess.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -45,8 +46,9 @@ struct MatrixTransposition
     {
         Matrix<TColumns, TRows> transposed;
 
-        for (RkSize index {0ULL}; index < TColumns * TRows; ++index)
-            transposed.data[index] = in_matrix.data[TColumns * TRows - index];
+        for (RkSize row {0ULL}; row < TRows; ++row)
+            for (RkSize column {0ULL}; column < TColumns; ++column)
+                MatrixAccess::At(transposed, column, row) = MatrixAccess::At(in_matrix, row, column);
 
         return transposed;
     }
