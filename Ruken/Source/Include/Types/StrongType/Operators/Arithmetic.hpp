@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
+
 #include "Types/StrongType/Operators/Arithmetic/Modulo.hpp"
 #include "Types/StrongType/Operators/Arithmetic/Addition.hpp"
 #include "Types/StrongType/Operators/Arithmetic/Division.hpp"
@@ -42,15 +44,16 @@ BEGIN_RUKEN_NAMESPACE
  * \see StrongType
  */
 template <typename TStrongType>
-struct Arithmetic: Modulo        <TStrongType>,
-                   Addition      <TStrongType>,
-                   Division      <TStrongType>,
-                   Increment     <TStrongType>,
-                   Decrement     <TStrongType>,
-                   UnaryPlus     <TStrongType>,
-                   UnaryMinus    <TStrongType>,
-                   Subtraction   <TStrongType>,
-                   Multiplication<TStrongType>
+struct RUKEN_EMPTY_BASES Arithmetic:
+    Modulo        <TStrongType>,
+    Addition      <TStrongType>,
+    Division      <TStrongType>,
+    Increment     <TStrongType>,
+    Decrement     <TStrongType>,
+    UnaryPlus     <TStrongType>,
+    UnaryMinus    <TStrongType>,
+    Subtraction   <TStrongType>,
+    Multiplication<TStrongType>
 {};
 
 END_RUKEN_NAMESPACE

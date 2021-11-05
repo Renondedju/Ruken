@@ -47,6 +47,8 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUniquePhantom Phantom type, this should be unique for each type
  * \see https://foonathan.net/blog/2016/10/19/strong-typedefs.html
  * \see https://arne-mertz.de/2016/11/stronger-types/
+ *
+ * \warning Please use the RUKEN_EMPTY_BASES macro with MSVC in order to avoid EBO miss
  */
 template <FundamentalType TBase, typename TUniquePhantom>
 class StrongType

@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
+
 #include "Types/StrongType/Operators/Bitwise/Or.hpp"
 #include "Types/StrongType/Operators/Bitwise/And.hpp"
 #include "Types/StrongType/Operators/Bitwise/Not.hpp"
@@ -39,12 +41,13 @@ BEGIN_RUKEN_NAMESPACE
  * \see StrongType
  */
 template <typename TStrongType>
-struct Bitwise: Or        <TStrongType>,
-                And       <TStrongType>,
-                Not       <TStrongType>,
-                Xor       <TStrongType>,
-                LeftShift <TStrongType>,
-                RightShift<TStrongType>
+struct RUKEN_EMPTY_BASES Bitwise:
+    Or        <TStrongType>,
+    And       <TStrongType>,
+    Not       <TStrongType>,
+    Xor       <TStrongType>,
+    LeftShift <TStrongType>,
+    RightShift<TStrongType>
 {};
 
 END_RUKEN_NAMESPACE

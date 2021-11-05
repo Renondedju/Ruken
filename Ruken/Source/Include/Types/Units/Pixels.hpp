@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
 #include "Types/StrongType/StrongType.hpp"
 #include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
@@ -32,10 +33,11 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-struct Pixels final: StrongType<RkInt32, Pixels>,
-                     Arithmetic<Pixels>,
-                     Comparison<Pixels>,
-                     Stream    <Pixels>
+struct RUKEN_EMPTY_BASES Pixels final:
+    StrongType<RkInt32, Pixels>,
+    Arithmetic<Pixels>,
+    Comparison<Pixels>,
+    Stream    <Pixels>
 {
     using StrongType<RkInt32, Pixels>::StrongType;
 };

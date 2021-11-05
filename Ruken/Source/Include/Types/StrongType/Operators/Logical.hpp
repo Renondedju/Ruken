@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
+
 #include "Types/StrongType/Operators/Logical/LogicalOr.hpp"
 #include "Types/StrongType/Operators/Logical/LogicalAnd.hpp"
 #include "Types/StrongType/Operators/Logical/LogicalNot.hpp"
@@ -36,9 +38,10 @@ BEGIN_RUKEN_NAMESPACE
  * \see StrongType
  */
 template <typename TStrongType>
-struct Logical: LogicalOr <TStrongType>,
-                LogicalAnd<TStrongType>,
-                LogicalNot<TStrongType>
+struct RUKEN_EMPTY_BASES Logical:
+    LogicalOr <TStrongType>,
+    LogicalAnd<TStrongType>,
+    LogicalNot<TStrongType>
 {};
 
 END_RUKEN_NAMESPACE

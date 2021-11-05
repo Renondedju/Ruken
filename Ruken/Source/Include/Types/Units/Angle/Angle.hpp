@@ -24,14 +24,15 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
+
+#include "Maths/Constants.hpp"
+#include "Types/Units/Angle/EAngleUnit.hpp"
 #include "Types/StrongType/StrongType.hpp"
 #include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
 #include "Types/StrongType/Operators/Comparison.hpp"
 #include "Types/StrongType/Operators/Stream.hpp"
-
-#include "Maths/Constants.hpp"
-#include "Types/Units/Angle/EAngleUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -40,10 +41,11 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
  */
 template<EAngleUnit TUnitType>
-struct Angle final: StrongType<RkFloat, Angle<TUnitType>>,
-                    Arithmetic<Angle<TUnitType>>,
-                    Comparison<Angle<TUnitType>>,
-                    Stream    <Angle<TUnitType>>
+struct RUKEN_EMPTY_BASES Angle final:
+    StrongType<RkFloat, Angle<TUnitType>>,
+    Arithmetic<Angle<TUnitType>>,
+    Comparison<Angle<TUnitType>>,
+    Stream    <Angle<TUnitType>>
 {
     #pragma region Constructors
 

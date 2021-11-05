@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
+
 #include "Types/StrongType/Operators/Comparison/Less.hpp"
 #include "Types/StrongType/Operators/Comparison/Equal.hpp"
 #include "Types/StrongType/Operators/Comparison/Greater.hpp"
@@ -39,12 +41,13 @@ BEGIN_RUKEN_NAMESPACE
  * \see StrongType
  */
 template <typename TStrongType>
-struct Comparison: Less        <TStrongType>,
-                   Equal       <TStrongType>,
-                   Greater     <TStrongType>,
-                   NotEqual    <TStrongType>,
-                   LessEqual   <TStrongType>,
-                   GreaterEqual<TStrongType>
+struct RUKEN_EMPTY_BASES Comparison:
+    Less        <TStrongType>,
+    Equal       <TStrongType>,
+    Greater     <TStrongType>,
+    NotEqual    <TStrongType>,
+    LessEqual   <TStrongType>,
+    GreaterEqual<TStrongType>
 {};
 
 END_RUKEN_NAMESPACE

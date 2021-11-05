@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
 #include "Types/StrongType/StrongType.hpp"
 #include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
@@ -39,10 +40,11 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnitType Unit type of the angle, must be either Degrees or Radians
  */
 template<EDurationUnit TUnitType>
-struct Duration final: StrongType<RkFloat, Duration<TUnitType>>,
-                       Arithmetic<Duration<TUnitType>>,
-                       Comparison<Duration<TUnitType>>,
-                       Stream    <Duration<TUnitType>>
+struct RUKEN_EMPTY_BASES Duration final:
+    StrongType<RkFloat, Duration<TUnitType>>,
+    Arithmetic<Duration<TUnitType>>,
+    Comparison<Duration<TUnitType>>,
+    Stream    <Duration<TUnitType>>
 {
     #pragma region Constructors
 

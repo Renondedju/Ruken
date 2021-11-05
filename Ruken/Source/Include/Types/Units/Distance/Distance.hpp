@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "Build/Attributes/EmptyBases.hpp"
 #include "Types/StrongType/StrongType.hpp"
 #include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"
@@ -39,10 +40,11 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TUnitType Unit type of the distance, must be either Kilometers, Meters or Centimeters
  */
 template<EDistanceUnit TUnitType>
-struct Distance final: StrongType<RkFloat, Distance<TUnitType>>,
-                       Arithmetic<Distance<TUnitType>>,
-                       Comparison<Distance<TUnitType>>,
-                       Stream    <Distance<TUnitType>>
+struct RUKEN_EMPTY_BASES Distance final:
+    StrongType<RkFloat, Distance<TUnitType>>,
+    Arithmetic<Distance<TUnitType>>,
+    Comparison<Distance<TUnitType>>,
+    Stream    <Distance<TUnitType>>
 {
     #pragma region Constructors
 
