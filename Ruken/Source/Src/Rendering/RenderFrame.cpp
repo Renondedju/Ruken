@@ -169,4 +169,3 @@ Buffer& RenderFrame::GetCameraUniformBuffer() noexcept
 {
     return m_camera_uniform_buffer;
 }
-}

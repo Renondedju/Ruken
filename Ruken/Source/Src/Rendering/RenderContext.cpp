@@ -7,7 +7,6 @@
     #include "Utility/WindowsOS.hpp"
 #endif
 
-USING_RUKEN_NAMESPACE
 #include "Rendering/RenderContext.hpp"
 
 #include "Debug/Logging/Logger.hpp"
