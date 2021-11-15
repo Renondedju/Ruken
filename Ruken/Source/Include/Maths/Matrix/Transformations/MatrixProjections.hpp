@@ -65,12 +65,12 @@ struct MatrixProjections<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumn
     {
         RkFloat const scale = 1.0F / Tan(in_fov / 2.0F);
 
-        return { .data = {
+        return Matrix<4, 4> {
             scale / in_aspect,  0.0F , 0.0F                                 ,  0.0F,
             0.0F             , -scale, 0.0F                                 ,  0.0F,
             0.0F             ,  0.0F , static_cast<RkFloat>(in_far / (in_near - in_far))          , -1.0F,
             0.0F             ,  0.0F , static_cast<RkFloat>(in_near * in_far / (in_near - in_far)),  0.0F
-        }};
+        };
     }
 
     /**
@@ -91,7 +91,7 @@ struct MatrixProjections<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumn
             Meters const in_bottom, Meters const in_top, 
             Meters const in_near  , Meters const in_far) noexcept
     {
-        return {
+        return Matrix<4, 4> {
             static_cast<RkFloat>(2.0F / (in_right - in_left)), 0.0F, 0.0F, 0.0F,
             0.0F, static_cast<RkFloat>(2.0F / (in_bottom - in_top)), 0.0F, 0.0F,
             0.0F, 0.0F, static_cast<RkFloat>(1.0F / (in_near - in_far)), 0.0F,

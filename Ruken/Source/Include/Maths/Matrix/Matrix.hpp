@@ -36,10 +36,14 @@
 #include "Maths/Matrix/Operations/MatrixMultiplication.hpp"
 
 #include "Maths/Matrix/Transformations/MatrixModel.hpp"
+#include "Maths/Matrix/Transformations/MatrixScale.hpp"
+#include "Maths/Matrix/Transformations/MatrixLookAt.hpp"
 #include "Maths/Matrix/Transformations/MatrixRotation.hpp"
+#include "Maths/Matrix/Transformations/MatrixClipSpace.hpp"
 #include "Maths/Matrix/Transformations/MatrixRotationX.hpp"
 #include "Maths/Matrix/Transformations/MatrixRotationY.hpp"
 #include "Maths/Matrix/Transformations/MatrixRotationZ.hpp"
+#include "Maths/Matrix/Transformations/MatrixProjections.hpp"
 #include "Maths/Matrix/Transformations/MatrixTranslation.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -59,18 +63,23 @@ BEGIN_RUKEN_NAMESPACE
 template<RkSize TRows, RkSize TColumns>
 struct RUKEN_EMPTY_BASES Matrix:
     MatrixAccess       ::Member<TRows, TColumns>,
-    MatrixTransposition <TRows, TColumns>,
+    MatrixConversions   <TRows, TColumns>,
     //MatrixInversion     <TRows, TColumns>,
     MatrixMultiplication<TRows, TColumns>,
-    MatrixConversions   <TRows, TColumns>,
-    MatrixUtility       <TRows, TColumns>,
     MatrixOstream       <TRows, TColumns>,
-    MatrixTranslation   <TRows, TColumns>,
+    MatrixTransposition <TRows, TColumns>,
+    MatrixUtility       <TRows, TColumns>,
+    // Transformations ---
+    MatrixClipSpace     <TRows, TColumns>,
+    MatrixLookAt        <TRows, TColumns>,
+    MatrixModel         <TRows, TColumns>,
+    MatrixProjections   <TRows, TColumns>,
     MatrixRotation      <TRows, TColumns>,
     MatrixRotationX     <TRows, TColumns>,
     MatrixRotationY     <TRows, TColumns>,
     MatrixRotationZ     <TRows, TColumns>,
-    MatrixModel         <TRows, TColumns>
+    MatrixScale         <TRows, TColumns>,
+    MatrixTranslation   <TRows, TColumns>
 {
     #pragma region Members
 

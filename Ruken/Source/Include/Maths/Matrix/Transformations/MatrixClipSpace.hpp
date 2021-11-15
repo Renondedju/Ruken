@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "Maths/Matrix/MatrixForward.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -59,7 +57,7 @@ struct MatrixClipSpace<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns 
     [[nodiscard]]
     static Matrix<TRows, TColumns> ClipSpace() noexcept
     {
-        return {
+        return Matrix<4, 4> {
             1.0F,  0.0F,  0.0F,  0.0F,
             0.0F, -1.0F,  0.0F,  0.0F,
             0.0F,  0.0F,  0.5F,  0.5F,

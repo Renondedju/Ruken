@@ -26,7 +26,6 @@
 
 #include "Maths/Trigonometry.hpp"
 #include "Maths/Matrix/MatrixForward.hpp"
-#include "Maths/Matrix/Operations/MatrixAccess.hpp"
 
 #include "Types/Units/Angle/Angle.hpp"
 

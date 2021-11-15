@@ -39,9 +39,9 @@ template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
 struct MatrixLookAt
 {};
 
-// Requires a 4x4 matrix
+// Requires at least a 3x4 matrix
 template <RkSize TRows, RkSize TColumns>
-struct MatrixLookAt<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4>>
+struct MatrixLookAt<TRows, TColumns, std::enable_if_t<(TRows == 3 || TRows == 4) && TColumns == 4>>
 {
     /**
      * \brief Creates model matrix to look at a specific point in the world
@@ -62,11 +62,10 @@ struct MatrixLookAt<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 
         Vector3m const right     (in_up.Cross(forward).Normalized());
         Vector3m const up        (forward.Cross(right));
 
-        return {
+        return Matrix<3, 4> {
             static_cast<RkFloat>(right.x), static_cast<RkFloat>(up.x), static_cast<RkFloat>(forward.x), static_cast<RkFloat>(in_from.x),
             static_cast<RkFloat>(right.y), static_cast<RkFloat>(up.y), static_cast<RkFloat>(forward.y), static_cast<RkFloat>(in_from.y),
-            static_cast<RkFloat>(right.z), static_cast<RkFloat>(up.z), static_cast<RkFloat>(forward.z), static_cast<RkFloat>(in_from.z),
-            0.0F, 0.0F, 0.0F, 1.0F
+            static_cast<RkFloat>(right.z), static_cast<RkFloat>(up.z), static_cast<RkFloat>(forward.z), static_cast<RkFloat>(in_from.z)
         };
     }
 };

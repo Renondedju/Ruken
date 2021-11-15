@@ -40,9 +40,9 @@ template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
 struct MatrixModel
 {};
 
-// Requires a 4x4 matrix
+// Requires at least 3x4 matrix
 template <RkSize TRows, RkSize TColumns>
-struct MatrixModel<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4>>
+struct MatrixModel<TRows, TColumns, std::enable_if_t<(TRows == 3 || TRows == 4) && TColumns == 4>>
 {
     /**
      * \brief Model matrix, also called TRS
@@ -63,7 +63,7 @@ struct MatrixModel<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4
         RkFloat const sqr_y (in_rotation.y * in_rotation.y);
         RkFloat const sqr_z (in_rotation.z * in_rotation.z);
 
-        return {
+        return Matrix<3, 4> {
             static_cast<RkFloat>((1 - 2 * (sqr_y + sqr_z)) * in_scale.x),
             static_cast<RkFloat>(2 * (in_rotation.x * in_rotation.y - in_rotation.z * in_rotation.w) * in_scale.y),
             static_cast<RkFloat>(2 * (in_rotation.x * in_rotation.z + in_rotation.y * in_rotation.w) * in_scale.z),
@@ -77,12 +77,7 @@ struct MatrixModel<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4
             static_cast<RkFloat>(2 * (in_rotation.x * in_rotation.z - in_rotation.y * in_rotation.w) * in_scale.x),
             static_cast<RkFloat>(2 * (in_rotation.y * in_rotation.z + in_rotation.x * in_rotation.w) * in_scale.y),
             static_cast<RkFloat>((1 - 2 * (sqr_x + sqr_y)) * in_scale.z),
-            static_cast<RkFloat>(in_position.z),
-
-            0.0F,
-            0.0F,
-            0.0F,
-            1.0F
+            static_cast<RkFloat>(in_position.z)
         };
     }
 };
