@@ -27,8 +27,7 @@
 #include <mutex>
 #include <vector>
 
-#include "Vector/Vector.hpp"
-
+#include "Maths/Vector4f.hpp"
 #include "Vulkan/Utilities/VulkanConfig.hpp"
 
 BEGIN_RUKEN_NAMESPACE

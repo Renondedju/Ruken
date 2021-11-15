@@ -4,11 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ruken", "Ruken\Ruken.vcxproj", "{91B56EA1-6D82-4200-A859-EF487BB0B39A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{407B4D74-CC7D-4637-8F69-F037E7178CCB} = {407B4D74-CC7D-4637-8F69-F037E7178CCB}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PotatoMaths", "PotatoMaths\PotatoMaths\PotatoMaths\PotatoMaths.vcxproj", "{407B4D74-CC7D-4637-8F69-F037E7178CCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +15,6 @@ Global
 		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Debug|x64.Build.0 = Debug|x64
 		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x64.ActiveCfg = Release|x64
 		{91B56EA1-6D82-4200-A859-EF487BB0B39A}.Release|x64.Build.0 = Release|x64
-		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Debug|x64.ActiveCfg = Debug|x64
-		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Debug|x64.Build.0 = Debug|x64
-		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Release|x64.ActiveCfg = Release|x64
-		{407B4D74-CC7D-4637-8F69-F037E7178CCB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

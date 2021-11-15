@@ -62,8 +62,8 @@
     <Link>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -72,7 +72,7 @@
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <ClCompile>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
@@ -92,11 +92,12 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -107,10 +108,11 @@
       <OmitFramePointers>false</OmitFramePointers>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;PotatoMaths.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;spirv-cross-c.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-msl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;SPVRemapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -122,6 +124,7 @@
     <ClInclude Include="Source\Include\Bitwise\Bitmask.hpp" />
     <ClInclude Include="Source\Include\Bitwise\Endian.hpp" />
     <ClInclude Include="Source\Include\Bitwise\SizedBitmask.hpp" />
+    <ClInclude Include="Source\Include\Build\Attributes\EmptyBases.hpp" />
     <ClInclude Include="Source\Include\Build\Build.hpp" />
     <ClInclude Include="Source\Include\Build\Compiler.hpp" />
     <ClInclude Include="Source\Include\Build\OperatingSystem.hpp" />
@@ -185,7 +188,52 @@
     <ClInclude Include="Source\Include\Functional\ReservedEvent.hpp" />
     <ClInclude Include="Source\Include\Core\Kernel.hpp" />
     <ClInclude Include="Source\Include\Core\KernelProxy.hpp" />
+    <ClInclude Include="Source\Include\Maths\Constants.hpp" />
+    <ClInclude Include="Source\Include\Maths\Easing.hpp" />
+    <ClInclude Include="Source\Include\Maths\Math.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Matrix.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\MatrixForward.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixAccess.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixConversions.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixInversion.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixMultiplication.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixOstream.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixTransposition.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixUtility.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixClipSpace.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixLookAt.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixModel.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixProjections.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotation.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotationX.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotationY.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotationZ.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixScale.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixTranslation.hpp" />
+    <ClInclude Include="Source\Include\Maths\MinMax.hpp" />
+    <ClInclude Include="Source\Include\Maths\Quaternion\Quaternion.hpp" />
+    <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
+    <ClInclude Include="Source\Include\Maths\Utility.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector4f.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\AngleVector2.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\AngleVector3.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\DistanceVector2.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\DistanceVector3.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Helper\VectorForward.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorCross.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorDot.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorLength.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorLerp.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorMinMax.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorNormalization.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorOperators.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Operations\VectorSlerp.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\Helper\VectorHelper.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\PixelVector2.hpp" />
+    <ClInclude Include="Source\Include\Maths\Vector\PixelVector3.hpp" />
     <ClInclude Include="Source\Include\Meta\Assert.hpp" />
+    <ClInclude Include="Source\Include\Meta\CommonTypeFallback.hpp" />
+    <ClInclude Include="Source\Include\Meta\HasCommonType.hpp" />
     <ClInclude Include="Source\Include\Meta\HasMember.hpp" />
     <ClInclude Include="Source\Include\Meta\IndexPack.hpp" />
     <ClInclude Include="Source\Include\Meta\IsBaseOfTemplate.hpp" />
@@ -203,8 +251,54 @@
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderTechnique.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderView.hpp" />
+    <ClInclude Include="Source\Include\Rendering\UV.hpp" />
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
     <ClInclude Include="Source\Include\Threading\Job.hpp" />
+    <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />
+    <ClInclude Include="Source\Include\Types\Concepts\FloatingPointType.hpp" />
+    <ClInclude Include="Source\Include\Types\Concepts\FundamentalType.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Addition.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Decrement.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Division.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Increment.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Modulo.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Multiplication.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\Subtraction.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\UnaryMinus.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Arithmetic\UnaryPlus.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\And.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\LeftShift.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\Not.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\Or.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\RightShift.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Bitwise\Xor.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Equal.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Greater.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\GreaterEqual.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Less.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\LessEqual.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\NotEqual.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Comparison\Spaceship.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalAnd.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalNot.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Logical\LogicalOr.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream\InputStream.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\Operators\Stream\OutputStream.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\StrongType.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\StrongTypeHelper.hpp" />
+    <ClInclude Include="Source\Include\Types\StrongType\StrongTypeSuffix.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Angle\Angle.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Angle\EAngleUnit.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Distance\Distance.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Distance\EDistanceUnit.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Duration\Duration.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Duration\EDurationUnit.hpp" />
+    <ClInclude Include="Source\Include\Types\Units\Pixels.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\Core\VulkanCommandBuffer.hpp" />
     <ClInclude Include="Source\Include\Vulkan\CommandPool.hpp" />
@@ -316,6 +410,7 @@
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
+    <None Include="Source\Src\Maths\Quaternion\Quaternion.inl" />
     <None Include="Source\Src\Resource\Handle.inl" />
     <None Include="Source\Src\Resource\ResourceManager.inl" />
     <None Include="Source\Src\Threading\Synchronized.inl" />
@@ -323,11 +418,20 @@
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
     <None Include="Source\Src\Threading\Worker.inl" />
+    <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
+    <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
+    <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
+    <ClCompile Include="Source\Src\Maths\Easing.cpp" />
+    <ClCompile Include="Source\Src\Maths\Math.cpp" />
+    <ClCompile Include="Source\Src\Maths\MinMax.cpp" />
+    <ClCompile Include="Source\Src\Maths\Quaternion\Quaternion.cpp" />
+    <ClCompile Include="Source\Src\Maths\Trigonometry.cpp" />
+    <ClCompile Include="Source\Src\Maths\Utility.cpp" />
     <ClCompile Include="Source\Src\Threading\ExecutionPlan.cpp" />
     <ClCompile Include="Source\Src\Vulkan\Utilities\VulkanUtilities.cpp" />
     <ClCompile Include="Source\Src\Debug\Logging\Handlers\ConsoleHandler.cpp" />

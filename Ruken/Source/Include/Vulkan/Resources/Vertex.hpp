@@ -24,9 +24,8 @@
 
 #pragma once
 
-#include "Build/Namespace.hpp"
-
-#include "Vector/Vector.hpp"
+#include "Rendering/UV.hpp"
+#include "Maths/Vector/DistanceVector3.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -36,9 +35,9 @@ struct Vertex
 
         #pragma region Members
 
-        Vector3f position;
-        Vector3f normal;
-        Vector2f uv;
+        Vector3m position;
+        Vector3m normal;
+        UV       uv;
 
         #pragma endregion
 
