@@ -38,7 +38,7 @@ BEGIN_RUKEN_NAMESPACE
 #pragma warning( disable:4201 )
 
 /**
- * \brief Two dimensional pixel vector
+ * \brief Three dimensional pixel vector
  */
 template <>
 struct RUKEN_EMPTY_BASES Vector<3, Pixels> final:

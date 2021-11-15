@@ -52,7 +52,7 @@ BEGIN_RUKEN_NAMESPACE
 [[nodiscard]] RkFloat MinExceptZero(RkFloat in_lhs, RkFloat in_rhs) noexcept;
 
 /**
- * \brief Returns the minimum of the 2 passed values except if one of the 2 is zero (then the other one is returned instead)
+ * \brief Returns the minimum of the passed values except if one of them is zero (then the other one is returned instead)
  * \param in_list Operands
  * \return Minimum except 0 value
  */

@@ -43,7 +43,7 @@ struct VectorNormalization
     #pragma region Static Methods
 
     /**
-     * \brief Returns the nomalized vector (with a length of 1)
+     * \brief Returns the normalized vector (with a length of 1)
      * If the vector is too small to be normalized a vector zero will be returned instead.
      *
      * \param in_vector Vector instance
@@ -69,7 +69,7 @@ struct VectorNormalization
     #pragma region Methods
 
     /**
-     * \brief Returns the nomalized vector (with a length of 1)
+     * \brief Returns the normalized vector (with a length of 1)
      * If the vector is too small to be normalized a vector zero will be returned instead.
      * \returns Normalized version of the vector 
      */

@@ -22,40 +22,13 @@
  *  SOFTWARE.
  */
 
-#include <iostream>
-
-#include "Build/Namespace.hpp"
-#include "Maths/Matrix/Matrix.hpp"
-#include "Maths/Quaternion/Quaternion.hpp"
-#include "Maths/Vector/DistanceVector3.hpp"
-#include "Maths/Vector/PixelVector2.hpp"
+#include "Core/Kernel.hpp"
 
 USING_RUKEN_NAMESPACE
 
 int main()
 {
-    Matrix const model {Matrix<4, 4>::ModelMatrix(
-        Constants<Vector3m>  ::zero,      // Position
-        Constants<Quaternion>::identity, // Rotation
-        Constants<Vector3m>  ::one      // Scale
-    )};
+    Kernel kernel;
 
-    Matrix const view {Matrix<4, 4>::LookAtMatrix(
-        Constants<Vector3m>::zero,     // Position
-        Constants<Vector3m>::forward, // Direction
-        Constants<Vector3m>::up      // Up vector
-    )};
-
-    Matrix const projection {Matrix<4, 4>::PerspectiveProjectionMatrix(
-        90_deg, Constants<Vector2px>::full_hd.AspectRatio(), 1_cm, 10_km
-    )};
-
-    Matrix const clip {Matrix<4, 4>::ClipSpace()};
-
-    Matrix test {Matrix<4, 4>::ClipSpace()};
-    test *= projection;
-
-    std::cout << clip * projection * view * model << std::endl;
-
-    return EXIT_SUCCESS;
+    return kernel.Run();
 }

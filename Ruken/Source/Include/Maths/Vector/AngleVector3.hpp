@@ -39,7 +39,7 @@ BEGIN_RUKEN_NAMESPACE
 #pragma warning( disable:4201 )
 
 /**
- * \brief Two dimensional angle vector
+ * \brief Three dimensional angle vector
  */
 template <EAngleUnit TAngleUnit>
 struct RUKEN_EMPTY_BASES Vector<3, Angle<TAngleUnit>> final:

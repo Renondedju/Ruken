@@ -49,7 +49,7 @@ struct VectorMinMax
     /**
      * \brief Returns a vector that is made from the largest components of two vectors
      *
-     * If one of the vectors is largest than the other, the last(s) components will simply be reused
+     * If one of the vectors is larger than the other, the last(s) components will simply be reused
      *
      * \tparam TOtherDimensions Dimensions or size of the right hand side vector
      * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
@@ -84,7 +84,7 @@ struct VectorMinMax
     /**
      * \brief Returns a vector that is made from the smallest components of two vectors
      *
-     * If one of the vectors is largest than the other, the last(s) components will simply be reused
+     * If one of the vectors is larger than the other, the last(s) components will simply be reused
      *
      * \tparam TOtherDimensions Dimensions or size of the right hand side vector
      * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
@@ -124,7 +124,7 @@ struct VectorMinMax
 
     /**
      * \brief Returns a vector that is made from the largest components of two vectors
-     * If one of the vectors is largest than the other, the last(s) components will simply be reused
+     * If one of the vectors is larger than the other, the last(s) components will simply be reused
      *
      * \tparam TOtherDimensions Dimensions or size of the right hand side vector
      * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
@@ -140,7 +140,7 @@ struct VectorMinMax
 
     /**
      * \brief Returns a vector that is made from the smallest components of two vectors
-     * If one of the vectors is largest than the other, the last(s) components will simply be reused
+     * If one of the vectors is larger than the other, the last(s) components will simply be reused
      *
      * \tparam TOtherDimensions Dimensions or size of the right hand side vector
      * \tparam TOtherUnderlyingType Underlying type of the right hand side vector

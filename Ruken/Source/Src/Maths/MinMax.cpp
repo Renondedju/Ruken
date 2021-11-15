@@ -33,6 +33,9 @@ RkFloat RUKEN_NAMESPACE::MinExceptZero(RkFloat const in_lhs, RkFloat const in_rh
     if (in_lhs == .0F)
         return in_rhs;
 
+    if (in_rhs == .0F)
+        return in_lhs;
+
     return Minimum(in_lhs, in_rhs);
 }
 
