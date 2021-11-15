@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "Maths/Matrix/Matrix.hpp"
+//#include "Maths/Matrix/Matrix.hpp"
 #include "Types/Units/Angle/Angle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -67,11 +67,11 @@ struct Quaternion
     /**
      * \brief Creates a quaternion with the given rotations (using euler angles)
      * 
-     * \param in_angle_x Angle to rotate around the x axis (in degrees)
-     * \param in_angle_y Angle to rotate around the y axis (in degrees)
-     * \param in_angle_z Angle to rotate around the z axis (in degrees)
+     * \param in_angle_x Angle to rotate around the x axis
+     * \param in_angle_y Angle to rotate around the y axis
+     * \param in_angle_z Angle to rotate around the z axis
      */
-    Quaternion(Degrees in_angle_x, Degrees in_angle_y, Degrees in_angle_z) noexcept;
+    Quaternion(Radians in_angle_x, Radians in_angle_y, Radians in_angle_z) noexcept;
 
     #pragma endregion
 
@@ -102,13 +102,6 @@ struct Quaternion
      * \return Quaternion instance
      */
     Quaternion& Normalized() noexcept;
-
-    /**
-     * \brief Computes an homogenous rotation 3x3 matrix for a given quaternion
-     * \return Homogenous 3x3 rotation matrix
-     */
-    [[nodiscard]]
-    constexpr Matrix<3, 3> GetRotationMatrix() const noexcept;
 
     #pragma endregion
 

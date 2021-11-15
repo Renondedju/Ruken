@@ -53,7 +53,7 @@ struct VectorNormalization
     static constexpr Vector<TDimensions, TUnderlyingType> Normalized(Vector<TDimensions, TUnderlyingType> const& in_vector) noexcept
     requires requires(TUnderlyingType in_a, TUnderlyingType in_b) { in_a == in_b; in_a /= in_b; }
     {
-        TUnderlyingType length = VectorLength<Vector<TDimensions, TUnderlyingType>>::Length(in_vector);
+        TUnderlyingType length = VectorLength<TDimensions, TUnderlyingType>::Length(in_vector);
         if (length == TUnderlyingType())
             return {};
 

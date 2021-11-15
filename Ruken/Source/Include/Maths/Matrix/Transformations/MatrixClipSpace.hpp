@@ -24,38 +24,48 @@
 
 #pragma once
 
-#include <algorithm>
+#include <type_traits>
 
 #include "Maths/Matrix/MatrixForward.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Implements matrix utilities
+ * \brief Implements the clip space matrix
+ * \tparam TRows Number of rows of the matrix
+ * \tparam TColumns Number of columns of the matrix
+ * \tparam TSfinae Special parameter allowing selection of class specialization to enable or disable some functions 
  */
+template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
+struct MatrixClipSpace
+{};
+
+// Requires a 4x4 matrix
 template <RkSize TRows, RkSize TColumns>
-struct MatrixConversions
+struct MatrixClipSpace<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4>>
 {
     /**
-	 * \brief Matrix conversion operator
-	 * \note This operator is only explicit if one of the new sizes of the matrix is smaller than the original one 
-	 * \tparam TNewRows New height or number of rows of the matrix
-	 * \tparam TNewColumns New width or number of columns of the matrix
-	 */
-	template <RkSize TNewRows, RkSize TNewColumns>
-	explicit(TNewRows < TRows || TNewColumns < TColumns)
-    operator Matrix<TNewRows, TNewColumns>() const noexcept
-	{
-		// Will be identity if the matrix is a square matrix
-		Matrix<TNewRows, TNewColumns> new_matrix {};
-
-		for (RkSize row {0ULL}; row < std::min(TRows, TNewRows); ++row)
-            std::memcpy(&new_matrix.data[row * TNewColumns],
-				&static_cast<Matrix<TRows, TColumns> const*>(this)->data[row * TColumns],
-				sizeof(RkFloat) * std::min(TColumns, TNewColumns));
-
-		return new_matrix;
-	}
+     * \brief Returns the clip space of the Vulkan API.
+     *
+     * This matrix is generally used in conjunction with a projection matrix to convert an object from the view space to the clip space
+     * This matrix allows to do the following transformations:
+     *  Position.y = -Position.y;
+     *  Position.z = (Position.z + Position.w) / 2.0;
+     *
+     * \see An example of the use of this matrix: https://github.com/LunarG/VulkanSamples/commit/0dd36179880238014512c0637b0ba9f41febe803
+     * 
+     * \return Vulkan clip space matrix
+     */
+    [[nodiscard]]
+    static Matrix<TRows, TColumns> ClipSpace() noexcept
+    {
+        return {
+            1.0F,  0.0F,  0.0F,  0.0F,
+            0.0F, -1.0F,  0.0F,  0.0F,
+            0.0F,  0.0F,  0.5F,  0.5F,
+            0.0F,  0.0F,  0.0F,  1.0F
+        };
+    }
 };
 
 END_RUKEN_NAMESPACE

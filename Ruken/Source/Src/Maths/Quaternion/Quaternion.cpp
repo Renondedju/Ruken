@@ -31,9 +31,9 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-Quaternion::Quaternion(Degrees const in_angle_x,
-                       Degrees const in_angle_y,
-                       Degrees const in_angle_z) noexcept
+Quaternion::Quaternion(Radians const in_angle_x,
+                       Radians const in_angle_y,
+                       Radians const in_angle_z) noexcept
 {
     Radians const half_x_angle = in_angle_x / 2.0F;
     Radians const half_y_angle = in_angle_y / 2.0F;

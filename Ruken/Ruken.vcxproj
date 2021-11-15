@@ -200,6 +200,16 @@
     <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixOstream.hpp" />
     <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixTransposition.hpp" />
     <ClInclude Include="Source\Include\Maths\Matrix\Operations\MatrixUtility.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixClipSpace.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixLookAt.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixModel.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixProjections.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotation.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotationX.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotationY.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixRotationZ.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixScale.hpp" />
+    <ClInclude Include="Source\Include\Maths\Matrix\Transformations\MatrixTranslation.hpp" />
     <ClInclude Include="Source\Include\Maths\MinMax.hpp" />
     <ClInclude Include="Source\Include\Maths\Quaternion\Quaternion.hpp" />
     <ClInclude Include="Source\Include\Maths\Trigonometry.hpp" />
@@ -418,7 +428,6 @@
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
     <ClCompile Include="Source\Src\Maths\Easing.cpp" />
     <ClCompile Include="Source\Src\Maths\Math.cpp" />
-    <ClCompile Include="Source\Src\Maths\Matrix\Matrix.cpp" />
     <ClCompile Include="Source\Src\Maths\MinMax.cpp" />
     <ClCompile Include="Source\Src\Maths\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Source\Src\Maths\Trigonometry.cpp" />

@@ -24,46 +24,41 @@
 
 #pragma once
 
-#pragma region Constructors
+#include "Maths/Matrix/MatrixForward.hpp"
+#include "Maths/Quaternion/Quaternion.hpp"
+#include "Maths/Vector/DistanceVector3.hpp"
 
-constexpr Quaternion::Quaternion(RkFloat const in_w,
-                                 RkFloat const in_x,
-                                 RkFloat const in_y,
-                                 RkFloat const in_z) noexcept:
-    w {in_w},
-    x {in_x},
-    y {in_y},
-    z {in_z}
-{}
+BEGIN_RUKEN_NAMESPACE
 
-#pragma endregion
+/**
+ * \brief Implements scale matrix
+ * \tparam TRows Number of rows of the matrix
+ * \tparam TColumns Number of columns of the matrix
+ * \tparam TSfinae Special parameter allowing selection of class specialization to enable or disable some functions 
+ */
+template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
+struct MatrixScale
+{};
 
-#pragma region Methods
-
-constexpr Quaternion& Quaternion::Invert() noexcept
+// Requires a 4x4 matrix
+template <RkSize TRows, RkSize TColumns>
+struct MatrixScale<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4>>
 {
-    x = -x;
-    y = -y;
-    z = -z;
+    /**
+     * \brief Creates a scale matrix
+     * \param in_scale Scaling factor
+     * \return Scale matrix
+     */
+    [[nodiscard]]
+    static Matrix<TRows, TColumns> ScaleMatrix(Vector3m const& in_scale) noexcept
+    {
+        return {
+            static_cast<RkFloat>(in_scale.x), 0.0F, 0.0F, 0.0F,
+            0.0F, static_cast<RkFloat>(in_scale.y), 0.0F, 0.0F,
+            0.0F, 0.0F, static_cast<RkFloat>(in_scale.z), 0.0F,
+            0.0F, 0.0F, 0.0F                            , 1.0F
+        };
+    }
+};
 
-    return *this;
-}
-
-constexpr RkFloat Quaternion::SqrLength() const noexcept
-{
-    return w * w + x * x + y * y + z * z;
-}
-
-#pragma endregion
-
-#pragma region Operators
-
-constexpr Quaternion Quaternion::operator*(Quaternion const& in_other) const noexcept
-{
-    return Quaternion(w * in_other.w - (x * in_other.x + y * in_other.y + z * in_other.z),
-                      w * in_other.x + in_other.w * x + (y * in_other.z - in_other.y * z),
-                      w * in_other.y + in_other.w * y + (z * in_other.x - in_other.z * x),
-                      w * in_other.z + in_other.w * z + (x * in_other.y - in_other.x * y));
-}
-
-#pragma endregion
+END_RUKEN_NAMESPACE

@@ -30,55 +30,32 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Implements matrix transposition methods
+ * \brief Implements member matrix transposition methods
+ * \tparam TRows Height or number of rows of the matrix
+ * \tparam TColumns Width or number of columns of the matrix
  */
+template <RkSize TRows, RkSize TColumns>
 struct MatrixTransposition
 {
-    #pragma region Static Methods
+    #pragma region Methods
 
     /**
      * \brief Transposes the matrix
      * \return Transposed matrix
      */
-    template <RkSize TRows, RkSize TColumns>
     [[nodiscard]]
-    static constexpr Matrix<TColumns, TRows> Transpose(Matrix<TRows, TColumns> const& in_matrix) noexcept
+    constexpr Matrix<TColumns, TRows> Transposed() const noexcept
     {
         Matrix<TColumns, TRows> transposed;
 
         for (RkSize row {0ULL}; row < TRows; ++row)
             for (RkSize column {0ULL}; column < TColumns; ++column)
-                MatrixAccess::At(transposed, column, row) = MatrixAccess::At(in_matrix, row, column);
+                MatrixAccess::At(transposed, column, row) = MatrixAccess::At(*static_cast<Matrix<TRows, TColumns> const*>(this), row, column);
 
         return transposed;
     }
 
     #pragma endregion
-
-	/**
-     * \brief Implements member matrix transposition methods
-     * \tparam TRows Height or number of rows of the matrix
-     * \tparam TColumns Width or number of columns of the matrix
-     */
-    template <RkSize TRows, RkSize TColumns>
-    struct Member
-    {
-        #pragma region Methods
-
-        /**
-         * \brief Transposes the matrix
-         * \return Transposed matrix
-         */
-        [[nodiscard]]
-        constexpr Matrix<TColumns, TRows>& Transpose() noexcept
-        {
-             *static_cast<Matrix<TRows, TColumns>*>(this) = MatrixTransposition::Transpose(*static_cast<Matrix<TRows, TColumns>*>(this));
-
-            return *static_cast<Matrix<TRows, TColumns>*>(this);
-        }
-
-        #pragma endregion
-    };
 };
 
 END_RUKEN_NAMESPACE

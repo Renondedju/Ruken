@@ -32,40 +32,47 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Implements matrix inversion methods 
+ * \brief Implements matrix inversion methods
+ * \tparam TRows Number of rows of the matrix
+ * \tparam TColumns Number of columns of the matrix
+ * \tparam TSfinae Special parameter allowing selection of class specialization to enable or disable some functions 
  */
+template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
 struct MatrixInversion
+{};
+
+/**
+ * \brief Implements matrix inversion methods. Requires a square matrix
+ * \warning BUG: Not working for now, do not use this
+ */
+template <RkSize TRows, RkSize TColumns>
+struct MatrixInversion<TRows, TColumns, std::enable_if_t<TRows == TColumns>>
 {
-    #pragma region Methods
+    #pragma region Static Methods
 
     /**
-     * \brief Inverts the passed matrix
+     * \brief Inverts the matrix
      * \note Inverted matrix is such that if multiplied by the original would result in identity matrix
-     * \tparam TSize Size of the square matrix to be inverted
-     * \param in_matrix Matrix instance
      * \return Inverted matrix
      */
-    template <RkSize TSize>
-    static constexpr Matrix<TSize, TSize> Invert(Matrix<TSize, TSize> const& in_matrix) noexcept
+    constexpr Matrix<TRows, TColumns> Inverted() const noexcept
     {
-        Matrix<TSize, TSize> inverted_matrix {};
-		Matrix<TSize, TSize> constexpr identity_matrix {};
+        Matrix<TRows, TColumns> inverted_matrix {};
+		Matrix<TRows, TColumns> constexpr identity_matrix {};
 
 		// Computing the LU matrices
-		Matrix<TSize, TSize> lower_matrix;
-		Matrix<TSize, TSize> upper_matrix;
+		Matrix<TRows, TColumns> lower_matrix;
+		Matrix<TRows, TColumns> upper_matrix;
 
-        LuDecomposition(in_matrix, lower_matrix, upper_matrix);
+        LuDecomposition(*static_cast<Matrix<TRows, TColumns> const*>(this), lower_matrix, upper_matrix);
 
-        for (RkSize column = 0ULL; column < TSize; ++column)
+        for (RkSize column = 0ULL; column < TRows; ++column)
         {
-            std::array<RkFloat, TSize> vector = BackwardSubstitution(upper_matrix,
-                ForwardSubstitution(lower_matrix,
-                    std::array<RkFloat, TSize>(&identity_matrix.data[column * TSize])
-                )
+            std::array<RkFloat, TRows> vector = BackwardSubstitution(upper_matrix,
+                ForwardSubstitution(lower_matrix, &identity_matrix.data[column * TRows]).data()
             );
 
-            memcpy(&inverted_matrix.data[column * TSize], vector.data, sizeof vector);
+            memcpy(&inverted_matrix.data[column * TRows], vector.data(), sizeof vector);
         }
 
 		return inverted_matrix;
@@ -73,22 +80,20 @@ struct MatrixInversion
 
     /**
      * \brief Lower–upper (LU) decomposition or factorization factors a matrix as the product of a lower triangular matrix and an upper triangular matrix.
-     * \tparam TSize Size of the matrix
      * \param in_matrix Matrix instance
      * \param out_lower_matrix Lower (L) matrix instance output
      * \param out_upper_matrix Upper (U) matrix instance output
      */
-    template <RkSize TSize>
-    static constexpr RkVoid LuDecomposition(Matrix<TSize, TSize> const& in_matrix,
-                                            Matrix<TSize, TSize>&       out_lower_matrix,
-                                            Matrix<TSize, TSize>&       out_upper_matrix) noexcept
+    static constexpr RkVoid LuDecomposition(Matrix<TRows, TColumns> const& in_matrix,
+                                            Matrix<TRows, TColumns>&       out_lower_matrix,
+                                            Matrix<TRows, TColumns>&       out_upper_matrix) noexcept
     {
         // Decomposing matrix into Upper and Lower
 		// Triangular matrix 
-		for (RkSize i {0ULL}; i < TSize; ++i)
+		for (RkSize i {0ULL}; i < TRows; ++i)
 		{
 			// Upper Triangular 
-			for (RkSize k {i}; k < TSize; ++k)
+			for (RkSize k {i}; k < TRows; ++k)
 			{
 				RkFloat sum {.0F}; 
 				for (RkSize j {0ULL}; j < i; ++j)
@@ -99,7 +104,7 @@ struct MatrixInversion
 			}
 
 			// Lower Triangular 
-			for (RkSize k {i}; k < TSize; ++k)
+			for (RkSize k {i}; k < TRows; ++k)
 			{
 				if (i == k) 
 					MatrixAccess::At(out_lower_matrix, i, i) = 1.0F; // Diagonal as 1 
@@ -122,15 +127,14 @@ struct MatrixInversion
      * \param in_vector The b operand
      * \return The resultant x vector
      */
-    template <RkSize TSize>
-    static constexpr std::array<RkFloat, TSize> ForwardSubstitution(
-        Matrix<TSize, TSize>       const& in_matrix,
-        std::array<RkFloat, TSize> const& in_vector) noexcept
+    static constexpr std::array<RkFloat, TRows> ForwardSubstitution(
+        Matrix<TRows, TColumns> const& in_matrix,
+        RkFloat const                  in_vector[TRows]) noexcept
     {
-        std::array<RkFloat, TSize> output;
+        std::array<RkFloat, TRows> output;
 
         RkFloat sum;
-        for(RkSize row {0ULL}; row < TSize; ++row)
+        for(RkSize row {0ULL}; row < TRows; ++row)
         {
             sum = 0;
             for(RkSize column = 0; column < row; ++column)
@@ -148,19 +152,18 @@ struct MatrixInversion
      * \param in_vector The b operand
      * \return The resultant x vector
      */
-    template <RkSize TSize>
-    static constexpr std::array<RkFloat, TSize> BackwardSubstitution(
-        Matrix<TSize, TSize>       const& in_matrix,
-        std::array<RkFloat, TSize> const& in_vector) noexcept
+    static constexpr std::array<RkFloat, TRows> BackwardSubstitution(
+        Matrix<TRows, TColumns>    const& in_matrix,
+        RkFloat const                     in_vector[TRows]) noexcept
     {
-        std::array<RkFloat, TSize> output;
+        std::array<RkFloat, TRows> output;
 
-        output[TSize-1] = in_vector[TSize-1] / MatrixAccess::At(in_matrix, TSize-1, TSize-1);
+        output[TRows-1] = in_vector[TRows-1] / MatrixAccess::At(in_matrix, TRows-1, TRows-1);
 
-        for (int64_t row = TSize-2; row >= 0; --row)
+        for (int64_t row = TRows-2; row >= 0; --row)
         {
             output[row] = in_vector[row];
-            for (RkSize column = row + 1; column < TSize; ++column)
+            for (RkSize column = row + 1; column < TRows; ++column)
                 output[row] -= MatrixAccess::At(in_matrix, column, row) * output[column];
 
             output[row] = output[row] / MatrixAccess::At(in_matrix, row, row);
@@ -170,26 +173,6 @@ struct MatrixInversion
     }
 
 	#pragma endregion
-
-    /**
-     * \brief Implements member inversion methods
-     * \tparam TSize Size of the square matrix to be inverted
-     */
-    template <RkSize TSize>
-    struct Member
-    {
-        /**
-         * \brief Inverts the matrix
-         * \note Inverted matrix is such that if multiplied by the original would result in identity matrix
-         * \return Matrix instance
-         */
-        constexpr Matrix<TSize, TSize>& Invert() noexcept
-        {
-            *static_cast<Matrix<TSize, TSize>*>(this) = MatrixInversion::Invert(*static_cast<Matrix<TSize, TSize>*>(this));
-
-            return *static_cast<Matrix<TSize, TSize>*>(this);
-        }
-    };
 };
 
 END_RUKEN_NAMESPACE
