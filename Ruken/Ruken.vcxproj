@@ -62,8 +62,8 @@
     <Link>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(VULKAN_SDK)\Lib;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;PotatoMaths.lib;spirv-cross-core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;spirv-cross-core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -74,7 +74,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(VULKAN_SDK)\Include;$(VULKAN_SDK)\Third-Party\Include;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(VULKAN_SDK)\Include;$(VULKAN_SDK)\Third-Party\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <StringPooling>true</StringPooling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -98,7 +98,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(VULKAN_SDK)\Include;$(VULKAN_SDK)\Third-Party\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -111,8 +111,8 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(VULKAN_SDK)\Lib;$(SolutionDir)PotatoMaths\Build\Binaries\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;PotatoMaths.lib;spirv-cross-cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;spirv-cross-cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -266,6 +266,7 @@
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Shader.hpp" />
     <ClInclude Include="Source\Include\Rendering\Resources\Texture.hpp" />
+    <ClInclude Include="Source\Include\Rendering\UV.hpp" />
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
     <ClInclude Include="Source\Include\Threading\Job.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />

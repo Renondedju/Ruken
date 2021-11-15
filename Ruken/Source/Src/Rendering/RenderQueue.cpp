@@ -1,5 +1,3 @@
-#include <ranges>
-
 #include "Rendering/RenderQueue.hpp"
 #include "Rendering/RenderDevice.hpp"
 
@@ -17,14 +15,14 @@ RenderQueue::RenderQueue(Logger* in_logger, RenderDevice* in_device, RkUint32 co
 
 RenderQueue::~RenderQueue() noexcept
 {
-    for (auto const& fence : m_fences | std::views::values)
+    for (auto const& fence : m_fences)
     {
-        m_device->GetLogicalDevice().destroy(fence);
+        m_device->GetLogicalDevice().destroy(fence.second);
     }
 
-    for (auto const& command_pool : m_command_pools | std::views::values)
+    for (auto const& command_pool : m_command_pools)
     {
-        m_device->GetLogicalDevice().destroy(command_pool);
+        m_device->GetLogicalDevice().destroy(command_pool.second);
     }
 }
 

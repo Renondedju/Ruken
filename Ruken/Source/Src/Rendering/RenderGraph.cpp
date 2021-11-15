@@ -1,7 +1,4 @@
 #include "Rendering/RenderGraph.hpp"
-
-#include <ranges>
-
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/Renderer.hpp"
 #include "Rendering/RenderFrame.hpp"
@@ -145,9 +142,9 @@ RenderGraph::~RenderGraph() noexcept
 
 RkVoid RenderGraph::Build() noexcept
 {
-    for (auto const& pass : m_passes | std::views::values)
+    for (auto const& pass : m_passes)
     {
-        pass->Build();
+        pass.second->Build();
     }
 }
 
@@ -155,9 +152,9 @@ RkVoid RenderGraph::Execute(vk::Semaphore const& in_wait_semaphore, vk::Semaphor
 {
     auto& frame = GetCurrentFrame();
 
-    for (auto const& pass : m_passes | std::views::values)
+    for (auto const& pass : m_passes)
     {
-        pass->Execute();
+        pass.second->Execute();
     }
 
     // TODO : Final pass to swapchain.
