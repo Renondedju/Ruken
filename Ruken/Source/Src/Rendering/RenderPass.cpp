@@ -49,88 +49,85 @@ RkVoid RenderPass::Build() noexcept
         .pDepthStencilAttachment = &depth_attachment_reference
     };
 
-    std::array<vk::AttachmentDescription, 2> attachments = {
-        {
-            {
-                .format = vk::Format::eR8G8B8A8Unorm,
-                .samples = vk::SampleCountFlagBits::e1,
-                .loadOp = vk::AttachmentLoadOp::eClear,
-                .storeOp = vk::AttachmentStoreOp::eStore,
-                .stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
-                .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
-                .initialLayout = vk::ImageLayout::eUndefined,
-                .finalLayout = vk::ImageLayout::eColorAttachmentOptimal
-            },
-            {
-                .format = vk::Format::eD32Sfloat,
-                .samples = vk::SampleCountFlagBits::e1,
-                .loadOp = vk::AttachmentLoadOp::eClear,
-                .storeOp = vk::AttachmentStoreOp::eDontCare,
-                .stencilLoadOp = vk::AttachmentLoadOp::eDontCare,
-                .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
-                .initialLayout = vk::ImageLayout::eUndefined,
-                .finalLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal
-            }
-        }
-    };
+    std::vector<vk::AttachmentDescription>          attachments;
+    std::vector<vk::FramebufferAttachmentImageInfo> framebuffer_attachments;
 
-    vk::SubpassDependency dependency = {
-        .srcSubpass = VK_SUBPASS_EXTERNAL,
-        .dstSubpass = 0,
-        .srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
-        .dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
-        .srcAccessMask = vk::AccessFlagBits::eNoneKHR,
-        .dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite
-    };
+    for (auto const* color_output : m_color_outputs)
+    {
+        vk::AttachmentDescription attachment = {
+            .format         = color_output->info.format,
+            .samples        = vk::SampleCountFlagBits::e1,
+            .loadOp         = vk::AttachmentLoadOp::eClear,
+            .storeOp        = vk::AttachmentStoreOp::eStore,
+            .stencilLoadOp  = vk::AttachmentLoadOp::eDontCare,
+            .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+            .initialLayout  = vk::ImageLayout::eUndefined,
+            .finalLayout    = vk::ImageLayout::eColorAttachmentOptimal
+        };
+
+        attachments.push_back(attachment);
+
+        vk::FramebufferAttachmentImageInfo framebuffer_attachment = {
+            .usage           = color_output->info.usage,
+            .width           = color_output->info.extent.width,
+            .height          = color_output->info.extent.height,
+            .layerCount      = 1U,
+            .viewFormatCount = 1U,
+            .pViewFormats    = &color_output->info.format
+        };
+
+        framebuffer_attachments.push_back(framebuffer_attachment);
+    }
+
+    if (m_depth_stencil_output)
+    {
+        vk::AttachmentDescription attachment = {
+            .format         = m_depth_stencil_output->info.format,
+            .samples        = vk::SampleCountFlagBits::e1,
+            .loadOp         = vk::AttachmentLoadOp::eClear,
+            .storeOp        = vk::AttachmentStoreOp::eDontCare,
+            .stencilLoadOp  = vk::AttachmentLoadOp::eDontCare,
+            .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+            .initialLayout  = vk::ImageLayout::eUndefined,
+            .finalLayout    = vk::ImageLayout::eDepthStencilAttachmentOptimal
+        };
+
+        attachments.push_back(attachment);
+
+        vk::FramebufferAttachmentImageInfo framebuffer_attachment = {
+            .usage           = m_depth_stencil_output->info.usage,
+            .width           = m_depth_stencil_output->info.extent.width,
+            .height          = m_depth_stencil_output->info.extent.height,
+            .layerCount      = 1U,
+            .viewFormatCount = 1U,
+            .pViewFormats    = &m_depth_stencil_output->info.format
+        };
+
+        framebuffer_attachments.push_back(framebuffer_attachment);
+    }
 
     vk::RenderPassCreateInfo render_pass_info = {
         .attachmentCount = static_cast<uint32_t>(attachments.size()),
-        .pAttachments = attachments.data(),
-        .subpassCount = 1,
-        .pSubpasses = &subpass,
-        .dependencyCount = 1,
-        .pDependencies = &dependency
+        .pAttachments    = attachments.data(),
+        .subpassCount    = 1U,
+        .pSubpasses      = &subpass
     };
 
     m_handle = m_device->GetLogicalDevice().createRenderPass(render_pass_info).value;
 
-    std::vector formats = {
-        vk::Format::eR8G8B8A8Unorm,
-        vk::Format::eD32Sfloat
-    };
-
-    std::vector<vk::FramebufferAttachmentImageInfo> framebuffer_attachment_image_infos = {
-        vk::FramebufferAttachmentImageInfo {
-            .usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc,
-            .width = 1920,
-            .height = 1080,
-            .layerCount = 1,
-            .viewFormatCount = static_cast<RkUint32>(formats.size()),
-            .pViewFormats = formats.data()
-        },
-        vk::FramebufferAttachmentImageInfo {
-            .usage = vk::ImageUsageFlagBits::eDepthStencilAttachment,
-            .width = 1920,
-            .height = 1080,
-            .layerCount = 1,
-            .viewFormatCount = static_cast<RkUint32>(formats.size()),
-            .pViewFormats = formats.data()
-        }
-    };
-
     vk::FramebufferAttachmentsCreateInfo framebuffer_attachments_create_info = {
-        .attachmentImageInfoCount = static_cast<RkUint32>(framebuffer_attachment_image_infos.size()),
-        .pAttachmentImageInfos    = framebuffer_attachment_image_infos.data()
+        .attachmentImageInfoCount = static_cast<RkUint32>(framebuffer_attachments.size()),
+        .pAttachmentImageInfos    = framebuffer_attachments.data()
     };
 
     vk::FramebufferCreateInfo framebuffer_create_info = {
         .pNext           = &framebuffer_attachments_create_info,
         .flags           = vk::FramebufferCreateFlagBits::eImageless,
         .renderPass      = m_handle,
-        .attachmentCount = static_cast<RkUint32>(framebuffer_attachment_image_infos.size()),
-        .width           = 1920,
-        .height          = 1080,
-        .layers          = 1,
+        .attachmentCount = static_cast<RkUint32>(framebuffer_attachments.size()),
+        .width           = 1920U,
+        .height          = 1080U,
+        .layers          = 1U,
     };
 
     m_framebuffer = m_device->GetLogicalDevice().createFramebuffer(framebuffer_create_info).value;
@@ -251,9 +248,9 @@ RkVoid RenderPass::AddColorInput(std::string const& in_name)
 
 RkVoid RenderPass::AddColorOutput(std::string const& in_name, ImageInfo const& in_image_info)
 {
-    (void)in_image_info;
-
     auto& res = m_graph->GetImageResource(in_name);
+
+    res.info = in_image_info;
 
     m_color_outputs.push_back(&res);
 }
@@ -267,9 +264,9 @@ RkVoid RenderPass::SetDepthStencilInput(std::string const& in_name)
 
 RkVoid RenderPass::SetDepthStencilOutput(std::string const& in_name, ImageInfo const& in_image_info)
 {
-    (void)in_image_info;
-
     auto& res = m_graph->GetImageResource(in_name);
+
+    res.info = in_image_info;
 
     m_depth_stencil_output = &res;
 }

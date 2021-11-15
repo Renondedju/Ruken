@@ -367,10 +367,20 @@ RkVoid RenderGraph::EndFrame() noexcept
 
 RenderImageResource& RenderGraph::GetImageResource(std::string const& in_name) noexcept
 {
-    return static_cast<RenderImageResource&>(*m_resources[in_name]);
+    if (!m_resources.contains(in_name))
+    {
+        m_resources.emplace(in_name, std::make_unique<RenderImageResource>());
+    }
+
+    return *static_cast<RenderImageResource*>(m_resources[in_name].get());
 }
 
 RenderBufferResource& RenderGraph::GetBufferResource(std::string const& in_name) noexcept
 {
-    return static_cast<RenderBufferResource&>(*m_resources[in_name]);
+    if (!m_resources.contains(in_name))
+    {
+        m_resources.emplace(in_name, std::make_unique<RenderBufferResource>());
+    }
+
+    return *static_cast<RenderBufferResource*>(m_resources[in_name].get());
 }

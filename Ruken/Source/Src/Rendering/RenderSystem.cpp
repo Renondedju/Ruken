@@ -25,10 +25,19 @@ RenderSystem::RenderSystem(ServiceProvider& in_service_provider) noexcept:
     auto& forward_pass = m_renderer->GetGraph()->AddPass("Forward");
 
     ImageInfo info = {
-        
+        .format = vk::Format::eR8G8B8A8Unorm,
+        .extent = {
+            .width  = 1920,
+            .height = 1080,
+            .depth  = 1
+        },
+        .usage  = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc
     };
 
     forward_pass.AddColorOutput("Final", info);
+
+    info.format = vk::Format::eD32Sfloat;
+    info.usage  = vk::ImageUsageFlagBits::eDepthStencilAttachment;
 
     forward_pass.SetDepthStencilOutput("Depth", info);
 
@@ -168,9 +177,7 @@ RkVoid RenderSystem::Update() noexcept
 
         ubo.proj[1][1] *= -1;
 
-        memcpy(camera_buffer.Map(), &ubo, sizeof(CameraData));
-
-        camera_buffer.UnMap();
+        camera_buffer.Upload(&ubo);
 
         // TODO : Setup graph and target swapchain.
         auto const image_semaphore   = frame.GetSemaphorePool().Request();

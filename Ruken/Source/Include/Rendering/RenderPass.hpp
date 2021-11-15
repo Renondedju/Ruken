@@ -10,12 +10,14 @@ class Logger;
 class RenderDevice;
 class RenderGraph;
 
-struct RenderResource
+class RenderResource
 {
-    std::string name;
+    public:
 
-    std::unordered_set<RkUint32> read_in_passes;
-    std::unordered_set<RkUint32> written_in_passes;
+        std::string name;
+
+        std::unordered_set<RkUint32> read_in_passes;
+        std::unordered_set<RkUint32> written_in_passes;
 };
 
 struct ImageInfo
@@ -25,9 +27,11 @@ struct ImageInfo
     vk::ImageUsageFlags usage;
 };
 
-struct RenderImageResource : public RenderResource
+class RenderImageResource : public RenderResource
 {
-    ImageInfo info;
+    public:
+
+        ImageInfo info;
 };
 
 struct BufferInfo
@@ -36,9 +40,11 @@ struct BufferInfo
     vk::BufferUsageFlags usage;
 };
 
-struct RenderBufferResource : public RenderResource
+class RenderBufferResource : public RenderResource
 {
-    BufferInfo info;
+    public:
+
+        BufferInfo info;
 };
 
 class RenderPass
