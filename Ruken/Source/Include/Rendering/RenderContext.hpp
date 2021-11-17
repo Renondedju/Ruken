@@ -23,7 +23,7 @@ class RenderContext
         #pragma region Methods
 
         RkBool CreateInstance           () noexcept;
-        RkVoid CreateDebugUtilsMessenger() noexcept;
+        RkBool CreateDebugUtilsMessenger() noexcept;
 
         #pragma endregion
 

@@ -3,8 +3,6 @@
 #include "Rendering/Resources/Shader.hpp"
 #include "Rendering/Resources/Texture.hpp"
 
-#include "Resource/IResource.hpp"
-
 BEGIN_RUKEN_NAMESPACE
 
 class Renderer;

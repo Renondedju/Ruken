@@ -33,14 +33,14 @@ Model::Model(Renderer* in_renderer, std::string_view in_path) noexcept:
         {
             Vertex vertex = {
                 .position = {
-                    attribute.vertices[3 * vertex_index + 0],
-                    attribute.vertices[3 * vertex_index + 1],
-                    attribute.vertices[3 * vertex_index + 2]
+                    static_cast<Meters>(attribute.vertices[3 * vertex_index + 0]),
+                    static_cast<Meters>(attribute.vertices[3 * vertex_index + 1]),
+                    static_cast<Meters>(attribute.vertices[3 * vertex_index + 2])
                 },
                 .color = {
-                    1.0F,
-                    1.0F,
-                    1.0F
+                    1_m,
+                    1_m,
+                    1_m
                 },
                 .uv = {
                     attribute.texcoords[2 * uv_index + 0],

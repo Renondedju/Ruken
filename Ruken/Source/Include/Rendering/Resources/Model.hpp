@@ -1,13 +1,11 @@
 #pragma once
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include "Maths/Vector/DistanceVector2.hpp"
+#include "Maths/Vector/DistanceVector3.hpp"
 
-#include <glm/glm.hpp>
+#include "Maths/Matrix/Matrix.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "Rendering/Resources/Material.hpp"
+#include "Rendering/UV.hpp"
 
 #include "Resource/IResource.hpp"
 
@@ -17,9 +15,9 @@ BEGIN_RUKEN_NAMESPACE
 
 struct Vertex
 {
-    glm::vec3 position;
-    glm::vec3 color;
-    glm::vec2 uv;
+    Vector3m position;
+    Vector3m color;
+    UV uv;
 
     static std::array<vk::VertexInputAttributeDescription, 3> get_attribute_descriptions()
     {
@@ -50,7 +48,7 @@ struct Vertex
 
 struct TransformData
 {
-    glm::mat4 model;
+    Matrix<4, 4> model;
 };
 
 struct DrawData
@@ -73,8 +71,6 @@ class Model final : public IResource
         vk::DeviceSize m_count;
 
         std::unique_ptr<Buffer> m_buffer;
-
-        std::unique_ptr<Material> m_material;
 
         #pragma endregion
 

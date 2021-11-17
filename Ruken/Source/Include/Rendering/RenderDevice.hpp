@@ -2,8 +2,6 @@
 
 #include "Rendering/RenderQueue.hpp"
 
-#include "RenderObjects/Buffer.hpp"
-
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
@@ -57,17 +55,17 @@ class RenderDevice
 
         #pragma region Methods
 
-        vk::PhysicalDevice      const& GetPhysicalDevice            () const noexcept;
-        vk::Device              const& GetLogicalDevice             () const noexcept;
-        VmaAllocator            const& GetAllocator                 () const noexcept;
-        RkUint32                       GetGraphicsFamilyIndex       () const noexcept;
-        RkUint32                       GetComputeFamilyIndex        () const noexcept;
-        RkUint32                       GetTransferFamilyIndex       () const noexcept;
-        RenderQueue&                   GetGraphicsQueue             () const noexcept;
-        RenderQueue&                   GetComputeQueue              () const noexcept;
-        RenderQueue&                   GetTransferQueue             () const noexcept;
-        RkBool                         HasDedicatedComputeQueue     () const noexcept;
-        RkBool                         HasDedicatedTransferQueue    () const noexcept;
+        vk::PhysicalDevice const& GetPhysicalDevice        () const noexcept;
+        vk::Device         const& GetLogicalDevice         () const noexcept;
+        VmaAllocator       const& GetAllocator             () const noexcept;
+        RkUint32                  GetGraphicsFamilyIndex   () const noexcept;
+        RkUint32                  GetComputeFamilyIndex    () const noexcept;
+        RkUint32                  GetTransferFamilyIndex   () const noexcept;
+        RenderQueue&              GetGraphicsQueue         () const noexcept;
+        RenderQueue&              GetComputeQueue          () const noexcept;
+        RenderQueue&              GetTransferQueue         () const noexcept;
+        RkBool                    HasDedicatedComputeQueue () const noexcept;
+        RkBool                    HasDedicatedTransferQueue() const noexcept;
 
         #pragma endregion
 

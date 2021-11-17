@@ -1,11 +1,6 @@
 #pragma once
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
-#include <glm/glm.hpp>
-
-#include <glm/gtc/matrix_transform.hpp>
+#include "Maths/Matrix/Matrix.hpp"
 
 #include "Rendering/RenderObjects/Buffer.hpp"
 #include "Rendering/RenderObjects/TimelineSemaphore.hpp"
@@ -21,8 +16,8 @@ class RenderGraph;
 
 struct CameraData
 {
-    glm::mat4 view;
-    glm::mat4 proj;
+    Matrix<4, 4> view;
+    Matrix<4, 4> proj;
 };
 
 class RenderFrame

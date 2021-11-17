@@ -21,11 +21,12 @@ class RenderQueue
         Logger*       m_logger {nullptr};
         RenderDevice* m_device {nullptr};
 
-        RkUint32  m_family_index;
-        vk::Queue m_queue;
+        RkUint32 m_family_index {UINT32_MAX};
 
-        std::unordered_map<std::thread::id, vk::CommandPool> m_command_pools;
-        std::unordered_map<std::thread::id, vk::Fence>       m_fences;
+        vk::Queue m_queue {};
+
+        std::unordered_map<std::thread::id, vk::CommandPool> m_command_pools {};
+        std::unordered_map<std::thread::id, vk::Fence>       m_fences        {};
 
         #pragma endregion
 
@@ -46,7 +47,6 @@ class RenderQueue
 
         RkVoid            Submit                     (vk::SubmitInfo2KHR const& in_submit_info)    noexcept;
         RkVoid            Present                    (vk::PresentInfoKHR const& in_present_info)   noexcept;
-        RkVoid            WaitIdle                   ()                                            noexcept;
         vk::CommandBuffer BeginSingleUseCommandBuffer()                                            noexcept;
         RkVoid            EndSingleUseCommandBuffer  (vk::CommandBuffer  const& in_command_buffer) const noexcept;
 

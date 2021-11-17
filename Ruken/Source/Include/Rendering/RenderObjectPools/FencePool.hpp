@@ -8,7 +8,11 @@ class FencePool final : public RenderObjectPool<vk::Fence>
 {
     private:
 
+        #pragma region Methods
+
         RkVoid Grow() override;
+
+        #pragma endregion
 
     public:
 

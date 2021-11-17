@@ -1,7 +1,4 @@
-
 #include "Rendering/Renderer.hpp"
-
-#include "Windowing/WindowManager.hpp"
 
 #include "Core/ServiceProvider.hpp"
 
@@ -31,10 +28,8 @@ Renderer::~Renderer() noexcept
     if (!m_device->GetLogicalDevice())
         return;
 
-    vk::Result const result = m_device->GetLogicalDevice().waitIdle();
-
-    if (result != vk::Result::eSuccess)
-        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to shutdown renderer : " + vk::to_string(result)))
+    if (m_device->GetLogicalDevice().waitIdle() != vk::Result::eSuccess)
+        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to shutdown renderer."))
 
     m_graph  .reset();
     m_device .reset();

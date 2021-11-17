@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Rendering/RenderDefines.hpp"
-
 #include "Resource/IResource.hpp"
 
 #include "Rendering/RenderObjects/Image.hpp"

@@ -8,7 +8,11 @@ class SemaphorePool final : public RenderObjectPool<vk::Semaphore>
 {
     private:
 
+        #pragma region Methods
+
         RkVoid Grow() override;
+
+        #pragma endregion
 
     public:
 

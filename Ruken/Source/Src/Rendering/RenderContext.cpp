@@ -1,4 +1,3 @@
-#include "Build/Info.hpp"
 #include "Build/Build.hpp"
 
 #if defined(RUKEN_OS_WINDOWS)
@@ -111,7 +110,7 @@ RenderContext::~RenderContext() noexcept
 
 RkBool RenderContext::CreateInstance() noexcept
 {
-    vk::DebugUtilsMessengerCreateInfoEXT messenger_create_info = {
+    vk::DebugUtilsMessengerCreateInfoEXT debug_utils_messenger_create_info = {
         .messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
                            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
         .messageType     = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
@@ -122,7 +121,7 @@ RkBool RenderContext::CreateInstance() noexcept
     };
 
     vk::ValidationFeaturesEXT validation_features = {
-        .pNext                         = &messenger_create_info,
+        .pNext                         = &debug_utils_messenger_create_info,
         .enabledValidationFeatureCount = static_cast<RkUint32>(g_enabled_validation_features.size()),
         .pEnabledValidationFeatures    = g_enabled_validation_features.data(),
     };
@@ -146,15 +145,15 @@ RkBool RenderContext::CreateInstance() noexcept
 
     auto [result, value] = createInstance(instance_create_info);
 
-    if (result != vk::Result::eSuccess)
-        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan instance : " + vk::to_string(result)))
-    else
+    if (result == vk::Result::eSuccess)
         m_instance = value;
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan instance : " + vk::to_string(result)))
 
     return result == vk::Result::eSuccess;
 }
 
-RkVoid RenderContext::CreateDebugUtilsMessenger() noexcept
+RkBool RenderContext::CreateDebugUtilsMessenger() noexcept
 {
     vk::DebugUtilsMessengerCreateInfoEXT debug_utils_messenger_create_info = {
         .messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
@@ -168,10 +167,12 @@ RkVoid RenderContext::CreateDebugUtilsMessenger() noexcept
 
     auto [result, value] = m_instance.createDebugUtilsMessengerEXT(debug_utils_messenger_create_info);
 
-    if (result != vk::Result::eSuccess)
-        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Error("Failed to create vulkan debug utils messenger : " + vk::to_string(result)))
+    if (result == vk::Result::eSuccess)
+        m_debug_utils_messenger = value;
+    else
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Error("Failed to create vulkan debug utils messenger : " + vk::to_string(result)))
 
-    m_debug_utils_messenger = value;
+    return result == vk::Result::eSuccess;
 }
 
 vk::Instance const& RenderContext::GetInstance() const noexcept

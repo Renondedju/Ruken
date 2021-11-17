@@ -8,9 +8,17 @@ class CommandPool final : public RenderObjectPool<vk::CommandBuffer>
 {
     private:
 
+        #pragma region Members
+
         vk::CommandPool m_handle;
 
+        #pragma endregion
+
+        #pragma region Methods
+
         RkVoid Grow() override;
+
+        #pragma endregion
 
     public:
 

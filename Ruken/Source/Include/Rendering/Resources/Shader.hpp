@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Rendering/RenderDefines.hpp"
-
 #include "Resource/IResource.hpp"
+
+#include "Rendering/RenderDefines.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

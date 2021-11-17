@@ -24,21 +24,17 @@ RenderDevice::RenderDevice(Logger* in_logger, RenderContext* in_context) noexcep
     m_logger  {in_logger},
     m_context {in_context}
 {
-    if (!in_context->GetInstance())
+    if (!in_context->GetInstance() || !PickPhysicalDevice())
         return;
-
-    if (!PickPhysicalDevice())
-        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to find a suitable physical device!"))
 
     FindQueueFamilies();
 
     if (!CreateLogicalDevice())
-        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to create logical device!"))
+        return;
 
     VULKAN_HPP_DEFAULT_DISPATCHER.init(m_logical_device);
 
-    if (!CreateDeviceAllocator())
-        RUKEN_SAFE_LOGGER_RETURN_CALL(m_logger, Fatal("Failed to create device allocator!"))
+    CreateDeviceAllocator();
 }
 
 RenderDevice::~RenderDevice() noexcept
@@ -46,11 +42,12 @@ RenderDevice::~RenderDevice() noexcept
     if (!m_logical_device)
         return;
 
-    vmaDestroyAllocator(m_allocator);
-
     m_graphics_queue.reset();
     m_compute_queue .reset();
     m_transfer_queue.reset();
+
+    if (m_allocator)
+        vmaDestroyAllocator(m_allocator);
 
     m_logical_device.destroy();
 }
@@ -84,6 +81,9 @@ RkBool RenderDevice::PickPhysicalDevice() noexcept
 
     else
         RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to enumerate physical devices : " + vk::to_string(result)))
+
+    if (!m_physical_device)
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to find a suitable physical device"))
 
     return m_physical_device;
 }
@@ -245,14 +245,12 @@ RkBool RenderDevice::CreateDeviceAllocator() noexcept
         .vulkanApiVersion = VK_API_VERSION_1_2,
     };
 
-    vmaCreateAllocator(&allocator_create_info, &m_allocator);
+    vk::Result const result = static_cast<vk::Result>(vmaCreateAllocator(&allocator_create_info, &m_allocator));
 
-    if (vmaCreateAllocator(&allocator_create_info, &m_allocator) == VK_SUCCESS)
-       return true;
+    if (result != vk::Result::eSuccess)
+        RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan device allocator : " + vk::to_string(result)))
 
-    RUKEN_SAFE_LOGGER_CALL(m_logger, Fatal("Failed to create vulkan device allocator"))
-
-    return false;
+    return result == vk::Result::eSuccess;
 }
 
 vk::PhysicalDevice const& RenderDevice::GetPhysicalDevice() const noexcept

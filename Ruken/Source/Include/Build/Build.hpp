@@ -1,6 +1,6 @@
-
 #pragma once
 
+#include "Build/Info.hpp"
 #include "Build/Config.hpp"
 #include "Build/Revision.hpp"
 #include "Build/Platform.hpp"

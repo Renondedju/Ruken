@@ -4,6 +4,8 @@
 
 #include "Rendering/Resources/Texture.hpp"
 
+#include "Rendering/RenderObjects/Buffer.hpp"
+
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/Renderer.hpp"
 

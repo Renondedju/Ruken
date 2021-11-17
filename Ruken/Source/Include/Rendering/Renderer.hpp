@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Meta/Meta.hpp"
@@ -12,7 +11,6 @@
 BEGIN_RUKEN_NAMESPACE
 
 class Logger;
-class Window;
 
 class Renderer final : public Service<Renderer>
 {
@@ -32,7 +30,7 @@ class Renderer final : public Service<Renderer>
 
         #pragma region Members
 
-        // Static name of the service, used by the kernel to report service errors
+        // Static name of the service, used by the kernel to report service errors.
         constexpr static const RkChar* service_name = RUKEN_STRING(Renderer);
 
         #pragma endregion

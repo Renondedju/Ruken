@@ -1,7 +1,6 @@
 #include "Rendering/RenderSystem.hpp"
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/RenderFrame.hpp"
-#include "Rendering/RenderGraph.hpp"
 #include "Rendering/Renderer.hpp"
 
 #include "Core/ServiceProvider.hpp"
@@ -90,7 +89,7 @@ RkVoid RenderSystem::Update() noexcept
     };
 
     TransformData transform_data = {
-        .model = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f))
+        .model = Matrix<4, 4>::ModelMatrix(Constants<Vector3m>::zero, Constants<Quaternion>::identity, Constants<Vector3m>::one)
     };
 
     MaterialData material_data = {
@@ -170,12 +169,15 @@ RkVoid RenderSystem::Update() noexcept
         // Camera data.
         auto const& camera_buffer = frame.GetCameraUniformBuffer();
 
-        CameraData ubo = {
-            .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
-            .proj = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.1f, 10.0f)
-        };
+        static auto startTime = std::chrono::high_resolution_clock::now();
 
-        ubo.proj[1][1] *= -1;
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        CameraData ubo = {
+            .view = Matrix<4, 4>::LookAtMatrix({0_m, 0_m, static_cast<Meters>(time)}, Constants<Vector3m>::zero, Constants<Vector3m>::up),
+            .proj = Matrix<4, 4>::PerspectiveProjectionMatrix(45_deg, 16.0F / 9.0F, 0.1_m, 10_m)
+        };
 
         camera_buffer.Upload(&ubo);
 

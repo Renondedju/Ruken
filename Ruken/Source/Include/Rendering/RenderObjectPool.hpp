@@ -13,11 +13,19 @@ class RenderObjectPool
 {
     protected:
 
+        #pragma region Members
+
         RenderDevice* m_device;
 
         std::deque<T> m_objects;
 
+        #pragma endregion
+
+        #pragma region Methods
+
         virtual RkVoid Grow() = 0;
+
+        #pragma endregion
 
     public:
 
