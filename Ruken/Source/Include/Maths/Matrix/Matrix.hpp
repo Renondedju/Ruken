@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Types/FundamentalTypes.hpp"
+
 #include "Build/Attributes/EmptyBases.hpp"
 
 #include "Maths/Matrix/Operations/MatrixAccess.hpp"
@@ -73,10 +73,10 @@ struct RUKEN_EMPTY_BASES Matrix:
      * effectively creating an identity matrix if the matrix is a square 
      */
     constexpr Matrix() noexcept:
-        data {0.F}
+        data {0.0F}
     {
         for (RkSize index {0ULL}; index < std::min(TRows, TColumns); ++index)
-			data[index * TColumns + index] = 1.F;
+			data[index + index * TRows] = 1.0F;
     }
 
     /**
@@ -86,9 +86,14 @@ struct RUKEN_EMPTY_BASES Matrix:
      */
     template <typename... TTypes>
     requires (sizeof...(TTypes) == TRows * TColumns)
-    constexpr Matrix(TTypes... in_values) noexcept:
-        data {static_cast<RkFloat>(in_values)...}
-    {}
+    constexpr Matrix(TTypes... in_values) noexcept
+    {
+        RkFloat values[] { static_cast<RkFloat>(in_values)... };
+
+        for (RkSize row {0ULL}; row < TRows; ++row)
+            for (RkSize column {0ULL}; column < TColumns; ++column)
+                data[row + column * TRows] = values[TColumns * row + column];
+    }
 
     #pragma endregion
 };

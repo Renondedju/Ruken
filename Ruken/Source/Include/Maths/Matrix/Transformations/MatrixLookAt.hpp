@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Maths/Matrix/MatrixForward.hpp"
+
 #include "Maths/Vector/DistanceVector3.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -36,13 +36,13 @@ struct MatrixLookAt<TRows, TColumns, std::enable_if_t<(TRows == 3 || TRows == 4)
             Vector3m const& in_up) noexcept
     {
         Vector3m const forward   ((in_to - in_from   ).Normalized());
-        Vector3m const right     (in_up.Cross(forward).Normalized());
-        Vector3m const up        (forward.Cross(right));
+        Vector3m const right     (forward.Cross(in_up).Normalized());
+        Vector3m const up        (right.Cross(forward));
 
         return Matrix<3, 4> {
-            static_cast<RkFloat>(right.x), static_cast<RkFloat>(up.x), static_cast<RkFloat>(forward.x), static_cast<RkFloat>(in_from.x),
-            static_cast<RkFloat>(right.y), static_cast<RkFloat>(up.y), static_cast<RkFloat>(forward.y), static_cast<RkFloat>(in_from.y),
-            static_cast<RkFloat>(right.z), static_cast<RkFloat>(up.z), static_cast<RkFloat>(forward.z), static_cast<RkFloat>(in_from.z)
+             static_cast<RkFloat>(right  .x),  static_cast<RkFloat>(right  .y),  static_cast<RkFloat>(right  .z), -right  .Dot(in_from),
+             static_cast<RkFloat>(up     .x),  static_cast<RkFloat>(up     .y),  static_cast<RkFloat>(up     .z), -up     .Dot(in_from),
+            -static_cast<RkFloat>(forward.x), -static_cast<RkFloat>(forward.y), -static_cast<RkFloat>(forward.z),  forward.Dot(in_from)
         };
     }
 };

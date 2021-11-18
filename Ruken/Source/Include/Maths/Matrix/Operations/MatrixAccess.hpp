@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Maths/Matrix/MatrixForward.hpp"
@@ -25,7 +24,7 @@ struct MatrixAccess
     [[nodiscard]]
     static constexpr RkFloat const& At(Matrix<TRows, TColumns> const& in_matrix, RkSize const in_row, RkSize const in_column) noexcept
     {
-        return in_matrix.data[TColumns * in_row + in_column];
+        return in_matrix.data[in_row + in_column * TRows];
     }
 
     /**
@@ -41,7 +40,7 @@ struct MatrixAccess
     [[nodiscard]]
     static constexpr RkFloat& At(Matrix<TRows, TColumns>& in_matrix, RkSize const in_row, RkSize const in_column) noexcept
     {
-        return in_matrix.data[TColumns * in_row + in_column];
+        return in_matrix.data[in_row + in_column * TRows];
     }
 
     #pragma endregion

@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Maths/Trigonometry.hpp"
+
 #include "Maths/Matrix/MatrixForward.hpp"
 
 #include "Types/Units/Angle/Angle.hpp"
@@ -43,10 +43,10 @@ struct MatrixProjections<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumn
         RkFloat const scale = 1.0F / Tan(in_fov / 2.0F);
 
         return Matrix<4, 4> {
-            scale / in_aspect,  0.0F , 0.0F                                 ,  0.0F,
-            0.0F             , -scale, 0.0F                                 ,  0.0F,
-            0.0F             ,  0.0F , static_cast<RkFloat>(in_far / (in_near - in_far))          , -1.0F,
-            0.0F             ,  0.0F , static_cast<RkFloat>(in_near * in_far / (in_near - in_far)),  0.0F
+            scale / in_aspect, 0.0F ,  0.0F,                                              0.0F,
+            0.0F,              scale,  0.0F,                                              0.0F,
+            0.0F,              0.0F ,  static_cast<RkFloat>(in_far / (in_near - in_far)), static_cast<RkFloat>(-(in_far * in_near) / (in_far - in_near)),
+            0.0F,              0.0F , -1.0F,                                              0.0F
         };
     }
 

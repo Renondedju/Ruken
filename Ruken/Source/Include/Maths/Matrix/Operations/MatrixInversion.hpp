@@ -1,9 +1,9 @@
-
 #pragma once
 
 #include <array>
 
 #include "Maths/Matrix/MatrixForward.hpp"
+
 #include "Maths/Matrix/Operations/MatrixAccess.hpp"
 
 BEGIN_RUKEN_NAMESPACE

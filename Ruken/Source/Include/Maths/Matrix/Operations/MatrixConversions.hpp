@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <algorithm>
@@ -26,10 +25,10 @@ struct MatrixConversions
 		// Will be identity if the matrix is a square matrix
 		Matrix<TNewRows, TNewColumns> new_matrix {};
 
-		for (RkSize row {0ULL}; row < std::min(TRows, TNewRows); ++row)
-            std::memcpy(&new_matrix.data[row * TNewColumns],
-				&static_cast<Matrix<TRows, TColumns> const*>(this)->data[row * TColumns],
-				sizeof(RkFloat) * std::min(TColumns, TNewColumns));
+		for (RkSize column {0ULL}; column < std::min(TColumns, TNewColumns); ++column)
+            std::memcpy(&new_matrix.data[column * TNewRows],
+				&static_cast<Matrix<TRows, TColumns> const*>(this)->data[column * TRows],
+				sizeof(RkFloat) * std::min(TRows, TNewRows));
 
 		return new_matrix;
 	}
