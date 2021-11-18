@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Maths/Trigonometry.hpp"
+
 #include "Maths/Matrix/MatrixForward.hpp"
 
 #include "Types/Units/Angle/Angle.hpp"

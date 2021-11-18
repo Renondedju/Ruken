@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Maths/Matrix/MatrixForward.hpp"
+
 #include "Maths/Matrix/Operations/MatrixAccess.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -34,7 +34,7 @@ struct MatrixMultiplication
         for (RkSize row    {0ULL}; row    < TRows;         ++row)
         for (RkSize column {0ULL}; column < TOtherColumns; ++column)
         {
-            MatrixAccess::At(new_matrix, row, column) = .0F;
+            MatrixAccess::At(new_matrix, row, column) = 0.0F;
             for (RkSize other_row {0ULL}; other_row < TOtherRows; ++other_row)
                 MatrixAccess::At(new_matrix, row, column) +=
                     MatrixAccess::At(*static_cast<TMatrix const*>(this), row, other_row) *

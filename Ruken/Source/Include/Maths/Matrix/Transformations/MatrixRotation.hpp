@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Types/Units/Angle/Angle.hpp"
+
 #include "Maths/Matrix/MatrixForward.hpp"
 
 BEGIN_RUKEN_NAMESPACE

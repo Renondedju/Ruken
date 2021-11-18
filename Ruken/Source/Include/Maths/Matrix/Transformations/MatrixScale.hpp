@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "Maths/Matrix/MatrixForward.hpp"
+
 #include "Maths/Vector/DistanceVector3.hpp"
 
 BEGIN_RUKEN_NAMESPACE
