@@ -88,8 +88,12 @@ RkVoid RenderSystem::Update() noexcept
         .transform_index = 0U
     };
 
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - startTime).count();
+
     TransformData transform_data = {
-        .model = Matrix<4, 4>::ModelMatrix(Constants<Vector3m>::zero, Constants<Quaternion>::identity, Constants<Vector3m>::one)
+        .model = Matrix<4, 4>::RotationMatrix(Constants<Vector3m>::forward, time * 90_deg)
     };
 
     MaterialData material_data = {
@@ -169,14 +173,9 @@ RkVoid RenderSystem::Update() noexcept
         // Camera data.
         auto const& camera_buffer = frame.GetCameraUniformBuffer();
 
-        static auto startTime = std::chrono::high_resolution_clock::now();
-
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
         CameraData ubo = {
-            .view = Matrix<4, 4>::LookAtMatrix({0_m, 0_m, static_cast<Meters>(time)}, Constants<Vector3m>::zero, Constants<Vector3m>::up),
-            .proj = Matrix<4, 4>::PerspectiveProjectionMatrix(45_deg, 16.0F / 9.0F, 0.1_m, 10_m)
+            .view = Matrix<4, 4>::LookAtMatrix({2_m, 2_m, 2_m}, Constants<Vector3m>::zero, Constants<Vector3m>::forward),
+            .proj = Matrix<4, 4>::ClipSpace() * Matrix<4, 4>::PerspectiveProjectionMatrix(45_deg, 16.0F / 9.0F, 0.1_m, 10_m)
         };
 
         camera_buffer.Upload(&ubo);
