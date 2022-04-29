@@ -1,4 +1,3 @@
-
 #include "Core/Kernel.hpp"
 
 USING_RUKEN_NAMESPACE

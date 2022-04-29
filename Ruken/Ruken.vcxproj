@@ -136,6 +136,11 @@
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
     <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingUnitType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\EExecutionMethod.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\ProcessingQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\ProcessingUnit.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceLoader.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
     <ClInclude Include="Source\Include\Core\Service.hpp" />
