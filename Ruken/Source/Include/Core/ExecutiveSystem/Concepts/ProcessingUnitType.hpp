@@ -2,11 +2,12 @@
 
 #include <type_traits>
 
-#include "Core/ExecutiveSystem/EExecutionMethod.hpp"
+#include "Core/ExecutiveSystem/EExecutionPolicy.hpp"
+#include "Core/ExecutiveSystem/EInstructionType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TInheriting, EExecutionMethod TExecutionMethod>
+template <typename TInheriting, EExecutionPolicy TExecutionMethod, EInstructionType TInstructionType>
 struct ProcessingUnit;
 
 /**
@@ -17,6 +18,6 @@ struct ProcessingUnit;
  * \tparam TType type to check
  */
 template <typename TType>
-concept ProcessingUnitType = std::is_base_of_v<ProcessingUnit<TType, TType::execution_method>, TType>;
+concept ProcessingUnitType = std::is_base_of_v<ProcessingUnit<TType, TType::execution_method, TType::instruction_type>, TType>;
 
 END_RUKEN_NAMESPACE

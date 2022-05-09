@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
-#include "Core/ExecutiveSystem/Concepts/ProcessingQueueType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -22,9 +21,6 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TInheriting, ProcessingUnitType TProcessingUnit>
 struct ProcessingQueue
 {
-    static_assert(ProcessingQueueType<TInheriting>);
-    static_assert(TProcessingUnit::is_immediate || SubmittableProcessingQueueType<TInheriting>);
-
     using ProcessingUnit = TProcessingUnit;
 };
 

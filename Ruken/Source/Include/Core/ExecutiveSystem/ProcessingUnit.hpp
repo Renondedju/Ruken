@@ -1,9 +1,7 @@
 #pragma once
 
-#include "Types/FundamentalTypes.hpp"
-
-#include "Core/ExecutiveSystem/EExecutionMethod.hpp"
-#include "Core/ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
+#include "Core/ExecutiveSystem/EExecutionPolicy.hpp"
+#include "Core/ExecutiveSystem/EInstructionType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -15,15 +13,13 @@ BEGIN_RUKEN_NAMESPACE
  *
  * \tparam TInheriting Inheriting class, this is used for the crtp pattern.
  * \tparam TExecutionMethod Execution method of the processing unit.
+ * \tparam TInstructionType Instruction type of the processing unit.
  */
-template <typename TInheriting, EExecutionMethod TExecutionMethod>
+template <typename TInheriting, EExecutionPolicy TExecutionMethod, EInstructionType TInstructionType>
 struct ProcessingUnit
 {
-    static_assert(ProcessingUnitType<TInheriting>);
-
-    static constexpr EExecutionMethod execution_method {TExecutionMethod};
-    static constexpr RkBool           is_recorded      {TExecutionMethod == EExecutionMethod::Recorded};
-    static constexpr RkBool           is_immediate     {TExecutionMethod == EExecutionMethod::Immediate};
+    static constexpr EInstructionType instruction_type {TInstructionType};
+    static constexpr EExecutionPolicy execution_method {TExecutionMethod};
 };
 
 END_RUKEN_NAMESPACE

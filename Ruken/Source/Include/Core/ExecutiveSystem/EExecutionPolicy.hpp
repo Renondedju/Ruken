@@ -5,9 +5,9 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Defines the execution method of a processing unit.
+ * \brief Defines the execution policy of a processing unit.
  */
-enum class EExecutionMethod
+enum class EExecutionPolicy
 {
     /**
      * Immediate execution method means that the processing unit will
@@ -16,11 +16,11 @@ enum class EExecutionMethod
     Immediate,
 
     /**
-     * Recorded execution method means that instructions sent to this processing
+     * Deferred execution method means that instructions sent to this processing
      * unit are recorded and will need to be manually submitted in order to start execution.
      * This is similar to the way command buffers in Vulkan works.
      */
-    Recorded
+    Deferred
 };
 
 END_RUKEN_NAMESPACE
