@@ -91,7 +91,7 @@ RkBool Handle<TResource_Type>::WaitForValidity(RkFloat in_timeout) const noexcep
     if (!m_manifest)
         return false;
 
-    TODO("Jul 23 2019", "Implement the handle timeout");
+    //TODO("Jul 23 2019", "Implement the handle timeout");
     while (!Available())
     {
         // If something wrong happened, then stopping the wait here and notifying the user
