@@ -1,0 +1,73 @@
+#include "Core/ExecutiveSystem/Subscriptions/DirectSubscriptionBase.hpp"
+
+USING_RUKEN_NAMESPACE
+
+DirectSubscriptionBase::DirectSubscriptionBase(Node& in_head) noexcept:
+    m_head {in_head}
+{}
+
+DirectSubscriptionBase::~DirectSubscriptionBase() noexcept
+{
+    // If the awaiter hasn't been completed in due time,
+    // we need to detach it from the awaited event to cancel
+    // our wait without crashing later down the line
+    if (m_next.load(std::memory_order_acquire) == completed)
+        return;
+
+    // Attempting to detach from the awaited event
+    Node*                   selection {std::addressof(m_head)};
+    DirectSubscriptionBase* expected  {this};
+
+    // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
+    while(!selection->compare_exchange_strong(expected, locked, std::memory_order_acq_rel, std::memory_order_acquire))
+    {
+        // Otherwise we need to check if the event hasn't been signaled in the meantime
+        if (expected == completed)
+            return;
+
+        // And if the selection isn't currently locked, then we can finally test the next awaiter in the list
+        // otherwise we'll just retry until the lock has been released
+        if (expected != locked)
+            selection = &expected->m_next;
+
+        expected = this;
+    }
+
+    // Lock acquired, we can now safely read the next pointer
+    // and swap our lock with that, effectively releasing our lock
+    selection->store(m_next.load(std::memory_order_acquire), std::memory_order_release);
+}
+
+RkBool DirectSubscriptionBase::await_ready() const noexcept
+{
+    // Since we are not attached yet, we can use the head directly
+    return m_head.load(std::memory_order_acquire) == completed;
+}
+
+RkBool DirectSubscriptionBase::await_suspend(std::coroutine_handle<>) noexcept
+{
+    DirectSubscriptionBase* head;
+
+    do
+    {
+        do { // If the current value is locked we need to wait
+            head = m_head.load(std::memory_order_acquire);
+        } while (head == locked);
+
+        // Checking if the event signaled a completion in the meanwhile
+        if (head == completed)
+            return false; // Operation failed
+
+        // Update linked list to point at the current head
+        m_next.store(head, std::memory_order_release);
+
+    // Finally, if the head we originally fetched is still the actual head
+    // (it could have been signaled, locked or swapped while we were testing stuff)
+    // swapping the old list head with this awaiter as the new list head.
+    } while (!m_head.compare_exchange_weak(head, this,
+        std::memory_order_release,
+        std::memory_order_acquire));
+
+    // Operation succeeded
+    return true;
+}

@@ -22,6 +22,9 @@ template <typename TInheriting, ProcessingUnitType TProcessingUnit>
 struct ProcessingQueue
 {
     using ProcessingUnit = TProcessingUnit;
+
+    static constexpr EInstructionType instruction_type {ProcessingUnit::instruction_type};
+    static constexpr EExecutionPolicy execution_policy {ProcessingUnit::execution_policy};
 };
 
 END_RUKEN_NAMESPACE

@@ -136,6 +136,11 @@
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
     <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\AsynchronousEvent.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Subscription.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Subscriptions\DirectSubscriptionBase.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Subscriptions\DirectToDirectSubscription.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\AwaiterType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingUnitType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CentralProcessingUnit.hpp" />
@@ -406,8 +411,11 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
+    <None Include="Source\Src\Core\ExecutiveSystem\AsynchronousEvent.inl" />
+    <None Include="Source\Src\Core\ExecutiveSystem\Awaiters\DirectToDirectSubscription.inl" />
     <None Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.inl" />
     <None Include="Source\Src\Core\ExecutiveSystem\Promise.inl" />
+    <None Include="Source\Src\Core\ExecutiveSystem\Task.inl" />
     <None Include="Source\Src\Core\Kernel.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
     <None Include="Source\Src\Core\Service.inl" />
@@ -437,6 +445,7 @@
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\Awaiters\DirectSubscriptionBase.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />

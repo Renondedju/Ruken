@@ -12,10 +12,12 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TQueue Queue type on which the task will be executed
  */
 template <ProcessingQueueType TQueue>
-struct Task: std::coroutine_handle<Promise<TQueue>>
+struct Task final: std::coroutine_handle<Promise<TQueue>>
 {
     using promise_type    = Promise<TQueue>;
     using ProcessingQueue = TQueue;
 };
+
+#include "Core/ExecutiveSystem/Task.inl"
 
 END_RUKEN_NAMESPACE

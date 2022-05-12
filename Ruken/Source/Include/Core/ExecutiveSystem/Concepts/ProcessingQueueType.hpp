@@ -29,7 +29,7 @@ concept ProcessingQueueType = std::is_base_of_v<ProcessingQueue<TType, typename 
 template <typename TType>
 concept SubmittableProcessingQueueType = 
     ProcessingQueueType<TType> &&
-    typename TType::ProcessingUnit::execution_method == EExecutionPolicy::Deferred &&
+    typename TType::ProcessingUnit::execution_policy == EExecutionPolicy::Deferred &&
     requires () { TType::Submit(); };
 
 END_RUKEN_NAMESPACE
