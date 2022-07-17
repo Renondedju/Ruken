@@ -1,8 +1,11 @@
 #pragma once
 
+#include <exception>
+
 #include "Types/FundamentalTypes.hpp"
-#include "Core/ExecutiveSystem/AsynchronousEvent.hpp"
-#include "Core/ExecutiveSystem/Concepts/AwaiterType.hpp"
+#include "Core/ExecutiveSystem/TaskCompletionEvent.hpp"
+#include "Core/ExecutiveSystem/Concepts/ProcessingQueueType.hpp"
+#include "Core/ExecutiveSystem/Concepts/AsynchronousEventType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -16,7 +19,7 @@ struct Task;
  * \tparam TQueue The owning queue of the promise object
  */
 template <ProcessingQueueType TQueue>
-class Promise final: public AsynchronousEvent<TQueue>
+struct Promise final: public TaskCompletionEvent<typename TQueue::ProcessingUnit>::Type
 {
     using ProcessingUnit    = typename TQueue::ProcessingUnit;
     using FinalSuspension   = std::suspend_never;
@@ -31,19 +34,16 @@ class Promise final: public AsynchronousEvent<TQueue>
         #pragma region Methods
 
         /**
-         * \brief Generates an awaiter from an asynchronous event.
-         * If no valid awaiter is found for both of these queue types, then the method
-         * will be disabled and co_awaiting such an event will prevent compilation.
-         *
-         * \tparam TAwaitedQueue Queue type this promise will wait on
-         * \param in_awaited_event Awaited event
-         * \return Awaiter instance
+         * \brief Converts awaited types to asynchronous events if possible
+         * \tparam TEvent Event type
+         * \param in_awaitable Implicit event instance
+         * \return Subscription instance
          */
-        template <ProcessingQueueType TAwaitedQueue> requires AwaiterType<Subscription<TQueue, TAwaitedQueue>>
-        Subscription<TQueue, TAwaitedQueue> await_transform(AsynchronousEvent<TAwaitedQueue>& in_awaited_event) noexcept;
-
-        template <ProcessingQueueType TAwaitedQueue> requires AwaiterType<Subscription<TQueue, TAwaitedQueue>>
-        Subscription<TQueue, TAwaitedQueue> await_transform(Task<TAwaitedQueue> const& in_awaited_task) noexcept;
+        template <typename TEvent>
+        auto await_transform(TEvent const& in_awaitable) noexcept
+        {
+            return in_awaitable.template GetSubscription<TQueue>({std::coroutine_handle<Promise<TQueue>>::from_promise(*this)});
+        }
 
         Task<TQueue> get_return_object() noexcept;
         void         return_void() const noexcept {}

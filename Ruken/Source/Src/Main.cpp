@@ -4,8 +4,7 @@
 #include "Core/ExecutiveSystem/Task.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
 #include "Core/ExecutiveSystem/GPU/GraphicsProcessingQueue.hpp"
-
-#include "Core/ExecutiveSystem/Subscriptions/DirectToDirectSubscription.hpp"
+#include "Core/ExecutiveSystem/CPU/Events/ManualResetEvent.hpp"
 
 USING_RUKEN_NAMESPACE
 

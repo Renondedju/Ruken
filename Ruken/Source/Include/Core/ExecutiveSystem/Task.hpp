@@ -1,8 +1,8 @@
 #pragma once
 
 #include <coroutine>
-
 #include "Core/ExecutiveSystem/Promise.hpp"
+#include "Core/ExecutiveSystem/CPU/CPUTaskSubscription.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -12,12 +12,26 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TQueue Queue type on which the task will be executed
  */
 template <ProcessingQueueType TQueue>
-struct Task final: std::coroutine_handle<Promise<TQueue>>
+struct Task: std::coroutine_handle<Promise<TQueue>>
 {
     using promise_type    = Promise<TQueue>;
     using ProcessingQueue = TQueue;
-};
+    using ProcessingUnit  = typename TQueue::ProcessingUnit;
 
-#include "Core/ExecutiveSystem/Task.inl"
+    /**
+     * \brief Returns the task's on completion event
+     * \return Completion event
+     */
+    explicit operator AsynchronousEvent<ProcessingUnit> const&() const noexcept
+    {
+        return this->promise();
+    }
+
+    template <ProcessingQueueType TAwaitingQueue> 
+    auto GetSubscription(Task<TAwaitingQueue> const& in_awaiting_task) const noexcept
+    {
+        //return CPUTaskSubscription(this->promise().)
+    }
+};
 
 END_RUKEN_NAMESPACE

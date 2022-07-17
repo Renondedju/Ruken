@@ -1,21 +1,20 @@
 #pragma once
 
-#include "Core/ExecutiveSystem/Concepts/ProcessingQueueType.hpp"
+#include "Core/ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief An object that waits for the completion of an asynchronous event.
+ * Awaiters are responsible for implementing the actual waiting algorithm.
+ * This synchronization between tasks and events should not be mixed up with the content of events themselves.
  *
- * Awaiters are responsible for implementing the actual waiting algorithm, that being
- * callback based, polling based or simply an injection in the recorded processing queues.
- * This synchronization between processing queues should not be mixed up with the content of events themselves.
- *
- * \tparam TOwningQueue Processing queue waiting to be notified of the completion of TAwaitedQueue
- * \tparam TAwaitedQueue Processing queue being waited on
+ * \tparam TProcessingUnit Processing unit the subscription is operating on
  */
-template <ProcessingQueueType TOwningQueue, ProcessingQueueType TAwaitedQueue>
+template <ProcessingUnitType TProcessingUnit>
 class Subscription
-{};
+{
+    using ProcessingUnit = TProcessingUnit;
+};
 
 END_RUKEN_NAMESPACE
