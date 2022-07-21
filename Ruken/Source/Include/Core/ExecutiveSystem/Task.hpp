@@ -28,9 +28,9 @@ struct Task: std::coroutine_handle<Promise<TQueue>>
     }
 
     template <ProcessingQueueType TAwaitingQueue> 
-    auto GetSubscription(Task<TAwaitingQueue> const& in_awaiting_task) const noexcept
+    auto GetSubscription(Task<TAwaitingQueue>&& in_awaiting_task) const noexcept
     {
-        //return CPUTaskSubscription(this->promise().)
+        return this->promise().GetSubscription(std::forward<Task<TAwaitingQueue>>(in_awaiting_task));
     }
 };
 

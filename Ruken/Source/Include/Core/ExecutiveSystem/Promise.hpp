@@ -39,7 +39,7 @@ struct Promise final: public TaskCompletionEvent<typename TQueue::ProcessingUnit
          * \param in_awaitable Implicit event instance
          * \return Subscription instance
          */
-        template <typename TEvent>
+        template <typename TEvent> requires AsynchronousEventType<TEvent, TQueue>
         auto await_transform(TEvent const& in_awaitable) noexcept
         {
             return in_awaitable.template GetSubscription<TQueue>({std::coroutine_handle<Promise<TQueue>>::from_promise(*this)});
