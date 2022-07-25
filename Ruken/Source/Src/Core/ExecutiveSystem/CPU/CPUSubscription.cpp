@@ -15,7 +15,7 @@ CPUSubscription::~CPUSubscription() noexcept
         return;
 
     // Attempting to detach from the awaited event
-    Node*                selection {std::addressof(head)};
+    Node*            selection {std::addressof(head)};
     CPUSubscription* expected  {this};
 
     // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer

@@ -17,7 +17,7 @@ Scheduler::Scheduler(ServiceProvider& in_service_provider, RkUint16 const in_wor
 
     #endif
 
-    for (Worker& worker : m_workers)
+    for (OldWorker& worker : m_workers)
         worker.Execute(&Scheduler::WorkersJob, this);
 }
 
@@ -51,11 +51,11 @@ RkVoid Scheduler::Shutdown() noexcept
     m_running.store(false, std::memory_order_release);
     m_job_queue.Clear();
 
-    for (Worker& worker : m_workers)
+    for (OldWorker& worker : m_workers)
         worker.Detach();
 }
 
-std::vector<Worker> const& Scheduler::GetWorkers() const noexcept
+std::vector<OldWorker> const& Scheduler::GetWorkers() const noexcept
 {
     return m_workers;
 }

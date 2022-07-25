@@ -2,6 +2,7 @@
 
 #include "Core/Kernel.hpp"
 #include "Core/ExecutiveSystem/Task.hpp"
+#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
 #include "Core/ExecutiveSystem/GPU/GraphicsProcessingQueue.hpp"
 #include "Core/ExecutiveSystem/CPU/Events/ManualResetEvent.hpp"
@@ -16,14 +17,23 @@ struct GraphicsQueue final: GraphicsProcessingQueue<GraphicsQueue>
 
 Task<EcsQueue> HelloTask()
 {
-    std::cout << "Hello Task" << std::endl;
+    std::cout << "Hello from " << WorkerInfo::name << std::endl;
 
     co_return;
 }
 
 Task<EcsQueue> SomeTask()
 {
-    co_await HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
+    HelloTask();
 
     std::cout << "Some Task" << std::endl;
 
@@ -32,9 +42,10 @@ Task<EcsQueue> SomeTask()
 
 int main()
 {
+    CentralProcessingUnit cpu;
+    cpu.SetConfiguration({EcsQueue::GetInterface(), EcsQueue::GetInterface()});
+
     SomeTask();
 
-    Kernel kernel;
-
-    return kernel.Run();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 }

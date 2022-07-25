@@ -141,6 +141,9 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUTaskSubscription.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Events\ManualResetEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUSubscription.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ICentralProcessingQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Worker.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\WorkerInfo.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\EventBridge.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Subscription.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
@@ -371,7 +374,7 @@
     <ClInclude Include="Source\Include\Threading\EAccessMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
-    <ClInclude Include="Source\Include\Threading\Worker.hpp" />
+    <ClInclude Include="Source\Include\Threading\OldWorker.hpp" />
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
@@ -439,14 +442,16 @@
     <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
-    <None Include="Source\Src\Threading\Worker.inl" />
+    <None Include="Source\Src\Threading\OldWorker.inl" />
     <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
     <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Events\ManualResetEvent.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CPUSubscription.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Worker.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
@@ -517,7 +522,7 @@
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManifest.cpp" />
     <ClCompile Include="Source\Src\Threading\Scheduler.cpp" />
-    <ClCompile Include="Source\Src\Threading\Worker.cpp" />
+    <ClCompile Include="Source\Src\Threading\OldWorker.cpp" />
     <ClCompile Include="Source\Src\Time\ControlClock.cpp" />
     <ClCompile Include="Source\Src\Time\Sleep.cpp" />
     <ClCompile Include="Source\Src\Time\Timer.cpp" />

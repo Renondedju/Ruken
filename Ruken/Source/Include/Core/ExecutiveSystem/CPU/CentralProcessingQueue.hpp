@@ -6,6 +6,7 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Core/ExecutiveSystem/ProcessingQueue.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
+#include "Core/ExecutiveSystem/CPU/ICentralProcessingQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -18,7 +19,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TSize Size of the bounded queue (default: 1024 tasks)
  */
 template <typename TInheriting, RkSize TSize>
-class CentralProcessingQueue: public ProcessingQueue<TInheriting, CentralProcessingUnit>
+class CentralProcessingQueue: public ICentralProcessingQueue, public ProcessingQueue<CentralProcessingUnit>
 {
     #pragma region Members
 
@@ -59,6 +60,12 @@ class CentralProcessingQueue: public ProcessingQueue<TInheriting, CentralProcess
          * \return True if the queue was empty, false otherwise
          */
         static RkBool Empty() noexcept;
+
+        /**
+         * \brief Returns an interface for this queue
+         * \return Interface instance
+         */
+        static ICentralProcessingQueue GetInterface() noexcept;
 
         #pragma endregion
 

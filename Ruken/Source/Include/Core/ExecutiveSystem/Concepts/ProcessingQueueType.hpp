@@ -4,7 +4,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TInheriting, ProcessingUnitType TProcessingUnit>
+template <ProcessingUnitType TProcessingUnit>
 struct ProcessingQueue;
 
 /**
@@ -15,7 +15,7 @@ struct ProcessingQueue;
  * \tparam TType type to check
  */
 template <typename TType>
-concept ProcessingQueueType = std::is_base_of_v<ProcessingQueue<TType, typename TType::ProcessingUnit>, TType>;
+concept ProcessingQueueType = std::is_base_of_v<ProcessingQueue<typename TType::ProcessingUnit>, TType>;
 
 /**
  * \brief Checks if the passed type is a submittable processing queue

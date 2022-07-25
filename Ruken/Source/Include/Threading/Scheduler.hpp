@@ -7,7 +7,7 @@
 
 #include "Core/Service.hpp"
 #include "Build/Namespace.hpp"
-#include "Threading/Worker.hpp"
+#include "Threading/OldWorker.hpp"
 #include "Debug/Logging/Logger.hpp"
 #include "Types/FundamentalTypes.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
@@ -25,7 +25,7 @@ class Scheduler final : public Service<Scheduler>
 
         #pragma region Members
 
-        std::vector<Worker>      m_workers;
+        std::vector<OldWorker>      m_workers;
         std::atomic_bool         m_running;
         ThreadSafeLockQueue<Job> m_job_queue;
 
@@ -86,7 +86,7 @@ class Scheduler final : public Service<Scheduler>
          */
         RkVoid Shutdown() noexcept;
 
-        std::vector<Worker> const& GetWorkers() const noexcept;
+        std::vector<OldWorker> const& GetWorkers() const noexcept;
 
         #pragma endregion 
 

@@ -8,7 +8,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class Worker
+class OldWorker
 {
     private:
 
@@ -22,10 +22,10 @@ class Worker
 
         #pragma region Constructors
 
-        Worker()                      = default;
-        Worker(Worker const& in_copy) = delete;
-        Worker(Worker&&      in_move) = default;
-        ~Worker() noexcept;
+        OldWorker()                      = default;
+        OldWorker(OldWorker const& in_copy) = delete;
+        OldWorker(OldWorker&&      in_move) = default;
+        ~OldWorker() noexcept;
 
         #pragma endregion
 
@@ -84,13 +84,13 @@ class Worker
 
         #pragma region Operators
 
-        Worker& operator=(Worker const& in_copy) = delete;
-        Worker& operator=(Worker&&      in_move) = default;
+        OldWorker& operator=(OldWorker const& in_copy) = delete;
+        OldWorker& operator=(OldWorker&&      in_move) = default;
 
         #pragma endregion
 
 };
 
-#include "Threading/Worker.inl"
+#include "Threading/OldWorker.inl"
 
-END_RUKEN_NAMESPACE
+    END_RUKEN_NAMESPACE

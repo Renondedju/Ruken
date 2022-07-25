@@ -1,6 +1,6 @@
 
 template <typename TExecutable, typename ...TArgs>
-RkVoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
+RkVoid OldWorker::Execute(TExecutable in_job, TArgs... in_args) noexcept
 {
     // This avoids an std::terminate throw
     WaitForAvailability();
@@ -9,7 +9,7 @@ RkVoid Worker::Execute(TExecutable in_job, TArgs... in_args) noexcept
 }
 
 template <typename TExecutable, typename ...TArgs>
-RkVoid Worker::ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept
+RkVoid OldWorker::ExecuteWithInstance(TExecutable in_job, TArgs... in_args) noexcept
 {
     // This avoids an std::terminate throw
     WaitForAvailability();

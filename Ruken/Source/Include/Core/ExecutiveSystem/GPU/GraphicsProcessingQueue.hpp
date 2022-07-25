@@ -10,7 +10,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TInheriting Inheriting class, this is used for the crtp pattern.
  */
 template <typename TInheriting>
-struct GraphicsProcessingQueue: ProcessingQueue<TInheriting, GraphicsProcessingUnit>
+struct GraphicsProcessingQueue: ProcessingQueue<GraphicsProcessingUnit>
 {};
 
 END_RUKEN_NAMESPACE

@@ -5,8 +5,6 @@ RkVoid CentralProcessingQueue<TInheriting, TSize>::Enqueue(std::coroutine_handle
 {
     while(!m_queue.try_push(in_handle))
         atomic_queue::spin_loop_pause();
-
-    in_handle.resume();
 }
 
 template <typename TInheriting, RkSize TSize>
@@ -24,4 +22,14 @@ template <typename TInheriting, RkSize TSize>
 RkBool CentralProcessingQueue<TInheriting, TSize>::Empty() noexcept
 {
     return m_queue.was_empty();
+}
+
+template <typename TInheriting, RkSize TSize>
+ICentralProcessingQueue CentralProcessingQueue<TInheriting, TSize>::GetInterface() noexcept
+{
+    return ICentralProcessingQueue {
+        .try_dequeue = &TryDequeue,
+        .enqueue     = &Enqueue,
+        .empty       = &Empty
+    };
 }

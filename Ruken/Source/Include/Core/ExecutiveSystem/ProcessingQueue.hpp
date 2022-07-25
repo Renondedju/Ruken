@@ -15,10 +15,9 @@ BEGIN_RUKEN_NAMESPACE
  * Some processing units even allow for the creation and configuration of custom queues
  * to add more granularity to your application if needed (ie. for path-finding, or procedural generation tasks)
  *
- * \tparam TInheriting Inheriting class, this is used for the crtp pattern.
  * \tparam TProcessingUnit Owning processing unit type of the queue
  */
-template <typename TInheriting, ProcessingUnitType TProcessingUnit>
+template <ProcessingUnitType TProcessingUnit>
 struct ProcessingQueue
 {
     using ProcessingUnit = TProcessingUnit;
