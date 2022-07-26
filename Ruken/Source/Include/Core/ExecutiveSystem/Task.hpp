@@ -29,9 +29,9 @@ struct Task: std::coroutine_handle<Promise<TQueue>>
 
     /**
      * \brief Creates a subscription to await the passed task and resume this one
-     * \tparam TAwaitingQueue 
-     * \param in_awaiting_task 
-     * \return 
+     * \tparam TAwaitingQueue Queue the awaiting task lives in
+     * \param in_awaiting_task Task awaiting the completion of this instance
+     * \return Subscription instance
      */
     template <ProcessingQueueType TAwaitingQueue> 
     auto GetSubscription(Task<TAwaitingQueue>&& in_awaiting_task) const noexcept

@@ -19,7 +19,7 @@ struct Task;
  * \tparam TQueue The owning queue of the promise object
  */
 template <ProcessingQueueType TQueue>
-struct Promise final: public TaskCompletionEvent<typename TQueue::ProcessingUnit>::Type
+struct Promise final: TaskCompletionEvent<typename TQueue::ProcessingUnit>::Type
 {
     using ProcessingUnit    = typename TQueue::ProcessingUnit;
     using FinalSuspension   = std::suspend_never;
@@ -36,7 +36,7 @@ struct Promise final: public TaskCompletionEvent<typename TQueue::ProcessingUnit
         /**
          * \brief Converts awaited types to asynchronous events if possible
          * \tparam TEvent Event type
-         * \param in_awaitable Implicit event instance
+         * \param in_awaitable Asynchronous event instance
          * \return Subscription instance
          */
         template <typename TEvent> requires AsynchronousEventType<TEvent, TQueue>
