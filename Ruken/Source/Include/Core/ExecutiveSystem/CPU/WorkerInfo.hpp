@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Core/ExecutiveSystem/CPU/ICentralProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -15,8 +15,8 @@ struct WorkerInfo
 {
     #pragma region Members
 
-    inline static thread_local std::string              name          {};
-    inline static thread_local ICentralProcessingQueue* current_queue {};
+    inline static thread_local std::string             name          {"Unnamed worker"};
+    inline static thread_local CentralProcessingQueue* current_queue {nullptr};
 
     #pragma endregion
 };

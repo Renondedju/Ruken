@@ -1,15 +1,16 @@
 #pragma once
 
-#include "Build/Namespace.hpp"
 #include "Core/ExecutiveSystem/AsynchronousEvent.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TType, typename TQueue>
-concept AsynchronousEventType = ProcessingQueueType<TQueue> && requires (TType in_type, TQueue const& in_queue)
+// TODO: Rename me properly + cleanup
+template <typename TType, typename TQueueHandle>
+concept AsynchronousEventType = ProcessingQueueType<decltype(TQueueHandle::queue)>
+	&& requires (TType in_event)
 {
-    static_cast<AsynchronousEvent<typename TType::ProcessingUnit>>(in_type);
-    in_type.template GetSubscription<TQueue>({});
+    static_cast<AsynchronousEvent<typename TType::ProcessingUnit>>(in_event);
+    in_event.template GetSubscription<TQueueHandle>({});
 };
 
 END_RUKEN_NAMESPACE

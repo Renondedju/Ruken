@@ -65,7 +65,8 @@ struct CPUSubscription: Subscription<CentralProcessingUnit>
      * \note This function can be called even if the awaited event has been deleted already
      * \return True if the awaiter has been completed, false otherwise
      */
-    RkBool await_ready() const noexcept;
+    [[nodiscard]]
+	RkBool await_ready() const noexcept;
 
     /**
      * \brief Attempts a suspension by attaching the awaiter to the awaited event

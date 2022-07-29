@@ -138,14 +138,19 @@
     <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\AsynchronousEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\AsynchronousEventType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\QueueHandleType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUPipeline.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUQueueHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUTaskSubscription.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ECPUPipelinePolicy.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ECPUQueueGroup.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Events\CountDownLatch.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Events\ManualResetEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUSubscription.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ICentralProcessingQueue.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Worker.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\WorkerInfo.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\EventBridge.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\QueueHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Subscription.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingUnitType.hpp" />
@@ -418,7 +423,6 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
-    <None Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.inl" />
     <None Include="Source\Src\Core\ExecutiveSystem\Promise.inl" />
     <None Include="Source\Src\Core\Kernel.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
@@ -449,6 +453,7 @@
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Events\CountDownLatch.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Events\ManualResetEvent.cpp" />

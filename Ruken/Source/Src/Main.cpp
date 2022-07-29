@@ -3,18 +3,20 @@
 #include "Core/Kernel.hpp"
 #include "Core/ExecutiveSystem/Task.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
-#include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
-#include "Core/ExecutiveSystem/GPU/GraphicsProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/CPUQueueHandle.hpp"
 #include "Core/ExecutiveSystem/CPU/Events/CountDownLatch.hpp"
 #include "Core/ExecutiveSystem/CPU/Events/ManualResetEvent.hpp"
 
 USING_RUKEN_NAMESPACE
 
-struct EcsQueue final: CentralProcessingQueue<EcsQueue, 4082>
-{};
+// --- Queues
 
-struct GraphicsQueue final: GraphicsProcessingQueue<GraphicsQueue>
-{};
+struct PathfindingQueue final: CPUQueueHandle<PathfindingQueue, 4082, ECPUQueueGroup::Processing, ECPUPipelinePolicy::Delayable> {};
+struct SoundQueue       final: CPUQueueHandle<SoundQueue      , 4082, ECPUQueueGroup::Processing, ECPUPipelinePolicy::Blocking > {};
+struct EcsQueue         final: CPUQueueHandle<EcsQueue        , 4082, ECPUQueueGroup::Processing, ECPUPipelinePolicy::Blocking > {};
+struct IOQueue          final: CPUQueueHandle<IOQueue         , 4082, ECPUQueueGroup::Transfer  , ECPUPipelinePolicy::Delayable> {};
+
+// --- Tasks
 
 Task<EcsQueue> HelloTask(CountDownLatch& in_latch, RkSize const in_value)
 {
@@ -25,7 +27,7 @@ Task<EcsQueue> HelloTask(CountDownLatch& in_latch, RkSize const in_value)
     co_return;
 }
 
-Task<EcsQueue> SomeTask()
+Task<EcsQueue> Main()
 {
 	constexpr RkSize count {512ULL};
 	CountDownLatch latch(count);
@@ -43,13 +45,11 @@ Task<EcsQueue> SomeTask()
 int main()
 {
     CentralProcessingUnit cpu;
-    cpu.SetConfiguration({
-        EcsQueue::GetInterface(), EcsQueue::GetInterface(), EcsQueue::GetInterface()
-    });
+    cpu.SetConfiguration({ &EcsQueue::queue, &EcsQueue::queue, &EcsQueue::queue });
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    SomeTask();
+    Main();
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }

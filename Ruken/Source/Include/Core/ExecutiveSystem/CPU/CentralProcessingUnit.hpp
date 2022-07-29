@@ -7,6 +7,8 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+class CentralProcessingQueue;
+
 /**
  * \brief Central Processing Unit
  *
@@ -35,7 +37,7 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
         #pragma region Methods
 
         // TODO: Temporary 
-        RkVoid SetConfiguration(std::vector<ICentralProcessingQueue> const& in_queues) noexcept;
+        RkVoid SetConfiguration(std::vector<CentralProcessingQueue*> const& in_queues) noexcept;
 
         #pragma endregion
 

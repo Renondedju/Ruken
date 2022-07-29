@@ -4,57 +4,55 @@
 
 #include "Types/FundamentalTypes.hpp"
 #include "Core/ExecutiveSystem/TaskCompletionEvent.hpp"
-#include "Core/ExecutiveSystem/Concepts/ProcessingQueueType.hpp"
+#include "Core/ExecutiveSystem/Concepts/QueueHandleType.hpp"
 #include "Core/ExecutiveSystem/Concepts/AsynchronousEventType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <ProcessingQueueType TQueue>
+template <QueueHandleType TQueue>
 struct Task;
 
 /**
  * The Promise object defines and controls the behaviour of the coroutine itself
  * by implementing methods that are called at specific points during execution of the coroutine.
  *
- * \tparam TQueue The owning queue of the promise object
+ * \tparam TQueueHandle The owning queue of the promise object
  */
-template <ProcessingQueueType TQueue>
-struct Promise final: TaskCompletionEvent<typename TQueue::ProcessingUnit>::Type
+template <QueueHandleType TQueueHandle>
+struct Promise final: TaskCompletionEvent<typename TQueueHandle::ProcessingUnit>::Type
 {
-    using ProcessingUnit    = typename TQueue::ProcessingUnit;
+    using ProcessingUnit    = typename TQueueHandle::ProcessingUnit;
     using FinalSuspension   = std::suspend_never;
     using InitialSuspension = std::conditional_t<
         ProcessingUnit::execution_policy == EExecutionPolicy::Deferred,
         std::suspend_never,   // Submittable queues requires to be recorded and
         std::suspend_always  // thus needs to be executed directly by the caller
     >; 
-
-    public:
         
-        #pragma region Methods
+    #pragma region Methods
 
-        /**
-         * \brief Converts awaited types to asynchronous events if possible
-         * \tparam TEvent Event type
-         * \param in_awaitable Asynchronous event instance
-         * \return Subscription instance
-         */
-        template <typename TEvent> requires AsynchronousEventType<TEvent, TQueue>
-        auto await_transform(TEvent const& in_awaitable) noexcept
-        {
-            return in_awaitable.template GetSubscription<TQueue>({std::coroutine_handle<Promise<TQueue>>::from_promise(*this)});
-        }
+    /**
+     * \brief Converts awaited types to asynchronous events if possible
+     * \tparam TEvent Event type
+     * \param in_awaitable Asynchronous event instance
+     * \return Subscription instance
+     */
+    template <typename TEvent> requires AsynchronousEventType<TEvent, TQueueHandle>
+    auto await_transform(TEvent const& in_awaitable) noexcept
+    {
+        return in_awaitable.template GetSubscription<TQueueHandle>({std::coroutine_handle<Promise<TQueueHandle>>::from_promise(*this)});
+    }
 
-        Task<TQueue> get_return_object() noexcept;
-        void         return_void() const noexcept {}
+    Task<TQueueHandle> get_return_object() noexcept;
+    void               return_void() const noexcept {}
 
-        [[noreturn]]
-        static RkVoid unhandled_exception();
+    [[noreturn]]
+    static RkVoid unhandled_exception();
 
-        static constexpr InitialSuspension initial_suspend() noexcept { return {}; }
-        FinalSuspension final_suspend() noexcept;
+    static constexpr InitialSuspension initial_suspend() noexcept { return {}; }
+    FinalSuspension final_suspend() noexcept;
 
-        #pragma endregion
+    #pragma endregion
 };
 
 #include "Core/ExecutiveSystem/Promise.inl"

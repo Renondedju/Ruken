@@ -12,7 +12,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TProcessingUnit Queue type the event lives in
  */
 template <ProcessingUnitType TProcessingUnit>
-class AsynchronousEvent
+struct AsynchronousEvent
 {
     using ProcessingUnit = TProcessingUnit;
 };

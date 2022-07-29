@@ -2,13 +2,11 @@
 
 #include <thread>
 
-#include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
-#include "Core/ExecutiveSystem/CPU/ICentralProcessingQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class CentralProcessingUnit; 
+class CentralProcessingQueue;
 
 /**
  * \brief Single thread of execution with its own internal routine
@@ -19,12 +17,10 @@ class CentralProcessingUnit;
  */
 class Worker
 {
-    using Dequeue = ICentralProcessingQueue::TryDequeueSignature;
-
 	#pragma region Members
 
-    std::atomic<Dequeue> m_dequeue {};
-    std::jthread         m_thread  {};
+    std::atomic<CentralProcessingQueue*> m_queue  {};
+    std::jthread                         m_thread {};
 
     #pragma endregion
 
@@ -47,7 +43,7 @@ class Worker
          * \brief Default constructor
          * \param in_name Worker name
          */
-        Worker(std::string&& in_name) noexcept;
+		explicit Worker(std::string&& in_name) noexcept;
 
         Worker()              = default;
         Worker(Worker const&) = delete;
@@ -62,7 +58,7 @@ class Worker
          * \brief Sets the current working queue of the worker
          * \param in_queue Interface instance
          */
-        RkVoid SetQueue(ICentralProcessingQueue const& in_queue);
+        RkVoid SetQueue(CentralProcessingQueue& in_queue);
 
         #pragma endregion
 

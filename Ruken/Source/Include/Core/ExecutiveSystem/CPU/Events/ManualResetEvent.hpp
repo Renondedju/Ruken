@@ -50,18 +50,19 @@ struct ManualResetEvent: AsynchronousEvent<CentralProcessingUnit>
          * \brief Checks if the event has been completed yet
          * \return True if the event has already been completed, false otherwise
          */
-        RkBool Completed() const noexcept;
+        [[nodiscard]]
+		RkBool Completed() const noexcept;
 
         /**
          * \brief Creates a subscription for a given task
-         * \tparam TQueue Queue the awaiting task lives in
+         * \tparam TQueueHandle Handle type to the queue the awaiting task lives in
          * \param in_task Awaiting task instance
          * \return Subscription instance
          */
-        template <ProcessingQueueType TQueue>
-        CPUTaskSubscription<TQueue> GetSubscription(Task<TQueue>&& in_task) const noexcept
+        template <QueueHandleType TQueueHandle>
+        CPUTaskSubscription<TQueueHandle> GetSubscription(Task<TQueueHandle>&& in_task) const noexcept
         {
-            return CPUTaskSubscription<TQueue>(m_head, std::forward<Task<TQueue>>(in_task));
+            return CPUTaskSubscription<TQueueHandle>(m_head, std::forward<Task<TQueueHandle>>(in_task));
         }
 
         #pragma endregion
