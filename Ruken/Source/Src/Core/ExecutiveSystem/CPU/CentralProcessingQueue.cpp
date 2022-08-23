@@ -2,14 +2,8 @@
 
 USING_RUKEN_NAMESPACE
 
-CentralProcessingQueue::CentralProcessingQueue(
-    const RkSize             in_size,
-	const ECPUQueueGroup     in_group,
-    const ECPUPipelinePolicy in_pipeline_policy) noexcept:
-
-	m_queue         {static_cast<unsigned>(in_size)},
-	group           {in_group},
-	pipeline_policy {in_pipeline_policy}
+CentralProcessingQueue::CentralProcessingQueue(const RkSize in_size) noexcept:
+	m_queue {static_cast<unsigned>(in_size)}
 {}
 
 RkVoid CentralProcessingQueue::Enqueue(std::coroutine_handle<>&& in_handle) noexcept

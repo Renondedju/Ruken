@@ -11,6 +11,8 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+class Worker;
+
 #pragma warning(push)
 #pragma warning(disable: 4324) // structure was padded due to __declspec(align())
 
@@ -19,8 +21,14 @@ BEGIN_RUKEN_NAMESPACE
  */
 class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 {
+    friend Worker;
+
     #pragma region Members
 
+    // Workers stats
+    std::atomic<RkUint64> m_current_concurrency {};
+
+    // Actual queue
     atomic_queue::AtomicQueueB2<std::coroutine_handle<>> m_queue;
 
     #pragma endregion
@@ -32,23 +40,14 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
         /**
 		 * \brief Default constructor
 		 * \param in_size Size of the queue
-		 * \param in_group Queue group
-		 * \param in_pipeline_policy Pipeline policy
 		 */
-		explicit CentralProcessingQueue(RkSize in_size, ECPUQueueGroup in_group, ECPUPipelinePolicy in_pipeline_policy) noexcept;
+		explicit CentralProcessingQueue(RkSize in_size) noexcept;
 
         CentralProcessingQueue(CentralProcessingQueue const&) = delete;
         CentralProcessingQueue(CentralProcessingQueue&&)      = delete;
         ~CentralProcessingQueue()                             = default;
 
         #pragma endregion
-
-		#pragma region Members
-
-        const ECPUQueueGroup     group;
-        const ECPUPipelinePolicy pipeline_policy;
-
-		#pragma endregion
 
         #pragma region Methods
 
@@ -61,7 +60,7 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
         /**
          * \brief Attempts to pop from the queue if not empty
          * \param out_handle Popped coroutine handle
-         * \param in_timeout Number of attempts to be done. Higher values will lead to less latency.
+         * \param in_timeout Number of attempts to be done. Higher values will lead to less latency at the potential cost of wasted CPU cycles.
          * \return True if the pop succeeded, false otherwise
          */
         RkBool TryDequeue(std::coroutine_handle<>& out_handle, RkSize in_timeout) noexcept;
@@ -90,12 +89,10 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
  * This is needed by the QueueHandle class.
  *
  * \tparam TSize Size of the queue
- * \tparam TGroup Group of the queue
- * \tparam TPolicy Pipeline policy of the queue
  */
-template <RkSize TSize, ECPUQueueGroup TGroup, ECPUPipelinePolicy TPolicy>
+template <RkSize TSize>
 struct MakeCentralProcessingQueue: CentralProcessingQueue
-{ MakeCentralProcessingQueue() noexcept: CentralProcessingQueue {TSize, TGroup, TPolicy} {} };
+{ MakeCentralProcessingQueue() noexcept: CentralProcessingQueue {TSize} {} };
 
 #pragma warning(pop)
 

@@ -7,7 +7,7 @@
 USING_RUKEN_NAMESPACE
 
 Worker::Worker(std::string&& in_name) noexcept:
-    m_thread  {std::bind_front(&Worker::Routine, this), std::forward<std::string>(in_name)}
+    m_thread {std::bind_front(&Worker::Routine, this), std::forward<std::string>(in_name)}
 {}
 
 RkVoid Worker::Routine(std::stop_token&& in_stop_token, std::string&& in_name) const noexcept

@@ -4,6 +4,7 @@
 
 #include "Core/ExecutiveSystem/CPU/Worker.hpp"
 #include "Core/ExecutiveSystem/ProcessingUnit.hpp"
+#include "Core/ExecutiveSystem/CPU/CPUPipeline.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -27,7 +28,12 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
 
         #pragma region Constructors
 
-        CentralProcessingUnit()                             = default;
+        /**
+		 * \brief Default constructor
+		 * \param in_pipeline Initial pipeline
+		 */
+		explicit CentralProcessingUnit(CPUPipeline const& in_pipeline) noexcept;
+
         CentralProcessingUnit(CentralProcessingUnit const&) = delete;
         CentralProcessingUnit(CentralProcessingUnit&&)      = delete;
         ~CentralProcessingUnit()                            = default;
@@ -36,8 +42,11 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
 
         #pragma region Methods
 
-        // TODO: Temporary 
-        RkVoid SetConfiguration(std::vector<CentralProcessingQueue*> const& in_queues) noexcept;
+	    /**
+	     * \brief Sets the pipeline of the processing unit
+	     * \param in_pipeline Pipeline instance
+	     */
+	    RkVoid SetPipeline(CPUPipeline const& in_pipeline) noexcept;
 
         #pragma endregion
 

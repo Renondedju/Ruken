@@ -455,6 +455,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CPUPipeline.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Events\CountDownLatch.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Events\ManualResetEvent.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CPUSubscription.cpp" />

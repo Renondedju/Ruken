@@ -3,6 +3,16 @@
 
 USING_RUKEN_NAMESPACE
 
+CentralProcessingUnit::CentralProcessingUnit(CPUPipeline const& in_pipeline) noexcept
+{
+	SetPipeline(in_pipeline);
+}
+
+RkVoid CentralProcessingUnit::SetPipeline(CPUPipeline const& in_pipeline) noexcept
+{
+
+}
+
 RkVoid CentralProcessingUnit::SetConfiguration(std::vector<CentralProcessingQueue*> const& in_queues) noexcept
 {
 	if (m_workers.size() < in_queues.size())

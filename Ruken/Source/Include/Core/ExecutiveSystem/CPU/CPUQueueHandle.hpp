@@ -15,11 +15,9 @@ BEGIN_RUKEN_NAMESPACE
  *
  * \tparam TInheriting Inheriting class (CRTP)
  * \tparam TSize Size of the queue
- * \tparam TGroup Queue group
- * \tparam TPipelinePolicy Pipeline policy
  */
-template <typename TInheriting, RkSize TSize, ECPUQueueGroup TGroup, ECPUPipelinePolicy TPipelinePolicy>
-struct CPUQueueHandle: QueueHandle<TInheriting, MakeCentralProcessingQueue<TSize, TGroup, TPipelinePolicy>>
+template <typename TInheriting, RkSize TSize>
+struct CPUQueueHandle: QueueHandle<TInheriting, MakeCentralProcessingQueue<TSize>>
 {};
 
 END_RUKEN_NAMESPACE
