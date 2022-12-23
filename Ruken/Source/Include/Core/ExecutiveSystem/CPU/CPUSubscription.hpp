@@ -74,7 +74,7 @@ struct CPUSubscription: Subscription<CentralProcessingUnit>
      */
     RkBool await_suspend(std::coroutine_handle<>) noexcept;
 
-    static constexpr RkVoid await_resume() noexcept {}
+    constexpr RkVoid await_resume() noexcept {}
 
     #pragma endregion
 

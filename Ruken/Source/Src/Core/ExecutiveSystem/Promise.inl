@@ -10,7 +10,7 @@ Task<TQueueHandle> Promise<TQueueHandle>::get_return_object() noexcept
     // If the coroutine contains direct instructions, then
     // we let the queue do it's things with the execution, otherwise the handle is executed in place
     if constexpr (typename ProcessingUnit::instruction_type == EInstructionType::Direct)
-        TQueueHandle::queue.Enqueue(handle);
+        TQueueHandle::queue.Push(handle);
 
     return {handle};
 }

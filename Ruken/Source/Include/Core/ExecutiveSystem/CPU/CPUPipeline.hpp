@@ -4,11 +4,11 @@
 #include <string>
 
 #include "Types/FundamentalTypes.hpp"
+#include "Core/ExecutiveSystem/CPU/ECPUQueueMode.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class CentralProcessingQueue;
-
 class CPUPipeline
 {
 	#pragma region Members
@@ -21,19 +21,9 @@ class CPUPipeline
 
 		struct QueueInfo
 		{
-			/**
-			 * \brief Queue instance
-			 */
 			const CentralProcessingQueue& queue;
-
-			/**
-			 * \brief Optimal concurrency hint for the queue
-			 *
-			 * TODO: Meaning of 0
-			 * This is only considered a hint, workers will adapt their behavior regarding concurrency
-			 * depending of the current policies and workload of the system.
-			 */
-			const RkSize concurrency_hint;
+			const ECPUQueueMode           mode;
+			const RkUint32                priority {0ULL};
 		};
 
 		#pragma region Members

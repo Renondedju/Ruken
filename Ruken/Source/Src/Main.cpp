@@ -8,6 +8,9 @@
 #include "Core/ExecutiveSystem/CPU/Events/CountDownLatch.hpp"
 #include "Core/ExecutiveSystem/CPU/Events/ManualResetEvent.hpp"
 
+// Debug
+#include "Utility/Benchmark.hpp" 
+
 USING_RUKEN_NAMESPACE
 
 // --- Queues
@@ -45,27 +48,81 @@ USING_RUKEN_NAMESPACE
 
 // Max FPS             | [TimeConstrained] - 0.1ms required  
 // Target 60           | [TimeConstrained] - 16.6ms required 
-// Pathfinding         | [Interruptable]   - Take the rest (will be prioritized if required by time constrained queues)
+// Pathfinding         | [Continuous]      - Must be ran by at least one worker (will be prioritized if required by time constrained queues)
 // Editor Light-mapper | [Interruptable]   - Mainly editor queues
 
 // If a TimeConstrained queue has a dependency on an Interruptable one, then the Interruptable is given the priority
 
 // for (Queue& queue: queues_sorted_by_priority)
 // {
-//      if (queue.RequiresMoreWorkers())
-//          while(queue.KeepWorker()) <- as long as there isn't a worker that is useless
-//				queue.PopAndRun();
+//      if (queue.RequiresMoreWorkers()) // (target occupancy not met for TimeConstrained queues)
+//          while(queue.PopAndRun());
 // } 
 
-// Workers are autonomous
-// If the worker of a previous pipeline is still working on an interruptable queue
-// and isn't required by the new one, it will continue its work in the background
-// In the case where all threads are required by the current pipeline the worker will naturally be given an order to
-// switch to a more requested queue
+// Big loop in workers as long as a queue decides to "stick" to it
+// OR 
+// Global state machine on workers << seems easier to reason about + reduces the cost of the checks gradually from worsts to cheaper ones
 
-// Calls from TimeConstrained queues to an Interruptable one will reserve new threads 
+// std::atomic<Worker*> m_continuous_worker; - Is the worker that will always prioritize continuous queues over anything else
+// Other workers will adjust based on the requirements 
 
-// Now how do I give out resources to the rest of the interruptable queues ?
+// t(Q) = target latency of a queue Q              - 16 ms
+// l(Q) = current latency of Q                     - 10 ms
+// a(Q) = total amount of time worked              - 10 ms
+// c(Q) = current concurrency of the queue         - 2
+// m(Q) = maximum current concurrency of the queue - 8
+// W    = number of available workers              - 2
+
+// balance = l(Q) / t(Q)
+// - a value > 1 means that too much resources are given to the queue 
+// - a value < 1 means that more resources need to be allocated to reach the target in time
+
+// Required concurrency: R = W * balance
+// Relative priority       = min(R - c(Q), m(Q))
+
+// ------ CONTINUOUS QUEUES ------
+// 
+// Relative priority should always be one such as:
+//     min(R - c(Q), m(Q))        = 1
+// <=> min(W * balance, m(Q))     = 1
+// <=> min(W * l(Q) / t(Q), m(Q)) = 1
+//
+// What that basically means is that either or both of "m(Q)"
+// and "W * l(Q) / t(Q)" has to = 1:
+//
+//     W * l(Q) / t(Q)      = 1     => Here we want W to be controlled by other systems so we will consider it a constant
+//                                     that means that we need to compensate the value of W with l(Q) / t(Q)
+// <=> W * (l(Q)*1)/(t(Q)*W) = 1    => By multiplying the other term by a factor of 1/W we can make sure we don't modify l(Q)
+//                                     because this is not the main goal, a continuous queue just wants to run continuously,
+//                                     no matter the load of the system.
+// <=> l(Q)/(t(Q)*W) = 1/W
+// <=> l(Q)          = (t(Q)*W)/W
+// <=> l(Q)          = t(Q)
+
+
+// ________________________
+//
+// This way m(Q) can also freely determine if the queue should
+// be ran in the case m(Q) > 1 meaning that there is work to be done.
+//
+// ------ INTERRUPTABLE QUEUES ------
+// We can use the same principle as the continuous queue, although we basically want to
+// share the remaining resources among them, meaning that every interruptable queue should
+// have the same priority of 1 when spare resources are available
+// 
+// By putting t(Q) = l(Q)*W/len(Q), we can make sure that the load will be evenly distributed
+// Hopefully that should allow us to get rid of the branches and be vectorized by the compiler
+// We need evaluations to be pretty quick to allow to be called more frequently and increase the precision
+// even though this has to be profiled
+
+// We can subdivide W into 3 distinct values
+// W = Wt + Wc + Wi
+// 
+
+
+
+
+// Efficiently sorting and updating queues
 
 struct ResourceManagement final: CPUQueueHandle<ResourceManagement, 4082> {};
 struct PathfindingQueue   final: CPUQueueHandle<PathfindingQueue  , 4082> {};
@@ -77,7 +134,7 @@ struct EcsQueue           final: CPUQueueHandle<EcsQueue          , 4082> {};
 Task<EcsQueue> HelloTask(CountDownLatch& in_latch, RkSize const in_value)
 {
     std::cout << "Hello from " + std::to_string(in_value) + ' ' + WorkerInfo::name + '\n';
-
+    
     in_latch.CountDown();
 
     co_return;
@@ -100,17 +157,15 @@ Task<EcsQueue> Main()
 
 int main()
 {
-    const CPUPipeline pipeline("Kernel Initialization Pipeline", {
-        { EcsQueue  ::queue, 0 },
-		{ SoundQueue::queue, 0 },
-		{ IOQueue   ::queue, 2 }
-    });
-
-    CentralProcessingUnit cpu(pipeline);
-
+    CentralProcessingUnit cpu {};
+    cpu.RegisterQueue(EcsQueue::queue);
+    cpu.RegisterQueue(SoundQueue::queue);
+    cpu.RegisterQueue(PathfindingQueue::queue);
+    cpu.RegisterQueue(ResourceManagement::queue);
+    
     std::this_thread::sleep_for(std::chrono::seconds(1));
-
+    
     Main();
-
+    
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }

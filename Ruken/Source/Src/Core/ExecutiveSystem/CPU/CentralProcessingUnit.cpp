@@ -1,29 +1,20 @@
+#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
 
 USING_RUKEN_NAMESPACE
 
-CentralProcessingUnit::CentralProcessingUnit(CPUPipeline const& in_pipeline) noexcept
+CentralProcessingUnit::CentralProcessingUnit() noexcept
 {
-	SetPipeline(in_pipeline);
+    m_workers.reserve(std::thread::hardware_concurrency() - 1);
+
+	for (RkSize index = 0ULL; index < std::thread::hardware_concurrency() - 1; ++index)
+        m_workers.emplace_back(std::make_unique<Worker>("CPU " + std::to_string(index), m_queues));
+
+	WorkerInfo::name = std::string("CPU Main");
 }
 
-RkVoid CentralProcessingUnit::SetPipeline(CPUPipeline const& in_pipeline) noexcept
+RkVoid CentralProcessingUnit::RegisterQueue(CentralProcessingQueue& in_queue) noexcept
 {
-
-}
-
-RkVoid CentralProcessingUnit::SetConfiguration(std::vector<CentralProcessingQueue*> const& in_queues) noexcept
-{
-	if (m_workers.size() < in_queues.size())
-	{
-	    m_workers = std::vector<Worker>(in_queues.size());
-
-		for (RkSize index {0ULL}; index < m_workers.size(); index++)
-			new (&m_workers[index]) Worker(std::string("Worker ") + std::to_string(index));
-	}
-
-	// Set the new configurations
-	for (RkSize index {0ULL}; index < in_queues.size(); index++)
-	    m_workers[index].SetQueue(*in_queues[index]);
+    m_queues.emplace_back(std::addressof(in_queue));
 }

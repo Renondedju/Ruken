@@ -47,9 +47,9 @@ struct Promise final: TaskCompletionEvent<typename TQueueHandle::ProcessingUnit>
     void               return_void() const noexcept {}
 
     [[noreturn]]
-    static RkVoid unhandled_exception();
+    RkVoid unhandled_exception();
 
-    static constexpr InitialSuspension initial_suspend() noexcept { return {}; }
+    constexpr InitialSuspension initial_suspend() noexcept { return {}; }
     FinalSuspension final_suspend() noexcept;
 
     #pragma endregion

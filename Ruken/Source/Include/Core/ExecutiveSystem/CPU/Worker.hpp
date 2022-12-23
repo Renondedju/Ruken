@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <thread>
 
 #include "Types/FundamentalTypes.hpp"
@@ -19,8 +20,8 @@ class Worker
 {
 	#pragma region Members
 
-    std::atomic<CentralProcessingQueue*> m_queue  {};
-    std::jthread                         m_thread {};
+    std::vector<CentralProcessingQueue*>& m_queues;
+    std::jthread                          m_thread {};
 
     #pragma endregion
 
@@ -42,23 +43,13 @@ class Worker
         /**
          * \brief Default constructor
          * \param in_name Worker name
+         * \param in_queues Queues to work on
          */
-		explicit Worker(std::string&& in_name) noexcept;
+		explicit Worker(std::string in_name, std::vector<CentralProcessingQueue*>& in_queues) noexcept;
 
-        Worker()              = default;
         Worker(Worker const&) = delete;
         Worker(Worker&&)      = delete;
         ~Worker()             = default;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief Sets the current working queue of the worker
-         * \param in_queue Interface instance
-         */
-        RkVoid SetQueue(CentralProcessingQueue& in_queue);
 
         #pragma endregion
 

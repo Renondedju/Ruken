@@ -41,7 +41,7 @@ struct CPUTaskSubscription final: CPUSubscription
      */
     RkVoid OnCompletion() noexcept override
     {
-        TQueueHandle::queue.Enqueue(task);
+        TQueueHandle::queue.Push(task);
     }
 
     #pragma endregion

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 
@@ -18,9 +18,12 @@ class CentralProcessingQueue;
  */
 class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, EExecutionPolicy::Immediate, EInstructionType::Direct>
 {
+    friend CentralProcessingQueue;
+
     #pragma region Members
 
-    std::vector<Worker> m_workers {};
+    std::vector<CentralProcessingQueue*> m_queues  {};
+    std::vector<std::unique_ptr<Worker>> m_workers {};
 
     #pragma endregion
 
@@ -28,11 +31,7 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
 
         #pragma region Constructors
 
-        /**
-		 * \brief Default constructor
-		 * \param in_pipeline Initial pipeline
-		 */
-		explicit CentralProcessingUnit(CPUPipeline const& in_pipeline) noexcept;
+		explicit CentralProcessingUnit() noexcept;
 
         CentralProcessingUnit(CentralProcessingUnit const&) = delete;
         CentralProcessingUnit(CentralProcessingUnit&&)      = delete;
@@ -42,11 +41,11 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
 
         #pragma region Methods
 
-	    /**
-	     * \brief Sets the pipeline of the processing unit
-	     * \param in_pipeline Pipeline instance
-	     */
-	    RkVoid SetPipeline(CPUPipeline const& in_pipeline) noexcept;
+        /**
+         * \brief Registers the passed queue so it can be processed
+         * \param in_queue Queue instance
+         */
+        RkVoid RegisterQueue(CentralProcessingQueue& in_queue) noexcept;
 
         #pragma endregion
 

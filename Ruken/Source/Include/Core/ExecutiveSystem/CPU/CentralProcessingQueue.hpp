@@ -4,14 +4,18 @@
 #include <atomic_queue/atomic_queue.h>
 
 #include "Types/FundamentalTypes.hpp"
+#include "Core/ExecutiveSystem/Concepts/QueueHandleType.hpp"
 #include "Core/ExecutiveSystem/ProcessingQueue.hpp"
-#include "Core/ExecutiveSystem/CPU/ECPUQueueGroup.hpp"
 #include "Core/ExecutiveSystem/CPU/ECPUPipelinePolicy.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
+#include "Core/ExecutiveSystem/CPU/ConcurrencyCounter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 class Worker;
+
+template <QueueHandleType TQueueHandle>
+struct CPUTaskSubscription;
 
 #pragma warning(push)
 #pragma warning(disable: 4324) // structure was padded due to __declspec(align())
@@ -21,15 +25,39 @@ class Worker;
  */
 class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 {
-    friend Worker;
+    friend const Worker; // readonly
+    friend CPUTaskSubscription; // Updating m_current_concurrency
 
     #pragma region Members
 
-    // Workers stats
-    std::atomic<RkUint64> m_current_concurrency {};
-
-    // Actual queue
+    std         ::atomic       <RkUint64>                m_concurrency {};
     atomic_queue::AtomicQueueB2<std::coroutine_handle<>> m_queue;
+
+    #pragma endregion
+
+    #pragma region Methods
+
+    /**
+     * \brief A simple utility function that attempts to dequeue a job and run it
+     *
+     * \param out_new_concurrency The new concurrency of the queue. This value is only modified if a job has been ran.
+     * \param in_max_attempts Maximum amount of times the operation can be attempted before returning.
+     *        A value of 0 will do nothing.
+     */
+    inline RkVoid TryConsumeJob(ConcurrencyCounter& out_new_concurrency, RkUint32 in_max_attempts) noexcept;
+
+    /**
+     * \brief Helper function returning the signed concurrency request of the queue.
+     *        If this function returns 2.3f, that means 2 full time workers + 30% of a 3rd one are requested.
+     *        Negative values indicates a surplus of concurrency.
+     *
+     * \param in_concurrency Fetched concurrency
+     * \param in_offset Current concurrency offset.
+     *        This allows to get the concurrency request as if x workers were to be added/removed from the queue.
+     *
+     * \return Signed concurrency request
+     */
+    inline RkFloat GetSignedConcurrencyRequest(ConcurrencyCounter const& in_concurrency, RkUint32 in_offset = 0U) const noexcept;
 
     #pragma endregion
 
@@ -53,17 +81,16 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 
         /**
          * \brief Blocking push, waits for available space in the queue 
-         * \param in_handle Handle to enqueue
+         * \param in_handle Job handle to push
          */
-        RkVoid Enqueue(std::coroutine_handle<>&& in_handle) noexcept;
+        RkVoid Push(std::coroutine_handle<>&& in_handle) noexcept;
 
         /**
-         * \brief Attempts to pop from the queue if not empty
-         * \param out_handle Popped coroutine handle
-         * \param in_timeout Number of attempts to be done. Higher values will lead to less latency at the potential cost of wasted CPU cycles.
-         * \return True if the pop succeeded, false otherwise
+         * \brief Attempts to consume jobs of the queue 
+         * \param in_sticky When set to true the queue will continue
+         *        to consume jobs until the queue no longer requires this much concurrency.
          */
-        RkBool TryDequeue(std::coroutine_handle<>& out_handle, RkSize in_timeout) noexcept;
+        RkVoid PopAndRun(RkBool in_sticky) noexcept;
 
         /**
          * \brief Checks if the queue is empty.
@@ -72,6 +99,10 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
          */
 		[[nodiscard]]
 		RkBool Empty() const noexcept;
+
+        // TODO constrained version
+        [[nodiscard]]
+        RkFloat OptimalConcurrency(RkUint32 in_max_concurrency) const noexcept;
 
         #pragma endregion
 
