@@ -89,8 +89,9 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
          * \brief Attempts to consume jobs of the queue 
          * \param in_sticky When set to true the queue will continue
          *        to consume jobs until the queue no longer requires this much concurrency.
+         * \param in_stop_token Stop token. Only useful when in_sticky is true to preemptively stop the loop.
          */
-        RkVoid PopAndRun(RkBool in_sticky) noexcept;
+        RkVoid PopAndRun(RkBool in_sticky, std::stop_token const& in_stop_token) noexcept;
 
         /**
          * \brief Checks if the queue is empty.

@@ -18,5 +18,5 @@ RkVoid Worker::Routine(std::stop_token&& in_stop_token, std::string&& in_name) c
     // This loop needs to be as small as possible in order to reduce latency
     while (!in_stop_token.stop_requested())
         for (CentralProcessingQueue* queue: m_queues)
-            queue->PopAndRun(true);
+            queue->PopAndRun(true, in_stop_token);
 }

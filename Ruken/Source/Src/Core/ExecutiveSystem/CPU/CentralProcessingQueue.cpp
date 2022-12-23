@@ -40,7 +40,7 @@ RkVoid CentralProcessingQueue::Push(std::coroutine_handle<>&& in_handle) noexcep
     m_concurrency.fetch_add(one_optimal.value, std::memory_order_release);
 }
 
-RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky) noexcept
+RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token const& in_stop_token) noexcept
 {
     RkFloat                      signed_request;
     ConcurrencyCounter           counter     { .value = m_concurrency.load(std::memory_order_relaxed) };
@@ -68,7 +68,7 @@ RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky) noexcept
 
         // Checking if the queue still needs us
         signed_request = GetSignedConcurrencyRequest(counter, -1);
-    } while (signed_request >= 1.0F);
+    } while (signed_request >= 1.0F && !in_stop_token.stop_requested());
 
     // Finally decrementing the current concurrency of the queue
     m_concurrency.fetch_sub(one_current.value, std::memory_order_release);
