@@ -2,7 +2,6 @@
 
 #include "Core/Kernel.hpp"
 #include "Core/ExecutiveSystem/Task.hpp"
-#include "Core/ExecutiveSystem/CPU/CPUPipeline.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/CPUQueueHandle.hpp"
 #include "Core/ExecutiveSystem/CPU/Events/CountDownLatch.hpp"
@@ -119,9 +118,6 @@ USING_RUKEN_NAMESPACE
 // W = Wt + Wc + Wi
 // 
 
-
-
-
 // Efficiently sorting and updating queues
 
 struct ResourceManagement final: CPUQueueHandle<ResourceManagement, 4082> {};
@@ -133,7 +129,11 @@ struct EcsQueue           final: CPUQueueHandle<EcsQueue          , 4082> {};
 
 Task<EcsQueue> HelloTask(CountDownLatch& in_latch, RkSize const in_value)
 {
-    std::cout << "Hello from " + std::to_string(in_value) + ' ' + WorkerInfo::name + '\n';
+    ConcurrencyCounter const counter = EcsQueue::queue.GetConcurrencyCounter();
+
+    std::cout << "- Running job " + std::to_string(in_value) + " [" + WorkerInfo::name
+                + "] : " + std::to_string(counter.current_concurrency) + " current workers out of optimal maximum: "
+                         + std::to_string(counter.optimal_concurrency) + '\n';
     
     in_latch.CountDown();
 

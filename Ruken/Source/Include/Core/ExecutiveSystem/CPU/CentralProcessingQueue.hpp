@@ -6,7 +6,6 @@
 #include "Types/FundamentalTypes.hpp"
 #include "Core/ExecutiveSystem/Concepts/QueueHandleType.hpp"
 #include "Core/ExecutiveSystem/ProcessingQueue.hpp"
-#include "Core/ExecutiveSystem/CPU/ECPUPipelinePolicy.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "Core/ExecutiveSystem/CPU/ConcurrencyCounter.hpp"
 
@@ -94,16 +93,15 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
         RkVoid PopAndRun(RkBool in_sticky, std::stop_token const& in_stop_token) noexcept;
 
         /**
-         * \brief Checks if the queue is empty.
-         * \note By the time the value is evaluated, the status of the queue may have changed
-         * \return True if the queue was empty, false otherwise
+         * \brief Returns the concurrency counter of the queue. This value cannot be used for any kind of synchronization.
+         * \return Concurrency counter
          */
-		[[nodiscard]]
-		RkBool Empty() const noexcept;
+        [[nodiscard]]
+        ConcurrencyCounter GetConcurrencyCounter() const noexcept;
 
         // TODO constrained version
         [[nodiscard]]
-        RkFloat OptimalConcurrency(RkUint32 in_max_concurrency) const noexcept;
+        RkFloat ComputeOptimalConcurrency(RkUint32 in_max_concurrency) const noexcept;
 
         #pragma endregion
 

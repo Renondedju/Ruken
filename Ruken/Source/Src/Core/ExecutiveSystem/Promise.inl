@@ -5,7 +5,7 @@
 template <QueueHandleType TQueueHandle>
 Task<TQueueHandle> Promise<TQueueHandle>::get_return_object() noexcept
 {
-    auto handle = std::coroutine_handle<Promise<TQueueHandle>>::from_promise(*this);
+    auto handle = std::coroutine_handle<Promise>::from_promise(*this);
 
     // If the coroutine contains direct instructions, then
     // we let the queue do it's things with the execution, otherwise the handle is executed in place

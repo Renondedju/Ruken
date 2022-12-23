@@ -40,7 +40,7 @@ struct Promise final: TaskCompletionEvent<typename TQueueHandle::ProcessingUnit>
     template <typename TEvent> requires AsynchronousEventType<TEvent, TQueueHandle>
     auto await_transform(TEvent const& in_awaitable) noexcept
     {
-        return in_awaitable.template GetSubscription<TQueueHandle>({std::coroutine_handle<Promise<TQueueHandle>>::from_promise(*this)});
+        return in_awaitable.template GetSubscription<TQueueHandle>({std::coroutine_handle<Promise>::from_promise(*this)});
     }
 
     Task<TQueueHandle> get_return_object() noexcept;

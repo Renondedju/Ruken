@@ -27,7 +27,7 @@ RkVoid CentralProcessingQueue::TryConsumeJob(ConcurrencyCounter& out_new_concurr
 
 RkFloat CentralProcessingQueue::GetSignedConcurrencyRequest(ConcurrencyCounter const& in_concurrency, RkUint32 const in_offset) const noexcept
 {
-    return OptimalConcurrency(in_concurrency.optimal_concurrency) - static_cast<RkFloat>(in_concurrency.current_concurrency + in_offset);
+    return ComputeOptimalConcurrency(in_concurrency.optimal_concurrency) - static_cast<RkFloat>(in_concurrency.current_concurrency + in_offset);
 }
 
 RkVoid CentralProcessingQueue::Push(std::coroutine_handle<>&& in_handle) noexcept
@@ -74,12 +74,13 @@ RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token
     m_concurrency.fetch_sub(one_current.value, std::memory_order_release);
 }
 
-RkBool CentralProcessingQueue::Empty() const noexcept
+ConcurrencyCounter CentralProcessingQueue::GetConcurrencyCounter() const noexcept
 {
-    return m_queue.was_empty();
+    ConcurrencyCounter const counter { .value = m_concurrency.load(std::memory_order_relaxed) };
+    return counter;
 }
 
-RkFloat CentralProcessingQueue::OptimalConcurrency(RkUint32 const in_max_concurrency) const noexcept
+RkFloat CentralProcessingQueue::ComputeOptimalConcurrency(RkUint32 const in_max_concurrency) const noexcept
 {
     return static_cast<RkFloat>(in_max_concurrency);
 }

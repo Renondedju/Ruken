@@ -4,7 +4,6 @@
 
 #include "Core/ExecutiveSystem/CPU/Worker.hpp"
 #include "Core/ExecutiveSystem/ProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/CPUPipeline.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
