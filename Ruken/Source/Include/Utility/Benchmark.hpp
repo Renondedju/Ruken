@@ -57,7 +57,7 @@ class Benchmark
  * \brief Benchmark macro, this is intended to quickly benchmark a part of your code.
  * \param in_benchmark_label Benchmark's label
  */
-#define BENCHMARK(in_benchmark_label) if (Benchmark const benchmark = Benchmark(in_benchmark_label, 1))
+#define RUKEN_BENCHMARK(in_benchmark_label) if (Benchmark const benchmark = Benchmark(in_benchmark_label, 1))
 
 namespace internal
 {
@@ -76,7 +76,7 @@ namespace internal
  * \param in_benchmark_label Benchmark's label
  * \param in_benchmark_execution_count Number of times to execute the benchmark
  */
-#define LOOPED_BENCHMARK(in_benchmark_label, in_benchmark_execution_count) \
+#define RUKEN_LOOPED_BENCHMARK(in_benchmark_label, in_benchmark_execution_count) \
     for (internal::BenchmarkIterator benchmark_iterator = {0, Benchmark(in_benchmark_label, in_benchmark_execution_count)}; benchmark_iterator.loop_count < in_benchmark_execution_count; ++benchmark_iterator.loop_count)
 
 END_RUKEN_NAMESPACE
