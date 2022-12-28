@@ -18,3 +18,9 @@ RkVoid CentralProcessingUnit::RegisterQueue(CentralProcessingQueue& in_queue) no
 {
     m_queues.emplace_back(std::addressof(in_queue));
 }
+
+RkVoid CentralProcessingUnit::CallerAsWorker(std::stop_token const& in_should_return) const noexcept
+{
+    while (!in_should_return.stop_requested())
+        Worker::ProcessQueues(m_queues, in_should_return);
+}

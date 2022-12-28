@@ -53,6 +53,17 @@ class Worker
 
         #pragma endregion
 
+        #pragma region Methods
+
+        /**
+         * \brief Runs jobs on the passed queues for a maximum of one full cycle.
+         * \param in_queues Queues to cycle though 
+         * \param in_stop_token If a stop is requested, the method will return as soon as the current job is done
+         */
+        static RkVoid ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queues, std::stop_token const& in_stop_token) noexcept;
+
+        #pragma endregion
+
         #pragma region Operators
 
         Worker& operator=(Worker const&) = delete;
