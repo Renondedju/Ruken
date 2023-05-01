@@ -1,4 +1,4 @@
-#include "Core/ExecutiveSystem/CPU/Events/CountDownLatch.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CountDownLatch.hpp"
 
 USING_RUKEN_NAMESPACE
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ExecutiveSystem/CPU/Events/ManualResetEvent.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/ManualResetEvent.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -18,6 +18,8 @@ class CountDownLatch: public ManualResetEvent
 	public:
 
 		#pragma region Constructors
+
+		using ManualResetEvent::ManualResetEvent;
 
 		/**
 		 * \brief Default constructor

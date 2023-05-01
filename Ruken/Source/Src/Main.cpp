@@ -4,15 +4,14 @@
 #include "Core/ExecutiveSystem/Task.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/CPUQueueHandle.hpp"
-#include "Core/ExecutiveSystem/CPU/Events/CountDownLatch.hpp"
-#include "Core/ExecutiveSystem/CPU/Events/ManualResetEvent.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CountDownLatch.hpp"
 
 USING_RUKEN_NAMESPACE
 
 struct MainQueue final: CPUQueueHandle<MainQueue, 4092> {};
 
 // Logs: "[<WorkerName>] Running job <in_identifier> - Concurrency [<Current>/<Max>]\n"
-ruken::Task<MainQueue> Task(CountDownLatch& in_latch, RkSize const in_identifier)
+Task<MainQueue> Job(CountDownLatch& in_latch, RkSize const in_identifier)
 {
     ConcurrencyCounter const counter = MainQueue::queue.GetConcurrencyCounter();
 
@@ -25,12 +24,13 @@ ruken::Task<MainQueue> Task(CountDownLatch& in_latch, RkSize const in_identifier
     co_return;
 }
 
-// Starts and waits for in_amount of dummy tasks 
-ruken::Task<MainQueue> RunTasks(std::stop_source& in_exit_signal, RkSize const in_amount)
+// Starts and waits for in_amount of dummy tasks before requesting in_exit_signal
+Task<MainQueue> RunJobs(std::stop_source& in_exit_signal, RkSize const in_amount)
 {
     CountDownLatch latch(in_amount);
     for (RkSize i = 0ULL; i < in_amount; ++i)
-		::Task(latch, i);
+		Job(latch, i);
+
     co_await latch;
 
     std::cout << '[' << WorkerInfo::name << "] Done ! Requesting exit.\n";
@@ -54,7 +54,7 @@ int main()
         // To avoid this issue, a stop source is passed to the async function that will signal it upon completion.
         std::stop_source stop_signal;
 
-        RunTasks(stop_signal, 2048); // < asynchronous call, does not block the thread
+        RunJobs(stop_signal, 2048); // < asynchronous call, does not block the thread
 
         // Finally we can actually wait for the signal by making this thread available to the CPU
         cpu.CallerAsWorker(stop_signal.get_token());
