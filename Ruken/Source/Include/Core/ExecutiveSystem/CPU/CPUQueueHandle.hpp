@@ -13,8 +13,9 @@ BEGIN_RUKEN_NAMESPACE
  * Doing it this way avoids code duplication and allows underlying systems to use a simple
  * non templated pointer for generic operations.
  *
- * \tparam TInheriting Inheriting class (CRTP)
- * \tparam TSize Size of the queue
+ * \tparam TInheriting Inheriting class (CRTP).
+ * \tparam TSize Size of the queue. Do note that this size is only
+ *				 indicative and may not correspond to the underlying implementation's chosen size.
  */
 template <typename TInheriting, RkSize TSize>
 struct CPUQueueHandle: QueueHandle<TInheriting, MakeCentralProcessingQueue<TSize>>

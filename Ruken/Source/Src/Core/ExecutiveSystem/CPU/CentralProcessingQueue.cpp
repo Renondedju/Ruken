@@ -6,7 +6,7 @@ CentralProcessingQueue::CentralProcessingQueue(const RkSize in_size) noexcept:
 	m_queue {static_cast<unsigned>(in_size)}
 {}
 
-RkVoid CentralProcessingQueue::TryConsumeJob(ConcurrencyCounter& out_new_concurrency, RkUint32 const in_max_attempts) noexcept
+RkVoid CentralProcessingQueue::TryConsumeJob(RkUint32 const in_max_attempts) noexcept
 {
     std::coroutine_handle<>      job;
     ConcurrencyCounter constexpr one_optimal { {.current_concurrency = 0, .optimal_concurrency = 1} };
@@ -21,29 +21,29 @@ RkVoid CentralProcessingQueue::TryConsumeJob(ConcurrencyCounter& out_new_concurr
         return;
 
     // Otherwise we need to update the concurrency and run the job
-    out_new_concurrency.value = m_concurrency.fetch_sub(one_optimal.value, std::memory_order_release);
+    m_concurrency.fetch_sub(one_optimal.value, std::memory_order_acq_rel);
     job.resume();
 }
 
 RkFloat CentralProcessingQueue::GetSignedConcurrencyRequest(ConcurrencyCounter const& in_concurrency, RkUint32 const in_offset) const noexcept
 {
-    return ComputeOptimalConcurrency(in_concurrency.optimal_concurrency) - static_cast<RkFloat>(in_concurrency.current_concurrency + in_offset);
+    return ComputeOptimalConcurrency(in_concurrency.optimal_concurrency)
+              - static_cast<RkFloat>(in_concurrency.current_concurrency)
+              + static_cast<RkFloat>(in_offset);
 }
 
 RkVoid CentralProcessingQueue::Push(std::coroutine_handle<>&& in_handle) noexcept
 {
     ConcurrencyCounter constexpr one_optimal { {.current_concurrency = 0, .optimal_concurrency = 1} };
 
-    while(!m_queue.try_push(in_handle))
-        atomic_queue::spin_loop_pause();
-
-    m_concurrency.fetch_add(one_optimal.value, std::memory_order_release);
+    m_queue      .push     (in_handle);
+    m_concurrency.fetch_add(one_optimal.value, std::memory_order_acq_rel);
 }
 
 RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token const& in_stop_token) noexcept
 {
     RkFloat                      signed_request;
-    ConcurrencyCounter           counter     { .value = m_concurrency.load(std::memory_order_relaxed) };
+    ConcurrencyCounter           counter     { .value = m_concurrency.load(std::memory_order_acquire) };
     ConcurrencyCounter constexpr one_current { {.current_concurrency = 1, .optimal_concurrency = 0} };
 
     do
@@ -58,20 +58,21 @@ RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token
     // If the caller don't want to stick to the queue
     // then we only try to consume a single job before returning
     if (!in_sticky)
-        TryConsumeJob(counter, 50);
+        TryConsumeJob(50);
 
     else do
     {
         // Otherwise, we'll consume a maximum of 10 jobs
         for(int i = 0; i < 10; ++i)
-            TryConsumeJob(counter, 50);
+            TryConsumeJob(50);
 
         // Checking if the queue still needs us
+        counter.value  = m_concurrency.load(std::memory_order_acquire);
         signed_request = GetSignedConcurrencyRequest(counter, -1);
     } while (signed_request >= 1.0F && !in_stop_token.stop_requested());
 
     // Finally decrementing the current concurrency of the queue
-    m_concurrency.fetch_sub(one_current.value, std::memory_order_release);
+    m_concurrency.fetch_sub(one_current.value, std::memory_order_acq_rel);
 }
 
 ConcurrencyCounter CentralProcessingQueue::GetConcurrencyCounter() const noexcept
@@ -82,5 +83,6 @@ ConcurrencyCounter CentralProcessingQueue::GetConcurrencyCounter() const noexcep
 
 RkFloat CentralProcessingQueue::ComputeOptimalConcurrency(RkUint32 const in_max_concurrency) const noexcept
 {
+    // For now the optimal concurrency is just the max concurrency
     return static_cast<RkFloat>(in_max_concurrency);
 }

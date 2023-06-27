@@ -37,13 +37,11 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
     #pragma region Methods
 
     /**
-     * \brief A simple utility function that attempts to dequeue a job and run it
-     *
-     * \param out_new_concurrency The new concurrency of the queue. This value is only modified if a job has been ran.
+     * \brief A simple utility function that attempts to dequeue a job and run it.
      * \param in_max_attempts Maximum amount of times the operation can be attempted before returning.
      *        A value of 0 will do nothing.
      */
-    inline RkVoid TryConsumeJob(ConcurrencyCounter& out_new_concurrency, RkUint32 in_max_attempts) noexcept;
+    inline RkVoid TryConsumeJob(RkUint32 in_max_attempts) noexcept;
 
     /**
      * \brief Helper function returning the signed concurrency request of the queue.

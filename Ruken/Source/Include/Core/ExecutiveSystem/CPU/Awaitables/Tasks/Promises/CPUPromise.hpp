@@ -12,6 +12,9 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TReturnType>
 class CPUPromise: public CPUAwaitable
 {
+    template <typename TOtherReturnType>
+    friend class CPUPromise;
+
     #pragma region Members
 
     TReturnType         m_result;
@@ -38,24 +41,34 @@ class CPUPromise: public CPUAwaitable
         #pragma region Methods
 
         /**
-         * \brief Signals to the promise that a reference has been made to it
-         *        Preventing if from destroying itself before the result could have been read.
+         * \brief Signals to the promise that a reference has been made to it,
+         *        preventing if from destroying itself before the result could have been read.
          */
         RkVoid AddReference() noexcept
         {
             m_references.fetch_add(1, std::memory_order_release);
+            std::cout << "add" << std::endl;
         }
         
         /**
-         * \brief 
+         * \brief Signals to the promise that a reference has removed.
+         *        If no other references are being made to the promise
+         *        and it has been completed, the promise is destroyed.
          */
         RkVoid RemoveReference() noexcept
         {
             // If the last reference has been dropped and the task is completed, then we need to manually
             // destroy the allocated frame.
+            std::cout << "remove" << std::endl;
             if (m_references.fetch_sub(1, std::memory_order_acq_rel) == 1 && this->Completed())
+            {
                 std::coroutine_handle<CPUPromise>::from_promise(*this).destroy();
+                std::cout << "destroyed" << std::endl;
+            }
         }
+
+        TReturnType const& GetResult() const noexcept
+        { return m_result; }
 
         /// ----- Coroutine methods -----
         ///
@@ -64,8 +77,12 @@ class CPUPromise: public CPUAwaitable
          * \brief Called when the coroutine returns a value
          * \param in_result Result emitted by the coroutine
          */
-        RkVoid return_value(TReturnType& in_result) const noexcept
+        void return_value(TReturnType&& in_result) noexcept
         { m_result = std::forward<TReturnType>(in_result); }
+
+        void return_value(TReturnType const& in_result) noexcept
+            requires !std::is_reference_v<TReturnType>
+        { m_result = in_result; }
 
         // CPU tasks will never start synchronously and are instead inserted into queues for it to be eventually processed.
         // Final suspension depends on the number of references that are made to the coroutine.

@@ -9,6 +9,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief This class acts as a base for every CPU awaitable
  */
+template <typename TReturnType>
 class CPUAwaitable: public Awaitable<CentralProcessingUnit>
 {
     #pragma region Members

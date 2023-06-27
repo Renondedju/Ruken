@@ -139,6 +139,8 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Awaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\AwaitableType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\QueueHandleType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Algorythms\ForEach.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Algorythms\WhenAll.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Suspensions\CPUTaskSuspension.hpp" />

@@ -42,8 +42,8 @@ struct CPUTaskSuspension final: CPUSuspension
      * \brief Called when the suspension is resumed.
      * \returns The result of the awaited task
      */
-    TReturnType& await_resume() const noexcept
-    { return instance.m_result; }
+    TReturnType const& await_resume() const noexcept
+    { return instance.GetResult(); }
 
     #pragma endregion
 };
@@ -81,9 +81,8 @@ struct CPUTaskSuspension<TQueueHandle, RkVoid> final: CPUSuspension
 
     /**
      * \brief Called when the suspension is resumed.
-     * \returns The result of the awaited task
      */
-    RkVoid await_resume() const noexcept { }
+    static constexpr RkVoid await_resume() noexcept { }
 
     #pragma endregion
 };

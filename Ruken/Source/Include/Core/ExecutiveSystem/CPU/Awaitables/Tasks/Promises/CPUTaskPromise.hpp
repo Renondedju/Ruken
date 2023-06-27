@@ -42,13 +42,13 @@ struct CPUTaskPromise final: CPUPromise<TReturnType>
      * \return Subscription instance
      */
     template <AwaitableType TAwaitable>
-    auto await_transform(TAwaitable& in_awaitable) noexcept
+    auto await_transform(TAwaitable&& in_awaitable) noexcept
     {
         static_assert(std::is_same_v<typename TAwaitable::ProcessingUnit, CentralProcessingUnit>,
             "Awaiting events from other processing units is not yet supported");
 
         // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
-        return CPUTaskSuspension<TQueueHandle, TReturnType> {in_awaitable.GetSuspensionNode(), *this};
+        return CPUTaskSuspension<TQueueHandle, TOtherReturnType> {in_awaitable.GetSuspensionNode(), *this};
     }
 
     RkVoid unhandled_exception() noexcept
