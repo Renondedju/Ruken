@@ -25,7 +25,10 @@ Task<MainQueue, RkSize> Job(RkSize const in_identifier)
 // Starts and waits for in_amount of dummy tasks before requesting in_exit_signal
 Task<MainQueue> RunJobs(std::stop_source& in_exit_signal, RkSize in_size)
 {
-    std::cout << co_await Job(1);
+    //Task<MainQueue, RkSize> task = Job(90);
+
+    std::cout << co_await Job(50);
+    //std::cout << co_await task;
 
     std::cout << '[' << WorkerInfo::name << "] Done ! Requesting exit.\n";
     in_exit_signal.request_stop();

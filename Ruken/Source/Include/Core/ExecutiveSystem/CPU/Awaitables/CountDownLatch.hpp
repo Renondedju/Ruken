@@ -7,7 +7,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief Asynchronous countdown latch
  */
-class CountDownLatch: public ManualResetEvent
+class CountDownLatch: public CPUAwaitable<RkVoid>
 {
 	#pragma region Members
 
@@ -19,7 +19,7 @@ class CountDownLatch: public ManualResetEvent
 
 		#pragma region Constructors
 
-		using ManualResetEvent::ManualResetEvent;
+		using CPUAwaitable::CPUAwaitable;
 
 		/**
 		 * \brief Default constructor
@@ -29,7 +29,7 @@ class CountDownLatch: public ManualResetEvent
 
 		CountDownLatch(CountDownLatch const&) = delete;
 		CountDownLatch(CountDownLatch&&)      = delete;
-		~CountDownLatch()                     = default;
+		~CountDownLatch() override            = default;
 
 		#pragma endregion
 

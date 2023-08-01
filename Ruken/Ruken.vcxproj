@@ -144,13 +144,15 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Suspensions\CPUTaskSuspension.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaitableCallback.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUReturningAwaitableBase.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ConcurrencyCounter.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Promises\CPUPromise.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTaskPromise.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUQueueHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\ManualResetEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Suspensions\CPUSuspension.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Promises\CPUTaskPromise.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Worker.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\WorkerInfo.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\EventBridge.hpp" />
@@ -426,6 +428,7 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
+    <None Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.inl" />
     <None Include="Source\Src\Core\ExecutiveSystem\Promise.inl" />
     <None Include="Source\Src\Core\Kernel.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
@@ -460,7 +463,7 @@
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CPUSuspension.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.cpp" />
-    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.inl" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Worker.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
