@@ -1,12 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include <coroutine>
 
-#include "Types/FundamentalTypes.hpp"
-#include "Core/ExecutiveSystem/Suspension.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaitableCallback.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaiter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -25,34 +22,46 @@ BEGIN_RUKEN_NAMESPACE
  *
  * Any other values simply acts as a classic linked list node pointer.
  */
-struct CPUSuspension: Suspension<CentralProcessingUnit>
+struct CPUContinuation
 {
-    using Node = std::atomic<CPUSuspension*>;
+    using Node = std::atomic<CPUContinuation*>;
 
-    static constexpr CPUSuspension* locked   {reinterpret_cast<CPUSuspension*>(0x1)};
-    static constexpr CPUSuspension* consumed {reinterpret_cast<CPUSuspension*>(0x2)};
+    static constexpr CPUContinuation* locked   {reinterpret_cast<CPUContinuation*>(0x1)};
+    static constexpr CPUContinuation* consumed {reinterpret_cast<CPUContinuation*>(0x2)};
 
     #pragma region Members
 
-    Node& head;            ///< Reference to the head of the list
+    Node* hook {};         ///< Reference to the head of the list
     Node  next {nullptr}; ///< Next subscription in the list
 
-    CPUAwaitableCallback& completion_callback;
+    CPUAwaiter* owner {};
 
     #pragma region
+
+    #pragma region Lifetime
+
+    CPUContinuation() = default;
+    CPUContinuation(CPUContinuation const&) = delete;
+    CPUContinuation(CPUContinuation&&     ) = delete;
+    ~CPUContinuation()                      = default;
+
+    CPUContinuation& operator=(CPUContinuation const&) = delete;
+    CPUContinuation& operator=(CPUContinuation&&     ) = delete;
+
+    #pragma endregion
 
     #pragma region Methods
 
     /**
-     * \brief Checks if the wait has been completed already
+     * \brief Checks if the event we want to wait for has been completed already
      * \note This function can be called even if the awaited event has been deleted already
      * \return True if the awaiter has been completed, false otherwise
      */
     [[nodiscard]]
-	RkBool await_ready() const noexcept
+	RkBool IsEventCompleted() const noexcept
     {
         // Since we are not attached yet, we can use the head directly
-        return head.load(std::memory_order_acquire) == consumed;
+        return hook->load(std::memory_order_acquire) == consumed;
     }
 
     /**
@@ -60,14 +69,14 @@ struct CPUSuspension: Suspension<CentralProcessingUnit>
      * \return True if the suspension succeeded, false otherwise
      */
     [[nodiscard]]
-    RkBool await_suspend(std::coroutine_handle<>) noexcept
+    RkBool TryAttach() noexcept
     {
-        CPUSuspension* head_value {head.load(std::memory_order_acquire)};
+        CPUContinuation* head_value {hook->load(std::memory_order_acquire)};
 
         do
         {
             while (head_value == locked) // If the current value is locked we need to wait
-                head_value = head.load(std::memory_order_acquire);
+                head_value = hook->load(std::memory_order_acquire);
 
             // Checking if the event signaled a completion in the meanwhile
             if (head_value == consumed)
@@ -79,7 +88,7 @@ struct CPUSuspension: Suspension<CentralProcessingUnit>
         // Finally, if the head we originally fetched is still the actual head
         // (it could have been signaled, locked or swapped while we were testing stuff)
         // swapping the old list head with this awaiter as the new list head.
-        } while (!head.compare_exchange_weak(head_value, this,
+        } while (!hook->compare_exchange_weak(head_value, this,
             std::memory_order_release,
             std::memory_order_acquire));
 
@@ -87,44 +96,30 @@ struct CPUSuspension: Suspension<CentralProcessingUnit>
         return true;
     }
 
-    static constexpr void await_resume() noexcept {}
-
-    #pragma region
-};
-
-
-template <typename TReturnType = RkVoid>
-struct CPUReturningSuspension: CPUSuspension
-{
-    using Node = std::atomic<CPUSuspension*>;
-
-    TReturnType& return_value;
-
-    #pragma region Initialization/Copy
-
-    CPUReturningSuspension(Node& in_head, CPUAwaitableCallback& in_completion_callback, TReturnType& in_return_value) noexcept:
-        CPUSuspension {.head = in_head, .completion_callback = in_completion_callback},
-        return_value  {in_return_value}
-    {}
-
-    virtual ~CPUReturningSuspension() noexcept
+    /**
+     * \brief Detaches the continuation 
+     */
+    RkBool Detach()
     {
         // If the awaiter hasn't been completed in due time,
         // we need to detach it from the awaited event to cancel
         // our wait without crashing later down the line
         if (next.load(std::memory_order_acquire) == consumed)
-            return;
+            return false;
 
-        // Attempting to detach from the awaited event
-        Node*          selection {std::addressof(head)};
-        CPUSuspension* expected  {this};
+        // Attempting to detach from the awaited event by looking for our
+        // address though the list of suspensions
+        Node*            selection {hook};
+        CPUContinuation* expected  {this};
 
         // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
         while(!selection->compare_exchange_strong(expected, locked, std::memory_order_acq_rel, std::memory_order_acquire))
         {
             // Otherwise we need to check if the event hasn't been signaled in the meantime
-            if (expected == consumed)
-                return;
+            // or if we haven't found ourselves in the list for some reason
+            if (expected == consumed ||
+                expected == nullptr)
+                return false;
 
             // And if the selection isn't currently locked, then we can finally test the next awaiter in the list
             // otherwise we'll just retry until the lock has been released
@@ -137,32 +132,11 @@ struct CPUReturningSuspension: CPUSuspension
         // Lock acquired, we can now safely read the next pointer
         // and swap our lock with that, effectively releasing our lock
         selection->store(next.load(std::memory_order_acquire), std::memory_order_release);
+
+        return true;
     }
 
-    CPUReturningSuspension(CPUReturningSuspension const&) = delete;
-    CPUReturningSuspension(CPUReturningSuspension&&)      = delete;
-
-    CPUReturningSuspension& operator=(CPUReturningSuspension const&) = delete;
-    CPUReturningSuspension& operator=(CPUReturningSuspension&&)      = delete;
-
-    #pragma endregion
-
-    #pragma region Methods
-
-    /**
-     * \brief Called when the suspension is resumed.
-     * \returns The result of the suspension
-     */
-    TReturnType const& await_resume() const noexcept
-    {
-        return return_value;
-    }
-
-    #pragma endregion
+    #pragma region
 };
-
-template <>
-struct CPUReturningSuspension<RkVoid>: CPUSuspension
-{};
 
 END_RUKEN_NAMESPACE

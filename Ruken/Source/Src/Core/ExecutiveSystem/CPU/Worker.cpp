@@ -13,6 +13,9 @@ Worker::Worker(std::string in_name, std::vector<CentralProcessingQueue*>& in_que
 
 RkVoid Worker::ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queues, std::stop_token const& in_stop_token) noexcept
 {
+    // This obviously defeats the whole purpose of making queues but is only temporary
+    // and is meant to be customized for each projects based on the needs.
+    // TODO: Implement a way of customizing the process behavior without modifying this code
     for (CentralProcessingQueue* queue: in_queues)
         queue->PopAndRun(true, in_stop_token);
 }

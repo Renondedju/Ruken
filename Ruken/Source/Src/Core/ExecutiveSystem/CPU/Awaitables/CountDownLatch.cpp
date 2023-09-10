@@ -6,8 +6,18 @@ CountDownLatch::CountDownLatch(RkSize const in_initial_count) noexcept:
 	m_count {in_initial_count}
 {}
 
-RkVoid CountDownLatch::CountDown(RkSize const in_amount) noexcept
+RkVoid CountDownLatch::CountDown() noexcept
 {
-	if (m_count.fetch_sub(in_amount, std::memory_order_release) - in_amount == 0ULL)
+    if (m_count.fetch_sub(1, std::memory_order_release) - 1 == 0ULL)
 		SignalCompletion();
+}
+
+RkSize CountDownLatch::Value() const noexcept
+{
+    return m_count.load(std::memory_order_relaxed);
+}
+
+RkVoid CountDownLatch::OnContinuation() noexcept
+{
+    CountDown();
 }

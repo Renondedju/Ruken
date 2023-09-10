@@ -10,7 +10,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TProcessingUnit Queue type the awaitable lives in.
  * \tparam TReturnType The type of the returned value once an awaiter is completed.
  */
-template <ProcessingUnitType TProcessingUnit, typename TReturnType = RkVoid>
+template <ProcessingUnitType TProcessingUnit, typename TReturnType>
 struct Awaitable
 {
     using ProcessingUnit = TProcessingUnit;

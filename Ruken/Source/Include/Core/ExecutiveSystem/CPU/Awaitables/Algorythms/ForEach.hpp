@@ -5,7 +5,7 @@
 #include "Core/ExecutiveSystem/CPU/Awaitables/Algorythms/WhenAll.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-    struct ForEachSuspension final: CPUSuspension
+    struct ForEachSuspension final: CPUAutomaticContinuation
 {
     CountDownLatch& latch;
 
@@ -16,7 +16,7 @@ BEGIN_RUKEN_NAMESPACE
      * \param in_head  Head node, used for insertion
      * \param in_latch Latch to decrement on completion
      */
-    ForEachSuspension(Node& in_head, CountDownLatch& in_latch) noexcept: CPUSuspension {in_head}, latch {in_latch} {}
+    ForEachSuspension(Node& in_head, CountDownLatch& in_latch) noexcept: CPUAutomaticContinuation {in_head}, latch {in_latch} {}
     ForEachSuspension(ForEachSuspension const&) = delete;
 	ForEachSuspension(ForEachSuspension&&)      = delete;
     ~ForEachSuspension() override               = default;

@@ -11,10 +11,6 @@ class CentralProcessingQueue;
 
 /**
  * \brief Single thread of execution with its own internal routine
- *
- * Workers are automatically spawned and owned by a scheduler.
- * Each worker has a given affinity with the queues held by the scheduler (with a global priority)
- * Workers can also be configured with multiple modes, to automatically balance between latency and performance
  */
 class Worker
 {

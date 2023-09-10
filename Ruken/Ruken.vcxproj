@@ -143,21 +143,22 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Algorythms\WhenAll.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Suspensions\CPUTaskSuspension.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaitableCallback.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUContinuation.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaiter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUReturningAwaitableBase.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ConcurrencyCounter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTaskPromise.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUReturningContinuation.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUQueueHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\ManualResetEvent.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\Suspensions\CPUSuspension.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUCoroutineContinuation.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Worker.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\WorkerInfo.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\EventBridge.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\QueueHandle.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Suspension.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Awaiter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingUnitType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CentralProcessingUnit.hpp" />
@@ -461,7 +462,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
-    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CPUSuspension.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.inl" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Worker.cpp" />

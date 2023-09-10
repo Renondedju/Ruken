@@ -20,7 +20,7 @@ struct QueueHandle
 {
 	using ProcessingUnit = typename TQueue::ProcessingUnit;
 
-	static inline TQueue queue {};
+	static inline TQueue instance {};
 };
 
 END_RUKEN_NAMESPACE

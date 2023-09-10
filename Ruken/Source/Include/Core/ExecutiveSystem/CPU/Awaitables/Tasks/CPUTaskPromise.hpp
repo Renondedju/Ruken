@@ -3,6 +3,7 @@
 #include "Build/Namespace.hpp"
 #include "Core/ExecutiveSystem/Concepts/AwaitableType.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
+#include "Core/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -14,7 +15,9 @@ struct CPUTask;
  * \tparam TReturnValue Return type of the associated coroutine
  */
 template <QueueHandleType TQueueHandle, typename TReturnValue>
-class CPUTaskPromise final: public CPUAwaitable<TReturnValue>
+class CPUTaskPromise final:
+    public CPUAwaitable<TReturnValue>,
+    public CPUAwaiter
 {
     template <typename TOtherReturnType>
     friend class CPUPromise;
@@ -25,18 +28,22 @@ class CPUTaskPromise final: public CPUAwaitable<TReturnValue>
 
         [[nodiscard]]
         bool await_ready() const noexcept {
-            return promise.GetReferenceCount() > 0;
+            return promise.GetReferenceCount() == 0;
         }
 
         constexpr void await_suspend(std::coroutine_handle<>) const noexcept {}
         constexpr void await_resume() const noexcept {}
     };
 
-    RkVoid OnSuspensionCompletion() noexcept override
+    /**
+     * \brief Called by the awaited event upon completion
+     * This method simply pushes the coroutine back to the queue for execution.
+     */
+    RkVoid OnContinuation() noexcept override
     {
         // CPU Tasks are not processed in place and are instead pushed to a queue
         // to be picked up and processed by a worker later.
-        TQueueHandle::queue.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+        TQueueHandle::instance.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
     }
 
     public:
@@ -56,7 +63,7 @@ class CPUTaskPromise final: public CPUAwaitable<TReturnValue>
         {
             // CPU Tasks are not processed in place and are instead pushed to a queue
             // to be picked up and processed by a worker later.
-            TQueueHandle::queue.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+            TQueueHandle::instance.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
 
             return {*this};
         }
@@ -70,11 +77,18 @@ class CPUTaskPromise final: public CPUAwaitable<TReturnValue>
         template <AwaitableType TAwaitable>
         auto await_transform(TAwaitable&& in_awaitable) noexcept
         {
-            static_assert(std::is_same_v<typename TAwaitable::ProcessingUnit, CentralProcessingUnit>,
+            using AReturnType     = typename std::decay_t<TAwaitable>::ReturnType;
+            using AProcessingUnit = typename std::decay_t<TAwaitable>::ProcessingUnit;
+            static_assert(std::is_same_v<AProcessingUnit, CentralProcessingUnit>, 
                 "Awaiting events from other processing units is not yet supported");
 
             // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
-            return in_awaitable.GetSuspension(*this);
+            if constexpr(std::is_same_v<AReturnType, RkVoid>)
+                return CPUCoroutineContinuation<RkVoid> (in_awaitable.m_continuation_hook, *this);
+            else
+                return CPUCoroutineContinuation<AReturnType> (
+                    in_awaitable.m_result, in_awaitable.m_continuation_hook, *this
+                );
         }
 
         /**
@@ -105,16 +119,27 @@ class CPUTaskPromise final: public CPUAwaitable<TReturnValue>
  * \brief Implements the base common behavior for all CPU tasks
  */
 template <QueueHandleType TQueueHandle>
-class CPUTaskPromise<TQueueHandle, RkVoid> final: public CPUAwaitable<RkVoid>
+class CPUTaskPromise<TQueueHandle, RkVoid> final:
+    public CPUAwaitable<RkVoid>,
+    public CPUAwaiter
 {
-    RkVoid OnSuspensionCompletion() noexcept override
+    /**
+     * \brief Called by the awaited event upon completion
+     * This method simply pushes the coroutine back to the queue for execution.
+     */
+    RkVoid OnContinuation() noexcept override
     {
         // CPU Tasks are not processed in place and are instead pushed to a queue
         // to be picked up and processed by a worker later.
-        TQueueHandle::queue.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+        TQueueHandle::instance.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
     }
 
     public:
+
+        #pragma region Methods
+
+        /// ----- Coroutine methods -----
+        ///
 
         /**
          * \brief Constructs, queues up and returns a handle to the promise
@@ -124,7 +149,7 @@ class CPUTaskPromise<TQueueHandle, RkVoid> final: public CPUAwaitable<RkVoid>
         {
             // CPU Tasks are not processed in place and are instead pushed to a queue
             // to be picked up and processed by a worker later.
-            TQueueHandle::queue.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+            TQueueHandle::instance.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
 
             return {*this};
         }
@@ -137,14 +162,21 @@ class CPUTaskPromise<TQueueHandle, RkVoid> final: public CPUAwaitable<RkVoid>
          * \param in_awaitable Asynchronous event instance
          * \return Subscription instance
          */
-        template <AwaitableType TAwaitable>
+        template <typename TAwaitable>
         auto await_transform(TAwaitable&& in_awaitable) noexcept
         {
-            static_assert(std::is_same_v<typename std::decay_t<TAwaitable>::ProcessingUnit, CentralProcessingUnit>,
+            using AReturnType     = typename std::decay_t<TAwaitable>::ReturnType;
+            using AProcessingUnit = typename std::decay_t<TAwaitable>::ProcessingUnit;
+            static_assert(std::is_same_v<AProcessingUnit, CentralProcessingUnit>, 
                 "Awaiting events from other processing units is not yet supported");
 
             // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
-            return in_awaitable.GetSuspension(*this);
+            if constexpr(std::is_same_v<AReturnType, RkVoid>)
+                return CPUCoroutineContinuation<RkVoid> (in_awaitable.m_continuation_hook, *this);
+            else
+                return CPUCoroutineContinuation<AReturnType> (
+                    in_awaitable.m_result, in_awaitable.m_continuation_hook, *this
+                );
         }
 
         // A promise with a return type of void will return nothing
@@ -157,6 +189,8 @@ class CPUTaskPromise<TQueueHandle, RkVoid> final: public CPUAwaitable<RkVoid>
         std::suspend_never  final_suspend  () noexcept { this->SignalCompletion(); return {}; }
 
         void unhandled_exception() noexcept { std::terminate(); }
+
+        #pragma endregion
 };
 
 END_RUKEN_NAMESPACE

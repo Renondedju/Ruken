@@ -6,9 +6,8 @@
 
 #include "Core/ExecutiveSystem/Awaitable.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/Suspensions/CPUSuspension.hpp"
+#include "Core/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUReturningAwaitableBase.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaitableCallback.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -21,20 +20,20 @@ class CPUAwaitableHandle;
 template <typename TReturnType>
 class RUKEN_EMPTY_BASES CPUAwaitable:
     protected CPUReturningAwaitableBase,
-    public    Awaitable<CentralProcessingUnit>,
-    public    CPUAwaitableCallback
+    public    Awaitable<CentralProcessingUnit, TReturnType>
 {
     friend CPUAwaitableHandle<TReturnType>;
-    using SuspensionNodeType = CPUSuspension::Node;
-
+    using ContinuationHookType = CPUContinuation::Node;
+    public:
     #pragma region Members
 
-    SuspensionNodeType  m_suspension_node {nullptr};
-    std::atomic<RkSize> m_references      {0ULL};
+    ContinuationHookType  m_continuation_hook {nullptr};
+    std::atomic<RkSize>   m_references        {0ULL};
 
     #pragma endregion
 
     protected:
+    public:
 
         #pragma region Members
 
@@ -55,8 +54,6 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
         #pragma endregion
 
     public:
-
-        using ProcessingUnit = CentralProcessingUnit;
 
         #pragma region Lifetime
 
@@ -101,15 +98,14 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 template <>
 class RUKEN_EMPTY_BASES CPUAwaitable<RkVoid>:
     protected CPUReturningAwaitableBase,
-    public    Awaitable<CentralProcessingUnit>,
-    public    CPUAwaitableCallback
+    public    Awaitable<CentralProcessingUnit, RkVoid>
 {
     friend CPUAwaitableHandle<RkVoid>;
-    using SuspensionNodeType = CPUSuspension::Node;
-
+    using ContinuationHookType = CPUContinuation::Node;
+    public:
     #pragma region Members
 
-    SuspensionNodeType m_suspension_node {nullptr};
+    ContinuationHookType m_continuation_hook {nullptr};
 
     #pragma endregion
 
@@ -133,8 +129,6 @@ class RUKEN_EMPTY_BASES CPUAwaitable<RkVoid>:
         #pragma endregion
 
     public:
-
-        using ProcessingUnit = CentralProcessingUnit;
 
         #pragma region Lifetime
 
@@ -169,27 +163,27 @@ RkSize CPUAwaitable<TReturnType>::GetReferenceCount() const noexcept
 template <typename TReturnType>
 RkVoid CPUAwaitable<TReturnType>::SignalCompletion() noexcept
 {
-    CPUSuspension::Node* selection {std::addressof(m_suspension_node)};
-    CPUSuspension*       value;
+    CPUContinuation::Node* selection {std::addressof(m_continuation_hook)};
+    CPUContinuation*       value;
 
     while(true)
     {
         do
         {
             value = nullptr; // Checking if we have awaiters to signal
-            if (selection->compare_exchange_strong(value, CPUSuspension::consumed, std::memory_order_release, std::memory_order_acquire))
+            if (selection->compare_exchange_strong(value, CPUContinuation::consumed, std::memory_order_release, std::memory_order_acquire))
                 return; 
 
         // And waiting for any lock in the process
-        } while(value == CPUSuspension::locked);
+        } while(value == CPUContinuation::locked);
 
         // If the value of status is still the same as before our last comparison
         // then we can exchange the pointer for a completion pointer and notify the awaiter 
-        if (selection->compare_exchange_weak(value, CPUSuspension::consumed, std::memory_order_release, std::memory_order_acquire))
+        if (selection->compare_exchange_weak(value, CPUContinuation::consumed, std::memory_order_release, std::memory_order_acquire))
         {
             // Fetching the next awaiter before notifying the dependent event in case it gets destroyed as a side effect
-            CPUSuspension::Node* next = &value->next;
-            value->completion_callback();
+            CPUContinuation::Node* next = &value->next;
+            value->owner->OnContinuation();
 
             selection = next;
         }
@@ -199,38 +193,38 @@ RkVoid CPUAwaitable<TReturnType>::SignalCompletion() noexcept
 template <typename TReturnType>
 RkVoid CPUAwaitable<TReturnType>::Reset() noexcept
 {
-    m_suspension_node.store(nullptr, std::memory_order_release);
+    m_continuation_hook.store(nullptr, std::memory_order_release);
 }
 
 template <typename TReturnType>
 RkBool CPUAwaitable<TReturnType>::Completed() const noexcept
 {
-    return m_suspension_node.load(std::memory_order_acquire) == CPUSuspension::consumed;
+    return m_continuation_hook.load(std::memory_order_acquire) == CPUContinuation::consumed;
 }
 
 inline RkVoid CPUAwaitable<RkVoid>::SignalCompletion() noexcept
 {
-    CPUSuspension::Node* selection {std::addressof(m_suspension_node)};
-    CPUSuspension*       value;
+    CPUContinuation::Node* selection {std::addressof(m_continuation_hook)};
+    CPUContinuation*       value;
 
     while(true)
     {
         do
         {
             value = nullptr; // Checking if we have awaiters to signal
-            if (selection->compare_exchange_strong(value, CPUSuspension::consumed, std::memory_order_release, std::memory_order_acquire))
+            if (selection->compare_exchange_strong(value, CPUContinuation::consumed, std::memory_order_release, std::memory_order_acquire))
                 return; 
 
         // And waiting for any lock in the process
-        } while(value == CPUSuspension::locked);
+        } while(value == CPUContinuation::locked);
 
         // If the value of status is still the same as before our last comparison
         // then we can exchange the pointer for a completion pointer and notify the awaiter 
-        if (selection->compare_exchange_weak(value, CPUSuspension::consumed, std::memory_order_release, std::memory_order_acquire))
+        if (selection->compare_exchange_weak(value, CPUContinuation::consumed, std::memory_order_release, std::memory_order_acquire))
         {
             // Fetching the next awaiter before notifying the dependent event in case it gets destroyed as a side effect
-            CPUSuspension::Node* next = &value->next;
-            value->completion_callback();
+            CPUContinuation::Node* next = &value->next;
+            value->owner->OnContinuation();
 
             selection = next;
         }
@@ -239,12 +233,12 @@ inline RkVoid CPUAwaitable<RkVoid>::SignalCompletion() noexcept
 
 inline RkVoid CPUAwaitable<RkVoid>::Reset() noexcept
 {
-    m_suspension_node.store(nullptr, std::memory_order_release);
+    m_continuation_hook.store(nullptr, std::memory_order_release);
 }
 
 inline RkBool CPUAwaitable<RkVoid>::Completed() const noexcept
 {
-    return m_suspension_node.load(std::memory_order_acquire) == CPUSuspension::consumed;
+    return m_continuation_hook.load(std::memory_order_acquire) == CPUContinuation::consumed;
 }
 
 

@@ -6,13 +6,13 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief An object that waits for the completion of an awaitable.
- * Subscriptions are responsible for implementing the actual waiting algorithm.
+ * Awaiters are responsible for implementing the actual waiting algorithm.
  * This synchronization between tasks and events should not be mixed up with the content of events themselves.
  *
  * \tparam TProcessingUnit Processing unit the subscription is operating on
  */
 template <ProcessingUnitType TProcessingUnit>
-class Suspension
+class Awaiter
 {
     using ProcessingUnit = TProcessingUnit;
 };

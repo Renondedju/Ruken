@@ -6,9 +6,11 @@ USING_RUKEN_NAMESPACE
 
 CentralProcessingUnit::CentralProcessingUnit() noexcept
 {
-    m_workers.reserve(std::thread::hardware_concurrency() - 1);
+    RkSize const concurrency {std::thread::hardware_concurrency() - 1};
 
-	for (RkSize index = 0ULL; index < std::thread::hardware_concurrency() - 1; ++index)
+    m_workers.reserve(concurrency);
+
+	for (RkSize index = 0ULL; index < concurrency; ++index)
         m_workers.emplace_back(std::make_unique<Worker>("CPU " + std::to_string(index), m_queues));
 
 	WorkerInfo::name = std::string("CPU Main");

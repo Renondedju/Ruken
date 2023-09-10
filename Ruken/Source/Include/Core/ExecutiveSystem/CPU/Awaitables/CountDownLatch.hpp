@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Core/ExecutiveSystem/CPU/Awaitables/ManualResetEvent.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaiter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Asynchronous countdown latch
  */
-class CountDownLatch: public CPUAwaitable<RkVoid>
+class CountDownLatch: public CPUAwaiter,
+                      public CPUAwaitable<RkVoid>
 {
 	#pragma region Members
 
@@ -20,6 +22,7 @@ class CountDownLatch: public CPUAwaitable<RkVoid>
 		#pragma region Constructors
 
 		using CPUAwaitable::CPUAwaitable;
+	    using ProcessingUnit = CentralProcessingUnit;
 
 		/**
 		 * \brief Default constructor
@@ -35,15 +38,23 @@ class CountDownLatch: public CPUAwaitable<RkVoid>
 
 		#pragma region Methods
 
+        /**
+         * \brief Decrements the internal counter by one.
+         *		  When the counter reaches 0, the completion of the latch is signaled.
+         *		  Calling this function when the internal counter is already 0 will cause an underflow.
+         */
+        RkVoid CountDown() noexcept;
+
+        /**
+         * \brief Returns the current value of the internal counter.
+         * \warning Synchronization cannot be achieved with this function.
+         */
+        RkSize Value() const noexcept;
+
 	    /**
-		 * \brief Decrements the counter in a non-blocking manner
-		 * Atomically decrements the internal counter by n without blocking the caller.
-		 * If in_amount is greater than the value of the internal counter or is negative, the behavior is undefined.
-		 * Completion is signaled when the counter reaches 0.
-		 * 
-		 * \param in_amount The value by which the internal counter is decreased
-		 */
-		RkVoid CountDown(RkSize in_amount = 1ULL) noexcept;
+         * \brief Called when an awaited event has been completed and counts down.
+         */
+		RkVoid OnContinuation() noexcept override;
 
 		#pragma endregion
 

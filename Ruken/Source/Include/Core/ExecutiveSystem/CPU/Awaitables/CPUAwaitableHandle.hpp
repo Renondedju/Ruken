@@ -18,6 +18,7 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TReturnType>
 class CPUAwaitableHandle
 {
+    public:
     CPUAwaitable<TReturnType>& m_handle;
 
     public:
@@ -31,48 +32,6 @@ class CPUAwaitableHandle
 
         CPUAwaitableHandle& operator=(CPUAwaitableHandle const&) = delete;
         CPUAwaitableHandle& operator=(CPUAwaitableHandle&&)      = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief Returns a suspension awaiting for the completion of this awaitable.
-         * \param in_completion_callback The suspension completion callback of the awaiter.
-         */
-        [[nodiscard]]
-        CPUReturningSuspension<TReturnType> GetSuspension(CPUAwaitableCallback& in_completion_callback) noexcept;
-
-        #pragma endregion
-};
-
-template <>
-class CPUAwaitableHandle<RkVoid>
-{
-    CPUAwaitable<RkVoid>& m_handle;
-
-    public:
-
-        #pragma region Lifetime
-
-        explicit CPUAwaitableHandle(CPUAwaitable<RkVoid>& in_handle) noexcept;
-        CPUAwaitableHandle (CPUAwaitableHandle const&)  = default;
-        CPUAwaitableHandle (CPUAwaitableHandle&&)       = default;
-        ~CPUAwaitableHandle()                           = default;
-
-        CPUAwaitableHandle& operator=(CPUAwaitableHandle const&) = delete;
-        CPUAwaitableHandle& operator=(CPUAwaitableHandle&&)      = delete;
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief Returns a suspension awaiting for the completion of this awaitable.
-         * \param in_completion_callback The suspension completion callback of the awaiter.
-         */
-        [[nodiscard]]
-        CPUSuspension GetSuspension(CPUAwaitableCallback& in_completion_callback) const noexcept;
 
         #pragma endregion
 };
