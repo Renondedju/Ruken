@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
-
 BEGIN_RUKEN_NAMESPACE
+
+template <typename TReturnType>
+class CPUAwaitable;
+struct CPUContinuation;
 
 /**
  * \brief Some CPU Awaitables can hold results, preventing them from cleaning up
@@ -18,20 +20,59 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TReturnType>
 class CPUAwaitableHandle
 {
-    public:
-    CPUAwaitable<TReturnType>& m_handle;
+    friend CPUContinuation;
+
+    CPUAwaitable<TReturnType>* m_instance;
 
     public:
 
         #pragma region Lifetime
 
-        explicit CPUAwaitableHandle(CPUAwaitable<TReturnType>& in_handle) noexcept;
+        explicit CPUAwaitableHandle(nullptr_t)                               noexcept;
+        explicit CPUAwaitableHandle(CPUAwaitable<TReturnType>& in_awaitable) noexcept;
+
         CPUAwaitableHandle (CPUAwaitableHandle const&) noexcept;
         CPUAwaitableHandle (CPUAwaitableHandle&&)      noexcept;
-        ~CPUAwaitableHandle() noexcept;
+        ~CPUAwaitableHandle()                          noexcept;
 
-        CPUAwaitableHandle& operator=(CPUAwaitableHandle const&) = delete;
-        CPUAwaitableHandle& operator=(CPUAwaitableHandle&&)      = delete;
+        CPUAwaitableHandle& operator=(CPUAwaitableHandle const&) noexcept;
+        CPUAwaitableHandle& operator=(CPUAwaitableHandle&&)      noexcept;
+
+        #pragma endregion
+
+        #pragma region Methods
+
+        /**
+         * \brief Returns the result of the awaitable.
+         * \warning Do note that this result is valid only if the awaitable has been completed.
+         * \return Const reference to the result value
+         */
+        [[nodiscard]]
+        TReturnType const& GetResult() const noexcept;
+
+        #pragma endregion
+};
+
+template <>
+class CPUAwaitableHandle<RkVoid>
+{
+    friend CPUContinuation;
+
+    CPUAwaitable<RkVoid>* m_instance;
+
+    public:
+
+        #pragma region Lifetime
+
+        explicit CPUAwaitableHandle(nullptr_t)                          noexcept;
+        explicit CPUAwaitableHandle(CPUAwaitable<RkVoid>& in_awaitable) noexcept;
+
+        CPUAwaitableHandle (CPUAwaitableHandle const&) = default;
+        CPUAwaitableHandle (CPUAwaitableHandle&&)      = default;
+        ~CPUAwaitableHandle()                          = default;
+
+        CPUAwaitableHandle& operator=(CPUAwaitableHandle const&) = default;
+        CPUAwaitableHandle& operator=(CPUAwaitableHandle&&)      = default;
 
         #pragma endregion
 };

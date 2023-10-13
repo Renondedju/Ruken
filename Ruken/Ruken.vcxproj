@@ -22,6 +22,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -143,10 +144,11 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Algorythms\WhenAll.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\ConditionalSuspension.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaitableResult.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUContinuation.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaiter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUReturningAwaitableBase.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ConcurrencyCounter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTaskPromise.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUReturningContinuation.hpp" />
@@ -464,6 +466,7 @@
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.inl" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Continuations\CPUContinuation.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Worker.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />

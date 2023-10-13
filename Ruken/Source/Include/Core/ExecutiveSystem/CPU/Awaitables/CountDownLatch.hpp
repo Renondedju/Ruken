@@ -19,10 +19,9 @@ class CountDownLatch: public CPUAwaiter,
 
 	public:
 
-		#pragma region Constructors
+		using ProcessingUnit = CentralProcessingUnit;
 
-		using CPUAwaitable::CPUAwaitable;
-	    using ProcessingUnit = CentralProcessingUnit;
+		#pragma region Lifetime
 
 		/**
 		 * \brief Default constructor
@@ -33,10 +32,16 @@ class CountDownLatch: public CPUAwaiter,
 		CountDownLatch(CountDownLatch const&) = delete;
 		CountDownLatch(CountDownLatch&&)      = delete;
 		~CountDownLatch() override            = default;
+	
+		CountDownLatch& operator=(CountDownLatch const&) = delete;
+		CountDownLatch& operator=(CountDownLatch&&)      = delete;
 
 		#pragma endregion
 
 		#pragma region Methods
+
+		RkVoid Deallocate() override
+	    {}
 
         /**
          * \brief Decrements the internal counter by one.
@@ -55,13 +60,6 @@ class CountDownLatch: public CPUAwaiter,
          * \brief Called when an awaited event has been completed and counts down.
          */
 		RkVoid OnContinuation() noexcept override;
-
-		#pragma endregion
-
-		#pragma region Operators
-
-		CountDownLatch& operator=(CountDownLatch const&) = delete;
-		CountDownLatch& operator=(CountDownLatch&&)      = delete;
 
 		#pragma endregion
 };

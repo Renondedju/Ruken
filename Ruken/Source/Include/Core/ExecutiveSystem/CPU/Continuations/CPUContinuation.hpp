@@ -2,8 +2,8 @@
 
 #include <atomic>
 
-#include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaiter.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -40,7 +40,7 @@ struct CPUContinuation
 
     #pragma region Lifetime
 
-    CPUContinuation() = default;
+    CPUContinuation()                       = default;
     CPUContinuation(CPUContinuation const&) = delete;
     CPUContinuation(CPUContinuation&&     ) = delete;
     ~CPUContinuation()                      = default;
@@ -52,89 +52,32 @@ struct CPUContinuation
 
     #pragma region Methods
 
+    template <typename TReturnType>
+    RkVoid Setup(CPUAwaiter& in_owner, CPUAwaitableHandle<TReturnType> const& in_awaited) noexcept
+    {
+        hook  = std::addressof(in_awaited.m_instance->m_continuation_hook);
+        owner = std::addressof(in_owner);
+    }
+
     /**
      * \brief Checks if the event we want to wait for has been completed already
      * \note This function can be called even if the awaited event has been deleted already
      * \return True if the awaiter has been completed, false otherwise
      */
     [[nodiscard]]
-	RkBool IsEventCompleted() const noexcept
-    {
-        // Since we are not attached yet, we can use the head directly
-        return hook->load(std::memory_order_acquire) == consumed;
-    }
+	RkBool IsEventCompleted() const noexcept;
 
     /**
      * \brief Attempts a suspension by attaching the awaiter to the awaited event
      * \return True if the suspension succeeded, false otherwise
      */
     [[nodiscard]]
-    RkBool TryAttach() noexcept
-    {
-        CPUContinuation* head_value {hook->load(std::memory_order_acquire)};
-
-        do
-        {
-            while (head_value == locked) // If the current value is locked we need to wait
-                head_value = hook->load(std::memory_order_acquire);
-
-            // Checking if the event signaled a completion in the meanwhile
-            if (head_value == consumed)
-                return false; // Operation failed
-
-            // Update linked list to point at the current head
-            next.store(head_value, std::memory_order_release);
-
-        // Finally, if the head we originally fetched is still the actual head
-        // (it could have been signaled, locked or swapped while we were testing stuff)
-        // swapping the old list head with this awaiter as the new list head.
-        } while (!hook->compare_exchange_weak(head_value, this,
-            std::memory_order_release,
-            std::memory_order_acquire));
-
-        // Operation succeeded
-        return true;
-    }
+    RkBool TryAttach() noexcept;
 
     /**
      * \brief Detaches the continuation 
      */
-    RkBool Detach()
-    {
-        // If the awaiter hasn't been completed in due time,
-        // we need to detach it from the awaited event to cancel
-        // our wait without crashing later down the line
-        if (next.load(std::memory_order_acquire) == consumed)
-            return false;
-
-        // Attempting to detach from the awaited event by looking for our
-        // address though the list of suspensions
-        Node*            selection {hook};
-        CPUContinuation* expected  {this};
-
-        // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
-        while(!selection->compare_exchange_strong(expected, locked, std::memory_order_acq_rel, std::memory_order_acquire))
-        {
-            // Otherwise we need to check if the event hasn't been signaled in the meantime
-            // or if we haven't found ourselves in the list for some reason
-            if (expected == consumed ||
-                expected == nullptr)
-                return false;
-
-            // And if the selection isn't currently locked, then we can finally test the next awaiter in the list
-            // otherwise we'll just retry until the lock has been released
-            if (expected != locked)
-                selection = &expected->next;
-
-            expected = this;
-        }
-
-        // Lock acquired, we can now safely read the next pointer
-        // and swap our lock with that, effectively releasing our lock
-        selection->store(next.load(std::memory_order_acquire), std::memory_order_release);
-
-        return true;
-    }
+    RkBool Detach();
 
     #pragma region
 };

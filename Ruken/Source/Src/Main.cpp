@@ -16,15 +16,14 @@ struct MainQueue final: CPUQueueHandle<MainQueue, 4096> {};
  * \param in_identifier Identifier of the job
  * \return Handle to the task instance
  */
-Task<MainQueue> Job(RkSize const in_identifier)
+Task<MainQueue, RkSize> Job(RkSize const in_identifier)
 {
     ConcurrencyCounter const counter = MainQueue::instance.GetConcurrencyCounter();
-
-    std::cout << "[" + WorkerInfo::name + "] Running job " + std::to_string(in_identifier) + 
-                 + " - Concurrency [" + std::to_string(counter.current_concurrency) + "/"
-                                      + std::to_string(counter.optimal_concurrency) + "]\n";
-
-    co_return;
+    //
+    //std::cout << std::format("[{}] Running job {} - Concurrency [{}/{}]\n", 
+    //    WorkerInfo::name, in_identifier, counter.current_concurrency, counter.optimal_concurrency);
+    
+    co_return 0;
 }
 
 /**
@@ -35,26 +34,33 @@ Task<MainQueue> Job(RkSize const in_identifier)
  */
 Task<MainQueue> RunJobs(std::stop_source& in_exit_signal, RkSize const in_size)
 {
-    CountDownLatch               latch         {in_size};
-    std::vector<CPUContinuation> continuations {in_size};
-
-    for (RkSize index = 0; index < in_size; ++index)
+    RUKEN_LOOPED_BENCHMARK("Run & Await", 50)
     {
-        // Instantiating the job and adding a continuation callback via our hook
-        // TODO: make a proper interface for hooking continuations to an event
-        // make the task consumable by the continuation ?
-        continuations[index].hook  = &Job(index).m_handle.m_continuation_hook;
-        continuations[index].owner = &latch;
+        CountDownLatch               latch         {in_size};
+        std::vector<CPUContinuation> continuations {in_size};
 
-        // If the attachment process failed, that means the event we were looking to await
-        // has already been completed. Thus we need to decrement manually the latch by one
-        if (!continuations[index].TryAttach())
-            latch.CountDown(); 
+        for (RkSize index = 0; index < in_size; ++index)
+        {
+            // Creating a job and keeping a reference onto it until the attachment
+            // process has been done to avoid it being deleted in the meanwhile.
+            auto job = Job(index);
+
+            // Instantiating the job and setup the continuation callback
+            continuations[index].Setup(latch, job);
+
+            // Trying to attach the continuation and if the process failed, that means the event we
+            // were looking to await has already been completed. Thus we need to decrement manually the latch by one.
+            if (!continuations[index].TryAttach())
+                latch.CountDown();
+        }
+
+        co_await latch;
+
+        std::cout << std::format("Ran batch {}/{}\n", benchmark_iterator.loop_index + 1, benchmark_iterator.loop_count);
     }
 
-    co_await latch;
+    std::cout << std::format("[{}] Done ! Requesting exit.\n", WorkerInfo::name);
 
-    std::cout << '[' + WorkerInfo::name + "] Done ! Requesting exit.\n";
     in_exit_signal.request_stop();
 }
 
@@ -73,7 +79,7 @@ int main()
         // To avoid this issue, a stop source is passed to the async function that will signal it upon completion.
         std::stop_source stop_signal;
 
-        RunJobs(stop_signal, 10000); // < asynchronous call, does not block the thread
+        RunJobs(stop_signal, 100000); // < asynchronous call, does not block the thread
 
         // Finally we can actually wait for the signal by making this thread
         // available to the CPU until a stop is requested

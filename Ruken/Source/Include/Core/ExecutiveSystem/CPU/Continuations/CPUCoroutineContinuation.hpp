@@ -16,16 +16,11 @@ struct CPUCoroutineContinuation: CPUReturningContinuation<TReturnType>
 
     /**
      * \brief Default constructor
-     * \param in_return_value Reference to the return value
-     * \param in_hook Continuation hook of the CPUAwaitable
-     * \param in_coroutine Coroutine instance
+     * \param in_coroutine Owning coroutine instance
+     * \param in_awaited Reference to the awaited event
      */
-    CPUCoroutineContinuation(TReturnType& in_return_value, Node& in_hook, CPUAwaiter& in_coroutine) noexcept:
-        CPUReturningContinuation<TReturnType>::return_value {in_return_value}
-    {
-        CPUReturningContinuation<TReturnType>::hook  = std::addressof(in_hook);
-        CPUReturningContinuation<TReturnType>::owner = std::addressof(in_coroutine);
-    }
+    CPUCoroutineContinuation(CPUAwaiter& in_coroutine, CPUAwaitableHandle<TReturnType>&& in_awaited) noexcept
+    { CPUReturningContinuation<TReturnType>::Setup(in_coroutine, std::forward<CPUAwaitableHandle<RkVoid>>(in_awaited)); }
 
     CPUCoroutineContinuation(CPUCoroutineContinuation const&) = delete;
     CPUCoroutineContinuation(CPUCoroutineContinuation&&     ) = delete;
@@ -60,7 +55,7 @@ struct CPUCoroutineContinuation: CPUReturningContinuation<TReturnType>
      * \brief Returns the result of the wait
      */
     TReturnType const& await_resume() const noexcept
-    { return CPUReturningContinuation<TReturnType>::return_value; }
+    { return CPUReturningContinuation<TReturnType>::GetReturnValue(); }
 
     #pragma region
 };
@@ -72,14 +67,11 @@ struct CPUCoroutineContinuation<RkVoid>: CPUContinuation
 
     /**
      * \brief Default constructor
-     * \param in_hook Continuation hook of the CPUAwaitable
-     * \param in_coroutine Coroutine instance
+     * \param in_coroutine Owning coroutine instance
+     * \param in_awaited Handle to the awaited event
      */
-    CPUCoroutineContinuation(Node& in_hook, CPUAwaiter& in_coroutine) noexcept
-    {
-        hook  = std::addressof(in_hook);
-        owner = std::addressof(in_coroutine);
-    }
+    CPUCoroutineContinuation(CPUAwaiter& in_coroutine, CPUAwaitableHandle<RkVoid>&& in_awaited) noexcept
+    { Setup(in_coroutine, std::forward<CPUAwaitableHandle<RkVoid>>(in_awaited)); }
 
     CPUCoroutineContinuation(CPUCoroutineContinuation const&) = delete;
     CPUCoroutineContinuation(CPUCoroutineContinuation&&     ) = delete;
@@ -113,7 +105,7 @@ struct CPUCoroutineContinuation<RkVoid>: CPUContinuation
     /**
      * \brief Returns the result of the wait
      */
-    static constexpr RkVoid await_resume() noexcept { }
+    constexpr RkVoid await_resume() noexcept { }
 
     #pragma region
 };
