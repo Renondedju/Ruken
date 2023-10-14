@@ -39,7 +39,7 @@ class CPUTaskPromise final:
      */
     RkVoid Deallocate() override
     {
-        //std::coroutine_handle<CPUTaskPromise>::from_promise(*this).destroy();
+        std::coroutine_handle<CPUTaskPromise>::from_promise(*this).destroy();
     }
 
     public:
@@ -109,14 +109,18 @@ class CPUTaskPromise final:
         auto initial_suspend() noexcept { return std::suspend_always {}; }
         auto final_suspend  () noexcept
         {
-            RkBool is_orphaned = false;
+            struct Awaiter: std::suspend_always
+            {
+                CPUTaskPromise& self;
 
-            this->SignalCompletion ();
-            this->DecrementReferenceCount(false, is_orphaned);
-
-            return ConditionalSuspension {
-                .condition = is_orphaned
+                void await_suspend(std::coroutine_handle<>) const noexcept
+                {
+                    self.SignalCompletion       ();
+                    self.DecrementReferenceCount();
+                }
             };
+
+            return Awaiter {{}, {*this}};
         }
 
         void unhandled_exception() noexcept { std::terminate(); }

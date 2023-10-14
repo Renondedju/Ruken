@@ -2,14 +2,6 @@
 
 #pragma region Lifetime
 
-inline CPUAwaitableHandle<RkVoid>::CPUAwaitableHandle(nullptr_t) noexcept:
-    m_instance {nullptr}
-{}
-
-inline CPUAwaitableHandle<RkVoid>::CPUAwaitableHandle(CPUAwaitable<RkVoid>& in_awaitable) noexcept:
-    m_instance {std::addressof(in_awaitable)}
-{}
-
 template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(nullptr_t) noexcept:
     m_instance {nullptr}
@@ -58,14 +50,15 @@ CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUA
 
 template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>::~CPUAwaitableHandle() noexcept
-{ RkBool orphaned; m_instance->DecrementReferenceCount(true, orphaned); }
+{ m_instance->DecrementReferenceCount(); }
 
 #pragma endregion
 
 #pragma region Methods
 
 template <typename TReturnType>
-TReturnType const& CPUAwaitableHandle<TReturnType>::GetResult() const noexcept
+template <typename>
+typename CPUAwaitableHandle<TReturnType>::Return CPUAwaitableHandle<TReturnType>::GetResult() const noexcept
 {
     return m_instance->GetResult();
 }

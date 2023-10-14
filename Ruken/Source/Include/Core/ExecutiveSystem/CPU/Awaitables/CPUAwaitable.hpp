@@ -69,9 +69,9 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 
         #pragma region Methods
 
-        RkVoid DecrementReferenceCount(RkBool const in_deallocate, RkBool& out_is_orphaned) noexcept
+        RkVoid DecrementReferenceCount() noexcept
         {
-            if (((out_is_orphaned = m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)) && in_deallocate)
+            if (m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)
                 Deallocate();
         }
 

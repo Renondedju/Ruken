@@ -16,14 +16,14 @@ struct MainQueue final: CPUQueueHandle<MainQueue, 4096> {};
  * \param in_identifier Identifier of the job
  * \return Handle to the task instance
  */
-Task<MainQueue, RkSize> Job(RkSize const in_identifier)
+Task<MainQueue> Job(RkSize const in_identifier)
 {
-    ConcurrencyCounter const counter = MainQueue::instance.GetConcurrencyCounter();
+    // ConcurrencyCounter const counter = MainQueue::instance.GetConcurrencyCounter();
     //
     //std::cout << std::format("[{}] Running job {} - Concurrency [{}/{}]\n", 
     //    WorkerInfo::name, in_identifier, counter.current_concurrency, counter.optimal_concurrency);
     
-    co_return 0;
+    co_return;
 }
 
 /**
@@ -56,7 +56,7 @@ Task<MainQueue> RunJobs(std::stop_source& in_exit_signal, RkSize const in_size)
 
         co_await latch;
 
-        std::cout << std::format("Ran batch {}/{}\n", benchmark_iterator.loop_index + 1, benchmark_iterator.loop_count);
+        //std::cout << std::format("Ran batch {}/{}\n", benchmark_iterator.loop_index + 1, benchmark_iterator.loop_count);
     }
 
     std::cout << std::format("[{}] Done ! Requesting exit.\n", WorkerInfo::name);

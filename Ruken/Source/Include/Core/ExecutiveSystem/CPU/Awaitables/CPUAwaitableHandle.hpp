@@ -42,37 +42,15 @@ class CPUAwaitableHandle
 
         #pragma region Methods
 
+        using Return = std::conditional_t<std::is_same_v<TReturnType, RkVoid>, RkInt, TReturnType> const&;
+
         /**
          * \brief Returns the result of the awaitable.
          * \warning Do note that this result is valid only if the awaitable has been completed.
          * \return Const reference to the result value
          */
-        [[nodiscard]]
-        TReturnType const& GetResult() const noexcept;
-
-        #pragma endregion
-};
-
-template <>
-class CPUAwaitableHandle<RkVoid>
-{
-    friend CPUContinuation;
-
-    CPUAwaitable<RkVoid>* m_instance;
-
-    public:
-
-        #pragma region Lifetime
-
-        explicit CPUAwaitableHandle(nullptr_t)                          noexcept;
-        explicit CPUAwaitableHandle(CPUAwaitable<RkVoid>& in_awaitable) noexcept;
-
-        CPUAwaitableHandle (CPUAwaitableHandle const&) = default;
-        CPUAwaitableHandle (CPUAwaitableHandle&&)      = default;
-        ~CPUAwaitableHandle()                          = default;
-
-        CPUAwaitableHandle& operator=(CPUAwaitableHandle const&) = default;
-        CPUAwaitableHandle& operator=(CPUAwaitableHandle&&)      = default;
+        template <typename = std::enable_if_t<!std::is_same_v<TReturnType, RkVoid>>>
+        [[nodiscard]] Return GetResult() const noexcept;
 
         #pragma endregion
 };
