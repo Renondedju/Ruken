@@ -9,11 +9,11 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueueHandle, typename TReturnType = RkVoid>
-struct CPUTask final: Awaitable<CentralProcessingUnit, TReturnType>, CPUAwaitableHandle<TReturnType>,
-                      std::coroutine_handle<CPUTaskPromise<TQueueHandle, TReturnType>>
+template <QueueHandleType TQueueHandle, typename TResult = RkVoid>
+struct CPUTask final: Awaitable<CentralProcessingUnit, TResult>, CPUAwaitableHandle<TResult>,
+                      std::coroutine_handle<CPUTaskPromise<TQueueHandle, TResult>>
 {
-    using promise_type   = CPUTaskPromise<TQueueHandle, TReturnType>;
+    using promise_type   = CPUTaskPromise<TQueueHandle, TResult>;
     using ProcessingUnit = typename TQueueHandle::ProcessingUnit;
 
     #pragma region Lifetime
@@ -23,7 +23,7 @@ struct CPUTask final: Awaitable<CentralProcessingUnit, TReturnType>, CPUAwaitabl
      * \param in_promise Promise instance
      */
     CPUTask(promise_type& in_promise) noexcept:
-        CPUAwaitableHandle<TReturnType>     {in_promise},
+        CPUAwaitableHandle<TResult>         {in_promise},
         std::coroutine_handle<promise_type> {std::coroutine_handle<promise_type>::from_promise(in_promise)}
     {}
 

@@ -111,7 +111,7 @@ RkVoid CPUAwaitable<TReturnType>::SignalCompletion() noexcept
         {
             // Fetching the next awaiter before notifying the dependent event in case it gets destroyed as a side effect
             CPUContinuation::Node* next = &value->next;
-            value->owner->OnContinuation();
+            value->owner->OnAwaitedContinuation();
 
             selection = next;
         }

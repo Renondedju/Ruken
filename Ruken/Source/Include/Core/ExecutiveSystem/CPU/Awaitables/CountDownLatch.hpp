@@ -59,7 +59,7 @@ class CountDownLatch: public CPUAwaiter,
 	    /**
          * \brief Called when an awaited event has been completed and counts down.
          */
-		RkVoid OnContinuation() noexcept override;
+		RkVoid OnAwaitedContinuation() noexcept override;
 
 		#pragma endregion
 };

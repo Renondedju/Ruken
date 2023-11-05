@@ -14,22 +14,22 @@ struct CPUContinuation;
  *        suspension via the handle, ensuring that the awaitable will stay alive as long
  *        as a reference to it is held.
  *
- * \tparam TReturnType The return type of the refereed awaitable
+ * \tparam TResult The result of the refereed awaitable
  * \note   This class has no side effects when TReturnType is void
  */
-template <typename TReturnType>
+template <typename TResult>
 class CPUAwaitableHandle
 {
     friend CPUContinuation;
 
-    CPUAwaitable<TReturnType>* m_instance;
+    CPUAwaitable<TResult>* m_instance;
 
     public:
 
         #pragma region Lifetime
 
         explicit CPUAwaitableHandle(nullptr_t)                               noexcept;
-        explicit CPUAwaitableHandle(CPUAwaitable<TReturnType>& in_awaitable) noexcept;
+        explicit CPUAwaitableHandle(CPUAwaitable<TResult>& in_awaitable) noexcept;
 
         CPUAwaitableHandle (CPUAwaitableHandle const&) noexcept;
         CPUAwaitableHandle (CPUAwaitableHandle&&)      noexcept;
@@ -42,14 +42,14 @@ class CPUAwaitableHandle
 
         #pragma region Methods
 
-        using Return = std::conditional_t<std::is_same_v<TReturnType, RkVoid>, RkInt, TReturnType> const&;
+        using Return = std::conditional_t<std::is_same_v<TResult, RkVoid>, RkInt, TResult> const&;
 
         /**
          * \brief Returns the result of the awaitable.
          * \warning Do note that this result is valid only if the awaitable has been completed.
          * \return Const reference to the result value
          */
-        template <typename = std::enable_if_t<!std::is_same_v<TReturnType, RkVoid>>>
+        template <typename = std::enable_if_t<!std::is_same_v<TResult, RkVoid>>>
         [[nodiscard]] Return GetResult() const noexcept;
 
         #pragma endregion

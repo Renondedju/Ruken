@@ -19,7 +19,7 @@ struct CPUAwaiter: Awaiter<CentralProcessingUnit>
     /**
      * \brief Called when an awaited event has been completed
      */
-    virtual RkVoid OnContinuation() noexcept = 0;
+    virtual RkVoid OnAwaitedContinuation() noexcept = 0;
 };
 
 END_RUKEN_NAMESPACE

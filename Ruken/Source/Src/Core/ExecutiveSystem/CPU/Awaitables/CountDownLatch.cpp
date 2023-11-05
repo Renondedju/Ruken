@@ -17,7 +17,7 @@ RkSize CountDownLatch::Value() const noexcept
     return m_count.load(std::memory_order_relaxed);
 }
 
-RkVoid CountDownLatch::OnContinuation() noexcept
+RkVoid CountDownLatch::OnAwaitedContinuation() noexcept
 {
     CountDown();
 }

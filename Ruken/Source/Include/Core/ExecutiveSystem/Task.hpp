@@ -8,9 +8,9 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueueHandle, typename TReturnType = RkVoid>
+template <QueueHandleType TQueueHandle, typename TResult = RkVoid>
 using Task = std::conditional_t<std::is_same_v<typename TQueueHandle::ProcessingUnit, CentralProcessingUnit>,
-    CPUTask<TQueueHandle, TReturnType>,
+    CPUTask<TQueueHandle, TResult>,
     RkVoid
     >;
 

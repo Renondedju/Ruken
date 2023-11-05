@@ -8,26 +8,26 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueueHandle, typename TReturnType>
+template <QueueHandleType TQueueHandle, typename TResult>
 struct CPUTask;
 
 /**
  * \brief Implements the base common behavior for all CPU tasks
- * \tparam TReturnValue Return type of the associated coroutine
+ * \tparam TResult Return type of the associated coroutine
  */
-template <QueueHandleType TQueueHandle, typename TReturnValue>
+template <QueueHandleType TQueueHandle, typename TResult>
 class CPUTaskPromise final:
-    public CPUAwaitable<TReturnValue>,
+    public CPUAwaitable<TResult>,
     public CPUAwaiter
 {
-    template <typename TOtherReturnType>
+    template <typename TOtherResult>
     friend class CPUPromise;
 
     /**
      * \brief Called by the awaited event upon completion
      * This method simply pushes the coroutine back to the queue for execution.
      */
-    RkVoid OnContinuation() noexcept override
+    RkVoid OnAwaitedContinuation() noexcept override
     {
         // CPU Tasks are not processed in place and are instead pushed to a queue
         // to be picked up and processed by a worker later.
@@ -66,12 +66,12 @@ class CPUTaskPromise final:
          * \brief Constructs, queues up and returns a handle to the promise
          * \return Promise handle
          */
-        CPUTask<TQueueHandle, TReturnValue> get_return_object() noexcept
+        CPUTask<TQueueHandle, TResult> get_return_object() noexcept
         {
             // The handle NEEDS to be initialized before the task is pushed
             // in the case we hold a result to make sure the reference counter
             // has time to be incremented to 1 before the task is executed and deleted by another thread
-            CPUTask<TQueueHandle, TReturnValue> handle {*this};
+            CPUTask<TQueueHandle, TResult> handle {*this};
 
             // CPU Tasks are not processed in place and are instead pushed to a queue
             // to be picked up and processed by a worker later.
@@ -89,16 +89,16 @@ class CPUTaskPromise final:
         template <AwaitableType TAwaitable>
         auto await_transform(TAwaitable&& in_awaitable) noexcept
         {
-            using AReturnType     = typename std::decay_t<TAwaitable>::ReturnType;
+            using AResult         = typename std::decay_t<TAwaitable>::Result;
             using AProcessingUnit = typename std::decay_t<TAwaitable>::ProcessingUnit;
             static_assert(std::is_same_v<AProcessingUnit, CentralProcessingUnit>, 
                 "Awaiting events from other processing units is not yet supported");
 
             // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
-            if constexpr(std::is_base_of_v<CPUAwaitableHandle<AReturnType>, TAwaitable>)
-                return CPUCoroutineContinuation<AReturnType> (*this, in_awaitable);
+            if constexpr(std::is_base_of_v<CPUAwaitableHandle<AResult>, TAwaitable>)
+                return CPUCoroutineContinuation<AResult> (*this, in_awaitable);
             else
-                return CPUCoroutineContinuation<AReturnType> (*this, CPUAwaitableHandle<AReturnType>(in_awaitable));
+                return CPUCoroutineContinuation<AResult> (*this, CPUAwaitableHandle<AResult>(in_awaitable));
         }
 
         // CPU tasks will never start synchronously and are instead inserted into queues for it to be eventually processed.

@@ -8,13 +8,13 @@ BEGIN_RUKEN_NAMESPACE
  * \brief A thing that can be waited for. ex: generic events, synchronization primitives or an IO operation.
  * Awaitables cannot be waited on directly by other processing units, and must use a bridge when available.
  * \tparam TProcessingUnit Queue type the awaitable lives in.
- * \tparam TReturnType The type of the returned value once an awaiter is completed.
+ * \tparam TResult The result type of the awaitable.
  */
-template <ProcessingUnitType TProcessingUnit, typename TReturnType>
+template <ProcessingUnitType TProcessingUnit, typename TResult>
 struct Awaitable
 {
     using ProcessingUnit = TProcessingUnit;
-    using ReturnType     = TReturnType;
+    using Result         = TResult;
 };
 
 END_RUKEN_NAMESPACE
