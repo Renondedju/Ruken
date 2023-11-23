@@ -30,7 +30,7 @@ class CPUTaskPromise final:
     {
         // CPU Tasks are not processed in place and are instead pushed to a queue
         // to be picked up and processed by a worker later.
-        TQueueHandle::instance.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+        TQueueHandle::GetInstance().Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
     }
 
     /**
@@ -73,7 +73,7 @@ class CPUTaskPromise final:
 
             // CPU Tasks are not processed in place and are instead pushed to a queue
             // to be picked up and processed by a worker later.
-            TQueueHandle::instance.Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+            TQueueHandle::GetInstance().Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
 
             return handle;
         }

@@ -1,6 +1,6 @@
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
 
 USING_RUKEN_NAMESPACE
 

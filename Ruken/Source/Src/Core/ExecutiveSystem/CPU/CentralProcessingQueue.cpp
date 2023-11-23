@@ -1,4 +1,4 @@
-#include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
 
 USING_RUKEN_NAMESPACE
 

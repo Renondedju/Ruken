@@ -17,7 +17,10 @@ template <QueueHandleType TQueueHandle>
 struct CPUTaskSubscription;
 
 #pragma warning(push)
-#pragma warning(disable: 4324) // structure was padded due to __declspec(align())
+#pragma warning(disable: 4324)
+
+// Disabled warning 4324: Structure was padded due to __declspec(align())
+// This is related to the way atomic values interacts with cache lines and is expected of the atomic_queue
 
 /**
  * \brief Lock-free multi-producer/multi-consumer FIFO queue.
@@ -110,17 +113,6 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 
         #pragma endregion
 };
-
-/**
- * \brief Central processing queue helper
- * This class makes a default constructor available with no arguments required.
- * This is needed by the QueueHandle class.
- *
- * \tparam TSize Size of the queue
- */
-template <RkSize TSize>
-struct MakeCentralProcessingQueue: CentralProcessingQueue
-{ MakeCentralProcessingQueue() noexcept: CentralProcessingQueue {TSize} {} };
 
 #pragma warning(pop)
 

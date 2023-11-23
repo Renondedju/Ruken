@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

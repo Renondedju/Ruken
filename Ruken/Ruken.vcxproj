@@ -144,6 +144,7 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Algorythms\ForEach.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Algorythms\WhenAll.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUDynamicTask.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\ConditionalSuspension.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaitableResult.hpp" />
@@ -153,7 +154,8 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ConcurrencyCounter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTaskPromise.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUReturningContinuation.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CPUQueueHandle.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CPUDynamicQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CPUQueueHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\ManualResetEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUCoroutineContinuation.hpp" />
@@ -165,7 +167,7 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingUnitType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CentralProcessingUnit.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CentralProcessingQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CentralProcessingQueue.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\EExecutionPolicy.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\EInstructionType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\GPU\GraphicsProcessingQueue.hpp" />

@@ -4,23 +4,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief Strongly typed queue handle
- *
- * This class allows the manipulation of queues as strong types,
- * statically accessible to anyone willing to use it.
- * Doing it this way avoids code duplication and allows underlying systems to use a simple
- * non templated pointer for generic operations.
- *
- * \tparam TInheriting Inheriting class (CRTP). This type makes sure the static member is unique for each handle.
- * \tparam TQueue Queue type
- */
-template <typename TInheriting, ProcessingQueueType TQueue>
+template <ProcessingUnitType TProcessingUnit>
 struct QueueHandle
 {
-	using ProcessingUnit = typename TQueue::ProcessingUnit;
-
-	static inline TQueue instance {};
+	using ProcessingUnit = TProcessingUnit;
 };
 
 END_RUKEN_NAMESPACE

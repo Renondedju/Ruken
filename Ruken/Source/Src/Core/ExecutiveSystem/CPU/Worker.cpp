@@ -2,7 +2,7 @@
 
 #include "Core/ExecutiveSystem/CPU/Worker.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
-#include "Core/ExecutiveSystem/CPU/CentralProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -17,7 +17,10 @@ RkVoid Worker::ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queu
     // and is meant to be customized for each projects based on the needs.
     // TODO: Implement a way of customizing the process behavior without modifying this code
     for (CentralProcessingQueue* queue: in_queues)
+    {
+        WorkerInfo::current_queue = queue;
         queue->PopAndRun(true, in_stop_token);
+    }
 }
 
 RkVoid Worker::Routine(std::stop_token&& in_stop_token, std::string&& in_name) const noexcept

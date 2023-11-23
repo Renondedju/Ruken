@@ -4,8 +4,10 @@
 #include "Utility/Benchmark.hpp" 
 #include "Core/ExecutiveSystem/Task.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
-#include "Core/ExecutiveSystem/CPU/CPUQueueHandle.hpp"
+#include "Core/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
+#include "Core/ExecutiveSystem/CPU/Queues/CPUDynamicQueue.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/Algorythms/WhenAll.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -16,7 +18,7 @@ struct MainQueue final: CPUQueueHandle<MainQueue, 4096> {};
  * \param in_identifier Identifier of the job
  * \return Handle to the task instance
  */
-Task<MainQueue> Job(RkSize const in_identifier)
+CPUDynamicTask<> Job(RkSize const in_identifier)
 {
     // ConcurrencyCounter const counter = MainQueue::instance.GetConcurrencyCounter();
     //

@@ -6,25 +6,26 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TInheriting, ProcessingQueueType TQueue>
+template <ProcessingUnitType TProcessingUnit>
 struct QueueHandle;
 
 /**
  * \brief Checks if the passed type is a processing queue handle
  */
 template <typename TType>
-concept QueueHandleType = requires { TType::instance; } && 
-	ProcessingQueueType<decltype(TType::instance)> &&
+concept QueueHandleType = requires { TType::GetInstance(); } && 
+	ProcessingQueueType<std::remove_reference_t<decltype(TType::GetInstance())>> &&
 	std::is_default_constructible_v<TType> &&
-	std::is_base_of_v<QueueHandle<TType, decltype(TType::instance)>, TType>;
+	std::is_base_of_v<QueueHandle<typename TType::ProcessingUnit>, TType>;
 
 /**
  * \brief Checks if the passed type is a submittable processing queue handle
  */
 template <typename TType>
-concept SubmittableQueueHandleType = requires { TType::instance; } && 
-	SubmittableProcessingQueueType<decltype(TType::instance)> &&
+concept SubmittableQueueHandleType = requires { TType::GetInstance(); } && 
+	SubmittableProcessingQueueType<std::remove_reference_t<decltype(TType::GetInstance())>> &&
 	std::is_default_constructible_v<TType> &&
-	std::is_base_of_v<QueueHandle<TType, decltype(TType::instance)>, TType>;
+	std::is_base_of_v<QueueHandle<typename TType::ProcessingUnit>, TType>;
+
 
 END_RUKEN_NAMESPACE
