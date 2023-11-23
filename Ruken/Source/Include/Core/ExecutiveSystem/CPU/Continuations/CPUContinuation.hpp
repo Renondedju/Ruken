@@ -31,24 +31,12 @@ struct CPUContinuation
 
     #pragma region Members
 
-    Node* hook {};         ///< Reference to the head of the list
+    Node* hook {nullptr};  ///< Reference to the head of the list
     Node  next {nullptr}; ///< Next subscription in the list
 
     CPUAwaiter* owner {};
 
     #pragma region
-
-    #pragma region Lifetime
-
-    CPUContinuation()                       = default;
-    CPUContinuation(CPUContinuation const&) = delete;
-    CPUContinuation(CPUContinuation&&     ) = delete;
-    ~CPUContinuation()                      = default;
-
-    CPUContinuation& operator=(CPUContinuation const&) = delete;
-    CPUContinuation& operator=(CPUContinuation&&     ) = delete;
-
-    #pragma endregion
 
     #pragma region Methods
 

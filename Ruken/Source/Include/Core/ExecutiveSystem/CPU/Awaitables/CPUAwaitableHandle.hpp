@@ -28,7 +28,7 @@ class CPUAwaitableHandle
 
         #pragma region Lifetime
 
-        explicit CPUAwaitableHandle(nullptr_t)                               noexcept;
+        explicit CPUAwaitableHandle(nullptr_t)                           noexcept;
         explicit CPUAwaitableHandle(CPUAwaitable<TResult>& in_awaitable) noexcept;
 
         CPUAwaitableHandle (CPUAwaitableHandle const&) noexcept;

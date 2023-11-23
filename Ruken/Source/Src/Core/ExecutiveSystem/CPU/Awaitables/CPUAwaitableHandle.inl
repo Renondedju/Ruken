@@ -18,22 +18,24 @@ template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(CPUAwaitableHandle const& in_other) noexcept:
     m_instance {in_other.m_instance}
 {
-    m_instance->IncrementReferenceCount();
+    if (m_instance) 
+        m_instance->IncrementReferenceCount();
 }
 
 template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(CPUAwaitableHandle&& in_other) noexcept:
     m_instance {in_other.m_instance}
 {
-    m_instance->IncrementReferenceCount();
+    if (m_instance) 
+        m_instance->IncrementReferenceCount();
 }
 
 template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUAwaitableHandle const& in_other) noexcept
 {
-    m_instance->DecrementReferenceCount();
+    if (m_instance) m_instance->DecrementReferenceCount();
     m_instance = in_other.m_instance;
-    m_instance->IncrementReferenceCount();
+    if (m_instance) m_instance->IncrementReferenceCount();
 
     return *this;
 }
@@ -41,16 +43,19 @@ CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUA
 template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUAwaitableHandle&& in_other) noexcept
 {
-    m_instance->DecrementReferenceCount();
+    if (m_instance) m_instance->DecrementReferenceCount();
     m_instance = std::move(in_other.m_instance);
-    m_instance->IncrementReferenceCount();
+    if (m_instance) m_instance->IncrementReferenceCount();
 
     return *this;
 }
 
 template <typename TReturnType>
 CPUAwaitableHandle<TReturnType>::~CPUAwaitableHandle() noexcept
-{ m_instance->DecrementReferenceCount(); }
+{
+    if (m_instance)
+        m_instance->DecrementReferenceCount();
+}
 
 #pragma endregion
 

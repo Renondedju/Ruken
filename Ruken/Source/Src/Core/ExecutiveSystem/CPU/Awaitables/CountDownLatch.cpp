@@ -8,7 +8,7 @@ CountDownLatch::CountDownLatch(RkSize const in_initial_count) noexcept:
 
 RkVoid CountDownLatch::CountDown() noexcept
 {
-    if (m_count.fetch_sub(1, std::memory_order_release) - 1 == 0ULL)
+    if (m_count.fetch_sub(1, std::memory_order_acq_rel) == 1ULL)
 		SignalCompletion();
 }
 

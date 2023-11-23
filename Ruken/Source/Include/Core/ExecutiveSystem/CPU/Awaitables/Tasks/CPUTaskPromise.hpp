@@ -4,7 +4,6 @@
 #include "Core/ExecutiveSystem/Concepts/AwaitableType.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
 #include "Core/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/ConditionalSuspension.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -55,7 +54,6 @@ class CPUTaskPromise final:
 
         CPUTaskPromise& operator=(CPUTaskPromise const&) = default;
         CPUTaskPromise& operator=(CPUTaskPromise&&     ) = default;
-
 
         #pragma region Methods
 

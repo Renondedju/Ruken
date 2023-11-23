@@ -69,14 +69,8 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 
         #pragma region Methods
 
-        RkVoid DecrementReferenceCount() noexcept
-        {
-            if (m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)
-                Deallocate();
-        }
-
-        RkVoid IncrementReferenceCount() noexcept
-        { m_references.fetch_add(1, std::memory_order_acq_rel); }
+        RkVoid DecrementReferenceCount() noexcept;
+        RkVoid IncrementReferenceCount() noexcept;
 
         /**
          * \brief Checks if the event has been completed yet
@@ -88,44 +82,68 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
         #pragma endregion
 };
 
-template <typename TReturnType>
-RkVoid CPUAwaitable<TReturnType>::SignalCompletion() noexcept
+template <typename TResult>
+RkVoid CPUAwaitable<TResult>::SignalCompletion() noexcept
 {
-    CPUContinuation::Node* selection {std::addressof(m_continuation_hook)};
-    CPUContinuation*       value;
+    CPUContinuation::Node* selection    {std::addressof(m_continuation_hook)};
+    CPUContinuation*       continuation {nullptr};
+    CPUAwaiter*            awaiter      {nullptr};
 
     while(true)
     {
         do
         {
-            value = nullptr; // Checking if we have awaiters to signal
-            if (selection->compare_exchange_strong(value, CPUContinuation::consumed, std::memory_order_release, std::memory_order_acquire))
-                return; 
+            // Checking for continuations to consume
+            if (selection->compare_exchange_strong(continuation = nullptr, CPUContinuation::consumed, std::memory_order_acq_rel))
+            {
+                // If there is not we need to notify the
+                // last awaiter before returning.
+                if (awaiter)
+                    awaiter->OnAwaitedContinuation();
 
-        // And waiting for any lock in the process
-        } while(value == CPUContinuation::locked);
+                return;
+            }
+
+        // If there are, waiting for any lock in the process
+        } while(continuation == CPUContinuation::locked);
 
         // If the value of status is still the same as before our last comparison
-        // then we can exchange the pointer for a completion pointer and notify the awaiter 
-        if (selection->compare_exchange_weak(value, CPUContinuation::consumed, std::memory_order_release, std::memory_order_acquire))
+        // then we can exchange the pointer for a completion pointer and notify the previous awaiter 
+        if (selection->compare_exchange_weak(continuation, CPUContinuation::consumed, std::memory_order_acq_rel))
         {
-            // Fetching the next awaiter before notifying the dependent event in case it gets destroyed as a side effect
-            CPUContinuation::Node* next = &value->next;
-            value->owner->OnAwaitedContinuation();
+            // This is done this way in case it gets destroyed as a side effect
+            // and avoids us to read potentially unallocated memory in the code above.
+            if (awaiter)
+                awaiter->OnAwaitedContinuation();
 
-            selection = next;
+            // Fetching the next awaiter
+            selection = &continuation->next;
+            awaiter   =  continuation->owner;
         }
     }
 }
 
-template <typename TReturnType>
-RkVoid CPUAwaitable<TReturnType>::Reset() noexcept
+template <typename TResult>
+RkVoid CPUAwaitable<TResult>::Reset() noexcept
 {
     m_continuation_hook.store(nullptr, std::memory_order_release);
 }
 
-template <typename TReturnType>
-RkBool CPUAwaitable<TReturnType>::Completed() const noexcept
+template <typename TResult>
+RkVoid CPUAwaitable<TResult>::DecrementReferenceCount() noexcept
+{
+    if (m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+        Deallocate();
+}
+
+template <typename TResult>
+RkVoid CPUAwaitable<TResult>::IncrementReferenceCount() noexcept
+{
+    m_references.fetch_add(1, std::memory_order_acq_rel);
+}
+
+template <typename TResult>
+RkBool CPUAwaitable<TResult>::Completed() const noexcept
 {
     return m_continuation_hook.load(std::memory_order_acquire) == CPUContinuation::consumed;
 }
