@@ -94,7 +94,7 @@ class CPUTaskPromise final:
 
             // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
             if constexpr(std::is_base_of_v<CPUAwaitableHandle<AResult>, TAwaitable>)
-                return CPUCoroutineContinuation<AResult> (*this, in_awaitable);
+                return CPUCoroutineContinuation<AResult> (*this, std::forward<TAwaitable>(in_awaitable));
             else
                 return CPUCoroutineContinuation<AResult> (*this, CPUAwaitableHandle<AResult>(in_awaitable));
         }

@@ -18,6 +18,11 @@ struct CPUTask final: Awaitable<CentralProcessingUnit, TResult>, CPUAwaitableHan
 
     #pragma region Lifetime
 
+    CPUTask() noexcept:
+        CPUAwaitableHandle<TResult>         {nullptr},
+        std::coroutine_handle<promise_type> {}
+    {}
+
     /**
      * \brief Default constructor
      * \param in_promise Promise instance
