@@ -20,15 +20,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -72,7 +74,7 @@
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <ClCompile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
@@ -93,11 +95,12 @@
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\Include;$(ProjectDir)Source\Src;$(ProjectDir)Source\ThirdParty;$(SolutionDir)PotatoMaths\PotatoMaths\PotatoMaths\Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -109,6 +112,7 @@
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)Libraries\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -136,6 +140,43 @@
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
     <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Awaitable.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\AwaitableType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\QueueHandleType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\AutomaticResetEvent.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUDynamicTask.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\ConditionalSuspension.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaitableResult.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUContinuation.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\CPUAwaiter.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ConcurrencyCounter.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTaskPromise.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUReturningContinuation.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CPUDynamicQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CPUQueueHandle.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\ManualResetEvent.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUCoroutineContinuation.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Worker.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\WorkerInfo.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\EventBridge.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\QueueHandle.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Awaiter.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingQueueType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\ProcessingUnitType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\CentralProcessingUnit.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CentralProcessingQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\EExecutionPolicy.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\EInstructionType.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\GPU\GraphicsProcessingQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\GPU\GraphicsProcessingUnit.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\ProcessingQueue.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\ProcessingUnit.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Promise.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\Task.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceLoader.hpp" />
     <ClInclude Include="Source\Include\Core\ServiceProvider.hpp" />
     <ClInclude Include="Source\Include\Core\Service.hpp" />
@@ -351,7 +392,7 @@
     <ClInclude Include="Source\Include\Threading\EAccessMode.hpp" />
     <ClInclude Include="Source\Include\Threading\Synchronized.hpp" />
     <ClInclude Include="Source\Include\Threading\SynchronizedAccess.hpp" />
-    <ClInclude Include="Source\Include\Threading\Worker.hpp" />
+    <ClInclude Include="Source\Include\Threading\OldWorker.hpp" />
     <ClInclude Include="Source\Include\Utility\Benchmark.hpp" />
     <ClInclude Include="Source\Include\Utility\Todo.hpp" />
     <ClInclude Include="Source\Include\Utility\WindowsOS.hpp" />
@@ -394,6 +435,8 @@
     <None Include="Source\Src\Bitwise\Bitmask.inl" />
     <None Include="Source\Src\Bitwise\SizedBitmask.inl" />
     <None Include="Source\Src\Containers\LinkedChunkList.inl" />
+    <None Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.inl" />
+    <None Include="Source\Src\Core\ExecutiveSystem\Promise.inl" />
     <None Include="Source\Src\Core\Kernel.inl" />
     <None Include="Source\Src\Core\ServiceProvider.inl" />
     <None Include="Source\Src\Core\Service.inl" />
@@ -417,12 +460,18 @@
     <None Include="Source\Src\Threading\SynchronizedAccess.inl" />
     <None Include="Source\Src\Threading\ThreadSafeLockQueue.inl" />
     <None Include="Source\Src\Threading\ThreadSafeQueue.inl" />
-    <None Include="Source\Src\Threading\Worker.inl" />
+    <None Include="Source\Src\Threading\OldWorker.inl" />
     <None Include="Source\Src\Types\Units\Angle\Angle.inl" />
     <None Include="Source\Src\Types\Units\Distance\Distance.inl" />
     <None Include="Source\Src\Types\Units\Duration\Duration.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.inl" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Continuations\CPUContinuation.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Worker.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
@@ -493,7 +542,7 @@
     <ClCompile Include="Source\Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Source\Src\Resource\ResourceManifest.cpp" />
     <ClCompile Include="Source\Src\Threading\Scheduler.cpp" />
-    <ClCompile Include="Source\Src\Threading\Worker.cpp" />
+    <ClCompile Include="Source\Src\Threading\OldWorker.cpp" />
     <ClCompile Include="Source\Src\Time\ControlClock.cpp" />
     <ClCompile Include="Source\Src\Time\Sleep.cpp" />
     <ClCompile Include="Source\Src\Time\Timer.cpp" />

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #if defined(__x86_64__) || defined(__ppc64__) || defined(_WIN64)

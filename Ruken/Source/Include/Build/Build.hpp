@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Config.hpp"

@@ -1,7 +1,6 @@
-
 #pragma once
 
-#if    defined(_MSC_VER)
+#if   defined(_MSC_VER)
     #define RUKEN_COMPILER_MSVC
     #define RUKEN_COMPILER_STR "msvc"
 #elif defined(__ICL) || defined(__ICC) || defined(__INTEL_COMPILER)

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #define RUKEN_NAMESPACE ruken
