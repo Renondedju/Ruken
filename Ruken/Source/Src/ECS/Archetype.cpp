@@ -1,6 +1,4 @@
-
 #include <ranges>
-#include <Common/Numerics.hpp>
 #include "Maths/MinMax.hpp"
 
 #include "ECS/Range.hpp"

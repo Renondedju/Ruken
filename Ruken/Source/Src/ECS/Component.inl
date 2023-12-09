@@ -1,34 +1,10 @@
-/*
- *  MIT License
- *
- *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
- *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
- */
-
 template <ComponentFieldType... TFields>
 template <RkSize... TIds>
 RkSize Component<TFields...>::EnsureStorageSpaceHelper(RkSize in_size, std::index_sequence<TIds...>) noexcept
 {
-        return MinExceptZero<RkSize>(
+    return static_cast<RkSize>(MinExceptZero(
         { // Initializer list containing all the lambda invocations
-            [in_size](FieldContainerType<TFields>& in_list)
+            [in_size]<typename TField>(FieldContainerType<TField>& in_list)
             {
                 // Computes the chunk id required to store all the requested data
                 RkSize const chunk_id      { in_size / in_list.chunk_element_count };
@@ -39,11 +15,11 @@ RkSize Component<TFields...>::EnsureStorageSpaceHelper(RkSize in_size, std::inde
                     in_list.CreateNode();
 
                 // Returning the amount of elements created
-                return chunk_missing * in_list.chunk_element_count;
+                return static_cast<RkFloat>(chunk_missing * in_list.chunk_element_count);
 
-            }(std::get<TIds>(m_storage))...
+            }.template operator()<std::tuple_element_t<TIds, std::tuple<TFields...>>>(std::get<TIds>(m_storage))...
         }
-    );
+    ));
 }
 
 template <ComponentFieldType... TFields>

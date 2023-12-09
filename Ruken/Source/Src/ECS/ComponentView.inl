@@ -49,17 +49,17 @@ RkVoid ComponentView<TFields...>::FindNextEntity() noexcept
     m_index += jump_size;
 
     // Otherwise, jumping to the next entity in range
-    ([jump_size](ReferencePair<TFields>& in_pair)
+    ([jump_size]<typename TField>(ReferencePair<TField>& in_pair)
     {
         // Computing the number of jumps to do
-        RkSize const jumps = (in_pair.first + jump_size) / FieldChunk<TFields>::element_count;
+        RkSize const jumps = (in_pair.first + jump_size) / FieldChunk<TField>::element_count;
 
         for(RkSize index = 0ULL; index < jumps; ++index)
             in_pair.second = in_pair.second->next_node;
 
-        in_pair.first = (in_pair.first + jump_size) % FieldChunk<TFields>::element_count;
+        in_pair.first = (in_pair.first + jump_size) % FieldChunk<TField>::element_count;
 
-    }(std::get<ReferencePair<TFields>>(m_fields_references)), ...);
+    }.template operator()<ReferencePair<TFields>>(std::get<ReferencePair<TFields>>(m_fields_references)), ...);
 }
 
 template <ComponentFieldType ... TFields>

@@ -3,8 +3,7 @@
 
 #include "Meta/Assert.hpp"
 
-#include <Common/Numerics.hpp>
-
+#include "Maths/MinMax.hpp"
 #include "ECS/ComponentBase.hpp"
 #include "Containers/LinkedChunkList.hpp"
 #include "ECS/Safety/ComponentFieldType.hpp"
