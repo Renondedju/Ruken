@@ -1,3 +1,4 @@
+#pragma once
 
 template <SystemType TSystem>
 RkVoid EntityAdmin::CreateSystem() noexcept

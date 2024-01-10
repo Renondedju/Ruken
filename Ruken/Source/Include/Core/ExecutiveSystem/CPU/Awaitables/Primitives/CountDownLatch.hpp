@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/ExecutiveSystem/CPU/Awaitables/ManualResetEvent.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaiter.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

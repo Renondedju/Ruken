@@ -25,18 +25,16 @@ BEGIN_RUKEN_NAMESPACE
  */
 class Kernel
 {
-    private:
+    #pragma region Members
 
-        #pragma region Members
+    ServiceProvider m_service_provider {};
 
-        ServiceProvider m_service_provider {};
+    Logger*             m_logger             {nullptr};
+    RkInt               m_exit_code          {0};
+    ConsoleHandler      m_console_handler    {};
+    std::atomic<RkBool> m_shutdown_requested {false};
 
-        Logger*             m_logger             {nullptr};
-        RkInt               m_exit_code          {0};
-        ConsoleHandler      m_console_handler    {};
-        std::atomic<RkBool> m_shutdown_requested {false};
-
-        #pragma endregion
+    #pragma endregion
 
     public:
 

@@ -113,7 +113,7 @@ class CPUTaskPromise final:
 
                 void await_suspend(std::coroutine_handle<>) const noexcept
                 {
-                    self.SignalCompletion       ();
+                    self.SignalConsume          ();
                     self.DecrementReferenceCount();
                 }
             };

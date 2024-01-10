@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaiter.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -36,7 +36,7 @@ struct CPUContinuation
 
     CPUAwaiter* owner {};
 
-    #pragma region
+    #pragma endregion
 
     #pragma region Methods
 
@@ -67,7 +67,7 @@ struct CPUContinuation
      */
     RkBool Detach();
 
-    #pragma region
+    #pragma endregion
 };
 
 END_RUKEN_NAMESPACE

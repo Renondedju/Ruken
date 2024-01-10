@@ -88,7 +88,7 @@ class EventHandler : public EventHandlerBase
 
     #pragma endregion
 
-    private:
+    protected:
 
         #pragma region Members
 
@@ -96,8 +96,6 @@ class EventHandler : public EventHandlerBase
         std::forward_list<std::reference_wrapper<Archetype>> m_archetypes;
 
         #pragma endregion
-
-    protected:
 
         #pragma region Methods
 

@@ -6,8 +6,8 @@
 
 #include "Core/ExecutiveSystem/Awaitable.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableResult.hpp"
 #include "Core/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Utils/CPUAwaitableResult.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
