@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,28 @@
  *  SOFTWARE.
  */
 
-#include "ECS/TagComponent.hpp"
+#include <ranges>
+
+#include "ECS/System.hpp"
+#include "ECS/EventHandlerBase.hpp"
 
 USING_RUKEN_NAMESPACE
 
-TagComponent::TagComponent(Archetype const* in_owning_archetype) noexcept:
-    ComponentBase {in_owning_archetype}
+System::System(EntityAdmin& in_admin) noexcept:
+    m_admin {in_admin}
 { }
 
-RkSize TagComponent::EnsureStorageSpace(RkSize) noexcept
+RkVoid System::BindArchetype(Archetype& in_archetype) noexcept
 {
-    return 0ULL;
+    for(auto const& event_handler: m_handlers | std::views::values)
+        if (event_handler->GetQuery().Match(in_archetype))
+            event_handler->AddArchetypeReference(in_archetype);
+}
+
+EventHandlerBase* System::GetEventHandler(EEventName const in_event_name) const noexcept
+{
+    if (m_handlers.contains(in_event_name))
+        return m_handlers.at(in_event_name).get();
+
+    return nullptr;
 }

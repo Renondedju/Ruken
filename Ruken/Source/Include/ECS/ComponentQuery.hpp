@@ -6,7 +6,7 @@
 #include "Types/FundamentalTypes.hpp"
 
 #include "ECS/ArchetypeFingerprint.hpp"
-#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -45,7 +45,7 @@ class ComponentQuery
          *        Passed components will be *required* by the query.
          * \tparam TComponents Required components of the query
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         RkVoid SetupInclusionQuery() noexcept;
 
         /**
@@ -54,7 +54,7 @@ class ComponentQuery
          *        even if the inclusion query selected them in the first place.
          * \tparam TComponents Excluded components of the query
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         RkVoid SetupExclusionQuery() noexcept;
 
         /**

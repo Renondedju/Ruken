@@ -22,45 +22,55 @@
  *  SOFTWARE.
  */
 
-template <template <RkSize...> class TPack, RkSize... TIndices, ComponentFieldType... TFields>
-ComponentView<TPack<TIndices...>, TFields...>::ComponentView(Archetype const& in_archetype, FieldChunk<TFields>*... in_fields) noexcept:
-    m_fields_references   {ReferencePair<TFields>(0ULL, in_fields)...},
-    m_next_empty_range    {in_archetype.GetFreeEntitiesRanges().cbegin()},
-    m_component_archetype {in_archetype}
+#pragma once
+
+template <ComponentFieldType... TFields>
+ComponentView<TFields...>::ComponentView(Archetype& in_archetype) noexcept:
+    m_fields_references    {ReferencePair<TFields>(0ULL, in_archetype.GetComponent<TFields::Component>().template GetFieldContainer<TFields>().GetHead())...},
+    m_current_entity_range {in_archetype.GetEntitiesRanges().cbegin()},
+    m_component_archetype  {in_archetype}
 { }
 
 #pragma region Methods
 
-template <template <RkSize...> class TPack, RkSize... TIndices, ComponentFieldType... TFields>
-RkBool ComponentView<TPack<TIndices...>, TFields...>::FindNextEntity() noexcept
+template <ComponentFieldType... TFields>
+RkVoid ComponentView<TFields...>::FindNextEntity() noexcept
 {
-    // Stores the increase required in 
-    RkSize increase_to_next {1ULL};
+    RkSize jump_size {1ULL};
 
-    // If we need to take care of free entities and if we are on the border of a de-allocated entity range
-    if (m_next_empty_range != m_component_archetype.GetFreeEntitiesRanges().cend() && m_index == m_next_empty_range->begin)
-            increase_to_next = m_next_empty_range->size;
+    // Checking if the next index is outside of the current range
+    if (m_index + 1 > m_current_entity_range->begin + m_current_entity_range->size)
+    {
+        // Jumping to the next range
+        ++m_current_entity_range;
+        jump_size = m_current_entity_range->begin - m_index;
+    }
 
-    ([increase_to_next](ReferencePair<TFields>& in_pair)
+    m_index += jump_size;
+
+    // Otherwise, jumping to the next entity in range
+    ([jump_size]<typename TField>(ReferencePair<TField>& in_pair)
     {
         // Computing the number of jumps to do
-        RkSize const jumps = (in_pair.first + increase_to_next) / FieldChunk<TFields>::element_count;
+        RkSize const jumps = (in_pair.first + jump_size) / FieldChunk<TField>::element_count;
 
         for(RkSize index = 0ULL; index < jumps; ++index)
             in_pair.second = in_pair.second->next_node;
 
-        in_pair.first = (in_pair.first + increase_to_next) % FieldChunk<TFields>::element_count;
+        in_pair.first = (in_pair.first + jump_size) % FieldChunk<TField>::element_count;
 
-    }(std::get<ReferencePair<TFields>>(m_fields_references)), ...);
-
-    m_index += increase_to_next;
-
-    return m_index != m_component_archetype.GetEntitiesCount();
+    }.template operator()<ReferencePair<TFields>>(std::get<ReferencePair<TFields>>(m_fields_references)), ...);
 }
 
-template <template <RkSize...> class TPack, RkSize... TIndices, ComponentFieldType... TFields>
+template <ComponentFieldType ... TFields>
+RkBool ComponentView<TFields...>::IterationDone() const noexcept
+{
+    return m_index == m_component_archetype.GetEntitiesCount();
+}
+
+template <ComponentFieldType... TFields>
 template <ComponentFieldType TField>
-typename ComponentView<TPack<TIndices...>, TFields...>::template FieldAccess<TField>& ComponentView<TPack<TIndices...>, TFields...>::Fetch() const noexcept
+typename ComponentView<TFields...>::template FieldAccess<TField>& ComponentView<TFields...>::Fetch() const noexcept
 {
     ReferencePair<TField> pair = std::get<ReferencePair<TField>>(m_fields_references);
 

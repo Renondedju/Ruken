@@ -7,7 +7,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-#define RUKEN_STATIC_ASSERT(in_expr, in_message) static_assert(in_expr, in_message)
+#define RUKEN_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 #define RUKEN_ASSERT_MESSAGE(in_expr, in_message) internal::Assert(#in_expr, in_expr, __FILE__, __LINE__, in_message)
 
 namespace internal

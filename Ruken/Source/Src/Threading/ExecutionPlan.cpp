@@ -38,17 +38,17 @@ RkVoid ExecutionPlan::ExecutePlanAsynchronously(Scheduler& in_scheduler) const n
     std::vector<std::latch*> latches {m_packs.size()};
 
     // Creating the latches
-    for (RkSize pack: m_packs)
-        latches.emplace_back(new std::latch(pack));
+    for (RkSize index = 0ULL; index < m_packs.size(); ++index)
+        latches[index] = new std::latch(static_cast<ptrdiff_t>(m_packs[index]));
 
     // Creating the jobs
     RkSize instruction_index = 0ULL;
 
     for(RkSize pack_index = 0ULL; pack_index < m_packs.size(); ++pack_index)
     {
-        RkSize const pack_end = instruction_index + m_packs[pack_index];
+        RkSize const start_instruction_index {instruction_index};
 
-        for(;instruction_index < pack_end; ++instruction_index)
+        for(;instruction_index < start_instruction_index + m_packs[pack_index]; ++instruction_index)
         {
             // FIXME: Scheduling every job right away
             //
@@ -76,7 +76,7 @@ RkVoid ExecutionPlan::ExecutePlanAsynchronously(Scheduler& in_scheduler) const n
     // ie. waiting for the plan to be executed
     latches[latches.size() - 1]->wait();
 
-    for(std::latch* latch: latches)
+    for(std::latch const* latch: latches)
         delete latch;
 }
 

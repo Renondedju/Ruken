@@ -1,3 +1,4 @@
+#pragma once
 
 template <SystemType TSystem>
 RkVoid EntityAdmin::CreateSystem() noexcept
@@ -5,9 +6,13 @@ RkVoid EntityAdmin::CreateSystem() noexcept
     std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
 
     m_systems.emplace_back(std::move(system));
+
+    // Binding relevant archetypes
+    for (auto& archetype_ptr: m_archetypes | std::views::values)
+        system->BindArchetype(*archetype_ptr);
 }
 
-template <ComponentType... TComponents>
+template <AnyComponentType... TComponents>
 Archetype* EntityAdmin::CreateArchetype() noexcept
 {
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
@@ -19,15 +24,14 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
     Archetype* archetype_ptr = new_archetype.get();
     m_archetypes[targeted_fingerprint] = std::move(new_archetype);
 
-    // Setup
-    for (std::unique_ptr<SystemBase>& system: m_systems)
-        if (system->GetQuery().Match(*archetype_ptr))
-            system->AddReferenceGroup(*archetype_ptr);
+    // Binding the archetype to every relevant system
+    for (auto&& system: m_systems)
+        system->BindArchetype(*archetype_ptr);
 
     return archetype_ptr; 
 }
 
-template <ComponentType... TComponents>
+template <AnyComponentType... TComponents>
 Entity EntityAdmin::CreateEntity() noexcept
 {
     // Looking for the archetype of the entity

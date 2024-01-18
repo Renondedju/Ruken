@@ -1,23 +1,20 @@
-
 #pragma once
 
 #include <vector>
 #include <memory>
+#include <ranges>
 #include <unordered_map>
 
-#include "Build/Namespace.hpp"
-
 #include "Core/Service.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
+#include "ECS/System.hpp"
 #include "ECS/Archetype.hpp"
-#include "ECS/SystemBase.hpp"
-
-#include "Threading/Scheduler.hpp"
-#include "Threading/ExecutionPlan.hpp"
+#include "ECS/EEventName.hpp"
 
 #include "ECS/Safety/SystemType.hpp"
-#include "ECS/Safety/ComponentType.hpp"
+#include "ECS/Safety/AnyComponentType.hpp"
 #include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -29,45 +26,36 @@ BEGIN_RUKEN_NAMESPACE
  */
 class EntityAdmin final: public Service<EntityAdmin>
 {
-    private:
+    #pragma region Members
 
-        #pragma region Members
+    std::vector<std::unique_ptr<System>>                       m_systems              {};
+    std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_exclusive_components {};
+    std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes {};
 
-        std::vector       <std::unique_ptr<SystemBase>>                      m_systems              {};
-        std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes           {};
-        std::unordered_map<RkSize, std::unique_ptr<ComponentBase>>           m_exclusive_components {};
+    #pragma endregion 
 
-        // Update related
-        ExecutionPlan m_update_plan {};
-        Scheduler*    m_scheduler   {nullptr};
+    #pragma region Methods
 
-        #pragma endregion 
+    /**
+     * \brief Creates a new archetype and handles any setup co-routine
+     * \tparam TComponents Component types
+     */
+    template <AnyComponentType... TComponents>
+    Archetype* CreateArchetype() noexcept;
 
-        #pragma region Methods
-
-        /**
-         * \brief Creates a new archetype and handles any setup co-routine
-         * \tparam TComponents Component types
-         */
-        template <ComponentType... TComponents>
-        Archetype* CreateArchetype() noexcept;
-
-        /**
-         * \brief Builds or rebuilds the update plan
-         */
-        RkVoid BuildUpdatePlan() noexcept;
-
-        #pragma endregion 
+    #pragma endregion 
 
     public:
 
-        #pragma region Constructors
+        #pragma region Lifetime
 
         EntityAdmin(ServiceProvider& in_service_provider) noexcept;
+        EntityAdmin(EntityAdmin const&) = delete;
+        EntityAdmin(EntityAdmin&&     ) = delete;
+        ~EntityAdmin() override         = default;
 
-        EntityAdmin(EntityAdmin const& in_copy) = delete;
-        EntityAdmin(EntityAdmin&&      in_move) = delete;
-        ~EntityAdmin()                          = default;
+        EntityAdmin& operator=(EntityAdmin const&) = delete;
+        EntityAdmin& operator=(EntityAdmin&&     ) = delete;
 
         #pragma endregion
 
@@ -75,9 +63,11 @@ class EntityAdmin final: public Service<EntityAdmin>
 
         // --- Simulation manipulation
 
-        RkVoid StartSimulation () noexcept;
-        RkVoid UpdateSimulation() noexcept;
-        RkVoid EndSimulation   () noexcept;
+        /**
+         * \brief Starts the execution of an event type
+         * \param in_event_name Event type to execute
+         */
+        CPUDynamicTask<RkVoid> ExecuteEvent(EEventName in_event_name) const noexcept;
 
         // --- Entity / Systems lifetime manipulation
 
@@ -93,7 +83,7 @@ class EntityAdmin final: public Service<EntityAdmin>
          * \tparam TComponents Components to attach to the new entity
          * \return Created entity id
          */
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         Entity CreateEntity() noexcept;
 
         /**
@@ -103,13 +93,6 @@ class EntityAdmin final: public Service<EntityAdmin>
          */
         template <ExclusiveComponentType TComponent>
         TComponent& GetExclusiveComponent() noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        EntityAdmin& operator=(EntityAdmin const& in_copy) = delete;
-        EntityAdmin& operator=(EntityAdmin&&      in_move) = delete;
 
         #pragma endregion
 };

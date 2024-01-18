@@ -1,44 +1,20 @@
-
+#include "ECS/System.hpp"
 #include "ECS/EntityAdmin.hpp"
-#include "Core/ServiceProvider.hpp"
+#include "ECS/EventHandlerBase.hpp"
+
+#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RkVoid EntityAdmin::BuildUpdatePlan() noexcept
-{
-    m_update_plan.ResetPlan();
-
-    for (auto& system: m_systems)
-    {
-        m_update_plan.AddInstruction([&system] { system->OnUpdate(); });
-        m_update_plan.EndInstructionPack();
-    }
-}
-
 EntityAdmin::EntityAdmin(ServiceProvider& in_service_provider) noexcept:
-    Service     {in_service_provider},
-    m_scheduler {m_service_provider.LocateService<Scheduler>()}
-{
-    // The entity admin requires a scheduler to be able to work
-    if (!m_scheduler)
-        SignalServiceInitializationFailure("The entity admin requires a scheduler to be able to work, updates are asynchronous");
-}
+    Service {in_service_provider}
+{ }
 
-RkVoid EntityAdmin::StartSimulation() noexcept
+CPUDynamicTask<RkVoid> EntityAdmin::ExecuteEvent(EEventName const in_event_name) const noexcept
 {
-    // Simulation start is synchronous for now
-    for (auto& system: m_systems)
-        system->OnStart();
-}
+    for (auto const& system: m_systems)
+        if (auto const handler = system->GetEventHandler(in_event_name))
+            co_await handler->Execute();
 
-RkVoid EntityAdmin::UpdateSimulation() noexcept
-{
-    m_update_plan.ExecutePlanAsynchronously(*m_scheduler);
-}
-
-RkVoid EntityAdmin::EndSimulation() noexcept
-{
-    // Simulation end is synchronous for now
-    for (auto& system: m_systems)
-        system->OnEnd();
+    co_return;
 }

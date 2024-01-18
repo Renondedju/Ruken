@@ -24,7 +24,7 @@ class Logger final: public Service<Logger>
 
         #pragma region Members
 
-        std::string   m_name   {""};
+        std::string   m_name;
         ELogLevel     m_level  {ELogLevel::Debug};
         Logger const* m_parent {nullptr};
 

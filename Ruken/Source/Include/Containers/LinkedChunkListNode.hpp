@@ -11,9 +11,9 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief Represents a node in a LinkedChunkList
  * \tparam TType Elements type of the node
- * \tparam TChunkSize Size in octets of the chunk (node) (default is 16Kb or 2046 octets)
+ * \tparam TChunkSize Size in octets of the chunk (node) (default is 32Mb or 32768 octets)
  */
-template<typename TType, RkSize TChunkSize = 2048>
+template<typename TType, RkSize TChunkSize = 32768>
 class LinkedChunkListNode
 {
     public:
@@ -22,9 +22,9 @@ class LinkedChunkListNode
 
         #pragma region Members
 
-        std::array<TType, element_count>        data      {};
-        LinkedChunkListNode<TType, TChunkSize>* next_node {nullptr};
-        LinkedChunkListNode<TType, TChunkSize>* prev_node {nullptr};
+        std::array<TType, element_count> data      {};
+        LinkedChunkListNode*             next_node {nullptr};
+        LinkedChunkListNode*             prev_node {nullptr};
 
         #pragma endregion
 

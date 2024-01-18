@@ -72,6 +72,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
+      <Profile>true</Profile>
     </Link>
     <ClCompile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -94,6 +95,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -111,6 +113,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -145,6 +148,11 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\QueueHandleType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\AutomaticResetEvent.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableResult.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaiter.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Primitives\AutomaticResetEvent.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Primitives\CountDownLatch.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Primitives\ManualResetEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUDynamicTask.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTask.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Utils\ConditionalSuspension.hpp" />
@@ -197,28 +205,31 @@
     <ClInclude Include="Source\Include\Debug\RenderDoc\RenderDocHook.hpp" />
     <ClInclude Include="Source\Include\ECS\Archetype.hpp" />
     <ClInclude Include="Source\Include\ECS\ArchetypeFingerprint.hpp" />
+    <ClInclude Include="Source\Include\ECS\ComponentCounter.hpp" />
+    <ClInclude Include="Source\Include\ECS\EEventName.hpp" />
+    <ClInclude Include="Source\Include\ECS\EventHandler.hpp" />
+    <ClInclude Include="Source\Include\ECS\EventHandlerBase.hpp" />
     <ClInclude Include="Source\Include\ECS\Meta\ComponentHelper.hpp" />
     <ClInclude Include="Source\Include\ECS\Meta\FieldHelper.hpp" />
     <ClInclude Include="Source\Include\ECS\Meta\ItemHelper.hpp" />
-    <ClInclude Include="Source\Include\ECS\Safety\SparseComponentType.hpp" />
-    <ClInclude Include="Source\Include\ECS\SparseComponent.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\EventHandlerType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\ComponentType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Component.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentBase.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentField.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentView.hpp" />
-    <ClInclude Include="Source\Include\ECS\ComponentLayout.hpp" />
     <ClInclude Include="Source\Include\ECS\ComponentQuery.hpp" />
     <ClInclude Include="Source\Include\ECS\ExclusiveComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Range.hpp" />
     <ClInclude Include="Source\Include\ECS\Entity.hpp" />
-    <ClInclude Include="Source\Include\ECS\Safety\ComponentType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\AnyComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ExclusiveComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\SystemType.hpp" />
+    <ClInclude Include="Source\Include\ECS\Safety\TagComponentType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ViewType.hpp" />
     <ClInclude Include="Source\Include\ECS\Safety\ComponentFieldType.hpp" />
-    <ClInclude Include="Source\Include\ECS\SystemBase.hpp" />
     <ClInclude Include="Source\Include\ECS\EntityAdmin.hpp" />
     <ClInclude Include="Source\Include\ECS\System.hpp" />
-    <ClInclude Include="Source\Include\ECS\Group.hpp" />
     <ClInclude Include="Source\Include\ECS\TagComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterComponent.hpp" />
     <ClInclude Include="Source\Include\ECS\Test\CounterSystem.hpp" />
@@ -280,13 +291,16 @@
     <ClInclude Include="Source\Include\Meta\IsBaseOfTemplate.hpp" />
     <ClInclude Include="Source\Include\Meta\IsInstance.hpp" />
     <ClInclude Include="Source\Include\Meta\IsNothrowIncrement.hpp" />
+    <ClInclude Include="Source\Include\Meta\MetaForeach.hpp" />
     <ClInclude Include="Source\Include\Meta\PassConst.hpp" />
     <ClInclude Include="Source\Include\Meta\Safety.hpp" />
     <ClInclude Include="Source\Include\Meta\Tag.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleApply.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleHasType.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleIndex.hpp" />
+    <ClInclude Include="Source\Include\Meta\TupleRemoveLast.hpp" />
     <ClInclude Include="Source\Include\Meta\TupleSubset.hpp" />
+    <ClInclude Include="Source\Include\Meta\UniqueTuple.hpp" />
     <ClInclude Include="Source\Include\Meta\UniqueTypes.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderContext.hpp" />
     <ClInclude Include="Source\Include\Rendering\RenderFrame.hpp" />
@@ -295,6 +309,7 @@
     <ClInclude Include="Source\Include\Rendering\UV.hpp" />
     <ClInclude Include="Source\Include\Threading\ExecutionPlan.hpp" />
     <ClInclude Include="Source\Include\Threading\Job.hpp" />
+    <ClInclude Include="Source\Include\Types\NonVoid.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\ArithmeticType.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\FloatingPointType.hpp" />
     <ClInclude Include="Source\Include\Types\Concepts\FundamentalType.hpp" />
@@ -442,14 +457,12 @@
     <None Include="Source\Src\Core\Service.inl" />
     <None Include="Source\Src\ECS\Archetype.inl" />
     <None Include="Source\Src\ECS\ArchetypeFingerprint.inl" />
-    <None Include="Source\Src\ECS\SparseComponent.inl" />
-    <None Include="Source\Src\ECS\ComponentLayout.inl" />
+    <None Include="Source\Src\ECS\EventHandler.inl" />
+    <None Include="Source\Src\ECS\Component.inl" />
     <None Include="Source\Src\ECS\ComponentQuery.inl" />
     <None Include="Source\Src\ECS\ComponentView.inl" />
-    <None Include="Source\Src\ECS\ExclusiveComponent.inl" />
-    <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\ECS\EntityAdmin.inl" />
-    <None Include="Source\Src\ECS\Group.inl" />
+    <None Include="Source\Src\ECS\System.inl" />
     <None Include="Source\Src\Functional\Event.inl" />
     <None Include="Source\Src\Functional\Function.inl" />
     <None Include="Source\Src\Functional\Method.inl" />
@@ -468,12 +481,14 @@
   <ItemGroup>
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingQueue.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\CentralProcessingUnit.cpp" />
-    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.cpp" />
+    <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\Primitives\CountDownLatch.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.inl" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Continuations\CPUContinuation.cpp" />
     <ClCompile Include="Source\Src\Core\ExecutiveSystem\CPU\Worker.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentBase.cpp" />
+    <ClCompile Include="Source\Src\ECS\EventHandlerBase.cpp" />
     <ClCompile Include="Source\Src\ECS\Range.cpp" />
+    <ClCompile Include="Source\Src\ECS\System.cpp" />
     <ClCompile Include="Source\Src\ECS\TagComponent.cpp" />
     <ClCompile Include="Source\Src\Maths\Easing.cpp" />
     <ClCompile Include="Source\Src\Maths\Math.cpp" />
@@ -526,7 +541,6 @@
     <ClCompile Include="Source\Src\ECS\Archetype.cpp" />
     <ClCompile Include="Source\Src\ECS\ComponentQuery.cpp" />
     <ClCompile Include="Source\Src\ECS\Entity.cpp" />
-    <ClCompile Include="Source\Src\ECS\SystemBase.cpp" />
     <ClCompile Include="Source\Src\ECS\EntityAdmin.cpp" />
     <ClCompile Include="Source\Src\Core\Kernel.cpp" />
     <ClCompile Include="Source\Src\Core\KernelProxy.cpp" />

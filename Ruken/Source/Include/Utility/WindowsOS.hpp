@@ -56,7 +56,16 @@
 #define NODEFERWINDOWPOS  // - DeferWindowPos routines
 #define NOMCX             // - Modem Configuration Extensions
 
+
+// Microsoft has rewritten the C/C++ preprocessor, but it is not enabled by default for "backwards-compatibility",
+// i.e. they prefer bug-compatibility with their own products instead of portability or standard compliance.
+// Because of that, when enabling the /experimental:preprocessor flag to restore that compliance, the windows header spits out some warnings
+#pragma warning(push)
+#pragma warning(disable:5105) //Warning C5105: macro expansion producing 'defined' has undefined behavior
+
 #include <windows.h>
+
+#pragma warning(pop)
 
 // Removing a bunch of junk
 
@@ -65,3 +74,4 @@
 #undef RGB
 #undef min
 #undef max
+#undef Yield

@@ -9,7 +9,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TPack, ComponentFieldType... TFields>
+template <ComponentFieldType... TFields>
 class ComponentView;
 
 /**
@@ -23,7 +23,7 @@ class ComponentView;
 template <typename TType>
 struct IsView
 {
-    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, ComponentView>::value && !std::is_volatile<std::remove_const_t<TType>>::value;
+    static constexpr RkBool value = IsInstance<std::remove_const_t<TType>, ComponentView>::value && !std::is_volatile_v<std::remove_const_t<TType>>;
 };
 
 template <typename TType>

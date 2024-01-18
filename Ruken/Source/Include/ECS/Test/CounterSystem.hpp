@@ -1,80 +1,89 @@
-/*
- *  MIT License
- *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
- *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
- */
-
 #pragma once
 
+#include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
+
 #include "ECS/System.hpp"
+#include "ECS/EventHandler.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
 USING_RUKEN_NAMESPACE
 
-struct CounterSystem final: public System<CounterComponent, ExclusiveComponentTest>
+inline CPUDynamicTask<> WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs)
 {
-    using System::System;
+    CountDownLatch               latch         {in_jobs.size()};
+    std::vector<CPUContinuation> continuations {in_jobs.size()};
 
-    using CountView = CounterComponent::Layout::MakeView<CountField>;
+    for (RkSize index = 0; index < in_jobs.size(); ++index)
+    {
+        // Creating a job and keeping a reference onto it until the attachment
+        // process has been done to avoid it being deleted in the meanwhile.
+
+        // Instantiating the job and setup the continuation callback
+        continuations[index].Setup(latch, in_jobs[index]);
+
+        // Trying to attach the continuation and if the process failed, that means the event we
+        // were looking to await has already been completed. Thus we need to decrement manually the latch by one.
+        if (!continuations[index].TryAttach())
+            latch.CountDown();
+    }
+
+    co_await latch;
+}
+
+struct CounterSystem final: public System
+{
+    CounterSystem(EntityAdmin& in_admin) : System(in_admin)
+    {
+        // Setup of the different event handlers
+        SetupEventHandler<StartHandler>();
+    }
 
     #pragma region Methods
 
     /**
-     * \brief Called once at the start of a simulation
-     * \note This method could be called multiple times for the same
-     *       instance if the simulation is restated without reloading the whole ECS 
+     * \brief Start event dispatcher
+     *
+     * Called once at the start of the simulation
+     * This method could be called multiple times for the same
+     * instance if the simulation is restarted without reloading the whole ECS 
      */
-    RkVoid OnStart() noexcept override
+    struct StartHandler final: EventHandler<EEventName::OnStart, CounterComponent::CountField>
     {
-        RkSize count = 0ULL;
-
-        auto& test = GetExclusiveComponent<ExclusiveComponentTest>();
-        test.Fetch<TestField>() = 3ULL;
-
-        // Iterating over every entity
-        for (auto& group: m_groups)
-        for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
+	    static CPUDynamicTask<RkVoid> ProcessChunk(LinkedChunkListNode<unsigned long long>& in_node) noexcept
         {
-            // Setting the "CounterComponent::Count" variable
-            view.Fetch<CountField>() = count++;
+            for (auto& data: in_node.data)
+                data++;
+
+            co_return;
         }
-    }
 
-    /**
-     * \brief Called every frame
-     */
-    RkVoid OnUpdate() noexcept override
-    {
-        RkSize total = 0;
-
-        std::cout << GetExclusiveComponent<ExclusiveComponentTest>().Fetch<TestField>();
-
-        // Iterating over every entity
-        for (auto& group: m_groups)
-        for (CountView view = group.GetComponent<CounterComponent>().GetView<CountView>(); view.FindNextEntity();)
+        CPUDynamicTask<RkVoid> Execute() noexcept override
         {
-            // Incrementing the total count
-            total += view.Fetch<CountField const>();
-        }
-    }
+            RkSize task_count {0};
+            for (auto const& archetype: m_archetypes)
+            {
+                task_count += archetype.get()
+                    .GetComponent     <CounterComponent>            ()
+                    .GetFieldContainer<CounterComponent::CountField>()
+                    .GetSize();
+            }
 
-    #pragma endregion 
+            std::vector<CPUDynamicTask<RkVoid>> tasks {task_count};
+            RkSize index {0};
+            for (auto const& archetype: m_archetypes)
+            {
+                auto& container = archetype.get()
+                        .GetComponent     <CounterComponent>            ()
+                        .GetFieldContainer<CounterComponent::CountField>();
+
+                using Container = std::remove_reference_t<decltype(container)>;
+                for (Container::Node* current_node = container.GetHead(); current_node != nullptr; current_node = current_node->next_node)
+                    tasks[index++] = ProcessChunk(*current_node);
+            }
+
+            co_await WhenAll(tasks);
+        }
+    };
+
+    #pragma endregion
 };

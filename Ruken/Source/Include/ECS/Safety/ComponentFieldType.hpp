@@ -5,13 +5,11 @@
 
 #include "Build/Namespace.hpp"
 
+#include "ECS/ComponentField.hpp"
 #include "Meta/IsInstance.hpp"
 #include "Meta/IsBaseOfTemplate.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-
-template <typename TDataType>
-struct ComponentField;
 
 /**
  * \brief Checks if the passed type is a valid field
@@ -25,9 +23,10 @@ struct ComponentField;
 template <typename TType>
 struct IsComponentField
 {
-    static constexpr RkBool value = IsBaseOfTemplate<ComponentField, std::remove_const_t<TType>>::value &&
-        !IsInstance<std::remove_const_t<TType>, ComponentField>::value &&
-        !std::is_volatile<std::remove_const_t<TType>>::value;
+    static constexpr RkBool value = 
+        IsBaseOfTemplate<ComponentField, std::remove_const_t<TType>>::value &&
+        !IsInstance<std::remove_const_t<TType>, ComponentField>::value      &&
+        !std::is_volatile_v<std::remove_const_t<TType>>;
 };
 
 template <typename TType>

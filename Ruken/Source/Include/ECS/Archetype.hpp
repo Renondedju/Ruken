@@ -9,7 +9,6 @@
 
 #include "Meta/Tag.hpp"
 
-#include "ECS/Group.hpp"
 #include "ECS/Range.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/ComponentBase.hpp"
@@ -40,21 +39,12 @@ class Archetype
         #pragma region Members
 
         ArchetypeFingerprint m_fingerprint      {};
-        std::list<Range>     m_free_entities    {};
+        std::list<Range>     m_entities         {};
         RkSize               m_entities_count   {0ULL};
         RkSize               m_free_space_count {0ULL};
 
+        // Component storage
         std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_components {};
-
-        #pragma endregion 
-
-        #pragma region Methods
-
-        /**
-         * \brief Returns a free entity location by either looking up for a free spot, or allocating a new one 
-         * \return Free entity location
-         */
-        RkSize GetFreeEntityLocation() noexcept;
 
         #pragma endregion 
 
@@ -62,7 +52,7 @@ class Archetype
 
         #pragma region Constructors
 
-        template <ComponentType... TComponents>
+        template <AnyComponentType... TComponents>
         Archetype(Tag<TComponents...>) noexcept;
 
         Archetype(Archetype const& in_copy) = default;
@@ -74,9 +64,9 @@ class Archetype
         #pragma region Methods
 
         // Getters
-        [[nodiscard]] std::list<Range>     const& GetFreeEntitiesRanges() const noexcept;
-        [[nodiscard]] ArchetypeFingerprint const& GetFingerprint       () const noexcept;
-        [[nodiscard]] RkSize                      GetEntitiesCount     () const noexcept;
+        [[nodiscard]] std::list<Range>     const& GetEntitiesRanges() const noexcept;
+        [[nodiscard]] RkSize                      GetEntitiesCount () const noexcept;
+        [[nodiscard]] ArchetypeFingerprint const& GetFingerprint   () const noexcept;
 
         /**
          * \brief Returns a component of the passed type stored in this archetype
@@ -84,7 +74,7 @@ class Archetype
          * \note Passing a component type that does not exists in this archetype will result in a crash
          * \return Found component
          */
-        template<ComponentType TComponent>
+        template<AnyComponentType TComponent>
         [[nodiscard]]
         TComponent& GetComponent() noexcept;
 
@@ -103,15 +93,6 @@ class Archetype
          * \param in_local_identifier Local identifier of the entity, if invalid, this method does nothing
          */
         RkVoid DeleteEntity(RkSize in_local_identifier) noexcept;
-
-        /**
-         * \brief Creates a components reference group
-         * \tparam TComponents Components to include in the group
-         * \return Newly created reference group
-         */
-        template <ComponentType... TComponents>
-        [[nodiscard]]
-        Group<TComponents...> CreateGroupReference() noexcept;
 
         #pragma endregion
 

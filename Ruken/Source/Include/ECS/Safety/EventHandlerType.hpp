@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
+ *  Copyright (c) 2019-2020 Basile Combet, Philippe Yi
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,30 @@
  *  SOFTWARE.
  */
 
-template <ComponentType... TComponents>
-Group<TComponents...>::Group(Archetype& in_archetype, TComponents&... in_components) noexcept
-    : m_archetype  {in_archetype},
-      m_components {std::forward_as_tuple(in_components...)}
-{}
+#pragma once
 
-template <ComponentType... TComponents>
-Archetype& Group<TComponents...>::GetReferencedArchetype() const noexcept
+#include "Build/Namespace.hpp"
+#include "ECS/Safety/ComponentFieldType.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+template <EEventName TEventName, ComponentFieldType... TFields>
+class EventHandler;
+
+template <template <EEventName, typename...> class TBase, typename TDerived>
+struct IsBaseOfEventHandlerImpl
 {
-    return m_archetype;
-}
+    template<EEventName TEventName, typename... TTypes>
+    static constexpr std::true_type  Test(const TBase<TEventName, TTypes...>*) { return {}; }
+    static constexpr std::false_type Test(...)                                 { return {}; }
+
+    using Type = decltype(Test(std::declval<TDerived*>()));
+};
+
+template<typename TType>
+using IsEventHandler = typename IsBaseOfEventHandlerImpl<EventHandler, TType>::Type;
+
+template <typename TType>
+concept EventHandlerType = IsEventHandler<TType>::value;
+
+END_RUKEN_NAMESPACE

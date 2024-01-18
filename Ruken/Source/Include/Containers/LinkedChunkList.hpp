@@ -11,9 +11,9 @@ BEGIN_RUKEN_NAMESPACE
  * \brief A linked chunk list mimics a linked list but instead of every node containing one object,
  *        it contains multiple ones, by default 16Kb of them
  * \tparam TType Type to hold in every node
- * \tparam TChunkSize Size in octets of one chunk (default is 16Kb or 2046 octets)
+ * \tparam TChunkSize Size in octets of one chunk (default is 32Mb or 32768 octets)
  */
-template<typename TType, RkSize TChunkSize = 2048>
+template<typename TType, RkSize TChunkSize = 32768>
 class LinkedChunkList
 {
     public:

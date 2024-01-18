@@ -16,24 +16,22 @@ class Logger;
  */
 class WindowManager final: public Service<WindowManager>
 {
-    private:
+    #pragma region Members
 
-        #pragma region Members
+    Logger*             m_logger  {nullptr};
+    std::vector<Window> m_windows {};
+    std::vector<Screen> m_screens {};
 
-        Logger*             m_logger  {nullptr};
-        std::vector<Window> m_windows {};
-        std::vector<Screen> m_screens {};
+    #pragma endregion
 
-        #pragma endregion
+    #pragma region Methods
 
-        #pragma region Methods
+    /**
+     * \brief Finds all connected monitors and creates the corresponding screen objects to manage them.
+     */
+    RkVoid SetupScreens() noexcept;
 
-        /**
-         * \brief Finds all connected monitors and creates the corresponding screen objects to manage them.
-         */
-        RkVoid SetupScreens() noexcept;
-
-        #pragma endregion
+    #pragma endregion
 
     public:
 
