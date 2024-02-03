@@ -37,7 +37,7 @@ using RkUint32 = uint32_t;
 using RkUint64 = uint64_t;
 
 using RkSize = size_t;
-using RkByte = RkUint8;
+using RkByte = char;
 
 // Floating points
 

@@ -7,7 +7,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief
  */
-class AutomaticResetEvent final : public CPUAwaitable<RkVoid>
+class AutomaticResetEvent final : public CPUAwaitable<RkVoid, true>
 {
     protected:
 

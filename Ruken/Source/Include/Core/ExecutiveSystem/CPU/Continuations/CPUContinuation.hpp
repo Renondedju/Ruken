@@ -40,8 +40,8 @@ struct CPUContinuation
 
     #pragma region Methods
 
-    template <typename TReturnType>
-    RkVoid Setup(CPUAwaiter& in_owner, CPUAwaitableHandle<TReturnType> const& in_awaited) noexcept
+    template <typename TResult, RkBool TNoexcept>
+    RkVoid Setup(CPUAwaiter& in_owner, CPUAwaitableHandle<TResult, TNoexcept> const& in_awaited) noexcept
     {
         hook  = std::addressof(in_awaited.m_instance->m_continuation_hook);
         owner = std::addressof(in_owner);

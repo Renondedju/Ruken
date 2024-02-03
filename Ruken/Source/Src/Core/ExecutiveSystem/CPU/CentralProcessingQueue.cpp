@@ -32,11 +32,11 @@ RkFloat CentralProcessingQueue::GetSignedConcurrencyRequest(ConcurrencyCounter c
               + static_cast<RkFloat>(in_offset);
 }
 
-RkVoid CentralProcessingQueue::Push(std::coroutine_handle<>&& in_handle) noexcept
+RkVoid CentralProcessingQueue::Push(std::coroutine_handle<> in_handle) noexcept
 {
     ConcurrencyCounter constexpr one_optimal { {.current_concurrency = 0, .optimal_concurrency = 1} };
 
-    m_queue      .push     (in_handle);
+    m_queue      .push     (std::forward<std::coroutine_handle<>>(in_handle));
     m_concurrency.fetch_add(one_optimal.value, std::memory_order_acq_rel);
 }
 

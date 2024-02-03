@@ -2,36 +2,36 @@
 
 #pragma region Lifetime
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(nullptr_t) noexcept:
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>::CPUAwaitableHandle(nullptr_t) noexcept:
     m_instance {nullptr}
 {}
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(CPUAwaitable<TReturnType>& in_awaitable) noexcept:
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>::CPUAwaitableHandle(CPUAwaitable<TResult, TNoexcept>& in_awaitable) noexcept:
     m_instance {std::addressof(in_awaitable)}
 {
     m_instance->IncrementReferenceCount();
 }
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(CPUAwaitableHandle const& in_other) noexcept:
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>::CPUAwaitableHandle(CPUAwaitableHandle const& in_other) noexcept:
     m_instance {in_other.m_instance}
 {
     if (m_instance) 
         m_instance->IncrementReferenceCount();
 }
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>::CPUAwaitableHandle(CPUAwaitableHandle&& in_other) noexcept:
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>::CPUAwaitableHandle(CPUAwaitableHandle&& in_other) noexcept:
     m_instance {in_other.m_instance}
 {
     if (m_instance) 
         m_instance->IncrementReferenceCount();
 }
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUAwaitableHandle const& in_other) noexcept
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>& CPUAwaitableHandle<TResult, TNoexcept>::operator=(CPUAwaitableHandle const& in_other) noexcept
 {
     if (m_instance) m_instance->DecrementReferenceCount();
     m_instance = in_other.m_instance;
@@ -40,8 +40,8 @@ CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUA
     return *this;
 }
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUAwaitableHandle&& in_other) noexcept
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>& CPUAwaitableHandle<TResult, TNoexcept>::operator=(CPUAwaitableHandle&& in_other) noexcept
 {
     if (m_instance) m_instance->DecrementReferenceCount();
     m_instance = std::move(in_other.m_instance);
@@ -50,8 +50,8 @@ CPUAwaitableHandle<TReturnType>& CPUAwaitableHandle<TReturnType>::operator=(CPUA
     return *this;
 }
 
-template <typename TReturnType>
-CPUAwaitableHandle<TReturnType>::~CPUAwaitableHandle() noexcept
+template <typename TResult, RkBool TNoexcept>
+CPUAwaitableHandle<TResult, TNoexcept>::~CPUAwaitableHandle() noexcept
 {
     if (m_instance)
         m_instance->DecrementReferenceCount();
@@ -61,11 +61,17 @@ CPUAwaitableHandle<TReturnType>::~CPUAwaitableHandle() noexcept
 
 #pragma region Methods
 
-template <typename TReturnType>
-template <typename>
-typename CPUAwaitableHandle<TReturnType>::Return CPUAwaitableHandle<TReturnType>::GetResult() const noexcept
+template <typename TResult, RkBool TNoexcept>
+std::add_lvalue_reference_t<const TResult> CPUAwaitableHandle<TResult, TNoexcept>::GetResult() const noexcept
+	requires !std::is_same_v<TResult, RkVoid>
 {
     return m_instance->GetResult();
+}
+
+template <typename TResult, RkBool TNoexcept>
+std::exception_ptr CPUAwaitableHandle<TResult, TNoexcept>::GetException() const noexcept requires !TNoexcept
+{
+    return m_instance->GetException();
 }
 
 #pragma endregion

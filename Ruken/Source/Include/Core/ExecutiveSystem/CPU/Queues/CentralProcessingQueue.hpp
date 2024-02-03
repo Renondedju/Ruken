@@ -83,7 +83,7 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
          * \brief Blocking push, waits for available space in the queue 
          * \param in_handle Job handle to push
          */
-        RkVoid Push(std::coroutine_handle<>&& in_handle) noexcept;
+        RkVoid Push(std::coroutine_handle<> in_handle) noexcept;
 
         /**
          * \brief Attempts to consume jobs of the queue 

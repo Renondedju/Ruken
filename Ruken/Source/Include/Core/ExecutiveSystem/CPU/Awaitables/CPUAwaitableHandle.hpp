@@ -1,9 +1,11 @@
 #pragma once
 
+#include <exception>
+
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TReturnType>
-class CPUAwaitable;
+template <typename TResult, RkBool TNoexcept>
+class  CPUAwaitable;
 struct CPUContinuation;
 
 /**
@@ -15,21 +17,22 @@ struct CPUContinuation;
  *        as a reference to it is held.
  *
  * \tparam TResult The result of the refereed awaitable
- * \note   This class has no side effects when TReturnType is void
+ * \tparam TNoexcept 
+ * \note   This class has no side effects when TResult is void
  */
-template <typename TResult>
+template <typename TResult, RkBool TNoexcept = true>
 class CPUAwaitableHandle
 {
     friend CPUContinuation;
 
-    CPUAwaitable<TResult>* m_instance;
+    CPUAwaitable<TResult, TNoexcept>* m_instance;
 
     public:
 
         #pragma region Lifetime
 
-        explicit CPUAwaitableHandle(nullptr_t)                           noexcept;
-        explicit CPUAwaitableHandle(CPUAwaitable<TResult>& in_awaitable) noexcept;
+        explicit CPUAwaitableHandle(nullptr_t)                                      noexcept;
+        explicit CPUAwaitableHandle(CPUAwaitable<TResult, TNoexcept>& in_awaitable) noexcept;
 
         CPUAwaitableHandle (CPUAwaitableHandle const&) noexcept;
         CPUAwaitableHandle (CPUAwaitableHandle&&)      noexcept;
@@ -42,15 +45,20 @@ class CPUAwaitableHandle
 
         #pragma region Methods
 
-        using Return = std::conditional_t<std::is_same_v<TResult, RkVoid>, RkInt, TResult> const&;
+        /**
+         * \brief Returns the result of the awaitable.
+         * \warning Do note that this result is valid only if the awaitable has been completed.
+         * \return Const reference to the result value
+         */
+        [[nodiscard]] std::add_lvalue_reference_t<const TResult> GetResult() const noexcept
+			requires !std::is_same_v<TResult, RkVoid>;
 
         /**
          * \brief Returns the result of the awaitable.
          * \warning Do note that this result is valid only if the awaitable has been completed.
          * \return Const reference to the result value
          */
-        template <typename = std::enable_if_t<!std::is_same_v<TResult, RkVoid>>>
-        [[nodiscard]] Return GetResult() const noexcept;
+        [[nodiscard]] std::exception_ptr GetException() const noexcept requires !TNoexcept;
 
         #pragma endregion
 };
