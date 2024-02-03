@@ -3,14 +3,14 @@
 #include <coroutine>
 
 #include "Types/FundamentalTypes.hpp"
-#include "Core/ExecutiveSystem/CPU/Continuations/CPUReturningContinuation.hpp"
+#include "Core/ExecutiveSystem/CPU/Continuations/CPUPropagatingContinuation.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TReturnType>
-struct CPUCoroutineContinuation: CPUReturningContinuation<TReturnType>
+template <typename TResult, RkBool TNoexcept>
+struct CPUCoroutineContinuation: CPUPropagatingContinuation<TResult, TNoexcept>
 {
-    using Node = typename CPUReturningContinuation<TReturnType>::Node;
+    using Node = typename CPUPropagatingContinuation<TResult, TNoexcept>::Node;
 
     #pragma region Lifetime
 
@@ -19,18 +19,18 @@ struct CPUCoroutineContinuation: CPUReturningContinuation<TReturnType>
      * \param in_coroutine Owning coroutine instance
      * \param in_awaited Reference to the awaited event
      */
-    CPUCoroutineContinuation(CPUAwaiter& in_coroutine, CPUAwaitableHandle<TReturnType>&& in_awaited) noexcept
-    { CPUReturningContinuation<TReturnType>::Setup(in_coroutine, std::forward<CPUAwaitableHandle<RkVoid>>(in_awaited)); }
+    CPUCoroutineContinuation(CPUAwaiter& in_coroutine, CPUAwaitableHandle<TResult, TNoexcept>&& in_awaited) noexcept
+    { this->Setup(in_coroutine, std::forward<CPUAwaitableHandle<TResult, TNoexcept>>(in_awaited)); }
 
     CPUCoroutineContinuation(CPUCoroutineContinuation const&) = delete;
     CPUCoroutineContinuation(CPUCoroutineContinuation&&     ) = delete;
     ~CPUCoroutineContinuation() noexcept
-    { CPUReturningContinuation<TReturnType>::Detach(); }
+    { this->Detach(); }
 
     CPUCoroutineContinuation operator=(CPUCoroutineContinuation const&) = delete;
     CPUCoroutineContinuation operator=(CPUCoroutineContinuation&&     ) = delete;
 
-    #pragma region
+    #pragma endregion
 
     #pragma region Methods
 
@@ -41,7 +41,7 @@ struct CPUCoroutineContinuation: CPUReturningContinuation<TReturnType>
      */
     [[nodiscard]]
 	RkBool await_ready() const noexcept
-    { return CPUReturningContinuation<TReturnType>::IsEventCompleted(); }
+    { return this->IsEventCompleted(); }
 
     /**
      * \brief Attempts a suspension by attaching the awaiter to the awaited event
@@ -49,19 +49,25 @@ struct CPUCoroutineContinuation: CPUReturningContinuation<TReturnType>
      */
     [[nodiscard]]
     RkBool await_suspend(std::coroutine_handle<>) noexcept
-    { return CPUReturningContinuation<TReturnType>::TryAttach(); }
+    { return this->TryAttach(); }
 
     /**
      * \brief Returns the result of the wait
      */
-    TReturnType const& await_resume() const noexcept
-    { return CPUReturningContinuation<TReturnType>::GetReturnValue(); }
+    auto await_resume() const noexcept(TNoexcept)
+    {
+        if constexpr (TNoexcept == false)
+			if (this->GetException())
+				std::rethrow_exception(this->GetException());
 
-    #pragma region
+	    return this->GetReturnValue();
+    }
+
+    #pragma endregion
 };
 
-template <>
-struct CPUCoroutineContinuation<RkVoid>: CPUContinuation
+template <RkBool TNoexcept>
+struct CPUCoroutineContinuation<RkVoid, TNoexcept>: CPUPropagatingContinuation<RkVoid, TNoexcept>
 {
     #pragma region Lifetime
 
@@ -70,18 +76,18 @@ struct CPUCoroutineContinuation<RkVoid>: CPUContinuation
      * \param in_coroutine Owning coroutine instance
      * \param in_awaited Handle to the awaited event
      */
-    CPUCoroutineContinuation(CPUAwaiter& in_coroutine, CPUAwaitableHandle<RkVoid>&& in_awaited) noexcept
-    { Setup(in_coroutine, std::forward<CPUAwaitableHandle<RkVoid>>(in_awaited)); }
+    CPUCoroutineContinuation(CPUAwaiter& in_coroutine, CPUAwaitableHandle<RkVoid, TNoexcept>&& in_awaited) noexcept
+    { this->Setup(in_coroutine, std::forward<CPUAwaitableHandle<RkVoid, TNoexcept>>(in_awaited)); }
 
     CPUCoroutineContinuation(CPUCoroutineContinuation const&) = delete;
     CPUCoroutineContinuation(CPUCoroutineContinuation&&     ) = delete;
     ~CPUCoroutineContinuation() noexcept
-    { Detach(); }
+    { this->Detach(); }
 
     CPUCoroutineContinuation operator=(CPUCoroutineContinuation const&) = delete;
     CPUCoroutineContinuation operator=(CPUCoroutineContinuation&&     ) = delete;
 
-    #pragma region
+    #pragma endregion
 
     #pragma region Methods
 
@@ -92,7 +98,7 @@ struct CPUCoroutineContinuation<RkVoid>: CPUContinuation
      */
     [[nodiscard]]
 	RkBool await_ready() const noexcept
-    { return IsEventCompleted(); }
+    { return this->IsEventCompleted(); }
 
     /**
      * \brief Attempts a suspension by attaching the awaiter to the awaited event
@@ -100,14 +106,19 @@ struct CPUCoroutineContinuation<RkVoid>: CPUContinuation
      */
     [[nodiscard]]
     RkBool await_suspend(std::coroutine_handle<>) noexcept
-    { return TryAttach(); }
+    { return this->TryAttach(); }
 
     /**
      * \brief Returns the result of the wait
      */
-    constexpr RkVoid await_resume() noexcept { }
+    RkVoid await_resume() const noexcept(TNoexcept)
+    {
+        if constexpr (TNoexcept == false)
+			if (this->GetException())
+				std::rethrow_exception(this->GetException());
+    }
 
-    #pragma region
+    #pragma endregion
 };
 
 END_RUKEN_NAMESPACE

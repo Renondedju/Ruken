@@ -1,11 +1,13 @@
 #pragma once
 
+#include <algorithm>
+
 #include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 template <typename TResult>
-class CPUAwaitableResult
+class CPUAwaitableResultStorage
 {
     protected:
 
@@ -22,14 +24,14 @@ class CPUAwaitableResult
         /**
          * \brief Returns the result of the awaitable.
          * \warning Do note that this result is valid only if the awaitable has been completed.
-         * \return Const reference to the result value
+         * \return The result value
          */
         [[nodiscard]]
         TResult const& GetResult() const noexcept
         { return m_result; }
 
 
-
+		// ----------------------------------------------------
         // The following methods are coroutine promises helpers
         // and can be ignored otherwise. This avoids having
         // to do a template specialization later.
@@ -49,7 +51,7 @@ class CPUAwaitableResult
 };
 
 template <>
-class CPUAwaitableResult<RkVoid>
+class CPUAwaitableResultStorage<RkVoid>
 {
     public:
 

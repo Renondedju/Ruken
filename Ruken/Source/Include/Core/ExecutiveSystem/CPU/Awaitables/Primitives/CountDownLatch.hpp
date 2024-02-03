@@ -9,7 +9,7 @@ BEGIN_RUKEN_NAMESPACE
  * \brief Asynchronous countdown latch
  */
 class CountDownLatch: public CPUAwaiter,
-                      public CPUAwaitable<RkVoid>
+                      public CPUAwaitable<RkVoid, true>
 {
 	#pragma region Members
 

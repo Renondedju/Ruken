@@ -6,12 +6,13 @@
 
 #include "Core/ExecutiveSystem/Awaitable.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableResult.hpp"
 #include "Core/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableResultStorage.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableExceptionStorage.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TResult>
+template <typename TResult, RkBool TNoexcept>
 class CPUAwaitableHandle;
 
 /**
@@ -24,10 +25,11 @@ class CPUAwaitableHandle;
  * continuations, you must make sure it is consumed either by calling
  * CPUAwaitable::Consume() or CPUAwaitable::SignalConsume().
  */
-template <typename TResult>
+template <typename TResult, RkBool TNoexcept>
 class RUKEN_EMPTY_BASES CPUAwaitable:
-    public CPUAwaitableResult<TResult>,
-    public Awaitable<CentralProcessingUnit, TResult>
+    public CPUAwaitableResultStorage<TResult>,
+	public CPUAwaitableExceptionStorage<TNoexcept>,
+    public Awaitable<CentralProcessingUnit, TResult, TNoexcept>
 {
     friend CPUContinuation;     // For the continuation hook
     friend CPUAwaitableHandle; // For the reference count
@@ -42,6 +44,11 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
     protected:
 
         #pragma region Methods
+
+	    /**
+	     * \brief Saves the passed exception pointer and calls SignalConsume()
+	     */
+	    RkVoid Cancel(std::exception_ptr in_reason) noexcept requires !TNoexcept;
 
         /**
          * \brief Signals the completion to all of the attached awaiters.
@@ -103,8 +110,14 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 
 #pragma region Implementation
 
-template <typename TResult>
-RkVoid CPUAwaitable<TResult>::Signal() const noexcept
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::Cancel(std::exception_ptr in_reason) noexcept requires !TNoexcept
+{
+    this->m_exception = in_reason;
+}
+
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::Signal() const noexcept
 {
     CPUContinuation::Node const* selection    {std::addressof(m_continuation_hook)};
     CPUAwaiter*                  awaiter      {nullptr};
@@ -134,8 +147,8 @@ RkVoid CPUAwaitable<TResult>::Signal() const noexcept
     }
 }
 
-template <typename TResult>
-RkVoid CPUAwaitable<TResult>::Consume() noexcept
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::Consume() noexcept
 {
     CPUContinuation::Node* selection    {std::addressof(m_continuation_hook)};
     CPUContinuation*       continuation {nullptr};
@@ -158,8 +171,8 @@ RkVoid CPUAwaitable<TResult>::Consume() noexcept
     }
 }
 
-template <typename TResult>
-RkVoid CPUAwaitable<TResult>::SignalConsume() noexcept
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::SignalConsume() noexcept
 {
     CPUContinuation::Node* selection    {std::addressof(m_continuation_hook)};
     CPUContinuation*       continuation {nullptr};
@@ -199,27 +212,30 @@ RkVoid CPUAwaitable<TResult>::SignalConsume() noexcept
     }
 }
 
-template <typename TResult>
-RkVoid CPUAwaitable<TResult>::Reset() noexcept
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::Reset() noexcept
 {
     m_continuation_hook.store(nullptr, std::memory_order_release);
+
+    if constexpr (TNoexcept == false)
+        this->m_exception = nullptr;
 }
 
-template <typename TResult>
-RkVoid CPUAwaitable<TResult>::DecrementReferenceCount() noexcept
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::DecrementReferenceCount() noexcept
 {
     if (m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)
         Deallocate();
 }
 
-template <typename TResult>
-RkVoid CPUAwaitable<TResult>::IncrementReferenceCount() noexcept
+template <typename TResult, RkBool TNoexcept>
+RkVoid CPUAwaitable<TResult, TNoexcept>::IncrementReferenceCount() noexcept
 {
     m_references.fetch_add(1, std::memory_order_acq_rel);
 }
 
-template <typename TResult>
-RkBool CPUAwaitable<TResult>::Completed() const noexcept
+template <typename TResult, RkBool TNoexcept>
+RkBool CPUAwaitable<TResult, TNoexcept>::Completed() const noexcept
 {
     return m_continuation_hook.load(std::memory_order_acquire) == CPUContinuation::consumed;
 }

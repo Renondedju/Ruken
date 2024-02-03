@@ -16,11 +16,13 @@ struct CPUTask;
  */
 template <QueueHandleType TQueueHandle, typename TResult>
 class CPUTaskPromise final:
-    public CPUAwaitable<TResult>,
+    public CPUAwaitable<TResult, false>,
     public CPUAwaiter
 {
     template <typename TOtherResult>
     friend class CPUPromise;
+
+	#pragma region Methods
 
     /**
      * \brief Called by the awaited event upon completion
@@ -41,6 +43,8 @@ class CPUTaskPromise final:
         std::coroutine_handle<CPUTaskPromise>::from_promise(*this).destroy();
     }
 
+	#pragma endregion
+
     public:
 
         using ProcessingUnit = CentralProcessingUnit;
@@ -54,6 +58,8 @@ class CPUTaskPromise final:
 
         CPUTaskPromise& operator=(CPUTaskPromise const&) = default;
         CPUTaskPromise& operator=(CPUTaskPromise&&     ) = default;
+
+		#pragma endregion
 
         #pragma region Methods
 
@@ -87,16 +93,17 @@ class CPUTaskPromise final:
         template <AwaitableType TAwaitable>
         auto await_transform(TAwaitable&& in_awaitable) noexcept
         {
-            using AResult         = typename std::decay_t<TAwaitable>::Result;
-            using AProcessingUnit = typename std::decay_t<TAwaitable>::ProcessingUnit;
+            using AResult              = typename std::decay_t<TAwaitable>::Result;
+            using AProcessingUnit      = typename std::decay_t<TAwaitable>::ProcessingUnit;
+            constexpr bool is_noexcept =          std::decay_t<TAwaitable>::reliable;
             static_assert(std::is_same_v<AProcessingUnit, CentralProcessingUnit>, 
                 "Awaiting events from other processing units is not yet supported");
 
             // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
             if constexpr(std::is_base_of_v<CPUAwaitableHandle<AResult>, TAwaitable>)
-                return CPUCoroutineContinuation<AResult> (*this, std::forward<TAwaitable>(in_awaitable));
+                return CPUCoroutineContinuation<AResult, is_noexcept> (*this, std::forward<TAwaitable>(in_awaitable));
             else
-                return CPUCoroutineContinuation<AResult> (*this, CPUAwaitableHandle<AResult>(in_awaitable));
+                return CPUCoroutineContinuation<AResult, is_noexcept> (*this, CPUAwaitableHandle<AResult, is_noexcept>(in_awaitable));
         }
 
         // CPU tasks will never start synchronously and are instead inserted into queues for it to be eventually processed.
@@ -113,7 +120,7 @@ class CPUTaskPromise final:
 
                 void await_suspend(std::coroutine_handle<>) const noexcept
                 {
-                    self.SignalConsume          ();
+					self.SignalConsume();
                     self.DecrementReferenceCount();
                 }
             };
@@ -121,7 +128,8 @@ class CPUTaskPromise final:
             return Awaiter {{}, {*this}};
         }
 
-        void unhandled_exception() noexcept { std::terminate(); }
+		void unhandled_exception() noexcept
+        { this->Cancel(std::current_exception()); }
 
         #pragma endregion
 };

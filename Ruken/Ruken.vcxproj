@@ -143,12 +143,14 @@
     <ClInclude Include="Source\Include\Containers\LinkedChunkList.hpp" />
     <ClInclude Include="Source\Include\Containers\LinkedChunkListNode.hpp" />
     <ClInclude Include="Source\Include\Core\EInitializationStatus.hpp" />
+    <ClInclude Include="Source\Include\Core\Exception.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Awaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\AwaitableType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\Concepts\QueueHandleType.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitable.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\AutomaticResetEvent.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableResult.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableExceptionStorage.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableResultStorage.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaiter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Primitives\AutomaticResetEvent.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Primitives\CountDownLatch.hpp" />
@@ -162,7 +164,7 @@
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CPUAwaitableHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\ConcurrencyCounter.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\Tasks\CPUTaskPromise.hpp" />
-    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUReturningContinuation.hpp" />
+    <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Continuations\CPUPropagatingContinuation.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CPUDynamicQueue.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Queues\CPUQueueHandle.hpp" />
     <ClInclude Include="Source\Include\Core\ExecutiveSystem\CPU\Awaitables\CountDownLatch.hpp" />
