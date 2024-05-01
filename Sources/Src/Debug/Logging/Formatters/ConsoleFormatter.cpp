@@ -1,5 +1,5 @@
 
-#include "Build/OperatingSystem.hpp"
+#include "Build/BuildInfo.hpp"
 #include "Debug/Logging/Formatters/ConsoleFormatter.hpp"
 
 #ifdef RUKEN_OS_WINDOWS

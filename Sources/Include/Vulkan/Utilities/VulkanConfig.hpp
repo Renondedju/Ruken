@@ -1,7 +1,7 @@
 ﻿
 #pragma once
 
-#include "Build/OperatingSystem.hpp"
+#include "Build/BuildInfo.hpp"
 #include "Types/FundamentalTypes.hpp"
 
 #if defined(RUKEN_OS_WINDOWS)

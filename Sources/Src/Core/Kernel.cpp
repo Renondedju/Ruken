@@ -1,9 +1,8 @@
 
 #include <iostream>
 
-#include "Build/Info.hpp"
-#include "Build/Build.hpp"
-#include "Build/Config.hpp"
+#include "Build/ProjectInfo.hpp"
+#include "Build/BuildInfo.hpp"
 
 #include "Core/Kernel.hpp"
 #include "Core/KernelProxy.hpp"
@@ -20,24 +19,20 @@ USING_RUKEN_NAMESPACE
 
 Kernel::Kernel()
 {
-    #if defined(RUKEN_LOGGING_ENABLED)
-
     std::string failure_reason;
     m_logger = m_service_provider.ProvideService<Logger>(failure_reason, "Ruken", ELogLevel::Debug);
 
     if (m_logger)
     {
         m_logger->AddHandler(&m_console_handler);
-        m_logger->Info("Booting up " RUKEN_BUILD_INFO);
-        m_logger->Info(RUKEN_LICENSE_STR " " RUKEN_COPYRIGHT_STR " (" RUKEN_URL ")");
+        m_logger->Info(std::format("Booting up {} {} rev {} ({} {} > {})", RUKEN_PROJECT_NAME, BuildInfo::Version, BuildInfo::Revision, BuildInfo::SystemName, BuildInfo::BuildType, BuildInfo::CompilerName));
+        m_logger->Info(std::format("{} - {} ({})", ProjectInfo::Copyright, ProjectInfo::Licence, ProjectInfo::RepositoryUrl));
     }
     else
     {
         std::cerr << "The logging service failed to initialize for the following reason: " << failure_reason
                   << "\nBecause of that, logging will be unavailable for this session."    << std::endl;
     }
-
-    #endif
 
     SetupService<KernelProxy>(true, *this);
 

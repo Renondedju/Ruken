@@ -2,8 +2,8 @@
 #include <set>
 #include <vector>
 
-#include "Build/Info.hpp"
-#include "Build/Config.hpp"
+#include "Build/ProjectInfo.hpp"
+#include "Build/BuildInfo.hpp"
 
 #include "Vulkan/Core/VulkanInstance.hpp"
 #include "Vulkan/Utilities/VulkanDebug.hpp"
@@ -169,7 +169,7 @@ RkBool VulkanInstance::CreateInstance() noexcept
 
     instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 
-    RUKEN_DEBUG
+    if constexpr (BuildInfo::HasDebugInfo)
     {
         instance_create_info.pNext = &debug_messenger_create_info;
     }

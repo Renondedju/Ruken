@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Build/OperatingSystem.hpp"
+#include "Build/BuildInfo.hpp"
 
 #include "Functional/Event.hpp"
 

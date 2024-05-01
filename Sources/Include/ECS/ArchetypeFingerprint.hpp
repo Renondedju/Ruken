@@ -1,14 +1,13 @@
 
 #pragma once
 
-#include "Build/Config.hpp"
 #include "Build/Namespace.hpp"
-
 #include "Meta/MinimumType.hpp"
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
-
 #include "ECS/Safety/AnyComponentType.hpp"
+
+#define RUKEN_MAX_ECS_COMPONENTS 64
 
 BEGIN_RUKEN_NAMESPACE
 

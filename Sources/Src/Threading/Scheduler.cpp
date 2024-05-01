@@ -1,5 +1,5 @@
 
-#include "Build/Config.hpp"
+#include "Build/BuildInfo.hpp"
 #include "Threading/Scheduler.hpp"
 #include "Core/ServiceProvider.hpp"
 

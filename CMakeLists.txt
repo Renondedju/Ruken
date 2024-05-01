@@ -6,6 +6,15 @@ set(CMAKE_CXX_STANDARD 23)
 # --- Project setup
 project(Ruken)
 
+set(RUKEN_SOURCES_DIR           ${CMAKE_CURRENT_LIST_DIR}/Sources)
+set(RUKEN_GENERATED_SOURCES_DIR ${CMAKE_BINARY_DIR}/Generated)
+
+if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR})
+    file(MAKE_DIRECTORY ${RUKEN_GENERATED_SOURCES_DIR})
+endif ()
+
+add_definitions(-DRUKEN_PROJECT_NAME="Ruken")
+
 add_compile_options(/Zc:wchar_t /Zc:char8_t- /Zc:preprocessor /wd5103)
 add_compile_definitions(UNICODE _UNICODE)
 add_executable(Ruken Sources/Src/Main.cpp
@@ -13,14 +22,8 @@ add_executable(Ruken Sources/Src/Main.cpp
         Sources/Include/Bitwise/Endian.hpp
         Sources/Include/Bitwise/SizedBitmask.hpp
         Sources/Include/Build/Attributes/EmptyBases.hpp
-        Sources/Include/Build/Build.hpp
-        Sources/Include/Build/Compiler.hpp
-        Sources/Include/Build/Config.hpp
-        Sources/Include/Build/Info.hpp
+        Sources/Include/Build/ProjectInfo.hpp
         Sources/Include/Build/Namespace.hpp
-        Sources/Include/Build/OperatingSystem.hpp
-        Sources/Include/Build/Platform.hpp
-        Sources/Include/Build/Revision.hpp
         Sources/Include/Containers/LinkedChunkList.hpp
         Sources/Include/Containers/LinkedChunkListNode.hh
         Sources/Include/Core/ExecutiveSystem/Concepts/AwaitableType.hpp
@@ -407,13 +410,14 @@ add_executable(Ruken Sources/Src/Main.cpp
         Sources/Src/Windowing/Window.cpp
         Sources/Src/Windowing/WindowManager.cpp)
 
-target_include_directories(Ruken PUBLIC  "Sources/Include")
-target_include_directories(Ruken PRIVATE "Sources/Src")
+target_include_directories(Ruken PUBLIC  ${RUKEN_GENERATED_SOURCES_DIR}/Include)
+target_include_directories(Ruken PUBLIC  ${RUKEN_SOURCES_DIR}/Include)
+target_include_directories(Ruken PRIVATE ${RUKEN_SOURCES_DIR}/Src)
 
 
 # --- Add dependencies
-include(Sources/CMake/CPM.cmake)
-set(CPM_SOURCE_CACHE Sources/ThirdParty)
+include(${RUKEN_SOURCES_DIR}/CMake/CPM.cmake)
+set(CPM_SOURCE_CACHE ${RUKEN_SOURCES_DIR}/ThirdParty)
 
 set(GLFW_BUILD_DOCS OFF)
 set(GLFW_BUILD_EXAMPLES OFF)
@@ -451,5 +455,14 @@ if (stb_ADDED)
     target_include_directories(stb INTERFACE $<BUILD_INTERFACE:${stb_SOURCE_DIR}>)
 endif()
 
+# --- Config file
+include(Sources/CMake/CheckGit.cmake)
+
+string(TOUPPER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME_TOUPPER)
+set(RUKEN_BUILD_VERSION "0.0.0")
+configure_file(${RUKEN_SOURCES_DIR}/Include/Build/BuildInfo.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Include/Build/BuildInfo.hpp)
+
+CheckGitSetup()
+
 # --- Link dependencies
-target_link_libraries(Ruken PRIVATE glm::glm fastgltf::fastgltf glfw atomic_queue stb Vulkan::Vulkan volk vma tinyobjloader)
+target_link_libraries(Ruken PRIVATE glm::glm fastgltf::fastgltf glfw atomic_queue stb Vulkan::Vulkan volk vma tinyobjloader git_version)
