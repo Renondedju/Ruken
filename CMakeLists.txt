@@ -414,7 +414,6 @@ target_include_directories(Ruken PUBLIC  ${RUKEN_GENERATED_SOURCES_DIR}/Include)
 target_include_directories(Ruken PUBLIC  ${RUKEN_SOURCES_DIR}/Include)
 target_include_directories(Ruken PRIVATE ${RUKEN_SOURCES_DIR}/Src)
 
-
 # --- Add dependencies
 include(${RUKEN_SOURCES_DIR}/CMake/CPM.cmake)
 set(CPM_SOURCE_CACHE ${RUKEN_SOURCES_DIR}/ThirdParty)
@@ -459,7 +458,12 @@ endif()
 include(Sources/CMake/CheckGit.cmake)
 
 string(TOUPPER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME_TOUPPER)
-set(RUKEN_BUILD_VERSION "0.0.0")
+
+set(RUKEN_DEBUG_BUILD_TYPES Debug RelWithDebInfo)
+if(${CMAKE_BUILD_TYPE} IN_LIST RUKEN_DEBUG_BUILD_TYPES)
+    set(RUKEN_BUILD_HAS_DEBUG_INFO true)
+endif ()
+
 configure_file(${RUKEN_SOURCES_DIR}/Include/Build/BuildInfo.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Include/Build/BuildInfo.hpp)
 
 CheckGitSetup()
