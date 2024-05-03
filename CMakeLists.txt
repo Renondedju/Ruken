@@ -1,10 +1,20 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.16.3)
 
 # --- Language setup
 set(CMAKE_CXX_STANDARD 23)
 
 # --- Project setup
 project(Ruken)
+
+macro(set_boolean var)
+    if(${ARGN})
+        set(${var} ON)
+    else()
+        set(${var} OFF)
+    endif()
+endmacro()
+
+option(RUKEN_HEADLESS_BUILD "Disables all form of rendering and presentation " OFF)
 
 set(RUKEN_SOURCES_DIR           ${CMAKE_CURRENT_LIST_DIR}/Sources)
 set(RUKEN_GENERATED_SOURCES_DIR ${CMAKE_BINARY_DIR}/Generated)
@@ -13,9 +23,6 @@ if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR})
     file(MAKE_DIRECTORY ${RUKEN_GENERATED_SOURCES_DIR})
 endif ()
 
-add_definitions(-DRUKEN_PROJECT_NAME="Ruken")
-
-add_compile_options(/Zc:wchar_t /Zc:char8_t- /Zc:preprocessor /wd5103)
 add_compile_definitions(UNICODE _UNICODE)
 add_executable(Ruken Sources/Src/Main.cpp
         Sources/Include/Bitwise/Bitmask.hpp
@@ -413,6 +420,12 @@ add_executable(Ruken Sources/Src/Main.cpp
 target_include_directories(Ruken PUBLIC  ${RUKEN_GENERATED_SOURCES_DIR}/Include)
 target_include_directories(Ruken PUBLIC  ${RUKEN_SOURCES_DIR}/Include)
 target_include_directories(Ruken PRIVATE ${RUKEN_SOURCES_DIR}/Src)
+target_compile_definitions(Ruken PRIVATE RUKEN_PROJECT_NAME="Ruken")
+target_compile_options    (Ruken PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/Zc:wchar_t /Zc:char8_t- /Zc:preprocessor /wd5103>
+    $<$<CXX_COMPILER_ID:GNU>:>
+)
+
 
 # --- Add dependencies
 include(${RUKEN_SOURCES_DIR}/CMake/CPM.cmake)
@@ -422,14 +435,20 @@ set(GLFW_BUILD_DOCS OFF)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
 
-find_package(Vulkan REQUIRED)
+if (NOT RUKEN_HEADLESS_BUILD)
+    find_package(Vulkan REQUIRED)
+
+    CPMAddPackage(URL "https://github.com/glfw/glfw/releases/download/3.3.9/glfw-3.3.9.zip" NAME glfw)
+    CPMAddPackage(URL "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.0.1.zip" NAME vma)
+    CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.3.270.zip" NAME volk)
+    set(RUKEN_VULKAN_LIBS glfw Vulkan::Vulkan volk vma)
+else ()
+    set(RUKEN_VULKAN_LIBS)
+endif()
 
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 CPMAddPackage(URL "https://github.com/g-truc/glm/archive/refs/tags/1.0.0.zip" NAME glm)
-CPMAddPackage(URL "https://github.com/glfw/glfw/releases/download/3.3.9/glfw-3.3.9.zip" NAME glfw)
-CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.3.270.zip" NAME volk)
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
-CPMAddPackage(URL "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.0.1.zip" NAME vma)
 CPMAddPackage("gh:spnda/fastgltf#7bb21c56dc41703cbb9df022b93c45428fd370bd")
 CPMAddPackage("gh:nothings/stb#f4a71b13373436a2866c5d68f8f80ac6f0bc1ffe")
 
@@ -460,13 +479,11 @@ include(Sources/CMake/CheckGit.cmake)
 string(TOUPPER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME_TOUPPER)
 
 set(RUKEN_DEBUG_BUILD_TYPES Debug RelWithDebInfo)
-if(${CMAKE_BUILD_TYPE} IN_LIST RUKEN_DEBUG_BUILD_TYPES)
-    set(RUKEN_BUILD_HAS_DEBUG_INFO true)
-endif ()
+set_boolean(RUKEN_BUILD_HAS_DEBUG_INFO ${CMAKE_BUILD_TYPE} IN_LIST RUKEN_DEBUG_BUILD_TYPES)
 
 configure_file(${RUKEN_SOURCES_DIR}/Include/Build/BuildInfo.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Include/Build/BuildInfo.hpp)
 
 CheckGitSetup()
 
 # --- Link dependencies
-target_link_libraries(Ruken PRIVATE glm::glm fastgltf::fastgltf glfw atomic_queue stb Vulkan::Vulkan volk vma tinyobjloader git_version)
+target_link_libraries(Ruken PRIVATE glm::glm fastgltf::fastgltf atomic_queue stb tinyobjloader git_version ${RUKEN_VULKAN_LIBS})

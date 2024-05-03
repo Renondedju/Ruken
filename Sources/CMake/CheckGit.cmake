@@ -24,6 +24,7 @@ function(CheckGitVersion)
             WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
             OUTPUT_VARIABLE GIT_REVISION
             OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
     )
 
     execute_process(
@@ -31,7 +32,16 @@ function(CheckGitVersion)
             WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
             OUTPUT_VARIABLE GIT_VERSION
             OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
     )
+
+    if (GIT_REVISION STREQUAL "")
+        set(GIT_REVISION "?")
+    endif ()
+
+    if (GIT_VERSION STREQUAL "")
+        set(GIT_VERSION "?")
+    endif ()
 
     GitReadCache(GIT_REVISION_CACHE Revision)
     GitReadCache(GIT_VERSION_CACHE Version)

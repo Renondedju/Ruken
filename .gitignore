@@ -1,6 +1,8 @@
 # Temp and debug folders
 logs/
 build/
+!Sources/Include/Build
+!Sources/Src/Build
 
 # Revision file
 Revision.hpp
