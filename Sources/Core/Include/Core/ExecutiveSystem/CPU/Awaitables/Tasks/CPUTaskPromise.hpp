@@ -1,5 +1,7 @@
 #pragma once
 
+#include <source_location>
+
 #include "Build/Namespace.hpp"
 #include "Build/BuildInfo.hpp"
 #include "Core/ExecutiveSystem/Concepts/AwaitableType.hpp"
@@ -31,6 +33,8 @@ class CPUTaskPromise final:
 
     template <typename TOtherResult, bool TOtherIsNoexcept>
     friend struct CPUCoroutineContinuation;
+
+    std::source_location m_source_location;
 
     #ifdef RUKEN_TRACE_BUILD
     std::source_location m_source_location {};
@@ -161,8 +165,9 @@ class CPUTaskPromise final:
         // Since we have to hold a result, the promise cannot be destroyed if there are still references to it
         // in that case, the last reference to be removed will destroy the coroutine.
         // If no references are made to the coroutine at the time of completion, the destruction happens immediately.
-        auto initial_suspend() noexcept
+        auto initial_suspend(std::source_location const& in_location = std::source_location::current()) noexcept
         {
+            m_source_location = in_location;
             struct Awaiter: std::suspend_always
             {
                 CPUTaskPromise& self;
@@ -170,7 +175,7 @@ class CPUTaskPromise final:
                 void await_resume() const noexcept
                 {
                     #ifdef RUKEN_TRACE_BUILD
-                    TracyCZone(ctx, 1)
+                    TracyCZoneN(ctx, self.m_source_location.function_name(), true);
                     self.m_zone = ctx;
                     #endif
                 }
@@ -179,7 +184,7 @@ class CPUTaskPromise final:
             return Awaiter {{}, {*this}};
         }
 
-        auto final_suspend  () noexcept
+        auto final_suspend() noexcept
         {
             struct Awaiter: std::suspend_always
             {

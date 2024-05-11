@@ -1,24 +1,13 @@
 #pragma once
 
 #include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
+#include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
 
 #include "ECS/System.hpp"
 #include "ECS/EventHandler.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
 USING_RUKEN_NAMESPACE
-
-struct WhenAll : CPUAwaitable<void, false>, CPUAwaiter
-{
-    WhenAll();
-    WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs);
-
-    private:
-
-        #pragma region Members
-
-        #pragma endregion
-}
 
 inline CPUDynamicTask<> WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs)
 {
@@ -42,7 +31,8 @@ inline CPUDynamicTask<> WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs)
     co_await latch;
 }
 
-struct CounterSystem final: public System
+
+struct CounterSystem final: System
 {
     CounterSystem(EntityAdmin& in_admin) : System(in_admin)
     {
