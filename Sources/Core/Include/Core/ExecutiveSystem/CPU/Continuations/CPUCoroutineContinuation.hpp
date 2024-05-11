@@ -40,7 +40,7 @@ struct CPUCoroutineContinuation: CPUPropagatingContinuation<TResult, TNoexcept>
      * \return True if the awaiter has been completed, false otherwise
      */
     [[nodiscard]]
-	RkBool await_ready() const noexcept
+    RkBool await_ready() const noexcept
     { return this->IsEventCompleted(); }
 
     /**
@@ -57,10 +57,10 @@ struct CPUCoroutineContinuation: CPUPropagatingContinuation<TResult, TNoexcept>
     auto await_resume() const noexcept(TNoexcept)
     {
         if constexpr (TNoexcept == false)
-			if (this->GetException())
-				std::rethrow_exception(this->GetException());
+			     if (this->GetException())
+				        std::rethrow_exception(this->GetException());
 
-	    return this->GetReturnValue();
+	       return this->GetReturnValue();
     }
 
     #pragma endregion

@@ -8,6 +8,18 @@
 
 USING_RUKEN_NAMESPACE
 
+struct WhenAll : CPUAwaitable<void, false>, CPUAwaiter
+{
+    WhenAll();
+    WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs);
+
+    private:
+
+        #pragma region Members
+
+        #pragma endregion
+}
+
 inline CPUDynamicTask<> WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs)
 {
     CountDownLatch               latch         {in_jobs.size()};

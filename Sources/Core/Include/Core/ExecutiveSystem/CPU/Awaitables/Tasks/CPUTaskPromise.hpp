@@ -13,7 +13,8 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueueHandle, typename TResult>
+BEGIN_RUKEN_NAMESPACE
+    template <QueueHandleType TQueueHandle, typename TResult>
 struct CPUTask;
 
 /**
@@ -113,6 +114,10 @@ class CPUTaskPromise final:
             static_assert(std::is_same_v<AProcessingUnit, CentralProcessingUnit>, 
                 "Awaiting events from other processing units is not yet supported");
 
+            #ifdef RUKEN_TRACE_BUILD
+            TracyCZoneEnd(m_zone)
+            #endif
+
             struct Awaiter : CPUCoroutineContinuation<AResult, is_noexcept>
             {
                 CPUTaskPromise& self;
@@ -145,10 +150,10 @@ class CPUTaskPromise final:
             };
 
             // In the case we don't need a bridge, we know the awaitable inherits from CPUAwaitable
-            if constexpr(std::is_base_of_v<CPUAwaitableHandle<AResult>, TAwaitable>)
-                return CPUCoroutineContinuation<AResult, is_noexcept> (*this, std::forward<TAwaitable>(in_awaitable));
+            if constexpr(std::is_base_of_v<CPUAwaitableHandle<AResult, is_noexcept>, TAwaitable>)
+                return Awaiter {*this, std::forward<TAwaitable>(in_awaitable)};
             else
-                return CPUCoroutineContinuation<AResult, is_noexcept> (*this, CPUAwaitableHandle<AResult, is_noexcept>(in_awaitable));
+                return Awaiter {*this, CPUAwaitableHandle<AResult, is_noexcept>(in_awaitable)};
         }
 
         // CPU tasks will never start synchronously and are instead inserted into queues for it to be eventually processed.
@@ -156,7 +161,24 @@ class CPUTaskPromise final:
         // Since we have to hold a result, the promise cannot be destroyed if there are still references to it
         // in that case, the last reference to be removed will destroy the coroutine.
         // If no references are made to the coroutine at the time of completion, the destruction happens immediately.
-        auto initial_suspend() noexcept { return std::suspend_always {}; }
+        auto initial_suspend() noexcept
+        {
+            struct Awaiter: std::suspend_always
+            {
+                CPUTaskPromise& self;
+
+                void await_resume() const noexcept
+                {
+                    #ifdef RUKEN_TRACE_BUILD
+                    TracyCZone(ctx, 1)
+                    self.m_zone = ctx;
+                    #endif
+                }
+            };
+
+            return Awaiter {{}, {*this}};
+        }
+
         auto final_suspend  () noexcept
         {
             struct Awaiter: std::suspend_always
@@ -165,7 +187,11 @@ class CPUTaskPromise final:
 
                 void await_suspend(std::coroutine_handle<>) const noexcept
                 {
-					self.SignalConsume();
+                    #ifdef RUKEN_TRACE_BUILD
+                    TracyCZoneEnd(self.m_zone)
+                    #endif
+
+                    self.SignalConsume          ();
                     self.DecrementReferenceCount();
                 }
             };
