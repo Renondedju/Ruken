@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 #include "Core/ExecutiveSystem/Awaitable.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
@@ -31,8 +31,9 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 	public CPUAwaitableExceptionStorage<TNoexcept>,
     public Awaitable<CentralProcessingUnit, TResult, TNoexcept>
 {
+    template <typename TFriendResult, RkBool TFriendNoexcept>
+    friend class CPUAwaitableHandle; // For the reference count
     friend CPUContinuation;     // For the continuation hook
-    friend CPUAwaitableHandle; // For the reference count
 
     #pragma region Members
 
@@ -48,7 +49,7 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 	    /**
 	     * \brief Saves the passed exception pointer and calls SignalConsume()
 	     */
-	    RkVoid Cancel(std::exception_ptr in_reason) noexcept requires !TNoexcept;
+	    RkVoid Cancel(std::exception_ptr in_reason) noexcept requires (!TNoexcept);
 
         /**
          * \brief Signals the completion to all of the attached awaiters.
@@ -111,7 +112,7 @@ class RUKEN_EMPTY_BASES CPUAwaitable:
 #pragma region Implementation
 
 template <typename TResult, RkBool TNoexcept>
-RkVoid CPUAwaitable<TResult, TNoexcept>::Cancel(std::exception_ptr in_reason) noexcept requires !TNoexcept
+RkVoid CPUAwaitable<TResult, TNoexcept>::Cancel(std::exception_ptr in_reason) noexcept requires (!TNoexcept)
 {
     this->m_exception = in_reason;
 }

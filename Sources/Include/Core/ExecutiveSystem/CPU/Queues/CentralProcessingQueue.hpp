@@ -27,8 +27,9 @@ struct CPUTaskSubscription;
  */
 class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 {
-    friend const Worker; // readonly
-    friend CPUTaskSubscription; // Updating m_current_concurrency
+    template <QueueHandleType TFriendQueueHandle>
+    friend struct CPUTaskSubscription; // Updating m_current_concurrency
+    friend Worker; // readonly
 
     #pragma region Members
 

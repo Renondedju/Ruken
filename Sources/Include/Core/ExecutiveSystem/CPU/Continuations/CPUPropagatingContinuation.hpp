@@ -33,7 +33,7 @@ class CPUPropagatingContinuation: public CPUContinuation
          * \return Reference to the return value
          */
         [[nodiscard]] auto GetReturnValue() const noexcept
-			requires !std::is_same_v<TResult, RkVoid>
+			requires (!std::is_same_v<TResult, RkVoid>)
         { return m_handle.GetResult(); }
 
         /**
@@ -42,7 +42,7 @@ class CPUPropagatingContinuation: public CPUContinuation
          * \return Exception pointer
          */
         [[nodiscard]] std::exception_ptr GetException() const noexcept
-			requires !TNoexcept
+			requires (!TNoexcept)
         { return m_handle.GetException(); }
 
         #pragma endregion

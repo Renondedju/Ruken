@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Types/Units/Pixels.hpp"
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 #include "Maths/Vector/Operations/VectorOperators.hpp"
 #include "Maths/Vector/Operations/VectorMinMax.hpp"

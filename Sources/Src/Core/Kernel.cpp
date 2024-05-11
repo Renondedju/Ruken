@@ -1,8 +1,8 @@
-
 #include <iostream>
+#include <format>
 
-#include "Build/ProjectInfo.hpp"
 #include "Build/BuildInfo.hpp"
+#include "Build/ProjectInfo.hpp"
 
 #include "Core/Kernel.hpp"
 #include "Core/KernelProxy.hpp"
@@ -10,9 +10,11 @@
 #include "Meta/Meta.hpp"
 #include "Meta/Safety.hpp"
 
-#include "Rendering/Renderer.hpp"
+#ifndef RUKEN_HEADLESS_BUILD
+    #include "Rendering/Renderer.hpp"
+    #include "Windowing/WindowManager.hpp"
+#endif
 #include "Threading/Scheduler.hpp"
-#include "Windowing/WindowManager.hpp"
 #include "Resource/ResourceManager.hpp"
 
 USING_RUKEN_NAMESPACE
@@ -35,10 +37,12 @@ Kernel::Kernel()
     }
 
     SetupService<KernelProxy>(true, *this);
+    SetupService<Scheduler>  (true);
 
-    SetupService<Scheduler>      (true);
+#ifndef RUKEN_HEADLESS_BUILD
     SetupService<WindowManager>  (true);
     SetupService<Renderer>       (true);
+#endif
     SetupService<ResourceManager>(true);
 
     m_console_handler.Flush();
@@ -57,6 +61,7 @@ RkInt Kernel::Run() noexcept
     if (m_exit_code != 0)
         return m_exit_code;
 
+#ifndef RUKEN_HEADLESS_BUILD
     auto& window_manager = *m_service_provider.LocateService<WindowManager>();
     auto& window         = window_manager.CreateWindow({
         .name = RUKEN_PROJECT_NAME,
@@ -66,16 +71,18 @@ RkInt Kernel::Run() noexcept
         },
         .transparent_framebuffer = true,
     });
+#endif
 
     // Main kernel loop
     while (!m_shutdown_requested.load(std::memory_order_acquire))
     {
+#ifndef RUKEN_HEADLESS_BUILD
         // Updating services that needs to
         window_manager.Update();
 
         if (window.ShouldClose())
             RequestShutdown(0);
-
+#endif
         // Displaying logs to the console
         m_console_handler.Flush();
     }

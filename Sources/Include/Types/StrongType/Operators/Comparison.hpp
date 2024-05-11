@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 #include "Types/StrongType/Operators/Comparison/Less.hpp"
 #include "Types/StrongType/Operators/Comparison/Equal.hpp"

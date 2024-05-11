@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 #include "Types/StrongType/Operators/Logical/LogicalOr.hpp"
 #include "Types/StrongType/Operators/Logical/LogicalAnd.hpp"

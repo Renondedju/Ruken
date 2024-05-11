@@ -26,8 +26,8 @@ struct CPUContinuation
 {
     using Node = std::atomic<CPUContinuation*>;
 
-    static constexpr CPUContinuation* locked   {reinterpret_cast<CPUContinuation*>(0x1)};
-    static constexpr CPUContinuation* consumed {reinterpret_cast<CPUContinuation*>(0x2)};
+    static inline auto locked   {reinterpret_cast<CPUContinuation*>(0x1)};
+    static inline auto consumed {reinterpret_cast<CPUContinuation*>(0x2)};
 
     #pragma region Members
 

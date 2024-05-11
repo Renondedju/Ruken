@@ -51,14 +51,14 @@ class CPUAwaitableHandle
          * \return Const reference to the result value
          */
         [[nodiscard]] std::add_lvalue_reference_t<const TResult> GetResult() const noexcept
-			requires !std::is_same_v<TResult, RkVoid>;
+        requires (!std::is_same_v<TResult, RkVoid>);
 
         /**
          * \brief Returns the result of the awaitable.
          * \warning Do note that this result is valid only if the awaitable has been completed.
          * \return Const reference to the result value
          */
-        [[nodiscard]] std::exception_ptr GetException() const noexcept requires !TNoexcept;
+        [[nodiscard]] std::exception_ptr GetException() const noexcept requires (!TNoexcept);
 
         #pragma endregion
 };

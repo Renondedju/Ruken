@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Debug/Logging/LogRecord.hpp"
+#include "Build/Attributes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -9,7 +10,7 @@ BEGIN_RUKEN_NAMESPACE
  * \brief This class provides a finer grained facility for determining which log records to output.
  * \note  Filters objects can be used by Loggers for more sophisticated filtering than is provided by levels.
  */
-class __declspec(novtable) LogFilter
+class RUKEN_NO_VTABLE LogFilter
 {
     public:
 

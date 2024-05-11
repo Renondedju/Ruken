@@ -63,13 +63,13 @@ CPUAwaitableHandle<TResult, TNoexcept>::~CPUAwaitableHandle() noexcept
 
 template <typename TResult, RkBool TNoexcept>
 std::add_lvalue_reference_t<const TResult> CPUAwaitableHandle<TResult, TNoexcept>::GetResult() const noexcept
-	requires !std::is_same_v<TResult, RkVoid>
+	requires (!std::is_same_v<TResult, RkVoid>)
 {
     return m_instance->GetResult();
 }
 
 template <typename TResult, RkBool TNoexcept>
-std::exception_ptr CPUAwaitableHandle<TResult, TNoexcept>::GetException() const noexcept requires !TNoexcept
+std::exception_ptr CPUAwaitableHandle<TResult, TNoexcept>::GetException() const noexcept requires (!TNoexcept)
 {
     return m_instance->GetException();
 }

@@ -11,3 +11,9 @@
 #else
     #define RUKEN_EMPTY_BASES
 #endif
+
+#ifdef RUKEN_COMPILER_MSVC
+    #define RUKEN_NO_VTABLE __declspec(novtable)
+#else
+    #define RUKEN_NO_VTABLE
+#endif

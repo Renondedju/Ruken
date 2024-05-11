@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 #include "Maths/Constants.hpp"
 #include "Types/Units/Angle/EAngleUnit.hpp"

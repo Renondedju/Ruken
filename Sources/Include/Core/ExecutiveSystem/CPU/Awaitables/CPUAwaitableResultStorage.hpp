@@ -44,7 +44,7 @@ class CPUAwaitableResultStorage
         {   m_result = std::forward<TResult>(in_result); }
 
         void return_value(TResult const& in_result) noexcept
-            requires !std::is_reference_v<TResult>
+            requires (!std::is_reference_v<TResult>)
         {   m_result = in_result; }
 
         #pragma endregion

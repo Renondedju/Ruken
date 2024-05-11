@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Types/FundamentalTypes.hpp"
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

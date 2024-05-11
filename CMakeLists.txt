@@ -28,7 +28,7 @@ add_executable(Ruken Sources/Src/Main.cpp
         Sources/Include/Bitwise/Bitmask.hpp
         Sources/Include/Bitwise/Endian.hpp
         Sources/Include/Bitwise/SizedBitmask.hpp
-        Sources/Include/Build/Attributes/EmptyBases.hpp
+        Sources/Include/Build/Attributes.hpp
         Sources/Include/Build/ProjectInfo.hpp
         Sources/Include/Build/Namespace.hpp
         Sources/Include/Containers/LinkedChunkList.hpp

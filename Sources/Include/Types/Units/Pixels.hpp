@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 #include "Types/StrongType/StrongType.hpp"
 #include "Types/StrongType/StrongTypeSuffix.hpp"
 #include "Types/StrongType/Operators/Arithmetic.hpp"

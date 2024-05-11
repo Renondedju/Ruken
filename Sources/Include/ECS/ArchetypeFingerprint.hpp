@@ -1,5 +1,6 @@
-
 #pragma once
+
+#include <functional>
 
 #include "Build/Namespace.hpp"
 #include "Meta/MinimumType.hpp"

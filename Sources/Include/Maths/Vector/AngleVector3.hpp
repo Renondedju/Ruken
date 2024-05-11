@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Types/Units/Angle/Angle.hpp"
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 #include "Maths/Vector/Helper/VectorForward.hpp"
 
 #include "Maths/Vector/Operations/VectorOperators.hpp"

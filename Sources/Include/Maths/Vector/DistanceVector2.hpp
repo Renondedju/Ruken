@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 #include "Types/Units/Distance/Distance.hpp"
 #include "Types/Units/Distance/EDistanceUnit.hpp"
 

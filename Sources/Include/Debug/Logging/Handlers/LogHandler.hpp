@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Build/Attributes.hpp"
 #include "Threading/ThreadSafeLockQueue.hpp"
-
 #include "Debug/Logging/Formatters/LogFormatter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -11,7 +11,7 @@ BEGIN_RUKEN_NAMESPACE
  *        (based on the log messages�' severity) to the handler�'s specified destination.
  * \note  Logger objects can add zero or more handler objects to themselves with an "AddHandler" method.
  */
-class __declspec(novtable) LogHandler
+class RUKEN_NO_VTABLE LogHandler
 {
     protected:
 

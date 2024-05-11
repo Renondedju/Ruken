@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Build/Attributes/EmptyBases.hpp"
+#include "Build/Attributes.hpp"
 
 #include "Types/StrongType/Operators/Stream/OutputStream.hpp"
 #include "Types/StrongType/Operators/Stream/InputStream.hpp"
