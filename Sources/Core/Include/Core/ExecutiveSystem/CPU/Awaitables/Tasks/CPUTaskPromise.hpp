@@ -16,7 +16,8 @@
 BEGIN_RUKEN_NAMESPACE
 
 BEGIN_RUKEN_NAMESPACE
-    template <QueueHandleType TQueueHandle, typename TResult>
+
+template <QueueHandleType TQueueHandle, typename TResult>
 struct CPUTask;
 
 /**
@@ -34,7 +35,6 @@ class CPUTaskPromise final:
     template <typename TOtherResult, bool TOtherIsNoexcept>
     friend struct CPUCoroutineContinuation;
 
-    std::source_location m_source_location;
 
     #ifdef RUKEN_TRACE_BUILD
     std::source_location m_source_location {};
@@ -165,9 +165,14 @@ class CPUTaskPromise final:
         // Since we have to hold a result, the promise cannot be destroyed if there are still references to it
         // in that case, the last reference to be removed will destroy the coroutine.
         // If no references are made to the coroutine at the time of completion, the destruction happens immediately.
+#ifdef RUKEN_TRACE_BUILD
         auto initial_suspend(std::source_location const& in_location = std::source_location::current()) noexcept
         {
             m_source_location = in_location;
+#else
+        auto initial_suspend() noexcept
+        {
+#endif
             struct Awaiter: std::suspend_always
             {
                 CPUTaskPromise& self;
@@ -181,7 +186,7 @@ class CPUTaskPromise final:
                 }
             };
 
-            return Awaiter {{}, {*this}};
+            return Awaiter {{}, *this};
         }
 
         auto final_suspend() noexcept
@@ -201,7 +206,7 @@ class CPUTaskPromise final:
                 }
             };
 
-            return Awaiter {{}, {*this}};
+            return Awaiter {{}, *this};
         }
 
 		void unhandled_exception() noexcept

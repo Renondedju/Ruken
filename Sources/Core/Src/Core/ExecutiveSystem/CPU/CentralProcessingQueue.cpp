@@ -9,15 +9,19 @@ CentralProcessingQueue::CentralProcessingQueue(const RkSize in_size) noexcept:
 RkVoid CentralProcessingQueue::TryConsumeJob(RkUint32 const in_max_attempts) noexcept
 {
     std::coroutine_handle<>      job;
+    RkBool                       has_job {false};
     ConcurrencyCounter constexpr one_optimal { {.current_concurrency = 0, .optimal_concurrency = 1} };
-    RkSize                       remaining_attempts { static_cast<RkSize>(in_max_attempts) + 1ULL   };
+    RkSize                       remaining_attempts { static_cast<RkSize>(in_max_attempts) + 1ULL };
 
     // Attempting to pop a job
-    while (--remaining_attempts > 0 && !m_queue.try_pop(job))
+    while (--remaining_attempts > 0 && !has_job)
+    {
+        has_job = m_queue.try_pop(job);
         atomic_queue::spin_loop_pause();
+    }
 
     // Escaping timeouts
-    if (remaining_attempts == 0)
+    if (remaining_attempts == 0 && !has_job)
         return;
 
     // Otherwise we need to update the concurrency and run the job
@@ -43,6 +47,7 @@ RkVoid CentralProcessingQueue::Push(std::coroutine_handle<> in_handle) noexcept
 RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token const& in_stop_token) noexcept
 {
     RkFloat                      signed_request;
+
     ConcurrencyCounter           counter     { .value = m_concurrency.load(std::memory_order_acquire) };
     ConcurrencyCounter constexpr one_current { {.current_concurrency = 1, .optimal_concurrency = 0} };
 

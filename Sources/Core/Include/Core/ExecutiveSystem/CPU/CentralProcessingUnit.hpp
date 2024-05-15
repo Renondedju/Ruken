@@ -47,6 +47,11 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
         RkVoid RegisterQueue(CentralProcessingQueue& in_queue) noexcept;
 
         /**
+         * \brief Starts the workers
+         */
+        RkVoid StartWorkers() noexcept;
+
+        /**
          * \brief Captures the calling thread and uses it as a worker.
          * \note For threads that are not created by the CentralProcessingUnit, make sure to look inside the WorkerInfo struct
          * \param in_should_return Stop token, signals the loop to return as soon as possible
