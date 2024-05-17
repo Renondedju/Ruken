@@ -1,8 +1,9 @@
-
 #pragma once
 
 #include "Build/Namespace.hpp"
 #include "Types/FundamentalTypes.hpp"
+
+#include <string>
 
 BEGIN_RUKEN_NAMESPACE
 

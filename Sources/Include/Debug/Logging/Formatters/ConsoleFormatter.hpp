@@ -1,9 +1,10 @@
-
 #pragma once
 
 #include "Debug/Logging/Formatters/LogFormatter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+
+class ConsoleHandler;
 
 /**
  * \brief This class configures the final order, structure, and contents of the log message for the console.
@@ -13,7 +14,7 @@ class ConsoleFormatter final : public LogFormatter
     /**
      * \brief ConsoleHandler is the only class able to create a ConsoleFormatter.
      */
-    friend class ConsoleHandler;
+    friend ConsoleHandler;
 
     private:
 
@@ -43,7 +44,7 @@ class ConsoleFormatter final : public LogFormatter
         ConsoleFormatter(ConsoleFormatter const& in_copy) = delete;
         ConsoleFormatter(ConsoleFormatter&&      in_move) = delete;
 
-        ~ConsoleFormatter() = default;
+        ~ConsoleFormatter() override = default;
 
         #pragma endregion
 

@@ -1,7 +1,6 @@
-﻿
-#include <iostream>
+﻿#include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-#include "Debug/Logging/Handlers/ConsoleHandler.hpp"
+#include <iostream>
 
 USING_RUKEN_NAMESPACE
 

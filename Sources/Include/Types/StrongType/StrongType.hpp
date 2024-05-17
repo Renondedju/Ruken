@@ -39,7 +39,7 @@ class StrongType
 
     public:
 
-        using UnderlyingType = TBase;
+        using TUnderlying = TBase;
 
         #pragma region Constructors
 

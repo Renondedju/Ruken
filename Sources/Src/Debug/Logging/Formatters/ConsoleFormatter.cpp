@@ -39,6 +39,15 @@ ConsoleFormatter::ConsoleFormatter() noexcept:
     
 }
 
+#else
+
+ConsoleFormatter::ConsoleFormatter() noexcept:
+    LogFormatter {},
+    m_handle     {0}
+{
+
+}
+
 #endif
 
 #pragma endregion

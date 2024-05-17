@@ -57,6 +57,7 @@ using RkByte = char;
 using RkFloat   = float;
 using RkDouble  = double;
 using RkLdouble = long double;
+using RkULLInt = unsigned long long int;
 
 // Others
 using RkVoid = void;

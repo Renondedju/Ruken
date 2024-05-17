@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
@@ -14,17 +13,11 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common bitwise operators
- * \tparam TStrongType Base StrongType
  * \see StrongType
  */
-template <typename TStrongType>
 struct RUKEN_EMPTY_BASES Bitwise:
-    Or        <TStrongType>,
-    And       <TStrongType>,
-    Not       <TStrongType>,
-    Xor       <TStrongType>,
-    LeftShift <TStrongType>,
-    RightShift<TStrongType>
+    Or, And, Not, Xor,
+    LeftShift, RightShift
 {};
 
 END_RUKEN_NAMESPACE

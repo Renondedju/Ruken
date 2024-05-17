@@ -1,11 +1,9 @@
-
 #pragma once
 
-#include <chrono>
-
 #include "Build/Namespace.hpp"
-
 #include "Types/FundamentalTypes.hpp"
+
+#include <chrono>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -22,7 +20,7 @@ class Benchmark
 
         RkChar const*  m_label;
         RkUint64       m_execution_count;
-        TimePoint       m_time;
+        TimePoint      m_time;
 
         #pragma endregion 
 

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
@@ -11,14 +10,10 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common logical operators
- * \tparam TStrongType Base StrongType
  * \see StrongType
  */
-template <typename TStrongType>
 struct RUKEN_EMPTY_BASES Logical:
-    LogicalOr <TStrongType>,
-    LogicalAnd<TStrongType>,
-    LogicalNot<TStrongType>
+    LogicalOr, LogicalAnd, LogicalNot
 {};
 
 END_RUKEN_NAMESPACE

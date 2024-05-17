@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
@@ -17,20 +16,14 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common arithmetic operators
- * \tparam TStrongType Base StrongType
  * \see StrongType
  */
-template <typename TStrongType>
 struct RUKEN_EMPTY_BASES Arithmetic:
-    Modulo        <TStrongType>,
-    Addition      <TStrongType>,
-    Division      <TStrongType>,
-    Increment     <TStrongType>,
-    Decrement     <TStrongType>,
-    UnaryPlus     <TStrongType>,
-    UnaryMinus    <TStrongType>,
-    Subtraction   <TStrongType>,
-    Multiplication<TStrongType>
+    Modulo,
+    Addition,         Subtraction,
+    Multiplication<>, Division<>,
+    Increment,        Decrement,
+    UnaryPlus,        UnaryMinus
 {};
 
 END_RUKEN_NAMESPACE

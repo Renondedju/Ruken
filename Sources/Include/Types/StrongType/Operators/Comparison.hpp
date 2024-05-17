@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
@@ -14,17 +13,15 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Module gathering all common comparison operators
- * \tparam TStrongType Base StrongType
  * \see StrongType
  */
-template <typename TStrongType>
 struct RUKEN_EMPTY_BASES Comparison:
-    Less        <TStrongType>,
-    Equal       <TStrongType>,
-    Greater     <TStrongType>,
-    NotEqual    <TStrongType>,
-    LessEqual   <TStrongType>,
-    GreaterEqual<TStrongType>
+    Less,
+    Equal,
+    Greater,
+    NotEqual,
+    LessEqual,
+    GreaterEqual
 {};
 
 END_RUKEN_NAMESPACE

@@ -1,13 +1,12 @@
-
 #pragma once
-
-#include <string>
-#include <exception>
 
 #include "Build/Namespace.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Resource/Enums/EResourceLoadingFailureCode.hpp"
+
+#include <stdexcept>
+#include <string>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -16,7 +15,7 @@ BEGIN_RUKEN_NAMESPACE
  * 
  * This exception and all the derived exceptions are handled by the resource manager.
  */
-struct ResourceProcessingFailure final : std::exception
+struct ResourceProcessingFailure final : std::runtime_error
 {
     #pragma region Variables
 
@@ -47,16 +46,10 @@ struct ResourceProcessingFailure final : std::exception
 
     ResourceProcessingFailure ()                                         noexcept = delete;
     ResourceProcessingFailure (ResourceProcessingFailure const& in_copy) noexcept = default;
-    ResourceProcessingFailure (ResourceProcessingFailure&& in_move)         noexcept = default;
+    ResourceProcessingFailure (ResourceProcessingFailure&& in_move)      noexcept = default;
     virtual ~ResourceProcessingFailure()                                          = default;
 
     #pragma endregion
-
-    #pragma region Methods
-    
-    char const* what() const override;
-
-    #pragma endregion 
 
     #pragma region Operators
 

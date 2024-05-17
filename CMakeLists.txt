@@ -213,9 +213,6 @@ add_executable(Ruken Sources/Src/Main.cpp
         Sources/Include/Threading/SynchronizedAccess.hpp
         Sources/Include/Threading/ThreadSafeLockQueue.hpp
         Sources/Include/Threading/ThreadSafeQueue.hpp
-        Sources/Include/Time/ControlClock.hpp
-        Sources/Include/Time/Sleep.hpp
-        Sources/Include/Time/Timer.hpp
         Sources/Include/Types/Concepts/ArithmeticType.hpp
         Sources/Include/Types/Concepts/FloatingPointType.hpp
         Sources/Include/Types/Concepts/FundamentalType.hpp
@@ -252,7 +249,6 @@ add_executable(Ruken Sources/Src/Main.cpp
         Sources/Include/Types/StrongType/Operators/Logical.hpp
         Sources/Include/Types/StrongType/Operators/Stream.hpp
         Sources/Include/Types/StrongType/StrongType.hpp
-        Sources/Include/Types/StrongType/StrongTypeHelper.hpp
         Sources/Include/Types/StrongType/StrongTypeSuffix.hpp
         Sources/Include/Types/Units/Angle/Angle.hpp
         Sources/Include/Types/Units/Angle/EAngleUnit.hpp
@@ -375,9 +371,6 @@ add_executable(Ruken Sources/Src/Main.cpp
         Sources/Src/Threading/SynchronizedAccess.inl
         Sources/Src/Threading/ThreadSafeLockQueue.inl
         Sources/Src/Threading/ThreadSafeQueue.inl
-        Sources/Src/Time/ControlClock.cpp
-        Sources/Src/Time/Sleep.cpp
-        Sources/Src/Time/Timer.cpp
         Sources/Src/Types/Units/Angle/Angle.inl
         Sources/Src/Types/Units/Distance/Distance.inl
         Sources/Src/Types/Units/Duration/Duration.inl
@@ -449,7 +442,6 @@ endif()
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 CPMAddPackage(URL "https://github.com/g-truc/glm/archive/refs/tags/1.0.0.zip" NAME glm)
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
-CPMAddPackage("gh:spnda/fastgltf#7bb21c56dc41703cbb9df022b93c45428fd370bd")
 CPMAddPackage("gh:nothings/stb#f4a71b13373436a2866c5d68f8f80ac6f0bc1ffe")
 
 # vma has no CMake support and is a header only library
@@ -486,4 +478,4 @@ configure_file(${RUKEN_SOURCES_DIR}/Include/Build/BuildInfo.hpp.in ${RUKEN_GENER
 CheckGitSetup()
 
 # --- Link dependencies
-target_link_libraries(Ruken PRIVATE glm::glm fastgltf::fastgltf atomic_queue stb tinyobjloader git_version ${RUKEN_VULKAN_LIBS})
+target_link_libraries(Ruken PRIVATE glm::glm atomic_queue stb tinyobjloader git_version ${RUKEN_VULKAN_LIBS})

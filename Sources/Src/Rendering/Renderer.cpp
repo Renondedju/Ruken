@@ -1,4 +1,3 @@
-
 #include "Rendering/Renderer.hpp"
 
 #include "Core/Kernel.hpp"

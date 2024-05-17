@@ -1,10 +1,8 @@
-
 #pragma once
 
 #include <istream>
 
 #include "Build/Namespace.hpp"
-#include "Types/StrongType/StrongTypeHelper.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -13,35 +11,24 @@ BEGIN_RUKEN_NAMESPACE
  * 
  * This class is meant to be used in conjunction with the StrongType class.
  * This allows for better and quicker operator integrations to named types.
- * 
- * \tparam TStrongType Base StrongType
- * \see StrongType
  */
-template <typename TStrongType>
-class InputStream
+struct InputStream
 {
-    using Type = StrongTypeHelper::UnderlyingType<TStrongType>;
+    /**
+     * \brief Bitwise left shift stream operator
+     *
+     * \param in_stream Stream instance
+     * \param in_strong_type Value
+     *
+     * \return Stream instance
+     */
+    template <typename TStrongType>
+    constexpr std::istream& operator>>(this std::istream& in_stream, TStrongType& in_strong_type) noexcept
+    {
+        in_stream >> in_strong_type.m_value;
 
-    public:
-
-        #pragma region Operators
-
-        /**
-         * \brief Bitwise left shift stream operator
-         *
-         * \param in_stream Stream instance
-         * \param in_strong_type Value
-         *
-         * \return Stream instance
-         */
-        friend constexpr std::istream& operator>>(std::istream& in_stream, TStrongType& in_strong_type) noexcept
-        {
-            in_stream >> static_cast<Type&>(in_strong_type);
-
-            return in_stream;
-        }
-
-        #pragma endregion
+        return in_stream;
+    }
 };
 
 END_RUKEN_NAMESPACE

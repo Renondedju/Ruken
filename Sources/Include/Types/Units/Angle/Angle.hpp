@@ -20,25 +20,12 @@ BEGIN_RUKEN_NAMESPACE
 template<EAngleUnit TUnitType>
 struct RUKEN_EMPTY_BASES Angle final:
     StrongType<RkFloat, Angle<TUnitType>>,
-    Arithmetic<Angle<TUnitType>>,
-    Comparison<Angle<TUnitType>>,
-    Stream    <Angle<TUnitType>>
+    Arithmetic, Comparison, Stream
 {
-    #pragma region Constructors
-
-    using StrongType<RkFloat, Angle<TUnitType>>::StrongType;
-
-    constexpr Angle()                     = default;
-    constexpr Angle(Angle const& in_copy) = default;
-    constexpr Angle(Angle&&      in_move) = default;
-             ~Angle()                     = default;
-
-    #pragma endregion
+    using StrongType<RkFloat, Angle>::StrongType;
+    using StrongType<RkFloat, Angle>::operator=;
 
     #pragma region Operators
-
-    constexpr Angle& operator=(Angle const& in_copy) = default;
-    constexpr Angle& operator=(Angle&&		in_move) = default;
 
     /**
      * \brief Degree angle conversion
@@ -77,9 +64,9 @@ struct StrongTypeSuffix<Radians>
 // Type literals
 
 constexpr Degrees operator"" _deg(RkLdouble in_angle) noexcept;
-constexpr Degrees operator"" _deg(RkSize    in_angle) noexcept;
+constexpr Degrees operator"" _deg(RkULLInt  in_angle) noexcept;
 constexpr Radians operator"" _rad(RkLdouble in_angle) noexcept;
-constexpr Radians operator"" _rad(RkSize    in_angle) noexcept;
+constexpr Radians operator"" _rad(RkULLInt  in_angle) noexcept;
 
 #include "Types/Units/Angle/Angle.inl"
 

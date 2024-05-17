@@ -19,9 +19,9 @@ BEGIN_RUKEN_NAMESPACE
 template<EDistanceUnit TUnitType>
 struct RUKEN_EMPTY_BASES Distance final:
     StrongType<RkFloat, Distance<TUnitType>>,
-    Arithmetic<Distance<TUnitType>>,
-    Comparison<Distance<TUnitType>>,
-    Stream    <Distance<TUnitType>>
+    Arithmetic,
+    Comparison,
+    Stream
 {
     #pragma region Constructors
 
@@ -89,11 +89,11 @@ struct StrongTypeSuffix<Kilometers>
 // Type literals
 
 constexpr Centimeters operator"" _cm(RkLdouble in_distance) noexcept;
-constexpr Centimeters operator"" _cm(RkSize    in_distance) noexcept;
+constexpr Centimeters operator"" _cm(RkULLInt  in_distance) noexcept;
 constexpr Kilometers  operator"" _km(RkLdouble in_distance) noexcept;
-constexpr Kilometers  operator"" _km(RkSize    in_distance) noexcept;
+constexpr Kilometers  operator"" _km(RkULLInt  in_distance) noexcept;
 constexpr Meters      operator"" _m (RkLdouble in_distance) noexcept;
-constexpr Meters      operator"" _m (RkSize    in_distance) noexcept;
+constexpr Meters      operator"" _m (RkULLInt  in_distance) noexcept;
 
 #include "Types/Units/Distance/Distance.inl"
 

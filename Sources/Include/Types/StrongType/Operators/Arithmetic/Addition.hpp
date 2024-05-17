@@ -1,8 +1,6 @@
-
 #pragma once
 
 #include "Build/Namespace.hpp"
-#include "Types/StrongType/StrongTypeHelper.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -11,48 +9,44 @@ BEGIN_RUKEN_NAMESPACE
  * 
  * This class is meant to be used in conjunction with the StrongType class.
  * This allows for better and quicker operator integrations to named types.
- * 
- * \tparam TStrongType Base StrongType
+ *
  * \see StrongType
  */
-template <typename TStrongType>
-class Addition
+struct Addition
 {
-    using Type = StrongTypeHelper::UnderlyingType<TStrongType>;
+    /**
+     * \brief Addition assignment operator
+     *
+     * \param in_lhs Left-hand side operand
+     * \param in_rhs Right-hand side operand
+     * \tparam TStrongType Base StrongType
+     *
+     * \return Reference to the instance
+     */
+    template <typename TStrongType>
+    constexpr TStrongType& operator+=(this TStrongType& in_lhs, TStrongType const& in_rhs) noexcept
+    {
+        in_lhs = in_lhs + in_rhs;
 
-    public:
+        return in_lhs;
+    }
 
-        #pragma region Operators
+    /**
+     * \brief Addition operator
+     *
+     * \param in_lhs Left-hand side operand
+     * \param in_rhs Right-hand side operand
+     * \tparam TStrongType Base StrongType
+     *
+     * \return Value of the new instance
+     */
+    template <typename TStrongType>
+    constexpr TStrongType operator+(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
+    {
+		using TBase = typename TStrongType::Tunderlying;
 
-        /**
-         * \brief Addition assignment operator
-         *
-         * \param in_lhs Left-hand side operand
-         * \param in_rhs Right-hand side operand
-         *
-         * \return Reference to the instance
-         */
-        friend constexpr TStrongType& operator+=(TStrongType& in_lhs, TStrongType const& in_rhs) noexcept
-        {
-            static_cast<Type&>(in_lhs) += static_cast<Type const&>(in_rhs);
-
-            return in_lhs;
-        }
-
-        /**
-         * \brief Addition operator
-         *
-         * \param in_lhs Left-hand side operand
-         * \param in_rhs Right-hand side operand
-         *
-         * \return Value of the new instance
-         */
-        friend constexpr TStrongType operator+(TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
-        {
-            return TStrongType(static_cast<Type const&>(in_lhs) + static_cast<Type const&>(in_rhs));
-        }
-
-        #pragma endregion
+        return TStrongType(static_cast<TBase>(in_lhs) + static_cast<TBase>(in_rhs));
+    }
 };
 
 END_RUKEN_NAMESPACE
