@@ -1,6 +1,7 @@
 #pragma once
 
 #include <coroutine>
+#include <tracy/Tracy.hpp>
 
 #include "Types/FundamentalTypes.hpp"
 #include "Core/ExecutiveSystem/CPU/Continuations/CPUPropagatingContinuation.hpp"
@@ -57,10 +58,10 @@ struct CPUCoroutineContinuation: CPUPropagatingContinuation<TResult, TNoexcept>
     auto await_resume() const noexcept(TNoexcept)
     {
         if constexpr (TNoexcept == false)
-			     if (this->GetException())
-				        std::rethrow_exception(this->GetException());
+            if (this->GetException())
+		        std::rethrow_exception(this->GetException());
 
-	       return this->GetReturnValue();
+       return this->GetReturnValue();
     }
 
     #pragma endregion
@@ -97,8 +98,10 @@ struct CPUCoroutineContinuation<RkVoid, TNoexcept>: CPUPropagatingContinuation<R
      * \return True if the awaiter has been completed, false otherwise
      */
     [[nodiscard]]
-	RkBool await_ready() const noexcept
-    { return this->IsEventCompleted(); }
+	   RkBool await_ready() const noexcept
+    {
+       return this->IsEventCompleted();
+    }
 
     /**
      * \brief Attempts a suspension by attaching the awaiter to the awaited event
@@ -106,7 +109,12 @@ struct CPUCoroutineContinuation<RkVoid, TNoexcept>: CPUPropagatingContinuation<R
      */
     [[nodiscard]]
     RkBool await_suspend(std::coroutine_handle<>) noexcept
-    { return this->TryAttach(); }
+    {
+        //TracyMessageL("Try attach");
+        auto val = this->TryAttach();
+        //TracyMessageL(val ? "attached" : "false");
+        return val;
+    }
 
     /**
      * \brief Returns the result of the wait
@@ -114,8 +122,8 @@ struct CPUCoroutineContinuation<RkVoid, TNoexcept>: CPUPropagatingContinuation<R
     RkVoid await_resume() const noexcept(TNoexcept)
     {
         if constexpr (TNoexcept == false)
-			if (this->GetException())
-				std::rethrow_exception(this->GetException());
+			        if (this->GetException())
+				        std::rethrow_exception(this->GetException());
     }
 
     #pragma endregion

@@ -1,4 +1,7 @@
 #include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
+
+#include <tracy/Tracy.hpp>
 
 USING_RUKEN_NAMESPACE
 
@@ -60,6 +63,7 @@ RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token
         // If the caller is needed then we need to update the concurrency of the queue
     } while(!m_concurrency.compare_exchange_weak(counter.value, counter.value + one_current.value, std::memory_order_acq_rel));
 
+    WorkerInfo::remaining_tasks = 1;
     // If the caller don't want to stick to the queue
     // then we only try to consume a single job before returning
     if (!in_sticky)
@@ -68,7 +72,8 @@ RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token
     else do
     {
         // Otherwise, we'll consume a maximum of 10 jobs
-        for(int i = 0; i < 10; ++i)
+        WorkerInfo::remaining_tasks = 10;
+        while (WorkerInfo::remaining_tasks > 1)
             TryConsumeJob(50);
 
         // Checking if the queue still needs us

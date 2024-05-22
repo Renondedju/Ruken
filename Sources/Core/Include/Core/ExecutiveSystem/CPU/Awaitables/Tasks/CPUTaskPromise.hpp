@@ -15,9 +15,11 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-BEGIN_RUKEN_NAMESPACE
+#include "../../../../../../ThirdParty/tracy/dede20a49fd55ec615451f07b969d950651359aa/public/tracy/Tracy.hpp"
+#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 
-template <QueueHandleType TQueueHandle, typename TResult>
+BEGIN_RUKEN_NAMESPACE
+    template <QueueHandleType TQueueHandle, typename TResult>
 struct CPUTask;
 
 /**
@@ -52,6 +54,7 @@ class CPUTaskPromise final:
         // CPU Tasks are not processed in place and are instead pushed to a queue
         // to be picked up and processed by a worker later.
         TQueueHandle::GetInstance().Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
+        //TracyMessageL("Pushed continuation");
     }
 
     /**
@@ -96,10 +99,6 @@ class CPUTaskPromise final:
             // has time to be incremented to 1 before the task is executed and deleted by another thread
             CPUTask<TQueueHandle, TResult> handle {*this};
 
-            // CPU Tasks are not processed in place and are instead pushed to a queue
-            // to be picked up and processed by a worker later.
-            TQueueHandle::GetInstance().Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
-
             return handle;
         }
 
@@ -117,10 +116,6 @@ class CPUTaskPromise final:
             constexpr bool is_noexcept =          std::decay_t<TAwaitable>::reliable;
             static_assert(std::is_same_v<AProcessingUnit, CentralProcessingUnit>, 
                 "Awaiting events from other processing units is not yet supported");
-
-            #ifdef RUKEN_TRACE_BUILD
-            TracyCZoneEnd(m_zone)
-            #endif
 
             struct Awaiter : CPUCoroutineContinuation<AResult, is_noexcept>
             {
@@ -173,9 +168,26 @@ class CPUTaskPromise final:
         auto initial_suspend() noexcept
         {
 #endif
-            struct Awaiter: std::suspend_always
+            struct Awaiter
             {
                 CPUTaskPromise& self;
+
+                [[nodiscard]]
+                bool await_ready() const noexcept
+                {
+                    auto value {WorkerInfo::current_queue == &TQueueHandle::GetInstance() && WorkerInfo::remaining_tasks >= 1};
+                    if (value)
+                        --WorkerInfo::remaining_tasks;
+
+                    return value;
+                }
+
+                void await_suspend(std::coroutine_handle<>) const noexcept
+                {
+                    // CPU Tasks are not processed in place and are instead pushed to a queue
+                    // to be picked up and processed by a worker later.
+                    TQueueHandle::GetInstance().Push(std::coroutine_handle<CPUTaskPromise>::from_promise(self));
+                }
 
                 void await_resume() const noexcept
                 {
@@ -186,7 +198,7 @@ class CPUTaskPromise final:
                 }
             };
 
-            return Awaiter {{}, *this};
+            return Awaiter {*this};
         }
 
         auto final_suspend() noexcept
@@ -198,7 +210,7 @@ class CPUTaskPromise final:
                 void await_suspend(std::coroutine_handle<>) const noexcept
                 {
                     #ifdef RUKEN_TRACE_BUILD
-                    TracyCZoneEnd(self.m_zone)
+                    TracyCZoneEnd(self.m_zone);
                     #endif
 
                     self.SignalConsume          ();

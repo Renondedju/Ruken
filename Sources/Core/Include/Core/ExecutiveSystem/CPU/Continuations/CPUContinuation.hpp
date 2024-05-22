@@ -53,7 +53,7 @@ struct CPUContinuation
      * \return True if the awaiter has been completed, false otherwise
      */
     [[nodiscard]]
-	RkBool IsEventCompleted() const noexcept;
+    RkBool IsEventCompleted() const noexcept;
 
     /**
      * \brief Attempts a suspension by attaching the awaiter to the awaited event

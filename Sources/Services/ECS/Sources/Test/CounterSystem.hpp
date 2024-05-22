@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
 
 #include "ECS/System.hpp"
 #include "ECS/EventHandler.hpp"
@@ -51,7 +50,7 @@ struct CounterSystem final: System
      */
     struct StartHandler final: EventHandler<EEventName::OnStart, CounterComponent::CountField>
     {
-	    static CPUDynamicTask<RkVoid> ProcessChunk(LinkedChunkListNode<unsigned long long>& in_node) noexcept
+	    static CPUDynamicTask<RkVoid> ProcessChunk(LinkedChunkListNode<RkSize>& in_node) noexcept
         {
             for (auto& data: in_node.data)
                 data++;
