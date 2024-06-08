@@ -15,11 +15,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-#include "../../../../../../ThirdParty/tracy/dede20a49fd55ec615451f07b969d950651359aa/public/tracy/Tracy.hpp"
-#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
-
-BEGIN_RUKEN_NAMESPACE
-    template <QueueHandleType TQueueHandle, typename TResult>
+template <QueueHandleType TQueueHandle, typename TResult>
 struct CPUTask;
 
 /**

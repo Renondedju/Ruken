@@ -16,7 +16,7 @@ USING_RUKEN_NAMESPACE
 struct MainQueue : CPUQueueHandle<MainQueue, 2048>
 {};
 
-int main()
+struct AsyncLoop
 {
     const char* name;
     EntityAdmin domain;
@@ -79,8 +79,9 @@ int main(int i_argc, char* i_argv[])
     AsyncMain(stop_source, services);
 
     cpu.RegisterQueue(MainQueue::instance);
+    cpu.StartWorkers ();
 
-    Kernel kernel {};
+    cpu.CallerAsWorker(stop_source.get_token());
 
-    return kernel.Run();
+    return 0;
 }
