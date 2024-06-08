@@ -1,7 +1,7 @@
 
 # https://jonathanhamberg.com/post/cmake-embedding-git-hash/
 
-set(pre_configure_file  ${RUKEN_SOURCES_DIR}/Src/Build/BuildInfo.cpp.in)
+set(pre_configure_file  ${RUKEN_CORE_DIR}/Src/Build/BuildInfo.cpp.in)
 set(post_configure_file ${RUKEN_GENERATED_SOURCES_DIR}/Src/Build/BuildInfo.cpp)
 
 function(GitWriteCache in_value in_cache_name)
@@ -74,6 +74,7 @@ function(CheckGitSetup)
     add_custom_target(AlwaysCheckGit COMMAND ${CMAKE_COMMAND}
             -DRUN_CHECK_GIT_VERSION=1
             -DRUKEN_SOURCES_DIR=${RUKEN_SOURCES_DIR}
+            -DRUKEN_CORE_DIR=${RUKEN_CORE_DIR}
             -DRUKEN_GENERATED_SOURCES_DIR=${RUKEN_GENERATED_SOURCES_DIR}
             -DGIT_HASH_CACHE=${GIT_HASH_CACHE}
             -P ${RUKEN_SOURCES_DIR}/CMake/CheckGit.cmake
@@ -81,7 +82,8 @@ function(CheckGitSetup)
     )
 
     add_library(git_version ${RUKEN_GENERATED_SOURCES_DIR}/Src/Build/BuildInfo.cpp)
-    target_include_directories(git_version PUBLIC ${RUKEN_GENERATED_SOURCES_DIR}/Include)
+    target_include_directories(git_version PUBLIC  ${RUKEN_GENERATED_SOURCES_DIR}/Include)
+    target_include_directories(git_version PRIVATE ${RUKEN_CORE_DIR}/Include)
     add_dependencies(git_version AlwaysCheckGit)
 
     CheckGitVersion()
