@@ -1,7 +1,8 @@
 # Temp and debug folders
-Logs/
-Build/
-Debug/*
+logs/
+build/
+!Sources/Core/Include/Build
+!Sources/Core/Src/Build
 
 # Revision file
 Revision.hpp
@@ -41,6 +42,7 @@ ipch
 *.ogg
 _ReSharper.Caches
 
-!/Ruken/Source/Include/Debug/
-!/Ruken/Source/Include/Build/
-!/Ruken/Source/Src/Debug/
+/sources/third-party/
+Sources/ThirdParty
+.idea
+Sources/Core/Include/Build/BuildInfo.hpp

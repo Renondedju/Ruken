@@ -1,0 +1,4 @@
+#include "Build/BuildInfo.hpp"
+
+const char* BuildInfo::Version  = "${GIT_VERSION}";
+const char* BuildInfo::Revision = "${GIT_REVISION}";
