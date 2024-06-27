@@ -1,9 +1,10 @@
 #pragma once
 
-#include <string>
-#include <thread>
-
 #include "Types/FundamentalTypes.hpp"
+
+#include <string>
+#include <vector>
+#include <thread>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -14,7 +15,7 @@ class CentralProcessingQueue;
  */
 class Worker
 {
-	#pragma region Members
+	   #pragma region Members
 
     std::vector<CentralProcessingQueue*>& m_queues;
     std::jthread                          m_thread {};
@@ -41,7 +42,7 @@ class Worker
          * \param in_name Worker name
          * \param in_queues Queues to work on
          */
-		explicit Worker(std::string in_name, std::vector<CentralProcessingQueue*>& in_queues) noexcept;
+		      explicit Worker(std::string in_name, std::vector<CentralProcessingQueue*>& in_queues) noexcept;
 
         Worker(Worker const&) = delete;
         Worker(Worker&&)      = delete;

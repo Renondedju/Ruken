@@ -21,8 +21,9 @@ set     (RUKEN_SOURCES_DIR           ${CMAKE_CURRENT_LIST_DIR}/Sources)
 set     (RUKEN_SERVICES_DIR          ${RUKEN_SOURCES_DIR}/Services)
 set     (RUKEN_CORE_DIR              ${RUKEN_SOURCES_DIR}/Core)
 
-option(RUKEN_HEADLESS_BUILD "Disables all form of rendering and presentation" OFF)
-option(RUKEN_TRACE_BUILD    "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})
+option(RUKEN_HEADLESS_BUILD          "Disables all form of rendering and presentation" OFF)
+option(RUKEN_TRACE_BUILD             "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})
+option(RUKEN_TRACE_SHOW_WORKER_ZONES "When on, tracy will also report the activity of workers" OFF)
 
 if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR})
     file(MAKE_DIRECTORY ${RUKEN_GENERATED_SOURCES_DIR})

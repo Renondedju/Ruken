@@ -279,7 +279,7 @@ include(${RUKEN_SOURCES_DIR}/CMake/CheckGit.cmake)
 
 string(TOUPPER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME_TOUPPER)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/Include/Build/BuildInfo.hpp)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Include/Build/BuildInfo.hpp)
 CheckGitSetup()
 
 # --- Link dependencies

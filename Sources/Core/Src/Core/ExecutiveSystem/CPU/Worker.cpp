@@ -1,8 +1,12 @@
-#include <functional>
-
 #include "Core/ExecutiveSystem/CPU/Worker.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+
+#include "Build/BuildInfo.hpp"
+
+#include <functional>
+#include <Tracy/Tracy.hpp>
+#include <Tracy/TracyC.h>
 
 USING_RUKEN_NAMESPACE
 
@@ -26,6 +30,7 @@ RkVoid Worker::ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queu
 RkVoid Worker::Routine(std::stop_token&& in_stop_token, std::string&& in_name) const noexcept
 {
     WorkerInfo::name = in_name;
+    TracyCSetThreadName(in_name.c_str());
 
     // This loop needs to be as small as possible in order to reduce latency
     while (!in_stop_token.stop_requested())

@@ -11,6 +11,8 @@ CentralProcessingQueue::CentralProcessingQueue(const RkSize in_size) noexcept:
 
 RkVoid CentralProcessingQueue::TryConsumeJob(RkUint32 const in_max_attempts) noexcept
 {
+    ZoneNamed(__tracy, RUKEN_TRACE_SHOW_WORKER_ZONES == 1);
+
     std::coroutine_handle<>      job;
     RkBool                       has_job {false};
     ConcurrencyCounter constexpr one_optimal { {.current_concurrency = 0, .optimal_concurrency = 1} };
@@ -49,6 +51,8 @@ RkVoid CentralProcessingQueue::Push(std::coroutine_handle<> in_handle) noexcept
 
 RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token const& in_stop_token) noexcept
 {
+    ZoneNamed(__tracy, RUKEN_TRACE_SHOW_WORKER_ZONES == 1);
+
     RkFloat                      signed_request;
 
     ConcurrencyCounter           counter     { .value = m_concurrency.load(std::memory_order_acquire) };
