@@ -30,8 +30,7 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
 
         #pragma region Constructors
 
-		explicit CentralProcessingUnit() noexcept;
-
+		      explicit CentralProcessingUnit()                    = default;
         CentralProcessingUnit(CentralProcessingUnit const&) = delete;
         CentralProcessingUnit(CentralProcessingUnit&&)      = delete;
         ~CentralProcessingUnit()                            = default;

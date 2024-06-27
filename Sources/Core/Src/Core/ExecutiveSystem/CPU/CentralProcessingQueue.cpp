@@ -73,7 +73,7 @@ RkVoid CentralProcessingQueue::PopAndRun(RkBool const in_sticky, std::stop_token
     {
         // Otherwise, we'll consume a maximum of 10 jobs
         WorkerInfo::remaining_tasks = 10;
-        while (WorkerInfo::remaining_tasks > 1)
+        while (WorkerInfo::remaining_tasks > 1 && !in_stop_token.stop_requested())
             TryConsumeJob(50);
 
         // Checking if the queue still needs us

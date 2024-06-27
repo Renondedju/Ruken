@@ -7,11 +7,12 @@
 #include "Core/ExecutiveSystem/Concepts/AwaitableType.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
 #include "Core/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp"
+#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
+
+#include "Debug/Tracy.hpp"
 
 #include <tracy/TracyC.h>
 #include <tracy/Tracy.hpp>
-
-#include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -32,7 +33,6 @@ class CPUTaskPromise final:
 
     template <typename TOtherResult, bool TOtherIsNoexcept>
     friend struct CPUCoroutineContinuation;
-
 
     #ifdef RUKEN_TRACE_BUILD
     std::source_location m_source_location {};
@@ -104,9 +104,16 @@ class CPUTaskPromise final:
          * \param in_awaitable Asynchronous event instance
          * \return Subscription instance
          */
+#ifdef RUKEN_TRACE_BUILD
+        template <AwaitableType TAwaitable>
+        auto await_transform(TAwaitable&& in_awaitable, std::source_location in_source_location = std::source_location::current()) noexcept
+        {
+            m_source_location = in_source_location;
+#else
         template <AwaitableType TAwaitable>
         auto await_transform(TAwaitable&& in_awaitable) noexcept
         {
+#endif
             using AResult              = typename std::decay_t<TAwaitable>::Result;
             using AProcessingUnit      = typename std::decay_t<TAwaitable>::ProcessingUnit;
             constexpr bool is_noexcept =          std::decay_t<TAwaitable>::reliable;
@@ -130,11 +137,15 @@ class CPUTaskPromise final:
                     return CPUCoroutineContinuation<AResult, is_noexcept>::await_ready();
                 }
 
+                auto await_suspend(std::coroutine_handle<> in_handle) noexcept
+                {
+                    return CPUCoroutineContinuation<AResult, is_noexcept>::await_suspend(in_handle);
+                }
+
                 auto await_resume() const
                 {
                     #ifdef RUKEN_TRACE_BUILD
-                    TracyCZoneN(ctx, self.m_source_location.function_name(), true);
-                    self.m_zone = ctx;
+                    TracySCZone(self.m_zone, self.m_source_location, true);
                     #endif
 
                     if constexpr (std::is_same_v<AResult, RkVoid>)
@@ -188,8 +199,7 @@ class CPUTaskPromise final:
                 void await_resume() const noexcept
                 {
                     #ifdef RUKEN_TRACE_BUILD
-                    TracyCZoneN(ctx, self.m_source_location.function_name(), true);
-                    self.m_zone = ctx;
+                    TracySCZone(self.m_zone, self.m_source_location, true);
                     #endif
                 }
             };

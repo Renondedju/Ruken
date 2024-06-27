@@ -69,8 +69,6 @@ add_library(RkCore STATIC
         Include/Core/ExecutiveSystem/Task.hpp
         Include/Core/EInitializationStatus.hpp
         Include/Core/Exception.hpp
-        Include/Core/Kernel.hpp
-        Include/Core/KernelProxy.hpp
         Include/Core/Service.hpp
         Include/Core/ServiceBase.hpp
         Include/Core/ServiceLoader.hpp
@@ -222,8 +220,6 @@ add_library(RkCore STATIC
         Src/Core/ExecutiveSystem/CPU/CentralProcessingUnit.cpp
         Src/Core/ExecutiveSystem/CPU/Worker.cpp
         Src/Core/ExecutiveSystem/Promise.inl
-        Src/Core/Kernel.inl
-        Src/Core/KernelProxy.cpp
         Src/Core/Service.inl
         Src/Core/ServiceBase.cpp
         Src/Core/ServiceProvider.cpp
@@ -269,6 +265,8 @@ add_library(RkCore STATIC
         Include/Resource/ResourceManager.hpp
         Include/Resource/ResourceManifest.hpp
         Include/Resource/ResourceProcessingFailure.hpp
+        Include/Debug/Tracy.hpp
+        Include/Debug/SourceLocation.hpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)
@@ -281,7 +279,7 @@ include(${RUKEN_SOURCES_DIR}/CMake/CheckGit.cmake)
 
 string(TOUPPER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME_TOUPPER)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/Include/Build/BuildInfo.hpp)
 CheckGitSetup()
 
 # --- Link dependencies
