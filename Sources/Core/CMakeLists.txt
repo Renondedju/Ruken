@@ -265,7 +265,7 @@ add_library(RkCore STATIC
         Include/Resource/ResourceManager.hpp
         Include/Resource/ResourceManifest.hpp
         Include/Resource/ResourceProcessingFailure.hpp
-        Include/Debug/Tracy.hpp
+        Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
 )
 

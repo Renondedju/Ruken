@@ -9,7 +9,7 @@
 #include "Core/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp"
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 
-#include "Debug/Tracy.hpp"
+#include "Debug/Trace.hpp"
 
 #include <tracy/TracyC.h>
 #include <tracy/Tracy.hpp>
@@ -228,7 +228,13 @@ class CPUTaskPromise final:
         }
 
 		void unhandled_exception() noexcept
-        { this->Cancel(std::current_exception()); }
+        {
+            #ifdef RUKEN_TRACE_BUILD
+            TracyCZoneEnd(m_zone);
+            TracyMessageLC("Exception !", 0xFF0000);
+            #endif
+            this->Cancel(std::current_exception());
+        }
 
         #pragma endregion
 };

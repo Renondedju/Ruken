@@ -2,8 +2,6 @@
 #include "Core/ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
 
-#include "Build/BuildInfo.hpp"
-
 #include <functional>
 #include <Tracy/Tracy.hpp>
 #include <Tracy/TracyC.h>
@@ -24,6 +22,7 @@ RkVoid Worker::ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queu
     {
         WorkerInfo::current_queue = queue;
         queue->PopAndRun(true, in_stop_token);
+        queue->Yield(in_stop_token);
     }
 }
 

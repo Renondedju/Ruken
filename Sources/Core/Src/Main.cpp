@@ -16,6 +16,19 @@ USING_RUKEN_NAMESPACE
 struct MainQueue : CPUQueueHandle<MainQueue, 2048>
 {};
 
+CPUTask<MainQueue> TracyUpdate(std::stop_token const& in_stop_token) noexcept
+{
+    using namespace std::chrono_literals;
+
+    while(!in_stop_token.stop_requested())
+    {
+        std::this_thread::sleep_for(100ms);
+
+    }
+
+    co_return;
+}
+
 struct AsyncLoop
 {
     const char* name;
@@ -25,14 +38,15 @@ struct AsyncLoop
     CPUDynamicTask<> Run() noexcept
     {
         domain.CreateSystem<CounterSystem>();
-        for (int i = 0; i < 1'000'000; i++)
+        for (int i = 0; i < 10'000'000; i++)
             domain.CreateEntity<CounterComponent>();
 
         co_await domain.ExecuteEvent(EEventName::OnStart);
+        std::cout << "on start" << std::endl;
 
-        for (int i = 0; i < 500000; ++i)
+        for (int i = 0; i < 5000; ++i)
         {
-            co_await domain.ExecuteEvent(EEventName::OnUpdate);
+            co_await domain.ExecuteEvent(EEventName::OnStart);
 
             FrameMark;
             FrameMarkNamed(name);
@@ -48,35 +62,23 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
         .name   = "Game loop",
         .domain = EntityAdmin {in_service_provider}
     };
-    AsyncLoop loop2 {
-        .name   = "Editor loop",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop3 {
-        .name   = "Test loop",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop4 {
-        .name   = "Test loop 2",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop5 {
-        .name   = "Test loop 3",
-        .domain = EntityAdmin {in_service_provider}
-    };
 
-    co_await WhenAll({loop.Run(), loop2.Run(), loop3.Run(), loop4.Run(), loop5.Run()});
+    co_await loop.Run();
+
+    std::cout << "stop" << std::endl;
 
     in_stop_source.request_stop();
 }
 
-int main(int i_argc, char* i_argv[])
+int main(int in_argc, char* in_argv[])
 {
     CentralProcessingUnit cpu      {};
     ServiceProvider       services {};
 
     std::stop_source stop_source {};
-    AsyncMain(stop_source, services);
+
+    AsyncMain  (stop_source, services);
+    //TracyUpdate(stop_source.get_token());
 
     cpu.RegisterQueue(MainQueue::instance);
     cpu.StartWorkers ();

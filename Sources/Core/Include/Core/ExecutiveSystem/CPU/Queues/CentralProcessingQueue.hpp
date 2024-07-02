@@ -1,16 +1,17 @@
 #pragma once
 
-#include <coroutine>
-#include <atomic_queue/atomic_queue.h>
-
 #include "Types/FundamentalTypes.hpp"
 #include "Core/ExecutiveSystem/Concepts/QueueHandleType.hpp"
 #include "Core/ExecutiveSystem/ProcessingQueue.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "Core/ExecutiveSystem/CPU/ConcurrencyCounter.hpp"
 
-BEGIN_RUKEN_NAMESPACE
+#include <atomic_queue/atomic_queue.h>
+#include <condition_variable>
+#include <tracy/Tracy.hpp>
+#include <coroutine>
 
+BEGIN_RUKEN_NAMESPACE
 class Worker;
 
 template <QueueHandleType TQueueHandle>
@@ -33,8 +34,12 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 
     #pragma region Members
 
-    std         ::atomic       <RkUint64>                m_concurrency {};
     atomic_queue::AtomicQueueB2<std::coroutine_handle<>> m_queue;
+
+    // Tracking
+    std::atomic<RkUint64>               m_concurrency        {};
+    mutable std::condition_variable_any m_condition_variable {};
+    mutable std::mutex                  m_sleep_mutex        {};
 
     #pragma endregion
 
@@ -67,10 +72,10 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
         #pragma region Constructors
 
         /**
-		 * \brief Default constructor
-		 * \param in_size Size of the queue
-		 */
-		explicit CentralProcessingQueue(RkSize in_size) noexcept;
+      		 * \brief Default constructor
+		       * \param in_size Size of the queue
+		       */
+		      explicit CentralProcessingQueue(RkSize in_size) noexcept;
 
         CentralProcessingQueue(CentralProcessingQueue const&) = delete;
         CentralProcessingQueue(CentralProcessingQueue&&)      = delete;
@@ -81,6 +86,12 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
         #pragma region Methods
 
         /**
+         * \brief Yielding to the queue will sleep the calling
+         *        thread until it is needed again by this queue.
+         */
+        RkVoid Yield(std::stop_token const& in_stop_token) const noexcept;
+
+        /**
          * \brief Blocking push, waits for available space in the queue 
          * \param in_handle Job handle to push
          */
@@ -88,18 +99,11 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 
         /**
          * \brief Attempts to consume jobs of the queue 
-         * \param in_sticky When set to true the queue will continue
+         * \param in_greedy When set to true the queue will continue
          *        to consume jobs until the queue no longer requires this much concurrency.
-         * \param in_stop_token Stop token. Only useful when in_sticky is true to preemptively stop the loop.
+         * \param in_stop_token Stop token. Only useful when in_greedy is true to preemptively stop the loop.
          */
-        RkVoid PopAndRun(RkBool in_sticky, std::stop_token const& in_stop_token) noexcept;
-
-        /**
-         * \brief Returns the concurrency counter of the queue. This value cannot be used for any kind of synchronization.
-         * \return Concurrency counter
-         */
-        [[nodiscard]]
-        ConcurrencyCounter GetConcurrencyCounter() const noexcept;
+        RkVoid PopAndRun(RkBool in_greedy, std::stop_token const& in_stop_token) noexcept;
 
         // TODO constrained version
         [[nodiscard]]

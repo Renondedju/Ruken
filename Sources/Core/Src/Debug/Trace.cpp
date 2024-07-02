@@ -1,3 +1,4 @@
+#include "Debug/Trace.hpp"
 #include "Build/BuildInfo.hpp"
 #include "Types/FundamentalTypes.hpp"
 
