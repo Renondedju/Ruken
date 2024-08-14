@@ -1,5 +1,4 @@
 #include "Core/Kernel.hpp"
-#include "Core/ExecutiveSystem/QueueHandle.hpp"
 #include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "Core/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
 #include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
@@ -21,10 +20,7 @@ CPUTask<MainQueue> TracyUpdate(std::stop_token const& in_stop_token) noexcept
     using namespace std::chrono_literals;
 
     while(!in_stop_token.stop_requested())
-    {
         std::this_thread::sleep_for(100ms);
-
-    }
 
     co_return;
 }
@@ -42,9 +38,8 @@ struct AsyncLoop
             domain.CreateEntity<CounterComponent>();
 
         co_await domain.ExecuteEvent(EEventName::OnStart);
-        std::cout << "on start" << std::endl;
 
-        for (int i = 0; i < 5000; ++i)
+        for (int i = 0; i < 2000; ++i)
         {
             co_await domain.ExecuteEvent(EEventName::OnStart);
 
@@ -64,8 +59,6 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
     };
 
     co_await loop.Run();
-
-    std::cout << "stop" << std::endl;
 
     in_stop_source.request_stop();
 }

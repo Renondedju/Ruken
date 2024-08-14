@@ -110,10 +110,7 @@ struct CPUCoroutineContinuation<RkVoid, TNoexcept>: CPUPropagatingContinuation<R
     [[nodiscard]]
     RkBool await_suspend(std::coroutine_handle<>) noexcept
     {
-        //TracyMessageL("Try attach");
-        auto val = this->TryAttach();
-        //TracyMessageL(val ? "attached" : "false");
-        return val;
+        return this->TryAttach();
     }
 
     /**

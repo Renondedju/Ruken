@@ -55,7 +55,7 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
          * \note For threads that are not created by the CentralProcessingUnit, make sure to look inside the WorkerInfo struct
          * \param in_should_return Stop token, signals the loop to return as soon as possible
          */
-        RkVoid CallerAsWorker(std::stop_token const& in_should_return) const noexcept;
+        RkVoid CallerAsWorker(std::stop_token&& in_should_return) const noexcept;
 
         #pragma endregion
 

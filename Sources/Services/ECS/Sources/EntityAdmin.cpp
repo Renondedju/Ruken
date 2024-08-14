@@ -4,6 +4,8 @@
 
 #include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
+#include <iostream>
+
 USING_RUKEN_NAMESPACE
 
 EntityAdmin::EntityAdmin(ServiceProvider& in_service_provider) noexcept:
@@ -15,6 +17,4 @@ CPUDynamicTask<RkVoid> EntityAdmin::ExecuteEvent(EEventName const in_event_name)
     for (auto const& system: m_systems)
         if (auto const handler = system->GetEventHandler(in_event_name))
             co_await handler->Execute();
-
-    co_return;
 }

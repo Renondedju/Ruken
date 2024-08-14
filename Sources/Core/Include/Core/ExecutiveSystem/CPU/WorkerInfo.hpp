@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
-
 #include "Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+
+#include <string>
 
 BEGIN_RUKEN_NAMESPACE
 

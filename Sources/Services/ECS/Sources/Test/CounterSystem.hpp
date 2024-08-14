@@ -33,7 +33,7 @@ inline CPUDynamicTask<> WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs)
 
 struct CounterSystem final: System
 {
-    CounterSystem(EntityAdmin& in_admin) : System(in_admin)
+    explicit CounterSystem(EntityAdmin& in_admin) : System(in_admin)
     {
         // Setup of the different event handlers
         SetupEventHandler<StartHandler>();

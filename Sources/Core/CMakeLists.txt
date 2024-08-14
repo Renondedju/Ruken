@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-set(TRACY_ENABLE ${RUKEN_TRACE_BUILD})
+set(TRACY_ENABLE    ${RUKEN_TRACE_BUILD})
+set(TRACY_ON_DEMAND ON)
 
 CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.10.zip" NAME tracy)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
@@ -267,6 +268,7 @@ add_library(RkCore STATIC
         Include/Resource/ResourceProcessingFailure.hpp
         Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
+        Src/Core/ExecutiveSystem/CPU/Awaitables/CPUTaskPromise.inl
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

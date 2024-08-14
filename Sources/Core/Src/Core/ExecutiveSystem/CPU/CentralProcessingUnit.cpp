@@ -21,7 +21,7 @@ RkVoid CentralProcessingUnit::StartWorkers() noexcept
     WorkerInfo::name = std::string("CPU Main");
 }
 
-RkVoid CentralProcessingUnit::CallerAsWorker(std::stop_token const& in_should_return) const noexcept
+RkVoid CentralProcessingUnit::CallerAsWorker(std::stop_token&& in_should_return) const noexcept
 {
     while (!in_should_return.stop_requested())
         Worker::ProcessQueues(m_queues, in_should_return);

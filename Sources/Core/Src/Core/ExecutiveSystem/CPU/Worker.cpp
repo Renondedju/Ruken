@@ -22,7 +22,9 @@ RkVoid Worker::ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queu
     {
         WorkerInfo::current_queue = queue;
         queue->PopAndRun(true, in_stop_token);
-        queue->Yield(in_stop_token);
+
+        if (!in_stop_token.stop_requested())
+            queue->Yield(in_stop_token);
     }
 }
 

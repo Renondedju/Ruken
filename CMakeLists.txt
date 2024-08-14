@@ -38,10 +38,11 @@ include(${RUKEN_SOURCES_DIR}/CMake/CPM.cmake)
 define_property(GLOBAL PROPERTY RUKEN_SERVICE_LIBS)
 
 set(CPM_SOURCE_CACHE ${RUKEN_SOURCES_DIR}/ThirdParty)
-file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE)
 
+file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE)
 add_subdirectory(${RUKEN_SERVICES_DIR})
 add_subdirectory(${RUKEN_CORE_DIR})
+file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE RELEASE)
 
 get_property(RUKEN_SERVICE_LIBS GLOBAL PROPERTY RUKEN_SERVICE_LIBS)
 
@@ -51,6 +52,5 @@ add_compile_definitions(UNICODE _UNICODE)
 add_executable(Ruken Sources/Core/Src/Main.cpp)
 
 target_compile_definitions(Ruken PRIVATE RUKEN_PROJECT_NAME="Ruken")
-
 
 target_link_libraries(Ruken RkCore ${RUKEN_SERVICE_LIBS})
