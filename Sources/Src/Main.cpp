@@ -1,8 +1,8 @@
 #include "Core/Kernel.hpp"
-#include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
+#include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
+#include "ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 #include <tracy/Tracy.hpp>
 #include <functional>

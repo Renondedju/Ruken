@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
 
 #include "ECS/System.hpp"
 #include "ECS/EventHandler.hpp"

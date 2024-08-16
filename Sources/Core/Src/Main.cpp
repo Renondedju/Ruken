@@ -1,8 +1,8 @@
 #include "Core/Kernel.hpp"
-#include "Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "Core/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
+#include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
+#include "ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 #include <tracy/Tracy.hpp>
 #include <functional>
@@ -14,16 +14,6 @@ USING_RUKEN_NAMESPACE
 
 struct MainQueue : CPUQueueHandle<MainQueue, 2048>
 {};
-
-CPUTask<MainQueue> TracyUpdate(std::stop_token const& in_stop_token) noexcept
-{
-    using namespace std::chrono_literals;
-
-    while(!in_stop_token.stop_requested())
-        std::this_thread::sleep_for(100ms);
-
-    co_return;
-}
 
 struct AsyncLoop
 {
@@ -70,8 +60,7 @@ int main(int in_argc, char* in_argv[])
 
     std::stop_source stop_source {};
 
-    AsyncMain  (stop_source, services);
-    //TracyUpdate(stop_source.get_token());
+    AsyncMain(stop_source, services);
 
     cpu.RegisterQueue(MainQueue::instance);
     cpu.StartWorkers ();

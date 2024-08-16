@@ -2,7 +2,7 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/EEventName.hpp"

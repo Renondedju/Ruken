@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "Core/Service.hpp"
-#include "Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
 #include "ECS/System.hpp"

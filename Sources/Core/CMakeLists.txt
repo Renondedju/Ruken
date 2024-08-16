@@ -31,43 +31,43 @@ add_library(RkCore STATIC
         Include/Build/Namespace.hpp
         Include/Containers/LinkedChunkList.hpp
         Include/Containers/LinkedChunkListNode.hpp
-        Include/Core/ExecutiveSystem/Concepts/AwaitableType.hpp
-        Include/Core/ExecutiveSystem/Concepts/ProcessingQueueType.hpp
-        Include/Core/ExecutiveSystem/Concepts/ProcessingUnitType.hpp
-        Include/Core/ExecutiveSystem/Concepts/QueueHandleType.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableExceptionStorage.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableResultStorage.hpp
-        Include/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp
-        Include/Core/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp
-        Include/Core/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp
-        Include/Core/ExecutiveSystem/CPU/Continuations/CPUPropagatingContinuation.hpp
-        Include/Core/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp
-        Include/Core/ExecutiveSystem/CPU/Queues/CPUDynamicQueue.hpp
-        Include/Core/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp
-        Include/Core/ExecutiveSystem/CPU/CentralProcessingUnit.hpp
-        Include/Core/ExecutiveSystem/CPU/ConcurrencyCounter.hpp
-        Include/Core/ExecutiveSystem/CPU/Worker.hpp
-        Include/Core/ExecutiveSystem/CPU/WorkerInfo.hpp
-        Include/Core/ExecutiveSystem/GPU/GraphicsProcessingQueue.hpp
-        Include/Core/ExecutiveSystem/GPU/GraphicsProcessingUnit.hpp
-        Include/Core/ExecutiveSystem/Awaitable.hpp
-        Include/Core/ExecutiveSystem/Awaiter.hpp
-        Include/Core/ExecutiveSystem/EExecutionPolicy.hpp
-        Include/Core/ExecutiveSystem/EInstructionType.hpp
-        Include/Core/ExecutiveSystem/EventBridge.hpp
-        Include/Core/ExecutiveSystem/ProcessingQueue.hpp
-        Include/Core/ExecutiveSystem/ProcessingUnit.hpp
-        Include/Core/ExecutiveSystem/Promise.hpp
-        Include/Core/ExecutiveSystem/QueueHandle.hpp
-        Include/Core/ExecutiveSystem/Task.hpp
+        Include/ExecutiveSystem/Concepts/AwaitableType.hpp
+        Include/ExecutiveSystem/Concepts/ProcessingQueueType.hpp
+        Include/ExecutiveSystem/Concepts/ProcessingUnitType.hpp
+        Include/ExecutiveSystem/Concepts/QueueHandleType.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitableExceptionStorage.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitableResultStorage.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp
+        Include/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp
+        Include/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp
+        Include/ExecutiveSystem/CPU/Continuations/CPUPropagatingContinuation.hpp
+        Include/ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp
+        Include/ExecutiveSystem/CPU/Queues/CPUDynamicQueue.hpp
+        Include/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp
+        Include/ExecutiveSystem/CPU/CentralProcessingUnit.hpp
+        Include/ExecutiveSystem/CPU/ConcurrencyCounter.hpp
+        Include/ExecutiveSystem/CPU/Worker.hpp
+        Include/ExecutiveSystem/CPU/WorkerInfo.hpp
+        Include/ExecutiveSystem/GPU/GraphicsProcessingQueue.hpp
+        Include/ExecutiveSystem/GPU/GraphicsProcessingUnit.hpp
+        Include/ExecutiveSystem/Awaitable.hpp
+        Include/ExecutiveSystem/Awaiter.hpp
+        Include/ExecutiveSystem/EExecutionPolicy.hpp
+        Include/ExecutiveSystem/EInstructionType.hpp
+        Include/ExecutiveSystem/EventBridge.hpp
+        Include/ExecutiveSystem/ProcessingQueue.hpp
+        Include/ExecutiveSystem/ProcessingUnit.hpp
+        Include/ExecutiveSystem/Promise.hpp
+        Include/ExecutiveSystem/QueueHandle.hpp
+        Include/ExecutiveSystem/Task.hpp
         Include/Core/EInitializationStatus.hpp
         Include/Core/Exception.hpp
         Include/Core/Service.hpp
@@ -213,14 +213,14 @@ add_library(RkCore STATIC
         Src/Bitwise/Bitmask.inl
         Src/Bitwise/SizedBitmask.inl
         Src/Containers/LinkedChunkList.inl
-        Src/Core/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.cpp
-        Src/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.inl
-        Src/Core/ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.inl
-        Src/Core/ExecutiveSystem/CPU/Continuations/CPUContinuation.cpp
-        Src/Core/ExecutiveSystem/CPU/CentralProcessingQueue.cpp
-        Src/Core/ExecutiveSystem/CPU/CentralProcessingUnit.cpp
-        Src/Core/ExecutiveSystem/CPU/Worker.cpp
-        Src/Core/ExecutiveSystem/Promise.inl
+        Src/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.cpp
+        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.inl
+        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.inl
+        Src/ExecutiveSystem/CPU/Continuations/CPUContinuation.cpp
+        Src/ExecutiveSystem/CPU/CentralProcessingQueue.cpp
+        Src/ExecutiveSystem/CPU/CentralProcessingUnit.cpp
+        Src/ExecutiveSystem/CPU/Worker.cpp
+        Src/ExecutiveSystem/Promise.inl
         Src/Core/Service.inl
         Src/Core/ServiceBase.cpp
         Src/Core/ServiceProvider.cpp
@@ -268,7 +268,7 @@ add_library(RkCore STATIC
         Include/Resource/ResourceProcessingFailure.hpp
         Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
-        Src/Core/ExecutiveSystem/CPU/Awaitables/CPUTaskPromise.inl
+        Src/ExecutiveSystem/CPU/Awaitables/CPUTaskPromise.inl
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)
