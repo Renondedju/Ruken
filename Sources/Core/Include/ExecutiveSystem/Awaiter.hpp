@@ -12,9 +12,9 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TProcessingUnit Processing unit the subscription is operating on
  */
 template <ProcessingUnitType TProcessingUnit>
-class Awaiter
+struct Awaiter
 {
-    using ProcessingUnit = TProcessingUnit;
+	using ProcessingUnit = TProcessingUnit;
 };
 
 END_RUKEN_NAMESPACE

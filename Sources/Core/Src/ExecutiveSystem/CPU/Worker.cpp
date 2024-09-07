@@ -1,24 +1,24 @@
 #include "ExecutiveSystem/CPU/Worker.hpp"
 #include "ExecutiveSystem/CPU/WorkerInfo.hpp"
-#include "ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+#include "ExecutiveSystem/CPU/Queues/CPUQueue.hpp"
 
 #include <functional>
-#include <Tracy/Tracy.hpp>
-#include <Tracy/TracyC.h>
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 
 USING_RUKEN_NAMESPACE
 
-Worker::Worker(std::string in_name, std::vector<CentralProcessingQueue*>& in_queues) noexcept:
+Worker::Worker(std::string in_name, std::vector<CPUQueue*>& in_queues) noexcept:
     m_queues {in_queues},
     m_thread {std::bind_front(&Worker::Routine, this), std::move(in_name)}
 {}
 
-RkVoid Worker::ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queues, std::stop_token const& in_stop_token) noexcept
+RkVoid Worker::ProcessQueues(std::vector<CPUQueue*> const& in_queues, std::stop_token const& in_stop_token) noexcept
 {
     // This obviously defeats the whole purpose of making queues but is only temporary
     // and is meant to be customized for each projects based on the needs.
     // TODO: Implement a way of customizing the process behavior without modifying this code
-    for (CentralProcessingQueue* queue: in_queues)
+    for (CPUQueue* queue: in_queues)
     {
         WorkerInfo::current_queue = queue;
         queue->PopAndRun(true, in_stop_token);

@@ -9,18 +9,12 @@ BEGIN_RUKEN_NAMESPACE
  * Awaitables cannot be waited on directly by other processing units, and must use a bridge when available.
  *
  * \tparam TProcessingUnit Queue type the awaitable lives in.
- * \tparam TResult The result type of the awaitable.
- * \tparam TReliable When false, waiting for this object can result in a failure fail.
  *         The result of the awaitable might not be valid after a failure and reading from it should be avoided.
  */
-template <ProcessingUnitType TProcessingUnit, typename TResult, RkBool TReliable>
+template <ProcessingUnitType TProcessingUnit>
 struct Awaitable
 {
     using ProcessingUnit = TProcessingUnit;
-    using Result         = TResult;
-
-    /// When false, waiting for this object can result in a failure fail.
-    static constexpr RkBool reliable {TReliable};
 };
 
 END_RUKEN_NAMESPACE

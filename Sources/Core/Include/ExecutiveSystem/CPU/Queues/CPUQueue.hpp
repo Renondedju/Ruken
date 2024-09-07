@@ -26,7 +26,7 @@ struct CPUTaskSubscription;
 /**
  * \brief Lock-free multi-producer/multi-consumer FIFO queue.
  */
-class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
+class CPUQueue: public ProcessingQueue<CentralProcessingUnit>
 {
     template <QueueHandleType TFriendQueueHandle>
     friend struct CPUTaskSubscription; // Updating m_current_concurrency
@@ -75,11 +75,11 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
       		 * \brief Default constructor
 		       * \param in_size Size of the queue
 		       */
-		      explicit CentralProcessingQueue(RkSize in_size) noexcept;
+		      explicit CPUQueue(RkSize in_size) noexcept;
 
-        CentralProcessingQueue(CentralProcessingQueue const&) = delete;
-        CentralProcessingQueue(CentralProcessingQueue&&)      = delete;
-        ~CentralProcessingQueue()                             = default;
+        CPUQueue(CPUQueue const&) = delete;
+        CPUQueue(CPUQueue&&)      = delete;
+        ~CPUQueue()               = default;
 
         #pragma endregion
 
@@ -113,8 +113,8 @@ class CentralProcessingQueue: public ProcessingQueue<CentralProcessingUnit>
 
         #pragma region Operators
 
-        CentralProcessingQueue& operator=(CentralProcessingQueue const&) = delete;
-        CentralProcessingQueue& operator=(CentralProcessingQueue&&)      = delete;
+        CPUQueue& operator=(CPUQueue const&) = delete;
+        CPUQueue& operator=(CPUQueue&&)      = delete;
 
         #pragma endregion
 };

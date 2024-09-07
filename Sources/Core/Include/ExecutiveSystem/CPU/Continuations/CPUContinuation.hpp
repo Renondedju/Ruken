@@ -1,77 +1,70 @@
 #pragma once
 
-#include <atomic>
-
-#include "ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.hpp"
+#include "ExecutiveSystem/CPU/Continuations/CPUContinuationNode.hpp"
+#include "Meta/Assert.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-
-/**
- * \brief Central processing unit task subscription base.
- * This class is in charge of the propagation of an event to every awaiting task.
- *
- * This class is basically a thread safe linked list node in conjunction with CPUAwaiter where awaiters
- * contains the head of the list and subscriptions are the actual node containers.
- * Since this node has been designed for co-routines in mind, it can hold some special
- * values listed bellow:
- *
- *  - locked: The next subscription (node) of the list is currently being modified,
- *  and any iteration of the list must be stopped until the pointer is restored.
- *  - expired: The event (list) that this subscription (node) was part of has expired.
- *
- * Any other values simply acts as a classic linked list node pointer.
- */
+template <typename TValue>
 struct CPUContinuation
 {
-    using Node = std::atomic<CPUContinuation*>;
+	static constexpr RkBool has_value {!std::is_same_v<TValue, RkVoid>};
 
-    static inline auto locked   {reinterpret_cast<CPUContinuation*>(0x1)};
-    static inline auto consumed {reinterpret_cast<CPUContinuation*>(0x2)};
+	using ValueT           = TValue;
+	using TValueRef		   = std::add_lvalue_reference_t<std::add_const_t<TValue>>;
+	using TSignalOperation = RkVoid(RkVoid*, RkVoid const*);
 
-    #pragma region Members
+	#pragma region Lifetime
 
-    Node* hook    {nullptr};  ///< Reference to the head of the list
-    Node  forward {nullptr}; ///< Next subscription in the list
+	CPUContinuation()						= default;
+	CPUContinuation(const CPUContinuation&) = default;
+	CPUContinuation(CPUContinuation&&)		= default;
 
-    CPUAwaiter* owner {};
+	CPUContinuation& operator=(const CPUContinuation&) = default;
+	CPUContinuation& operator=(CPUContinuation&&     ) = default;
 
-    #pragma endregion
+	~CPUContinuation()
+	{ m_continuation_node.TryStopAwait(); }
 
-    #pragma region Methods
+	#pragma endregion
 
-    template <typename TResult, RkBool TNoexcept>
-    RkVoid Setup(CPUAwaiter& in_owner, CPUAwaitableHandle<TResult, TNoexcept> const& in_awaited) noexcept
-    {
-        hook  = std::addressof(in_awaited.m_instance->m_continuation_hook);
-        owner = std::addressof(in_owner);
-    }
+	template <typename TAwaitable, typename TAwaiter>
+	RkVoid Setup(TAwaitable const& in_awaitable, TAwaiter& in_awaiter) noexcept
+	{
+		m_continuation_node.head = in_awaitable.GetContinuationHook();
+		m_awaiter_ptr		     = std::addressof(in_awaiter);
+		m_signal_operation       = [](RkVoid* in_awaiter_ptr, RkVoid const* in_value) {
+			if constexpr ( has_value && std::is_same_v<typename TAwaiter::ValueT, TValue>)
+				static_cast<TAwaiter*>(in_awaiter_ptr)->Signal(*static_cast<TValue const*>(in_value));
+			if constexpr (!has_value || std::is_same_v<typename TAwaiter::ValueT, RkVoid>)
+				static_cast<TAwaiter*>(in_awaiter_ptr)->Signal();
+		};
+	}
 
-    /**
-     * \brief Checks if the event we want to wait for has been completed already
-     * \note This function can be called even if the awaited event has been deleted already
-     * \return True if the awaiter has been completed, false otherwise
-     */
-    [[nodiscard]]
-    RkBool IsEventCompleted() const noexcept;
+	RkBool TryStartAwait() noexcept
+	{
+		RUKEN_ASSERT(m_awaiter_ptr != nullptr, "Awaiter ptr should not be null, make sure Setup() is properly called.");
 
-    /**
-     * \brief Attempts a suspension by attaching the awaiter to the awaited event
-     * \return True if the suspension succeeded, false otherwise
-     */
-    [[nodiscard]]
-    RkBool TryAttach() noexcept;
+		return m_continuation_node.TryStartAwait();
+	}
 
-    /**
-     * \brief Detaches the continuation 
-     */
-    RkBool TryDetach();
+	/**
+	 * Signals the owner (awaiter) of the continuation.
+	 * @note The underlying logic is type erased, meaning that the owning awaiter can discard any passed value if needed.
+	 */
+	RkVoid Signal(TValue const* in_value) const noexcept requires ( has_value);
+	RkVoid Signal()				          const noexcept requires (!has_value);
 
-    #pragma endregion
+	RkBool Consumed() const noexcept
+	{ return m_continuation_node.Consumed(); }
 
-    Node& Front() const noexcept;
-    Node& Back () const noexcept;
+	private:
+
+		CPUContinuationNode m_continuation_node {};
+		RkVoid*    			m_awaiter_ptr		{};
+		TSignalOperation* 	m_signal_operation  {};
 };
 
 END_RUKEN_NAMESPACE
+
+#include "ExecutiveSystem/CPU/Continuations/CPUContinuation.inl"

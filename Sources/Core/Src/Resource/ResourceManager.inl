@@ -63,7 +63,7 @@ RkVoid ResourceManager::LoadResource(ResourceManifest* in_manifest, ResourceLoad
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::RequestResource(ResourceIdentifier const& in_unique_identifier, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
+CPUTask<TResource_Type> ResourceManager::RequestResource(ResourceIdentifier const& in_unique_identifier, ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode const in_loading_mode) noexcept
 {
     ResourceManifest* manifest = RequestManifest(in_unique_identifier);
 
@@ -71,11 +71,11 @@ Handle<TResource_Type> ResourceManager::RequestResource(ResourceIdentifier const
     if (manifest->status.load(std::memory_order_acquire) == EResourceStatus::Invalid)
         LoadResource<TResource_Type>(manifest, in_descriptor, in_loading_mode);
 
-    return std::move(Handle<TResource_Type>(manifest));
+    return std::move(CPUTask<TResource_Type>(manifest));
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::ReloadResource(Handle<TResource_Type> const& in_handle, ESynchronizationMode const in_loading_mode) noexcept
+CPUTask<TResource_Type> ResourceManager::ReloadResource(CPUTask<TResource_Type> const& in_handle, ESynchronizationMode const in_loading_mode) noexcept
 {
     // Cannot reload an unloaded or invalid handle
     if (!in_handle.Available())
@@ -94,13 +94,13 @@ Handle<TResource_Type> ResourceManager::ReloadResource(Handle<TResource_Type> co
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::ReferenceResource(ResourceIdentifier const& in_unique_identifier, TResource_Type* in_resource, EResourceGCStrategy const in_strategy) noexcept
+CPUTask<TResource_Type> ResourceManager::ReferenceResource(ResourceIdentifier const& in_unique_identifier, TResource_Type* in_resource, EResourceGCStrategy const in_strategy) noexcept
 {
     ManifestsWriteAccess access(m_manifests);
 
     // If there is already a manifest with the target name or the resource is an empty pointer
     if (access->find(in_unique_identifier) != access->end() || !in_resource)
-        return Handle<TResource_Type>(nullptr);
+        return CPUTask<TResource_Type>(nullptr);
 
     // Otherwise, referencing the resource
     ResourceManifest* manifest = new ResourceManifest();
@@ -110,17 +110,17 @@ Handle<TResource_Type> ResourceManager::ReferenceResource(ResourceIdentifier con
     manifest->data            = in_resource;
     manifest->status.store(EResourceStatus::Loaded, std::memory_order_release);
 
-    return Handle<TResource_Type>(manifest);
+    return CPUTask<TResource_Type>(manifest);
 }
 
 template <typename TResource_Type>
-Handle<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode const in_loading_mode) noexcept
+CPUTask<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode const in_loading_mode) noexcept
 {
     ResourceManifest* manifest = RequestManifest(in_unique_identifier, false);
     
     // Cannot reload an unloaded or invalid manifest
     if (!manifest || manifest->status != EResourceStatus::Loaded)
-        return Handle<TResource_Type>(manifest);
+        return CPUTask<TResource_Type>(manifest);
 
     if (in_loading_mode == ESynchronizationMode::Synchronous)
         ReloadingRoutine(manifest);
@@ -131,5 +131,5 @@ Handle<TResource_Type> ResourceManager::ReloadResource(ResourceIdentifier const&
         });
     }
 
-    return Handle<TResource_Type>(manifest);
+    return CPUTask<TResource_Type>(manifest);
 }

@@ -1,10 +1,10 @@
 #include "ExecutiveSystem/CPU/WorkerInfo.hpp"
 #include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+#include "ExecutiveSystem/CPU/Queues/CPUQueue.hpp"
 
 USING_RUKEN_NAMESPACE
 
-RkVoid CentralProcessingUnit::RegisterQueue(CentralProcessingQueue& in_queue) noexcept
+RkVoid CentralProcessingUnit::RegisterQueue(CPUQueue& in_queue) noexcept
 {
     m_queues.emplace_back(std::addressof(in_queue));
 }

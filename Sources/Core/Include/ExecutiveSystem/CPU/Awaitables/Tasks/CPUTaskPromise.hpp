@@ -1,123 +1,97 @@
 #pragma once
 
 #include "Build/BuildInfo.hpp"
-#include "ExecutiveSystem/Concepts/AwaitableType.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
 #include "ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp"
-#include "ExecutiveSystem/CPU/WorkerInfo.hpp"
 
 #include "Debug/Trace.hpp"
 
-#include <tracy/TracyC.h>
-#include <tracy/Tracy.hpp>
 #include <source_location>
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueueHandle, typename TResult>
+#define RUKEN_INTERNAL_SOURCE_LOCATION [[maybe_unused]] std::source_location in_source_location = std::source_location::current()
+
+template <typename TQueueHandle, typename TResult>
 struct CPUTask;
+
+template <typename TResult>
+using TPromiseAwaitableValue = std::conditional_t<
+		!std::is_same_v<TResult, RkVoid>,
+			std::variant<TResult, std::exception_ptr>,
+			std::exception_ptr
+	>;
+
 
 /**
  * \brief Implements the base common behavior for all CPU tasks
  * \tparam TResult Return type of the associated coroutine
  */
-template <QueueHandleType TQueueHandle, typename TResult>
-struct CPUTaskPromise final: CPUAwaitable<TResult, false>, CPUAwaiter
+template <typename TResult>
+struct CPUPromise:
+	protected CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>,
+			  CPUAwaitable       <TPromiseAwaitableValue<TResult>>
 {
-    template <typename TOtherResult>
-    friend class CPUPromise;
+	using ReturnType     = TPromiseAwaitableValue<TResult>;
+	using ProcessingUnit = CentralProcessingUnit;
 
-    template <typename TOtherResult, bool TOtherIsNoexcept>
-    friend struct CPUCoroutineContinuation;
+	CPUPromise() noexcept:
+		CPUAwaitableStorage<TPromiseAwaitableValue<TResult>> {},
+		CPUAwaitable	   <TPromiseAwaitableValue<TResult>> {m_continuation_node, std::addressof(value)}
+	{}
 
-    using ProcessingUnit = CentralProcessingUnit;
+	CPUQueue* CurrentQueue() const noexcept { return m_queue; }
 
-    #pragma region Lifetime
-
-    CPUTaskPromise()                      = default;
-    CPUTaskPromise(CPUTaskPromise const&) = default;
-    CPUTaskPromise(CPUTaskPromise&&     ) = default;
-    ~CPUTaskPromise() override            = default;
-
-    CPUTaskPromise& operator=(CPUTaskPromise const&) = default;
-    CPUTaskPromise& operator=(CPUTaskPromise&&     ) = default;
-
-	#pragma endregion
-
-    #pragma region Methods
-
-    /// ----- Coroutine methods -----
-    ///
-
-    /**
-     * \brief Constructs, queues up and returns a handle to the promise
-     * \return Promise handle
-     */
-    CPUTask<TQueueHandle, TResult> get_return_object() noexcept;
-
-	/**
-	 * CPU tasks will never start synchronously and are instead inserted into queues for it to be eventually processed.
-	 *
-	 * @param in_location Source location at the start of the coroutine.
-	 * @return Awaiter instance
-	 */
-	auto initial_suspend([[maybe_unused]] std::source_location const& in_location = std::source_location::current()) noexcept;
+    #pragma region Coroutine Methods
 
 	/**
      * \brief Converts awaited types to asynchronous events if possible
-     * \tparam TAwaitable Event type
      * \param in_awaitable Asynchronous event instance
-     * \param in_source_location Source location of the transform
      * \return Awaiter instance
      */
-    template <AwaitableType TAwaitable>
-    auto await_transform(TAwaitable&&         in_awaitable,
-        [[maybe_unused]] std::source_location in_source_location = std::source_location::current()
-    ) noexcept;
+	template<typename TAwaitableValue>
+	auto await_transform    (CPUAwaitable<TAwaitableValue> const& in_awaitable, RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
 
-	/**
-     * Final suspension depends on the number of references that are made to the coroutine.
-     * Since we have to hold a result, the promise cannot be destroyed if there are still references to it
-     * in that case, the last reference to be removed will destroy the coroutine.
-     *
-	 * @return Awaiter instance
-	 */
-	auto final_suspend() noexcept;
-
+	// Coroutine lifetime
+	//auto get_return_object  () noexcept;
+	auto initial_suspend	(RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
+	auto final_suspend		() noexcept;
 	void unhandled_exception() noexcept;
 
 	#pragma endregion
 
-	private:
+	#pragma region Members
+
+	protected:
+
+		template <typename TQueueHandle, typename TOtherResult>
+		friend struct CPUTask;
+
+		using CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>::value;
+
+		CPUQueue*			   m_queue			   {nullptr};
+		std::atomic<RkSize>	   m_references		   {1ULL};
+		CPUContinuationNodePtr m_continuation_node {nullptr};
 
 		#ifdef RUKEN_TRACE_BUILD
-		std::source_location m_current_source_location {};
-		TracyCZoneCtx        m_zone                    {};
+			TracyCZoneCtx m_zone {};
 		#endif
 
-		#pragma region Methods
+	#pragma endregion
+};
 
-		/**
-		 * \brief Called by the awaited event upon completion
-		 * This method simply pushes the coroutine back to the queue for execution.
-		 */
-		RkVoid OnAwaitedContinuation() noexcept override
-		{
-			// CPU Tasks are not processed in place and are instead pushed to a queue
-			// to be picked up and processed by a worker later.
-			TQueueHandle::GetInstance().Push(std::coroutine_handle<CPUTaskPromise>::from_promise(*this));
-			//TracyMessageL("Pushed continuation");
-		}
+template<typename TQueueHandle, typename TResult>
+struct CPUTaskPromise: CPUPromise<TResult>
+{
+	auto get_return_object()						 noexcept;
+	void return_value	  (TResult const& in_result) noexcept;
+};
 
-		/**
-		 * \brief Destroys the coroutine frame when there is no longer any references made to it.
-		 */
-		RkVoid Deallocate() override
-		{
-			std::coroutine_handle<CPUTaskPromise>::from_promise(*this).destroy();
-		}
-
-		#pragma endregion
+template <typename TQueueHandle>
+struct CPUTaskPromise<TQueueHandle, RkVoid>: CPUPromise<RkVoid>
+{
+	auto get_return_object() noexcept;
+	void return_void      () noexcept;
 };
 
 END_RUKEN_NAMESPACE

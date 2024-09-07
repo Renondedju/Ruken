@@ -1,45 +1,35 @@
 #pragma once
 
-#include <coroutine>
-
-#include "Types/FundamentalTypes.hpp"
-#include "ExecutiveSystem/Concepts/QueueHandleType.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/CPUAwaitableHandle.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp"
+
+#include <coroutine>
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueueHandle, typename TResult = RkVoid>
-struct CPUTask final: Awaitable<CentralProcessingUnit, TResult, false>, CPUAwaitableHandle<TResult, false>,
-                      std::coroutine_handle<CPUTaskPromise<TQueueHandle, TResult>>
+/// Promises are allocated on the heap and need to stay alive
+/// in order to retrieve their results.
+/// This handle acts as a shared pointer to the promise.
+template<typename TQueueHandle, typename TResult = RkVoid>
+struct CPUTask: CPUAwaitable<TPromiseAwaitableValue<TResult>>
 {
-    using promise_type   = CPUTaskPromise<TQueueHandle, TResult>;
-    using ProcessingUnit = typename TQueueHandle::ProcessingUnit;
+	explicit CPUTask(CPUTaskPromise<TQueueHandle, TResult>& in_parent, CPUContinuationNodePtr& in_continuation_node) noexcept;
 
-    #pragma region Lifetime
+	CPUTask () = default;
+	CPUTask (CPUTask const&) noexcept;
+	CPUTask (CPUTask&&     ) noexcept;
+	~CPUTask()			     noexcept;
 
-    CPUTask() noexcept:
-        CPUAwaitableHandle<TResult, false>  {nullptr},
-        std::coroutine_handle<promise_type> {}
-    {}
+	CPUTask& operator=(CPUTask const&) noexcept;
+	CPUTask& operator=(CPUTask&&     ) noexcept;
 
-    /**
-     * \brief Default constructor
-     * \param in_promise Promise instance
-     */
-    CPUTask(promise_type& in_promise) noexcept:
-        CPUAwaitableHandle<TResult, false>  {in_promise},
-        std::coroutine_handle<promise_type> {std::coroutine_handle<promise_type>::from_promise(in_promise)}
-    {}
+	using promise_type = CPUTaskPromise<TQueueHandle, TResult>;
 
-    CPUTask(CPUTask const&) = default;
-    CPUTask(CPUTask&&)      = default;
-    ~CPUTask()              = default;
+	private:
 
-    CPUTask& operator=(CPUTask const&) = default;
-    CPUTask& operator=(CPUTask&&)      = default;
-
-    #pragma endregion
+		CPUTaskPromise<TQueueHandle, TResult>*					     m_parent		    {nullptr};
+		std::coroutine_handle<CPUTaskPromise<TQueueHandle, TResult>> m_coroutine_handle {};
 };
 
 END_RUKEN_NAMESPACE
+
+#include "ExecutiveSystem/CPU/Awaitables/CPUTask.inl"

@@ -7,7 +7,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class CentralProcessingQueue;
+class CPUQueue;
 
 /**
  * \brief Central Processing Unit
@@ -17,11 +17,11 @@ class CentralProcessingQueue;
  */
 class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, EExecutionPolicy::Immediate, EInstructionType::Direct>
 {
-    friend CentralProcessingQueue;
+    friend CPUQueue;
 
     #pragma region Members
 
-    std::vector<CentralProcessingQueue*> m_queues  {};
+    std::vector<CPUQueue*> m_queues  {};
     std::vector<std::unique_ptr<Worker>> m_workers {};
 
     #pragma endregion
@@ -43,7 +43,7 @@ class CentralProcessingUnit final: public ProcessingUnit<CentralProcessingUnit, 
          * \brief Registers the passed queue so it can be processed
          * \param in_queue Queue instance
          */
-        RkVoid RegisterQueue(CentralProcessingQueue& in_queue) noexcept;
+        RkVoid RegisterQueue(CPUQueue& in_queue) noexcept;
 
         /**
          * \brief Starts the workers

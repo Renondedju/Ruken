@@ -1,35 +1,12 @@
 #pragma once
 
-#include "ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp"
-
 #include "ECS/System.hpp"
 #include "ECS/EventHandler.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
+#include "ExecutiveSystem/CPU/Awaitables/Primitives/WhenAll.hpp"
+
 USING_RUKEN_NAMESPACE
-
-inline CPUDynamicTask<> WhenAll(std::vector<CPUDynamicTask<>> const& in_jobs)
-{
-    CountDownLatch               latch         {in_jobs.size()};
-    std::vector<CPUContinuation> continuations {in_jobs.size()};
-
-    for (RkSize index = 0; index < in_jobs.size(); ++index)
-    {
-        // Creating a job and keeping a reference onto it until the attachment
-        // process has been done to avoid it being deleted in the meanwhile.
-
-        // Instantiating the job and setup the continuation callback
-        continuations[index].Setup(latch, in_jobs[index]);
-
-        // Trying to attach the continuation and if the process failed, that means the event we
-        // were looking to await has already been completed. Thus we need to decrement manually the latch by one.
-        if (!continuations[index].TryAttach())
-            latch.CountDown();
-    }
-
-    co_await latch;
-}
-
 
 struct CounterSystem final: System
 {
@@ -70,7 +47,7 @@ struct CounterSystem final: System
             }
 
             std::vector<CPUDynamicTask<RkVoid>> tasks {task_count};
-            RkSize index {0};
+            RkSize                              index {0};
             for (auto const& archetype: m_archetypes)
             {
                 auto& container = archetype.get()

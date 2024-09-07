@@ -4,16 +4,33 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief Central processing unit manual reset event
- */
-template <typename TResult, RkBool TNoexcept>
-struct ManualResetEvent final: CPUAwaitable<TResult, TNoexcept>
+template <typename TValue>
+struct ManualResetEvent: CPUAwaitable<TValue>
 {
-    protected:
+	using Parent = CPUAwaitable<TValue>;
 
-        // RAII controlled
-        RkVoid Deallocate() override {}
+	 ManualResetEvent()						  noexcept: Parent(m_continuation_node, &m_value) {}
+	~ManualResetEvent()					      noexcept {					 Parent::Consume(); }
+	RkVoid     Signal(TValue const& in_value) noexcept { m_value = in_value; Parent::Consume(true); }
+	RkVoid	   Reset ()						  noexcept {					 Parent::Reset(); }
+
+	private:
+
+		TValue				   m_value			   {};
+		CPUContinuationNodePtr m_continuation_node {};
+};
+
+template <>
+struct ManualResetEvent<RkVoid>: CPUAwaitable<RkVoid>
+{
+	 ManualResetEvent() noexcept: CPUAwaitable(m_continuation_node) {}
+	~ManualResetEvent() noexcept { Consume(); }
+	RkVoid     Signal() noexcept { Consume(true); }
+	RkVoid	   Reset () noexcept { CPUAwaitable::Reset(); }
+
+	private:
+
+		CPUContinuationNodePtr m_continuation_node {};
 };
 
 END_RUKEN_NAMESPACE

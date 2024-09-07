@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ExecutiveSystem/QueueHandle.hpp"
-#include "ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+#include "ExecutiveSystem/CPU/Queues/CPUQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -20,9 +20,9 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TInheriting, RkSize TSize>
 struct CPUQueueHandle: QueueHandle<CentralProcessingUnit>
 {
-    static inline CentralProcessingQueue instance {TSize};
+    static inline CPUQueue instance {TSize};
 
-    static CentralProcessingQueue& GetInstance() noexcept
+    static CPUQueue& GetInstance() noexcept
     { return instance; }
 };
 

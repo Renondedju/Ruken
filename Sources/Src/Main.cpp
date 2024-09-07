@@ -7,7 +7,6 @@
 #include <tracy/Tracy.hpp>
 #include <functional>
 
-#include "../ThirdParty/tracy/dede20a49fd55ec615451f07b969d950651359aa/public/tracy/Tracy.hpp"
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
@@ -61,7 +60,7 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
         .domain = EntityAdmin {in_service_provider}
     };
     AsyncLoop loop5 {
-        .name   = "Test loop 3",<
+        .name   = "Test loop 3",
         .domain = EntityAdmin {in_service_provider}
     };
 

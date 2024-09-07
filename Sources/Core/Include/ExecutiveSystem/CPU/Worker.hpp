@@ -7,7 +7,7 @@
 #include <thread>
 
 BEGIN_RUKEN_NAMESPACE
-class CentralProcessingQueue;
+class CPUQueue;
 
 /**
  * \brief Single thread of execution with its own internal routine
@@ -16,7 +16,7 @@ class Worker
 {
 	   #pragma region Members
 
-    std::vector<CentralProcessingQueue*>& m_queues;
+    std::vector<CPUQueue*>& m_queues;
     std::jthread                          m_thread {};
 
     #pragma endregion
@@ -41,7 +41,7 @@ class Worker
          * \param in_name Worker name
          * \param in_queues Queues to work on
          */
-		      explicit Worker(std::string in_name, std::vector<CentralProcessingQueue*>& in_queues) noexcept;
+		      explicit Worker(std::string in_name, std::vector<CPUQueue*>& in_queues) noexcept;
 
         Worker(Worker const&) = delete;
         Worker(Worker&&)      = delete;
@@ -56,7 +56,7 @@ class Worker
          * \param in_queues Queues to cycle though 
          * \param in_stop_token If a stop is requested, the method will return as soon as the current job is done
          */
-        static RkVoid ProcessQueues(std::vector<CentralProcessingQueue*> const& in_queues, std::stop_token const& in_stop_token) noexcept;
+        static RkVoid ProcessQueues(std::vector<CPUQueue*> const& in_queues, std::stop_token const& in_stop_token) noexcept;
 
         #pragma endregion
 

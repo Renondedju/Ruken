@@ -45,28 +45,28 @@ TracyCZoneCtx TracyUtilities::TracyZone(___tracy_source_location_data* in_source
     return ctx;
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location, bool const in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location, bool const in_active) noexcept
 {
     return TracyZone(
         ::RUKEN_NAMESPACE::s_tracy_utilities.GetOrInsertSourceLocationData(in_source_location),
         in_active);
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location, std::string_view const in_name, bool const in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location, std::string_view const in_name, bool const in_active) noexcept
 {
     return TracyZone(
         ::RUKEN_NAMESPACE::s_tracy_utilities.GetOrInsertSourceLocationData(in_source_location, in_name.data()),
         in_active);
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location, uint32_t const in_color, bool const in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location, uint32_t const in_color, bool const in_active) noexcept
 {
     return TracyZone(
         ::RUKEN_NAMESPACE::s_tracy_utilities.GetOrInsertSourceLocationData(in_source_location, nullptr, in_color),
         in_active);
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location,
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location,
     std::string_view const in_name, uint32_t const in_color, bool const in_active) noexcept
 {
     return TracyZone(

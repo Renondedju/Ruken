@@ -1,67 +1,37 @@
 #pragma once
 
-#include "ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Asynchronous countdown latch
  */
-class CountDownLatch final : public CPUAwaiter,
-							 public CPUAwaitable<RkVoid, true>
+struct CountDownLatch: CPUAwaitable<RkVoid>
 {
-	#pragma region Members
+	/**
+	 * \brief Default constructor
+	 * \param in_initial_count Initial latch count
+	 */
+	explicit CountDownLatch(RkSize in_initial_count) noexcept;
 
-	std::atomic<RkSize> m_count;
+	/**
+	 * @brief Decrements the internal counter by one.
+	 *		  When the counter reaches 0, the completion of the latch is signaled.
+	 *		  Calling this function when the internal counter is already 0 will cause an underflow.
+	 */
+	RkVoid Signal() noexcept;
 
-	#pragma endregion
+    /**
+     * \brief Returns the current value of the internal counter.
+     * \warning Synchronization cannot be achieved with this function.
+     */
+    RkSize Value() const noexcept;
 
-	public:
+	private:
 
-		using ProcessingUnit = CentralProcessingUnit;
-
-		#pragma region Lifetime
-
-		/**
-		 * \brief Default constructor
-		 * \param in_initial_count Initial latch count
-		 */
-		explicit CountDownLatch(RkSize in_initial_count) noexcept;
-
-		CountDownLatch(CountDownLatch const&) = delete;
-		CountDownLatch(CountDownLatch&&)      = delete;
-		~CountDownLatch() override            = default;
-	
-		CountDownLatch& operator=(CountDownLatch const&) = delete;
-		CountDownLatch& operator=(CountDownLatch&&)      = delete;
-
-		#pragma endregion
-
-		#pragma region Methods
-
-		RkVoid Deallocate() override
-	    {}
-
-        /**
-         * \brief Decrements the internal counter by one.
-         *		  When the counter reaches 0, the completion of the latch is signaled.
-         *		  Calling this function when the internal counter is already 0 will cause an underflow.
-         */
-        RkVoid CountDown() noexcept;
-
-        /**
-         * \brief Returns the current value of the internal counter.
-         * \warning Synchronization cannot be achieved with this function.
-         */
-        RkSize Value() const noexcept;
-
-	    /**
-         * \brief Called when an awaited event has been completed and counts down.
-         */
-		RkVoid OnAwaitedContinuation() noexcept override;
-
-		#pragma endregion
+		std::atomic<RkSize>	   m_counter;
+		CPUContinuationNodePtr m_continuation_node;
 };
 
 END_RUKEN_NAMESPACE

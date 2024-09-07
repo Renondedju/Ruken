@@ -4,38 +4,33 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-/**
- * \brief
- */
-class AutomaticResetEvent final : public CPUAwaitable<RkVoid, true>
+template <typename TValue>
+struct AutomaticResetEvent: CPUAwaitable<TValue>
 {
-    protected:
+	using Parent = CPUAwaitable<TValue>;
 
-        RkVoid Deallocate() override {}
+	 AutomaticResetEvent()						 noexcept: Parent(m_continuation_node, &m_value) {}
+	~AutomaticResetEvent()					     noexcept {					    Parent::Consume(); }
+	RkVoid        Signal(TValue const& in_value) noexcept { m_value = in_value; Parent::Signal(); }
+	RkVoid	      Reset ()						 noexcept {					    Parent::Reset(); }
 
-    public:
+private:
 
-        #pragma region Lifetime
+	TValue				   m_value			   {};
+	CPUContinuationNodePtr m_continuation_node {};
+};
 
-        AutomaticResetEvent()                           = default;
-        AutomaticResetEvent(AutomaticResetEvent const&) = delete;
-        AutomaticResetEvent(AutomaticResetEvent&&)      = delete;
-        ~AutomaticResetEvent() noexcept override
-        {
-            Consume();
-        }
+template <>
+struct AutomaticResetEvent<RkVoid>: CPUAwaitable<RkVoid>
+{
+	 AutomaticResetEvent() noexcept: CPUAwaitable(m_continuation_node) {}
+	~AutomaticResetEvent() noexcept { Consume(); }
+	RkVoid        Signal() noexcept { CPUAwaitable::Signal(); }
+	RkVoid	      Reset () noexcept { CPUAwaitable::Reset(); }
 
-        AutomaticResetEvent& operator=(AutomaticResetEvent const&) = delete;
-        AutomaticResetEvent& operator=(AutomaticResetEvent&&)      = delete;
+private:
 
-        #pragma endregion
-
-        #pragma region Methods
-
-        /// Signals the event
-        RkVoid Signal() const noexcept { CPUAwaitable::Signal(); }
-
-        #pragma endregion
+	CPUContinuationNodePtr m_continuation_node {};
 };
 
 END_RUKEN_NAMESPACE

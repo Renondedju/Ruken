@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ExecutiveSystem/CPU/Queues/CentralProcessingQueue.hpp"
+#include "ExecutiveSystem/CPU/Queues/CPUQueue.hpp"
 
 #include <string>
 
@@ -16,7 +16,7 @@ struct WorkerInfo
     #pragma region Members
 
     inline static thread_local std::string             name            {"Unnamed worker"};
-    inline static thread_local CentralProcessingQueue* current_queue   {nullptr};
+    inline static thread_local CPUQueue* current_queue   {nullptr};
 	inline static thread_local RkSize				   remaining_tasks {0};
 
     #pragma endregion

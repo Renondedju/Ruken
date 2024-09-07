@@ -8,7 +8,7 @@ BEGIN_RUKEN_NAMESPACE
 
 struct CPUDynamicQueue: QueueHandle<CentralProcessingUnit>
 {
-    static CentralProcessingQueue& GetInstance() noexcept
+    static CPUQueue& GetInstance() noexcept
     { return *WorkerInfo::current_queue; }
 };
 
