@@ -10,7 +10,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 template <CQueueHandle TQueueHandle, typename TResult>
-struct CPUPromise;
+struct CPUTaskPromiseBase;
 
 template <typename TType > struct VariantHelper										      { using ValueType = TType;  using HasExceptions = std::false_type;};
 template <typename TValue> struct VariantHelper<std::variant<std::exception_ptr, TValue>> { using ValueType = TValue; using HasExceptions = std::true_type; };

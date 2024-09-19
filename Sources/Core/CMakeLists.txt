@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 3.16.3)
 
 set(TRACY_ENABLE    ${RUKEN_TRACE_BUILD})
 set(TRACY_ON_DEMAND OFF)
+set(TRACY_NO_FRAME_IMAGE ON)
+set(TRACY_NO_SAMPLING ON)
+set(TRACY_NO_VERIFY ON)
 
 CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.10.zip" NAME tracy)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
-CPMAddPackage("gh:nothings/stb#f4a71b13373436a2866c5d68f8f80ac6f0bc1ffe")
+CPMAddPackage(URL "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.6.zip" NAME magic_enum)
+CPMAddPackage(URL "https://github.com/nothings/stb/archive/refs/heads/master.zip" NAME stb)
 
 # stb has no CMake support and is a header only library
 if (stb_ADDED)
@@ -275,6 +279,13 @@ target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Src)
 target_include_directories(RkCore PUBLIC ${RUKEN_GENERATED_SOURCES_DIR}/Include)
 target_include_directories(RkCore PUBLIC ${RUKEN_GENERATED_SOURCES_DIR}/Services)
 
+if(MSVC)
+    target_compile_options(RkCore PRIVATE /W4)
+else()
+    target_compile_options(RkCore PRIVATE -Wall -Wextra -Wpedantic -fsized-deallocation -no-pie)
+    target_link_libraries (RkCore PUBLIC stdc++exp)
+endif()
+
 # --- Config file
 include(${RUKEN_SOURCES_DIR}/CMake/CheckGit.cmake)
 
@@ -284,4 +295,4 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp.in ${RUKE
 CheckGitSetup()
 
 # --- Link dependencies
-target_link_libraries(RkCore PUBLIC atomic_queue git_version stb tinyobjloader TracyClient)
+target_link_libraries(RkCore PUBLIC atomic_queue git_version stb tinyobjloader TracyClient magic_enum)

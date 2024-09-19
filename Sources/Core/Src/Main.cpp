@@ -7,6 +7,7 @@
 #include <tracy/Tracy.hpp>
 #include <functional>
 
+#include "Core/Exception.hpp"
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
@@ -20,6 +21,14 @@ struct AsyncLoop
     const char* name;
     EntityAdmin domain;
 
+    CPUDynamicTask<> SometimesThrows()
+    {
+        if (rand() % 100 == 0)
+            throw Exception("Random exception");
+
+        co_return;
+    }
+
     [[nodiscard]]
     CPUDynamicTask<> Run() noexcept
     {
@@ -32,6 +41,8 @@ struct AsyncLoop
         for (int i = 0; i < 2000; ++i)
         {
             co_await domain.ExecuteEvent(EEventName::OnStart);
+
+            SometimesThrows();
 
             FrameMark;
             FrameMarkNamed(name);
@@ -48,7 +59,13 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
         .domain = EntityAdmin {in_service_provider}
     };
 
-    co_await loop.Run();
+    try
+    { co_await loop.Run(); }
+    catch (Exception& in_exception)
+    {
+        std::string const what {in_exception};
+        TracyMessageC(what.c_str(), what.length(), 0xFF0000);
+    }
 
     in_stop_source.request_stop();
 }

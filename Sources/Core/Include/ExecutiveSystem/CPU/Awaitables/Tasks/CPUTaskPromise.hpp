@@ -29,14 +29,14 @@ using TPromiseAwaitableValue = std::conditional_t<
  * \tparam TResult Return type of the associated coroutine
  */
 template <CQueueHandle TQueueHandle, typename TResult>
-struct CPUPromise:
+struct CPUTaskPromiseBase:
 	protected CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>,
 			  CPUAwaitable       <TPromiseAwaitableValue<TResult>>
 {
 	using ReturnType     = TPromiseAwaitableValue<TResult>;
 	using ProcessingUnit = CentralProcessingUnit;
 
-	CPUPromise() noexcept:
+	CPUTaskPromiseBase() noexcept:
 		CPUAwaitableStorage<TPromiseAwaitableValue<TResult>> {},
 		CPUAwaitable	   <TPromiseAwaitableValue<TResult>> {m_continuation_node, std::addressof(value)}
 	{}
@@ -63,12 +63,11 @@ struct CPUPromise:
 
 	protected:
 
-		template <CQueueHandle TOtherQueueHandle, typename TOtherResult>
-		friend struct CPUTask;
+		template <CQueueHandle TOtherQueueHandle, typename TOtherResult> friend struct CPUTask;
+		template <CQueueHandle TOtherQueueHandle, typename TOtherResult> friend struct CPUTaskContinuationBase;
 
 		using CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>::value;
 
-		CPUQueue*			   m_queue			   {nullptr};
 		std::atomic<RkSize>	   m_references		   {1ULL};
 		CPUContinuationNodePtr m_continuation_node {nullptr};
 
@@ -80,14 +79,14 @@ struct CPUPromise:
 };
 
 template<CQueueHandle TQueueHandle, typename TResult>
-struct CPUTaskPromise: CPUPromise<TQueueHandle, TResult>
+struct CPUTaskPromise: CPUTaskPromiseBase<TQueueHandle, TResult>
 {
 	auto get_return_object()						 noexcept;
 	void return_value	  (TResult const& in_result) noexcept;
 };
 
 template <CQueueHandle TQueueHandle>
-struct CPUTaskPromise<TQueueHandle, RkVoid>: CPUPromise<TQueueHandle, RkVoid>
+struct CPUTaskPromise<TQueueHandle, RkVoid>: CPUTaskPromiseBase<TQueueHandle, RkVoid>
 {
 	auto get_return_object() noexcept;
 	void return_void      () noexcept;

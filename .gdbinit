@@ -1,1 +1,1 @@
-set non-stop on
+set non-stop off

@@ -84,56 +84,41 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief Contains a windows exception
  */
-class WindowsException final : public Exception
+struct WindowsException final : Exception
 {
-	LPSTR m_message_buffer {nullptr};
+	/**
+	 * \brief This constructor automatically fetches the description of the error upon construction
+	 * \param in_error_code Error code
+	 * \param in_stacktrace The stacktrace of the code that created this exception
+	 * \param in_source_location The source location of the code that created this exception
+	 */
+	explicit WindowsException(DWORD const in_error_code,
+							  std::stacktrace      const& in_stacktrace      = std::stacktrace::current(),
+							  std::source_location const& in_source_location = std::source_location::current()) noexcept:
+		Exception("", in_stacktrace, in_source_location)
+	{
+		LPSTR message_buffer {nullptr};
 
-	public:
+		//Ask Win32 to give us the string version of that message ID.
+		//The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK | FORMAT_MESSAGE_IGNORE_INSERTS,
+					   nullptr, in_error_code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), reinterpret_cast<LPSTR>(&message_buffer), 0, nullptr);
 
-		DWORD error_code;
+		reason = message_buffer;
 
-		#pragma region Lifetime
+		//Free the Win32's string's buffer after initialization
+		LocalFree(message_buffer);
+	}
 
-		/**
-		 * \brief Manual constructor
-		 * \param in_error_code Error code
-		 * \param in_what The reason of the failure 
-		 * \param in_stacktrace The stacktrace of the code that created this exception
-		 */
-		explicit WindowsException(const DWORD in_error_code, const std::string_view in_what, std::stacktrace const& in_stacktrace = std::stacktrace::current()) noexcept:
-			Exception  (in_what.data(), in_stacktrace),
-			error_code (in_error_code)
-		{}
-
-		/**
-		 * \brief This constructor automatically fetches the description of the error upon construction
-		 * \param in_error_code Error code
-		 * \param in_stacktrace The stacktrace of the code that created this exception
-		 */
-		explicit WindowsException(const DWORD in_error_code, std::stacktrace const& in_stacktrace = std::stacktrace::current()) noexcept:
-			WindowsException(in_error_code, [this, &in_error_code]()
-			{
-			    //Ask Win32 to give us the string version of that message ID.
-			    //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
-			    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK | FORMAT_MESSAGE_IGNORE_INSERTS,
-			                   nullptr, in_error_code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), reinterpret_cast<LPSTR>(&m_message_buffer), 0, nullptr);
-			            
-			    return m_message_buffer;
-			}(), in_stacktrace)
-		{
-			//Free the Win32's string's buffer after initialization
-			LocalFree(m_message_buffer);
-		}
-
-		/**
-		 * \brief This constructor automatically fetches the last error and description of the error upon construction
-		 * \param in_stacktrace The stacktrace of the code that created this exception
-		 */
-		explicit WindowsException(std::stacktrace const& in_stacktrace = std::stacktrace::current()) noexcept:
-			WindowsException(::GetLastError(), in_stacktrace)
-		{}
-
-		#pragma endregion
+	/**
+	 * \brief This constructor automatically fetches the last error and description of the error upon construction
+	 * \param in_stacktrace The stacktrace of the code that created this exception
+	 * \param in_source_location The source location of the code that created this exception
+	 */
+	explicit WindowsException(std::stacktrace      const& in_stacktrace      = std::stacktrace::current(),
+							  std::source_location const& in_source_location = std::source_location::current()) noexcept:
+		WindowsException(::GetLastError(), in_stacktrace, in_source_location)
+	{}
 };
 
 END_RUKEN_NAMESPACE

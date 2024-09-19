@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Exception.hpp"
 #include "ExecutiveSystem/CPU/Continuations/CPUTaskContinuation.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp"
 
@@ -7,7 +8,7 @@ BEGIN_RUKEN_NAMESPACE
 
 template<CQueueHandle TQueueHandle, typename TResult>
 template<typename TThis, typename TAwaitableValue>
-auto CPUPromise<TQueueHandle, TResult>::await_transform(
+auto CPUTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 	this TThis&							 in_self,
 	CPUAwaitable<TAwaitableValue> const& in_awaitable,
     std::source_location                 in_source_location) noexcept
@@ -21,7 +22,7 @@ auto CPUPromise<TQueueHandle, TResult>::await_transform(
 
 		explicit Awaiter(TThis&								  in_self,
 						 CPUAwaitable<TAwaitableValue> const& in_handle,
-						 std::source_location                 in_location) noexcept:
+						 std::source_location          const& in_location) noexcept:
 			Parent          {in_handle, in_self},
 			self            {in_self},
 			source_location {in_location}
@@ -29,18 +30,14 @@ auto CPUPromise<TQueueHandle, TResult>::await_transform(
 
 		auto await_ready() noexcept
 		{
-#ifdef RUKEN_TRACE_BUILD
-			TracyUtilities::TracyZoneEnd(self.m_zone);
-#endif
+			TRACY_END_ZONE(self.m_zone);
 
 			return Parent::await_ready();
 		}
 
 		auto await_resume() const
 		{
-#ifdef RUKEN_TRACE_BUILD
-			self.m_zone = TracyUtilities::TracyZone(source_location, true);
-#endif
+			TRACY_BEGIN_ZONE(self.m_zone, source_location, true);
 
 			if constexpr (std::is_same_v<TAwaitableValue, RkVoid>)
 				Parent::await_resume();
@@ -54,7 +51,7 @@ auto CPUPromise<TQueueHandle, TResult>::await_transform(
 
 template<CQueueHandle TQueueHandle, typename TResult>
 template<typename TThis>
-auto CPUPromise<TQueueHandle, TResult>::initial_suspend(this TThis& in_self, std::source_location in_source_location) noexcept
+auto CPUTaskPromiseBase<TQueueHandle, TResult>::initial_suspend(this TThis& in_self, std::source_location in_source_location) noexcept
 {
     struct Awaiter
     {
@@ -69,10 +66,7 @@ auto CPUPromise<TQueueHandle, TResult>::initial_suspend(this TThis& in_self, std
 
         void await_resume() const
         {
-#ifdef RUKEN_TRACE_BUILD
-            auto zone = TracyUtilities::TracyZone(source_location, true);
-        	promise.m_zone = zone;
-#endif
+    		TRACY_BEGIN_ZONE(promise.m_zone, source_location, true);
         }
     };
 
@@ -83,11 +77,11 @@ auto CPUPromise<TQueueHandle, TResult>::initial_suspend(this TThis& in_self, std
 }
 
 template<CQueueHandle TQueueHandle, typename TResult>
-auto CPUPromise<TQueueHandle, TResult>::final_suspend() noexcept
+auto CPUTaskPromiseBase<TQueueHandle, TResult>::final_suspend() noexcept
 {
 	struct Awaiter
 	{
-		CPUPromise* promise;
+		CPUTaskPromiseBase* promise;
 
 		[[nodiscard]] bool await_ready() const noexcept {
 			return promise->m_references.fetch_sub(1, std::memory_order_acq_rel) == 1;
@@ -101,39 +95,40 @@ auto CPUPromise<TQueueHandle, TResult>::final_suspend() noexcept
 }
 
 template<CQueueHandle TQueueHandle, typename TResult>
-void CPUPromise<TQueueHandle, TResult>::unhandled_exception() noexcept
+void CPUTaskPromiseBase<TQueueHandle, TResult>::unhandled_exception() noexcept
 {
-	#ifdef RUKEN_TRACE_BUILD
-	TracyUtilities::TracyZoneEnd(m_zone);
-	TracyMessageLC("Exception !", 0xFF0000);
-	#endif
-
 	std::exception_ptr ptr {std::current_exception()};
+
+	try
+	{
+		std::rethrow_exception(ptr);
+	}
+	catch (Exception& in_exception)
+	{
+		std::string const what {in_exception};
+		TracyMessageC(what.c_str(), what.length(), 0xFF0000);
+	}
+
+	TRACY_END_ZONE(m_zone);
 	this->Consume(true, &ptr);
 }
 
 template<CQueueHandle TQueueHandle, typename TResult>
 auto CPUTaskPromise<TQueueHandle, TResult>::get_return_object() noexcept
 {
-	this->m_queue = std::addressof(TQueueHandle::GetInstance());
-
 	return CPUTask<TQueueHandle, TResult> {*this, this->m_continuation_node};
 }
 
 template<CQueueHandle TQueueHandle>
 auto CPUTaskPromise<TQueueHandle, RkVoid>::get_return_object() noexcept
 {
-	this->m_queue = std::addressof(TQueueHandle::GetInstance());
-
 	return CPUTask<TQueueHandle, RkVoid> {*this, this->m_continuation_node};
 }
 
 template<CQueueHandle TQueueHandle, typename TResult>
 void CPUTaskPromise<TQueueHandle, TResult>::return_value(TResult const& in_result) noexcept
 {
-#ifdef RUKEN_TRACE_BUILD
-	TracyUtilities::TracyZoneEnd(this->m_zone);
-#endif
+	TRACY_END_ZONE(this->m_zone);
 
 	this->Consume(true, &in_result);
 }
@@ -141,9 +136,7 @@ void CPUTaskPromise<TQueueHandle, TResult>::return_value(TResult const& in_resul
 template <CQueueHandle TQueueHandle>
 void CPUTaskPromise<TQueueHandle, RkVoid>::return_void() noexcept
 {
-#ifdef RUKEN_TRACE_BUILD
-	TracyUtilities::TracyZoneEnd(this->m_zone);
-#endif
+	TRACY_END_ZONE(this->m_zone);
 
 	std::exception_ptr ptr {nullptr};
 	this->Consume(true, &ptr);

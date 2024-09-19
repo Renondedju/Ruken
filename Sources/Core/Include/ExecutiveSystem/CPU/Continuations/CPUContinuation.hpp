@@ -11,7 +11,6 @@ struct CPUContinuation
 	static constexpr RkBool has_value {!std::is_same_v<TValue, RkVoid>};
 
 	using ValueT           = TValue;
-	using TValueRef		   = std::add_lvalue_reference_t<std::add_const_t<TValue>>;
 	using TSignalOperation = RkVoid(RkVoid*, RkVoid const*);
 
 	#pragma region Lifetime

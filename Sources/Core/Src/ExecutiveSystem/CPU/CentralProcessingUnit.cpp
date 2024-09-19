@@ -11,7 +11,7 @@ RkVoid CentralProcessingUnit::RegisterQueue(CPUQueue& in_queue) noexcept
 
 RkVoid CentralProcessingUnit::StartWorkers() noexcept
 {
-    RkSize const concurrency {4};
+    RkSize const concurrency {std::thread::hardware_concurrency() - 1};
 
     m_workers.reserve(concurrency);
 

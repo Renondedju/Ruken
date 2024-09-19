@@ -55,4 +55,16 @@ struct TracyUtilities
 
 static inline TracyUtilities s_tracy_utilities {};
 
+#ifdef TRACY_ENABLE
+
+#define TRACY_BEGIN_ZONE(in_zone, ...) in_zone = TracyUtilities::TracyZone(__VA_ARGS__)
+#define TRACY_END_ZONE(in_zone) TracyUtilities::TracyZoneEnd(in_zone)
+
+#else
+
+#define TRACY_BEGIN_ZONE(in_zone, ...)
+#define TRACY_END_ZONE(in_zone)
+
+#endif
+
 END_RUKEN_NAMESPACE

@@ -21,7 +21,15 @@ RkVoid Worker::ProcessQueues(std::vector<CPUQueue*> const& in_queues, std::stop_
     for (CPUQueue* queue: in_queues)
     {
         WorkerInfo::current_queue = queue;
-        queue->PopAndRun(true, in_stop_token);
+        try
+        {
+            queue->PopAndRun(true, in_stop_token);
+        }
+        catch (std::exception& in_exception)
+        {
+            const char* what {in_exception.what()};
+            TracyMessageC(what, strlen(what), 0xFF0000);
+        }
 
         if (!in_stop_token.stop_requested())
             queue->Yield(in_stop_token);
