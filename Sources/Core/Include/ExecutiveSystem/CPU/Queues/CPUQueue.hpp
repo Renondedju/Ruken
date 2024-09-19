@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Types/FundamentalTypes.hpp"
-#include "ExecutiveSystem/Concepts/QueueHandleType.hpp"
+#include "ExecutiveSystem/Concepts/CQueueHandle.hpp"
 #include "ExecutiveSystem/ProcessingQueue.hpp"
 #include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "ExecutiveSystem/CPU/ConcurrencyCounter.hpp"
@@ -14,7 +14,7 @@
 BEGIN_RUKEN_NAMESPACE
 class Worker;
 
-template <QueueHandleType TQueueHandle>
+template <CQueueHandle TQueueHandle>
 struct CPUTaskSubscription;
 
 #pragma warning(push)
@@ -28,7 +28,7 @@ struct CPUTaskSubscription;
  */
 class CPUQueue: public ProcessingQueue<CentralProcessingUnit>
 {
-    template <QueueHandleType TFriendQueueHandle>
+    template <CQueueHandle TFriendQueueHandle>
     friend struct CPUTaskSubscription; // Updating m_current_concurrency
     friend Worker; // readonly
 

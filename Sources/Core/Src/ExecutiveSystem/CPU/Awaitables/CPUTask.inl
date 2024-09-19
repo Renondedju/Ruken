@@ -4,7 +4,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template<typename TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, typename TResult>
 CPUTask<TQueueHandle, TResult>::CPUTask(CPUTaskPromise<TQueueHandle, TResult>& in_parent, CPUContinuationNodePtr& in_continuation_node) noexcept:
 	CPUAwaitable<TPromiseAwaitableValue<TResult>> {in_continuation_node, std::addressof(in_parent.value)},
 	m_parent			                          {std::addressof(in_parent)},
@@ -13,7 +13,7 @@ CPUTask<TQueueHandle, TResult>::CPUTask(CPUTaskPromise<TQueueHandle, TResult>& i
 	m_parent->m_references.fetch_add(1, std::memory_order_acq_rel);
 }
 
-template<typename TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, typename TResult>
 CPUTask<TQueueHandle, TResult>::CPUTask(CPUTask const& in_other) noexcept:
 	CPUAwaitable<TPromiseAwaitableValue<TResult>> {in_other},
 	m_parent		   							  {in_other.m_parent},
@@ -23,7 +23,7 @@ CPUTask<TQueueHandle, TResult>::CPUTask(CPUTask const& in_other) noexcept:
 		m_parent->m_references.fetch_add(1, std::memory_order_acq_rel);
 }
 
-template<typename TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, typename TResult>
 CPUTask<TQueueHandle, TResult>::CPUTask(CPUTask&& in_other) noexcept:
 	CPUAwaitable<TPromiseAwaitableValue<TResult>> {std::move(in_other)},
 	m_parent		   							  {std::move(in_other.m_parent)},
@@ -33,14 +33,14 @@ CPUTask<TQueueHandle, TResult>::CPUTask(CPUTask&& in_other) noexcept:
 		m_parent->m_references.fetch_add(1, std::memory_order_acq_rel);
 }
 
-template<typename TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, typename TResult>
 CPUTask<TQueueHandle, TResult>::~CPUTask() noexcept
 {
 	if (m_parent && m_parent->m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)
 		m_coroutine_handle.destroy();
 }
 
-template<typename TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, typename TResult>
 CPUTask<TQueueHandle, TResult>& CPUTask<TQueueHandle, TResult>::operator=(CPUTask const& in_other) noexcept
 {
 	if (m_parent && m_parent->m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)
@@ -56,7 +56,7 @@ CPUTask<TQueueHandle, TResult>& CPUTask<TQueueHandle, TResult>::operator=(CPUTas
 	return *this;
 }
 
-template<typename TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, typename TResult>
 CPUTask<TQueueHandle, TResult>& CPUTask<TQueueHandle, TResult>::operator=(CPUTask&& in_other) noexcept
 {
 	if (m_parent && m_parent->m_references.fetch_sub(1, std::memory_order_acq_rel) == 1)

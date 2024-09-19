@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
+#include "ExecutiveSystem/Concepts/CProcessingUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -11,7 +11,7 @@ BEGIN_RUKEN_NAMESPACE
  *
  * \tparam TProcessingUnit Processing unit the subscription is operating on
  */
-template <ProcessingUnitType TProcessingUnit>
+template <CProcessingUnit TProcessingUnit>
 struct Awaiter
 {
 	using ProcessingUnit = TProcessingUnit;

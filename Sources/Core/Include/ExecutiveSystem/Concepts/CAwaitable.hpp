@@ -5,7 +5,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 template <typename TType>
-concept AwaitableType = requires(TType in_awaitable)
+concept CAwaitable = requires(TType in_awaitable)
 {
     static_cast<Awaitable<typename std::decay_t<TType>::ProcessingUnit,
                           typename std::decay_t<TType>::Result,

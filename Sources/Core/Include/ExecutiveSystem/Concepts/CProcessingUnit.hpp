@@ -18,6 +18,6 @@ struct ProcessingUnit;
  * \tparam TType type to check
  */
 template <typename TType>
-concept ProcessingUnitType = std::is_base_of_v<ProcessingUnit<TType, TType::execution_policy, TType::instruction_type>, TType>;
+concept CProcessingUnit = std::is_base_of_v<ProcessingUnit<TType, TType::execution_policy, TType::instruction_type>, TType>;
 
 END_RUKEN_NAMESPACE

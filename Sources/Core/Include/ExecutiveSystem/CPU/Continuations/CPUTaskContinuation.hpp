@@ -9,15 +9,15 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TResult>
+template <CQueueHandle TQueueHandle, typename TResult>
 struct CPUPromise;
 
 template <typename TType > struct VariantHelper										      { using ValueType = TType;  using HasExceptions = std::false_type;};
 template <typename TValue> struct VariantHelper<std::variant<std::exception_ptr, TValue>> { using ValueType = TValue; using HasExceptions = std::true_type; };
 template <typename TValue> struct VariantHelper<std::variant<TValue, std::exception_ptr>> { using ValueType = TValue; using HasExceptions = std::true_type; };
 
-template <typename TResult>
-struct CPUCoroutineContinuationBase: CPUContinuation<TResult>
+template <CQueueHandle TQueueHandle, typename TResult>
+struct CPUTaskContinuationBase: CPUContinuation<TResult>
 {
 	static constexpr RkBool has_exceptions = VariantHelper<TResult>::HasExceptions::value || std::is_same_v<TResult, std::exception_ptr>;
 
@@ -28,15 +28,14 @@ struct CPUCoroutineContinuationBase: CPUContinuation<TResult>
 	 * @param in_promise Owning coroutine instance
 	 */
 	template <typename TCoroutineResult>
-	explicit CPUCoroutineContinuationBase(CPUPromise<TCoroutineResult>& in_promise) noexcept:
+	explicit CPUTaskContinuationBase(CPUTaskPromise<TQueueHandle, TCoroutineResult>& in_promise) noexcept:
 		CPUContinuation<TResult> {},
-		m_queue					 {*in_promise.CurrentQueue()},
-		m_coroutine				 {std::coroutine_handle<CPUPromise<TCoroutineResult>>::from_promise(in_promise)}
+		m_coroutine				 {std::coroutine_handle<CPUTaskPromise<TQueueHandle, TCoroutineResult>>::from_promise(in_promise)}
 	{ }
 
-	CPUCoroutineContinuationBase (CPUCoroutineContinuationBase const&) = default;
-	CPUCoroutineContinuationBase (CPUCoroutineContinuationBase&&     ) = default;
-	~CPUCoroutineContinuationBase()									   = default;
+	CPUTaskContinuationBase (CPUTaskContinuationBase const&) = default;
+	CPUTaskContinuationBase (CPUTaskContinuationBase&&     ) = default;
+	~CPUTaskContinuationBase()								 = default;
 
 	#pragma endregion
 
@@ -63,12 +62,11 @@ struct CPUCoroutineContinuationBase: CPUContinuation<TResult>
 
 	protected:
 
-		CPUQueue&				m_queue;
 		std::coroutine_handle<> m_coroutine;
 };
 
-template <typename TResult>
-struct CPUCoroutineContinuation: CPUCoroutineContinuationBase<TResult>
+template <CQueueHandle TQueueHandle, typename TResult>
+struct CPUTaskContinuation: CPUTaskContinuationBase<TQueueHandle, TResult>
 {
     /**
      * @brief Default constructor
@@ -76,12 +74,12 @@ struct CPUCoroutineContinuation: CPUCoroutineContinuationBase<TResult>
      * @param in_awaited Reference to the awaited event
      */
 	template <typename TCoroutineResult>
-    CPUCoroutineContinuation(CPUAwaitable<TResult> const& in_awaited, CPUPromise<TCoroutineResult>& in_awaiter) noexcept:
-		CPUCoroutineContinuationBase<TResult> {in_awaiter}
+    CPUTaskContinuation(CPUAwaitable<TResult> const& in_awaited, CPUTaskPromise<TQueueHandle, TCoroutineResult>& in_awaiter) noexcept:
+		CPUTaskContinuationBase<TQueueHandle, TResult> {in_awaiter}
     { this->Setup(in_awaited, *this); }
 
 	/// @brief Returns the result of the wait
-    auto await_resume() const noexcept(!CPUCoroutineContinuationBase<TResult>::has_exceptions)
+    auto await_resume() const noexcept(!CPUTaskContinuationBase<TQueueHandle, TResult>::has_exceptions)
     {
         if constexpr (VariantHelper<TResult>::HasExceptions::value)
 	        if (std::get<std::exception_ptr>(return_value))
@@ -102,7 +100,7 @@ struct CPUCoroutineContinuation: CPUCoroutineContinuationBase<TResult>
 	RkVoid Signal(TResult const& in_value) noexcept
 	{
 		return_value = in_value;
-		this->m_queue.Push(this->m_coroutine);
+		TQueueHandle::GetInstance().Push(this->m_coroutine);
 	}
 
 	protected:
@@ -110,8 +108,8 @@ struct CPUCoroutineContinuation: CPUCoroutineContinuationBase<TResult>
 		TResult	return_value {};
 };
 
-template <>
-struct CPUCoroutineContinuation<RkVoid>: CPUCoroutineContinuationBase<RkVoid>
+template <CQueueHandle TQueueHandle>
+struct CPUTaskContinuation<TQueueHandle, RkVoid>: CPUTaskContinuationBase<TQueueHandle, RkVoid>
 {
 	/**
 	 * @brief Default constructor
@@ -119,8 +117,8 @@ struct CPUCoroutineContinuation<RkVoid>: CPUCoroutineContinuationBase<RkVoid>
 	 * @param in_awaited Reference to the awaited event
 	 */
 	template <typename TCoroutineResult>
-	CPUCoroutineContinuation(CPUAwaitable<RkVoid> const& in_awaited, CPUPromise<TCoroutineResult>& in_awaiter) noexcept:
-		CPUCoroutineContinuationBase {in_awaiter}
+	CPUTaskContinuation(CPUAwaitable<RkVoid> const& in_awaited, CPUTaskPromise<TQueueHandle, TCoroutineResult>& in_awaiter) noexcept:
+		CPUTaskContinuationBase<TQueueHandle, RkVoid> {in_awaiter}
 	{ this->Setup(in_awaited, *this); }
 
 	/// @brief Returns the result of the wait
@@ -129,7 +127,7 @@ struct CPUCoroutineContinuation<RkVoid>: CPUCoroutineContinuationBase<RkVoid>
 
 	/// @brief Called when the wait is over
 	RkVoid Signal() const noexcept
-	{ this->m_queue.Push(this->m_coroutine); }
+	{ TQueueHandle::GetInstance().Push(this->m_coroutine); }
 };
 
 END_RUKEN_NAMESPACE

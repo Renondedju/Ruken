@@ -3,14 +3,14 @@
 #include <exception>
 
 #include "Types/FundamentalTypes.hpp"
-#include "ExecutiveSystem/Concepts/QueueHandleType.hpp"
+#include "ExecutiveSystem/Concepts/CQueueHandle.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <QueueHandleType TQueue, typename TReturnType>
+template <CQueueHandle TQueue, typename TReturnType>
 using Task;
 
-template <QueueHandleType TQueueHandle, typename TReturnType = RkVoid>
+template <CQueueHandle TQueueHandle, typename TReturnType = RkVoid>
 struct Promise
 {
     using ProcessingUnit    = typename TQueueHandle::ProcessingUnit;
@@ -61,7 +61,7 @@ struct Promise
  *
  * \tparam TQueueHandle The owning queue of the promise object
  */
-template <QueueHandleType TQueueHandle>
+template <CQueueHandle TQueueHandle>
 struct Promise<TQueueHandle, RkVoid>
 {
     using ProcessingUnit    = typename TQueueHandle::ProcessingUnit;

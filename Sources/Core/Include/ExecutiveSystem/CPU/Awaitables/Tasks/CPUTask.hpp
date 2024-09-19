@@ -9,7 +9,7 @@ BEGIN_RUKEN_NAMESPACE
 /// Promises are allocated on the heap and need to stay alive
 /// in order to retrieve their results.
 /// This handle acts as a shared pointer to the promise.
-template<typename TQueueHandle, typename TResult = RkVoid>
+template<CQueueHandle TQueueHandle, typename TResult = RkVoid>
 struct CPUTask: CPUAwaitable<TPromiseAwaitableValue<TResult>>
 {
 	explicit CPUTask(CPUTaskPromise<TQueueHandle, TResult>& in_parent, CPUContinuationNodePtr& in_continuation_node) noexcept;

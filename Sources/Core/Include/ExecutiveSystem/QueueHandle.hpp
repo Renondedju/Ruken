@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ExecutiveSystem/Concepts/ProcessingQueueType.hpp"
+#include "ExecutiveSystem/Concepts/CProcessingQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <ProcessingUnitType TProcessingUnit>
+template <CProcessingUnit TProcessingUnit>
 struct QueueHandle
 {
 	using ProcessingUnit = TProcessingUnit;

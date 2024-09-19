@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
+#include "ExecutiveSystem/Concepts/CProcessingUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -11,7 +11,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TProcessingUnit Queue type the awaitable lives in.
  *         The result of the awaitable might not be valid after a failure and reading from it should be avoided.
  */
-template <ProcessingUnitType TProcessingUnit>
+template <CProcessingUnit TProcessingUnit>
 struct Awaitable
 {
     using ProcessingUnit = TProcessingUnit;

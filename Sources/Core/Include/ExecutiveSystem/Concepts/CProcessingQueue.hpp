@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
+#include "ExecutiveSystem/Concepts/CProcessingUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <ProcessingUnitType TProcessingUnit>
+template <CProcessingUnit TProcessingUnit>
 struct ProcessingQueue;
 
 /**
@@ -15,7 +15,7 @@ struct ProcessingQueue;
  * \tparam TType type to check
  */
 template <typename TType>
-concept ProcessingQueueType = std::is_base_of_v<ProcessingQueue<typename TType::ProcessingUnit>, TType>;
+concept CProcessingQueue = std::is_base_of_v<ProcessingQueue<typename TType::ProcessingUnit>, TType>;
 
 /**
  * \brief Checks if the passed type is a submittable processing queue
@@ -27,8 +27,8 @@ concept ProcessingQueueType = std::is_base_of_v<ProcessingQueue<typename TType::
  * \tparam TType type to check
  */
 template <typename TType>
-concept SubmittableProcessingQueueType = 
-    ProcessingQueueType<TType> &&
+concept CSubmittableProcessingQueue =
+    CProcessingQueue<TType> &&
     TType::ProcessingUnit::execution_policy == EExecutionPolicy::Deferred &&
     requires () { TType::Submit(); };
 

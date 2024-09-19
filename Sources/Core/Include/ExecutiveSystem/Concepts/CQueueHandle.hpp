@@ -2,19 +2,19 @@
 
 #include <type_traits>
 
-#include "ExecutiveSystem/Concepts/ProcessingQueueType.hpp"
+#include "ExecutiveSystem/Concepts/CProcessingQueue.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <ProcessingUnitType TProcessingUnit>
+template <CProcessingUnit TProcessingUnit>
 struct QueueHandle;
 
 /**
  * \brief Checks if the passed type is a processing queue handle
  */
 template <typename TType>
-concept QueueHandleType = requires { TType::GetInstance(); } && 
-	ProcessingQueueType<std::remove_reference_t<decltype(TType::GetInstance())>> &&
+concept CQueueHandle = requires { TType::GetInstance(); } &&
+	CProcessingQueue<std::remove_reference_t<decltype(TType::GetInstance())>> &&
 	std::is_default_constructible_v<TType> &&
 	std::is_base_of_v<QueueHandle<typename TType::ProcessingUnit>, TType>;
 
@@ -22,8 +22,8 @@ concept QueueHandleType = requires { TType::GetInstance(); } &&
  * \brief Checks if the passed type is a submittable processing queue handle
  */
 template <typename TType>
-concept SubmittableQueueHandleType = requires { TType::GetInstance(); } && 
-	SubmittableProcessingQueueType<std::remove_reference_t<decltype(TType::GetInstance())>> &&
+concept CSubmittableQueueHandle = requires { TType::GetInstance(); } &&
+	CSubmittableProcessingQueue<std::remove_reference_t<decltype(TType::GetInstance())>> &&
 	std::is_default_constructible_v<TType> &&
 	std::is_base_of_v<QueueHandle<typename TType::ProcessingUnit>, TType>;
 

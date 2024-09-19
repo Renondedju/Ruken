@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16.3)
 
 set(TRACY_ENABLE    ${RUKEN_TRACE_BUILD})
-set(TRACY_ON_DEMAND ON)
+set(TRACY_ON_DEMAND OFF)
 
 CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.10.zip" NAME tracy)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
@@ -32,10 +32,10 @@ add_library(RkCore STATIC
         Include/Build/Namespace.hpp
         Include/Containers/LinkedChunkList.hpp
         Include/Containers/LinkedChunkListNode.hpp
-        Include/ExecutiveSystem/Concepts/AwaitableType.hpp
-        Include/ExecutiveSystem/Concepts/ProcessingQueueType.hpp
-        Include/ExecutiveSystem/Concepts/ProcessingUnitType.hpp
-        Include/ExecutiveSystem/Concepts/QueueHandleType.hpp
+        Include/ExecutiveSystem/Concepts/CAwaitable.hpp
+        Include/ExecutiveSystem/Concepts/CProcessingQueue.hpp
+        Include/ExecutiveSystem/Concepts/CProcessingUnit.hpp
+        Include/ExecutiveSystem/Concepts/CQueueHandle.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp
@@ -44,7 +44,7 @@ add_library(RkCore STATIC
         Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp
         Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp
         Include/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUCoroutineContinuation.hpp
+        Include/ExecutiveSystem/CPU/Continuations/CPUTaskContinuation.hpp
         Include/ExecutiveSystem/CPU/Queues/CPUQueue.hpp
         Include/ExecutiveSystem/CPU/Queues/CPUDynamicQueue.hpp
         Include/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp

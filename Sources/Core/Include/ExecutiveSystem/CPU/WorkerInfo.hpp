@@ -15,9 +15,9 @@ struct WorkerInfo
 {
     #pragma region Members
 
-    inline static thread_local std::string             name            {"Unnamed worker"};
-    inline static thread_local CPUQueue* current_queue   {nullptr};
-	inline static thread_local RkSize				   remaining_tasks {0};
+    inline static thread_local std::string name            {"Unnamed worker"};
+    inline static thread_local CPUQueue*   current_queue   {nullptr};
+	inline static thread_local RkSize	   remaining_tasks {0};
 
     #pragma endregion
 };

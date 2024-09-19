@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ExecutiveSystem/Concepts/ProcessingUnitType.hpp"
+#include "ExecutiveSystem/Concepts/CProcessingUnit.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-template <ProcessingUnitType TEmittingUnit, ProcessingUnitType TReceivingUnit>
+template <CProcessingUnit TEmittingUnit, CProcessingUnit TReceivingUnit>
 struct EventBridge
 {};
 
