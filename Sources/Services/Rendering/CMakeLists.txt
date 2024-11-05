@@ -112,3 +112,5 @@ target_include_directories(RkRenderingService PRIVATE ${RUKEN_SOURCES_DIR}/Core/
 target_include_directories(RkRenderingService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Src)
 target_include_directories(RkRenderingService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Services)
 target_link_libraries     (RkRenderingService PUBLIC  glfw Vulkan::Vulkan volk VulkanMemoryAllocator RkCore)
+
+set_property(GLOBAL APPEND PROPERTY RUKEN_SERVICE_LIBS RkRenderingService)

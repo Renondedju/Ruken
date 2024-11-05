@@ -22,7 +22,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TResource_Type Type of resource kept by the manager 
  */
 template <typename TResource_Type>
-class Handle
+class CPUTask
 {
     static_assert(std::is_base_of_v<IResource, TResource_Type>, "Handles can only be used on classes that implements the IResource interface");
 
@@ -42,13 +42,13 @@ class Handle
 
         #pragma region Constructors
 
-        Handle() = default;
-        Handle(Handle const& in_copy) noexcept;
-        Handle(Handle&&      in_move) noexcept;
-        ~Handle();
+        CPUTask() = default;
+        CPUTask(CPUTask const& in_copy) noexcept;
+        CPUTask(CPUTask&&      in_move) noexcept;
+        ~CPUTask();
 
         // Creation from a resource manifest, resource manager exclusive
-        explicit Handle(ResourceManifest* in_manifest);
+        explicit CPUTask(ResourceManifest* in_manifest);
 
         #pragma endregion
 
@@ -116,16 +116,16 @@ class Handle
 
         #pragma region Constructors
 
-        Handle& operator=(ResourceManifest* in_manifest) noexcept;
-        Handle& operator=(Handle const&     in_copy)     noexcept;
-        Handle& operator=(Handle&&          in_move)     noexcept;
+        CPUTask& operator=(ResourceManifest* in_manifest) noexcept;
+        CPUTask& operator=(CPUTask const&     in_copy)     noexcept;
+        CPUTask& operator=(CPUTask&&          in_move)     noexcept;
 
         /**
          * \brief Downcast support for handles
          * \tparam TDerived Derived resource class to cast to
          */
         template<typename TDerived>
-        explicit operator Handle<TDerived>() const;
+        explicit operator CPUTask<TDerived>() const;
 
         #pragma endregion
 };

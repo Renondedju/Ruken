@@ -21,8 +21,9 @@ set     (RUKEN_SOURCES_DIR           ${CMAKE_CURRENT_LIST_DIR}/Sources)
 set     (RUKEN_SERVICES_DIR          ${RUKEN_SOURCES_DIR}/Services)
 set     (RUKEN_CORE_DIR              ${RUKEN_SOURCES_DIR}/Core)
 
-option(RUKEN_HEADLESS_BUILD "Disables all form of rendering and presentation" OFF)
-option(RUKEN_TRACE_BUILD    "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})
+option(RUKEN_HEADLESS_BUILD          "Disables all form of rendering and presentation" OFF)
+option(RUKEN_TRACE_BUILD             "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})
+option(RUKEN_TRACE_SHOW_WORKER_ZONES "When on, tracy will also report the activity of workers" OFF)
 
 if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR})
     file(MAKE_DIRECTORY ${RUKEN_GENERATED_SOURCES_DIR})
@@ -34,26 +35,22 @@ endif ()
 
 # --- Add dependencies
 include(${RUKEN_SOURCES_DIR}/CMake/CPM.cmake)
+define_property(GLOBAL PROPERTY RUKEN_SERVICE_LIBS)
 
 set(CPM_SOURCE_CACHE ${RUKEN_SOURCES_DIR}/ThirdParty)
-file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE)
 
+file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE)
 add_subdirectory(${RUKEN_SERVICES_DIR})
 add_subdirectory(${RUKEN_CORE_DIR})
+file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE RELEASE)
+
+get_property(RUKEN_SERVICE_LIBS GLOBAL PROPERTY RUKEN_SERVICE_LIBS)
 
 # --- Executable
 
 add_compile_definitions(UNICODE _UNICODE)
-add_executable(Ruken Sources/Core/Src/Main.cpp
-                     Sources/Core/Src/Core/Kernel.cpp)
+add_executable(Ruken Sources/Core/Src/Main.cpp)
 
 target_compile_definitions(Ruken PRIVATE RUKEN_PROJECT_NAME="Ruken")
-target_compile_options    (Ruken PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/Zc:wchar_t /Zc:char8_t- /Zc:preprocessor /wd5103>
-    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:>
-)
-target_link_options(Ruken PRIVATE
-    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:>
-)
 
-target_link_libraries(Ruken RkCore RkRenderingService RkECSService)
+target_link_libraries(Ruken RkCore ${RUKEN_SERVICE_LIBS})

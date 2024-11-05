@@ -150,7 +150,7 @@ class ResourceManager final: public Service<ResourceManager>
          * \return Handle to the newly referenced resource.
          */
         template <typename TResource_Type>
-        Handle<TResource_Type> ReferenceResource(ResourceIdentifier const& in_unique_identifier, TResource_Type* in_resource, EResourceGCStrategy in_strategy = EResourceGCStrategy::ReferenceCount) noexcept;
+        CPUTask<TResource_Type> ReferenceResource(ResourceIdentifier const& in_unique_identifier, TResource_Type* in_resource, EResourceGCStrategy in_strategy = EResourceGCStrategy::ReferenceCount) noexcept;
 
         /**
          * \brief Reloads a resource. This requires the resource to already be loaded and available.
@@ -161,7 +161,7 @@ class ResourceManager final: public Service<ResourceManager>
          * \return Handle to the resource
          */
         template <typename TResource_Type>
-        Handle<TResource_Type> ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
+        CPUTask<TResource_Type> ReloadResource(ResourceIdentifier const& in_unique_identifier, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
 
         /**
          * \brief Reloads a resource. This requires the resource to already be loaded and available.
@@ -174,7 +174,7 @@ class ResourceManager final: public Service<ResourceManager>
          * \return Handle to the resource
          */
         template <typename TResource_Type>
-        Handle<TResource_Type> ReloadResource(Handle<TResource_Type> const& in_handle, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
+        CPUTask<TResource_Type> ReloadResource(CPUTask<TResource_Type> const& in_handle, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
 
         /**
          * \brief Requests a resource from the resource manager.
@@ -186,7 +186,7 @@ class ResourceManager final: public Service<ResourceManager>
          * \return Handle to the resource
          */
         template <typename TResource_Type>
-        Handle<TResource_Type> RequestResource(ResourceIdentifier const& in_unique_identifier, class ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
+        CPUTask<TResource_Type> RequestResource(ResourceIdentifier const& in_unique_identifier, class ResourceLoadingDescriptor const& in_descriptor, ESynchronizationMode in_loading_mode = ESynchronizationMode::Asynchronous) noexcept;
         
         /**
          * \brief Sets the garbage collection mode of the resource manager

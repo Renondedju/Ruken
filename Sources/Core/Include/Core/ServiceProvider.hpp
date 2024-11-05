@@ -18,15 +18,13 @@ BEGIN_RUKEN_NAMESPACE
  */
 class ServiceProvider
 {
-    private:
+    #pragma region Members
 
-        #pragma region Members
+    // Provided services key = service id, value = service pointer
+    std::unordered_map<RkSize, ServiceBase*> m_services;
+    std::stack<RkSize>                       m_services_order;
 
-        // Provided services key = service id, value = service pointer
-        std::unordered_map<RkSize, ServiceBase*> m_services;
-        std::stack<RkSize>                       m_services_order;
-
-        #pragma endregion
+    #pragma endregion
 
     public:
 

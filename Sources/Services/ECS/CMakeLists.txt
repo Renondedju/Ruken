@@ -54,8 +54,12 @@ add_library(RkECSService STATIC
         Sources/Meta/ComponentHelper.hpp
 )
 
+if (MSVC)
+    target_compile_options(RkECSService PUBLIC /Zc:preprocessor)
+endif ()
+
 target_include_directories(RkECSService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)
 target_include_directories(RkECSService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Include)
-target_include_directories(RkECSService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Services)
+target_link_libraries     (RkECSService PUBLIC RkCore)
 
-target_link_libraries(RkECSService PUBLIC RkCore)
+set_property(GLOBAL APPEND PROPERTY RUKEN_SERVICE_LIBS RkECSService)
