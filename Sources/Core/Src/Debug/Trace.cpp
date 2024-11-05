@@ -83,7 +83,7 @@ RkVoid TracyUtilities::TracyZoneEnd(TracyCZoneCtx const& out_context) noexcept
 
 #ifdef TRACY_ENABLE
 
-    void* operator new(RkSize const in_count)
+    void* operator new (RkSize const in_count)
     {
         auto const ptr {malloc(in_count)};
         TracyAlloc(ptr, in_count);
@@ -91,6 +91,12 @@ RkVoid TracyUtilities::TracyZoneEnd(TracyCZoneCtx const& out_context) noexcept
     }
 
     void operator delete(void* in_ptr) noexcept
+    {
+        TracyFree(in_ptr);
+        free     (in_ptr);
+    }
+
+    void operator delete(void* in_ptr, std::size_t) noexcept
     {
         TracyFree(in_ptr);
         free     (in_ptr);
