@@ -3,7 +3,7 @@
 USING_RUKEN_NAMESPACE
 
 CountDownLatch::CountDownLatch(RkSize const in_initial_count) noexcept:
-    CPUAwaitable {m_continuation_node},
+    CPUAwaitable {m_awaiter_list},
 	m_counter    {in_initial_count}
 {}
 

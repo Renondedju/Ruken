@@ -38,7 +38,7 @@ struct CPUTaskPromiseBase:
 
 	CPUTaskPromiseBase() noexcept:
 		CPUAwaitableStorage<TPromiseAwaitableValue<TResult>> {},
-		CPUAwaitable	   <TPromiseAwaitableValue<TResult>> {m_continuation_node, std::addressof(value)}
+		CPUAwaitable	   <TPromiseAwaitableValue<TResult>> {m_awaiter_list, std::addressof(value)}
 	{}
 
     #pragma region Coroutine Methods
@@ -64,12 +64,12 @@ struct CPUTaskPromiseBase:
 	protected:
 
 		template <CQueueHandle TOtherQueueHandle, typename TOtherResult> friend struct CPUTask;
-		template <CQueueHandle TOtherQueueHandle, typename TOtherResult> friend struct CPUTaskContinuationBase;
+		//template								 <typename TOtherResult> friend struct CPUTaskAwaiterBase;
 
 		using CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>::value;
 
-		std::atomic<RkSize>	   m_references		   {1ULL};
-		CPUContinuationNodePtr m_continuation_node {nullptr};
+		std::atomic<RkSize>								m_references   {1ULL};
+		CPUAwaiterList<TPromiseAwaitableValue<TResult>> m_awaiter_list {nullptr};
 
 		#ifdef RUKEN_TRACE_BUILD
 			TracyCZoneCtx m_zone {};
@@ -81,15 +81,15 @@ struct CPUTaskPromiseBase:
 template<CQueueHandle TQueueHandle, typename TResult>
 struct CPUTaskPromise: CPUTaskPromiseBase<TQueueHandle, TResult>
 {
-	auto get_return_object()						 noexcept;
-	void return_value	  (TResult const& in_result) noexcept;
+	auto get_return_object() noexcept;
+	void return_value     (TResult const& in_result) noexcept;
 };
 
 template <CQueueHandle TQueueHandle>
 struct CPUTaskPromise<TQueueHandle, RkVoid>: CPUTaskPromiseBase<TQueueHandle, RkVoid>
 {
 	auto get_return_object() noexcept;
-	void return_void      () noexcept;
+	void return_void	  () noexcept;
 };
 
 END_RUKEN_NAMESPACE

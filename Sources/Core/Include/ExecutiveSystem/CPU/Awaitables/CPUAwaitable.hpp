@@ -2,7 +2,7 @@
 
 #include "ExecutiveSystem/Awaitable.hpp"
 #include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "ExecutiveSystem/CPU/Continuations/CPUContinuationNode.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp"
 
 #include <atomic>
 
@@ -25,16 +25,22 @@ template <               > struct CPUAwaitableStorage<RkVoid> {};
 template <typename TValue>
 struct CPUAwaitable : protected CPUAwaitableStorage<TValue*>, Awaitable<CentralProcessingUnit>
 {
-	using ValueT = TValue;
+	static constexpr RkBool has_value { !std::is_void_v<TValue> };
 
 	/// @return Returns true if the event has already been completed, false otherwise
-	[[nodiscard]] RkBool                  Completed          () const noexcept;
+	[[nodiscard]] RkBool Completed() const noexcept;
 
-	/// @return Returns the continuation node used to await this awaitable
-	[[nodiscard]] CPUContinuationNodePtr* GetContinuationHook() const noexcept;
+	template <typename TOtherValue> RkBool TryAttach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept;
+	template <typename TOtherValue> RkBool TryDetach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept;
 
-
-	static constexpr RkBool has_value { !std::is_same_v<TValue, RkVoid> };
+	/**
+	 * @brief Calls TryAttach and Signals the awaiter automatically if the operation failed
+	 *
+	 * @todo { We could optimize attach bulk by passing a pre-constructed chain of awaiters }
+	 */
+	template <typename TOtherValue>
+	requires (std::is_void_v<TOtherValue> || std::is_same_v<TOtherValue, TValue>)
+	RkVoid AttachOrSignal(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept;
 
 	protected:
 
@@ -42,11 +48,11 @@ struct CPUAwaitable : protected CPUAwaitableStorage<TValue*>, Awaitable<CentralP
 
 		/**
 		 * Default constructor.
-		 * @param in_continuation_hook Continuation hook reference.
+		 * @param in_list_head Continuation hook reference.
 		 * @param in_value Value reference.
 		 */
-		explicit CPUAwaitable(CPUContinuationNodePtr& in_continuation_hook, TValue* in_value) noexcept requires ( has_value);
-		explicit CPUAwaitable(CPUContinuationNodePtr& in_continuation_hook			        ) noexcept requires (!has_value);
+		explicit CPUAwaitable(CPUAwaiterList<TValue>& in_list_head, TValue* in_value) noexcept requires ( has_value);
+		explicit CPUAwaitable(CPUAwaiterList<TValue>& in_list_head			        ) noexcept requires (!has_value);
 
 		CPUAwaitable ()						     = default;
 		CPUAwaitable (CPUAwaitable const& other) = default;
@@ -86,7 +92,7 @@ struct CPUAwaitable : protected CPUAwaitableStorage<TValue*>, Awaitable<CentralP
 
 	private:
 
-		CPUContinuationNodePtr* m_continuation_hook {};
+		CPUAwaiterList<TValue>* m_awaiter_list {nullptr};
 
 		// Actual implementations of signal and consume
 		RkVoid DoSignal ()				   noexcept;

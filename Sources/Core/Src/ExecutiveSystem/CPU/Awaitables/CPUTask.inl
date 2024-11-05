@@ -5,8 +5,9 @@
 BEGIN_RUKEN_NAMESPACE
 
 template<CQueueHandle TQueueHandle, typename TResult>
-CPUTask<TQueueHandle, TResult>::CPUTask(CPUTaskPromise<TQueueHandle, TResult>& in_parent, CPUContinuationNodePtr& in_continuation_node) noexcept:
-	CPUAwaitable<TPromiseAwaitableValue<TResult>> {in_continuation_node, std::addressof(in_parent.value)},
+CPUTask<TQueueHandle, TResult>::CPUTask(CPUTaskPromise<TQueueHandle, TResult>&			 in_parent,
+										CPUAwaiterList<TPromiseAwaitableValue<TResult>>& in_awaiter_list) noexcept:
+	CPUAwaitable<TPromiseAwaitableValue<TResult>> {in_awaiter_list, std::addressof(in_parent.value)},
 	m_parent			                          {std::addressof(in_parent)},
 	m_coroutine_handle                            {std::coroutine_handle<CPUTaskPromise<TQueueHandle, TResult>>::from_promise(in_parent)}
 {

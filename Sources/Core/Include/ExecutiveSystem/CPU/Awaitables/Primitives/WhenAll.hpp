@@ -8,20 +8,19 @@ struct WhenAll: CountDownLatch
 {
 	template <typename TAwaitable>
 	explicit WhenAll(std::vector<TAwaitable> const& in_awaitables) noexcept:
-		CountDownLatch  {in_awaitables.size()},
-		m_continuations {in_awaitables.size()}
+		CountDownLatch {in_awaitables.size()},
+		m_awaiters     {in_awaitables.size()}
 	{
 		for (int i = 0; i < in_awaitables.size(); i++)
 		{
-			m_continuations[i].Setup(in_awaitables[i], *this);
-			if (!m_continuations[i].TryStartAwait())
-				Signal();
+			m_awaiters[i].signal = CPUSignal<RkVoid>(*this);
+			in_awaitables[i].AttachOrSignal(m_awaiters[i]);
 		}
 	}
 
 	private:
 
-		std::vector<CPUContinuation<RkVoid>> m_continuations;
+		std::vector<CPUAwaiter<RkVoid>> m_awaiters;
 };
 
 END_RUKEN_NAMESPACE

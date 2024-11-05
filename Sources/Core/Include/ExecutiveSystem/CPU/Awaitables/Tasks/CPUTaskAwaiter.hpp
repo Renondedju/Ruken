@@ -1,11 +1,13 @@
 #pragma once
 
-#include "ExecutiveSystem/CPU/Queues/CPUQueue.hpp"
-#include "Meta/TupleHasType.hpp"
+#include "../../../../Meta/TupleHasType.hpp"
+#include "../../Queues/CPUQueue.hpp"
+#include "../CPUAwaiter.hpp"
 
 #include <type_traits>
 #include <coroutine>
 #include <variant>
+
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -16,8 +18,8 @@ template <typename TType > struct VariantHelper										      { using ValueType
 template <typename TValue> struct VariantHelper<std::variant<std::exception_ptr, TValue>> { using ValueType = TValue; using HasExceptions = std::true_type; };
 template <typename TValue> struct VariantHelper<std::variant<TValue, std::exception_ptr>> { using ValueType = TValue; using HasExceptions = std::true_type; };
 
-template <CQueueHandle TQueueHandle, typename TResult>
-struct CPUTaskContinuationBase: CPUContinuation<TResult>
+template <typename TResult>
+struct CPUTaskAwaiterBase: CPUAwaiter<TResult>
 {
 	static constexpr RkBool has_exceptions = VariantHelper<TResult>::HasExceptions::value || std::is_same_v<TResult, std::exception_ptr>;
 
@@ -25,17 +27,16 @@ struct CPUTaskContinuationBase: CPUContinuation<TResult>
 
 	/**
 	 * @brief Default constructor
-	 * @param in_promise Owning coroutine instance
+	 * @param in_awaitable Awaited event
 	 */
-	template <typename TCoroutineResult>
-	explicit CPUTaskContinuationBase(CPUTaskPromise<TQueueHandle, TCoroutineResult>& in_promise) noexcept:
-		CPUContinuation<TResult> {},
-		m_coroutine				 {std::coroutine_handle<CPUTaskPromise<TQueueHandle, TCoroutineResult>>::from_promise(in_promise)}
-	{ }
+	explicit CPUTaskAwaiterBase(CPUAwaitable<TResult> const& in_awaitable) noexcept:
+		CPUAwaiter<TResult>(),
+		m_awaitable {in_awaitable}
+	{}
 
-	CPUTaskContinuationBase (CPUTaskContinuationBase const&) = default;
-	CPUTaskContinuationBase (CPUTaskContinuationBase&&     ) = default;
-	~CPUTaskContinuationBase()								 = default;
+	CPUTaskAwaiterBase (CPUTaskAwaiterBase const&) = default;
+	CPUTaskAwaiterBase (CPUTaskAwaiterBase&&     ) = default;
+	~CPUTaskAwaiterBase()						   = default;
 
 	#pragma endregion
 
@@ -48,38 +49,40 @@ struct CPUTaskContinuationBase: CPUContinuation<TResult>
 	 */
 	[[nodiscard]]
 	RkBool await_ready() const noexcept
-	{ return this->Consumed(); }
+	{ return CPUAwaiter<TResult>::Consumed(); }
 
 	/**
 	 * \brief Attempts a suspension by attaching the awaiter to the awaited event
 	 * \return True if the suspension succeeded, false otherwise
 	 */
 	[[nodiscard]]
-	RkBool await_suspend(std::coroutine_handle<>) noexcept
-	{ return this->TryStartAwait(); }
+	RkBool await_suspend(std::coroutine_handle<> const in_coroutine) noexcept
+	{
+		m_coroutine = in_coroutine;
+		return m_awaitable.TryAttach(*this);
+	}
 
 	#pragma endregion
 
 	protected:
 
-		std::coroutine_handle<> m_coroutine;
+		CPUAwaitable<TResult> const& m_awaitable;
+		std::coroutine_handle<>      m_coroutine;
 };
 
 template <CQueueHandle TQueueHandle, typename TResult>
-struct CPUTaskContinuation: CPUTaskContinuationBase<TQueueHandle, TResult>
+struct CPUTaskAwaiter: CPUTaskAwaiterBase<TResult>
 {
     /**
      * @brief Default constructor
-     * @param in_awaiter Owning coroutine instance
-     * @param in_awaited Reference to the awaited event
+     * @param in_awaitable Reference to the awaited event
      */
-	template <typename TCoroutineResult>
-    CPUTaskContinuation(CPUAwaitable<TResult> const& in_awaited, CPUTaskPromise<TQueueHandle, TCoroutineResult>& in_awaiter) noexcept:
-		CPUTaskContinuationBase<TQueueHandle, TResult> {in_awaiter}
-    { this->Setup(in_awaited, *this); }
+    explicit CPUTaskAwaiter(CPUAwaitable<TResult> const& in_awaitable) noexcept:
+		CPUTaskAwaiterBase<TResult> {in_awaitable}
+	{ this->signal = CPUSignal<TResult>(*this); }
 
 	/// @brief Returns the result of the wait
-    auto await_resume() const noexcept(!CPUTaskContinuationBase<TQueueHandle, TResult>::has_exceptions)
+    auto await_resume() const noexcept(!CPUTaskAwaiterBase<TResult>::has_exceptions)
     {
         if constexpr (VariantHelper<TResult>::HasExceptions::value)
 	        if (std::get<std::exception_ptr>(return_value))
@@ -109,17 +112,15 @@ struct CPUTaskContinuation: CPUTaskContinuationBase<TQueueHandle, TResult>
 };
 
 template <CQueueHandle TQueueHandle>
-struct CPUTaskContinuation<TQueueHandle, RkVoid>: CPUTaskContinuationBase<TQueueHandle, RkVoid>
+struct CPUTaskAwaiter<TQueueHandle, RkVoid>: CPUTaskAwaiterBase<RkVoid>
 {
 	/**
 	 * @brief Default constructor
-	 * @param in_awaiter Owning coroutine instance
-	 * @param in_awaited Reference to the awaited event
+	 * @param in_awaitable Reference to the awaited event
 	 */
-	template <typename TCoroutineResult>
-	CPUTaskContinuation(CPUAwaitable<RkVoid> const& in_awaited, CPUTaskPromise<TQueueHandle, TCoroutineResult>& in_awaiter) noexcept:
-		CPUTaskContinuationBase<TQueueHandle, RkVoid> {in_awaiter}
-	{ this->Setup(in_awaited, *this); }
+	explicit CPUTaskAwaiter(CPUAwaitable<RkVoid> const& in_awaitable) noexcept:
+		CPUTaskAwaiterBase {in_awaitable}
+	{ this->signal = CPUSignal<RkVoid>(*this); }
 
 	/// @brief Returns the result of the wait
 	static constexpr void await_resume() noexcept

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Exception.hpp"
-#include "ExecutiveSystem/CPU/Continuations/CPUTaskContinuation.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskAwaiter.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -13,17 +13,17 @@ auto CPUTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 	CPUAwaitable<TAwaitableValue> const& in_awaitable,
     std::source_location                 in_source_location) noexcept
 {
-	struct Awaiter : CPUTaskContinuation<TQueueHandle, TAwaitableValue>
+	struct Awaiter : CPUTaskAwaiter<TQueueHandle, TAwaitableValue>
 	{
-		using Parent = CPUTaskContinuation<TQueueHandle, TAwaitableValue>;
+		using Parent = CPUTaskAwaiter<TQueueHandle, TAwaitableValue>;
 
 		TThis&			     self;
 		std::source_location source_location;
 
 		explicit Awaiter(TThis&								  in_self,
-						 CPUAwaitable<TAwaitableValue> const& in_handle,
+						 CPUAwaitable<TAwaitableValue> const& in_awaitable,
 						 std::source_location          const& in_location) noexcept:
-			Parent          {in_handle, in_self},
+			Parent          {in_awaitable},
 			self            {in_self},
 			source_location {in_location}
 		{}
@@ -116,13 +116,13 @@ void CPUTaskPromiseBase<TQueueHandle, TResult>::unhandled_exception() noexcept
 template<CQueueHandle TQueueHandle, typename TResult>
 auto CPUTaskPromise<TQueueHandle, TResult>::get_return_object() noexcept
 {
-	return CPUTask<TQueueHandle, TResult> {*this, this->m_continuation_node};
+	return CPUTask<TQueueHandle, TResult> {*this, this->m_awaiter_list};
 }
 
 template<CQueueHandle TQueueHandle>
 auto CPUTaskPromise<TQueueHandle, RkVoid>::get_return_object() noexcept
 {
-	return CPUTask<TQueueHandle, RkVoid> {*this, this->m_continuation_node};
+	return CPUTask<TQueueHandle, RkVoid> {*this, this->m_awaiter_list};
 }
 
 template<CQueueHandle TQueueHandle, typename TResult>

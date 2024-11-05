@@ -1,4 +1,9 @@
 #include "Core/Kernel.hpp"
+#include "Core/Exception.hpp"
+
+#include "ECS/EntityAdmin.hpp"
+#include "ECS/Test/CounterSystem.hpp"
+
 #include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
@@ -6,10 +11,6 @@
 
 #include <tracy/Tracy.hpp>
 #include <functional>
-
-#include "Core/Exception.hpp"
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterSystem.hpp"
 
 USING_RUKEN_NAMESPACE
 

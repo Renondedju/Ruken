@@ -22,8 +22,7 @@ endif()
 # atomic_queue has no CMake support and is a header only library
 if (atomic_queue_ADDED)
     FILE(GLOB atomic_queue_sources ${atomic_queue_SOURCE_DIR}/include/atomic_queue/*.h)
-    add_library(atomic_queue INTERFACE ${atomic_queue_sources}
-            Src/ExecutiveSystem/CPU/Continuations/CPUContinuationNode.cpp)
+    add_library(atomic_queue INTERFACE ${atomic_queue_sources})
     target_include_directories(atomic_queue INTERFACE $<BUILD_INTERFACE:${atomic_queue_SOURCE_DIR}/include>)
 endif()
 
@@ -47,8 +46,7 @@ add_library(RkCore STATIC
         Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp
         Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUTaskContinuation.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskAwaiter.hpp
         Include/ExecutiveSystem/CPU/Queues/CPUQueue.hpp
         Include/ExecutiveSystem/CPU/Queues/CPUDynamicQueue.hpp
         Include/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp
@@ -270,8 +268,8 @@ add_library(RkCore STATIC
         Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.inl
         Include/Meta/FirstOf.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/WhenAll.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUContinuationNode.hpp
-        Src/ExecutiveSystem/CPU/Continuations/CPUContinuationNode.cpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUSignal.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

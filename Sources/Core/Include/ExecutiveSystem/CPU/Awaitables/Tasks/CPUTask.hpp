@@ -12,7 +12,8 @@ BEGIN_RUKEN_NAMESPACE
 template<CQueueHandle TQueueHandle, typename TResult = RkVoid>
 struct CPUTask: CPUAwaitable<TPromiseAwaitableValue<TResult>>
 {
-	explicit CPUTask(CPUTaskPromise<TQueueHandle, TResult>& in_parent, CPUContinuationNodePtr& in_continuation_node) noexcept;
+	explicit CPUTask(CPUTaskPromise<TQueueHandle, TResult>&			  in_parent,
+					 CPUAwaiterList<TPromiseAwaitableValue<TResult>>& in_awaiter_list) noexcept;
 
 	CPUTask () = default;
 	CPUTask (CPUTask const&) noexcept;
