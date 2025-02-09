@@ -14,10 +14,10 @@ class CPUQueue;
  */
 class Worker
 {
-	   #pragma region Members
+	#pragma region Members
 
     std::vector<CPUQueue*>& m_queues;
-    std::jthread                          m_thread {};
+    std::jthread            m_thread {};
 
     #pragma endregion
 

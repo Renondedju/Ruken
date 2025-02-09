@@ -31,16 +31,16 @@ RkBool CPUAwaitable<TValue>::TryAttach(CPUAwaiter<TOtherValue>& in_awaiter) cons
 {
     // FIXME: Make a proper type erasure
     CPUAwaiter<RkVoid>& awaiter {reinterpret_cast<CPUAwaiter<RkVoid>&>(in_awaiter)};
-    awaiter.head = reinterpret_cast<CPUAwaiterList<RkVoid>*>(m_awaiter_list);
 
     // ---
-    CPUAwaiter<RkVoid>* head_value {(awaiter.head->load(std::memory_order_acquire))};
+    awaiter.head = reinterpret_cast<CPUAwaiterList<RkVoid>*>(m_awaiter_list);
+    CPUAwaiter<RkVoid>* head_value {reinterpret_cast<CPUAwaiter<RkVoid>*>(m_awaiter_list->load(std::memory_order_acquire))};
 
     do
     {
         while (head_value == CPUAwaiter<RkVoid>::locked) // If the current value is locked we need to wait
             head_value = awaiter.head->load(std::memory_order_acquire);
-*
+
         // Checking if the event signaled a completion in the meanwhile
         if (head_value == CPUAwaiter<RkVoid>::consumed)
             return false;
@@ -58,7 +58,41 @@ RkBool CPUAwaitable<TValue>::TryAttach(CPUAwaiter<TOtherValue>& in_awaiter) cons
     // Operation succeeded
     return true;
 }
+/* TODO
+template <typename TValue>
+template <typename TOtherValue>
+RkBool CPUAwaitable<TValue>::TryAttachLast(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept
+{
+    // FIXME: Make a proper type erasure
+    CPUAwaiter<RkVoid>& awaiter {reinterpret_cast<CPUAwaiter<RkVoid>&>(in_awaiter)};
 
+    // Attempting to detach from the awaited event by looking for our
+    // address though the list of suspensions
+    CPUAwaiterList<RkVoid>* selection {awaiter.head};
+    CPUAwaiter    <RkVoid>* expected  {nullptr};
+
+    // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
+    while(!selection->compare_exchange_strong(expected, CPUAwaiter<RkVoid>::locked, std::memory_order_acq_rel, std::memory_order_acquire))
+    {
+        // Otherwise we need to check if the event hasn't been signaled in the meantime
+        if (expected == CPUAwaiter<RkVoid>::consumed)
+            return false;
+
+        // And if the selection isn't currently locked, then we can finally test the next awaiter in the list
+        // otherwise we'll just retry until the lock has been released
+        if (expected != CPUAwaiter<RkVoid>::locked)
+            selection = &expected->next;
+
+        expected = nullptr;
+    }
+
+    // Lock acquired, we can now safely read the next pointer
+    // and swap our lock with that, effectively releasing our lock
+    selection->store(std::addressof(awaiter), std::memory_order_release);
+
+    return true;
+}
+*/
 template <typename TValue>
 template <typename TOtherValue>
 RkBool CPUAwaitable<TValue>::TryDetach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept
@@ -119,15 +153,15 @@ RkVoid CPUAwaitable<TValue>::AttachOrSignal(CPUAwaiter<TOtherValue>& in_awaiter)
 }
 
 template <typename TValue>
-RkVoid CPUAwaitable<TValue>::Signal(TValue* in_value) noexcept requires (has_value)
-{ this->value = in_value; DoSignal(); }
+RkVoid CPUAwaitable<TValue>::Signal(TValue* in_value, RkUint64* in_tag) noexcept requires (has_value)
+{ this->value = in_value; DoSignal(in_tag); }
 
 template <typename TValue>
-RkVoid CPUAwaitable<TValue>::Signal() noexcept requires (!has_value)
-{ DoSignal(); }
+RkVoid CPUAwaitable<TValue>::Signal(RkUint64* in_tag) noexcept requires (!has_value)
+{ DoSignal(in_tag); }
 
 template <typename TValue>
-RkVoid CPUAwaitable<TValue>::DoSignal() noexcept
+RkVoid CPUAwaitable<TValue>::DoSignal(RkUint64* in_tag) noexcept
 {
     RUKEN_ASSERT(m_awaiter_list != nullptr, "");
 
@@ -144,7 +178,7 @@ RkVoid CPUAwaitable<TValue>::DoSignal() noexcept
         // We can signal the previous awaiter.
         // This is done this way in case it gets destroyed as a side effect
         // and avoids us to read potentially unallocated memory.
-        if (previous)
+        if (previous && (in_tag == nullptr || previous->tag == *in_tag))
             if constexpr (!std::is_void_v<TValue>)
                 previous->signal.Signal(this->value);
             else
@@ -163,15 +197,15 @@ RkVoid CPUAwaitable<TValue>::DoSignal() noexcept
 // --- Consume
 
 template <typename TValue>
-RkVoid CPUAwaitable<TValue>::Consume(RkBool const in_signal, TValue* in_value) noexcept requires (has_value)
-{ if (in_signal) this->value = in_value; DoConsume(in_signal); }
+RkVoid CPUAwaitable<TValue>::Consume(RkBool const in_signal, TValue* in_value, RkUint64* in_tag) noexcept requires (has_value)
+{ if (in_signal) this->value = in_value; DoConsume(in_signal, in_tag); }
 
 template <typename TValue>
-RkVoid CPUAwaitable<TValue>::Consume(RkBool const in_signal) noexcept requires (!has_value)
-{ DoConsume(in_signal); }
+RkVoid CPUAwaitable<TValue>::Consume(RkBool const in_signal, RkUint64* in_tag) noexcept requires (!has_value)
+{ DoConsume(in_signal, in_tag); }
 
 template <typename TValue>
-RkVoid CPUAwaitable<TValue>::DoConsume(RkBool const in_signal) noexcept
+RkVoid CPUAwaitable<TValue>::DoConsume(RkBool const in_signal, RkUint64* in_tag) noexcept
 {
     RUKEN_ASSERT(m_awaiter_list != nullptr, "");
 
@@ -187,7 +221,8 @@ RkVoid CPUAwaitable<TValue>::DoConsume(RkBool const in_signal) noexcept
         do
         {
             // Checking for continuations to consume
-            if (selection->compare_exchange_strong(continuation = nullptr, CPUAwaiter<TValue>::consumed, std::memory_order_acq_rel))
+            if (selection->compare_exchange_strong(continuation = nullptr, CPUAwaiter<TValue>::consumed, std::memory_order_acq_rel)
+                || (in_tag && continuation != CPUAwaiter<TValue>::locked && continuation->tag != *in_tag))
             {
                 // If there is not we need to notify the
                 // last awaiter before returning.

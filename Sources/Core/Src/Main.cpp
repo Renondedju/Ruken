@@ -7,7 +7,6 @@
 #include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
 #include "ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
 
 #include <tracy/Tracy.hpp>
 #include <functional>
@@ -20,9 +19,9 @@ struct MainQueue : CPUQueueHandle<MainQueue, 2048>
 struct AsyncLoop
 {
     const char* name;
-    EntityAdmin domain;
+    EntityAdmin scene;
 
-    CPUDynamicTask<> SometimesThrows()
+    CPUTask<MainQueue> SometimesThrows()
     {
         if (rand() % 100 == 0)
             throw Exception("Random exception");
@@ -31,25 +30,29 @@ struct AsyncLoop
     }
 
     [[nodiscard]]
-    CPUDynamicTask<> Run() noexcept
+    CPUTask<MainQueue> Run() noexcept
     {
-        domain.CreateSystem<CounterSystem>();
+        scene.CreateSystem<CounterSystem>();
         for (int i = 0; i < 10'000'000; i++)
-            domain.CreateEntity<CounterComponent>();
+            scene.CreateEntity<CounterComponent>();
 
-        co_await domain.ExecuteEvent(EEventName::OnStart);
+        co_await scene.ExecuteEvent(EEventName::OnStart);
+        // ^^^   At this point the function is paused, and an awaiter is attached
+        //       to the synchronisation primitive returned by the invocation of the task.
 
-        for (int i = 0; i < 2000; ++i)
+        // When the awaited primitive is signaled (in this case when the task is done),
+        // the Run() coroutine is then scheduled back into the MainQueue, waiting to be picked up
+        // by the first available thread.
+
+        // Main loop
+        for (int i = 0; i < 500; ++i)
         {
-            co_await domain.ExecuteEvent(EEventName::OnStart);
-
-            SometimesThrows();
+            co_await scene.ExecuteEvent(EEventName::OnStart);
 
             FrameMark;
-            FrameMarkNamed(name);
         }
 
-        co_await domain.ExecuteEvent(EEventName::OnEnd);
+        co_await scene.ExecuteEvent(EEventName::OnEnd);
     }
 };
 
@@ -57,11 +60,13 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
 {
     AsyncLoop loop {
         .name   = "Game loop",
-        .domain = EntityAdmin {in_service_provider}
+        .scene = EntityAdmin {in_service_provider}
     };
 
     try
-    { co_await loop.Run(); }
+    {
+        co_await loop.Run();
+    }
     catch (Exception& in_exception)
     {
         std::string const what {in_exception};
