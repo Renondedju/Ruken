@@ -27,123 +27,10 @@ CPUAwaitable<TValue>::CPUAwaitable(CPUAwaiterList<TValue>& in_list_head) noexcep
 
 template <typename TValue>
 template <typename TOtherValue>
-RkBool CPUAwaitable<TValue>::TryAttach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept
-{
-    // FIXME: Make a proper type erasure
-    CPUAwaiter<RkVoid>& awaiter {reinterpret_cast<CPUAwaiter<RkVoid>&>(in_awaiter)};
-
-    // ---
-    awaiter.head = reinterpret_cast<CPUAwaiterList<RkVoid>*>(m_awaiter_list);
-    CPUAwaiter<RkVoid>* head_value {reinterpret_cast<CPUAwaiter<RkVoid>*>(m_awaiter_list->load(std::memory_order_acquire))};
-
-    do
-    {
-        while (head_value == CPUAwaiter<RkVoid>::locked) // If the current value is locked we need to wait
-            head_value = awaiter.head->load(std::memory_order_acquire);
-
-        // Checking if the event signaled a completion in the meanwhile
-        if (head_value == CPUAwaiter<RkVoid>::consumed)
-            return false;
-
-        // Update linked list to point at the current head
-        awaiter.next.store(head_value, std::memory_order_release);
-
-        // Finally, if the head we originally fetched is still the actual head
-        // (it could have been signaled, locked or swapped while we were testing stuff)
-        // swapping the old list head with this awaiter as the new list head.
-    } while (!awaiter.head->compare_exchange_weak(head_value, std::addressof(awaiter),
-                                          std::memory_order_release,
-                                          std::memory_order_acquire));
-
-    // Operation succeeded
-    return true;
-}
-/* TODO
-template <typename TValue>
-template <typename TOtherValue>
-RkBool CPUAwaitable<TValue>::TryAttachLast(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept
-{
-    // FIXME: Make a proper type erasure
-    CPUAwaiter<RkVoid>& awaiter {reinterpret_cast<CPUAwaiter<RkVoid>&>(in_awaiter)};
-
-    // Attempting to detach from the awaited event by looking for our
-    // address though the list of suspensions
-    CPUAwaiterList<RkVoid>* selection {awaiter.head};
-    CPUAwaiter    <RkVoid>* expected  {nullptr};
-
-    // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
-    while(!selection->compare_exchange_strong(expected, CPUAwaiter<RkVoid>::locked, std::memory_order_acq_rel, std::memory_order_acquire))
-    {
-        // Otherwise we need to check if the event hasn't been signaled in the meantime
-        if (expected == CPUAwaiter<RkVoid>::consumed)
-            return false;
-
-        // And if the selection isn't currently locked, then we can finally test the next awaiter in the list
-        // otherwise we'll just retry until the lock has been released
-        if (expected != CPUAwaiter<RkVoid>::locked)
-            selection = &expected->next;
-
-        expected = nullptr;
-    }
-
-    // Lock acquired, we can now safely read the next pointer
-    // and swap our lock with that, effectively releasing our lock
-    selection->store(std::addressof(awaiter), std::memory_order_release);
-
-    return true;
-}
-*/
-template <typename TValue>
-template <typename TOtherValue>
-RkBool CPUAwaitable<TValue>::TryDetach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept
-{
-    // FIXME: Make a proper type erasure
-    CPUAwaiter<RkVoid>& awaiter {reinterpret_cast<CPUAwaiter<RkVoid>&>(in_awaiter)};
-
-    RUKEN_ASSERT(reinterpret_cast<CPUAwaiterList<RkVoid>*>(m_awaiter_list) == awaiter.head,
-        "Awaiter must have been attached to this awaiable to be detached");
-
-    // If the awaiter hasn't been completed in due time,
-    // we need to detach it from the awaited event to cancel
-    // our wait without crashing later down the line
-    if (awaiter.next.load(std::memory_order_acquire) == CPUAwaiter<RkVoid>::consumed)
-        return false;
-
-    // Attempting to detach from the awaited event by looking for our
-    // address though the list of suspensions
-    CPUAwaiterList<RkVoid>* selection {awaiter.head};
-    CPUAwaiter    <RkVoid>* expected  {std::addressof(awaiter)};
-
-    // If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
-    while(!selection->compare_exchange_strong(expected, CPUAwaiter<RkVoid>::locked, std::memory_order_acq_rel, std::memory_order_acquire))
-    {
-        // Otherwise we need to check if the event hasn't been signaled in the meantime
-        // or if we haven't found ourselves in the list for some reason
-        if (expected == CPUAwaiter<RkVoid>::consumed ||
-            expected == nullptr)
-            return false;
-
-        // And if the selection isn't currently locked, then we can finally test the next awaiter in the list
-        // otherwise we'll just retry until the lock has been released
-        if (expected != CPUAwaiter<RkVoid>::locked)
-            selection = &expected->next;
-
-        expected = std::addressof(awaiter);
-    }
-
-    // Lock acquired, we can now safely read the next pointer
-    // and swap our lock with that, effectively releasing our lock
-    selection->store(awaiter.next.load(std::memory_order_acquire), std::memory_order_release);
-
-    return true;
-}
-
-template <typename TValue>
-template <typename TOtherValue>
 requires (std::is_void_v<TOtherValue> || std::is_same_v<TOtherValue, TValue>)
 RkVoid CPUAwaitable<TValue>::AttachOrSignal(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept
 {
-    if (TryAttach(in_awaiter))
+    if (in_awaiter.TryAttach())
         return;
 
     if constexpr (!std::is_void_v<TOtherValue>)
@@ -198,11 +85,18 @@ RkVoid CPUAwaitable<TValue>::DoSignal(RkUint64* in_tag) noexcept
 
 template <typename TValue>
 RkVoid CPUAwaitable<TValue>::Consume(RkBool const in_signal, TValue* in_value, RkUint64* in_tag) noexcept requires (has_value)
-{ if (in_signal) this->value = in_value; DoConsume(in_signal, in_tag); }
+{
+    if (in_signal)
+        this->value = in_value;
+
+    DoConsume(in_signal, in_tag);
+}
 
 template <typename TValue>
 RkVoid CPUAwaitable<TValue>::Consume(RkBool const in_signal, RkUint64* in_tag) noexcept requires (!has_value)
-{ DoConsume(in_signal, in_tag); }
+{
+    DoConsume(in_signal, in_tag);
+}
 
 template <typename TValue>
 RkVoid CPUAwaitable<TValue>::DoConsume(RkBool const in_signal, RkUint64* in_tag) noexcept
@@ -263,6 +157,12 @@ template <typename TValue>
 RkVoid CPUAwaitable<TValue>::Reset() noexcept
 {
     m_awaiter_list->store(nullptr, std::memory_order_release);
+}
+
+template<typename TValue>
+CPUAwaiter<TValue> CPUAwaitable<TValue>::operator co_await() const noexcept
+{
+    return CPUAwaiter<TValue>(m_awaiter_list);
 }
 
 template <typename TValue>

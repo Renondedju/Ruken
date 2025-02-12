@@ -52,9 +52,6 @@ struct CPUAwaitable : protected CPUAwaitableStorage<TValue*>, Awaitable<CentralP
 	/// @return Returns true if the event has already been completed, false otherwise
 	[[nodiscard]] RkBool Completed() const noexcept;
 
-	template <typename TOtherValue> RkBool TryAttach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept;
-	template <typename TOtherValue> RkBool TryDetach(CPUAwaiter<TOtherValue>& in_awaiter) const noexcept;
-
 	/**
 	 * @brief Calls TryAttach and Signals the awaiter automatically if the operation failed
 	 *
@@ -92,6 +89,11 @@ struct CPUAwaitable : protected CPUAwaitableStorage<TValue*>, Awaitable<CentralP
 	 * CPUAwaitable::Completed() returns false. Make sure to signal a completion before resetting.
 	 */
 	RkVoid Reset() noexcept;
+
+	/**
+	 * @return Constructs and returns an awaiter that has yet to be attached.
+	 */
+	CPUAwaiter<TValue> operator co_await() const noexcept;
 
 	#pragma endregion
 

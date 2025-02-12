@@ -5,34 +5,30 @@
 BEGIN_RUKEN_NAMESPACE
 
 template <typename TValue>
-struct ManualResetEvent
+struct ManualResetEvent: CPUAwaitable<TValue>
 {
-	~ManualResetEvent()					      noexcept { m_awaitable.Consume(); }
-	RkVoid     Signal(TValue const& in_value) noexcept { m_value = in_value; m_awaitable.Consume(true); }
-	RkVoid	   Reset ()						  noexcept { m_awaitable.Reset(); }
-
-	CPUAwaitable<TValue> operator co_await() noexcept { return m_awaitable; }
+	ManualResetEvent ()						  noexcept: CPUAwaitable<TValue> {m_continuation_node, &m_value} {}
+	~ManualResetEvent()					      noexcept { CPUAwaitable<TValue>::Consume(); }
+	RkVoid     Signal(TValue const& in_value) noexcept { m_value = in_value; CPUAwaitable<TValue>::Consume(true); }
+	RkVoid	   Reset ()						  noexcept { CPUAwaitable<TValue>::Reset(); }
 
 	private:
 
 		TValue				   m_value			   {};
-		CPUContinuationNodePtr m_continuation_node {};
-		CPUAwaitable<TValue>   m_awaitable		   {m_continuation_node, &m_value};
+		CPUAwaiterList<TValue> m_continuation_node {};
 };
 
 template <>
-struct ManualResetEvent<RkVoid>
+struct ManualResetEvent<RkVoid>: CPUAwaitable<RkVoid>
 {
-	~ManualResetEvent() noexcept { m_awaitable.Consume(); }
-	RkVoid     Signal() noexcept { m_awaitable.Consume(true); }
-	RkVoid	   Reset () noexcept { m_awaitable.Reset(); }
-
-	CPUAwaitable<RkVoid> operator co_await() const noexcept { return m_awaitable; }
+	ManualResetEvent () noexcept: CPUAwaitable {m_continuation_node} {}
+	~ManualResetEvent() noexcept { Consume(); }
+	RkVoid     Signal() noexcept { Consume(true); }
+	RkVoid	   Reset () noexcept { CPUAwaitable::Reset(); }
 
 	private:
 
-		CPUContinuationNodePtr m_continuation_node {};
-		CPUAwaitable<RkVoid>   m_awaitable		   {m_continuation_node};
+		CPUAwaiterList<RkVoid> m_continuation_node {};
 };
 
 END_RUKEN_NAMESPACE

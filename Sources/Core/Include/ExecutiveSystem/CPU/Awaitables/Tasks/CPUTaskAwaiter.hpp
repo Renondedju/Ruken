@@ -18,22 +18,16 @@ template <typename TType > struct VariantHelper										      { using ValueType
 template <typename TValue> struct VariantHelper<std::variant<std::exception_ptr, TValue>> { using ValueType = TValue; using HasExceptions = std::true_type; };
 template <typename TValue> struct VariantHelper<std::variant<TValue, std::exception_ptr>> { using ValueType = TValue; using HasExceptions = std::true_type; };
 
-template <typename TResult>
-struct CPUTaskAwaiterBase: CPUAwaiter<TResult>
+template <typename TResult, typename TAwaiter = CPUAwaiter<TResult>>
+struct CPUTaskAwaiterBase: TAwaiter
 {
 	static constexpr RkBool has_exceptions = VariantHelper<TResult>::HasExceptions::value || std::is_same_v<TResult, std::exception_ptr>;
 
 	#pragma region Lifetime
 
-	/**
-	 * @brief Default constructor
-	 * @param in_awaitable Awaited event
-	 */
-	explicit CPUTaskAwaiterBase(CPUAwaitable<TResult> const& in_awaitable) noexcept:
-		CPUAwaiter<TResult>(),
-		m_awaitable {in_awaitable}
+	explicit CPUTaskAwaiterBase(TAwaiter const& in_awaiter) noexcept:
+		TAwaiter(in_awaiter)
 	{}
-
 	CPUTaskAwaiterBase (CPUTaskAwaiterBase const&) = default;
 	CPUTaskAwaiterBase (CPUTaskAwaiterBase&&     ) = default;
 	~CPUTaskAwaiterBase()						   = default;
@@ -49,7 +43,7 @@ struct CPUTaskAwaiterBase: CPUAwaiter<TResult>
 	 */
 	[[nodiscard]]
 	RkBool await_ready() const noexcept
-	{ return CPUAwaiter<TResult>::Consumed(); }
+	{ return TAwaiter::Consumed(); }
 
 	/**
 	 * \brief Attempts a suspension by attaching the awaiter to the awaited event
@@ -59,27 +53,27 @@ struct CPUTaskAwaiterBase: CPUAwaiter<TResult>
 	RkBool await_suspend(std::coroutine_handle<> const in_coroutine) noexcept
 	{
 		m_coroutine = in_coroutine;
-		return m_awaitable.TryAttach(*this);
+		return TAwaiter::TryAttach();
 	}
 
 	#pragma endregion
 
 	protected:
 
-		CPUAwaitable<TResult> const& m_awaitable;
-		std::coroutine_handle<>      m_coroutine;
+		std::coroutine_handle<> m_coroutine;
 };
 
-template <CQueueHandle TQueueHandle, typename TResult>
-struct CPUTaskAwaiter: CPUTaskAwaiterBase<TResult>
+template <CQueueHandle TQueueHandle, typename TResult, typename TAwaiter = CPUAwaiter<TResult>>
+struct CPUTaskAwaiter: CPUTaskAwaiterBase<TResult, TAwaiter>
 {
     /**
      * @brief Default constructor
-     * @param in_awaitable Reference to the awaited event
      */
-    explicit CPUTaskAwaiter(CPUAwaitable<TResult> const& in_awaitable) noexcept:
-		CPUTaskAwaiterBase<TResult> {in_awaitable}
-	{ this->signal = CPUSignal<TResult>(*this); }
+    explicit CPUTaskAwaiter(TAwaiter const& in_awaiter) noexcept:
+		CPUTaskAwaiterBase<TResult, TAwaiter>(in_awaiter)
+    {
+	    CPUTaskAwaiterBase<TResult, TAwaiter>::signal = CPUSignal<TResult>(*this);
+    }
 
 	/// @brief Returns the result of the wait
     auto await_resume() const noexcept(!CPUTaskAwaiterBase<TResult>::has_exceptions)
@@ -111,16 +105,17 @@ struct CPUTaskAwaiter: CPUTaskAwaiterBase<TResult>
 		TResult	return_value {};
 };
 
-template <CQueueHandle TQueueHandle>
-struct CPUTaskAwaiter<TQueueHandle, RkVoid>: CPUTaskAwaiterBase<RkVoid>
+template <CQueueHandle TQueueHandle, typename TAwaiter>
+struct CPUTaskAwaiter<TQueueHandle, RkVoid, TAwaiter>: CPUTaskAwaiterBase<RkVoid, TAwaiter>
 {
 	/**
 	 * @brief Default constructor
-	 * @param in_awaitable Reference to the awaited event
 	 */
-	explicit CPUTaskAwaiter(CPUAwaitable<RkVoid> const& in_awaitable) noexcept:
-		CPUTaskAwaiterBase {in_awaitable}
-	{ this->signal = CPUSignal<RkVoid>(*this); }
+	explicit CPUTaskAwaiter(TAwaiter const& in_awaiter) noexcept:
+		CPUTaskAwaiterBase<RkVoid, TAwaiter>(in_awaiter)
+	{
+		CPUTaskAwaiterBase<RkVoid, TAwaiter>::signal = CPUSignal<RkVoid>(*this);
+	}
 
 	/// @brief Returns the result of the wait
 	static constexpr void await_resume() noexcept
@@ -128,7 +123,9 @@ struct CPUTaskAwaiter<TQueueHandle, RkVoid>: CPUTaskAwaiterBase<RkVoid>
 
 	/// @brief Called when the wait is over
 	RkVoid Signal() const noexcept
-	{ TQueueHandle::GetInstance().Push(this->m_coroutine); }
+	{
+		TQueueHandle::GetInstance().Push(this->m_coroutine);
+	}
 };
 
 END_RUKEN_NAMESPACE

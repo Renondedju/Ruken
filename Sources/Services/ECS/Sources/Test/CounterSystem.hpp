@@ -59,7 +59,8 @@ struct CounterSystem final: System
                     tasks[index++] = ProcessChunk(*current_node);
             }
 
-            co_await WhenAll(tasks);
+	        auto a = WhenAll(tasks);
+	        co_await a;
         }
     };
 

@@ -271,6 +271,7 @@ add_library(RkCore STATIC
         Include/ExecutiveSystem/CPU/Awaitables/CPUSignal.hpp
         Include/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/SharedMutex.hpp
+        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.inl
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

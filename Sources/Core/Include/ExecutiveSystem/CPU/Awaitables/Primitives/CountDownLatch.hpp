@@ -31,7 +31,7 @@ struct CountDownLatch: CPUAwaitable<RkVoid>
 	private:
 
 		std::atomic<RkSize>	   m_counter;
-		CPUAwaiterList<RkVoid> m_awaiter_list {nullptr};
+		CPUAwaiterList<RkVoid> m_awaiter_list {};
 };
 
 END_RUKEN_NAMESPACE

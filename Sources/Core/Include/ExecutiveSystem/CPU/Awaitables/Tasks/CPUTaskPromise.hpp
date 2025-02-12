@@ -45,11 +45,12 @@ struct CPUTaskPromiseBase:
 
 	/**
      * \brief Converts awaited types to asynchronous events if possible
+     * \param in_self Task instance
      * \param in_awaitable Asynchronous event instance
      * \return Awaiter instance
      */
-	template<typename TThis, typename TAwaitableValue>
-	auto await_transform    (this TThis& in_self, CPUAwaitable<TAwaitableValue> const& in_awaitable, RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
+	template<typename TThis, typename TAwaitable>
+	auto await_transform    (this TThis& in_self, TAwaitable const& in_awaitable, RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
 
 	// Coroutine lifetime
 	template <typename TThis>
@@ -63,8 +64,8 @@ struct CPUTaskPromiseBase:
 
 	protected:
 
-		template <CQueueHandle TOtherQueueHandle, typename TOtherResult> friend struct CPUTask;
-		//template								 <typename TOtherResult> friend struct CPUTaskAwaiterBase;
+		template <CQueueHandle TOtherQueueHandle, typename TOtherResult>
+		friend struct CPUTask;
 
 		using CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>::value;
 

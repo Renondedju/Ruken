@@ -20,20 +20,34 @@ using CPUAwaiterList = std::atomic<CPUAwaiter<TValue>*>;
 template <typename TSignalValue>
 struct CPUAwaiter
 {
-	// FIXME: /!\ /!\ /!\ /!\ /!\ /!\
-	// FIXME: If deleted, awaiters won't detach themselves -> Read after free errors
+	using SignalValue = TSignalValue;
 
-	static inline auto locked    {reinterpret_cast<CPUAwaiter* const>(0x1)};
-	static inline auto consumed  {reinterpret_cast<CPUAwaiter* const>(0x2)};
+	static inline auto locked   {reinterpret_cast<CPUAwaiter* const>(0x1)};
+	static inline auto consumed {reinterpret_cast<CPUAwaiter* const>(0x2)};
+	static inline auto detached {reinterpret_cast<CPUAwaiter* const>(0x3)};
 
-	RkBool Consumed() const noexcept
-	{ return head && head->load(std::memory_order_acquire) == consumed; }
-
-	CPUAwaiterList<TSignalValue>* head   {nullptr};  ///< Reference to the head of the list
-	CPUAwaiterList<TSignalValue>  next   {nullptr}; ///< Next awaiter in the list
-
+	CPUAwaiterList<TSignalValue>* head;			      ///< Reference to the head of the list
+	CPUAwaiterList<TSignalValue>  next   {detached}; ///< Next awaiter in the list
 	CPUSignal     <TSignalValue>  signal {};
 	RkUint64                      tag    {};
+
+	#pragma region Lifetime
+
+	explicit CPUAwaiter(CPUAwaiterList<TSignalValue>* in_head = nullptr) noexcept;
+	CPUAwaiter(CPUAwaiter const&) 										 noexcept;
+	CPUAwaiter(CPUAwaiter&&)	  										 noexcept;
+	~CPUAwaiter();
+
+	CPUAwaiter& operator=(CPUAwaiter const&) noexcept;
+	CPUAwaiter& operator=(CPUAwaiter&&)      noexcept;
+
+	#pragma endregion
+
+	RkBool TryAttach() noexcept;
+	RkBool TryDetach() noexcept;
+	RkBool Consumed () const noexcept;
 };
 
 END_RUKEN_NAMESPACE
+
+#include "ExecutiveSystem/CPU/Awaitables/CPUAwaiter.inl"

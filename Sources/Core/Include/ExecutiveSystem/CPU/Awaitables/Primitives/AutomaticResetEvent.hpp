@@ -17,7 +17,7 @@ struct AutomaticResetEvent: CPUAwaitable<TValue>
 private:
 
 	TValue				   m_value			   {};
-	CPUContinuationNodePtr m_continuation_node {};
+	CPUAwaiterList<TValue> m_continuation_node {};
 };
 
 template <>
@@ -30,7 +30,7 @@ struct AutomaticResetEvent<RkVoid>: CPUAwaitable<RkVoid>
 
 private:
 
-	CPUContinuationNodePtr m_continuation_node {};
+	CPUAwaiterList<RkVoid> m_continuation_node {};
 };
 
 END_RUKEN_NAMESPACE

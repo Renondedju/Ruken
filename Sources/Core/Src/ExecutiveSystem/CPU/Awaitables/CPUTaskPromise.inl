@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "Core/Exception.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskAwaiter.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp"
@@ -7,46 +9,62 @@
 BEGIN_RUKEN_NAMESPACE
 
 template<CQueueHandle TQueueHandle, typename TResult>
-template<typename TThis, typename TAwaitableValue>
+template<typename TThis, typename TAwaitable>
 auto CPUTaskPromiseBase<TQueueHandle, TResult>::await_transform(
-	this TThis&							 in_self,
-	CPUAwaitable<TAwaitableValue> const& in_awaitable,
-    std::source_location                 in_source_location) noexcept
+	this TThis&			 in_self,
+	TAwaitable const&	 in_awaitable,
+    std::source_location in_source_location) noexcept
 {
-	struct Awaiter : CPUTaskAwaiter<TQueueHandle, TAwaitableValue>
+	struct TaskAwaitable
 	{
-		using Parent = CPUTaskAwaiter<TQueueHandle, TAwaitableValue>;
+		using TAwaiter      = std::remove_cvref_t<decltype(std::declval<TAwaitable>().operator co_await())>;
+		using TAwaiterValue = typename TAwaiter::SignalValue;
 
-		TThis&			     self;
+		TThis&				 task;
+		TAwaitable const&    awaitable;
 		std::source_location source_location;
 
-		explicit Awaiter(TThis&								  in_self,
-						 CPUAwaitable<TAwaitableValue> const& in_awaitable,
-						 std::source_location          const& in_location) noexcept:
-			Parent          {in_awaitable},
-			self            {in_self},
-			source_location {in_location}
-		{}
-
-		auto await_ready() noexcept
+		// This operator allows us to compose a new awaiter type
+		auto operator co_await() const
 		{
-			TRACY_END_ZONE(self.m_zone);
+			struct TaskAwaiter : CPUTaskAwaiter<TQueueHandle, TAwaiterValue, TAwaiter>
+			{
+				explicit TaskAwaiter(TAwaitable const& in_awaitable, TThis& in_task, std::source_location const& in_source_location):
+					CPUTaskAwaiter<TQueueHandle, TAwaiterValue> {in_awaitable.operator co_await()},
+					task			{in_task},
+					source_location {in_source_location}
+				{}
 
-			return Parent::await_ready();
-		}
+				TThis&				 task;
+				std::source_location source_location;
 
-		auto await_resume() const
-		{
-			TRACY_BEGIN_ZONE(self.m_zone, source_location, true);
+				auto await_ready() noexcept
+				{
+					TRACY_END_ZONE(task.m_zone);
 
-			if constexpr (std::is_same_v<TAwaitableValue, RkVoid>)
-				Parent::await_resume();
-			else
-				return Parent::await_resume();
+					return CPUTaskAwaiter<TQueueHandle, TAwaiterValue>::await_ready();
+				}
+
+				auto await_resume() const
+				{
+					TRACY_BEGIN_ZONE(task.m_zone, source_location, true);
+
+					if constexpr (std::is_same_v<TAwaiterValue, RkVoid>)
+						CPUTaskAwaiter<TQueueHandle, TAwaiterValue>::await_resume();
+					else
+						return CPUTaskAwaiter<TQueueHandle, TAwaiterValue>::await_resume();
+				}
+			};
+
+			return TaskAwaiter(awaitable, task, source_location);
 		}
 	};
 
-	return Awaiter(in_self, in_awaitable, in_source_location);
+	return TaskAwaitable {
+		.task			 = in_self,
+		.awaitable  	 = in_awaitable,
+		.source_location = in_source_location
+	};
 }
 
 template<CQueueHandle TQueueHandle, typename TResult>
