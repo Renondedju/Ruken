@@ -34,7 +34,6 @@ struct AsyncLoop
             co_await domain.ExecuteEvent(EEventName::OnUpdate);
 
             FrameMark;
-            FrameMarkNamed(name);
         }
 
         co_await domain.ExecuteEvent(EEventName::OnEnd);
@@ -43,30 +42,9 @@ struct AsyncLoop
 
 CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
 {
-    AsyncLoop loop {
-        .name   = "Game loop",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop2 {
-        .name   = "Editor loop",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop3 {
-        .name   = "Test loop",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop4 {
-        .name   = "Test loop 2",
-        .domain = EntityAdmin {in_service_provider}
-    };
-    AsyncLoop loop5 {
-        .name   = "Test loop 3",
-        .domain = EntityAdmin {in_service_provider}
-    };
-
-    co_await WhenAll({loop.Run(), loop2.Run(), loop3.Run(), loop4.Run(), loop5.Run()});
-
     in_stop_source.request_stop();
+
+    co_return;
 }
 
 int main(int i_argc, char* i_argv[])

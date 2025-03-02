@@ -8,17 +8,17 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 template<typename TThis, typename TAwaitable>
 auto CPUTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 	this TThis&			 in_self,
 	TAwaitable const&	 in_awaitable,
     std::source_location in_source_location) noexcept
 {
-	struct TaskAwaitable
+	struct ComposedAwaitable
 	{
-		using TAwaiter      = std::remove_cvref_t<decltype(std::declval<TAwaitable>().operator co_await())>;
-		using TAwaiterValue = typename TAwaiter::SignalValue;
+		using TAwaiter       = decltype(std::declval<TAwaitable>().operator co_await());
+		using TAwaiterResult = decltype(std::declval<TAwaiter  >().await_resume     ());
 
 		TThis&				 task;
 		TAwaitable const&    awaitable;
@@ -27,13 +27,15 @@ auto CPUTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 		// This operator allows us to compose a new awaiter type
 		auto operator co_await() const
 		{
-			struct TaskAwaiter : CPUTaskAwaiter<TQueueHandle, TAwaiterValue, TAwaiter>
+			struct ComposedAwaiter: TAwaiter
 			{
-				explicit TaskAwaiter(TAwaitable const& in_awaitable, TThis& in_task, std::source_location const& in_source_location):
-					CPUTaskAwaiter<TQueueHandle, TAwaiterValue> {in_awaitable.operator co_await()},
+				explicit ComposedAwaiter(TThis& in_task, TAwaitable const& in_awaitable, std::source_location const& in_source_location) noexcept:
+					TAwaiter	    {in_awaitable.operator co_await()},
 					task			{in_task},
 					source_location {in_source_location}
-				{}
+				{
+					TAwaiter::signal = CPUSignal(*this);
+				}
 
 				TThis&				 task;
 				std::source_location source_location;
@@ -42,32 +44,37 @@ auto CPUTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 				{
 					TRACY_END_ZONE(task.m_zone);
 
-					return CPUTaskAwaiter<TQueueHandle, TAwaiterValue>::await_ready();
+					return TAwaiter::await_ready();
 				}
 
 				auto await_resume() const
 				{
 					TRACY_BEGIN_ZONE(task.m_zone, source_location, true);
 
-					if constexpr (std::is_same_v<TAwaiterValue, RkVoid>)
-						CPUTaskAwaiter<TQueueHandle, TAwaiterValue>::await_resume();
+					if constexpr (std::is_same_v<TAwaiterResult, RkVoid>)
+						TAwaiter::await_resume();
 					else
-						return CPUTaskAwaiter<TQueueHandle, TAwaiterValue>::await_resume();
+						return TAwaiter::await_resume();
+				}
+
+				RkVoid Signal() noexcept
+				{
+					TQueueHandle::GetInstance().Push(std::coroutine_handle<TThis>::from_promise(task));
 				}
 			};
 
-			return TaskAwaiter(awaitable, task, source_location);
+			return ComposedAwaiter(task, awaitable, source_location);
 		}
 	};
 
-	return TaskAwaitable {
+	return ComposedAwaitable {
 		.task			 = in_self,
 		.awaitable  	 = in_awaitable,
 		.source_location = in_source_location
 	};
 }
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 template<typename TThis>
 auto CPUTaskPromiseBase<TQueueHandle, TResult>::initial_suspend(this TThis& in_self, std::source_location in_source_location) noexcept
 {
@@ -94,7 +101,7 @@ auto CPUTaskPromiseBase<TQueueHandle, TResult>::initial_suspend(this TThis& in_s
     };
 }
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 auto CPUTaskPromiseBase<TQueueHandle, TResult>::final_suspend() noexcept
 {
 	struct Awaiter
@@ -112,7 +119,7 @@ auto CPUTaskPromiseBase<TQueueHandle, TResult>::final_suspend() noexcept
     return Awaiter {this};
 }
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 void CPUTaskPromiseBase<TQueueHandle, TResult>::unhandled_exception() noexcept
 {
 	std::exception_ptr ptr {std::current_exception()};
@@ -128,27 +135,49 @@ void CPUTaskPromiseBase<TQueueHandle, TResult>::unhandled_exception() noexcept
 	}
 
 	TRACY_END_ZONE(m_zone);
-	this->Consume(true, &ptr);
+	this->result = ptr;
+	this->SignalConsume();
 }
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 auto CPUTaskPromise<TQueueHandle, TResult>::get_return_object() noexcept
 {
-	return CPUTask<TQueueHandle, TResult> {*this, this->m_awaiter_list};
+	return CPUTask<TQueueHandle, TResult> {*this};
 }
 
 template<CQueueHandle TQueueHandle>
 auto CPUTaskPromise<TQueueHandle, RkVoid>::get_return_object() noexcept
 {
-	return CPUTask<TQueueHandle, RkVoid> {*this, this->m_awaiter_list};
+	return CPUTask<TQueueHandle, RkVoid> {*this};
 }
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
+auto CPUTaskPromise<TQueueHandle, TResult>::operator co_await() noexcept
+{
+	CPUTaskAwaiter<TQueueHandle, TResult> awaiter {};
+	awaiter = CPUAwaitable::operator co_await();
+	awaiter.promise = this;
+
+	return awaiter;
+}
+
+template<CQueueHandle TQueueHandle>
+auto CPUTaskPromise<TQueueHandle, RkVoid>::operator co_await() noexcept
+{
+	CPUTaskAwaiter<TQueueHandle, RkVoid> awaiter {};
+	awaiter = CPUAwaitable::operator co_await();
+	awaiter.promise = this;
+
+	return awaiter;
+}
+
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 void CPUTaskPromise<TQueueHandle, TResult>::return_value(TResult const& in_result) noexcept
 {
 	TRACY_END_ZONE(this->m_zone);
 
-	this->Consume(true, &in_result);
+	this->result = in_result;
+	this->SignalConsume();
 }
 
 template <CQueueHandle TQueueHandle>
@@ -156,8 +185,8 @@ void CPUTaskPromise<TQueueHandle, RkVoid>::return_void() noexcept
 {
 	TRACY_END_ZONE(this->m_zone);
 
-	std::exception_ptr ptr {nullptr};
-	this->Consume(true, &ptr);
+	this->result = std::exception_ptr {nullptr};
+	this->SignalConsume();
 }
 
 END_RUKEN_NAMESPACE

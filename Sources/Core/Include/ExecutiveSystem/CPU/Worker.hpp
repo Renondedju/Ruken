@@ -41,7 +41,7 @@ class Worker
          * \param in_name Worker name
          * \param in_queues Queues to work on
          */
-		      explicit Worker(std::string in_name, std::vector<CPUQueue*>& in_queues) noexcept;
+		explicit Worker(std::string in_name, std::vector<CPUQueue*>& in_queues) noexcept;
 
         Worker(Worker const&) = delete;
         Worker(Worker&&)      = delete;

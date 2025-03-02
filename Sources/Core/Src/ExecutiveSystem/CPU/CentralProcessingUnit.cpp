@@ -19,6 +19,7 @@ RkVoid CentralProcessingUnit::StartWorkers() noexcept
         m_workers.emplace_back(std::make_unique<Worker>("CPU " + std::to_string(index), m_queues));
 
     WorkerInfo::name = std::string("CPU Main");
+    tracy::SetThreadNameWithHint(WorkerInfo::name.c_str(), 1);
 }
 
 RkVoid CentralProcessingUnit::CallerAsWorker(std::stop_token&& in_should_return) const noexcept

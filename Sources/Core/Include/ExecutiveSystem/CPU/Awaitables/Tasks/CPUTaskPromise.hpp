@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Build/BuildInfo.hpp"
 #include "ExecutiveSystem/Concepts/CQueueHandle.hpp"
 #include "ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Tasks/CTaskResult.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp"
 
 #include "Debug/Trace.hpp"
 
@@ -10,10 +11,9 @@
 #include <variant>
 
 BEGIN_RUKEN_NAMESPACE
-
 #define RUKEN_INTERNAL_SOURCE_LOCATION [[maybe_unused]] std::source_location in_source_location = std::source_location::current()
 
-template <CQueueHandle TQueueHandle, typename TResult>
+template <CQueueHandle TQueueHandle, CTaskResult TResult>
 struct CPUTask;
 
 template <typename TResult>
@@ -23,23 +23,19 @@ using TPromiseAwaitableValue = std::conditional_t<
 			std::exception_ptr
 	>;
 
+template <typename TResult> struct CPUAwaitableStorage		   { TResult result; };
+template <>					struct CPUAwaitableStorage<RkVoid> {};
 
 /**
  * \brief Implements the base common behavior for all CPU tasks
  * \tparam TResult Return type of the associated coroutine
  */
-template <CQueueHandle TQueueHandle, typename TResult>
-struct CPUTaskPromiseBase:
-	protected CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>,
-			  CPUAwaitable       <TPromiseAwaitableValue<TResult>>
+template <CQueueHandle TQueueHandle, CTaskResult TResult>
+struct CPUTaskPromiseBase: CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>, ManualResetEvent
 {
 	using ReturnType     = TPromiseAwaitableValue<TResult>;
 	using ProcessingUnit = CentralProcessingUnit;
-
-	CPUTaskPromiseBase() noexcept:
-		CPUAwaitableStorage<TPromiseAwaitableValue<TResult>> {},
-		CPUAwaitable	   <TPromiseAwaitableValue<TResult>> {m_awaiter_list, std::addressof(value)}
-	{}
+	using Storage        = CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>;
 
     #pragma region Coroutine Methods
 
@@ -50,7 +46,7 @@ struct CPUTaskPromiseBase:
      * \return Awaiter instance
      */
 	template<typename TThis, typename TAwaitable>
-	auto await_transform    (this TThis& in_self, TAwaitable const& in_awaitable, RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
+	auto await_transform(this TThis& in_self, TAwaitable const& in_awaitable, RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
 
 	// Coroutine lifetime
 	template <typename TThis>
@@ -64,13 +60,10 @@ struct CPUTaskPromiseBase:
 
 	protected:
 
-		template <CQueueHandle TOtherQueueHandle, typename TOtherResult>
+		template <CQueueHandle TOtherQueueHandle, CTaskResult TOtherResult>
 		friend struct CPUTask;
 
-		using CPUAwaitableStorage<TPromiseAwaitableValue<TResult>>::value;
-
-		std::atomic<RkSize>								m_references   {1ULL};
-		CPUAwaiterList<TPromiseAwaitableValue<TResult>> m_awaiter_list {nullptr};
+		std::atomic<RkSize> m_references {1ULL};
 
 		#ifdef RUKEN_TRACE_BUILD
 			TracyCZoneCtx m_zone {};
@@ -79,9 +72,10 @@ struct CPUTaskPromiseBase:
 	#pragma endregion
 };
 
-template<CQueueHandle TQueueHandle, typename TResult>
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
 struct CPUTaskPromise: CPUTaskPromiseBase<TQueueHandle, TResult>
 {
+	auto operator co_await() noexcept;
 	auto get_return_object() noexcept;
 	void return_value     (TResult const& in_result) noexcept;
 };
@@ -89,6 +83,7 @@ struct CPUTaskPromise: CPUTaskPromiseBase<TQueueHandle, TResult>
 template <CQueueHandle TQueueHandle>
 struct CPUTaskPromise<TQueueHandle, RkVoid>: CPUTaskPromiseBase<TQueueHandle, RkVoid>
 {
+	auto operator co_await() noexcept;
 	auto get_return_object() noexcept;
 	void return_void	  () noexcept;
 };

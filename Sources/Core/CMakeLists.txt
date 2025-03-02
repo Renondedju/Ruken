@@ -265,13 +265,20 @@ add_library(RkCore STATIC
         Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
         Src/ExecutiveSystem/CPU/Awaitables/CPUTaskPromise.inl
-        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.inl
+        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.cpp
         Include/Meta/FirstOf.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/WhenAll.hpp
         Include/ExecutiveSystem/CPU/Awaitables/CPUSignal.hpp
         Include/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp
         Include/ExecutiveSystem/CPU/Awaitables/Primitives/SharedMutex.hpp
-        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.inl
+        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaiter.cpp
+        Src/ExecutiveSystem/CPU/Awaitables/Primitives/SharedMutex.inl
+        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.inl
+        Src/ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.cpp
+        Src/ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.cpp
+        Src/ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.inl
+        Include/ExecutiveSystem/CPU/Awaitables/Primitives/AwaitableWatch.hpp
+        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CTaskResult.hpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

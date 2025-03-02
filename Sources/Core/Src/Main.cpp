@@ -11,6 +11,8 @@
 #include <tracy/Tracy.hpp>
 #include <functional>
 
+#include "ExecutiveSystem/CPU/Awaitables/Primitives/SharedMutex.hpp"
+
 USING_RUKEN_NAMESPACE
 
 struct MainQueue : CPUQueueHandle<MainQueue, 2048>
@@ -20,14 +22,6 @@ struct AsyncLoop
 {
     const char* name;
     EntityAdmin scene;
-
-    CPUTask<MainQueue> SometimesThrows()
-    {
-        if (rand() % 100 == 0)
-            throw Exception("Random exception");
-
-        co_return;
-    }
 
     [[nodiscard]]
     CPUTask<MainQueue> Run() noexcept
@@ -45,7 +39,7 @@ struct AsyncLoop
         // by the first available thread.
 
         // Main loop
-        for (int i = 0; i < 500; ++i)
+        for (int i = 0; i < 200; ++i)
         {
             co_await scene.ExecuteEvent(EEventName::OnStart);
 
@@ -56,26 +50,52 @@ struct AsyncLoop
     }
 };
 
-CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
-{
-    AsyncLoop loop {
-        .name   = "Game loop",
-        .scene = EntityAdmin {in_service_provider}
-    };
-
-    try
-    {
-        co_await loop.Run();
-    }
-    catch (Exception& in_exception)
-    {
-        std::string const what {in_exception};
-        TracyMessageC(what.c_str(), what.length(), 0xFF0000);
-    }
-
-    in_stop_source.request_stop();
+CPUTask<MainQueue> Read(SharedMutex<RkInt64>& in_mutex) {
+    auto access = co_await in_mutex.AsyncRead();
+    TracyMessageL("Reading !");
 }
 
+CPUTask<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
+    auto access = co_await in_mutex.AsyncWrite();
+    TracyMessageL("Writing !");
+    (*access)++;
+};
+
+/**
+ * Asynchronous main
+ * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
+ * @param in_service_provider Service Provider
+ */
+CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
+{
+    SharedMutex<RkInt64> mutex {};
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    auto const vector = {
+        Write(mutex),
+        Read (mutex),
+        Read (mutex),
+        Read (mutex),
+        Write(mutex),
+        Write(mutex),
+        Write(mutex)
+    };
+    co_await WhenAll<CPUTask<MainQueue>>(vector);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    in_stop_source.request_stop();
+
+    co_return;
+}
+
+/**
+ * Initializes services and waits for the async main function to request a stop.
+ * @param in_argc Argument count
+ * @param in_argv Argument values
+ * @return Error code
+ */
 int main(int in_argc, char* in_argv[])
 {
     CentralProcessingUnit cpu      {};

@@ -1,13 +1,14 @@
 #pragma once
 
 #include "ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp"
+#include "ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Asynchronous countdown latch
  */
-struct CountDownLatch: CPUAwaitable<RkVoid>
+struct CountDownLatch: ManualResetEvent
 {
 	/**
 	 * \brief Default constructor
@@ -30,8 +31,7 @@ struct CountDownLatch: CPUAwaitable<RkVoid>
 
 	private:
 
-		std::atomic<RkSize>	   m_counter;
-		CPUAwaiterList<RkVoid> m_awaiter_list {};
+		std::atomic<RkSize>	m_counter;
 };
 
 END_RUKEN_NAMESPACE

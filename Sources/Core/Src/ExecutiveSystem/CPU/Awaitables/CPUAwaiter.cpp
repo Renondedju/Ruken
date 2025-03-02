@@ -1,33 +1,26 @@
-#pragma once
-
 #include "ExecutiveSystem/CPU/Awaitables/CPUAwaiter.hpp"
-#include "Meta/Assert.hpp"
 
-BEGIN_RUKEN_NAMESPACE
+USING_RUKEN_NAMESPACE
 
-template<typename TSignalValue>
-CPUAwaiter<TSignalValue>::CPUAwaiter(CPUAwaiterList<TSignalValue>* in_head) noexcept:
+CPUAwaiter::CPUAwaiter(CPUAwaiterList* in_head) noexcept:
 	head {in_head}
 {}
 
-template<typename TSignalValue>
-CPUAwaiter<TSignalValue>::CPUAwaiter(CPUAwaiter const& in_other) noexcept
+CPUAwaiter::CPUAwaiter(CPUAwaiter const& in_other) noexcept
 {
 	head   = in_other.head;
 	signal = in_other.signal;
 	tag    = in_other.tag;
 }
 
-template<typename TSignalValue>
-CPUAwaiter<TSignalValue>::CPUAwaiter(CPUAwaiter&& in_other) noexcept
+CPUAwaiter::CPUAwaiter(CPUAwaiter&& in_other) noexcept
 {
 	head   = std::move(in_other.head);
 	signal = std::move(in_other.signal);
 	tag    = std::move(in_other.tag);
 }
 
-template<typename TSignalValue>
-CPUAwaiter<TSignalValue>& CPUAwaiter<TSignalValue>::operator=(CPUAwaiter const& in_other) noexcept
+CPUAwaiter& CPUAwaiter::operator=(CPUAwaiter const& in_other) noexcept
 {
 	TryDetach();
 
@@ -38,8 +31,7 @@ CPUAwaiter<TSignalValue>& CPUAwaiter<TSignalValue>::operator=(CPUAwaiter const& 
 	return *this;
 }
 
-template<typename TSignalValue>
-CPUAwaiter<TSignalValue>& CPUAwaiter<TSignalValue>::operator=(CPUAwaiter&& in_other) noexcept
+CPUAwaiter& CPUAwaiter::operator=(CPUAwaiter&& in_other) noexcept
 {
 	TryDetach();
 
@@ -50,14 +42,25 @@ CPUAwaiter<TSignalValue>& CPUAwaiter<TSignalValue>::operator=(CPUAwaiter&& in_ot
 	return *this;
 }
 
-template<typename TSignalValue>
-CPUAwaiter<TSignalValue>::~CPUAwaiter()
+RkBool CPUAwaiter::await_ready() const noexcept
+{
+	return Consumed();
+}
+
+RkBool CPUAwaiter::await_suspend(std::coroutine_handle<>) noexcept
+{
+	return TryAttach();
+}
+
+RkVoid CPUAwaiter::await_resume() const noexcept
+{}
+
+CPUAwaiter::~CPUAwaiter()
 {
 	TryDetach();
 }
 
-template<typename TSignalValue>
-RkBool CPUAwaiter<TSignalValue>::TryAttach() noexcept
+RkBool CPUAwaiter::TryAttach() noexcept
 {
 	CPUAwaiter* head_value {head->load(std::memory_order_acquire)};
 
@@ -85,20 +88,19 @@ RkBool CPUAwaiter<TSignalValue>::TryAttach() noexcept
 	return true;
 }
 
-template<typename TSignalValue>
-RkBool CPUAwaiter<TSignalValue>::TryDetach() noexcept
+RkBool CPUAwaiter::TryDetach() noexcept
 {
 	// If the awaiter hasn't been completed in due time,
 	// we need to detach it from the awaited event to cancel
 	// our wait without crashing later down the line
-	CPUAwaiter* next_val {next.load(std::memory_order_acquire)};
+	CPUAwaiter const* next_val {next.load(std::memory_order_acquire)};
 	if (next_val == detached || next_val == consumed)
 		return false;
 
 	// Attempting to detach from the awaited event by looking for our
 	// address though the list of suspensions
-	CPUAwaiterList<TSignalValue>* selection {head};
-	CPUAwaiter*					  expected  {this};
+	CPUAwaiterList* selection {head};
+	CPUAwaiter*		expected  {this};
 
 	// If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
 	while(!selection->compare_exchange_strong(expected, locked, std::memory_order_acq_rel, std::memory_order_acquire))
@@ -125,12 +127,7 @@ RkBool CPUAwaiter<TSignalValue>::TryDetach() noexcept
 	return true;
 }
 
-template<typename TSignalValue>
-RkBool CPUAwaiter<TSignalValue>::Consumed() const noexcept
+RkBool CPUAwaiter::Consumed() const noexcept
 {
 	return head && head->load(std::memory_order_acquire) == consumed;
 }
-
-
-END_RUKEN_NAMESPACE
-

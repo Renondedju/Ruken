@@ -5,7 +5,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TResult = RkVoid>
+template <CTaskResult TResult = RkVoid>
 using CPUDynamicTask = CPUTask<CPUDynamicQueue, TResult>;
 
 END_RUKEN_NAMESPACE

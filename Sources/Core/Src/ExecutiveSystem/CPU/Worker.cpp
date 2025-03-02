@@ -39,7 +39,7 @@ RkVoid Worker::ProcessQueues(std::vector<CPUQueue*> const& in_queues, std::stop_
 RkVoid Worker::Routine(std::stop_token&& in_stop_token, std::string&& in_name) const noexcept
 {
     WorkerInfo::name = in_name;
-    TracyCSetThreadName(in_name.c_str());
+    tracy::SetThreadNameWithHint(in_name.c_str(), 1);
 
     // This loop needs to be as small as possible in order to reduce latency
     while (!in_stop_token.stop_requested())

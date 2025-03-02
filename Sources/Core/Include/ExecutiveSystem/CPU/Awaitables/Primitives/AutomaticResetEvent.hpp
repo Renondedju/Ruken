@@ -4,33 +4,22 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TValue>
-struct AutomaticResetEvent: CPUAwaitable<TValue>
+struct AutomaticResetEvent: CPUAwaitable
 {
-	using Parent = CPUAwaitable<TValue>;
+	protected:
 
-	 AutomaticResetEvent()						 noexcept: Parent(m_continuation_node, &m_value) {}
-	~AutomaticResetEvent()					     noexcept {					    Parent::Consume(); }
-	RkVoid        Signal(TValue const& in_value) noexcept { m_value = in_value; Parent::Signal(); }
-	RkVoid	      Reset ()						 noexcept {					    Parent::Reset(); }
+		/// @brief Signals a completion to all the attached awaiters.
+		RkBool Signal() const noexcept;
 
-private:
-
-	TValue				   m_value			   {};
-	CPUAwaiterList<TValue> m_continuation_node {};
-};
-
-template <>
-struct AutomaticResetEvent<RkVoid>: CPUAwaitable<RkVoid>
-{
-	 AutomaticResetEvent() noexcept: CPUAwaitable(m_continuation_node) {}
-	~AutomaticResetEvent() noexcept { Consume(); }
-	RkVoid        Signal() noexcept { CPUAwaitable::Signal(); }
-	RkVoid	      Reset () noexcept { CPUAwaitable::Reset(); }
-
-private:
-
-	CPUAwaiterList<RkVoid> m_continuation_node {};
+		/**
+		 * @brief Signals a completion to a selected set of awaiters.
+		 * @param in_signal_if Predicate indicating if the passed awaiter should be signaled.
+		 * @returns True if the method signaled any awaiters.
+		 */
+		template <std::predicate<CPUAwaiter*> TSignalIf>
+		RkBool SignalIf(TSignalIf&& in_signal_if) const noexcept;
 };
 
 END_RUKEN_NAMESPACE
+
+#include "ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.inl"

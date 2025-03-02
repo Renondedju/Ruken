@@ -4,31 +4,19 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename TValue>
-struct ManualResetEvent: CPUAwaitable<TValue>
+struct ManualResetEvent: CPUAwaitable
 {
-	ManualResetEvent ()						  noexcept: CPUAwaitable<TValue> {m_continuation_node, &m_value} {}
-	~ManualResetEvent()					      noexcept { CPUAwaitable<TValue>::Consume(); }
-	RkVoid     Signal(TValue const& in_value) noexcept { m_value = in_value; CPUAwaitable<TValue>::Consume(true); }
-	RkVoid	   Reset ()						  noexcept { CPUAwaitable<TValue>::Reset(); }
+	/// @return Returns true if the event has already been completed, false otherwise
+	[[nodiscard]]
+	RkBool Consumed() const noexcept;
 
-	private:
+	protected:
 
-		TValue				   m_value			   {};
-		CPUAwaiterList<TValue> m_continuation_node {};
-};
+		/// @brief Resets the event, making it non consumed and ready to hook new awaiters.
+		RkVoid Reset() const noexcept;
 
-template <>
-struct ManualResetEvent<RkVoid>: CPUAwaitable<RkVoid>
-{
-	ManualResetEvent () noexcept: CPUAwaitable {m_continuation_node} {}
-	~ManualResetEvent() noexcept { Consume(); }
-	RkVoid     Signal() noexcept { Consume(true); }
-	RkVoid	   Reset () noexcept { CPUAwaitable::Reset(); }
-
-	private:
-
-		CPUAwaiterList<RkVoid> m_continuation_node {};
+		/// @brief Consumes and signals the list of awaiters.
+		RkBool SignalConsume() const noexcept;
 };
 
 END_RUKEN_NAMESPACE
