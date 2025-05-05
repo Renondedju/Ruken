@@ -7,48 +7,53 @@ BEGIN_RUKEN_NAMESPACE
 #pragma region Access
 
 template<std::default_initializable TData>
-SharedMutex<TData>::Access::Access(SharedMutex& in_mutex) noexcept:
+SharedMutex<TData>::ReadAccess::ReadAccess(SharedMutex& in_mutex) noexcept:
 	m_mutex {&in_mutex}
 {
 	// Acquire is called for us before construction to ensure thread safety
 }
 
 template<std::default_initializable TData>
-SharedMutex<TData>::Access::Access(Access const& in_other) noexcept:
+SharedMutex<TData>::ReadAccess::ReadAccess(ReadAccess const& in_other) noexcept:
 	m_mutex {in_other.m_mutex}
 {
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Acquire());
+	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_add(1, std::memory_order_acq_rel));
 }
 
 template<std::default_initializable TData>
-SharedMutex<TData>::Access::Access(Access&& in_other) noexcept:
+SharedMutex<TData>::ReadAccess::ReadAccess(ReadAccess&& in_other) noexcept:
 	m_mutex {in_other.m_mutex}
 {
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Acquire());
+	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_add(1, std::memory_order_acq_rel));
 }
 
 template<std::default_initializable TData>
-SharedMutex<TData>::Access::~Access() noexcept
+SharedMutex<TData>::ReadAccess::~ReadAccess() noexcept
 {
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Release());
+	if (m_mutex && m_mutex->m_concurrency.fetch_sub(1, std::memory_order_acq_rel) == 1)
+		m_mutex->ConsumeNext();
 }
 
 template<std::default_initializable TData>
-typename SharedMutex<TData>::Access& SharedMutex<TData>::Access::operator=(Access const& in_other) noexcept
+typename SharedMutex<TData>::ReadAccess& SharedMutex<TData>::ReadAccess::operator=(ReadAccess const& in_other) noexcept
 {
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Release());
+	if (m_mutex && m_mutex->m_concurrency.fetch_sub(1, std::memory_order_acq_rel) == 1)
+		m_mutex->ConsumeNext();
+
 	m_mutex = in_other.m_mutex;
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Acquire());
+	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_add(1, std::memory_order_acq_rel));
 
 	return *this;
 }
 
 template<std::default_initializable TData>
-typename SharedMutex<TData>::Access& SharedMutex<TData>::Access::operator=(Access&& in_other) noexcept
+typename SharedMutex<TData>::ReadAccess& SharedMutex<TData>::ReadAccess::operator=(ReadAccess&& in_other) noexcept
 {
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Release());
+	if (m_mutex && m_mutex->m_concurrency.fetch_sub(1, std::memory_order_acq_rel) == 1)
+		m_mutex->ConsumeNext();
+
 	m_mutex = std::move(in_other.m_mutex);
-	RUKEN_SAFE_POINTER_CALL(m_mutex, Acquire());
+	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_add(1, std::memory_order_acq_rel));
 
 	return *this;
 }
@@ -56,13 +61,46 @@ typename SharedMutex<TData>::Access& SharedMutex<TData>::Access::operator=(Acces
 template<std::default_initializable TData>
 TData const& SharedMutex<TData>::ReadAccess::operator*() const noexcept
 {
-	return Access::m_mutex->m_shared_data;
+	return m_mutex->m_data;
+}
+
+template<std::default_initializable TData>
+SharedMutex<TData>::WriteAccess::WriteAccess(SharedMutex& in_mutex) noexcept:
+	m_mutex {&in_mutex}
+{
+	// Acquire is called for us before construction to ensure thread safety
+}
+
+template<std::default_initializable TData>
+SharedMutex<TData>::WriteAccess::WriteAccess(WriteAccess&& in_other) noexcept:
+	m_mutex {in_other.m_mutex}
+{
+	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_sub(1, std::memory_order_acq_rel));
+}
+
+template<std::default_initializable TData>
+SharedMutex<TData>::WriteAccess::~WriteAccess() noexcept
+{
+	if (m_mutex && m_mutex->m_concurrency.fetch_add(1, std::memory_order_acq_rel) == -1)
+		m_mutex->ConsumeNext();
+}
+
+template<std::default_initializable TData>
+typename SharedMutex<TData>::WriteAccess& SharedMutex<TData>::WriteAccess::operator=(WriteAccess&& in_other) noexcept
+{
+	if (m_mutex && m_mutex->m_concurrency.fetch_add(1, std::memory_order_acq_rel) == -1)
+		m_mutex->ConsumeNext();
+
+	m_mutex = std::move(in_other.m_mutex);
+	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_sub(1, std::memory_order_acq_rel));
+
+	return *this;
 }
 
 template<std::default_initializable TData>
 TData& SharedMutex<TData>::WriteAccess::operator*() noexcept
 {
-	return Access::m_mutex->m_shared_data;
+	return m_mutex->m_data;
 }
 
 #pragma endregion
@@ -70,40 +108,27 @@ TData& SharedMutex<TData>::WriteAccess::operator*() noexcept
 #pragma region SharedMutex
 
 template<std::default_initializable TData>
-RkVoid SharedMutex<TData>::Acquire() noexcept
-{
-	TracyCPlotI("concurrency", m_concurrency.fetch_add(1, std::memory_order_acq_rel) + 1);
-}
-
-template<std::default_initializable TData>
-RkVoid SharedMutex<TData>::Release() noexcept
-{
-	auto const value = m_concurrency.fetch_sub(1, std::memory_order_acq_rel) - 1;
-	TracyCPlotI("concurrency", value);
-	if (value == 0)
-		ConsumeNext();
-}
-
-template<std::default_initializable TData>
 RkVoid SharedMutex<TData>::ConsumeNext() noexcept
 {
 	// This is safe because consume signals the previous awaiter only after calling this function for the next awaiter.
-	auto can_consume = [&](CPUAwaiter const* in_awaiter) -> RkBool
-	{
-		RkBool const condition = {
-			in_awaiter->tag == static_cast<RkUint64>(EAccessType::Read) ||
-		   (in_awaiter->tag == static_cast<RkUint64>(EAccessType::Write) && m_concurrency.load(std::memory_order_acquire) == 0)
-		};
+	m_awaitable.SignalConsumeIf([&](auto const* in_awaiter) {
+		return CanSignal(in_awaiter);
+	});
+}
 
-		if (condition)
-			Acquire();
+template<std::default_initializable TData>
+RkBool SharedMutex<TData>::CanSignal(CPUAwaiter const* in_awaiter) noexcept
+{
+	// A negative concurrency represents write accesses
+	// Positive concurrency represents read accesses
+	RkInt64 const concurrency {m_concurrency.load(std::memory_order_acquire)};
+	RkBool  const read        {in_awaiter->tag == static_cast<RkUint64>(EAccessType::Read ) && concurrency >= 0};
+	RkBool  const write       {in_awaiter->tag == static_cast<RkUint64>(EAccessType::Write) && concurrency == 0};
 
-		return condition;
-	};
+	if (read ) m_concurrency.fetch_add(1, std::memory_order_acq_rel);
+	if (write) m_concurrency.fetch_sub(1, std::memory_order_acq_rel);
 
-	auto count = m_awaitable.SignalConsumeIf(can_consume);
-
-	TracyCPlotI("SignalConsumeIf()", count);
+	return read || write;
 }
 
 template<std::default_initializable TData>
@@ -162,37 +187,36 @@ RkBool SharedMutex<TData>::Awaiter::await_suspend(std::coroutine_handle<>) noexc
 	CPUAwaiterList* selection {head};
 	CPUAwaiter*     continuation;
 
-	TracyMessageL("Start Attach");
-
 	// Waiting for a lock on the head and acquiring it as soon as possible
 	while ((continuation = selection->exchange(locked, std::memory_order_acq_rel)) == locked)
 		_mm_pause();
 
-	// Starting the "consume chain reaction" if it wasn't started already without actually attaching to the mutex
-	if (continuation == nullptr && mutex->m_concurrency.load(std::memory_order_acquire) == 0)
+	// Fast Path: Starting the "consume chain reaction" if it wasn't started already without actually attaching
+	if (continuation == nullptr && mutex->CanSignal(this))
 	{
-		mutex->Acquire();
-		head ->store(nullptr, std::memory_order_release);
-
-		TracyMessageL("No attach, manual start");
+		head->store(nullptr, std::memory_order_release);
 		return false;
 	}
 
-	// Getting to the end of the list and wait for locks in the process
-	CPUAwaiter* first {continuation};
-	while (continuation != nullptr)
-	{
-		if (continuation != locked && continuation != detached && continuation != consumed)
-			selection = &continuation->next;
-
-		continuation = selection->load(std::memory_order_acquire);
-	}
+	next = nullptr;
 
 	// Finally, attaching and releasing the lock
-	selection->store(this , std::memory_order_release);
-	head	 ->store(first, std::memory_order_release);
+	if (CPUAwaiter* first {continuation}; first == nullptr)
+		head->store(this, std::memory_order_release);
 
-	TracyMessageL("Attached, auto start");
+	else
+	{
+		// Getting to the end of the list and wait for locks in the process
+		while (continuation != nullptr)
+		{
+			selection    = &continuation->next;
+			continuation = selection->load(std::memory_order_acquire);
+		}
+
+		selection->store(this,  std::memory_order_release);
+		head     ->store(first, std::memory_order_release);
+	}
+
 	return true;
 }
 

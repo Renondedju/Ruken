@@ -20,24 +20,39 @@ struct SharedMutex
 {
 	#pragma region Access
 
-	struct Access
+	struct ReadAccess
 	{
-		explicit Access() = default;
-		explicit Access(SharedMutex&) noexcept;
-		Access (Access const&)		  noexcept;
-		Access (Access&&     )		  noexcept;
-		~Access()		  			  noexcept;
+		explicit ReadAccess() = default;
+		explicit ReadAccess(SharedMutex&) noexcept;
+		 ReadAccess(ReadAccess const&)	  noexcept;
+		 ReadAccess(ReadAccess&&     )	  noexcept;
+		~ReadAccess()		  			  noexcept;
 
-		Access& operator=(Access const&) noexcept;
-		Access& operator=(Access&&     ) noexcept;
+		ReadAccess&  operator=(ReadAccess const&) noexcept;
+		ReadAccess&  operator=(ReadAccess&&     ) noexcept;
+		TData const& operator*()		    const noexcept;
 
 	protected:
 
 		SharedMutex* m_mutex {};
 	};
 
-	struct ReadAccess : Access { using Access::Access; TData const& operator*() const noexcept; };
-	struct WriteAccess: Access { using Access::Access; TData&       operator*()       noexcept; };
+	struct WriteAccess
+	{
+		explicit WriteAccess()						= default;
+		explicit WriteAccess(SharedMutex&) noexcept;
+		 WriteAccess(WriteAccess const&)   noexcept = delete;
+		 WriteAccess(WriteAccess&&     )   noexcept;
+		~WriteAccess()		  			   noexcept;
+
+		WriteAccess& operator=(WriteAccess const&) noexcept = delete;
+		WriteAccess& operator=(WriteAccess&&     ) noexcept;
+		TData&       operator*()                   noexcept;
+
+	protected:
+
+		SharedMutex* m_mutex {};
+	};
 
 	#pragma endregion
 
@@ -47,15 +62,11 @@ struct SharedMutex
 	auto AsyncRead () noexcept { return MakeAwaitable<ReadAccess >(EAccessType::Read ); }
 	auto AsyncWrite() noexcept { return MakeAwaitable<WriteAccess>(EAccessType::Write); }
 
-	/**
-	 * Consumes the following awaiters if any.
-	 * The method is thread safe and will only trigger if concurrency equals 0.
-	 */
-	RkVoid ConsumeNext() noexcept;
-
 	#pragma endregion
 
 	private:
+
+		#pragma region Awaitables
 
 		struct Awaitable: CPUAwaitable
 		{
@@ -79,21 +90,20 @@ struct SharedMutex
 			RkBool await_suspend(std::coroutine_handle<>)       noexcept;
 		};
 
+		#pragma endregion
+
+		friend ReadAccess;
+		friend WriteAccess;
+
 		#pragma region Members
 
-		TData				 m_shared_data {};
-		std::atomic_uint64_t m_concurrency {};
-		Awaitable            m_awaitable   {};
+		TData		     	m_data        {};
+		std::atomic_int64_t m_concurrency {};
+		Awaitable           m_awaitable   {};
 
 		#pragma endregion
 
 		#pragma region Methods
-
-		friend Access;
-
-		// Acquire/Release access
-		RkVoid Acquire() noexcept;
-		RkVoid Release() noexcept;
 
 		/**
 		 * Creates an async event that returns access to the underlying data
@@ -103,6 +113,19 @@ struct SharedMutex
 		 */
 		template <typename TAccess>
 		auto MakeAwaitable(EAccessType in_access_type) noexcept;
+
+		/**
+		* Consumes the following awaiters if any.
+		* The method is thread safe and will only trigger if concurrency equals 0.
+		*/
+		RkVoid ConsumeNext() noexcept;
+
+		/**
+		 * Checks if an awaiter can be signaled based on the current state of the mutex.
+		 * @param in_awaiter Awaiter to check for.
+		 * @return True if the awaiter can be signaled.
+		 */
+		RkBool CanSignal(CPUAwaiter const* in_awaiter) noexcept;
 
 		#pragma endregion
 };

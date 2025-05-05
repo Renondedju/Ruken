@@ -52,14 +52,14 @@ struct AsyncLoop
 
 CPUTask<MainQueue> Read(SharedMutex<RkInt64>& in_mutex) {
     auto access = co_await in_mutex.AsyncRead();
-    TracyMessageL("Reading !");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 CPUTask<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
     auto access = co_await in_mutex.AsyncWrite();
-    TracyMessageL("Writing !");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     (*access)++;
-};
+}
 
 /**
  * Asynchronous main
@@ -70,20 +70,19 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
 {
     SharedMutex<RkInt64> mutex {};
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    auto const vector = {
+    co_await WhenAll<CPUTask<MainQueue>> ({
+        Read (mutex),
+        Read (mutex),
         Write(mutex),
         Read (mutex),
         Read (mutex),
         Read (mutex),
         Write(mutex),
         Write(mutex),
-        Write(mutex)
-    };
-    co_await WhenAll<CPUTask<MainQueue>>(vector);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        Write(mutex),
+        Read (mutex),
+        Read (mutex)
+    });
 
     in_stop_source.request_stop();
 
