@@ -2,7 +2,7 @@
 
 #include "Build/Namespace.hpp"
 
-#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
+#include "ExecutiveSystem/Awaitables/Tasks/DynamicTask.hpp"
 
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/EEventName.hpp"
@@ -59,7 +59,7 @@ class EventHandlerBase
         /**
          * \brief Runs the event handler
          */
-        virtual CPUDynamicTask<RkVoid> Execute() noexcept = 0;
+        virtual DynamicTask<RkVoid> Execute() noexcept = 0;
 
         #pragma endregion
 };

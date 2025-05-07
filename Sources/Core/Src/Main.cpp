@@ -4,18 +4,16 @@
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
-#include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
+#include "ExecutiveSystem/JobSystem.hpp"
+#include "ExecutiveSystem/Queues/QueueHandle.hpp"
+#include "ExecutiveSystem/Awaitables/Tasks/Task.hpp"
+#include "ExecutiveSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include <tracy/Tracy.hpp>
-#include <functional>
-
-#include "ExecutiveSystem/CPU/Awaitables/Primitives/SharedMutex.hpp"
 
 USING_RUKEN_NAMESPACE
 
-struct MainQueue : CPUQueueHandle<MainQueue, 2048>
+struct MainQueue : QueueHandle<MainQueue, 2048>
 {};
 
 struct AsyncLoop
@@ -24,7 +22,7 @@ struct AsyncLoop
     EntityAdmin scene;
 
     [[nodiscard]]
-    CPUTask<MainQueue> Run() noexcept
+    Task<MainQueue> Run() noexcept
     {
         scene.CreateSystem<CounterSystem>();
         for (int i = 0; i < 10'000'000; i++)
@@ -50,12 +48,12 @@ struct AsyncLoop
     }
 };
 
-CPUTask<MainQueue> Read(SharedMutex<RkInt64>& in_mutex) {
+Task<MainQueue> Read(SharedMutex<RkInt64>& in_mutex) {
     auto access = co_await in_mutex.AsyncRead();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
-CPUTask<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
+Task<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
     auto access = co_await in_mutex.AsyncWrite();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     (*access)++;
@@ -66,11 +64,11 @@ CPUTask<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
  * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
  * @param in_service_provider Service Provider
  */
-CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
+Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
 {
     SharedMutex<RkInt64> mutex {};
 
-    co_await WhenAll<CPUTask<MainQueue>> ({
+    co_await WhenAll<Task<MainQueue>> ({
         Read (mutex),
         Read (mutex),
         Write(mutex),
@@ -97,17 +95,19 @@ CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& 
  */
 int main(int in_argc, char* in_argv[])
 {
-    CentralProcessingUnit cpu      {};
-    ServiceProvider       services {};
+    // Initializing services and core systems
+    JobSystem       job_system {};
+    ServiceProvider services   {};
 
     std::stop_source stop_source {};
 
+    // Pushing async main to the MainQueue
     AsyncMain(stop_source, services);
 
-    cpu.RegisterQueue(MainQueue::instance);
-    cpu.StartWorkers ();
-
-    cpu.CallerAsWorker(stop_source.get_token());
+    // Running the job system
+    job_system.RegisterQueue (MainQueue::instance);
+    job_system.StartWorkers  ();
+    job_system.CallerAsWorker(stop_source.get_token());
 
     return 0;
 }

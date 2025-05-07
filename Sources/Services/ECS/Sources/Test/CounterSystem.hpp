@@ -4,7 +4,7 @@
 #include "ECS/EventHandler.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
-#include "ExecutiveSystem/CPU/Awaitables/Primitives/WhenAll.hpp"
+#include "ExecutiveSystem/Awaitables/Primitives/WhenAll.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -27,7 +27,7 @@ struct CounterSystem final: System
      */
     struct StartHandler final: EventHandler<EEventName::OnStart, CounterComponent::CountField>
     {
-	    static CPUDynamicTask<RkVoid> ProcessChunk(LinkedChunkListNode<RkSize>& in_node) noexcept
+	    static DynamicTask<RkVoid> ProcessChunk(LinkedChunkListNode<RkSize>& in_node) noexcept
         {
             for (auto& data: in_node.data)
                 data++;
@@ -35,7 +35,7 @@ struct CounterSystem final: System
             co_return;
         }
 
-        CPUDynamicTask<RkVoid> Execute() noexcept override
+        DynamicTask<RkVoid> Execute() noexcept override
         {
             RkSize task_count {0};
             for (auto const& archetype: m_archetypes)
@@ -46,8 +46,8 @@ struct CounterSystem final: System
                     .GetSize();
             }
 
-            std::vector<CPUDynamicTask<RkVoid>> tasks {task_count};
-            RkSize                              index {0};
+            std::vector<DynamicTask<RkVoid>> tasks {task_count};
+            RkSize                           index {0};
             for (auto const& archetype: m_archetypes)
             {
                 auto& container = archetype.get()
