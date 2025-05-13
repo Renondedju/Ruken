@@ -1,88 +1,113 @@
 #include "Core/Kernel.hpp"
-#include "ExecutiveSystem/CPU/CentralProcessingUnit.hpp"
-#include "ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
-
-#include <tracy/Tracy.hpp>
-#include <functional>
-
 #include "Core/Exception.hpp"
+
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
+#include "ExecutiveSystem/JobSystem.hpp"
+#include "ExecutiveSystem/Queues/QueueHandle.hpp"
+#include "ExecutiveSystem/Awaitables/Tasks/Task.hpp"
+#include "ExecutiveSystem/Awaitables/Primitives/SharedMutex.hpp"
+
+#include <tracy/Tracy.hpp>
+
 USING_RUKEN_NAMESPACE
 
-struct MainQueue : CPUQueueHandle<MainQueue, 2048>
+struct MainQueue : QueueHandle<MainQueue, 2048>
 {};
 
 struct AsyncLoop
 {
     const char* name;
-    EntityAdmin domain;
-
-    CPUDynamicTask<> SometimesThrows()
-    {
-        if (rand() % 100 == 0)
-            throw Exception("Random exception");
-
-        co_return;
-    }
+    EntityAdmin scene;
 
     [[nodiscard]]
-    CPUDynamicTask<> Run() noexcept
+    Task<MainQueue> Run() noexcept
     {
-        domain.CreateSystem<CounterSystem>();
+        scene.CreateSystem<CounterSystem>();
         for (int i = 0; i < 10'000'000; i++)
-            domain.CreateEntity<CounterComponent>();
+            scene.CreateEntity<CounterComponent>();
 
-        co_await domain.ExecuteEvent(EEventName::OnStart);
+        co_await scene.ExecuteEvent(EEventName::OnStart);
+        // ^^^   At this point the function is paused, and an awaiter is attached
+        //       to the synchronisation primitive returned by the invocation of the task.
 
-        for (int i = 0; i < 2000; ++i)
+        // When the awaited primitive is signaled (in this case when the task is done),
+        // the Run() coroutine is then scheduled back into the MainQueue, waiting to be picked up
+        // by the first available thread.
+
+        // Main loop
+        for (int i = 0; i < 200; ++i)
         {
-            co_await domain.ExecuteEvent(EEventName::OnStart);
-
-            SometimesThrows();
+            co_await scene.ExecuteEvent(EEventName::OnStart);
 
             FrameMark;
-            FrameMarkNamed(name);
         }
 
-        co_await domain.ExecuteEvent(EEventName::OnEnd);
+        co_await scene.ExecuteEvent(EEventName::OnEnd);
     }
 };
 
-CPUTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
-{
-    AsyncLoop loop {
-        .name   = "Game loop",
-        .domain = EntityAdmin {in_service_provider}
-    };
-
-    try
-    { co_await loop.Run(); }
-    catch (Exception& in_exception)
-    {
-        std::string const what {in_exception};
-        TracyMessageC(what.c_str(), what.length(), 0xFF0000);
-    }
-
-    in_stop_source.request_stop();
+Task<MainQueue> Read(SharedMutex<RkInt64>& in_mutex) {
+    auto access = co_await in_mutex.AsyncRead();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
+Task<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
+    auto access = co_await in_mutex.AsyncWrite();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    (*access)++;
+}
+
+/**
+ * Asynchronous main
+ * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
+ * @param in_service_provider Service Provider
+ */
+Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
+{
+    SharedMutex<RkInt64> mutex {};
+
+    co_await WhenAll<Task<MainQueue>> ({
+        Read (mutex),
+        Read (mutex),
+        Write(mutex),
+        Read (mutex),
+        Read (mutex),
+        Read (mutex),
+        Write(mutex),
+        Write(mutex),
+        Write(mutex),
+        Read (mutex),
+        Read (mutex)
+    });
+
+    in_stop_source.request_stop();
+
+    co_return;
+}
+
+/**
+ * Initializes services and waits for the async main function to request a stop.
+ * @param in_argc Argument count
+ * @param in_argv Argument values
+ * @return Error code
+ */
 int main(int in_argc, char* in_argv[])
 {
-    CentralProcessingUnit cpu      {};
-    ServiceProvider       services {};
+    // Initializing services and core systems
+    JobSystem       job_system {};
+    ServiceProvider services   {};
 
     std::stop_source stop_source {};
 
+    // Pushing async main to the MainQueue
     AsyncMain(stop_source, services);
 
-    cpu.RegisterQueue(MainQueue::instance);
-    cpu.StartWorkers ();
-
-    cpu.CallerAsWorker(stop_source.get_token());
+    // Running the job system
+    job_system.RegisterQueue (MainQueue::instance);
+    job_system.StartWorkers  ();
+    job_system.CallerAsWorker(stop_source.get_token());
 
     return 0;
 }

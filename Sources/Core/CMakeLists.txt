@@ -6,7 +6,7 @@ set(TRACY_NO_FRAME_IMAGE ON)
 set(TRACY_NO_SAMPLING ON)
 set(TRACY_NO_VERIFY ON)
 
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.10.zip" NAME tracy)
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.11.1.zip" NAME tracy)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
 CPMAddPackage(URL "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.6.zip" NAME magic_enum)
@@ -22,8 +22,7 @@ endif()
 # atomic_queue has no CMake support and is a header only library
 if (atomic_queue_ADDED)
     FILE(GLOB atomic_queue_sources ${atomic_queue_SOURCE_DIR}/include/atomic_queue/*.h)
-    add_library(atomic_queue INTERFACE ${atomic_queue_sources}
-            Src/ExecutiveSystem/CPU/Continuations/CPUContinuationNode.cpp)
+    add_library(atomic_queue INTERFACE ${atomic_queue_sources})
     target_include_directories(atomic_queue INTERFACE $<BUILD_INTERFACE:${atomic_queue_SOURCE_DIR}/include>)
 endif()
 
@@ -37,37 +36,22 @@ add_library(RkCore STATIC
         Include/Containers/LinkedChunkList.hpp
         Include/Containers/LinkedChunkListNode.hpp
         Include/ExecutiveSystem/Concepts/CAwaitable.hpp
-        Include/ExecutiveSystem/Concepts/CProcessingQueue.hpp
-        Include/ExecutiveSystem/Concepts/CProcessingUnit.hpp
         Include/ExecutiveSystem/Concepts/CQueueHandle.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Primitives/AutomaticResetEvent.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Primitives/ManualResetEvent.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTask.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Tasks/CPUTaskPromise.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUContinuation.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUTaskContinuation.hpp
-        Include/ExecutiveSystem/CPU/Queues/CPUQueue.hpp
-        Include/ExecutiveSystem/CPU/Queues/CPUDynamicQueue.hpp
-        Include/ExecutiveSystem/CPU/Queues/CPUQueueHandle.hpp
-        Include/ExecutiveSystem/CPU/CentralProcessingUnit.hpp
-        Include/ExecutiveSystem/CPU/ConcurrencyCounter.hpp
-        Include/ExecutiveSystem/CPU/Worker.hpp
-        Include/ExecutiveSystem/CPU/WorkerInfo.hpp
-        Include/ExecutiveSystem/GPU/GraphicsProcessingQueue.hpp
-        Include/ExecutiveSystem/GPU/GraphicsProcessingUnit.hpp
-        Include/ExecutiveSystem/Awaitable.hpp
-        Include/ExecutiveSystem/Awaiter.hpp
-        Include/ExecutiveSystem/EExecutionPolicy.hpp
-        Include/ExecutiveSystem/EInstructionType.hpp
-        Include/ExecutiveSystem/EventBridge.hpp
-        Include/ExecutiveSystem/ProcessingQueue.hpp
-        Include/ExecutiveSystem/ProcessingUnit.hpp
-        Include/ExecutiveSystem/Promise.hpp
-        Include/ExecutiveSystem/QueueHandle.hpp
-        Include/ExecutiveSystem/Task.hpp
+        Include/ExecutiveSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
+        Include/ExecutiveSystem/Awaitables/Primitives/CountDownLatch.hpp
+        Include/ExecutiveSystem/Awaitables/Primitives/ManualResetEvent.hpp
+        Include/ExecutiveSystem/Awaitables/Tasks/DynamicTask.hpp
+        Include/ExecutiveSystem/Awaitables/Tasks/Task.hpp
+        Include/ExecutiveSystem/Awaitables/Tasks/TaskPromise.hpp
+        Include/ExecutiveSystem/Awaitables/Awaitable.hpp
+        Include/ExecutiveSystem/Awaitables/Tasks/TaskAwaiter.hpp
+        Include/ExecutiveSystem/Queues/JobQueue.hpp
+        Include/ExecutiveSystem/Queues/DynamicQueue.hpp
+        Include/ExecutiveSystem/Queues/QueueHandle.hpp
+        Include/ExecutiveSystem/JobSystem.hpp
+        Include/ExecutiveSystem/ConcurrencyCounter.hpp
+        Include/ExecutiveSystem/Worker.hpp
+        Include/ExecutiveSystem/WorkerInfo.hpp
         Include/Core/EInitializationStatus.hpp
         Include/Core/Exception.hpp
         Include/Core/Service.hpp
@@ -213,12 +197,11 @@ add_library(RkCore STATIC
         Src/Bitwise/Bitmask.inl
         Src/Bitwise/SizedBitmask.inl
         Src/Containers/LinkedChunkList.inl
-        Src/ExecutiveSystem/CPU/Awaitables/Primitives/CountDownLatch.cpp
-        Src/ExecutiveSystem/CPU/Awaitables/CPUTask.inl
-        Src/ExecutiveSystem/CPU/Continuations/CPUContinuation.inl
-        Src/ExecutiveSystem/CPU/CPUQueue.cpp
-        Src/ExecutiveSystem/CPU/CentralProcessingUnit.cpp
-        Src/ExecutiveSystem/CPU/Worker.cpp
+        Src/ExecutiveSystem/Awaitables/Primitives/CountDownLatch.cpp
+        Src/ExecutiveSystem/Awaitables/Task.inl
+        Src/ExecutiveSystem/JobQueue.cpp
+        Src/ExecutiveSystem/JobSystem.cpp
+        Src/ExecutiveSystem/Worker.cpp
         Src/Core/Service.inl
         Src/Core/ServiceBase.cpp
         Src/Core/ServiceProvider.cpp
@@ -266,12 +249,19 @@ add_library(RkCore STATIC
         Include/Resource/ResourceProcessingFailure.hpp
         Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
-        Src/ExecutiveSystem/CPU/Awaitables/CPUTaskPromise.inl
-        Src/ExecutiveSystem/CPU/Awaitables/CPUAwaitable.inl
+        Src/ExecutiveSystem/Awaitables/TaskPromise.inl
+        Src/ExecutiveSystem/Awaitables/Awaitable.cpp
         Include/Meta/FirstOf.hpp
-        Include/ExecutiveSystem/CPU/Awaitables/Primitives/WhenAll.hpp
-        Include/ExecutiveSystem/CPU/Continuations/CPUContinuationNode.hpp
-        Src/ExecutiveSystem/CPU/Continuations/CPUContinuationNode.cpp
+        Include/ExecutiveSystem/Awaitables/Primitives/WhenAll.hpp
+        Include/ExecutiveSystem/Awaitables/Signal.hpp
+        Include/ExecutiveSystem/Awaitables/Awaiter.hpp
+        Include/ExecutiveSystem/Awaitables/Primitives/SharedMutex.hpp
+        Src/ExecutiveSystem/Awaitables/Awaiter.cpp
+        Src/ExecutiveSystem/Awaitables/Primitives/SharedMutex.inl
+        Src/ExecutiveSystem/Awaitables/Primitives/ManualResetEvent.cpp
+        Src/ExecutiveSystem/Awaitables/Primitives/AutomaticResetEvent.cpp
+        Src/ExecutiveSystem/Awaitables/Primitives/AutomaticResetEvent.inl
+        Include/ExecutiveSystem/Concepts/CTaskResult.hpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

@@ -49,7 +49,9 @@ get_property(RUKEN_SERVICE_LIBS GLOBAL PROPERTY RUKEN_SERVICE_LIBS)
 # --- Executable
 
 add_compile_definitions(UNICODE _UNICODE)
-add_executable(Ruken Sources/Core/Src/Main.cpp)
+add_executable(Ruken Sources/Core/Src/Main.cpp
+        Sources/Src/Test.hpp
+)
 
 target_compile_definitions(Ruken PRIVATE RUKEN_PROJECT_NAME="Ruken")
 

@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "Core/Service.hpp"
-#include "ExecutiveSystem/CPU/Awaitables/Tasks/CPUDynamicTask.hpp"
+#include "ExecutiveSystem/Awaitables/Tasks/DynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
 #include "ECS/System.hpp"
@@ -67,7 +67,7 @@ class EntityAdmin final: public Service<EntityAdmin>
          * \brief Starts the execution of an event type
          * \param in_event_name Event type to execute
          */
-        CPUDynamicTask<RkVoid> ExecuteEvent(EEventName in_event_name) const noexcept;
+        DynamicTask<> ExecuteEvent(EEventName in_event_name) const noexcept;
 
         // --- Entity / Systems lifetime manipulation
 
