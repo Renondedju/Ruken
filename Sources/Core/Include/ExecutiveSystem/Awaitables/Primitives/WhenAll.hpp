@@ -20,7 +20,7 @@ struct WhenAll: CountDownLatch
 		for (int i = 0; i < in_awaitables.size(); i++)
 		{
 			m_awaiters[i]		 = in_awaitables[i].operator co_await();
-			m_awaiters[i].signal = ruken::Signal(*this);
+			m_awaiters[i].signal = SignalReceiver(*this);
 
 			// Trying to suspend
 			if (!m_awaiters[i].await_ready  () &&
@@ -48,7 +48,7 @@ auto WhenAllVariadic(TAwaitables const&... in_awaitables) ->
 		([&](auto& in_awaiter, auto const& in_awaitable)
 		{
 			in_awaiter		  = in_awaitable.operator co_await();
-			in_awaiter.signal = Signal(latch);
+			in_awaiter.signal = SignalReceiver(latch);
 
 			// Trying to suspend
 			if (!in_awaiter.await_ready  () &&

@@ -99,7 +99,7 @@ struct SharedMutex
 
 		TData		     	m_data        {};
 		std::atomic_int64_t m_concurrency {};
-		MutexAwaitable           m_awaitable   {};
+		MutexAwaitable      m_awaitable   {};
 
 		#pragma endregion
 

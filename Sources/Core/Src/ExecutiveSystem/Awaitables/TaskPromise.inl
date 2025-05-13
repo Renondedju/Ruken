@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Core/Exception.hpp"
-#include "ExecutiveSystem/Awaitables/Signal.hpp"
+#include "ExecutiveSystem/Awaitables/SignalReceiver.hpp"
 #include "ExecutiveSystem/Awaitables/Tasks/TaskAwaiter.hpp"
 #include "ExecutiveSystem/Awaitables/Tasks/TaskPromise.hpp"
 
@@ -35,7 +35,7 @@ auto TaskPromiseBase<TQueueHandle, TResult>::await_transform(
 					task			{in_task},
 					source_location {in_source_location}
 				{
-					TAwaiter::signal = ruken::Signal(*this);
+					TAwaiter::signal = SignalReceiver(*this);
 				}
 
 				TThis&				 task;
@@ -131,7 +131,7 @@ void TaskPromiseBase<TQueueHandle, TResult>::unhandled_exception() noexcept
 	}
 	catch (Exception& in_exception)
 	{
-		std::string const what {in_exception};
+		std::string const what {std::format("{}", in_exception)};
 		TracyMessageC(what.c_str(), what.length(), 0xFF0000);
 	}
 

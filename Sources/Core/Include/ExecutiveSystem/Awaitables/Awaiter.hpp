@@ -1,9 +1,10 @@
 #pragma once
 
-#include <coroutine>
-
 #include "Build/Namespace.hpp"
-#include "ExecutiveSystem/Awaitables/Signal.hpp"
+#include "ExecutiveSystem/Awaitables/SignalReceiver.hpp"
+
+#include <atomic>
+#include <coroutine>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -23,14 +24,14 @@ using AwaiterList = std::atomic<Awaiter*>;
  */
 struct Awaiter
 {
-	static inline auto locked   {reinterpret_cast<Awaiter* const>(0x1)};
-	static inline auto consumed {reinterpret_cast<Awaiter* const>(0x2)};
-	static inline auto detached {reinterpret_cast<Awaiter* const>(0x3)};
+	static inline auto const locked   {reinterpret_cast<Awaiter* const>(0x1)};
+	static inline auto const consumed {reinterpret_cast<Awaiter* const>(0x2)};
+	static inline auto const detached {reinterpret_cast<Awaiter* const>(0x3)};
 
-	AwaiterList* head   {nullptr};	///< Reference to the head of the list
-	AwaiterList  next   {detached}; ///< Next awaiter in the list
-	Signal       signal {};
-	RkUint64     tag    {};
+	AwaiterList*   head   {nullptr};	///< Reference to the head of the list
+	AwaiterList    next   {detached}; ///< Next awaiter in the list
+	SignalReceiver signal {};
+	RkUint64       tag    {};
 
 	#pragma region Lifetime
 

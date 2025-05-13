@@ -9,8 +9,6 @@ BEGIN_RUKEN_NAMESPACE
 class JobQueue;
 
 /**
- * \brief Central Processing Unit
- *
  * This class contains the thread pool required to execute the different tasks.
  * Execution is immediate (greedy) and does not require submission.
  */
