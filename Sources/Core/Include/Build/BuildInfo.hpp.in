@@ -33,6 +33,7 @@ struct BuildInfo
     static constexpr bool         HasDebugInfo   {${RUKEN_BUILD_HAS_DEBUG_INFO}};
     static constexpr bool         HeadlessBuild  {${RUKEN_HEADLESS_BUILD}};
     static constexpr bool         TraceBuild     {${RUKEN_TRACE_BUILD}};
+    static constexpr bool         BreakOnError   {${RUKEN_BREAK_ON_ERROR}}; // The engine always breaks for fatal logs
 
     static const char* Version;
     static const char* Revision;
@@ -40,8 +41,10 @@ struct BuildInfo
 
 #cmakedefine RUKEN_HEADLESS_BUILD
 #cmakedefine RUKEN_TRACE_BUILD
+#cmakedefine RUKEN_BREAK_ON_ERROR
 
 #cmakedefine01 RUKEN_TRACE_SHOW_WORKER_ZONES
+#cmakedefine01 RUKEN_TRACE_SHOW_LOGGER_ZONES
 
 #define RUKEN_COMPILER_${CMAKE_CXX_COMPILER_ID}
 #define RUKEN_OS_${SYSTEM_NAME_TOUPPER}

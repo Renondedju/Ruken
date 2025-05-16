@@ -13,7 +13,7 @@ BEGIN_RUKEN_NAMESPACE
  * \tparam TService Service type
  * \tparam TRequired Is the service required for the kernel to boot ?
  */
-template <ServiceType TService, RkBool TRequired>
+template <CService TService, RkBool TRequired>
 struct ServiceLoader
 {
     using Service = TService;

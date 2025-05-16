@@ -4,7 +4,7 @@
 #include "ECS/EventHandler.hpp"
 #include "ECS/Test/CounterComponent.hpp"
 
-#include "ExecutiveSystem/Awaitables/Primitives/WhenAll.hpp"
+#include "JobSystem/Awaitables/Primitives/WhenAll.hpp"
 
 USING_RUKEN_NAMESPACE
 

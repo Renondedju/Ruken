@@ -11,46 +11,38 @@ BEGIN_RUKEN_NAMESPACE
  *        (based on the log messages�' severity) to the handler�'s specified destination.
  * \note  Logger objects can add zero or more handler objects to themselves with an "AddHandler" method.
  */
-class RUKEN_NO_VTABLE LogHandler
+class LogHandler
 {
     protected:
 
         #pragma region Members
 
-        LogFormatter const& m_formatter {};
-
-        ThreadSafeLockQueue<LogRecord> m_records {};
+        LogFormatter const&            m_formatter {};
+        ThreadSafeLockQueue<LogRecord> m_records   {};
 
         #pragma endregion
 
     public:
 
-        #pragma region Contructors
+        #pragma region Lifetime
 
         explicit LogHandler(LogFormatter const& in_formatter) noexcept;
 
         LogHandler(LogHandler const& in_copy) = delete;
         LogHandler(LogHandler&&      in_move) = delete;
+        LogHandler& operator=(LogHandler const& in_other) = delete;
+        LogHandler& operator=(LogHandler&&      in_other) = delete;
 
         virtual ~LogHandler() = default;
 
         #pragma endregion
 
         #pragma region Methods
-
-        virtual RkVoid Flush() = 0;
-
+    
         /**
          * \brief Adds the specified record to a thread safe queue.
          */
-        RkVoid Handle(LogRecord const& in_record) noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogHandler& operator=(LogHandler const& in_other) = delete;
-        LogHandler& operator=(LogHandler&&      in_other) = delete;
+        virtual RkVoid Handle(LogRecord&& in_record) noexcept = 0;
 
         #pragma endregion
 };

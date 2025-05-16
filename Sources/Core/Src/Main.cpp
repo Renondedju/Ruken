@@ -1,13 +1,14 @@
-#include "Core/Kernel.hpp"
-#include "Core/Exception.hpp"
-
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
-#include "ExecutiveSystem/JobSystem.hpp"
-#include "ExecutiveSystem/Queues/QueueHandle.hpp"
-#include "ExecutiveSystem/Awaitables/Tasks/Task.hpp"
-#include "ExecutiveSystem/Awaitables/Primitives/SharedMutex.hpp"
+#include "JobSystem/JobSystem.hpp"
+#include "JobSystem/Queues/QueueHandle.hpp"
+#include "JobSystem/Awaitables/Tasks/Task.hpp"
+#include "JobSystem/Awaitables/Primitives/SharedMutex.hpp"
+
+#include "Debug/Logging/Logger.hpp"
+#include "Debug/Logging/Handlers/DebugHandler.hpp"
+#include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
 #include <tracy/Tracy.hpp>
 
@@ -37,7 +38,7 @@ struct AsyncLoop
         // by the first available thread.
 
         // Main loop
-        for (int i = 0; i < 200; ++i)
+        for (int i = 0; i < 2000; ++i)
         {
             co_await scene.ExecuteEvent(EEventName::OnStart);
 
@@ -60,12 +61,13 @@ Task<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
 }
 
 /**
- * Asynchronous main
+ * Asynchronous main.
  * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
- * @param in_service_provider Service Provider
+ * @param in_service_provider Service Provider.
  */
 Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
 {
+    AsyncLoop            loop  {"Loop", EntityAdmin {in_service_provider}};
     SharedMutex<RkInt64> mutex {};
 
     co_await WhenAll<Task<MainQueue>> ({
@@ -79,7 +81,8 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_
         Write(mutex),
         Write(mutex),
         Read (mutex),
-        Read (mutex)
+        Read (mutex),
+        loop.Run()
     });
 
     in_stop_source.request_stop();
@@ -95,19 +98,26 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_
  */
 int main(int in_argc, char* in_argv[])
 {
+    // Setup logging
+    ConsoleHandler console_handler {};
+    DebugHandler   debug_handler   {{}};
+
+    std::initializer_list<LogHandler*> handlers { &console_handler, &debug_handler };
+
     // Initializing services and core systems
-    JobSystem       job_system {};
-    ServiceProvider services   {};
+    ServiceProvider services   {"Root"};
+    Logger*         logger     {services.ProvideService<Logger>(handlers)};
+    JobSystem*      job_system {services.ProvideService<JobSystem>()};
 
     std::stop_source stop_source {};
 
     // Pushing async main to the MainQueue
     AsyncMain(stop_source, services);
 
-    // Running the job system
-    job_system.RegisterQueue (MainQueue::instance);
-    job_system.StartWorkers  ();
-    job_system.CallerAsWorker(stop_source.get_token());
+    // Starting workers
+    job_system->RegisterQueue (MainQueue::instance);
+    job_system->StartWorkers  ();
+    job_system->CallerAsWorker(stop_source.get_token());
 
     return 0;
 }

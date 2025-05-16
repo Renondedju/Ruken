@@ -1,9 +1,8 @@
-
 #pragma once
 
-#include <string>
-
 #include "Debug/Logging/LogRecord.hpp"
+
+#include <string>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -25,12 +24,13 @@ class LogFormatter
 
         #pragma region Constructors
 
-        LogFormatter() = default;
-
+        LogFormatter()                            = default;
         LogFormatter(LogFormatter const& in_copy) = delete;
         LogFormatter(LogFormatter&&      in_move) = delete;
+        virtual ~LogFormatter()                   = default;
 
-        virtual ~LogFormatter() = default;
+        LogFormatter& operator=(LogFormatter const& in_copy) = delete;
+        LogFormatter& operator=(LogFormatter&&      in_move) = delete;
 
         #pragma endregion
 
@@ -41,13 +41,6 @@ class LogFormatter
          */
         [[nodiscard]]
         virtual std::string Format(LogRecord const& in_record) const noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        LogFormatter& operator=(LogFormatter const& in_copy) = delete;
-        LogFormatter& operator=(LogFormatter&&      in_move) = delete;
 
         #pragma endregion
 };

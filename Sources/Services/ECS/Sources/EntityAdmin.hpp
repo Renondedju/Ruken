@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "Core/Service.hpp"
-#include "ExecutiveSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "JobSystem/Awaitables/Tasks/DynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
 #include "ECS/System.hpp"
@@ -22,9 +22,9 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief EntityAdmins are for isolation.
  *        Each admin can be described as a simulation containing entities
- *        and a group of system to maintain and update theses entities.
+ *        and a group of system to maintain and update these entities.
  */
-class EntityAdmin final: public Service<EntityAdmin>
+class EntityAdmin final: public Service
 {
     #pragma region Members
 

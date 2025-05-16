@@ -9,11 +9,11 @@ std::string LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcep
 {
     switch (in_record.level)
     {
-        case ELogLevel::Debug:   return "[DEBUG]";
-        case ELogLevel::Info:    return "[INFO]";
-        case ELogLevel::Warning: return "[WARNING]";
-        case ELogLevel::Error:   return "[ERROR]";
-        case ELogLevel::Fatal:   return "[FATAL]";
+        case ELogLevel::Debug:   return "[Debug]  ";
+        case ELogLevel::Info:    return "[Info]   ";
+        case ELogLevel::Warning: return "[Warning]";
+        case ELogLevel::Error:   return "[Error]  ";
+        case ELogLevel::Fatal:   return "[Fatal]  ";
     }
 
     return "";

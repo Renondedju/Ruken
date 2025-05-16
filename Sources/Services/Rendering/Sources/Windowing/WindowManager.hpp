@@ -14,7 +14,7 @@ class Logger;
 /**
  * \brief Manages the connected screens and the created windows.
  */
-class WindowManager final: public Service<WindowManager>
+class WindowManager final: public Service
 {
     #pragma region Members
 

@@ -1,8 +1,5 @@
 #include "Rendering/Rendering/Renderer.hpp"
 
-#include "Core/Kernel.hpp"
-#include "Core/KernelProxy.hpp"
-
 #include "Threading/Scheduler.hpp"
 
 #include "Rendering/Windowing/WindowManager.hpp"
@@ -15,21 +12,21 @@ USING_RUKEN_NAMESPACE
 #pragma region Constructors
 
 Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
-    Service<Renderer> {in_service_provider},
-    m_scheduler       {in_service_provider.LocateService<Scheduler>()}
+    Service     {in_service_provider},
+    m_scheduler {in_service_provider.LocateService<Scheduler>()}
 {
-    auto& kernel         = in_service_provider.LocateService<KernelProxy>  ()->GetKernelReference();
     auto* window_manager = in_service_provider.LocateService<WindowManager>();
     auto* root_logger    = in_service_provider.LocateService<Logger>       ();
 
     if (root_logger)
-        m_logger = root_logger->AddChild("Rendering");
+        m_logger = root_logger;//->AddChild("Rendering");
 
     VulkanDebug::Initialize(m_logger);
 
     if (!VulkanLoader::Initialize())
     {
-        kernel.RequestShutdown(1);
+
+        //kernel.RequestShutdown(1);
         return;
     }
 
@@ -45,11 +42,11 @@ Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
         };
 
         if (m_logger)
-            m_logger->Info("Renderer initialized.");
+            m_logger->Info(service_name, "Renderer initialized.");
     }
 
-    else
-        kernel.RequestShutdown(1);
+    else;
+        //kernel.RequestShutdown(1);
 }
 
 Renderer::~Renderer() noexcept
@@ -64,7 +61,7 @@ Renderer::~Renderer() noexcept
     m_instance        .reset();
 
     if (m_logger)
-        m_logger->Info("Renderer shutdown.");
+        m_logger->Info(service_name, "Renderer shutdown.");
 }
 
 #pragma endregion

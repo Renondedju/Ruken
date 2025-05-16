@@ -11,42 +11,24 @@ BEGIN_RUKEN_NAMESPACE
  */
 class ConsoleHandler final : public StreamHandler
 {
-    /**
-     * \brief Kernel is the only class able to create a ConsoleHandler.
-     */
-    friend class Kernel;
-
-    private:
-
-        #pragma region Members
-
-        ConsoleFormatter m_console_formatter;
-
-        #pragma endregion
-
-        #pragma region Constructors
-
-        ConsoleHandler() noexcept;
-
-        #pragma endregion
+	ConsoleFormatter m_console_formatter;
 
     public:
 
-        #pragma region Constructors
+        #pragma region Lifetime
 
+        ConsoleHandler() noexcept;
         ConsoleHandler(ConsoleHandler const& in_copy) = delete;
         ConsoleHandler(ConsoleHandler&&      in_move) = delete;
+
+		ConsoleHandler& operator=(ConsoleHandler const& in_copy) = delete;
+		ConsoleHandler& operator=(ConsoleHandler&&      in_move) = delete;
 
         ~ConsoleHandler() override = default;
 
         #pragma endregion
 
-        #pragma region Operators
-
-        ConsoleHandler& operator=(ConsoleHandler const& in_copy) = delete;
-        ConsoleHandler& operator=(ConsoleHandler&&      in_move) = delete;
-
-        #pragma endregion
+		RkVoid Handle(LogRecord&& in_record) noexcept override;
 };
 
 END_RUKEN_NAMESPACE

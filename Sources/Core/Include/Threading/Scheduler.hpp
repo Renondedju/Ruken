@@ -17,7 +17,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * \brief This class is responsible for the repartition of different tasks between workers
  */
-class Scheduler final : public Service<Scheduler>
+class Scheduler final : public Service
 {
     public: using Job = std::function<RkVoid()>;
 
