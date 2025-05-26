@@ -262,6 +262,8 @@ add_library(RkCore STATIC
         Include/Debug/Logging/Handlers/DebugHandler.hpp
         Src/Core/Service.cpp
         Src/Debug/Logging/Logger.inl
+        Include/IO/IOJobQueue.hpp
+        Include/IO/File.hpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

@@ -144,7 +144,7 @@ RkUint64 SharedMutex<TData>::MutexAwaitable::SignalConsumeIf(TPredicate&& in_pre
 	{
 		// Waiting for a lock on the selection and acquiring it as soon as possible
 		while ((continuation = selection->exchange(Awaiter::locked, std::memory_order_acq_rel)) == Awaiter::locked)
-			_mm_pause();
+			atomic_queue::spin_loop_pause();
 
 		// Return if nothing can or should be consumed
 		if (continuation == nullptr || !in_predicate(continuation))
@@ -189,7 +189,7 @@ RkBool SharedMutex<TData>::MutexAwaiter::await_suspend(std::coroutine_handle<>) 
 
 	// Waiting for a lock on the head and acquiring it as soon as possible
 	while ((continuation = selection->exchange(locked, std::memory_order_acq_rel)) == locked)
-		_mm_pause();
+		atomic_queue::spin_loop_pause();
 
 	// Fast Path: Starting the "consume chain reaction" if it wasn't started already without actually attaching
 	if (continuation == nullptr && mutex->CanSignal(this))

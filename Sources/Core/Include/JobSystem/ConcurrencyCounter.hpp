@@ -18,6 +18,10 @@ struct ConcurrencyCounter
 	};
 };
 
+
+static constexpr ConcurrencyCounter s_one_optimal { .current_concurrency = 0, .optimal_concurrency = 1 };
+static constexpr ConcurrencyCounter s_one_current { .current_concurrency = 0, .optimal_concurrency = 1 };
+
 static_assert(sizeof(ConcurrencyCounter) == sizeof(RkUint64));
 
 END_RUKEN_NAMESPACE

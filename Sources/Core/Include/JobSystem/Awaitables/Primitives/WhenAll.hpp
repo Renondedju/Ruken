@@ -61,8 +61,8 @@ auto WhenAllVariadic(TAwaitables const&... in_awaitables) ->
 
 	co_await latch;
 
-	co_return std::apply([&](auto const&... in_values) {
-		return std::tuple(in_values.await_resume()...);
+	co_return std::apply([&] <typename... TAwaiter> (TAwaiter&... in_awaiters) {
+		return std::tuple(std::forward<decltype(std::declval<TAwaiter>().await_resume())>(in_awaiters.await_resume())...);
 	}, awaiters);
 }
 

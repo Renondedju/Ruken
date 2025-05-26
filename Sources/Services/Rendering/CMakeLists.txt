@@ -22,7 +22,6 @@ add_library(RkRenderingService STATIC
     Sources/Rendering/RenderTechnique.hpp
     Sources/Rendering/RenderView.hpp
     Sources/Rendering/UV.hpp
-
     Sources/Vulkan/Core/VulkanBuffer.hpp
     Sources/Vulkan/Core/VulkanCommandBuffer.hpp
     Sources/Vulkan/Core/VulkanCommandPool.hpp
@@ -54,7 +53,6 @@ add_library(RkRenderingService STATIC
     Sources/Vulkan/CommandPool.hpp
     Sources/Vulkan/FencePool.hpp
     Sources/Vulkan/SemaphorePool.hpp
-
     Sources/Vulkan/Core/VulkanBuffer.cpp
     Sources/Vulkan/Core/VulkanCommandBuffer.cpp
     Sources/Vulkan/Core/VulkanCommandPool.cpp
@@ -89,7 +87,6 @@ add_library(RkRenderingService STATIC
     Sources/Windowing/Utilities.cpp
     Sources/Windowing/Window.cpp
     Sources/Windowing/WindowManager.cpp
-
     Sources/Windowing/GammaRamp.hpp
     Sources/Windowing/Metrics.hpp
     Sources/Windowing/Screen.hpp
@@ -98,7 +95,6 @@ add_library(RkRenderingService STATIC
     Sources/Windowing/Window.hpp
     Sources/Windowing/WindowManager.hpp
     Sources/Windowing/WindowParams.hpp
-
     Sources/Rendering/RenderContext.cpp
     Sources/Rendering/Renderer.cpp
     Sources/Rendering/RenderFrame.cpp

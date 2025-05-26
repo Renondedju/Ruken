@@ -7,6 +7,7 @@
 #include <thread>
 
 BEGIN_RUKEN_NAMESPACE
+
 class JobQueue;
 
 /**

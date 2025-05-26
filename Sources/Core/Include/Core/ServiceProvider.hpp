@@ -3,6 +3,7 @@
 #include "Types/FundamentalTypes.hpp"
 
 #include <stack>
+#include <string>
 #include <typeindex>
 #include <unordered_map>
 
