@@ -87,174 +87,13 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_
 {
     AsyncLoop loop {"Loop", EntityAdmin {in_service_provider}};
 
-    File const file("C:\\Users\\Basile\\Downloads\\Sicion- KUSS - The Journey EP -MLKL041.zip");
-    File const other("D:\\screen_space_shadows.zip");
-
     co_await loop.Setup();
-
-    co_await WhenAllVariadic(
-        //file .ReadEverything(),
-        //other.ReadEverything(),
-        loop.Run()
-    );
+    co_await loop.Run  ();
 
     in_stop_source.request_stop();
 
     co_return;
 }
-
-struct BinaryTreePath
-{
-    RkUint64       path      {};   // Binary path of the node. bit 0 = left child, bit 1 = right child
-    RkUint64       depth     {};  // Depth of the path.
-    const RkUint64 max_depth {}; // Max depth of the
-
-    /**
-      * Computes the amount of nodes required to store a tree of depth TDepth,
-      * excluding layers before in_start_depth.
-      *
-      * @param in_start_depth Start depth of the count.
-      * @return Node count.
-      */
-    constexpr RkUint64 GetNodeCount(RkUint64 const in_start_depth) const noexcept
-    {
-        RkUint64 value {};
-
-        for (RkUint64 index = in_start_depth; index <= max_depth; ++index)
-            value |= 1 << max_depth - index;
-
-        return value;
-    }
-
-    /**
-     * Returns the address of a node.
-     * @return Index of the node within the nodes array.
-     */
-    constexpr RkUint64 GetIndex() const noexcept
-    {
-        auto recursive_get_index = [&](this const auto& in_self, RkUint64 const in_current_depth = 0) {
-
-            if (depth == in_current_depth)
-                return 0;
-
-            const RkUint64 depth_mask   {static_cast<RkUint64>(1 << in_current_depth)};
-            const RkBool   is_bit_set   {(path & depth_mask) == depth_mask};
-            const RkUint64 contribution {1 + GetNodeCount(in_current_depth + 1) * is_bit_set};
-
-            return contribution + in_self(in_current_depth + 1);
-        };
-
-        return recursive_get_index();
-    }
-
-    constexpr void Parent    () noexcept {                        depth--; RUKEN_ASSERT(depth >= 0);         }
-    constexpr void LeftChild () noexcept { path &= ~(1 << depth); depth++; RUKEN_ASSERT(depth <= max_depth); }
-    constexpr void RightChild() noexcept { path |=   1 << depth ; depth++; RUKEN_ASSERT(depth <= max_depth); }
-
-    constexpr RkBool IsRoot() const noexcept { return depth == 0; }
-    constexpr RkBool IsLeaf() const noexcept { return depth == max_depth; }
-};
-
-/**
- * A contiguous binary tree.
- * @tparam TDepth Depth of the tree.
- * @tparam TData Data type.
- */
-template <RkUint64 TDepth, typename TData>
-struct BinaryTree
-{
-    #pragma region Methods
-
-    /**
-     * Computes the amount of nodes required to store a tree of depth TDepth.
-     * @return Node count.
-     */
-    static constexpr RkUint64 GetNodeCount()
-    {
-        RkUint64 value {};
-
-        for (RkUint64 index = 0; index <= TDepth; ++index)
-            value |= 1 << index;
-
-        return value;
-    }
-
-    /// @returns the root node.
-    static constexpr BinaryTreePath Root() noexcept
-    { return BinaryTreePath { .max_depth = TDepth }; }
-
-    #pragma endregion
-
-    static constexpr RkUint64 depth      = TDepth;
-    static constexpr RkUint64 leaf_count = 1 << depth; // == pow(2, depth)
-    static constexpr RkUint64 node_count = GetNodeCount();
-
-    /**
-     * Memory Layout example for a tree depth of 3:
-     * Root node is A0. Leafs are *3.
-     * std::array<>{ | | | | | | | | | | | | | | | }
-     *   depth = 3 - | | | A3B3| C3D3| | E3F3| G3H3
-     *           2 - | | A2    C2    | E2    G2
-     *           1 - | A1            E1
-     *           0 - A0
-     * .
-     *           A0
-     *         /    \
-     *       A1      E1
-     *      /  \    /  \
-     *     A2  C2  E2  G2
-     */
-    std::array<TData, node_count> nodes {};
-};
-
-template <RkUint64 TDepth>
-struct ConcurrencyTree
-{
-    BinaryTree<TDepth, std::atomic_uint64_t> tree                {};
-    BinaryTree<TDepth, RkUint8>              maximum_concurrency {};
-
-    void IncrementOptimal(BinaryTreePath in_leaf)
-    {
-        for (int depth = 0; depth < TDepth; ++depth)
-        {
-            tree.nodes[in_leaf.GetIndex()].fetch_add(s_one_optimal.value, std::memory_order_acq_rel);
-            in_leaf.Parent();
-        }
-    }
-
-    void DecrementOptimal(BinaryTreePath in_leaf)
-    {
-        for (int depth = 0; depth < TDepth; ++depth)
-        {
-            tree.nodes[in_leaf.GetIndex()].fetch_sub(s_one_optimal.value, std::memory_order_acq_rel);
-            in_leaf.Parent();
-        }
-    }
-
-    void FindLeaf(BinaryTreePath in_bias)
-    {
-        BinaryTreePath path {tree.Root()};
-
-        for (int depth = 0; depth < TDepth; ++depth)
-        {
-            RkUint64           index   {path.GetIndex()};
-            ConcurrencyCounter current {tree.nodes[index].load(std::memory_order_acquire)};
-            ConcurrencyCounter desired {};
-
-            do
-            {
-                // Decide ?
-                decide(current, )
-
-                desired.value = current.value + s_one_current.value;
-
-            } while (!tree.nodes[index].compare_exchange_weak(current.value, desired, std::memory_order_acq_rel));
-
-            if (true) path.LeftChild ();
-            else      path.RightChild();
-        }
-    }
-};
 
 /**
  * Initializes services and waits for the async main function to request a stop.
@@ -264,26 +103,32 @@ struct ConcurrencyTree
  */
 int main(int in_argc, char* in_argv[])
 {
-    // Setup logging
+    // 1. --- Setup logging and general configuration. ---
     ConsoleHandler console_handler {};
     DebugHandler   debug_handler   {{}};
 
     std::initializer_list<LogHandler*> handlers { &console_handler, &debug_handler };
+    std::initializer_list              queues   { &MainQueue::instance, &IOJobQueue::instance };
 
-    // Initializing services and core systems
+    MainQueue::instance.SetMaximumConcurrency(4);
+
+    auto worker_bias_function = [](RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system) -> RkUint64 {
+        // Selects the queue bias of workers
+
+        return 0; // For now, we always select the first queue.
+    };
+
+    // 2. --- Initializing services and core systems. ---
     ServiceProvider services   {"Root"};
-    Logger*         logger     {services.ProvideService<Logger>(handlers)};
-    JobSystem*      job_system {services.ProvideService<JobSystem>()};
+    Logger*         logger     {services.ProvideService<Logger   >(handlers)};
+    JobSystem*      job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
 
+    // 3. --- Running async main. ---
     std::stop_source stop_source {};
-
-    // Pushing async main to the MainQueue
     AsyncMain(stop_source, services);
 
-    // Starting workers
-    job_system->RegisterQueue (MainQueue::instance);
-    job_system->StartWorkers  ();
-    job_system->CallerAsWorker(stop_source.get_token());
+    // And waiting for it to complete as a worker.
+    job_system->CallerAsWorker(stop_source.get_token(), "CPU Main");
 
     return 0;
 }

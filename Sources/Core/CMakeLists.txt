@@ -49,8 +49,7 @@ add_library(RkCore STATIC
         Include/JobSystem/Queues/DynamicQueue.hpp
         Include/JobSystem/Queues/QueueHandle.hpp
         Include/JobSystem/JobSystem.hpp
-        Include/JobSystem/ConcurrencyCounter.hpp
-        Include/JobSystem/Worker.hpp
+        Include/JobSystem/Concurrency.hpp
         Include/JobSystem/WorkerInfo.hpp
         Include/Core/Exception.hpp
         Include/Core/Service.hpp
@@ -198,7 +197,6 @@ add_library(RkCore STATIC
         Src/JobSystem/Awaitables/Task.inl
         Src/JobSystem/JobQueue.cpp
         Src/JobSystem/JobSystem.cpp
-        Src/JobSystem/Worker.cpp
         Src/Core/Service.inl
         Src/Core/ServiceProvider.cpp
         Src/Core/ServiceProvider.inl
@@ -264,6 +262,12 @@ add_library(RkCore STATIC
         Src/Debug/Logging/Logger.inl
         Include/IO/IOJobQueue.hpp
         Include/IO/File.hpp
+        Include/Containers/BinaryTree.hpp
+        Include/JobSystem/WorkerRequestTree.hpp
+        Include/Containers/BinaryTreePath.hpp
+        Src/Containers/BinaryTreePath.cpp
+        Src/Containers/BinaryTree.inl
+        Src/JobSystem/ConcurrencyTree.cpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

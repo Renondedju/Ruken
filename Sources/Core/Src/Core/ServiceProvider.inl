@@ -4,7 +4,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template<typename TService, typename ... TArgs>
+template<typename TService, typename... TArgs>
     requires std::is_constructible_v<TService, ServiceProvider&, TArgs...>
 TService* ServiceProvider::ProvideService(TArgs&&... in_args)
     noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)

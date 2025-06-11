@@ -1,10 +1,10 @@
 #pragma once
 
-#include "JobSystem/Queues/JobQueue.hpp"
-
 #include <string>
 
 BEGIN_RUKEN_NAMESPACE
+
+class JobQueue;
 
 /**
  * Globally accessible worker info.
@@ -13,9 +13,9 @@ BEGIN_RUKEN_NAMESPACE
  */
 struct WorkerInfo
 {
-    inline static thread_local std::string name            {"Unnamed worker"};
-    inline static thread_local JobQueue*   current_queue   {nullptr};
-	inline static thread_local RkSize	   remaining_tasks {0};
+    std::string name          {"Unnamed worker"};
+    JobQueue*   current_queue {nullptr};
+    RkUint64    queue_bias    {0};
 };
 
 END_RUKEN_NAMESPACE
