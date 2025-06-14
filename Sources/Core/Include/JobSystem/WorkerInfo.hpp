@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Containers/BinaryTreePath.hpp"
+
 #include <string>
 
 BEGIN_RUKEN_NAMESPACE
@@ -13,9 +15,9 @@ class JobQueue;
  */
 struct WorkerInfo
 {
-    std::string name          {"Unnamed worker"};
-    JobQueue*   current_queue {nullptr};
-    RkUint64    queue_bias    {0};
+    std::string    name          {"Unnamed worker"};
+    JobQueue*      current_queue {nullptr};
+    BinaryTreePath queue_bias    {};
 };
 
 END_RUKEN_NAMESPACE

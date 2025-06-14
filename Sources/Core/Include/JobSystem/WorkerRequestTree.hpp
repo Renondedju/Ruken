@@ -2,25 +2,30 @@
 
 #include "Containers/BinaryTree.hpp"
 
+#include <condition_variable>
 #include <tracy/Tracy.hpp>
 #include <atomic>
 
 BEGIN_RUKEN_NAMESPACE
 
+/**
+ * A synchronisation structure used to prioritize tasks between a number of threads.
+ */
 struct WorkerRequestTree
 {
     BinaryTree<std::atomic_uint64_t> tree;
     std::condition_variable_any      sleep_variable {};
     std::mutex                       sleep_mutex    {};
 
+    static inline thread_local RkUint64 fair_path {};
+
+    /**
+     * Constructor.
+     * @param in_minimum_capacity
+     */
     explicit WorkerRequestTree(RkUint64 const in_minimum_capacity) noexcept:
         tree {in_minimum_capacity}
     {}
-
-    ~WorkerRequestTree()
-    {
-        sleep_variable.notify_all();
-    }
 
     /**
      * Emits a request for the passed leaf
@@ -43,32 +48,29 @@ struct WorkerRequestTree
 
     /**
      * Waits for and consumes or request based on a bias.
-     * @param in_bias Preferred path in the tree.
-     * @param in_stop_signal Stop signal.
+     * @param in_preferred_path Preferred path in the tree. If it does not directly lead to a leaf, the rest of the traversal will be uniformly distributed over time.
+     * @param in_stop_signal Stop signal. Used to cancel the wait.
      * @returns Path to the leaf that emitted the request we consumed.
      */
-    BinaryTreePath WaitConsumeRequest(RkUint64 const in_bias, std::stop_token const& in_stop_signal) noexcept
+    BinaryTreePath WaitConsumeRequest(BinaryTreePath const& in_preferred_path, std::stop_token const& in_stop_signal) noexcept
     {
         ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_WORKER_ZONES));
 
         BinaryTreePath path {tree.Root()};
 
         // Try to acquire root node and sleeping if that can't be done
-        std::unique_lock    lock {sleep_mutex};
-        sleep_variable.wait(lock, [&] {
-            return TryConsumeRequest(path) || in_stop_signal.stop_requested();
-        });
-
-        if (in_stop_signal.stop_requested())
-            return tree.Root();
+        std::unique_lock lock {sleep_mutex};
+        if (!sleep_variable.wait(lock, in_stop_signal, [&] { return TryConsumeRequest(path); }))
+            return {};
 
         // Successfully consumed a request from the root node. That means we cannot
         // return anymore without going all the way down,
         // Otherwise we would leave the tree in an invalid state.
 
-        for (int depth = 0; depth < tree.max_depth; ++depth)
+        for (int depth {}; depth < tree.max_depth; ++depth)
         {
-            path.ChildFromBias(in_bias);
+            // Use the preferred path up to its depth and fall-back to a fair path after that
+            path.ChildFromBias(depth < in_preferred_path.depth ? in_preferred_path.path : GetFairPath(depth));
 
             while (!TryConsumeRequest(path))
                 path.Sibling();
@@ -78,6 +80,14 @@ struct WorkerRequestTree
     }
 
     private:
+
+        /**
+         * Returns a fair bias path over time.
+         * @param in_depth Depth to sample and switch the path at.
+         * @return Bias.
+         */
+        static RkUint64 GetFairPath(RkUint64 const in_depth) noexcept
+        { return fair_path ^= 1ULL << in_depth; }
 
         /**
          * Tries to consume a request from the passed path.

@@ -60,6 +60,12 @@ JobSystem::JobSystem(
         );
 }
 
+JobSystem::~JobSystem()
+{
+    for (std::jthread& thread : m_workers)
+        thread.request_stop();
+}
+
 RkVoid JobSystem::CallerAsWorker(std::stop_token&& in_stop_token, std::string_view const in_worker_name) noexcept
 {
     { // Registering the thread as a worker

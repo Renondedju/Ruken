@@ -19,7 +19,7 @@ class JobQueue;
  */
 struct JobSystem final : Service
 {
-	using EvaluateWorkerBias = RkUint64 (*)(RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system);
+	using EvaluateWorkerBias = BinaryTreePath (*)(RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system);
 
 	static inline thread_local WorkerInfo worker_info {};
 
@@ -39,7 +39,7 @@ struct JobSystem final : Service
      JobSystem			 (JobSystem&&)      = delete;
 	 JobSystem& operator=(JobSystem const&) = delete;
 	 JobSystem& operator=(JobSystem&&)      = delete;
-    ~JobSystem() override					= default;
+    ~JobSystem() override;
 
     #pragma endregion
 
@@ -72,13 +72,13 @@ struct JobSystem final : Service
 
 		#pragma region Members
 
-		EvaluateWorkerBias	   m_bias_function {};
-		WorkerRequestTree	   m_request_tree;
-		std::vector<JobQueue*> m_queues		   {};
-
-		std::vector       <std::jthread>				 m_workers     {};
-		std::unordered_map<std::thread::id, WorkerInfo*> m_workers_map {};
 		mutable std::shared_mutex                        m_workers_mtx {};
+		std::unordered_map<std::thread::id, WorkerInfo*> m_workers_map {};
+		std::vector		  <JobQueue*>					 m_queues	   {};
+		std::vector       <std::jthread>				 m_workers     {};
+
+		EvaluateWorkerBias m_bias_function {};
+		WorkerRequestTree  m_request_tree;
 
 		#pragma endregion
 

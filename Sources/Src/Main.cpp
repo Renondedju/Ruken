@@ -44,7 +44,7 @@ struct AsyncLoop
         // by the first available thread.
 
         // Main loop
-        for (int i = 0; i < 2000; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             co_await scene.ExecuteEvent(EEventName::OnStart);
             File::on_io_pull.Signal();
@@ -85,10 +85,12 @@ Task<MainQueue> Pull(std::stop_source& in_stop_source)
  */
 Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
 {
-    AsyncLoop loop {"Loop", EntityAdmin {in_service_provider}};
+    {
+        AsyncLoop loop {"Loop", EntityAdmin {in_service_provider}};
 
-    co_await loop.Setup();
-    co_await loop.Run  ();
+        co_await loop.Setup();
+        co_await loop.Run  ();
+    }
 
     in_stop_source.request_stop();
 
@@ -110,12 +112,11 @@ int main(int in_argc, char* in_argv[])
     std::initializer_list<LogHandler*> handlers { &console_handler, &debug_handler };
     std::initializer_list              queues   { &MainQueue::instance, &IOJobQueue::instance };
 
-    MainQueue::instance.SetMaximumConcurrency(4);
+    MainQueue ::instance.SetMaximumConcurrency(8);
+    IOJobQueue::instance.SetMaximumConcurrency(3);
 
-    auto worker_bias_function = [](RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system) -> RkUint64 {
-        // Selects the queue bias of workers
-
-        return 0; // For now, we always select the first queue.
+    auto worker_bias_function = [](RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system) -> BinaryTreePath {
+        return {}; // We simply let all threads try to distribute themselves fairly among all queues
     };
 
     // 2. --- Initializing services and core systems. ---

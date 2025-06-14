@@ -47,7 +47,7 @@ void BinaryTreePath::RightChild() noexcept
 
 void BinaryTreePath::Sibling() noexcept
 {
-	path ^= 1ULL << depth;
+	path ^= 1ULL << (depth - 1);
 }
 
 void BinaryTreePath::ChildFromBias(RkUint64 const in_bias) noexcept
