@@ -6,9 +6,9 @@
 USING_RUKEN_NAMESPACE
 
 Scheduler::Scheduler(ServiceProvider& in_service_provider, RkUint16 const in_workers_count) noexcept:
-    Service<Scheduler> {in_service_provider},
-    m_workers          {in_workers_count == 0U ? std::thread::hardware_concurrency() - 1 : in_workers_count},
-    m_running          {true}
+    Service   {in_service_provider},
+    m_workers {in_workers_count == 0U ? std::thread::hardware_concurrency() - 1 : in_workers_count},
+    m_running {true}
 {
     #if defined(RUKEN_LOGGING_ENABLED)
 

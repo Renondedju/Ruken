@@ -22,14 +22,16 @@ class StreamHandler : public LogHandler
 
     public:
 
-        #pragma region Contructors
+        #pragma region Lifetime
 
         explicit StreamHandler(LogFormatter const& in_formatter, std::ostream const& in_stream) noexcept;
 
         StreamHandler(StreamHandler const& in_copy) = delete;
         StreamHandler(StreamHandler&&      in_move) = delete;
+        StreamHandler& operator=(StreamHandler const& in_other) = delete;
+        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
 
-        ~StreamHandler() = default;
+        ~StreamHandler() override = default;
 
         #pragma endregion
 
@@ -39,14 +41,7 @@ class StreamHandler : public LogHandler
          * \brief Empties the entire queue to the stream.
          * \note  This method must not be called on multiple threads at a time.
          */
-        RkVoid Flush() override;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        StreamHandler& operator=(StreamHandler const& in_other) = delete;
-        StreamHandler& operator=(StreamHandler&&      in_other) = delete;
+        RkVoid Handle(LogRecord&& in_record) noexcept override;
 
         #pragma endregion
 };

@@ -23,7 +23,9 @@ set     (RUKEN_CORE_DIR              ${RUKEN_SOURCES_DIR}/Core)
 
 option(RUKEN_HEADLESS_BUILD          "Disables all form of rendering and presentation" OFF)
 option(RUKEN_TRACE_BUILD             "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})
+option(RUKEN_BREAK_ON_ERROR          "When on, a break interrupt will be generated on errors" ${RUKEN_BUILD_HAS_DEBUG_INFO})
 option(RUKEN_TRACE_SHOW_WORKER_ZONES "When on, tracy will also report the activity of workers" OFF)
+option(RUKEN_TRACE_SHOW_LOGGER_ZONES "When on, tracy will also report the activity of loggers" OFF)
 
 if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR})
     file(MAKE_DIRECTORY ${RUKEN_GENERATED_SOURCES_DIR})
@@ -49,7 +51,8 @@ get_property(RUKEN_SERVICE_LIBS GLOBAL PROPERTY RUKEN_SERVICE_LIBS)
 # --- Executable
 
 add_compile_definitions(UNICODE _UNICODE)
-add_executable(Ruken Sources/Core/Src/Main.cpp
+add_executable(Ruken
+        Sources/Src/Main.cpp
         Sources/Src/Test.hpp
 )
 

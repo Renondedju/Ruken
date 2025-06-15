@@ -1,11 +1,7 @@
 #include "Rendering/Windowing/WindowManager.hpp"
+#include "Debug/Logging/Logger.hpp"
 
 #include <GLFW/glfw3.h>
-
-#include "Core/Kernel.hpp"
-#include "Core/KernelProxy.hpp"
-
-#include "Debug/Logging/Logger.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -15,22 +11,22 @@ WindowManager::WindowManager(ServiceProvider& in_service_provider) noexcept:
     Service {in_service_provider}
 {
     if (auto* root_logger = in_service_provider.LocateService<Logger>())
-        m_logger = root_logger->AddChild("Windowing");
+        m_logger = root_logger;//->AddChild("Windowing");
 
     // TODO : SetErrorCallback
 
     if (!glfwInit())
     {
         if (m_logger)
-            m_logger->Fatal("Failed to initialize GLFW!");
+            m_logger->Fatal(service_name, "Failed to initialize GLFW!");
 
-        m_service_provider.LocateService<KernelProxy>()->GetKernelReference().RequestShutdown(1);
+//        m_service_provider.LocateService<KernelProxy>()->GetKernelReference().RequestShutdown(1);
 
         return;
     }
 
     if (m_logger)
-        m_logger->Info("GLFW initialized.");
+        m_logger->Info(service_name, "GLFW initialized.");
 
     SetupScreens();
 
@@ -45,7 +41,7 @@ WindowManager::~WindowManager() noexcept
     glfwTerminate();
 
     if (m_logger)
-        m_logger->Info("GLFW terminated.");
+        m_logger->Info(service_name, "GLFW terminated.");
 }
 
 #pragma endregion

@@ -1,79 +1,24 @@
-
 #include "Debug/Logging/Logger.hpp"
+
+#include <tracy/TracyC.h>
 
 USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-Logger::Logger(ServiceProvider&        in_service_provider,
-               std::string_view const  in_name,
-               ELogLevel        const  in_level, 
-               Logger           const* in_parent) noexcept:
-    Service  {in_service_provider},
-    m_name   {in_name},
-    m_level  {in_level},
-    m_parent {in_parent}
+Logger::Logger(ServiceProvider& in_service_provider,
+               ELogLevel const  in_level) noexcept:
+    Service {in_service_provider},
+    m_level {in_level}
 { }
 
 #pragma endregion
 
 #pragma region Methods
 
-RkVoid Logger::ForceHandle(LogRecord const& in_record) const noexcept
-{
-    if (propagate && m_parent)
-        m_parent->ForceHandle(in_record);
-
-    for (auto* handler : m_handlers)
-        handler->Handle(in_record);
-}
-
 RkVoid Logger::SetLevel(ELogLevel const in_level) noexcept
 {
 	m_level = in_level;
-}
-
-RkBool Logger::IsEnabledFor(ELogLevel const in_level) const noexcept
-{
-	return in_level >= m_level;
-}
-
-Logger* Logger::AddChild(std::string_view const in_name) noexcept
-{
-    return &m_children.emplace_front(m_service_provider, in_name, m_level, this);
-}
-
-RkVoid Logger::Log(ELogLevel const in_level, std::string_view const in_message) const noexcept
-{
-    if (!IsEnabledFor(in_level))
-        return;
-
-    Handle(LogRecord {in_level, m_name, std::string(in_message)});
-}
-
-RkVoid Logger::Debug(std::string_view const in_message) const noexcept
-{
-    Log(ELogLevel::Debug, in_message);
-}
-
-RkVoid Logger::Info(std::string_view const in_message) const noexcept
-{
-    Log(ELogLevel::Info, in_message);
-}
-
-RkVoid Logger::Warning(std::string_view const in_message) const noexcept
-{
-    Log(ELogLevel::Warning, in_message);
-}
-
-RkVoid Logger::Error(std::string_view const in_message) const noexcept
-{
-    Log(ELogLevel::Error, in_message);
-}
-
-RkVoid Logger::Fatal(std::string_view const in_message) const noexcept
-{
-    Log(ELogLevel::Fatal, in_message);
 }
 
 RkVoid Logger::AddFilter(LogFilter const* in_filter) noexcept
@@ -87,17 +32,6 @@ RkVoid Logger::RemoveFilter(LogFilter const* in_filter) noexcept
     m_filters.remove(in_filter);
 }
 
-RkBool Logger::Filter(LogRecord const& in_record) const noexcept
-{
-    for (auto const* filter : m_filters)
-    {
-        if (!filter->Filter(in_record))
-            return false;
-    }
-
-    return true;
-}
-
 RkVoid Logger::AddHandler(LogHandler* in_handler) noexcept
 {
     if (in_handler)
@@ -109,18 +43,32 @@ RkVoid Logger::RemoveHandler(LogHandler* in_handler) noexcept
     m_handlers.remove(in_handler);
 }
 
-RkVoid Logger::Handle(LogRecord const& in_record) const noexcept
+RkVoid Logger::Dispatch(LogRecord const& in_record) const noexcept
 {
-    if (Filter(in_record))
-        ForceHandle(in_record);
+    // Checking for level
+    if (in_record.level < m_level)
+        return;
+
+    // Checking filters
+    for (auto const* filter : m_filters)
+        if (!filter->Filter(in_record))
+            return;
+
+    // Dispatching to handlers and parents.
+    for (auto* handler : m_handlers)
+        handler->Handle(LogRecord(in_record));
+
+    if (Logger const* parent {GetParent()})
+        parent->Dispatch(in_record);
 }
 
-RkBool Logger::HasHandlers() const noexcept
+Logger::Logger(ServiceProvider& in_service_provider,
+               std::initializer_list<LogHandler*> in_handlers, ELogLevel in_level) noexcept:
+    Service    {in_service_provider},
+    m_level    {in_level},
+    m_handlers {in_handlers}
 {
-    if (propagate && m_parent)
-        return !m_handlers.empty() || m_parent->HasHandlers();
 
-    return !m_handlers.empty();
 }
 
 #pragma endregion

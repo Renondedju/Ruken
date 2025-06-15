@@ -16,16 +16,9 @@ StreamHandler::StreamHandler(LogFormatter const& in_formatter, std::ostream cons
 
 #pragma region Methods
 
-RkVoid StreamHandler::Flush()
+RkVoid StreamHandler::Handle(LogRecord&& in_record) noexcept
 {
-    while (!m_records.Empty())
-    {
-        LogRecord record;
-
-        m_records.Dequeue(record);
-
-        m_stream << m_formatter.Format(record);
-    }
+    m_stream << m_formatter.Format(in_record) << std::flush;
 }
 
 #pragma endregion

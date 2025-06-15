@@ -1,69 +1,43 @@
 #pragma once
 
-#include "Build/Namespace.hpp"
-#include "Core/ServiceBase.hpp"
-#include "Types/FundamentalTypes.hpp"
+#include "Core/ServiceProvider.hpp"
+
+#include <string_view>
 
 BEGIN_RUKEN_NAMESPACE
 
-class ServiceProvider;
-
-/**
- * \brief Service base class. Must be inherited from to implement a service.
- * \tparam TCrtp This class uses the Curiously Recurring Template Pattern. This type must be the actual service implementation class.
- */
-template <typename TCrtp>
-class Service : public ServiceBase
+/// @brief Service base class. Must be inherited from to implement a service.
+struct Service
 {
-    protected:
+    #pragma region Lifetime
 
-        #pragma region Members
+	// FIXME: Services can be instantiated outside of a provider. This could be a source of error.
 
-        ServiceProvider& m_service_provider;
+    /**
+     * @brief Default constructor
+     * @param in_service_provider Service provider instance
+     * @warning Any service inheriting from this class must declare a default constructor that
+     *          takes in the service provider instance as the FIRST parameter.
+     */
+    explicit Service(ServiceProvider& in_service_provider) noexcept;
+    Service           (Service const& in_copy) = delete;
+    Service           (Service&&      in_move) = delete;
+    Service& operator=(Service const& in_copy) = delete;
+    Service& operator=(Service&&      in_move) = delete;
+    virtual ~Service()                         = default;
 
-        #pragma endregion
+    #pragma endregion
 
-    public:
+    // Static name of the service, used by the kernel to report service errors
+    constexpr static std::string_view service_name = "Unknown";
 
-        #pragma region Constructors
+    /// @return Parent service if any
+    template <typename TService>
+    TService* GetParent(this TService const& in_self) noexcept;
 
-        /**
-         * \brief Default constructor
-         * \param in_service_provider Service provider instance
-         * \warning Any service service inheriting from this class must declare a default constructor that
-         *          takes in the service provider instance as the FIRST parameter.
-         */
-        Service(ServiceProvider& in_service_provider) noexcept;
+	protected:
 
-        Service(Service const& in_copy) = delete;
-        Service(Service&&      in_move) = delete;
-        virtual ~Service()              = default;
-
-        #pragma endregion
-
-        #pragma region Members
-
-        // Static name of the service, used by the kernel to report service errors
-        constexpr static const RkChar* service_name = "Unknown";
-
-        #pragma endregion
-
-        #pragma region Methods
-
-        /**
-         * \brief Retrieves the unique ID of the service
-         * \return Service ID
-         */
-        static RkSize ServiceID() noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-        
-        Service& operator=(Service const& in_copy) = delete;
-        Service& operator=(Service&&      in_move) = delete;
-
-        #pragma endregion
+		ServiceProvider& m_service_provider;
 };
 
 #include "Core/Service.inl"

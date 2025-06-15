@@ -1,14 +1,7 @@
+#pragma once
 
-template <typename TCrtp>
-Service<TCrtp>::Service(ServiceProvider& in_service_provider) noexcept:
-    m_service_provider {in_service_provider}
-{}
-
-template <typename TCrtp>
-RkSize Service<TCrtp>::ServiceID() noexcept
+template<typename TService>
+TService* Service::GetParent(this TService const& in_self) noexcept
 {
-    // Generating the ID once
-    static RkSize id = GetNextId();
-    
-    return id;
+    return in_self.m_service_provider.template LocateServiceParent<TService>();
 }

@@ -17,7 +17,7 @@ class Logger;
 class Window;
 class Scheduler;
 
-class Renderer final : public Service<Renderer>
+class Renderer final : public Service
 {
     private:
 

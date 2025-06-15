@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include "Build/Namespace.hpp"
 
 #include <string>
@@ -30,12 +32,66 @@ struct Exception
 		stacktrace      {in_stacktrace},
 		source_location {in_source_location}
 	{}
-
-	/// Pretty printing
-	explicit operator std::string() const noexcept
-	{
-		return std::format("Exception caught: {}\n{}", reason, stacktrace);
-	}
 };
 
 END_RUKEN_NAMESPACE
+
+template <>
+struct std::formatter<RUKEN_NAMESPACE::Exception>: std::formatter<std::string>
+{
+	auto format(RUKEN_NAMESPACE::Exception in_exception, format_context& in_ctx) const
+	{
+		return std::formatter<string>::format(
+			std::format("Exception thrown: {}\n{}", in_exception.reason, in_exception.stacktrace)
+			, in_ctx);
+	}
+};
+
+/*
+template <>
+struct std::formatter<RUKEN_NAMESPACE::Exception>: std::formatter<std::string>
+{
+	static inline auto to_string = [](auto p){
+		auto c = p | views::common;
+		return string(c.begin(), c.end());
+	};
+
+	std::string read_file(std::string_view const& in_path, RkUint32 in_line) const
+	{
+		std::ifstream file(std::filesystem::path(in_path), std::ios::binary);
+
+		if (!file.is_open())
+			return "";
+
+		RkUint32 const start_line {std::max<RkUint32>(0, in_line - 2)};
+
+		std::string line;
+		for (int i = 1; i < start_line; i++)
+			std::getline(file, line);
+
+		std::string str;
+		for (int i = start_line; i < start_line + 5 && std::getline(file, line); i++)
+			str += std::format("│ {} {} {}\n", i == in_line ? "❱" : " ", i, line);
+
+		return str + "│\n";
+	}
+
+	auto format(RUKEN_NAMESPACE::Exception in_exception, format_context& in_ctx) const
+	{
+		auto str = std::format("{}\n╭{:─^98}╮\n", in_exception.reason, "Traceback (most recent call first)");
+		for (auto [index, entry]: views::enumerate(in_exception.stacktrace))
+		{
+			using std::operator""sv;
+			auto header = std::format("{}> {}:{}\nin {}\n", index, entry.source_file(), entry.source_line(), entry.description());
+			for (auto subrange: header | views::split("\n"sv) | views::transform(to_string) | views::chunk(96))
+				for (auto const& string: subrange)
+					str += std::format("│ {: <96} │\n", string);
+
+			str += read_file(entry.source_file(), entry.source_line());
+		}
+		str += std::format("╰{:─^98}╯", "");
+
+		return std::formatter<string>::format(str, in_ctx);
+	}
+};
+*/

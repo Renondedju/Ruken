@@ -1,5 +1,5 @@
 
-template <ServiceType TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool>>
+template <typename TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool>>
 RkBool Kernel::SetupService(RkBool const in_required, TArgs&&...in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
 {
     // If an exit is required

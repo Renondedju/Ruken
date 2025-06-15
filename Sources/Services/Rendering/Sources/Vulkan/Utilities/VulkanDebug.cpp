@@ -1,27 +1,3 @@
-/*
- *  MIT License
- *
- *  Copyright (c) 2019 Basile Combet, Philippe Yi
- *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
- */
-
 #include "Rendering/Vulkan/Utilities/VulkanDebug.hpp"
 #include "Rendering/Vulkan/Utilities/VulkanLoader.hpp"
 
@@ -41,37 +17,37 @@ RkVoid VulkanDebug::Initialize(Logger* in_parent_logger) noexcept
     if (!in_parent_logger)
         return;
 
-    m_logger = in_parent_logger->AddChild("Vulkan");
+    m_logger = in_parent_logger;//->AddChild("Vulkan");
 }
 
 RkVoid VulkanDebug::Debug(std::string_view const in_message) noexcept
 {
     if (m_logger)
-        m_logger->Debug(in_message);
+        m_logger->Debug("Renderer", "{}", in_message);
 }
 
 RkVoid VulkanDebug::Info(std::string_view const in_message) noexcept
 {
     if (m_logger)
-        m_logger->Info(in_message);
+        m_logger->Info("Renderer","{}", in_message);
 }
 
 RkVoid VulkanDebug::Warning(std::string_view const in_message) noexcept
 {
     if (m_logger)
-        m_logger->Warning(in_message);
+        m_logger->Warning("Renderer","{}", in_message);
 }
 
 RkVoid VulkanDebug::Error(std::string_view const in_message) noexcept
 {
     if (m_logger)
-        m_logger->Error(in_message);
+        m_logger->Error("Renderer","{}", in_message);
 }
 
 RkVoid VulkanDebug::Fatal(std::string_view const in_message) noexcept
 {
     if (m_logger)
-        m_logger->Fatal(in_message);
+        m_logger->Fatal("Renderer","{}", in_message);
 }
 
 RkBool VulkanDebug::CheckResult(VkResult const in_result, std::string_view const in_function_name) noexcept

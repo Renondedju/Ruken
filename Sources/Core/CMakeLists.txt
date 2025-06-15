@@ -35,30 +35,26 @@ add_library(RkCore STATIC
         Include/Build/Namespace.hpp
         Include/Containers/LinkedChunkList.hpp
         Include/Containers/LinkedChunkListNode.hpp
-        Include/ExecutiveSystem/Concepts/CAwaitable.hpp
-        Include/ExecutiveSystem/Concepts/CQueueHandle.hpp
-        Include/ExecutiveSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
-        Include/ExecutiveSystem/Awaitables/Primitives/CountDownLatch.hpp
-        Include/ExecutiveSystem/Awaitables/Primitives/ManualResetEvent.hpp
-        Include/ExecutiveSystem/Awaitables/Tasks/DynamicTask.hpp
-        Include/ExecutiveSystem/Awaitables/Tasks/Task.hpp
-        Include/ExecutiveSystem/Awaitables/Tasks/TaskPromise.hpp
-        Include/ExecutiveSystem/Awaitables/Awaitable.hpp
-        Include/ExecutiveSystem/Awaitables/Tasks/TaskAwaiter.hpp
-        Include/ExecutiveSystem/Queues/JobQueue.hpp
-        Include/ExecutiveSystem/Queues/DynamicQueue.hpp
-        Include/ExecutiveSystem/Queues/QueueHandle.hpp
-        Include/ExecutiveSystem/JobSystem.hpp
-        Include/ExecutiveSystem/ConcurrencyCounter.hpp
-        Include/ExecutiveSystem/Worker.hpp
-        Include/ExecutiveSystem/WorkerInfo.hpp
-        Include/Core/EInitializationStatus.hpp
+        Include/JobSystem/Concepts/CAwaitable.hpp
+        Include/JobSystem/Concepts/CQueueHandle.hpp
+        Include/JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
+        Include/JobSystem/Awaitables/Primitives/CountDownLatch.hpp
+        Include/JobSystem/Awaitables/Primitives/ManualResetEvent.hpp
+        Include/JobSystem/Awaitables/Tasks/DynamicTask.hpp
+        Include/JobSystem/Awaitables/Tasks/Task.hpp
+        Include/JobSystem/Awaitables/Tasks/TaskPromise.hpp
+        Include/JobSystem/Awaitables/Awaitable.hpp
+        Include/JobSystem/Awaitables/Tasks/TaskAwaiter.hpp
+        Include/JobSystem/Queues/JobQueue.hpp
+        Include/JobSystem/Queues/DynamicQueue.hpp
+        Include/JobSystem/Queues/QueueHandle.hpp
+        Include/JobSystem/JobSystem.hpp
+        Include/JobSystem/Concurrency.hpp
+        Include/JobSystem/WorkerInfo.hpp
         Include/Core/Exception.hpp
         Include/Core/Service.hpp
-        Include/Core/ServiceBase.hpp
         Include/Core/ServiceLoader.hpp
         Include/Core/ServiceProvider.hpp
-        Include/Core/ServiceType.hpp
         Include/Debug/Logging/Filters/LogFilter.hpp
         Include/Debug/Logging/Formatters/ConsoleFormatter.hpp
         Include/Debug/Logging/Formatters/FileFormatter.hpp
@@ -197,13 +193,11 @@ add_library(RkCore STATIC
         Src/Bitwise/Bitmask.inl
         Src/Bitwise/SizedBitmask.inl
         Src/Containers/LinkedChunkList.inl
-        Src/ExecutiveSystem/Awaitables/Primitives/CountDownLatch.cpp
-        Src/ExecutiveSystem/Awaitables/Task.inl
-        Src/ExecutiveSystem/JobQueue.cpp
-        Src/ExecutiveSystem/JobSystem.cpp
-        Src/ExecutiveSystem/Worker.cpp
+        Src/JobSystem/Awaitables/Primitives/CountDownLatch.cpp
+        Src/JobSystem/Awaitables/Task.inl
+        Src/JobSystem/JobQueue.cpp
+        Src/JobSystem/JobSystem.cpp
         Src/Core/Service.inl
-        Src/Core/ServiceBase.cpp
         Src/Core/ServiceProvider.cpp
         Src/Core/ServiceProvider.inl
         Src/Debug/Logging/Formatters/ConsoleFormatter.cpp
@@ -249,19 +243,31 @@ add_library(RkCore STATIC
         Include/Resource/ResourceProcessingFailure.hpp
         Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
-        Src/ExecutiveSystem/Awaitables/TaskPromise.inl
-        Src/ExecutiveSystem/Awaitables/Awaitable.cpp
+        Src/JobSystem/Awaitables/TaskPromise.inl
+        Src/JobSystem/Awaitables/Awaitable.cpp
         Include/Meta/FirstOf.hpp
-        Include/ExecutiveSystem/Awaitables/Primitives/WhenAll.hpp
-        Include/ExecutiveSystem/Awaitables/Signal.hpp
-        Include/ExecutiveSystem/Awaitables/Awaiter.hpp
-        Include/ExecutiveSystem/Awaitables/Primitives/SharedMutex.hpp
-        Src/ExecutiveSystem/Awaitables/Awaiter.cpp
-        Src/ExecutiveSystem/Awaitables/Primitives/SharedMutex.inl
-        Src/ExecutiveSystem/Awaitables/Primitives/ManualResetEvent.cpp
-        Src/ExecutiveSystem/Awaitables/Primitives/AutomaticResetEvent.cpp
-        Src/ExecutiveSystem/Awaitables/Primitives/AutomaticResetEvent.inl
-        Include/ExecutiveSystem/Concepts/CTaskResult.hpp
+        Include/JobSystem/Awaitables/Primitives/WhenAll.hpp
+        Include/JobSystem/Awaitables/SignalReceiver.hpp
+        Include/JobSystem/Awaitables/Awaiter.hpp
+        Include/JobSystem/Awaitables/Primitives/SharedMutex.hpp
+        Src/JobSystem/Awaitables/Awaiter.cpp
+        Src/JobSystem/Awaitables/Primitives/SharedMutex.inl
+        Src/JobSystem/Awaitables/Primitives/ManualResetEvent.cpp
+        Src/JobSystem/Awaitables/Primitives/AutomaticResetEvent.cpp
+        Src/JobSystem/Awaitables/Primitives/AutomaticResetEvent.inl
+        Include/JobSystem/Concepts/CTaskResult.hpp
+        Src/Debug/Logging/Handlers/DebugHandler.cpp
+        Include/Debug/Logging/Handlers/DebugHandler.hpp
+        Src/Core/Service.cpp
+        Src/Debug/Logging/Logger.inl
+        Include/IO/IOJobQueue.hpp
+        Include/IO/File.hpp
+        Include/Containers/BinaryTree.hpp
+        Include/JobSystem/WorkerRequestTree.hpp
+        Include/Containers/BinaryTreePath.hpp
+        Src/Containers/BinaryTreePath.cpp
+        Src/Containers/BinaryTree.inl
+        Src/JobSystem/ConcurrencyTree.cpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

@@ -1,33 +1,42 @@
+#pragma once
 
-template <ServiceType TService, typename ... TArgs, std::enable_if_t<std::is_constructible_v<TService, ServiceProvider&, TArgs...>, RkBool>>
-TService* ServiceProvider::ProvideService(std::string& out_failure_reason, TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
+#include "Core/ServiceProvider.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+template<typename TService, typename... TArgs>
+    requires std::is_constructible_v<TService, ServiceProvider&, TArgs...>
+TService* ServiceProvider::ProvideService(TArgs&&... in_args)
+    noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
 {
-    TService* new_service = new TService(*this, std::forward<TArgs>(in_args)...);
+    TService* new_service {new TService(*this, std::forward<TArgs>(in_args)...)};
 
-    if (new_service->CheckInitializationStatus(out_failure_reason) == EInitializationStatus::Succeeded)
-    {
-        m_services[TService::ServiceID()] = reinterpret_cast<ServiceBase*>(new_service);
-        m_services_order.push(TService::ServiceID());
-    }
-    else
-    {
-        delete new_service;
-        new_service = nullptr;
-    }
+    const std::type_index& service_id {std::type_index(typeid(TService))};
+
+    m_services           [service_id] = new_service;
+    m_services_order.push(service_id);
 
     return new_service;
 }
 
-template <ServiceType TService>
+template <typename TService>
 TService* ServiceProvider::LocateService() noexcept
 {
     // Locating the service
-    auto it = m_services.find(TService::ServiceID());
+    auto const it = m_services.find(std::type_index(typeid(TService)));
 
-    // If the service hasn't been found, returning nullptr
+    // If the service hasn't been found
     if (it == m_services.end())
-        return nullptr;
+        return LocateServiceParent<TService>();
 
     // Otherwise returning the service address 
     return reinterpret_cast<TService*>(it->second);
 }
+
+template<typename TService>
+TService* ServiceProvider::LocateServiceParent() noexcept
+{
+    return m_parent ? m_parent->LocateService<TService>() : nullptr;
+}
+
+END_RUKEN_NAMESPACE
