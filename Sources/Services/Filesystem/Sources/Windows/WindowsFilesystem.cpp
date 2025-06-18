@@ -11,11 +11,7 @@ WindowsFilesystem::WindowsFilesystem(ServiceProvider& in_service_provider, std::
 	Filesystem   {in_service_provider},
 	project_path {in_project_path},
 	tmp_path     {std::filesystem::temp_directory_path()}
-{
-	RUKEN_ASSERT(in_project_path.is_absolute() && in_project_path.is_directory(),
-		"Project path must be an absolute directory"
-	);
-}
+{}
 
 FileHandle WindowsFilesystem::Open(FilePath const& in_path, EOpenMode const in_open_mode)
 {

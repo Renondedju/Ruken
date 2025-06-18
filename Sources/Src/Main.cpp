@@ -120,7 +120,7 @@ int main(int in_argc, char* in_argv[])
     ServiceProvider    services   {"Root"};
     Logger*            logger     {services.ProvideService<Logger    >(handlers)};
     JobSystem*         job_system {services.ProvideService<JobSystem >(queues, worker_bias_function)};
-    WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>(".")};
+    WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("..")};
 
     // 3. --- Running async main. ---
     std::stop_source stop_source {};
