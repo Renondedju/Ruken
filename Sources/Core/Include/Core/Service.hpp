@@ -11,7 +11,7 @@ struct Service
 {
     #pragma region Lifetime
 
-	// FIXME: Services can be instantiated outside of a provider. This could be a source of error.
+	// FIXME: Services can be instantiated outside a provider. This could be a source of error.
 
     /**
      * @brief Default constructor

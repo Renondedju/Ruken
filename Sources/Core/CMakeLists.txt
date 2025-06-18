@@ -260,14 +260,13 @@ add_library(RkCore STATIC
         Include/Debug/Logging/Handlers/DebugHandler.hpp
         Src/Core/Service.cpp
         Src/Debug/Logging/Logger.inl
-        Include/IO/IOJobQueue.hpp
-        Include/IO/File.hpp
         Include/Containers/BinaryTree.hpp
         Include/JobSystem/WorkerRequestTree.hpp
         Include/Containers/BinaryTreePath.hpp
         Src/Containers/BinaryTreePath.cpp
         Src/Containers/BinaryTree.inl
         Src/JobSystem/ConcurrencyTree.cpp
+        Src/Core/Exception.cpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)

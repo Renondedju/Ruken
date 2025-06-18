@@ -41,7 +41,7 @@ JobSystem::JobSystem(
     RkSize const concurrency {std::thread::hardware_concurrency() - 1};
 
     m_service_provider.LocateService<Logger>()->Info(service_name,
-        "Starting job system with {} worker(s) and {} queue(s)", concurrency, m_queues.size());
+        "Starting job system with {} worker(s) and {} queue(s) (excluding the main thread)", concurrency, m_queues.size());
 
     // Registering queues
     for (auto&& [index, queue]: std::views::enumerate(m_queues))

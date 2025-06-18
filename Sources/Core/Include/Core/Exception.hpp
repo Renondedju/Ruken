@@ -1,18 +1,15 @@
 #pragma once
 
-#include <filesystem>
-
 #include "Build/Namespace.hpp"
 
 #include <string>
 #include <format>
 #include <stacktrace>
 #include <source_location>
-#include <magic_enum.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
-/// The base exception
+/// @brief The base exception
 struct Exception
 {
 	std::string                reason;
@@ -25,13 +22,30 @@ struct Exception
 	 * @param in_stacktrace The stacktrace of the code that created this exception
 	 * @param in_source_location The source location of the code that created this exception
 	 */
-	explicit Exception(const std::string_view in_what,
-						std::stacktrace		 const& in_stacktrace	   = std::stacktrace::current(),
-						std::source_location const& in_source_location = std::source_location::current()):
-		reason			{in_what},
-		stacktrace      {in_stacktrace},
-		source_location {in_source_location}
-	{}
+	explicit Exception(std::string&&			   in_what,
+	                   std::stacktrace		const& in_stacktrace	  = std::stacktrace::current(),
+	                   std::source_location const& in_source_location = std::source_location::current());
+};
+
+/// @brief Exception for errno errors.
+struct ErrnoException: Exception
+{
+	/**
+	 * @brief Default constructor
+	 * @param in_error_number Error number.
+	 * @param in_stacktrace The stacktrace of the code that created this exception
+	 * @param in_source_location The source location of the code that created this exception
+	 */
+	explicit ErrnoException(errno_t				        in_error_number,
+	                        std::stacktrace		 const& in_stacktrace	   = std::stacktrace::current(),
+	                        std::source_location const& in_source_location = std::source_location::current());
+
+	/**
+	 * Converts an error number into a string.
+	 * @param in_error_number Error number.
+	 * @return Error string.
+	 */
+	static std::string GetErrorString(errno_t in_error_number) noexcept;
 };
 
 END_RUKEN_NAMESPACE
