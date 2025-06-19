@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Meta/Meta.hpp"
+
 #include "Core/Service.hpp"
 #include "Core/ServiceProvider.hpp"
 #include "JobSystem/WorkerInfo.hpp"
@@ -21,7 +23,8 @@ struct JobSystem final : Service
 {
 	using EvaluateWorkerBias = BinaryTreePath (*)(RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system);
 
-	static inline thread_local WorkerInfo worker_info {};
+	constexpr static           std::string_view service_name {RUKEN_STRING(JobSystem)};
+	static inline thread_local WorkerInfo       worker_info  {};
 
     #pragma region Lifetime
 
@@ -98,5 +101,6 @@ struct JobSystem final : Service
 
 		#pragma endregion
 };
+
 
 END_RUKEN_NAMESPACE

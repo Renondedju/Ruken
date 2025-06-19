@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types/FundamentalTypes.hpp"
+#include "Build/Namespace.hpp"
 
 #include <stack>
 #include <string>

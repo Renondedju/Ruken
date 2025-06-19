@@ -16,6 +16,7 @@ add_library(RkFilesystemService STATIC
         Sources/Windows/WindowsFilesystem.cpp
         Sources/Windows/WindowsFile.cpp
         Sources/Windows/WindowsFile.hpp
+        Sources/Filesystem.cpp
 )
 
 target_include_directories(RkFilesystemService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)

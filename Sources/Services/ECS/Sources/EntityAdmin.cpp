@@ -7,7 +7,7 @@
 USING_RUKEN_NAMESPACE
 
 EntityAdmin::EntityAdmin(ServiceProvider& in_service_provider) noexcept:
-    Service {in_service_provider}
+    Service {in_service_provider, typeid(EntityAdmin)}
 { }
 
 DynamicTask<> EntityAdmin::ExecuteEvent(EEventName const in_event_name) const noexcept

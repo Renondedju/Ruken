@@ -18,18 +18,15 @@ BEGIN_RUKEN_NAMESPACE
 struct Filesystem : Service
 {
 	// Static name of the service, used by the kernel to report service errors
-	constexpr static const RkChar* service_name = RUKEN_STRING(Filesystem);
+	constexpr static std::string_view service_name = RUKEN_STRING(Filesystem);
 
-#pragma region Lifetime
+	#pragma region Lifetime
 
 	/**
 	 * Default constructor.
 	 * @param in_service_provider Service provider instance.
 	 */
-	explicit Filesystem(ServiceProvider& in_service_provider) noexcept:
-		Service {in_service_provider}
-	{}
-
+	explicit Filesystem(ServiceProvider& in_service_provider) noexcept;
 	Filesystem           (Filesystem const& in_copy) = delete;
 	Filesystem           (Filesystem&&      in_move) = delete;
 	Filesystem& operator=(Filesystem const& in_copy) = delete;

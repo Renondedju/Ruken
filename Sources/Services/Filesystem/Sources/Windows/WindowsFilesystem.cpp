@@ -22,7 +22,7 @@ FileHandle WindowsFilesystem::Open(FilePath const& in_path, EOpenMode const in_o
 	real_path += in_path.Filename;
 
 	if (auto const logger {m_service_provider.LocateService<Logger>()})
-		logger->Log(service_name, ELogLevel::Info, "Opened file named {}", real_path.string());
+		logger->Log(service_name, ELogLevel::Info, "Opening file named {}", real_path.string());
 
 	return std::make_unique<WindowsFile>(in_path, in_open_mode, real_path);
 }

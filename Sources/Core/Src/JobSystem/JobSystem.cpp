@@ -33,7 +33,7 @@ JobSystem::JobSystem(
         ServiceProvider&                       in_provider,
         std::initializer_list<JobQueue*> const in_queues,
         EvaluateWorkerBias               const in_bias_function) noexcept:
-    Service         {in_provider},
+    Service         {in_provider, typeid(JobSystem)},
     m_bias_function {in_bias_function},
     m_request_tree  {in_queues.size()},
     m_queues        {in_queues}

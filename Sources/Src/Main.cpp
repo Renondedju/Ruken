@@ -74,7 +74,7 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_
 {
     AsyncLoop loop {"Loop", EntityAdmin {in_service_provider}};
 
-    auto       const filesystem {in_service_provider.LocateService<WindowsFilesystem>()};
+    auto       const filesystem {in_service_provider.LocateService<Filesystem>()};
     FileHandle const file       {filesystem->Open(FilePath {
         .Directory = DirectoryPath {
             .Location = EFilesystemLocation::ProjectDirectory,

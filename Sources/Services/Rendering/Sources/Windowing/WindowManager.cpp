@@ -8,7 +8,7 @@ USING_RUKEN_NAMESPACE
 #pragma region Constructors
 
 WindowManager::WindowManager(ServiceProvider& in_service_provider) noexcept:
-    Service {in_service_provider}
+    Service {in_service_provider, typeid(WindowManager)}
 {
     if (auto* root_logger = in_service_provider.LocateService<Logger>())
         m_logger = root_logger;//->AddChild("Windowing");

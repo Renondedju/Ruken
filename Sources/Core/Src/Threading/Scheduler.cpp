@@ -6,7 +6,7 @@
 USING_RUKEN_NAMESPACE
 
 Scheduler::Scheduler(ServiceProvider& in_service_provider, RkUint16 const in_workers_count) noexcept:
-    Service   {in_service_provider},
+    Service   {in_service_provider, typeid(Scheduler)},
     m_workers {in_workers_count == 0U ? std::thread::hardware_concurrency() - 1 : in_workers_count},
     m_running {true}
 {

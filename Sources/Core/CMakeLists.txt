@@ -6,7 +6,7 @@ set(TRACY_NO_FRAME_IMAGE ON)
 set(TRACY_NO_SAMPLING ON)
 set(TRACY_NO_VERIFY ON)
 
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.1.zip" NAME tracy)
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.1.zip" NAME zq)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
 CPMAddPackage(URL "https://github.com/nothings/stb/archive/refs/heads/master.zip" NAME stb)
