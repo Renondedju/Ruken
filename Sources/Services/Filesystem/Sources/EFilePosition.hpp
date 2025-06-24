@@ -4,11 +4,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-enum class EOpenMode
+enum class EFilePosition
 {
-	Read	  = 1 << 0,
-	Write     = 1 << 1,
-	ReadWrite = Read | Write,
+	Beginning,
+	End
 };
 
 END_RUKEN_NAMESPACE

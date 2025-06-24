@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <thread>
+#include <shared_mutex>
 
 BEGIN_RUKEN_NAMESPACE
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Filesystem/FileCursor.hpp"
 #include "Filesystem/IOJobQueue.hpp"
-#include "Filesystem/EOpenMode.hpp"
 #include "Filesystem/FilePath.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -14,8 +14,7 @@ struct File
 {
 	#pragma region Members
 
-	const EOpenMode OpenMode;
-	const FilePath  Path;
+	const FilePath Path;
 
 	#pragma endregion
 
@@ -24,11 +23,9 @@ struct File
 	/**
 	 * Default constructor
 	 * @param in_path Path of the file.
-	 * @param in_open_mode Open mode.
 	 */
-	explicit File(FilePath const& in_path, EOpenMode const in_open_mode) noexcept:
-		OpenMode {in_open_mode},
-		Path	 {in_path}
+	explicit File(FilePath const& in_path) noexcept:
+		Path {in_path}
 	{}
 
 	File           (File const& in_copy) = default;
@@ -41,15 +38,35 @@ struct File
 
 	#pragma region Methods
 
+	/// @brief Returns the size in bytes of the file.
+	virtual RkSize GetFileSize() const = 0;
+
 	/**
-	 * Reads the whole file.
-	 * @return File contents.
+	 * Reads a number of bytes starting from the file pointer.
+	 * The file pointer also gets pushed by the number of bytes read.
+	 *
+	 * @param in_destination Address of a buffer to write into.
+	 * @param in_start_position Start position of the read.
+	 * @param in_size Number of bytes to read.
+	 * @return Number of bytes actually read.
 	 */
-	virtual IOTask<std::vector<RkByte>> Read() = 0;
+	virtual IOTask<RkSize> Read(RkVoid* in_destination, FileCursor in_start_position, RkSize in_size) const = 0;
+
+	/**
+	 * Writes a number of bytes starting from the file pointer.
+	 * The file pointer also gets pushed by the number of bytes written.
+	 *
+	 * @param in_source Address of a buffer to read from.
+	 * @param in_start_position Start position of the write.
+	 * @param in_size Number of bytes to write.
+	 * @return Number of bytes actually written.
+	 */
+	virtual IOTask<RkSize> Write(RkVoid* in_source, FileCursor in_start_position, RkSize in_size) = 0;
 
 	#pragma endregion
 };
 
-using FileHandle = std::unique_ptr<File>;
+// File is meant to be a polymorphic type.
+using FileHandle = std::shared_ptr<File>;
 
 END_RUKEN_NAMESPACE

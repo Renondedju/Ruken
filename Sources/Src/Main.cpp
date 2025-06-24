@@ -36,14 +36,14 @@ struct AsyncLoop
     }
 
     [[nodiscard]]
-    Task<MainQueue> Run() noexcept
+    Task<MainQueue> Run() const noexcept
     {
         // When the awaited primitive is signaled (in this case when the task is done),
         // the Run() coroutine is then scheduled back into the MainQueue, waiting to be picked up
         // by the first available thread.
 
         // Main loop
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             co_await scene.ExecuteEvent(EEventName::OnStart);
 
@@ -67,6 +67,7 @@ Task<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
 
 /**
  * Asynchronous main.
+ *
  * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
  * @param in_service_provider Service Provider.
  */
@@ -81,10 +82,14 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_
             .Path     = "Assets"
         },
         .Filename = "test.zip"
-    }, EOpenMode::Read)};
+    })};
 
+    RkSize        const filesize {file->GetFileSize()};
+    std::vector<RkByte> buffer   {};
+
+    buffer.reserve(filesize);
     for (int i = 0; i < 25; i++)
-        file->Read();
+        file->Read(buffer.data(), {0, EFilePosition::Beginning}, buffer.capacity());
 
     co_await loop.Setup();
     co_await loop.Run  ();
@@ -96,6 +101,7 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_
 
 /**
  * Initializes services and waits for the async main function to request a stop.
+ *
  * @param in_argc Argument count
  * @param in_argv Argument values
  * @return Error code

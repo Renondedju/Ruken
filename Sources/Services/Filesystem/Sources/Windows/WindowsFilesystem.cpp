@@ -11,47 +11,35 @@ WindowsFilesystem::WindowsFilesystem(ServiceProvider& in_service_provider, std::
 	Filesystem   {in_service_provider},
 	project_path {in_project_path},
 	tmp_path     {std::filesystem::temp_directory_path()}
-{}
+{
+	if (auto const logger {m_service_provider.LocateService<Logger>()})
+		logger->Log(service_name, ELogLevel::Info, "Opened a Windows filesystem at {}",
+			std::filesystem::absolute(in_project_path).string()
+		);
+}
 
-FileHandle WindowsFilesystem::Open(FilePath const& in_path, EOpenMode const in_open_mode)
+FileHandle WindowsFilesystem::Open(FilePath const& in_path)
 {
 	std::filesystem::path real_path {GetPathFromLocation(in_path.Directory.Location).c_str()};
-	real_path += "/";
+	real_path += "\\";
 	real_path += in_path.Directory.Path;
-	real_path += "/";
+	real_path += "\\";
 	real_path += in_path.Filename;
 
 	if (auto const logger {m_service_provider.LocateService<Logger>()})
 		logger->Log(service_name, ELogLevel::Info, "Opening file named {}", real_path.string());
 
-	return std::make_unique<WindowsFile>(in_path, in_open_mode, real_path);
+	return std::make_unique<WindowsFile>(in_path, real_path);
 }
 
-std::filesystem::path const& WindowsFilesystem::GetPathFromLocation(EFilesystemLocation const in_location) const noexcept
+std::filesystem::path WindowsFilesystem::GetPathFromLocation(EFilesystemLocation const in_location) const noexcept
 {
 	switch (in_location)
 	{
 		case EFilesystemLocation::ProjectDirectory:
-			return project_path;
+			return std::filesystem::absolute(project_path);
 		case EFilesystemLocation::Temporary:
-			return tmp_path;
-
-		default:
-			std::unreachable();
-	}
-}
-
-std::string_view const& WindowsFilesystem::GetFileModeString(EOpenMode const in_open_mode) noexcept
-{
-	static std::string_view read_str  {"r"};
-	static std::string_view write_str {"w+"};
-
-	switch (in_open_mode)
-	{
-		case EOpenMode::Read:
-			return read_str;
-		case EOpenMode::Write:
-			return write_str;
+			return std::filesystem::absolute(tmp_path);
 
 		default:
 			std::unreachable();

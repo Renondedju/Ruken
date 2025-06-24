@@ -9,7 +9,6 @@ add_library(RkFilesystemService STATIC
     Sources/EFilesystemLocation.hpp
         Sources/DirectoryPath.hpp
         Sources/FilePath.hpp
-        Sources/EOpenMode.hpp
         Sources/IOJobQueue.hpp
         Sources/File.hpp
         Sources/Windows/WindowsFilesystem.hpp
@@ -17,6 +16,7 @@ add_library(RkFilesystemService STATIC
         Sources/Windows/WindowsFile.cpp
         Sources/Windows/WindowsFile.hpp
         Sources/Filesystem.cpp
+        Sources/FileCursor.hpp
 )
 
 target_include_directories(RkFilesystemService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)

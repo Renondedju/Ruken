@@ -3,7 +3,6 @@
 #include "Core/Service.hpp"
 #include "Meta/Meta.hpp"
 
-#include "Filesystem/EOpenMode.hpp"
 #include "Filesystem/FilePath.hpp"
 #include "Filesystem/File.hpp"
 
@@ -38,10 +37,9 @@ struct Filesystem : Service
 	/**
 	 * Opens a file.
 	 * @param in_path Path of the file.
-	 * @param in_open_mode Open mode.
 	 * @return File instance.
 	 */
-	virtual FileHandle Open(FilePath const& in_path, EOpenMode in_open_mode) = 0;
+	virtual FileHandle Open(FilePath const& in_path) = 0;
 };
 
 END_RUKEN_NAMESPACE

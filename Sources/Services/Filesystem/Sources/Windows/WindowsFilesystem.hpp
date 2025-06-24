@@ -37,24 +37,16 @@ struct WindowsFilesystem final: Filesystem
 	/**
 	 * Opens a file.
 	 * @param in_path Path of the file.
-	 * @param in_open_mode Open mode.
 	 * @return File instance.
 	 */
-	FileHandle Open(FilePath const& in_path, EOpenMode in_open_mode) override;
+	FileHandle Open(FilePath const& in_path) override;
 
 	/**
 	 * Returns a path corresponding to the passed location.
 	 * @param in_location Location.
 	 * @return Path.
 	 */
-	std::filesystem::path const& GetPathFromLocation(EFilesystemLocation in_location) const noexcept;
-
-	/**
-	 * Returns the corresponding file mode string.
-	 * @param in_open_mode Open mode.
-	 * @return File mode string.
-	 */
-	static std::string_view const& GetFileModeString(EOpenMode in_open_mode) noexcept;
+	std::filesystem::path GetPathFromLocation(EFilesystemLocation in_location) const noexcept;
 
 	#pragma endregion
 };
