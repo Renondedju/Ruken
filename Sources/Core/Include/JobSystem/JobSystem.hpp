@@ -76,7 +76,7 @@ struct JobSystem final : Service
 
 		#pragma region Members
 
-		mutable std::shared_mutex                        m_workers_mtx {};
+		mutable TracyLockable(std::shared_mutex,		 m_workers_mtx);
 		std::unordered_map<std::thread::id, WorkerInfo*> m_workers_map {};
 		std::vector		  <JobQueue*>					 m_queues	   {};
 		std::vector       <std::jthread>				 m_workers     {};
@@ -91,9 +91,10 @@ struct JobSystem final : Service
 		/**
 		 * @brief Runs jobs on the passed queues for a maximum of one full cycle.
 		 * @param in_queue Queue to run jobs from.
-		 * @param in_stop_token If a stop is requested, the method will return as soon as the current job is done
+		 * @param in_sticky Indicates if the worker should stick to the queue or just run one job.
+		 * @param in_stop_token Stop token to prompt sticky workers to exit preemptively the queue.
 		 */
-		static RkVoid ProcessQueue(JobQueue* in_queue, std::stop_token const& in_stop_token) noexcept;
+		static RkVoid ProcessQueue(JobQueue* in_queue, RkBool in_sticky, std::stop_token const& in_stop_token) noexcept;
 
 		/**
 		 * @brief (Re)evaluates a new queue bias for every worker.

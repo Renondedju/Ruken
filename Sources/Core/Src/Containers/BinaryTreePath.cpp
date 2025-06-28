@@ -30,6 +30,15 @@ RkUint64 BinaryTreePath::GetIndex() const noexcept
 	return recursive_get_index();
 }
 
+RkBool BinaryTreePath::IsParentOf(BinaryTreePath const& in_path) const noexcept
+{
+	for (RkUint64 i = 0ULL; i < depth; ++i)
+        if ((in_path.path & 1ULL << i) != (path & 1ULL << i))
+        	return false;
+
+	return true;
+}
+
 void BinaryTreePath::Parent() noexcept
 {
 	RUKEN_ASSERT(depth != 0, ""); depth--;

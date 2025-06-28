@@ -264,7 +264,6 @@ add_library(RkCore STATIC
         Include/Containers/BinaryTreePath.hpp
         Src/Containers/BinaryTreePath.cpp
         Src/Containers/BinaryTree.inl
-        Src/JobSystem/ConcurrencyTree.cpp
         Src/Core/Exception.cpp
 )
 

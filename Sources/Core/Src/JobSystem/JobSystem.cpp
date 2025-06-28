@@ -10,12 +10,15 @@
 
 USING_RUKEN_NAMESPACE
 
-RkVoid JobSystem::ProcessQueue(JobQueue* in_queue, std::stop_token const& in_stop_token) noexcept
+RkVoid JobSystem::ProcessQueue(JobQueue* in_queue, RkBool const in_sticky, std::stop_token const& in_stop_token) noexcept
 {
    worker_info.current_queue = in_queue;
 
     try {
-        in_queue->Pop(true, in_stop_token);
+        if (!in_sticky)
+            in_queue->RunOnce();
+        else
+            in_queue->RunMultiple(in_stop_token);
     }
     catch (std::exception& in_exception) {
         const char* what {in_exception.what()};
@@ -34,9 +37,9 @@ JobSystem::JobSystem(
         std::initializer_list<JobQueue*> const in_queues,
         EvaluateWorkerBias               const in_bias_function) noexcept:
     Service         {in_provider, typeid(JobSystem)},
+    m_queues        {in_queues},
     m_bias_function {in_bias_function},
-    m_request_tree  {in_queues.size()},
-    m_queues        {in_queues}
+    m_request_tree  {in_queues.size()}
 {
     RkSize const concurrency {std::thread::hardware_concurrency() - 1};
 
@@ -69,7 +72,7 @@ JobSystem::~JobSystem()
 RkVoid JobSystem::CallerAsWorker(std::stop_token&& in_stop_token, std::string_view const in_worker_name) noexcept
 {
     { // Registering the thread as a worker
-        std::unique_lock lock {m_workers_mtx};
+        std::lock_guard lock {m_workers_mtx};
         m_workers_map[std::this_thread::get_id()] = &worker_info;
 
         EvaluateWorkerBiases();
@@ -82,20 +85,21 @@ RkVoid JobSystem::CallerAsWorker(std::stop_token&& in_stop_token, std::string_vi
     while (!in_stop_token.stop_requested())
     {
         BinaryTreePath const path {m_request_tree.WaitConsumeRequest(worker_info.queue_bias, in_stop_token)};
+        RkBool const is_parent_of {worker_info.queue_bias.IsParentOf(path)};
 
         if (!in_stop_token.stop_requested())
-            ProcessQueue(m_queues[path.path], in_stop_token);
+            ProcessQueue(m_queues[path.path], is_parent_of, in_stop_token);
     }
 
     { // Unregistering the thread
-        std::unique_lock lock {m_workers_mtx};
+        std::lock_guard lock {m_workers_mtx};
         m_workers_map.erase(std::this_thread::get_id());
     }
 }
 
 RkSize JobSystem::GetWorkerCount() const noexcept
 {
-    std::shared_lock lock {m_workers_mtx};
+    std::lock_guard lock {m_workers_mtx};
     return m_workers_map.size();
 }
 

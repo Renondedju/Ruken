@@ -116,10 +116,13 @@ int main(int in_argc, char* in_argv[])
     std::initializer_list              queues   { &MainQueue::instance, &IOJobQueue::instance };
 
     MainQueue ::instance.SetMaximumConcurrency(8);
-    IOJobQueue::instance.SetMaximumConcurrency(3);
+    IOJobQueue::instance.SetMaximumConcurrency(8);
 
-    auto worker_bias_function = [](RkUint64 in_total, RkUint64 in_current, JobSystem& in_job_system) -> BinaryTreePath {
-        return {}; // We simply let all threads try to distribute themselves fairly among all queues
+    auto worker_bias_function = [](RkUint64 const in_total, RkUint64 const in_current, JobSystem& in_job_system) -> BinaryTreePath {
+        return {
+            .path  = in_current < 3ULL ? 0b1ULL : 0b0ULL,
+            .depth = 1
+        }; // We simply let all threads try to distribute themselves fairly among all queues
     };
 
     // 2. --- Initializing services and core systems. ---

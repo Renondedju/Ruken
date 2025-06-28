@@ -20,14 +20,24 @@ struct alignas(std::hardware_destructive_interference_size) Concurrency
 	{
 		struct Fields
 		{
-			RkUint64 maximum   : 16 {255};
-			RkUint64 current   : 16 {0};
-			RkUint64 requested : 16 {0};
-			RkUint64 optimal   : 16 {0};
+			RkSize maximum   : 16 {255};
+			RkSize current   : 16 {0};
+			RkSize requested : 16 {0};
+			RkSize optimal   : 16 {0};
 		} fields {};
 
-		RkUint64 packed_value;
+		RkSize packed_value;
 	};
+
+	#pragma region Operators
+
+	operator	   RkSize&()	   noexcept { return packed_value; }
+	operator const RkSize&() const noexcept { return packed_value; }
+
+	Concurrency operator+(Concurrency const& in_other) const { return Concurrency { .packed_value = packed_value + in_other.packed_value }; }
+	Concurrency operator-(Concurrency const& in_other) const { return Concurrency { .packed_value = packed_value - in_other.packed_value }; }
+
+	#pragma endregion
 
 	RkInt64 ComputeRequest(RkInt64 const in_offset) const noexcept
 	{
