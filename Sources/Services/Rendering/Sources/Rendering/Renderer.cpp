@@ -12,7 +12,7 @@ USING_RUKEN_NAMESPACE
 #pragma region Constructors
 
 Renderer::Renderer(ServiceProvider& in_service_provider) noexcept:
-    Service     {in_service_provider},
+    Service     {in_service_provider, typeid(Renderer)},
     m_scheduler {in_service_provider.LocateService<Scheduler>()}
 {
     auto* window_manager = in_service_provider.LocateService<WindowManager>();

@@ -26,12 +26,19 @@ struct BinaryTreePath
      */
     RkUint64 GetIndex() const noexcept;
 
+    /**
+     * Checks if the passed path is a child of this path.
+     * @param in_path Path to check.
+     * @return True if this path is a parent of in_path.
+     */
+    RkBool IsParentOf(BinaryTreePath const& in_path) const noexcept;
+
 	// Selection methods
-    void Parent       () noexcept;
-    void LeftChild    () noexcept;
-    void RightChild   () noexcept;
-    void Sibling      () noexcept;
-    void ChildFromBias(RkUint64 in_bias) noexcept;
+    RkVoid Parent       () noexcept;
+    RkVoid LeftChild    () noexcept;
+    RkVoid RightChild   () noexcept;
+    RkVoid Sibling      () noexcept;
+    RkVoid ChildFromBias(RkUint64 in_bias) noexcept;
 
     RkBool IsRoot() const noexcept;
     RkBool IsLeaf() const noexcept;

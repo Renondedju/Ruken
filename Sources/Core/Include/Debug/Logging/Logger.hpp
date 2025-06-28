@@ -33,7 +33,7 @@ class Logger final: public Service
     public:
 
         // Static name of the service, used by the kernel to report service errors
-        constexpr static const RkChar* service_name = RUKEN_STRING(Logger);
+        constexpr static const RkChar*   service_name = RUKEN_STRING(Logger);
 
         #pragma region Lifetime
 

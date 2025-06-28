@@ -6,10 +6,9 @@ set(TRACY_NO_FRAME_IMAGE ON)
 set(TRACY_NO_SAMPLING ON)
 set(TRACY_NO_VERIFY ON)
 
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.11.1.zip" NAME tracy)
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.1.zip" NAME zq)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
-CPMAddPackage(URL "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.6.zip" NAME magic_enum)
 CPMAddPackage(URL "https://github.com/nothings/stb/archive/refs/heads/master.zip" NAME stb)
 
 # stb has no CMake support and is a header only library
@@ -260,14 +259,12 @@ add_library(RkCore STATIC
         Include/Debug/Logging/Handlers/DebugHandler.hpp
         Src/Core/Service.cpp
         Src/Debug/Logging/Logger.inl
-        Include/IO/IOJobQueue.hpp
-        Include/IO/File.hpp
         Include/Containers/BinaryTree.hpp
         Include/JobSystem/WorkerRequestTree.hpp
         Include/Containers/BinaryTreePath.hpp
         Src/Containers/BinaryTreePath.cpp
         Src/Containers/BinaryTree.inl
-        Src/JobSystem/ConcurrencyTree.cpp
+        Src/Core/Exception.cpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)
@@ -291,4 +288,4 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Include/Build/BuildInfo.hpp.in ${RUKE
 CheckGitSetup()
 
 # --- Link dependencies
-target_link_libraries(RkCore PUBLIC atomic_queue git_version stb tinyobjloader TracyClient magic_enum)
+target_link_libraries(RkCore PUBLIC atomic_queue git_version stb tinyobjloader TracyClient)

@@ -1,0 +1,81 @@
+#pragma once
+
+#include <Filesystem/EFilePosition.hpp>
+
+#include "Filesystem/File.hpp"
+#include "Utility/WindowsOS.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+/**
+ * File implementation of the underlying operating system's filesystem.
+ */
+struct WindowsFile final: File
+{
+	#pragma region Lifetime
+
+	/**
+	 * Default constructor
+	 * @param in_path Path of the file.
+	 * @param in_os_path Full OS path.
+	 */
+	explicit WindowsFile(FilePath const& in_path, std::filesystem::path const& in_os_path);
+	WindowsFile           (WindowsFile const& in_copy) = default;
+	WindowsFile           (WindowsFile&&      in_move) = default;
+	WindowsFile& operator=(WindowsFile const& in_copy) = delete;
+	WindowsFile& operator=(WindowsFile&&      in_move) = delete;
+	~WindowsFile() noexcept override;
+
+	#pragma endregion
+
+	#pragma region Methods
+
+	/**
+	 * Reads a number of bytes starting from the file pointer.
+	 * The file pointer also gets pushed by the number of bytes read.
+	 *
+	 * @param in_destination Address of a buffer to write into.
+	 * @param in_start_position Start position of the read.
+	 * @param in_size Number of bytes to read.
+	 * @return Number of bytes actually read.
+	 */
+	IOTask<RkSize> Read(RkVoid* in_destination, FileCursor in_start_position, RkSize in_size) const override;
+
+	/**
+	 * Writes a number of bytes starting from the file pointer.
+	 * The file pointer also gets pushed by the number of bytes written.
+	 *
+	 * @param in_source Address of a buffer to read from.
+	 * @param in_start_position Start position of the write.
+	 * @param in_size Number of bytes to write.
+	 * @return Number of bytes actually written.
+	 */
+	IOTask<RkSize> Write(RkVoid* in_source, FileCursor in_start_position, RkSize in_size) override;
+
+	/// @brief Returns the size in bytes of the file.
+	RkSize GetFileSize() const override;
+
+	#pragma endregion
+
+	private:
+
+		#pragma region Members
+
+		HANDLE		file_handle {nullptr};
+		std::size_t file_size   {0};
+
+		#pragma endregion
+
+		#pragma region Methods
+
+		/**
+		 * Converts a file position into a move method for the windows.h SetFilePointer function.
+		 * @param in_position File position.
+		 * @return Move method.
+		 */
+		static DWORD GetWindowsMoveMethod(EFilePosition in_position) noexcept;
+
+		#pragma endregion
+};
+
+END_RUKEN_NAMESPACE

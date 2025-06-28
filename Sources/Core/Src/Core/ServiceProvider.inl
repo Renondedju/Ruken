@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Meta/Assert.hpp"
 #include "Core/ServiceProvider.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -11,7 +12,7 @@ TService* ServiceProvider::ProvideService(TArgs&&... in_args)
 {
     TService* new_service {new TService(*this, std::forward<TArgs>(in_args)...)};
 
-    const std::type_index& service_id {std::type_index(typeid(TService))};
+    std::type_index const service_id {new_service->GetServiceID()};
 
     m_services           [service_id] = new_service;
     m_services_order.push(service_id);
@@ -23,7 +24,7 @@ template <typename TService>
 TService* ServiceProvider::LocateService() noexcept
 {
     // Locating the service
-    auto const it = m_services.find(std::type_index(typeid(TService)));
+    auto const it = m_services.find(typeid(TService));
 
     // If the service hasn't been found
     if (it == m_services.end())

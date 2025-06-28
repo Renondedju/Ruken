@@ -36,7 +36,7 @@ TracyCZoneCtx TracyUtilities::TracyZone(___tracy_source_location_data* in_source
 
 #ifdef TRACY_ENABLE
     #if defined TRACY_HAS_CALLSTACK && defined TRACY_CALLSTACK
-        ctx = ___tracy_emit_zone_begin_callstack(in_source_data, in_active);
+        ctx = ___tracy_emit_zone_begin_callstack(in_source_data, TRACY_CALLSTACK, in_active);
     #else
         ctx = ___tracy_emit_zone_begin(in_source_data, in_active);
     #endif

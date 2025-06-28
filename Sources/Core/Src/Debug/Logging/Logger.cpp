@@ -8,7 +8,7 @@ USING_RUKEN_NAMESPACE
 
 Logger::Logger(ServiceProvider& in_service_provider,
                ELogLevel const  in_level) noexcept:
-    Service {in_service_provider},
+    Service {in_service_provider, typeid(Logger)},
     m_level {in_level}
 { }
 
@@ -63,12 +63,11 @@ RkVoid Logger::Dispatch(LogRecord const& in_record) const noexcept
 }
 
 Logger::Logger(ServiceProvider& in_service_provider,
-               std::initializer_list<LogHandler*> in_handlers, ELogLevel in_level) noexcept:
-    Service    {in_service_provider},
+               std::initializer_list<LogHandler*> const in_handlers,
+               ELogLevel const in_level) noexcept:
+    Service    {in_service_provider, typeid(Logger)},
     m_level    {in_level},
     m_handlers {in_handlers}
-{
-
-}
+{}
 
 #pragma endregion

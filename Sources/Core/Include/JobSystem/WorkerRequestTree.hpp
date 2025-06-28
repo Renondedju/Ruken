@@ -15,7 +15,7 @@ struct WorkerRequestTree
 {
     BinaryTree<std::atomic_uint64_t> tree;
     std::condition_variable_any      sleep_variable {};
-    std::mutex                       sleep_mutex    {};
+    TracyLockable(std::mutex       , sleep_mutex);
 
     static inline thread_local RkUint64 fair_path {};
 
@@ -48,7 +48,8 @@ struct WorkerRequestTree
 
     /**
      * Waits for and consumes or request based on a bias.
-     * @param in_preferred_path Preferred path in the tree. If it does not directly lead to a leaf, the rest of the traversal will be uniformly distributed over time.
+     * @param in_preferred_path Preferred path in the tree. If it does not directly lead to a leaf,
+     *                          the rest of the traversal will be uniformly distributed over time.
      * @param in_stop_signal Stop signal. Used to cancel the wait.
      * @returns Path to the leaf that emitted the request we consumed.
      */
@@ -101,9 +102,9 @@ struct WorkerRequestTree
 
             do
             {
-                if (value == 0)
+                if (value == 0ULL)
                     return false;
-            } while (!tree.nodes[index].compare_exchange_weak(value, value - 1, std::memory_order_acq_rel));
+            } while (!tree.nodes[index].compare_exchange_weak(value, value - 1ULL, std::memory_order_acq_rel));
 
             return true;
         }
