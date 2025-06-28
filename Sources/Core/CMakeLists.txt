@@ -130,16 +130,6 @@ add_library(RkCore STATIC
         Include/Meta/TupleSubset.hpp
         Include/Meta/UniqueTuple.hpp
         Include/Meta/UniqueTypes.hpp
-        Include/Threading/EAccessMode.hpp
-        Include/Threading/ESynchronizationMode.hpp
-        Include/Threading/ExecutionPlan.hpp
-        Include/Threading/Job.hpp
-        Include/Threading/OldWorker.hpp
-        Include/Threading/Scheduler.hpp
-        Include/Threading/Synchronized.hpp
-        Include/Threading/SynchronizedAccess.hpp
-        Include/Threading/ThreadSafeLockQueue.hpp
-        Include/Threading/ThreadSafeQueue.hpp
         Include/Types/Concepts/ArithmeticType.hpp
         Include/Types/Concepts/FloatingPointType.hpp
         Include/Types/Concepts/FundamentalType.hpp
@@ -214,32 +204,11 @@ add_library(RkCore STATIC
         Src/Maths/MinMax.cpp
         Src/Maths/Trigonometry.cpp
         Src/Maths/Utility.cpp
-        Src/Threading/ExecutionPlan.cpp
-        Src/Threading/OldWorker.cpp
-        Src/Threading/OldWorker.inl
-        Src/Threading/Scheduler.cpp
-        Src/Threading/Synchronized.inl
-        Src/Threading/SynchronizedAccess.inl
-        Src/Threading/ThreadSafeLockQueue.inl
-        Src/Threading/ThreadSafeQueue.inl
         Src/Types/Units/Angle/Angle.inl
         Src/Types/Units/Distance/Distance.inl
         Src/Types/Units/Duration/Duration.inl
         Src/Utility/Benchmark.cpp
         Src/Debug/Trace.cpp
-        Src/Resource/Handle.inl
-        Src/Resource/ResourceManager.inl
-        Include/Resource/Enums/EGCCollectionMode.hpp
-        Include/Resource/Enums/EResourceGCStrategy.hpp
-        Include/Resource/Enums/EResourceLoadingFailureCode.hpp
-        Include/Resource/Enums/EResourceStatus.hpp
-        Include/Resource/Handle.hpp
-        Include/Resource/IResource.hpp
-        Include/Resource/ResourceIdentifier.hpp
-        Include/Resource/ResourceLoadingDescriptor.hpp
-        Include/Resource/ResourceManager.hpp
-        Include/Resource/ResourceManifest.hpp
-        Include/Resource/ResourceProcessingFailure.hpp
         Include/Debug/Trace.hpp
         Include/Debug/SourceLocation.hpp
         Src/JobSystem/Awaitables/TaskPromise.inl

@@ -1,15 +1,16 @@
 #pragma once
 
-#include "Build/Attributes.hpp"
-#include "Threading/ThreadSafeLockQueue.hpp"
+#include "JobSystem/Blocking/Synchronized.hpp"
 #include "Debug/Logging/Formatters/LogFormatter.hpp"
+
+#include <queue>
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief This is the base class responsible for dispatching the appropriate log messages
+ * @brief This is the base class responsible for dispatching the appropriate log messages
  *        (based on the log messages�' severity) to the handler�'s specified destination.
- * \note  Logger objects can add zero or more handler objects to themselves with an "AddHandler" method.
+ * @note  Logger objects can add zero or more handler objects to themselves with an "AddHandler" method.
  */
 class LogHandler
 {
@@ -17,8 +18,8 @@ class LogHandler
 
         #pragma region Members
 
-        LogFormatter const&            m_formatter {};
-        ThreadSafeLockQueue<LogRecord> m_records   {};
+        LogFormatter const&                 m_formatter {};
+        Synchronized<std::queue<LogRecord>> m_records   {};
 
         #pragma endregion
 
@@ -27,12 +28,10 @@ class LogHandler
         #pragma region Lifetime
 
         explicit LogHandler(LogFormatter const& in_formatter) noexcept;
-
-        LogHandler(LogHandler const& in_copy) = delete;
-        LogHandler(LogHandler&&      in_move) = delete;
-        LogHandler& operator=(LogHandler const& in_other) = delete;
-        LogHandler& operator=(LogHandler&&      in_other) = delete;
-
+        LogHandler           (LogHandler const&) = delete;
+        LogHandler           (LogHandler&&     ) = delete;
+        LogHandler& operator=(LogHandler const&) = delete;
+        LogHandler& operator=(LogHandler&&     ) = delete;
         virtual ~LogHandler() = default;
 
         #pragma endregion

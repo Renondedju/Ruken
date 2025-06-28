@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <thread>
@@ -44,7 +43,7 @@ class VulkanDevice
 
         RkBool CreateDevice      (VulkanPhysicalDevice const& in_physical_device) noexcept;
         RkVoid CreateQueues      (VulkanPhysicalDevice const& in_physical_device) noexcept;
-        RkVoid CreateCommandPools(Scheduler            const& in_scheduler)       noexcept;
+        RkVoid CreateCommandPools(/*Scheduler            const& in_scheduler*/)       noexcept;
 
         #pragma endregion
 
@@ -52,7 +51,7 @@ class VulkanDevice
 
         #pragma region Constructors
 
-        explicit VulkanDevice(Scheduler            const& in_scheduler,
+        explicit VulkanDevice(/*Scheduler            const& in_scheduler,*/
                               VulkanPhysicalDevice const& in_physical_device) noexcept;
 
         VulkanDevice(VulkanDevice const& in_copy) = delete;
@@ -79,10 +78,10 @@ class VulkanDevice
          */
         [[nodiscard]] VulkanQueue const* RequestPresentQueue(VkSurfaceKHR const& in_surface) const noexcept;
 
-        [[nodiscard]] RkBool                    IsValid               () const noexcept;
-        [[nodiscard]] RkUint32                  GetGraphicsFamily     () const noexcept;
-        [[nodiscard]] RkUint32                  GetComputeFamily      () const noexcept;
-        [[nodiscard]] RkUint32                  GetTransferFamily     () const noexcept;
+        [[nodiscard]] RkBool                     IsValid               () const noexcept;
+        [[nodiscard]] RkUint32                   GetGraphicsFamily     () const noexcept;
+        [[nodiscard]] RkUint32                   GetComputeFamily      () const noexcept;
+        [[nodiscard]] RkUint32                   GetTransferFamily     () const noexcept;
         [[nodiscard]] VkDevice            const& GetHandle             () const noexcept;
         [[nodiscard]] VulkanQueue         const& GetGraphicsQueue      () const noexcept;
         [[nodiscard]] VulkanQueue         const& GetComputeQueue       () const noexcept;

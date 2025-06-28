@@ -3,8 +3,6 @@
 
 #include "Rendering/Vulkan/Core/VulkanDevice.hpp"
 
-#include "Threading/Scheduler.hpp"
-
 #include "Rendering/Vulkan/Utilities/VulkanDebug.hpp"
 #include "Rendering/Vulkan/Utilities/VulkanLoader.hpp"
 
@@ -12,7 +10,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Constructors
 
-VulkanDevice::VulkanDevice(Scheduler            const& in_scheduler,
+VulkanDevice::VulkanDevice(/*Scheduler            const& in_scheduler*/,
                            VulkanPhysicalDevice const& in_physical_device) noexcept:
     m_queue_families {in_physical_device.GetQueueFamilies()}
 {
@@ -20,7 +18,7 @@ VulkanDevice::VulkanDevice(Scheduler            const& in_scheduler,
         return;
 
     CreateQueues      (in_physical_device);
-    CreateCommandPools(in_scheduler);
+    CreateCommandPools(/*in_scheduler*/);
 
     m_pipeline_cache = std::make_unique<VulkanPipelineCache>("Data/PipelineCache.data");
 }
@@ -114,7 +112,7 @@ RkVoid VulkanDevice::CreateQueues(VulkanPhysicalDevice const& in_physical_device
     }
 }
 
-RkVoid VulkanDevice::CreateCommandPools(Scheduler const& in_scheduler) noexcept
+RkVoid VulkanDevice::CreateCommandPools(/*Scheduler const& in_scheduler*/) noexcept
 {
     std::set<RkUint32> const unique_queue_families = {
         *m_queue_families.graphics,
@@ -123,10 +121,10 @@ RkVoid VulkanDevice::CreateCommandPools(Scheduler const& in_scheduler) noexcept
     };
 
     for (auto const& queue_family : unique_queue_families)
-    {
+    {/*
         for (auto const& worker : in_scheduler.GetWorkers())
             m_command_pools[queue_family].emplace(worker.ID(), VulkanCommandPool(VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
-
+      */
         m_command_pools[queue_family].emplace(std::this_thread::get_id(), VulkanCommandPool(VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
     }
 }
