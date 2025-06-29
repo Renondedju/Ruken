@@ -6,8 +6,8 @@ endif ()
 
 add_library(RkResourcesService STATIC
     Sources/ResourceManager.hpp
-        Sources/ResourceManager.cpp
-        Sources/Resource.hpp
+    Sources/ResourceManager.cpp
+    Sources/Resource.hpp
 )
 
 target_include_directories(RkResourcesService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)

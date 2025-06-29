@@ -1,7 +1,7 @@
 # Temp and debug folders
 logs/
 build/
-!Sources/Core/Include/Build
+!Sources/Core/Sources/Build
 !Sources/Core/Src/Build
 
 # Revision file
@@ -45,4 +45,4 @@ _ReSharper.Caches
 /sources/third-party/
 Sources/ThirdParty
 .idea
-Sources/Core/Include/Build/BuildInfo.hpp
+Sources/Core/Sources/Build/BuildInfo.hpp

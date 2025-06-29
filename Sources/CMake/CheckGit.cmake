@@ -1,8 +1,8 @@
 
 # https://jonathanhamberg.com/post/cmake-embedding-git-hash/
 
-set(pre_configure_file  ${RUKEN_CORE_DIR}/Src/Build/BuildInfo.cpp.in)
-set(post_configure_file ${RUKEN_GENERATED_SOURCES_DIR}/Src/Build/BuildInfo.cpp)
+set(pre_configure_file  ${RUKEN_CORE_DIR}/Sources/Build/BuildInfo.cpp.in)
+set(post_configure_file ${RUKEN_GENERATED_SOURCES_DIR}/Sources/Build/BuildInfo.cpp)
 
 function(GitWriteCache in_value in_cache_name)
     file(WRITE ${CMAKE_BINARY_DIR}/Git${in_cache_name}Cache.txt ${in_value})
@@ -81,7 +81,7 @@ function(CheckGitSetup)
             BYPRODUCTS ${post_configure_file}
     )
 
-    add_library(git_version ${RUKEN_GENERATED_SOURCES_DIR}/Src/Build/BuildInfo.cpp)
+    add_library(git_version ${RUKEN_GENERATED_SOURCES_DIR}/Sources/Build/BuildInfo.cpp)
     target_include_directories(git_version PUBLIC  ${RUKEN_GENERATED_SOURCES_DIR}/Include)
     target_include_directories(git_version PRIVATE ${RUKEN_CORE_DIR}/Include)
     add_dependencies(git_version AlwaysCheckGit)
