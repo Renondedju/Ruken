@@ -1,18 +1,21 @@
-#include "Core/JobSystem/JobSystem.hpp"
-#include "Core/JobSystem/Queues/QueueHandle.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
-#include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
-
-#include "Core/Debug/Logging/Logger.hpp"
-#include "Core/Debug/Logging/Handlers/DebugHandler.hpp"
-#include "Core/Debug/Logging/Handlers/ConsoleHandler.hpp"
-
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
+
+#include "JobSystem/JobSystem.hpp"
+#include "JobSystem/Queues/QueueHandle.hpp"
+#include "JobSystem/Awaitables/Tasks/Task.hpp"
+#include "JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/DirectoryPath.hpp"
 #include "Filesystem/Windows/WindowsFilesystem.hpp"
+
+#include "Debug/Logging/Logger.hpp"
+#include "Debug/Logging/Handlers/DebugHandler.hpp"
+#include "Debug/Logging/Handlers/ConsoleHandler.hpp"
+
+#include "Windowing/WindowManager.hpp"
+#include "Windowing/Window.hpp"
 
 #include <tracy/Tracy.hpp>
 
@@ -130,10 +133,13 @@ int main(int in_argc, char* in_argv[])
     Logger*            logger     {services.ProvideService<Logger    >(handlers)};
     JobSystem*         job_system {services.ProvideService<JobSystem >(queues, worker_bias_function)};
     WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("..")};
+    WindowManager*     windowing  {services.ProvideService<WindowManager>()};
 
     // 3. --- Running async main. ---
     std::stop_source stop_source {};
     AsyncMain(stop_source, services);
+
+    auto window {windowing->CreateWindow(Constants<Vector2px>::standard_definition, "Coucou")};
 
     // And waiting for it to complete as a worker.
     job_system->CallerAsWorker(stop_source.get_token(), "CPU Main");

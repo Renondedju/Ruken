@@ -6,15 +6,15 @@ set(GLFW_BUILD_DOCS OFF)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
 
-if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR}/Services/Rendering)
-    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Sources ${RUKEN_GENERATED_SOURCES_DIR}/Services/Rendering SYMBOLIC)
+if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR}/Services/OldRendering)
+    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Sources ${RUKEN_GENERATED_SOURCES_DIR}/Services/OldRendering SYMBOLIC)
 endif ()
 
 CPMAddPackage(URL "https://github.com/glfw/glfw/releases/download/3.3.9/glfw-3.3.9.zip" NAME glfw)
 CPMAddPackage(URL "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.0.1.zip" NAME vma)
 CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.3.270.zip" NAME volk)
 
-add_library(RkRenderingService STATIC
+add_library(RkOldRenderingService STATIC
     Sources/Rendering/RenderContext.hpp
     Sources/Rendering/Renderer.hpp
     Sources/Rendering/RenderFrame.hpp
@@ -103,10 +103,10 @@ add_library(RkRenderingService STATIC
     Sources/Rendering/RenderView.cpp
 )
 
-target_include_directories(RkRenderingService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)
-target_include_directories(RkRenderingService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Include)
-target_include_directories(RkRenderingService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Src)
-target_include_directories(RkRenderingService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Services)
-target_link_libraries     (RkRenderingService PUBLIC  glfw Vulkan::Vulkan volk VulkanMemoryAllocator RkCore)
+target_include_directories(RkOldRenderingService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)
+target_include_directories(RkOldRenderingService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Include)
+target_include_directories(RkOldRenderingService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Src)
+target_include_directories(RkOldRenderingService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Services)
+target_link_libraries     (RkOldRenderingService PUBLIC  glfw Vulkan::Vulkan volk VulkanMemoryAllocator RkCore)
 
-set_property(GLOBAL APPEND PROPERTY RUKEN_SERVICE_LIBS RkRenderingService)
+#set_property(GLOBAL APPEND PROPERTY RUKEN_SERVICE_LIBS RkRenderingService)
