@@ -1,16 +1,18 @@
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.24)
 
-if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR}/Services/Resources)
-    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Sources ${RUKEN_GENERATED_SOURCES_DIR}/Services/Resources SYMBOLIC)
-endif ()
+# Creating a new service
+include(${RUKEN_SOURCES_DIR}/CMake/RkService.cmake)
+register_ruken_service(RkResourcesService Resources)
 
-add_library(RkResourcesService STATIC
-    Sources/ResourceManager.hpp
-    Sources/ResourceManager.cpp
-    Sources/Resource.hpp
+# Files
+target_sources(RkResourcesService INTERFACE
+    FILE_SET HEADERS BASE_DIRS Sources FILES
+        Sources/Resource.hpp
+        Sources/ResourceManager.hpp
 )
 
-target_include_directories(RkResourcesService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)
-target_link_libraries     (RkResourcesService PUBLIC RkCore)
+target_sources(RkResourcesService PRIVATE
+        Sources/ResourceManager.cpp
+)
 
-set_property(GLOBAL APPEND PROPERTY RUKEN_SERVICE_LIBS RkResourcesService)
+target_link_libraries(RkResourcesService PUBLIC RkCore)

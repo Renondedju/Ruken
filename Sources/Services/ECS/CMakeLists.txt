@@ -1,65 +1,66 @@
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.24)
 
-if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR}/Services/ECS)
-    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Sources ${RUKEN_GENERATED_SOURCES_DIR}/Services/ECS SYMBOLIC)
-endif ()
+# Creating a new service
+include(${RUKEN_SOURCES_DIR}/CMake/RkService.cmake)
+register_ruken_service(RkECSService ECS)
 
-add_library(RkECSService STATIC
-        Sources/Test/CounterSystem.hpp
+# Files
+target_sources(RkECSService INTERFACE
+        FILE_SET HEADERS BASE_DIRS Sources FILES
+            Sources/Test/CounterSystem.hpp
+            Sources/Archetype.hpp
+            Sources/Archetype.inl
+            Sources/ArchetypeFingerprint.hpp
+            Sources/ArchetypeFingerprint.inl
+            Sources/Component.hpp
+            Sources/Component.inl
+            Sources/ComponentBase.hpp
+            Sources/ComponentCounter.hpp
+            Sources/ComponentField.hpp
+            Sources/ComponentQuery.hpp
+            Sources/ComponentQuery.inl
+            Sources/ComponentView.hpp
+            Sources/ComponentView.inl
+            Sources/EEventName.hpp
+            Sources/Entity.hpp
+            Sources/EntityAdmin.hpp
+            Sources/EntityAdmin.inl
+            Sources/EventHandler.hpp
+            Sources/EventHandler.inl
+            Sources/EventHandlerBase.hpp
+            Sources/ExclusiveComponent.hpp
+            Sources/Range.hpp
+            Sources/System.hpp
+            Sources/System.inl
+            Sources/TagComponent.hpp
+            Sources/Test/CounterComponent.hpp
+            Sources/Safety/ViewType.hpp
+            Sources/Safety/TagComponentType.hpp
+            Sources/Safety/SystemType.hpp
+            Sources/Safety/ExclusiveComponentType.hpp
+            Sources/Safety/EventHandlerType.hpp
+            Sources/Safety/ComponentType.hpp
+            Sources/Safety/ComponentFieldType.hpp
+            Sources/Safety/AnyComponentType.hpp
+            Sources/Meta/ItemHelper.hpp
+            Sources/Meta/FieldHelper.hpp
+            Sources/Meta/ComponentHelper.hpp
+)
+
+target_sources(RkECSService PRIVATE
         Sources/Archetype.cpp
-        Sources/Archetype.hpp
-        Sources/Archetype.inl
-        Sources/ArchetypeFingerprint.hpp
-        Sources/ArchetypeFingerprint.inl
-        Sources/Component.hpp
-        Sources/Component.inl
-        Sources/ComponentBase.cpp
-        Sources/ComponentBase.hpp
-        Sources/ComponentCounter.hpp
-        Sources/ComponentField.hpp
-        Sources/ComponentQuery.cpp
-        Sources/ComponentQuery.hpp
-        Sources/ComponentQuery.inl
-        Sources/ComponentView.hpp
-        Sources/ComponentView.inl
-        Sources/EEventName.hpp
         Sources/Entity.cpp
-        Sources/Entity.hpp
-        Sources/EntityAdmin.cpp
-        Sources/EntityAdmin.hpp
-        Sources/EntityAdmin.inl
-        Sources/EventHandler.hpp
-        Sources/EventHandler.inl
         Sources/EventHandlerBase.cpp
-        Sources/EventHandlerBase.hpp
-        Sources/ExclusiveComponent.hpp
+        Sources/EntityAdmin.cpp
         Sources/Range.cpp
-        Sources/Range.hpp
-        Sources/System.cpp
-        Sources/System.hpp
-        Sources/System.inl
         Sources/TagComponent.cpp
-        Sources/TagComponent.hpp
-        Sources/Test/CounterComponent.hpp
-        Sources/Safety/ViewType.hpp
-        Sources/Safety/TagComponentType.hpp
-        Sources/Safety/SystemType.hpp
-        Sources/Safety/ExclusiveComponentType.hpp
-        Sources/Safety/EventHandlerType.hpp
-        Sources/Safety/ComponentType.hpp
-        Sources/Safety/ComponentFieldType.hpp
-        Sources/Safety/AnyComponentType.hpp
-        Sources/Meta/ItemHelper.hpp
-        Sources/Meta/FieldHelper.hpp
-        Sources/Meta/ComponentHelper.hpp
+        Sources/System.cpp
+        Sources/ComponentQuery.cpp
+        Sources/ComponentBase.cpp
 )
 
 if (MSVC)
     target_compile_options(RkECSService PUBLIC /Zc:preprocessor)
 endif ()
 
-target_include_directories(RkECSService PRIVATE ${RUKEN_GENERATED_SOURCES_DIR}/Include)
-target_include_directories(RkECSService PRIVATE ${RUKEN_SOURCES_DIR}/Core/Include)
 target_link_libraries     (RkECSService PUBLIC RkCore)
-
-set_property(GLOBAL APPEND PROPERTY RUKEN_SERVICE_LIBS RkECSService)

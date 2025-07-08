@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Exception.hpp"
+#include "../Debug/Exception.hpp"
 #include "Build/Namespace.hpp"
 
 #include <stacktrace>

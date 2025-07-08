@@ -1,4 +1,4 @@
-#include "Core/Exception.hpp"
+#include "Exception.hpp"
 
 USING_RUKEN_NAMESPACE
 

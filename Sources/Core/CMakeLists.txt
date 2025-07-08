@@ -50,7 +50,7 @@ add_library(RkCore STATIC
         Sources/JobSystem/JobSystem.hpp
         Sources/JobSystem/Concurrency.hpp
         Sources/JobSystem/WorkerInfo.hpp
-        Sources/Core/Exception.hpp
+        Sources/Debug/Exception.hpp
         Sources/Core/Service.hpp
         Sources/Core/ServiceLoader.hpp
         Sources/Core/ServiceProvider.hpp
@@ -108,7 +108,7 @@ add_library(RkCore STATIC
         Sources/Maths/Trigonometry.hpp
         Sources/Maths/Utility.hpp
         Sources/Maths/Vector4f.hpp
-        Sources/Meta/Assert.hpp
+        Sources/Debug/Assert.hpp
         Sources/Meta/CommonTypeFallback.hpp
         Sources/Meta/CopyConst.hpp
         Sources/Meta/HasCommonType.hpp
@@ -230,7 +230,7 @@ add_library(RkCore STATIC
         Sources/Containers/BinaryTreePath.hpp
         Sources/Containers/BinaryTreePath.cpp
         Sources/Containers/BinaryTree.inl
-        Sources/Core/Exception.cpp
+        Sources/Debug/Exception.cpp
 )
 
 target_include_directories(RkCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Sources)
