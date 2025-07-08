@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Meta/Assert.hpp"
+#include "../Debug/Assert.hpp"
 #include "Core/ServiceProvider.hpp"
 
 BEGIN_RUKEN_NAMESPACE

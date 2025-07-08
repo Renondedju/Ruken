@@ -1,5 +1,5 @@
 #include "Containers/BinaryTreePath.hpp"
-#include "Meta/Assert.hpp"
+#include "../Debug/Assert.hpp"
 
 USING_RUKEN_NAMESPACE
 

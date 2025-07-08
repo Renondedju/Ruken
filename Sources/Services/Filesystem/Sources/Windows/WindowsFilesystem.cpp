@@ -3,7 +3,7 @@
 #include "Debug/Logging/Logger.hpp"
 #include "Filesystem/Windows/WindowsFile.hpp"
 
-#include "Meta/Assert.hpp"
+#include "../../../../Core/Sources/Debug/Assert.hpp"
 
 USING_RUKEN_NAMESPACE
 

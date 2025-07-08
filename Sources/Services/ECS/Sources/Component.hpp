@@ -1,8 +1,7 @@
 
 #pragma once
 
-#include "Meta/Assert.hpp"
-
+#include "Debug/Assert.hpp"
 #include "Maths/MinMax.hpp"
 #include "ECS/ComponentBase.hpp"
 #include "Containers/LinkedChunkList.hpp"

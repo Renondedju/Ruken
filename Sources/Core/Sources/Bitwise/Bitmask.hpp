@@ -5,7 +5,7 @@
 
 #include "Build/Namespace.hpp"
 
-#include "Meta/Assert.hpp"
+#include "../Debug/Assert.hpp"
 #include "Bitwise/SizedBitmask.hpp"
 #include "Types/FundamentalTypes.hpp"
 

@@ -27,7 +27,7 @@
 #include <tuple>
 #include <forward_list>
 
-#include "Meta/Assert.hpp"
+#include "../../../Core/Sources/Debug/Assert.hpp"
 #include "Meta/PassConst.hpp"
 #include "Meta/TupleSubset.hpp"
 #include "Meta/UniqueTuple.hpp"

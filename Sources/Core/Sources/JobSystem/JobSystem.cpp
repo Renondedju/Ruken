@@ -3,7 +3,7 @@
 #include "JobSystem/JobSystem.hpp"
 
 #include "Debug/Logging/Logger.hpp"
-#include "Meta/Assert.hpp"
+#include "../Debug/Assert.hpp"
 
 #include <functional>
 #include <ranges>

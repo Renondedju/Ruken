@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-#include "Meta/Assert.hpp"
+#include "Debug/Assert.hpp"
 #include "Build/Namespace.hpp"
 
 #include "ECS/ComponentBase.hpp"

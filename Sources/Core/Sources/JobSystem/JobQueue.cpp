@@ -95,7 +95,7 @@ RkVoid JobQueue::Push(std::coroutine_handle<> in_handle) noexcept
     TryEmitWorkerRequest(concurrency);
 }
 
-RkVoid JobQueue::RunMultiple(std::stop_token const& in_stop_token)
+RkVoid JobQueue::RunMultiple(std::stop_token const&)
 {
     ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_WORKER_ZONES));
 
@@ -105,6 +105,8 @@ RkVoid JobQueue::RunMultiple(std::stop_token const& in_stop_token)
     // needed for this queue anymore, another worker has been faster.
     if (!TryConsumeWorkerRequest(concurrency))
         return;
+
+    //
 
     // do
     // {

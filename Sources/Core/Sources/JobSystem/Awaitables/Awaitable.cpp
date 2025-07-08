@@ -1,7 +1,7 @@
 #include "JobSystem/Awaitables/Awaitable.hpp"
 #include "JobSystem/Awaitables/Awaiter.hpp"
 
-#include "Meta/Assert.hpp"
+#include "../../Debug/Assert.hpp"
 
 USING_RUKEN_NAMESPACE
 
