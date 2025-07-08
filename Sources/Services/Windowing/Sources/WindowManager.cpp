@@ -1,6 +1,6 @@
 #include "Windowing/WindowManager.hpp"
 #include "Windowing/Window.hpp"
-#include "Core/Exception.hpp"
+#include "Debug/Exception.hpp"
 
 #include <glfw/glfw3.h>
 

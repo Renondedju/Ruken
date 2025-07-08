@@ -1,9 +1,8 @@
 #include "Windowing/Window.hpp"
 #include "Maths/Vector/PixelVector2.hpp"
+#include "Debug/Exception.hpp"
 
 #include <glfw/glfw3.h>
-
-#include "Core/Exception.hpp"
 
 USING_RUKEN_NAMESPACE
 
