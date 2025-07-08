@@ -26,7 +26,9 @@ RkVoid DebugHandler::Handle([[maybe_unused]] LogRecord&& in_record) noexcept
 	}
 
 	TracyMessageC(in_record.message.c_str(), in_record.message.size(), color);
-/*
+
+/*  TODO: waiting on std::breakpoint
+
 	if (BuildInfo:: &&
 		(in_record.level == ELogLevel::Fatal && BuildInfo::BreakOnError ||
 		(in_record.level == ELogLevel::Error && BuildInfo::BreakOnError)))

@@ -1,5 +1,3 @@
-import Ruken.Core;
-
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/Test/CounterSystem.hpp"
 
