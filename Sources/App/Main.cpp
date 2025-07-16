@@ -17,6 +17,9 @@
 #include "Windowing/WindowManager.hpp"
 #include "Windowing/Window.hpp"
 
+#include "Rendering/VulkanInstance.hpp"
+#include "Rendering/Renderer.hpp"
+
 #include <tracy/Tracy.hpp>
 
 struct MainQueue : QueueHandle<MainQueue, 2048>
@@ -113,7 +116,7 @@ int main(int in_argc, char* in_argv[])
 {
     // 1. --- Setup logging and general configuration. ---
     ConsoleHandler console_handler {};
-    DebugHandler   debug_handler   {{}};
+    DebugHandler   debug_handler   {};
 
     std::initializer_list<LogHandler*> handlers { &console_handler, &debug_handler };
     std::initializer_list              queues   { &MainQueue::instance, &IOJobQueue::instance };
@@ -128,12 +131,17 @@ int main(int in_argc, char* in_argv[])
         }; // We simply let all threads try to distribute themselves fairly among all queues
     };
 
+    std::vector<const RkChar*> vulkan_layers     {};
+    std::vector<const RkChar*> vulkan_extensions {};
+
     // 2. --- Initializing services and core systems. ---
     ServiceProvider    services   {"Root"};
-    Logger*            logger     {services.ProvideService<Logger    >(handlers)};
-    JobSystem*         job_system {services.ProvideService<JobSystem >(queues, worker_bias_function)};
+    Logger*            logger     {services.ProvideService<Logger   >(handlers)};
+    JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
     WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("..")};
     WindowManager*     windowing  {services.ProvideService<WindowManager>()};
+    VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
+    Renderer*          renderer   {services.ProvideService<Renderer>()};
 
     // 3. --- Running async main. ---
     std::stop_source stop_source {};

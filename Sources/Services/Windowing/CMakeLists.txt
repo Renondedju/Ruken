@@ -23,4 +23,4 @@ target_sources(RkWindowingService PRIVATE
         Sources/Window.cpp
 )
 
-target_link_libraries(RkWindowingService PUBLIC  glfw RkCore)
+target_link_libraries(RkWindowingService PUBLIC glfw RkCore)

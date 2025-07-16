@@ -11,6 +11,9 @@ BEGIN_RUKEN_NAMESPACE
 struct Window;
 struct WindowManager final: Service
 {
+	// Static name of the service, used by the logger to report service errors
+	constexpr static std::string_view service_name = RUKEN_STRING(WindowManager);
+
 	#pragma region Lifetime
 
 	/**

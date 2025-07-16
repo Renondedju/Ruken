@@ -42,6 +42,7 @@ struct BuildInfo
 #cmakedefine RUKEN_HEADLESS_BUILD
 #cmakedefine RUKEN_TRACE_BUILD
 #cmakedefine RUKEN_BREAK_ON_ERROR
+#cmakedefine RUKEN_BUILD_HAS_DEBUG_INFO
 
 #cmakedefine01 RUKEN_TRACE_SHOW_WORKER_ZONES
 #cmakedefine01 RUKEN_TRACE_SHOW_LOGGER_ZONES

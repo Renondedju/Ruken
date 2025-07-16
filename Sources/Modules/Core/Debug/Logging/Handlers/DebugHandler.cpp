@@ -5,8 +5,8 @@
 
 USING_RUKEN_NAMESPACE
 
-DebugHandler::DebugHandler(LogFormatter const& in_formatter) noexcept:
-	LogHandler(in_formatter)
+DebugHandler::DebugHandler() noexcept:
+	LogHandler(formatter)
 {}
 
 RkVoid DebugHandler::Handle([[maybe_unused]] LogRecord&& in_record) noexcept

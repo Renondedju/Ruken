@@ -6,9 +6,11 @@ BEGIN_RUKEN_NAMESPACE
 
 struct DebugHandler final: LogHandler
 {
+	LogFormatter formatter {};
+
 	#pragma region Lifetime
 
-	explicit DebugHandler(LogFormatter const& in_formatter) noexcept;
+	explicit DebugHandler() noexcept;
 	 DebugHandler(const DebugHandler&) 			  = delete;
 	 DebugHandler(DebugHandler&&     ) 			  = delete;
 	 DebugHandler& operator=(const DebugHandler&) = delete;
