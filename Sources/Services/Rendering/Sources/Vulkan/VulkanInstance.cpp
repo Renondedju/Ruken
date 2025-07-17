@@ -1,11 +1,10 @@
-#include "Rendering/VulkanInstance.hpp"
-#include "Types/FundamentalTypes.hpp"
 #include "Build/ProjectInfo.hpp"
-
 #include "Debug/Exception.hpp"
 #include "Debug/Logging/Logger.hpp"
+#include "Rendering/Vulkan/VulkanInstance.hpp"
 
 #include <volk.h>
+#include <glfw/glfw3.h>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_raii.hpp>
 
@@ -25,30 +24,30 @@ VulkanInstance::VulkanInstance(
 		.engineVersion 		= 0u,
 		.apiVersion			= VK_API_VERSION_1_4
 	},
-	instance   {context, MakeInstanceCreateInfo(in_layers, in_extensions)}
+	instance   {context, MakeInstanceCreateInfo(in_parent, in_layers, in_extensions)}
 {
 	volkLoadInstance(*instance);
 
-	if constexpr (!BuildInfo::HasDebugInfo)
-		return;
+	if (Logger* logger {in_parent.LocateService<Logger>()})
+	{
+		VkDebugUtilsMessengerCreateInfoEXT const create_info {
+			.sType 			 = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+			.pNext 			 = nullptr,
+			.flags			 = {},
+			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+							   VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+							   VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+							   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+			.messageType	 = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+							   VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+							   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+			.pfnUserCallback = &VulkanInstance::DebugCallback,
+			.pUserData		 = logger
+		};
 
-	VkDebugUtilsMessengerCreateInfoEXT const create_info {
-		.sType 			 = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-		.pNext 			 = nullptr,
-		.flags			 = {},
-		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-		.messageType	 = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-		.pfnUserCallback = &VulkanInstance::DebugCallback,
-		.pUserData		 = in_parent.LocateService<Logger>()
-	};
-
-	if (vkCreateDebugUtilsMessengerEXT(*instance, &create_info, nullptr, &debug_utils_messenger) != VK_SUCCESS)
-		throw Exception("Could not setup the Vulkan debug utils messenger");
+		if (vkCreateDebugUtilsMessengerEXT(*instance, &create_info, nullptr, &debug_utils_messenger) != VK_SUCCESS)
+			throw Exception("Could not setup the Vulkan debug utils messenger");
+	}
 }
 
 VulkanInstance::~VulkanInstance()
@@ -57,12 +56,27 @@ VulkanInstance::~VulkanInstance()
 }
 
 vk::InstanceCreateInfo VulkanInstance::MakeInstanceCreateInfo(
+	ServiceProvider&		    in_service_provider,
 	std::vector<const RkChar*>& in_layers,
 	std::vector<const RkChar*>& in_extensions) const
 {
-	if constexpr (BuildInfo::HasDebugInfo) {
-		in_layers    .emplace_back("VK_LAYER_KHRONOS_validation");
+	if constexpr (BuildInfo::HasDebugInfo)
+		in_layers.emplace_back("VK_LAYER_KHRONOS_validation");
+
+	// Presentation support
+	std::uint32_t extension_count {};
+	const RkChar** required_ext   {glfwGetRequiredInstanceExtensions(&extension_count)};
+	for (std::uint32_t i = 0; i < extension_count; ++i)
+		in_extensions.emplace_back(required_ext[i]);
+
+	// Logging
+	if (auto const logger = in_service_provider.LocateService<Logger>())
+	{
 		in_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+		logger->Info(service_name, "Enabling the following Vulkan extensions:");
+		for (auto const& extension : in_extensions)
+			logger->Info(service_name, "\t{}", extension);
 	}
 
 	// Throwing if something is unavailable.

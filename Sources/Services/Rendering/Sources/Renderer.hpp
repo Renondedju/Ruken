@@ -4,7 +4,7 @@
 #include "Core/Service.hpp"
 #include "Meta/Meta.hpp"
 
-#include "Rendering/VulkanInstance.hpp"
+#include "Rendering/Vulkan/VulkanInstance.hpp"
 
 #include <volk.h>
 #include <vulkan/vulkan_raii.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/VulkanLoaderInstance.hpp"
+#include "Rendering/Vulkan/VulkanLoaderInstance.hpp"
 
 #include "Types/FundamentalTypes.hpp"
 #include "Core/Service.hpp"
@@ -48,11 +48,13 @@ struct VulkanInstance final: Service
 
 		/**
 		 * Fills in and returns a vk::InstanceCreateInfo instance.
+		 * @param in_service_provider Service provider.
 		 * @param in_layers Instance layers to enable.
 		 * @param in_extensions Instance extensions to enable.
 		 * @return vk::InstanceCreateInfo.
 		 */
 		vk::InstanceCreateInfo MakeInstanceCreateInfo(
+			ServiceProvider&		    in_service_provider,
 			std::vector<const RkChar*>& in_layers,
 			std::vector<const RkChar*>& in_extensions
 		) const;

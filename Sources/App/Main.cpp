@@ -14,10 +14,8 @@
 #include "Debug/Logging/Handlers/DebugHandler.hpp"
 #include "Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-#include "Windowing/WindowManager.hpp"
-#include "Windowing/Window.hpp"
-
-#include "Rendering/VulkanInstance.hpp"
+#include "Rendering/Vulkan/VulkanInstance.hpp"
+#include "Rendering/Windowing/Window.hpp"
 #include "Rendering/Renderer.hpp"
 
 #include <tracy/Tracy.hpp>
@@ -139,7 +137,6 @@ int main(int in_argc, char* in_argv[])
     Logger*            logger     {services.ProvideService<Logger   >(handlers)};
     JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
     WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("..")};
-    WindowManager*     windowing  {services.ProvideService<WindowManager>()};
     VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
     Renderer*          renderer   {services.ProvideService<Renderer>()};
 
@@ -147,7 +144,7 @@ int main(int in_argc, char* in_argv[])
     std::stop_source stop_source {};
     AsyncMain(stop_source, services);
 
-    auto window {windowing->CreateWindow(Constants<Vector2px>::standard_definition, "Coucou")};
+    Window window {vulkan->instance, Constants<Vector2px>::standard_definition, "Coucou"};
 
     // And waiting for it to complete as a worker.
     job_system->CallerAsWorker(stop_source.get_token(), "CPU Main");
