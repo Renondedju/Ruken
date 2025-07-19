@@ -1,0 +1,18 @@
+#pragma once
+
+#include "Core/Debug/Logging/LogLevel.hpp"
+
+#include <string_view>
+#include <string>
+
+BEGIN_RUKEN_NAMESPACE
+
+struct LogRecord
+{
+    ELogLevel        level            {ELogLevel::Debug};
+    std::string_view service_provider {"?"};
+    std::string_view service_name     {"?"};
+    std::string      message          {""};
+};
+
+END_RUKEN_NAMESPACE
