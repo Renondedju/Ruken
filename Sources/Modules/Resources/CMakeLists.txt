@@ -5,7 +5,7 @@ include(${RUKEN_SOURCES_DIR}/CMake/RkModule.cmake)
 register_ruken_module(RkResources)
 
 # Files
-target_sources(RkResources INTERFACE
+target_sources(RkResources PUBLIC
     FILE_SET HEADERS FILES
         Resource.hpp
         ResourceManager.hpp

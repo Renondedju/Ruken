@@ -5,7 +5,7 @@ include(${RUKEN_SOURCES_DIR}/CMake/RkModule.cmake)
 register_ruken_module(RkECS)
 
 # Files
-target_sources(RkECS INTERFACE
+target_sources(RkECS PUBLIC
         FILE_SET HEADERS FILES
     Test/CounterSystem.hpp
     Archetype.hpp

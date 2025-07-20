@@ -1,8 +1,9 @@
-#include <ranges>
-#include "Maths/MinMax.hpp"
+#include "Core/Maths/MinMax.hpp"
 
 #include "ECS/Range.hpp"
 #include "ECS/Archetype.hpp"
+
+#include <ranges>
 
 USING_RUKEN_NAMESPACE
 

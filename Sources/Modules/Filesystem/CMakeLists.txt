@@ -5,7 +5,7 @@ include(${RUKEN_SOURCES_DIR}/CMake/RkModule.cmake)
 register_ruken_module(RkFilesystem)
 
 # Files
-target_sources(RkFilesystem INTERFACE
+target_sources(RkFilesystem PUBLIC
         FILE_SET HEADERS FILES
     Filesystem.hpp
     EFilesystemLocation.hpp

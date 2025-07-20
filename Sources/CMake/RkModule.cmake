@@ -1,16 +1,23 @@
 cmake_minimum_required(VERSION 3.28)
 
 # Registers a new service.
-# [module_name] is the name of the target
-function(register_ruken_module module_name)
+# [MODULE_NAME] is the name of the target
+function(register_ruken_module MODULE_NAME)
 
     # Creating the library
     # TODO: Support for hot reload here
-    add_library               (${module_name} STATIC)
-    target_include_directories(${module_name} PUBLIC  ${RUKEN_MODULES_DIR})
-    target_include_directories(${module_name} PRIVATE ${RUKEN_GENERATED_SOURCES_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+    add_library               (${MODULE_NAME} STATIC)
+    target_include_directories(${MODULE_NAME} PUBLIC  ${RUKEN_MODULES_DIR})
+    target_include_directories(${MODULE_NAME} PRIVATE ${RUKEN_GENERATED_SOURCES_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+
+    # Enabling warnings
+    if(MSVC)
+        target_compile_options(${MODULE_NAME} PRIVATE /W4)
+    else()
+        target_compile_options(${MODULE_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
 
     # Adding the library to the list of available services
-    set_property(GLOBAL APPEND PROPERTY RUKEN_MODULES_LIB ${module_name})
+    set_property(GLOBAL APPEND PROPERTY RUKEN_MODULES_LIB ${MODULE_NAME})
 
 endfunction()

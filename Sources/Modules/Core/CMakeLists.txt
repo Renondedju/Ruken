@@ -10,15 +10,8 @@ set(TRACY_NO_FRAME_IMAGE ON)
 set(TRACY_NO_SAMPLING    ON)
 set(TRACY_NO_VERIFY      ON)
 
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.2.zip" NAME tracy)
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.2.zip"      NAME tracy)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
-
-# stb has no CMake support and is a header only library
-# if (stb_ADDED)
-#     FILE(GLOB stb_sources ${stb_SOURCE_DIR}/*.h)
-#     add_library(stb INTERFACE ${stb_sources})
-#     target_include_directories(stb INTERFACE $<BUILD_INTERFACE:${stb_SOURCE_DIR}>)
-# endif()
 
 # atomic_queue has no CMake support and is a header only library
 if (atomic_queue_ADDED)
@@ -27,7 +20,7 @@ if (atomic_queue_ADDED)
     target_include_directories(atomic_queue INTERFACE $<BUILD_INTERFACE:${atomic_queue_SOURCE_DIR}/include>)
 endif()
 
-target_sources(RkCore INTERFACE
+target_sources(RkCore PUBLIC
         FILE_SET HEADERS FILES
     Bitwise/Bitmask.hpp
     Bitwise/Endian.hpp

@@ -1,4 +1,3 @@
-
 #include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
 

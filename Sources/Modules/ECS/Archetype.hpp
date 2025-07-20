@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <list>
@@ -6,7 +5,6 @@
 #include <unordered_map>
 
 #include "Build/Namespace.hpp"
-
 #include "Meta/Tag.hpp"
 
 #include "ECS/Range.hpp"

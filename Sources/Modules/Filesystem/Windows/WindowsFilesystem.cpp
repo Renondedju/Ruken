@@ -1,7 +1,7 @@
 #include "Filesystem/Windows/WindowsFilesystem.hpp"
 #include "Filesystem/Windows/WindowsFile.hpp"
 #include "Debug/Logging/Logger.hpp"
- err
+
 USING_RUKEN_NAMESPACE
 
 WindowsFilesystem::WindowsFilesystem(ServiceProvider& in_service_provider, std::filesystem::path const& in_project_path):
