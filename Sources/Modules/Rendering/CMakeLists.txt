@@ -19,14 +19,14 @@ CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.4.304.zip" N
 # Files
 target_sources(RkRendering PUBLIC
         FILE_SET HEADERS FILES
-        Renderer.hpp
+        RenderDevice.hpp
         Windowing/Window.hpp
         Vulkan/VulkanInstance.hpp
         Vulkan/VulkanLoaderInstance.hpp
 )
 
 target_sources(RkRendering PRIVATE
-        Renderer.cpp
+        RenderDevice.cpp
         Windowing/Window.cpp
         Vulkan/VulkanInstance.cpp
         Vulkan/VulkanLoaderInstance.cpp

@@ -3,6 +3,8 @@
 #include "Debug/Logging/Logger.hpp"
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 
+#define VOLK_IMPLEMENTATION
+
 #include <volk.h>
 #include <glfw/glfw3.h>
 #include <vulkan/vulkan.h>

@@ -16,7 +16,7 @@
 
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 #include "Rendering/Windowing/Window.hpp"
-#include "Rendering/Renderer.hpp"
+#include "Rendering/RenderDevice.hpp"
 
 #include <tracy/Tracy.hpp>
 
@@ -138,13 +138,13 @@ int main(int in_argc, char* in_argv[])
     JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
     WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("..")};
     VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
-    Renderer*          renderer   {services.ProvideService<Renderer>()};
+    RenderDevice*      renderer   {services.ProvideService<RenderDevice>()};
 
     // 3. --- Running async main. ---
     std::stop_source stop_source {};
     AsyncMain(stop_source, services);
 
-    Window window {vulkan->instance, Constants<Vector2px>::standard_definition, "Coucou"};
+    Window window {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
 
     // And waiting for it to complete as a worker.
     job_system->CallerAsWorker(stop_source.get_token(), "CPU Main");

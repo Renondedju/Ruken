@@ -1,19 +1,16 @@
 #pragma once
 
-#include "Build/Namespace.hpp"
 #include "Core/Service.hpp"
-#include "Meta/Meta.hpp"
+#include "Core/Meta/Meta.hpp"
 
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 
-#include <volk.h>
 #include <vulkan/vulkan_raii.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
-
 /// @brief A single physical rendering device.
-struct Renderer final : Service
+struct RenderDevice final : Service
 {
 	// Static name of the service, used by the logger to report service errors
 	constexpr static std::string_view service_name = RUKEN_STRING(Renderer);
@@ -22,14 +19,24 @@ struct Renderer final : Service
 
 	/**
 	 * Constructor.
+	 * TODO: Find a way to select the underlying VkPhysicalDevice.
 	 * @param in_parent Parent provider.
 	 */
-	explicit Renderer(ServiceProvider& in_parent);
-	Renderer		   (const Renderer&) = delete;
-	Renderer		   (Renderer&&     ) = delete;
-	Renderer& operator=(const Renderer&) = delete;
-	Renderer& operator=(Renderer&&     ) = delete;
-	~Renderer() override				 = default;
+	explicit RenderDevice(ServiceProvider& in_parent);
+	RenderDevice		   (const RenderDevice&) = delete;
+	RenderDevice		   (RenderDevice&&     ) = delete;
+	RenderDevice& operator=(const RenderDevice&) = delete;
+	RenderDevice& operator=(RenderDevice&&     ) = delete;
+	~RenderDevice() override				     = default;
+
+	#pragma endregion
+
+	#pragma region Methods
+
+	// Getters
+	vk::raii::Instance&       GetInstance() const noexcept { return m_instance->instance; }
+	vk::raii::PhysicalDevice& GetPhysicalDevice() noexcept { return m_physical_device; }
+	vk::raii::Device&		  GetDevice()		  noexcept { return m_device; }
 
 	#pragma endregion
 
@@ -41,9 +48,12 @@ struct Renderer final : Service
 		vk::raii::PhysicalDevice 	 		   m_physical_device;
 		std::vector<RkFloat>		 		   m_queue_priorities;
 		std::vector<vk::DeviceQueueCreateInfo> m_queue_create_infos;
+		vk::raii::Device		 	 		   m_device;
+		std::vector<vk::raii::Queue> 		   m_queues;
 
-		vk::raii::Device		 	 m_device;
-		std::vector<vk::raii::Queue> m_queues;
+		static inline std::vector<const RkChar*> s_extensions {
+			VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		};
 
 		#pragma endregion
 
