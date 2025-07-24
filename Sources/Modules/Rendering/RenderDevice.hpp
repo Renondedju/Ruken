@@ -50,6 +50,7 @@ struct RenderDevice final : Service
 		std::vector<vk::DeviceQueueCreateInfo> m_queue_create_infos;
 		vk::raii::Device		 	 		   m_device;
 		std::vector<vk::raii::Queue> 		   m_queues;
+		vk::raii::CommandPool				   m_command_pool;
 
 		static inline std::vector<const RkChar*> s_extensions {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME

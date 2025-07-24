@@ -30,11 +30,14 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 		.flags 			  = {},
 		.queueFamilyIndex = m_queue_create_infos[0].queueFamilyIndex,
 		.queueIndex		  = 0u
+	})},
+	m_command_pool {m_device.createCommandPool(vk::CommandPoolCreateInfo {
+		.sType 			  = vk::StructureType::eCommandPoolCreateInfo,
+		.pNext 			  = nullptr,
+		.flags 			  = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+		.queueFamilyIndex = m_queue_create_infos[0].queueFamilyIndex
 	})}
-{
-
-
-}
+{}
 
 std::vector<vk::DeviceQueueCreateInfo> RenderDevice::MakeQueueCreateInfo() const noexcept
 {

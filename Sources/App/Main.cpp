@@ -4,10 +4,8 @@
 #include "JobSystem/JobSystem.hpp"
 #include "JobSystem/Queues/QueueHandle.hpp"
 #include "JobSystem/Awaitables/Tasks/Task.hpp"
-#include "JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
-#include "Filesystem/DirectoryPath.hpp"
 #include "Filesystem/Windows/WindowsFilesystem.hpp"
 
 #include "Debug/Logging/Logger.hpp"
@@ -18,56 +16,10 @@
 #include "Rendering/Windowing/Window.hpp"
 #include "Rendering/RenderDevice.hpp"
 
-#include <tracy/Tracy.hpp>
-
 struct MainQueue : QueueHandle<MainQueue, 2048>
 {};
 
 USING_RUKEN_NAMESPACE
-
-struct AsyncLoop
-{
-    const char* name;
-    EntityAdmin scene;
-
-    Task<MainQueue> Setup()
-    {
-        scene.CreateSystem<CounterSystem>();
-        for (int i = 0; i < 10'000'000; i++)
-            scene.CreateEntity<CounterComponent>();
-
-        co_await scene.ExecuteEvent(EEventName::OnStart);
-    }
-
-    [[nodiscard]]
-    Task<MainQueue> Run() const noexcept
-    {
-        // When the awaited primitive is signaled (in this case when the task is done),
-        // the Run() coroutine is then scheduled back into the MainQueue, waiting to be picked up
-        // by the first available thread.
-
-        // Main loop
-        for (int i = 0; i < 100; ++i)
-        {
-            co_await scene.ExecuteEvent(EEventName::OnStart);
-
-            FrameMark;
-        }
-
-        co_await scene.ExecuteEvent(EEventName::OnEnd);
-    }
-};
-
-Task<MainQueue> Read(SharedMutex<RkInt64>& in_mutex) {
-    auto access = co_await in_mutex.AsyncRead();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-}
-
-Task<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
-    auto access = co_await in_mutex.AsyncWrite();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    (*access)++;
-}
 
 /**
  * Asynchronous main.
@@ -77,26 +29,7 @@ Task<MainQueue> Write(SharedMutex<RkInt64>& in_mutex) {
  */
 Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
 {
-    AsyncLoop loop {"Loop", EntityAdmin {in_service_provider}};
 
-    auto       const filesystem {in_service_provider.LocateService<Filesystem>()};
-    FileHandle const file       {filesystem->Open(FilePath {
-        .Directory = DirectoryPath {
-            .Location = EFilesystemLocation::ProjectDirectory,
-            .Path     = "Assets"
-        },
-        .Filename = "test.zip"
-    })};
-
-    RkSize        const filesize {file->GetFileSize()};
-    std::vector<RkByte> buffer   {};
-
-    buffer.reserve(filesize);
-    for (int i = 0; i < 25; i++)
-        file->Read(buffer.data(), {0, EFilePosition::Beginning}, buffer.capacity());
-
-    co_await loop.Setup();
-    co_await loop.Run  ();
 
     in_stop_source.request_stop();
 

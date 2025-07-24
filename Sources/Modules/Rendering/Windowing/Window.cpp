@@ -2,7 +2,6 @@
 #include "Maths/Vector/PixelVector2.hpp"
 #include "Debug/Exception.hpp"
 
-#include <volk.h>
 #include <vulkan/vulkan_raii.hpp>
 #include <glfw/glfw3.h>
 
