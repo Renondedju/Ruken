@@ -38,7 +38,7 @@ struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
 		struct
 	    {
 	        Pixels width;
-			Pixels height;
+	        Pixels height;
 	    };
 	};
 

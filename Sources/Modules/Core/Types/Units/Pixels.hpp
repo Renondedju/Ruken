@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
@@ -11,12 +10,12 @@
 BEGIN_RUKEN_NAMESPACE
 
 struct RUKEN_EMPTY_BASES Pixels final:
-    StrongType<RkInt32, Pixels>,
-    Arithmetic<Pixels>,
-    Comparison<Pixels>,
-    Stream    <Pixels>
+    StrongType<RkInt, Pixels>,
+    Arithmetic,
+    Comparison,
+    Stream
 {
-    using StrongType<RkInt32, Pixels>::StrongType;
+    using StrongType::StrongType;
 };
 
 // Suffixes
