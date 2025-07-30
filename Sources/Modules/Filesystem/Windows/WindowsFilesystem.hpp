@@ -12,6 +12,7 @@ struct WindowsFilesystem final: Filesystem
 	#pragma region Members
 
 	std::filesystem::path const project_path;
+	std::filesystem::path const imported_assets_path;
 	std::filesystem::path const tmp_path;
 
 	#pragma endregion

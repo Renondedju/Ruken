@@ -11,6 +11,9 @@ struct DirectoryPath
 {
 	EFilesystemLocation Location;
 	std::string         Path;
+
+	std::string ToString() const noexcept
+	{ return EFilesystemLocationToString(Location) + "/" + Path; }
 };
 
 END_RUKEN_NAMESPACE

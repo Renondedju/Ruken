@@ -5,9 +5,10 @@
 USING_RUKEN_NAMESPACE
 
 WindowsFilesystem::WindowsFilesystem(ServiceProvider& in_service_provider, std::filesystem::path const& in_project_path):
-	Filesystem   {in_service_provider},
-	project_path {in_project_path},
-	tmp_path     {std::filesystem::temp_directory_path()}
+	Filesystem           {in_service_provider},
+	project_path         {in_project_path},
+    imported_assets_path {in_project_path / "Imports"},
+	tmp_path			 {std::filesystem::temp_directory_path()}
 {
 	if (auto const logger {m_service_provider.LocateService<Logger>()})
 		logger->Log(service_name, ELogLevel::Info, "Opened a Windows filesystem at {}",
@@ -17,11 +18,9 @@ WindowsFilesystem::WindowsFilesystem(ServiceProvider& in_service_provider, std::
 
 FileHandle WindowsFilesystem::Open(FilePath const& in_path)
 {
-	std::filesystem::path real_path {GetPathFromLocation(in_path.Directory.Location).c_str()};
-	real_path += "\\";
-	real_path += in_path.Directory.Path;
-	real_path += "\\";
-	real_path += in_path.Filename;
+	std::filesystem::path real_path {(
+		GetPathFromLocation(in_path.Directory.Location) / in_path.Directory.Path / in_path.Filename
+	).c_str()};
 
 	if (auto const logger {m_service_provider.LocateService<Logger>()})
 		logger->Log(service_name, ELogLevel::Info, "Opening file named {}", real_path.string());
@@ -37,6 +36,8 @@ std::filesystem::path WindowsFilesystem::GetPathFromLocation(EFilesystemLocation
 			return std::filesystem::absolute(project_path);
 		case EFilesystemLocation::Temporary:
 			return std::filesystem::absolute(tmp_path);
+		case EFilesystemLocation::ImportedAssets:
+			return std::filesystem::absolute(imported_assets_path);
 
 		default:
 			std::unreachable();
