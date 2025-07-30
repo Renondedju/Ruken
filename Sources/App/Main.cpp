@@ -1,24 +1,40 @@
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
-#include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include "Core/Debug/Logging/Logger.hpp"
 #include "Core/Debug/Logging/Handlers/DebugHandler.hpp"
 #include "Core/Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-#include "ECS/EntityAdmin.hpp"
-#include "ECS/Test/CounterSystem.hpp"
+#include "Core/Maths/Vector/PixelVector2.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/Windows/WindowsFilesystem.hpp"
 
-#include <tracy/Tracy.hpp>
+#include "Rendering/Vulkan/VulkanInstance.hpp"
+#include "Rendering/Windowing/Window.hpp"
+#include "Rendering/SlangImporter.hpp"
+#include "Rendering/RenderDevice.hpp"
 
 struct MainQueue : QueueHandle<MainQueue, 2048>
 {};
 
 USING_RUKEN_NAMESPACE
+
+IOTask<> LoadShader(ServiceProvider& in_service_provider)
+{
+    SlangImporter    importer    {};
+    Filesystem*      filesystem  {in_service_provider.LocateService<Filesystem>()};
+    FileHandle const shader_file {filesystem->Open(FilePath {
+        .Filename  = "test.slang",
+        .Directory = DirectoryPath {
+            .Location = EFilesystemLocation::ProjectDirectory,
+            .Path     = "."
+        }
+    })};
+
+    co_await importer.Import(shader_file);
+}
 
 /**
  * Asynchronous main.
@@ -28,7 +44,15 @@ USING_RUKEN_NAMESPACE
  */
 Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
 {
+    Logger const* logger {in_service_provider.LocateService<Logger>()};
 
+    try {
+        co_await LoadShader(in_service_provider);
+    } catch (Exception& in_exception) {
+        if (logger) logger->Error("", "{}", in_exception.reason);
+    } catch (std::exception& in_exception) {
+        if (logger) logger->Error("", "{}", in_exception.what());
+    }
 
     in_stop_source.request_stop();
 
@@ -51,14 +75,11 @@ int main(int in_argc, char* in_argv[])
     std::initializer_list<LogHandler*> handlers { &console_handler, &debug_handler };
     std::initializer_list              queues   { &MainQueue::instance, &IOJobQueue::instance };
 
-    MainQueue ::instance.SetMaximumConcurrency(8);
-    IOJobQueue::instance.SetMaximumConcurrency(8);
-
-    auto worker_bias_function = [](RkUint64 const in_total, RkUint64 const in_current, JobSystem& in_job_system) -> BinaryTreePath {
-        return {
+    auto worker_bias_function = [](RkUint64 const _, RkUint64 const in_current, JobSystem& __) {
+        return BinaryTreePath {
             .path  = in_current < 3ULL ? 0b1ULL : 0b0ULL,
             .depth = 1
-        }; // We simply let all threads try to distribute themselves fairly among all queues
+        }; // The first 3 threads will prioritize the IO queue.
     };
 
     std::vector<const RkChar*> vulkan_layers     {};
@@ -66,9 +87,9 @@ int main(int in_argc, char* in_argv[])
 
     // 2. --- Initializing services and core systems. ---
     ServiceProvider    services   {"Root"};
-    Logger*            logger     {services.ProvideService<Logger   >(handlers)};
+    Logger*            logger     {services.ProvideService<Logger>(handlers)};
     JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
-    WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("..")};
+    WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("../Assets")};
     VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
     RenderDevice*      renderer   {services.ProvideService<RenderDevice>()};
 

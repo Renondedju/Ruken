@@ -48,11 +48,14 @@ JobSystem::JobSystem(
 
     // Registering queues
     for (auto&& [index, queue]: std::views::enumerate(m_queues))
+    {
+        queue->SetMaximumConcurrency(std::thread::hardware_concurrency());
         queue->OnRegister(m_request_tree, BinaryTreePath {
             .path      = static_cast<RkUint64>(index),
             .depth     = m_request_tree.tree.max_depth,
             .max_depth = m_request_tree.tree.max_depth
         });
+    }
 
     // Starting workers
     m_workers.reserve(concurrency);
