@@ -26,31 +26,30 @@ struct TaskAwaiter: Awaiter
 	using Awaiter::operator=;
 
 	TaskAwaiter& operator=(TaskAwaiter const&) = default;
-	TaskAwaiter& operator=(TaskAwaiter&&	   ) = default;
+	TaskAwaiter& operator=(TaskAwaiter&&	 ) = default;
 
-	TaskAwaiter ()					   = default;
+	TaskAwaiter ()					 = default;
 	TaskAwaiter (TaskAwaiter const&) = default;
 	TaskAwaiter (TaskAwaiter&&     ) = default;
-	~TaskAwaiter()					   = default;
+	~TaskAwaiter()					 = default;
 
 	#pragma endregion
 
 	/// @brief Returns the result of the wait
 	auto await_resume() const
 	{
-		if constexpr (VariantHelper<TResult>::HasExceptions::value)
-			if (std::get<std::exception_ptr>(promise->result))
-				std::rethrow_exception(std::get<std::exception_ptr>(promise->result));
-
-		if constexpr (std::is_same_v<TResult, std::exception_ptr>)
+		if constexpr (std::is_void_v<TResult>)
+		{
 			if (promise->result)
 				std::rethrow_exception(promise->result);
+		}
+		else
+		{
+			if (std::holds_alternative<std::exception_ptr>(promise->result))
+				std::rethrow_exception(std::get<std::exception_ptr>(promise->result));
 
-		if constexpr (VariantHelper<TResult>::HasExceptions::value)
-			return std::move(std::get<VariantHelper<TResult>::ValueType>(promise->result));
-
-		if constexpr (!std::is_same_v<TResult, std::exception_ptr>)
-			return promise->result;
+			return std::move(std::get<TResult>(promise->result));
+		}
 	}
 };
 

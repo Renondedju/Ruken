@@ -2,6 +2,7 @@
 #include "JobSystem/Concurrency.hpp"
 #include "JobSystem/WorkerInfo.hpp"
 
+#include <array>
 #include <tracy/Tracy.hpp>
 #include <tracy/TracyC.h>
 

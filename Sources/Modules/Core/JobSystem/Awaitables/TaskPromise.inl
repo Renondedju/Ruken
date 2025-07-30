@@ -125,12 +125,10 @@ void TaskPromiseBase<TQueueHandle, TResult>::unhandled_exception() noexcept
 {
 	std::exception_ptr ptr {std::current_exception()};
 
-	try
-	{
+	try {
 		std::rethrow_exception(ptr);
 	}
-	catch (Exception& in_exception)
-	{
+	catch (Exception& in_exception) {
 		std::string const what {std::format("{}", in_exception)};
 		TracyMessageC(what.c_str(), what.length(), 0xFF0000);
 	}
