@@ -14,13 +14,11 @@ struct Awaiter;
 using AwaiterList = std::atomic<Awaiter*>;
 
 /**
- *
  * @brief An object that waits for the completion of an awaitable.
  * Awaiters are responsible for implementing the actual waiting algorithm.
- * This synchronization between tasks and events should not be mixed up with the content of events themselves.
  *
- * Awaiters are basically a long thread-safe linked list holding
- * each a signal to trigger when the wait is over.
+ * Put simply : Awaiters are a long thread-safe linked list owned by the Awaitable, each node holding
+ * a signal to trigger when the Awaitable is done or triggered.
  */
 struct Awaiter
 {
@@ -28,7 +26,7 @@ struct Awaiter
 	static inline auto const consumed {reinterpret_cast<Awaiter* const>(0x2)};
 	static inline auto const detached {reinterpret_cast<Awaiter* const>(0x3)};
 
-	AwaiterList*   head   {nullptr};	///< Reference to the head of the list
+	AwaiterList*   head   {nullptr};   ///< Reference to the head of the list
 	AwaiterList    next   {detached}; ///< Next awaiter in the list
 	SignalReceiver signal {};
 	RkUint64       tag    {};

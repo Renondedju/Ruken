@@ -35,6 +35,7 @@ target_sources(RkCore PUBLIC
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
     JobSystem/Awaitables/Primitives/CountDownLatch.hpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.hpp
+    JobSystem/Awaitables/Primitives/Mutex.hpp
     JobSystem/Awaitables/Tasks/DynamicTask.hpp
     JobSystem/Awaitables/Tasks/Task.hpp
     JobSystem/Awaitables/Tasks/TaskPromise.hpp
@@ -193,6 +194,7 @@ target_sources(RkCore PUBLIC
     JobSystem/Awaitables/Primitives/SharedMutex.hpp
     JobSystem/Awaitables/Primitives/SharedMutex.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.inl
+    JobSystem/Awaitables/Primitives/Mutex.inl
     JobSystem/Concepts/CTaskResult.hpp
     Debug/Logging/Handlers/DebugHandler.hpp
     Debug/Logging/Logger.inl
