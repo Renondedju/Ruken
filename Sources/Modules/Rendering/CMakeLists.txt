@@ -34,6 +34,15 @@ target_sources(RkRendering PRIVATE
         Vulkan/VulkanLoaderInstance.cpp
 )
 
+set(RUKEN_SLANG_INCLUDE_DIR ${RUKEN_GENERATED_SOURCES_DIR}/Shaders)
+if (NOT EXISTS ${RUKEN_SLANG_INCLUDE_DIR})
+    file(MAKE_DIRECTORY ${RUKEN_SLANG_INCLUDE_DIR})
+endif ()
+
+# Adding shaders to the slang include directory as the 'Ruken' module.
+file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Shaders ${RUKEN_SLANG_INCLUDE_DIR}/Ruken COPY_ON_ERROR SYMBOLIC)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SlangSearchPath.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Rendering/SlangSearchPath.hpp)
+
 # Workaround to avoid having to pull the slang project recursively from git.
 # find_package also does not allow us to link from the SDK even though slang is shipped with it.
 # CPMAddPackage("gh:shader-slang/slang#6e0c63b723cc81efcc82c2af778b26e507c71825")
