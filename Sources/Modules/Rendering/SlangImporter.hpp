@@ -2,7 +2,7 @@
 
 #include "Core/JobSystem/Awaitables/Primitives/Mutex.hpp"
 
-#include "Resources/ResourceImporter.hpp"
+#include "Resources/Assets/AssetImporter.hpp"
 #include "Rendering/SlangSearchPath.hpp"
 
 #include <slang/slang.h>
@@ -10,8 +10,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+class Logger;
+
 /// @brief Transforms slang files into SPIR-V shader modules
-struct SlangImporter final : ResourceImporter
+struct SlangImporter final : AssetImporter::Importer
 {
 	#pragma region Lifetime
 
@@ -26,11 +28,11 @@ struct SlangImporter final : ResourceImporter
 
 	#pragma region Methods
 
-	/// @copydoc ResourceImporter::SupportedExtensions
+	/// @copydoc AssetImporter::Importer::SupportedExtensions
 	std::vector<std::string> SupportedExtensions() const noexcept override;
 
-	/// @copydoc ResourceImporter::Import
-	IOTask<RkVoid> Import(FileHandle const& in_file) noexcept override;
+	/// @copydoc AssetImporter::Importer::Import
+	IOTask<std::vector<std::shared_ptr<Resource>>> Import(ServiceProvider const& in_services, FileHandle const& in_file) noexcept override;
 
 	#pragma endregion
 
@@ -49,6 +51,12 @@ struct SlangImporter final : ResourceImporter
 
 		Slang::ComPtr<slang::IGlobalSession>  m_global_session {};
 		Mutex<Slang::ComPtr<slang::ISession>> m_session;
+
+		#pragma endregion
+
+		#pragma region Methods
+
+		RkVoid LogDiagnostics(Logger* in_logger, slang::IBlob* in_diagnostics);
 
 		#pragma endregion
 };

@@ -8,12 +8,13 @@ register_ruken_module(RkResources)
 target_sources(RkResources PUBLIC
     FILE_SET HEADERS FILES
         Resource.hpp
-        ResourceImporter.hpp
+        Assets/AssetImporter.hpp
         ResourceManager.hpp
 )
 
 target_sources(RkResources PRIVATE
         ResourceManager.cpp
+        Assets/AssetImporter.cpp
 )
 
 target_link_libraries(RkResources PUBLIC RkCore)

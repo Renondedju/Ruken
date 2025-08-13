@@ -21,19 +21,16 @@ struct MainQueue : QueueHandle<MainQueue, 2048>
 
 USING_RUKEN_NAMESPACE
 
-IOTask<> LoadShader(ServiceProvider& in_service_provider)
+IOTask<> LoadShader(ServiceProvider const& in_service_provider)
 {
     SlangImporter    importer    {};
     Filesystem*      filesystem  {in_service_provider.LocateService<Filesystem>()};
-    FileHandle const shader_file {filesystem->Open(FilePath {
-        .Filename  = "test.slang",
-        .Directory = DirectoryPath {
-            .Location = EFilesystemLocation::ProjectDirectory,
-            .Path     = "."
-        }
+    FileHandle const shader_file {filesystem->Open(FilesystemPath {
+        .location = EFilesystemLocation::ProjectDirectory,
+        .path     = "test.slang"
     })};
 
-    co_await importer.Import(shader_file);
+    co_await importer.Import(in_service_provider, shader_file);
 }
 
 /**

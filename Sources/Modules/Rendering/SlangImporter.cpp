@@ -1,4 +1,8 @@
 #include "Rendering/SlangImporter.hpp"
+#include "Rendering/SpirvModule.hpp"
+
+#include "Filesystem/Filesystem.hpp"
+#include "Core/Debug/Logging/Logger.hpp"
 
 #include <slang/slang.h>
 #include <slang/slang-com-ptr.h>
@@ -12,7 +16,7 @@ SlangImporter::SlangImporter() noexcept:
 		createGlobalSession(m_global_session.writeRef());
 
 		m_target_create_info .format                   = SLANG_SPIRV;
-		m_target_create_info .profile                  = m_global_session->findProfile("spirv_1_6");
+		m_target_create_info .profile                  = m_global_session->findProfile("spirv_1_5");
 		m_session_create_info.targets                  = &m_target_create_info;
 		m_session_create_info.targetCount              = 1;
 		m_session_create_info.searchPaths              = m_search_paths.data();
@@ -37,8 +41,22 @@ std::vector<std::string> SlangImporter::SupportedExtensions() const noexcept
 }
 
 // TODO: Proper error handling / logging.
-IOTask<RkVoid> SlangImporter::Import(FileHandle const& in_file) noexcept
+IOTask<std::vector<std::shared_ptr<Resource>>> SlangImporter::Import(ServiceProvider const& in_services, FileHandle const& in_file) noexcept
 {
+	Filesystem* filesystem {in_services.LocateService<Filesystem>()};
+	Logger*     logger     {in_services.LocateService<Logger>()};
+
+	auto check_result = [&](SlangResult const in_result, slang::IBlob* in_diagnostics) {
+		if (SLANG_FAILED(in_result))
+			throw Exception(std::format("Failed to load module '{}' : {}",
+				in_file->path.path.generic_string(),
+				in_diagnostics->getBufferPointer())
+			);
+
+		if (in_diagnostics)
+			logger->Warning("TODO", "{}", static_cast<const RkChar*>(in_diagnostics->getBufferPointer()));
+	};
+
 	// ---
 	std::vector<RkChar> data {};
 	data.resize(in_file->GetFileSize());
@@ -52,47 +70,60 @@ IOTask<RkVoid> SlangImporter::Import(FileHandle const& in_file) noexcept
 	Slang::ComPtr<slang::IModule> module	  {};
 
 	auto const session {co_await m_session};
-	module   = session->loadModuleFromSourceString( // ! Requires sources, the call attempts to read from the
-		in_file->Path.ToString().c_str(),		   //  ! underlying filesystem, bypassing the RkFilesystem module.
-		in_file->Path.Filename  .c_str(),         //   ! Will fail if attempted on a packaged build or any kind of
-		data.data(), diagnostics.writeRef()      //    ! exotic configuration without direct access to the sources.
+	module   = session->loadModuleFromSourceString(				 // ! Requires sources, the call attempts to read from the
+		in_file->path.path			 .generic_string().c_str(), //  ! underlying filesystem, bypassing the RkFilesystem module.
+		in_file->path.path.filename().generic_string().c_str(),//   ! Will fail if attempted on a packaged build or any kind of
+		data.data(), diagnostics.writeRef()					  //    ! exotic configuration without direct access to the sources.
 	);
 
 	// TODO: Might throw for a warning ?
 	if (!module)
 		throw Exception(std::format("Failed to load module '{}' : {}",
-			in_file->Path.Filename.c_str(),
+			in_file->path.path.generic_string(),
 			static_cast<const char*>(diagnostics.get()->getBufferPointer()))
 		);
 
 	// --- Retrieving entry points
-	std::vector<slang::IEntryPoint*>    entry_points    {static_cast<std::size_t>(module->getDefinedEntryPointCount()), nullptr};
-	std::vector<slang::IComponentType*> component_types {entry_points.size() + 1, nullptr};
-	for (int entry_point = 0; entry_point < module->getDefinedEntryPointCount(); entry_point++)
-		module->getDefinedEntryPoint(entry_point, &entry_points[entry_point]);
+	std::size_t const entry_point_count {static_cast<std::size_t>(module->getDefinedEntryPointCount())};
 
-	component_types.assign_range(entry_points);
-	component_types.back() = module;
+	std::vector<slang::IEntryPoint*>    entry_points   (entry_point_count       , nullptr);
+	std::vector<slang::IComponentType*> component_types(entry_point_count + 1ULL, nullptr);
+	for (std::size_t entry_point {}; entry_point < entry_point_count; entry_point++)
+	{
+		module->getDefinedEntryPoint(entry_point, &entry_points[entry_point]);
+		component_types[entry_point] = entry_points[entry_point];
+	}
+
+	component_types[entry_points.size()] = module;
 
 	// --- Linking
-	Slang::ComPtr<slang::IComponentType> program     	{};
-	Slang::ComPtr<slang::IComponentType> linked_program {};
+	Slang::ComPtr<slang::IComponentType> program     	  {};
+	Slang::ComPtr<slang::IComponentType> linked_program   {};
+	Slang::ComPtr<ISlangBlob>		     link_diagnostics {};
 
 	session->createCompositeComponentType(component_types.data(), component_types.size(), program.writeRef());
-	program->link(linked_program.writeRef(), diagnostics.writeRef());
+	check_result(program->link(linked_program.writeRef(), link_diagnostics.writeRef()), link_diagnostics);
 
-	// TODO: Might throw for a warning ?
-	if (diagnostics)
-		throw Exception(std::format("Failed to link module '{}' : {}",
-			in_file->Path.Filename.c_str(),
-			static_cast<const char*>(diagnostics.get()->getBufferPointer()))
-		);
-
-	// --- Writing code to disk
-	Slang::ComPtr<slang::IBlob> kernel {};
-	for (int entry_point = 0; entry_point < module->getDefinedEntryPointCount(); entry_point++)
+	// --- Generating resources
+	std::vector<std::shared_ptr<Resource>> resources (entry_points.size());
+	for (std::size_t entry_point = 0ULL; entry_point < entry_points.size(); entry_point++)
 	{
-		linked_program->getEntryPointCode(entry_point, 0, kernel.writeRef(), diagnostics.writeRef());
+		slang::IBlob*	  aaaaah   {};
+		slang::IBlob*	  kernel   {};
+		slang::IMetadata* metadata {};
+		check_result(linked_program->getEntryPointCode    (entry_point, 0, &kernel  , &aaaaah), aaaaah);
+		check_result(linked_program->getEntryPointMetadata(entry_point, 0, &metadata, &aaaaah), aaaaah);
 
+		std::vector<RkByte>	byte_array (kernel->getBufferSize());
+		std::memmove(byte_array.data(), kernel->getBufferPointer(), kernel->getBufferSize());
+
+		resources[entry_point] = std::make_shared<SpirvModule>(in_file->path,
+				metadata->getDebugBuildIdentifier(), byte_array);
 	}
+
+	co_return resources;
 }
+
+/*
+ 
+ */
