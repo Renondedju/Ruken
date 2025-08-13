@@ -18,13 +18,9 @@ CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.4.304.zip" N
 # Workaround to avoid having to pull the slang project recursively from git using CPM.
 # Instead we use precompiled binaries from github releases.
 # find_package(Vulkan COMPONENTS slang) does not work even though slang is shipped with it.
+# And we still have to copy manually the shared libraries like slang-glslang. Adding them to path does not seem to be working.
 include(${RUKEN_CMAKE_DIR}/FetchSlang.cmake)
 target_copy_slang_binaries(RkRendering ${RUKEN_BINARY_DIR})
-
-# get_filename_component (RUKEN_VULKAN_LIB_DIR ${Vulkan_LIBRARY} DIRECTORY)
-# target_link_directories(RkRendering PUBLIC  ${RUKEN_VULKAN_LIB_DIR})
-# add_custom_command     (TARGET RkRendering POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#         "${RUKEN_VULKAN_LIB_DIR}/../Bin/slang-glslang${CMAKE_SHARED_LIBRARY_SUFFIX}" ${CMAKE_BINARY_DIR})
 
 # Files
 target_sources(RkRendering PUBLIC

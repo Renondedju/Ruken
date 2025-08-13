@@ -21,30 +21,22 @@ struct MainQueue : QueueHandle<MainQueue, 2048>
 
 USING_RUKEN_NAMESPACE
 
-IOTask<> LoadShader(ServiceProvider const& in_service_provider)
-{
-    SlangImporter    importer    {};
-    Filesystem*      filesystem  {in_service_provider.LocateService<Filesystem>()};
-    FileHandle const shader_file {filesystem->Open(FilesystemPath {
-        .location = EFilesystemLocation::ProjectDirectory,
-        .path     = "test.slang"
-    })};
-
-    co_await importer.Import(in_service_provider, shader_file);
-}
-
 /**
  * Asynchronous main.
  *
  * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
  * @param in_service_provider Service Provider.
  */
-Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider& in_service_provider)
+Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
 {
-    Logger const* logger {in_service_provider.LocateService<Logger>()};
+    Logger        const* logger   {in_service_provider.LocateService<Logger>()};
+    AssetImporter const* importer {in_service_provider.LocateService<AssetImporter>()};
 
     try {
-        co_await LoadShader(in_service_provider);
+        co_await importer->Import(FilesystemPath {
+            .location = EFilesystemLocation::ProjectDirectory,
+            .path     = "test.slang"
+        });
     } catch (Exception& in_exception) {
         if (logger) logger->Error("", "{}", in_exception.reason);
     } catch (std::exception& in_exception) {
@@ -89,6 +81,9 @@ int main(int in_argc, char* in_argv[])
     WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("../Assets")};
     VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
     RenderDevice*      renderer   {services.ProvideService<RenderDevice>()};
+    AssetImporter*     importer   {services.ProvideService<AssetImporter>()};
+
+    importer->ProvideImporter<SlangImporter>();
 
     // 3. --- Running async main. ---
     std::stop_source stop_source {};

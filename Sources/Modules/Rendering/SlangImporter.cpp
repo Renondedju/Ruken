@@ -35,7 +35,7 @@ SlangImporter::SlangImporter() noexcept:
 std::vector<std::string> SlangImporter::SupportedExtensions() const noexcept
 {
 	return {
-		".slang"
+		".slang",
 		".slang-module"
 	};
 }
@@ -43,21 +43,25 @@ std::vector<std::string> SlangImporter::SupportedExtensions() const noexcept
 // TODO: Proper error handling / logging.
 IOTask<std::vector<std::shared_ptr<Resource>>> SlangImporter::Import(ServiceProvider const& in_services, FileHandle const& in_file) noexcept
 {
-	Filesystem* filesystem {in_services.LocateService<Filesystem>()};
-	Logger*     logger     {in_services.LocateService<Logger>()};
+	Slang::ComPtr<slang::IBlob> diagnostics {};
+	Logger const*				logger		{in_services.LocateService<Logger>()};
 
-	auto check_result = [&](SlangResult const in_result, slang::IBlob* in_diagnostics) {
+	/** A simple debug helper. */
+	auto check_result = [&](SlangResult const in_result) -> RkVoid
+	{
 		if (SLANG_FAILED(in_result))
 			throw Exception(std::format("Failed to load module '{}' : {}",
 				in_file->path.path.generic_string(),
-				in_diagnostics->getBufferPointer())
+				static_cast<const RkChar*>(diagnostics->getBufferPointer()))
 			);
 
-		if (in_diagnostics)
-			logger->Warning("TODO", "{}", static_cast<const RkChar*>(in_diagnostics->getBufferPointer()));
+		if (diagnostics)
+			logger->Warning(AssetImporter::service_name, "{}", static_cast<const RkChar*>(diagnostics->getBufferPointer()));
+
+		diagnostics = nullptr;
 	};
 
-	// ---
+	// --- Reading the source file
 	std::vector<RkChar> data {};
 	data.resize(in_file->GetFileSize());
 	co_await in_file->Read(data.data(), FileCursor {
@@ -66,8 +70,7 @@ IOTask<std::vector<std::shared_ptr<Resource>>> SlangImporter::Import(ServiceProv
 	}, data.size());
 
 	// --- Acquiring the section lock & loading module.
-	Slang::ComPtr<slang::IBlob>   diagnostics {};
-	Slang::ComPtr<slang::IModule> module	  {};
+	Slang::ComPtr<slang::IModule> module {};
 
 	auto const session {co_await m_session};
 	module   = session->loadModuleFromSourceString(				 // ! Requires sources, the call attempts to read from the
@@ -90,7 +93,7 @@ IOTask<std::vector<std::shared_ptr<Resource>>> SlangImporter::Import(ServiceProv
 	std::vector<slang::IComponentType*> component_types(entry_point_count + 1ULL, nullptr);
 	for (std::size_t entry_point {}; entry_point < entry_point_count; entry_point++)
 	{
-		module->getDefinedEntryPoint(entry_point, &entry_points[entry_point]);
+		check_result(module->getDefinedEntryPoint(entry_point, &entry_points[entry_point]));
 		component_types[entry_point] = entry_points[entry_point];
 	}
 
@@ -99,31 +102,23 @@ IOTask<std::vector<std::shared_ptr<Resource>>> SlangImporter::Import(ServiceProv
 	// --- Linking
 	Slang::ComPtr<slang::IComponentType> program     	  {};
 	Slang::ComPtr<slang::IComponentType> linked_program   {};
-	Slang::ComPtr<ISlangBlob>		     link_diagnostics {};
 
-	session->createCompositeComponentType(component_types.data(), component_types.size(), program.writeRef());
-	check_result(program->link(linked_program.writeRef(), link_diagnostics.writeRef()), link_diagnostics);
+	check_result(session->createCompositeComponentType(component_types.data(), component_types.size(), program.writeRef(), diagnostics.writeRef()));
+	check_result(program->link(linked_program.writeRef(), diagnostics.writeRef()));
 
 	// --- Generating resources
 	std::vector<std::shared_ptr<Resource>> resources (entry_points.size());
 	for (std::size_t entry_point = 0ULL; entry_point < entry_points.size(); entry_point++)
 	{
-		slang::IBlob*	  aaaaah   {};
-		slang::IBlob*	  kernel   {};
-		slang::IMetadata* metadata {};
-		check_result(linked_program->getEntryPointCode    (entry_point, 0, &kernel  , &aaaaah), aaaaah);
-		check_result(linked_program->getEntryPointMetadata(entry_point, 0, &metadata, &aaaaah), aaaaah);
+		Slang::ComPtr<slang::IBlob> kernel {};
+		check_result(linked_program->getEntryPointCode(entry_point, 0, kernel.writeRef(), diagnostics.writeRef()));
 
+		std::string			name       {entry_points[entry_point]->getFunctionReflection()->getName()};
 		std::vector<RkByte>	byte_array (kernel->getBufferSize());
 		std::memmove(byte_array.data(), kernel->getBufferPointer(), kernel->getBufferSize());
 
-		resources[entry_point] = std::make_shared<SpirvModule>(in_file->path,
-				metadata->getDebugBuildIdentifier(), byte_array);
+		resources[entry_point] = std::make_shared<SpirvModule>(in_file->path, std::format("{}.spv", name), byte_array);
 	}
 
 	co_return resources;
 }
-
-/*
- 
- */

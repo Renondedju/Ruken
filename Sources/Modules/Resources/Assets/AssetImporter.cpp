@@ -42,9 +42,10 @@ IOTask<RkVoid> AssetImporter::Import(FilesystemPath const& in_file_path) const n
 
 AssetImporter::Importer* AssetImporter::GetCompatibleImporter(std::filesystem::path const& in_extension) const
 {
+	std::string const in_str {in_extension.generic_string()};
 	for (auto const& current : m_importers)
 		for (auto const& extension : current->SupportedExtensions())
-			if (extension == in_extension)
+			if (extension == in_str)
 				return current.get();
 
 	return nullptr;
