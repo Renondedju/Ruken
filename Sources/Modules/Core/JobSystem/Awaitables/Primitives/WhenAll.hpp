@@ -1,16 +1,22 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Primitives/CountDownLatch.hpp"
+#include <latch>
+
+#include "Core/JobSystem/Awaitables/Primitives/CountDownLatch.hpp"
+#include "Core/JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "Core/JobSystem/Concepts/CAwaitable.hpp"
 
 #include <utility>
+#include <ranges>
 
 BEGIN_RUKEN_NAMESPACE
+
+template <typename TAwaitable> using AwaiterType = decltype(std::declval<TAwaitable>().operator co_await());
+template <typename TAwaiter>   using ResumeType  = decltype(std::declval<TAwaiter  >().await_resume		());
 
 template <typename TAwaitable>
 struct WhenAll: CountDownLatch
 {
-	using TAwaiter = decltype(std::declval<TAwaitable>().operator co_await());
-
 	explicit WhenAll(std::vector<TAwaitable> const& in_awaitables) noexcept:
 		CountDownLatch {in_awaitables.size()},
 		m_awaiters     {in_awaitables.size()}
@@ -33,16 +39,101 @@ struct WhenAll: CountDownLatch
 
 	private:
 
-		std::vector<TAwaiter> m_awaiters;
+		std::vector<AwaiterType<TAwaitable>> m_awaiters;
 };
+
+/**
+ * Invokes in_function for each value in in_value_container and waits for all the returned awaitables.
+ *
+ * @tparam TRange Value container type. Must be a sized range.
+ * @tparam TFunction Method to invoke for each value in in_value_container. Must return an awaitable.
+ * @param in_value_container Value container.
+ * @param in_function Method to invoke for each value in in_value_container. Must return an awaitable.
+ * @return An awaitable that returns a vector of the results.
+ */
+template <std::ranges::sized_range TRange, typename TFunction>
+//	requires CAwaitable<std::invoke_result_t<TFunction>> &&
+//			 std::is_invocable_v<TFunction, std::ranges::range_value_t<TRange>>
+
+auto ParallelForeach(TRange const& in_value_container, TFunction&& in_function) noexcept ->
+	DynamicTask<      // Runs on the same queue as the caller
+		std::vector< // And returns a vector of all the result types of the passed awaitables
+			ResumeType<AwaiterType<
+				std::invoke_result_t<TFunction, std::ranges::range_value_t<TRange>>>
+			>
+		>
+	>
+{
+	CountDownLatch										 					         latch    {std::ranges::size(in_value_container)};
+	std::vector<ResumeType<AwaiterType<std::ranges::range_value_t<TRange>>>>         results  {std::ranges::size(in_value_container)};
+	std::vector<std::invoke_result_t<TFunction, std::ranges::range_value_t<TRange>>> awaiters {std::ranges::size(in_value_container)};
+
+	// co_await compiler transform
+	for (auto& [value, awaiter] : std::views::zip(in_value_container, awaiters))
+	{
+		awaiter		   = in_function(value);
+		awaiter.signal = SignalReceiver(latch);
+
+		// Trying to suspend
+		if (!awaiter.await_ready  () &&
+			 awaiter.await_suspend(std::coroutine_handle()))
+			continue;
+
+		latch.Signal();
+	}
+
+	co_await latch;
+
+	// Gathering results
+	for (auto& [result, awaiter] : std::views::zip(results, awaiters))
+		result = awaiter.await_resume();
+
+	co_return results;
+}
+
+
+template <std::ranges::sized_range TRange, typename TFunction>
+//	requires CAwaitable<std::invoke_result_t<TFunction>> &&
+//			 std::is_invocable_v<TFunction, std::ranges::range_value_t<TRange>>
+
+auto ParallelForeach2(TRange const& in_value_container, TFunction&& in_function) noexcept -> DynamicTask<RkVoid>
+{
+	using TFunctionResult = std::invoke_result_t<TFunction, std::ranges::range_value_t<TRange>>;
+
+	CountDownLatch							  latch      {std::ranges::size(in_value_container)};
+	std::vector<TFunctionResult>			  awaitables {std::ranges::size(in_value_container)};
+	std::vector<AwaiterType<TFunctionResult>> awaiters   {std::ranges::size(in_value_container)};
+
+	// co_await compiler transform
+	for (auto const& [value, awaiter, awaitable] : std::views::zip(in_value_container, awaiters, awaitables))
+	{
+		awaitable      = in_function(value);
+		awaiter		   = awaitable.operator co_await();
+		awaiter.signal = SignalReceiver(latch);
+
+		// Trying to suspend
+		if (!awaiter.await_ready  () &&
+			 awaiter.await_suspend(std::coroutine_handle()))
+			continue;
+
+		latch.Signal();
+	}
+
+	co_await latch;
+}
 
 template <typename... TAwaitables>
 auto WhenAllVariadic(TAwaitables const&... in_awaitables) ->
-	DynamicTask<std::tuple<decltype(std::declval<decltype(std::declval<TAwaitables>().operator co_await())>().await_resume())...>>
+	DynamicTask<     // Runs on the same queue as the caller
+		std::tuple< // And returns a tuple of all the result types of the passed awaitables
+			ResumeType<AwaiterType<TAwaitables>>...
+		>
+	>
 {
-	CountDownLatch															 latch    {sizeof...(TAwaitables)};
-	std::tuple<decltype(std::declval<TAwaitables>().operator co_await())...> awaiters {};
+	CountDownLatch							latch    {sizeof...(TAwaitables)};
+	std::tuple<AwaiterType<TAwaitables>...> awaiters {};
 
+	// co_await compiler transform
 	[&]<auto... Is>(std::index_sequence<Is...>)
 	{
 		([&](auto& in_awaiter, auto const& in_awaitable)
@@ -61,8 +152,9 @@ auto WhenAllVariadic(TAwaitables const&... in_awaitables) ->
 
 	co_await latch;
 
+	// Gathering results
 	co_return std::apply([&] <typename... TAwaiter> (TAwaiter&... in_awaiters) {
-		return std::tuple(std::forward<decltype(std::declval<TAwaiter>().await_resume())>(in_awaiters.await_resume())...);
+		return std::tuple(std::forward<ResumeType<TAwaiter>>(in_awaiters.await_resume())...);
 	}, awaiters);
 }
 
