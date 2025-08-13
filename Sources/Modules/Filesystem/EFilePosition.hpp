@@ -7,6 +7,7 @@ BEGIN_RUKEN_NAMESPACE
 enum class EFilePosition
 {
 	Beginning,
+	Current,
 	End
 };
 

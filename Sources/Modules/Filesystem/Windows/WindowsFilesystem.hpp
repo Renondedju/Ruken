@@ -40,7 +40,7 @@ struct WindowsFilesystem final: Filesystem
 	 * @param in_path Path of the file.
 	 * @return File instance.
 	 */
-	FileHandle Open(FilePath const& in_path) override;
+	FileHandle Open(FilesystemPath const& in_path) override;
 
 	/**
 	 * Returns a path corresponding to the passed location.

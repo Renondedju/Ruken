@@ -9,8 +9,7 @@ target_sources(RkFilesystem PUBLIC
         FILE_SET HEADERS FILES
     Filesystem.hpp
     EFilesystemLocation.hpp
-    DirectoryPath.hpp
-    FilePath.hpp
+        FilesystemPath.hpp
     IOJobQueue.hpp
     File.hpp
     Windows/WindowsFilesystem.hpp

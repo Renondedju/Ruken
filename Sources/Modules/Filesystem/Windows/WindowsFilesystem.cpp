@@ -12,14 +12,14 @@ WindowsFilesystem::WindowsFilesystem(ServiceProvider& in_service_provider, std::
 {
 	if (auto const logger {m_service_provider.LocateService<Logger>()})
 		logger->Log(service_name, ELogLevel::Info, "Opened a Windows filesystem at {}",
-			std::filesystem::absolute(in_project_path).string()
+			std::filesystem::absolute(in_project_path).generic_string()
 		);
 }
 
-FileHandle WindowsFilesystem::Open(FilePath const& in_path)
+FileHandle WindowsFilesystem::Open(FilesystemPath const& in_path)
 {
 	std::filesystem::path real_path {(
-		GetPathFromLocation(in_path.Directory.Location) / in_path.Directory.Path / in_path.Filename
+		GetPathFromLocation(in_path.location) / in_path.path
 	).c_str()};
 
 	if (auto const logger {m_service_provider.LocateService<Logger>()})

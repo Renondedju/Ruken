@@ -3,7 +3,7 @@
 #include "Core/Service.hpp"
 #include "Meta/Meta.hpp"
 
-#include "Filesystem/FilePath.hpp"
+#include "Filesystem/FilesystemPath.hpp"
 #include "Filesystem/File.hpp"
 
 #include <filesystem>
@@ -39,7 +39,7 @@ struct Filesystem : Service
 	 * @param in_path Path of the file.
 	 * @return File instance.
 	 */
-	virtual FileHandle Open(FilePath const& in_path) = 0;
+	virtual FileHandle Open(FilesystemPath const& in_path) = 0;
 };
 
 END_RUKEN_NAMESPACE

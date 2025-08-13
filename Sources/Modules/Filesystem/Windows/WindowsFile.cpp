@@ -6,58 +6,61 @@
 
 USING_RUKEN_NAMESPACE
 
-WindowsFile::WindowsFile(FilePath const& in_path, std::filesystem::path const& in_os_path):
+WindowsFile::WindowsFile(FilesystemPath const& in_path, std::filesystem::path const& in_os_path):
 	File {in_path}
 {
-	file_handle = CreateFileW(in_os_path.c_str(),
-		GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-		nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr
-	);
+	auto file_path = in_os_path.generic_string();
+	file_handle    = std::fopen(file_path.c_str(), "a+");
 
-	if (file_handle == INVALID_HANDLE_VALUE)
-		throw WindowsException();
+	if (!file_handle)
+		throw Exception(std::format("Failed to open file named : {}", file_path));
 }
 
 WindowsFile::~WindowsFile() noexcept
 {
-	CloseHandle(file_handle);
+	std::fclose(file_handle);
 }
 
 IOTask<RkSize> WindowsFile::Read(RkVoid* in_destination, FileCursor const in_start_position, RkSize const in_size) const
 {
-	DWORD bytes_read {};
+	std::fseek(file_handle, in_start_position.offset, GetOrigin(in_start_position.position));
+	std::size_t bytes_read {std::fread(in_destination, sizeof(RkByte), in_size, file_handle)};
 
-	SetFilePointer(file_handle, in_start_position.offset, nullptr, GetWindowsMoveMethod(in_start_position.position));
-	if (ReadFile(file_handle, in_destination, in_size, &bytes_read, nullptr) == FALSE)
-		throw WindowsException();
+	// TODO: Check if ferror and errno could catch an error from another thread.
+	if (std::ferror(file_handle))
+		throw ErrnoException(errno);
 
 	co_return bytes_read;
 }
 
-IOTask<RkSize> WindowsFile::Write(RkVoid* in_source, FileCursor const in_start_position, RkSize const in_size)
+IOTask<RkSize> WindowsFile::Write(RkVoid const* in_source, FileCursor const in_start_position, RkSize const in_size)
 {
-	DWORD bytes_written {};
+	std::fseek(file_handle, in_start_position.offset, GetOrigin(in_start_position.position));
+	std::size_t bytes_written {std::fwrite(in_source, sizeof(RkByte), in_size, file_handle)};
 
-	SetFilePointer(file_handle, in_start_position.offset, nullptr, GetWindowsMoveMethod(in_start_position.position));
-	if (WriteFile(file_handle, in_source, in_size, &bytes_written, nullptr) == FALSE)
-		throw WindowsException();
+	// TODO: Check if ferror and errno could catch an error from another thread.
+	if (std::ferror(file_handle))
+		throw ErrnoException(errno);
 
 	co_return bytes_written;
 }
 
 RkSize WindowsFile::GetFileSize() const
 {
-	return SetFilePointer(file_handle, 0, nullptr, FILE_END);
+	std::fseek(file_handle, 0, SEEK_END);
+	return std::ftell(file_handle);
 }
 
-DWORD WindowsFile::GetWindowsMoveMethod(EFilePosition const in_position) noexcept
+int WindowsFile::GetOrigin(EFilePosition const in_position) noexcept
 {
 	switch (in_position)
 	{
 		case EFilePosition::End:
-			return FILE_END;
+			return SEEK_END;
+		case EFilePosition::Current:
+			return SEEK_CUR;
 		case EFilePosition::Beginning:
-			return FILE_BEGIN;
+			return SEEK_SET;
 
 		default:
 			std::unreachable();
