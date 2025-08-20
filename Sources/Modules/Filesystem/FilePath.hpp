@@ -7,7 +7,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 /// @brief Path to a directory in the current filesystem.
-struct FilesystemPath
+struct FilePath
 {
 	EFilesystemLocation   location;
 	std::filesystem::path path;
@@ -19,9 +19,9 @@ struct FilesystemPath
 END_RUKEN_NAMESPACE
 
 template<>
-struct std::hash<RUKEN_NAMESPACE::FilesystemPath>
+struct std::hash<RUKEN_NAMESPACE::FilePath>
 {
-	std::size_t operator()(RUKEN_NAMESPACE::FilesystemPath const& in_path) const noexcept
+	std::size_t operator()(RUKEN_NAMESPACE::FilePath const& in_path) const noexcept
 	{
 		using UnderlyingType = std::underlying_type_t<RUKEN_NAMESPACE::EFilesystemLocation>;
 

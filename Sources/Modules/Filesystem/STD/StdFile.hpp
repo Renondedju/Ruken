@@ -8,7 +8,7 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * File implementation of the underlying operating system's filesystem.
  */
-struct WindowsFile final: File
+struct StdFile final: File
 {
 	#pragma region Lifetime
 
@@ -17,12 +17,12 @@ struct WindowsFile final: File
 	 * @param in_path Path of the file.
 	 * @param in_os_path Full OS path.
 	 */
-	explicit WindowsFile(FilesystemPath const& in_path, std::filesystem::path const& in_os_path);
-	WindowsFile           (WindowsFile const& in_copy) = default;
-	WindowsFile           (WindowsFile&&      in_move) = default;
-	WindowsFile& operator=(WindowsFile const& in_copy) = delete;
-	WindowsFile& operator=(WindowsFile&&      in_move) = delete;
-	~WindowsFile() noexcept override;
+	explicit StdFile(FilePath const& in_path, std::filesystem::path const& in_os_path);
+	StdFile           (StdFile const& in_copy) = default;
+	StdFile           (StdFile&&      in_move) = default;
+	StdFile& operator=(StdFile const& in_copy) = delete;
+	StdFile& operator=(StdFile&&      in_move) = delete;
+	~StdFile() noexcept override;
 
 	#pragma endregion
 

@@ -9,17 +9,17 @@ target_sources(RkFilesystem PUBLIC
         FILE_SET HEADERS FILES
     Filesystem.hpp
     EFilesystemLocation.hpp
-        FilesystemPath.hpp
+        FilePath.hpp
     IOJobQueue.hpp
     File.hpp
-    Windows/WindowsFilesystem.hpp
-    Windows/WindowsFile.hpp
+        STD/StdFilesystem.hpp
+        STD/StdFile.hpp
     FileCursor.hpp
 )
 
 target_sources(RkFilesystem PRIVATE
-    Windows/WindowsFilesystem.cpp
-    Windows/WindowsFile.cpp
+        STD/StdFilesystem.cpp
+        STD/StdFile.cpp
     Filesystem.cpp
 )
 

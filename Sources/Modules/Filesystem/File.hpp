@@ -2,7 +2,7 @@
 
 #include "Filesystem/FileCursor.hpp"
 #include "Filesystem/IOJobQueue.hpp"
-#include "Filesystem/FilesystemPath.hpp"
+#include "Filesystem/FilePath.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -14,7 +14,7 @@ struct File
 {
 	#pragma region Members
 
-	const FilesystemPath path;
+	const FilePath path;
 
 	#pragma endregion
 
@@ -24,7 +24,7 @@ struct File
 	 * Default constructor
 	 * @param in_path Path of the file.
 	 */
-	explicit File(FilesystemPath const& in_path) noexcept:
+	explicit File(FilePath const& in_path) noexcept:
 		path {in_path}
 	{}
 

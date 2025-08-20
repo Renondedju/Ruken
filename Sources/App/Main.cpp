@@ -9,7 +9,7 @@
 #include "Core/Maths/Vector/PixelVector2.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
-#include "Filesystem/Windows/WindowsFilesystem.hpp"
+#include "Filesystem/STD/StdFilesystem.hpp"
 
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 #include "Rendering/Windowing/Window.hpp"
@@ -33,7 +33,7 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
     AssetImporter const* importer {in_service_provider.LocateService<AssetImporter>()};
 
     try {
-        co_await importer->Import(FilesystemPath {
+        co_await importer->Import(FilePath {
             .location = EFilesystemLocation::ProjectDirectory,
             .path     = "test.slang"
         });
@@ -78,7 +78,7 @@ int main(int in_argc, char* in_argv[])
     ServiceProvider    services   {"Root"};
     Logger*            logger     {services.ProvideService<Logger>(handlers)};
     JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
-    WindowsFilesystem* filesystem {services.ProvideService<WindowsFilesystem>("../Assets")};
+    StdFilesystem*     filesystem {services.ProvideService<StdFilesystem>("../Assets")};
     VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
     RenderDevice*      renderer   {services.ProvideService<RenderDevice>()};
     AssetImporter*     importer   {services.ProvideService<AssetImporter>()};
