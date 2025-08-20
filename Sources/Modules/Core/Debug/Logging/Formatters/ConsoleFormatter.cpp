@@ -75,10 +75,6 @@ std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noe
         case ELogLevel::Error:
             SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_RED);
             break;
-
-        case ELogLevel::Fatal:
-            SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_WHITE | RUKEN_BACKGROUND_RED);
-            break;
     }
 
     #endif

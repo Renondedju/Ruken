@@ -11,7 +11,7 @@ BEGIN_RUKEN_NAMESPACE
 
 struct Service;
 
-/// @brief Locates and provides services.
+/// @brief Locates and provides services using a tree-like structure.
 class ServiceProvider
 {
     #pragma region Members
