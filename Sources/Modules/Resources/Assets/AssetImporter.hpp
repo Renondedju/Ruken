@@ -7,6 +7,7 @@
 #include "Filesystem/File.hpp"
 
 #include "Resources/Resource.hpp"
+#include "Resources/ImportContext.hpp"
 
 #include <vector>
 
@@ -46,11 +47,10 @@ struct AssetImporter final : Service
 
 		/**
 		 * Imports a file.
-		 * @param in_services Service provider.
-		 * @param in_file File to import.
+		 * @param in_context Import context.
 		 * @return Import task.
 		 */
-		virtual IOTask<std::vector<std::shared_ptr<Resource>>> Import(ServiceProvider const& in_services, FileHandle const& in_file) noexcept = 0;
+		virtual IOTask<RkVoid> Import(ImportContext& in_context) noexcept = 0;
 
 		/// @returns a list of the supported file extensions.
 		virtual std::vector<std::string> SupportedExtensions() const noexcept = 0;
@@ -65,7 +65,7 @@ struct AssetImporter final : Service
 	RkVoid ProvideImporter() { m_importers.emplace_back(std::make_unique<TImporter>()); }
 
 	/// @brief Tries to import the passed file.
-	IOTask<RkVoid> Import(FilesystemPath const& in_file_path) const noexcept;
+	IOTask<RkVoid> Import(FilePath const& in_file_path) const noexcept;
 
 	#pragma endregion
 

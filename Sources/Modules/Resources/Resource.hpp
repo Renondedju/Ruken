@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Filesystem/FilesystemPath.hpp"
+#include "Resources/ResourcePath.hpp"
 #include "Filesystem/ISerializable.hpp"
 
 BEGIN_RUKEN_NAMESPACE
@@ -10,9 +10,8 @@ struct Resource : ISerializable
 {
 	#pragma region Lifetime
 
-	Resource(FilesystemPath const& in_file_path, std::string const& in_subresource_name) noexcept:
-		file_path		 {in_file_path},
-		subresource_name {in_subresource_name}
+	explicit Resource(ResourcePath const& in_resource_path) noexcept:
+		resource_path {in_resource_path}
 	{}
 
 	Resource(Resource const&)			 = default;
@@ -25,8 +24,7 @@ struct Resource : ISerializable
 
 	#pragma region Members
 
-	FilesystemPath file_path		{};
-	std::string    subresource_name {};
+	ResourcePath resource_path;
 
 	#pragma endregion
 };

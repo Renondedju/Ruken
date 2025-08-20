@@ -3,9 +3,9 @@
 BEGIN_RUKEN_NAMESPACE
 
 template <typename TType>
-concept CAwaitable = requires
+concept CAwaitable = requires (TType const& in_type)
 {
-	typename TType::operator co_await;
+	in_type.operator co_await();
 };
 
 END_RUKEN_NAMESPACE

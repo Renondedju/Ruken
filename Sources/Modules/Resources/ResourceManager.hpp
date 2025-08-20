@@ -6,7 +6,7 @@
 #include "Resources/Resource.hpp"
 #include "Resources/Assets/AssetImporter.hpp"
 
-#include "Filesystem/FilesystemPath.hpp"
+#include "Filesystem/FilePath.hpp"
 #include "Filesystem/IOJobQueue.hpp"
 
 #include <unordered_map>
@@ -56,7 +56,7 @@ struct ResourceManager final : Service
 		#pragma region Members
 
 		std::vector<std::unique_ptr<AssetImporter>> importers {};
-		std::unordered_map<FilesystemPath, Resource*>  resources {};
+		std::unordered_map<FilePath, Resource*>  resources {};
 
 		#pragma endregion
 

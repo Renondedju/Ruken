@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../../Debug/Exception.hpp"
+#include "Core/Debug/Exception.hpp"
 #include "JobSystem/Awaitables/SignalReceiver.hpp"
 #include "JobSystem/Awaitables/Tasks/TaskAwaiter.hpp"
 #include "JobSystem/Awaitables/Tasks/TaskPromise.hpp"

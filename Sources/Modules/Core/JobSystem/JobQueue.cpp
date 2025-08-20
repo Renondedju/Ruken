@@ -8,8 +8,6 @@
 
 USING_RUKEN_NAMESPACE
 
-static inline std::array<const RkChar*, 2> s_request_plots {"Main Requests", "IO Requests"};
-
 JobQueue::JobQueue(const RkSize in_size) noexcept:
 	m_queue {static_cast<unsigned>(in_size)}
 {}
@@ -22,8 +20,6 @@ RkBool JobQueue::TryConsumeWorkerRequest(Concurrency& inout_concurrency) noexcep
         if (inout_concurrency.ComputeRequest(+1) < 0)
         {
             inout_concurrency.packed_value = m_concurrency.fetch_sub(s_one_requested_concurrency, std::memory_order_acq_rel) - s_one_requested_concurrency;
-
-            TracyPlot(s_request_plots[m_request_location.path], static_cast<int64_t>(inout_concurrency.fields.requested));
             return false;
         }
 
@@ -31,8 +27,6 @@ RkBool JobQueue::TryConsumeWorkerRequest(Concurrency& inout_concurrency) noexcep
     } while(!m_concurrency.compare_exchange_weak(inout_concurrency,
         inout_concurrency + s_one_current_concurrency - s_one_requested_concurrency, std::memory_order_acq_rel)
     );
-
-    TracyPlot(s_request_plots[m_request_location.path], static_cast<int64_t>(inout_concurrency.fields.requested));
 
     return true;
 }
@@ -76,7 +70,6 @@ RkBool JobQueue::TryEmitWorkerRequest(Concurrency& inout_concurrency) noexcept
     );
 
     m_request_tree->EmitRequest(m_request_location);
-    TracyPlot(s_request_plots[m_request_location.path], static_cast<int64_t>(inout_concurrency.fields.requested));
 
     return true;
 }

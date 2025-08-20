@@ -1,7 +1,7 @@
 #include "Resources/Assets/AssetImporter.hpp"
 
+#include "Core/JobSystem/Awaitables/Primitives/ParallelForEach.hpp"
 #include "Filesystem/Filesystem.hpp"
-#include "JobSystem/Awaitables/Primitives/WhenAll.hpp"
 #include "Resources/Resource.hpp"
 
 USING_RUKEN_NAMESPACE
@@ -10,33 +10,36 @@ AssetImporter::AssetImporter(ServiceProvider& in_provider) noexcept:
 	Service {in_provider, typeid(AssetImporter)}
 {}
 
-IOTask<RkVoid> AssetImporter::Import(FilesystemPath const& in_file_path) const noexcept
+IOTask<RkVoid> AssetImporter::Import(FilePath const& in_file_path) const noexcept
 {
-	// Look for a compatible importer
-	std::filesystem::path const& extension {in_file_path.path.extension()};
-	Importer*					 importer  {GetCompatibleImporter(extension)};
+	// --- 1. Setup & safety
+	std::filesystem::path const& extension  {in_file_path.path.extension()};
+	Importer*					 importer   {GetCompatibleImporter(extension)};
+	Filesystem*					 filesystem {m_service_provider.LocateService<Filesystem>()};
+
+	RUKEN_ASSERT(filesystem, "Cannot import assets without a filesystem");
 
 	if (!importer)
 		throw Exception(std::format("There is no available importer for the '{}' file extension.", extension.generic_string()));
 
-	Filesystem*  filesystem {m_service_provider.LocateService<Filesystem>()};
-	RUKEN_ASSERT(filesystem, "Cannot import assets without a filesystem");
+	// --- 2. Import
+	ImportContext context {
+		.services   = m_service_provider,
+		.asset_file = filesystem->Open(in_file_path),
+		.resources  = {} // To be filled by the importer
+	};
 
-	auto const resources {co_await importer->Import(m_service_provider, filesystem->Open(in_file_path))};
+	co_await importer->Import(context);
 
 	// For each extracted resource, writing it back to disk
-	co_await ParallelForeach2(resources, [&](std::shared_ptr<Resource> const& in_resource) -> DynamicTask<RkVoid> {
+	co_await ParallelForeach(context.resources, [&](ImportContext::ResourceData const& in_resource) -> DynamicTask<RkVoid> {
 
-		auto const data {in_resource->Serialize()};
-		auto const file {filesystem->Open(FilesystemPath {
+		auto const file {filesystem->Open(FilePath {
 			.location = EFilesystemLocation::ImportedAssets,
-			.path     = in_file_path.path / in_resource->subresource_name
+			.path     = in_resource.name.file_path.path / in_resource.name.subresource_name
 		})};
 
-		co_await file->Write(data.data(), FileCursor {
-			.offset   = 0ULL,
-			.position = EFilePosition::Beginning
-		}, data.size());
+		co_await file->Write(in_resource.data.data(), {}, in_resource.data.size());
 	});
 }
 

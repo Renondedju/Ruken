@@ -32,7 +32,7 @@ struct SlangImporter final : AssetImporter::Importer
 	std::vector<std::string> SupportedExtensions() const noexcept override;
 
 	/// @copydoc AssetImporter::Importer::Import
-	IOTask<std::vector<std::shared_ptr<Resource>>> Import(ServiceProvider const& in_services, FileHandle const& in_file) noexcept override;
+	IOTask<RkVoid> Import(ImportContext& in_context) noexcept override;
 
 	#pragma endregion
 
@@ -40,8 +40,8 @@ struct SlangImporter final : AssetImporter::Importer
 
 		#pragma region Members
 
-		slang::SessionDesc m_session_create_info {};
-		slang::TargetDesc  m_target_create_info  {};
+		slang::SessionDesc  m_session_create_info {};
+		slang::TargetDesc   m_target_create_info  {};
 
 		std::vector<const RkChar*>		    const m_search_paths {SlangSearchPath::s_path};
 		std::vector<slang::PreprocessorMacroDesc> m_macros       {};
@@ -51,12 +51,6 @@ struct SlangImporter final : AssetImporter::Importer
 
 		Slang::ComPtr<slang::IGlobalSession>  m_global_session {};
 		Mutex<Slang::ComPtr<slang::ISession>> m_session;
-
-		#pragma endregion
-
-		#pragma region Methods
-
-		RkVoid LogDiagnostics(Logger* in_logger, slang::IBlob* in_diagnostics);
 
 		#pragma endregion
 };
