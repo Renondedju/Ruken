@@ -12,18 +12,28 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 	m_physical_device    {SelectPhysicalDevice()},
 	m_queue_priorities   {1.0f},
 	m_queue_create_infos {MakeQueueCreateInfo()},
-	m_device             {m_physical_device.createDevice(vk::DeviceCreateInfo {
-		.sType 					 = vk::StructureType::eDeviceCreateInfo,
-		.pNext 					 = nullptr,
-		.flags 					 = {},
-		.queueCreateInfoCount    = static_cast<uint32_t>(m_queue_create_infos.size()),
-		.pQueueCreateInfos 		 = m_queue_create_infos.data(),
-		.enabledLayerCount 		 = 0u,	     // Deprecated and ignored.
-		.ppEnabledLayerNames	 = nullptr, // Deprecated and ignored.
-		.enabledExtensionCount	 = static_cast<uint32_t>(s_extensions.size()),
-		.ppEnabledExtensionNames = s_extensions.data(),
-		.pEnabledFeatures		 = nullptr
-	})},
+	m_device             {[&] {
+
+		vk::StructureChain const features { m_physical_device.getFeatures2<
+			vk::PhysicalDeviceFeatures2,
+			vk::PhysicalDeviceVulkan11Features,
+			vk::PhysicalDeviceDynamicRenderingFeatures,
+			vk::PhysicalDeviceSynchronization2Features
+		>()};
+
+		return m_physical_device.createDevice(vk::DeviceCreateInfo {
+			.sType 					 = vk::StructureType::eDeviceCreateInfo,
+			.pNext 					 = &features,
+			.flags 					 = {},
+			.queueCreateInfoCount    = static_cast<uint32_t>(m_queue_create_infos.size()),
+			.pQueueCreateInfos 		 = m_queue_create_infos.data(),
+			.enabledLayerCount 		 = 0u,	      // Deprecated and ignored.
+			.ppEnabledLayerNames	 = nullptr,  // Deprecated and ignored.
+			.enabledExtensionCount	 = static_cast<uint32_t>(s_extensions.size()),
+			.ppEnabledExtensionNames = s_extensions.data(),
+			.pEnabledFeatures		 = nullptr // Deprecated
+		});
+	}()},
 	m_queues {m_device.getQueue2(vk::DeviceQueueInfo2 {
 		.sType 			  = vk::StructureType::eDeviceQueueInfo2,
 		.pNext 			  = nullptr,

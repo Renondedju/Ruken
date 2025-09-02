@@ -25,6 +25,10 @@ struct Task
 
 	using promise_type = TaskPromise<TQueueHandle, TResult>;
 
+	/// @returns True if the task is done.
+	RkBool Done() const noexcept;
+
+	/// @returns An awaiter that waits for the task to return.
 	auto operator co_await() const noexcept;
 
 	private:

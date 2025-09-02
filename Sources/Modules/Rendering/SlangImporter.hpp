@@ -29,7 +29,7 @@ struct SlangImporter final : AssetImporter::Importer
 	#pragma region Methods
 
 	/// @copydoc AssetImporter::Importer::SupportedExtensions
-	std::vector<std::string> SupportedExtensions() const noexcept override;
+	std::vector<std::string_view> SupportedExtensions() const noexcept override;
 
 	/// @copydoc AssetImporter::Importer::Import
 	IOTask<RkVoid> Import(ImportContext& in_context) noexcept override;
@@ -46,7 +46,8 @@ struct SlangImporter final : AssetImporter::Importer
 		std::vector<const RkChar*>		    const m_search_paths {SlangSearchPath::s_path};
 		std::vector<slang::PreprocessorMacroDesc> m_macros       {};
 		std::vector<slang::CompilerOptionEntry  > m_options      {
-			{slang::CompilerOptionName::EmitSpirvDirectly, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}}
+			{slang::CompilerOptionName::EmitSpirvDirectly      , {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}},
+			{slang::CompilerOptionName::VulkanUseEntryPointName, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}},
 		};
 
 		Slang::ComPtr<slang::IGlobalSession>  m_global_session {};

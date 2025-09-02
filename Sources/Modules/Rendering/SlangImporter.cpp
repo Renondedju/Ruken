@@ -32,7 +32,7 @@ SlangImporter::SlangImporter() noexcept:
 	}()}
 {}
 
-std::vector<std::string> SlangImporter::SupportedExtensions() const noexcept
+std::vector<std::string_view> SlangImporter::SupportedExtensions() const noexcept
 {
 	return {
 		".slang",
@@ -107,25 +107,22 @@ IOTask<RkVoid> SlangImporter::Import(ImportContext& in_context) noexcept
 		program->link(linked_program.writeRef(),
 	diagnostics.writeRef())));
 
-	// --- 5. Generating resources
-	std::vector<std::shared_ptr<Resource>> resources (entry_points.size());
-	for (std::size_t entry_point = 0ULL; entry_point < entry_points.size(); entry_point++)
-	{
-		Slang::ComPtr<slang::IBlob> kernel {};
-		log_or_throw(SLANG_SUCCEEDED(
-			linked_program->getEntryPointCode(entry_point, 0, kernel.writeRef(),
-		diagnostics.writeRef())));
+	// --- 5. Exporting code
+	Slang::ComPtr<slang::IBlob> kernel {};
 
-		std::string			name       {entry_points[entry_point]->getFunctionReflection()->getName()};
-		std::vector<RkByte>	byte_array (kernel->getBufferSize());
-		std::memmove(byte_array.data(), kernel->getBufferPointer(), kernel->getBufferSize());
+	log_or_throw(SLANG_SUCCEEDED(
+		linked_program->getTargetCode(0, kernel.writeRef(),
+	diagnostics.writeRef())));
 
-		in_context.resources.emplace_back(ImportContext::ResourceData {
-			.name = ResourcePath {
-				.file_path        = path,
-				.subresource_name = std::format("{}.spv", name)
-			 },
-			.data = byte_array
-		});
-	}
+	//std::string			name       {entry_points[entry_point]->getFunctionReflection()->getName()};
+	std::vector<RkByte>	byte_array (kernel->getBufferSize());
+	std::memmove(byte_array.data(), kernel->getBufferPointer(), kernel->getBufferSize());
+
+	in_context.resources.emplace_back(ImportContext::ResourceData {
+		.data = byte_array,
+		.path = FilePath {
+			.location = EFilesystemLocation::ImportedAssets,
+			.path     = in_context.asset_file->path.path / "code.spv"
+		 }
+	});
 }

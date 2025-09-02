@@ -2,6 +2,8 @@
 
 #include "Build/Namespace.hpp"
 
+#include <string>
+
 BEGIN_RUKEN_NAMESPACE
 
 /// @brief An enumeration of all the major locations or "volumes" of the filesystem.

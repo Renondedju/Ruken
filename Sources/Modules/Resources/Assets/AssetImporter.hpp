@@ -7,7 +7,7 @@
 #include "Filesystem/File.hpp"
 
 #include "Resources/Resource.hpp"
-#include "Resources/ImportContext.hpp"
+#include "ImportContext.hpp"
 
 #include <vector>
 
@@ -53,7 +53,7 @@ struct AssetImporter final : Service
 		virtual IOTask<RkVoid> Import(ImportContext& in_context) noexcept = 0;
 
 		/// @returns a list of the supported file extensions.
-		virtual std::vector<std::string> SupportedExtensions() const noexcept = 0;
+		virtual std::vector<std::string_view> SupportedExtensions() const noexcept = 0;
 
 		#pragma endregion
 	};

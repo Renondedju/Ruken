@@ -1,3 +1,4 @@
+#include "SpirvLoader.hpp"
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
@@ -10,11 +11,16 @@
 
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/STD/StdFilesystem.hpp"
+#include "JobSystem/Awaitables/Primitives/WhenAll.hpp"
+
+#include "Resources/Assets/AssetImporter.hpp"
+#include "Resources/ResourceManager.hpp"
 
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 #include "Rendering/Windowing/Window.hpp"
 #include "Rendering/SlangImporter.hpp"
 #include "Rendering/RenderDevice.hpp"
+#include "Rendering/ShaderModule.hpp"
 
 struct MainQueue : QueueHandle<MainQueue, 2048>
 {};
@@ -29,14 +35,25 @@ USING_RUKEN_NAMESPACE
  */
 Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
 {
-    Logger        const* logger   {in_service_provider.LocateService<Logger>()};
-    AssetImporter const* importer {in_service_provider.LocateService<AssetImporter>()};
+    Logger          const* logger    {in_service_provider.LocateService<Logger>()};
+    AssetImporter   const* importer  {in_service_provider.LocateService<AssetImporter>()};
+    ResourceManager*       resources {in_service_provider.LocateService<ResourceManager>()};
 
     try {
-        co_await importer->Import(FilePath {
+        //co_await importer->Import(FilePath {
+        //    .location = EFilesystemLocation::ProjectDirectory,
+        //    .path     = "test.slang"
+        //});
+
+        auto const code {resources->Request<ShaderModule>(FilePath {
             .location = EFilesystemLocation::ProjectDirectory,
-            .path     = "test.slang"
-        });
+            .path     = "slang.spv",
+        })};
+
+        co_await code.LoadTask();
+
+        logger->Info("", "Loaded shader modules !!", "");
+
     } catch (Exception& in_exception) {
         if (logger) logger->Error("", "{}", in_exception.reason);
     } catch (std::exception& in_exception) {
@@ -82,8 +99,10 @@ int main(int in_argc, char* in_argv[])
     VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
     RenderDevice*      renderer   {services.ProvideService<RenderDevice>()};
     AssetImporter*     importer   {services.ProvideService<AssetImporter>()};
+    ResourceManager*   resources  {services.ProvideService<ResourceManager>()};
 
-    importer->ProvideImporter<SlangImporter>();
+    importer ->ProvideImporter<SlangImporter>();
+    resources->ProvideLoader  <SpirvLoader>  ();
 
     // 3. --- Running async main. ---
     std::stop_source stop_source {};

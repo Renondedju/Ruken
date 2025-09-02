@@ -32,14 +32,12 @@ IOTask<RkVoid> AssetImporter::Import(FilePath const& in_file_path) const noexcep
 	co_await importer->Import(context);
 
 	// For each extracted resource, writing it back to disk
-	co_await ParallelForeach(context.resources, [&](ImportContext::ResourceData const& in_resource) -> DynamicTask<RkVoid> {
+	co_await ParallelForeach(context.resources,
+		[&](ImportContext::ResourceData const& in_resource) -> DynamicTask<RkVoid> {
 
-		auto const file {filesystem->Open(FilePath {
-			.location = EFilesystemLocation::ImportedAssets,
-			.path     = in_resource.name.file_path.path / in_resource.name.subresource_name
-		})};
-
-		co_await file->Write(in_resource.data.data(), {}, in_resource.data.size());
+		co_await filesystem
+			->Open (in_resource.path)
+			->Write(in_resource.data.data(), {}, in_resource.data.size());
 	});
 }
 

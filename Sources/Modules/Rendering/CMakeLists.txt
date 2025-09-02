@@ -26,7 +26,9 @@ target_copy_slang_binaries(RkRendering ${RUKEN_BINARY_DIR})
 target_sources(RkRendering PUBLIC
         FILE_SET HEADERS FILES
         RenderDevice.hpp
+        ShaderModule.hpp
         SlangImporter.hpp
+        SpirvLoader.hpp
         Windowing/Window.hpp
         Vulkan/VulkanInstance.hpp
         Vulkan/VulkanLoaderInstance.hpp
@@ -35,6 +37,8 @@ target_sources(RkRendering PUBLIC
 target_sources(RkRendering PRIVATE
         RenderDevice.cpp
         SlangImporter.cpp
+        SpirvLoader.cpp
+        ShaderModule.cpp
         Windowing/Window.cpp
         Vulkan/VulkanInstance.cpp
         Vulkan/VulkanLoaderInstance.cpp

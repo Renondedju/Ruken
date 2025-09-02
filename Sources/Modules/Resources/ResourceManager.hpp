@@ -3,11 +3,14 @@
 #include "Core/Meta/Meta.hpp"
 #include "Core/Service.hpp"
 
-#include "Resources/Resource.hpp"
 #include "Resources/Assets/AssetImporter.hpp"
+#include "Resources/ResourceManifest.hpp"
+#include "Resources/ResourceHandle.hpp"
+#include "Resources/ResourceLoader.hpp"
+#include "Resources/Resource.hpp"
 
-#include "Filesystem/FilePath.hpp"
 #include "Filesystem/IOJobQueue.hpp"
+#include "Filesystem/FilePath.hpp"
 
 #include <unordered_map>
 
@@ -37,17 +40,25 @@ struct ResourceManager final : Service
 
 	#pragma region Lifetime
 
-	/**
-	 * Default constructor.
-	 * @param in_parent Owning provider.
-	 */
-	explicit ResourceManager(ServiceProvider& in_parent);
+	/// @brief Constructor
+	explicit ResourceManager(ServiceProvider& in_provider) noexcept;
+	ResourceManager(ResourceManager const&)	           = delete;
+	ResourceManager(ResourceManager&&)		           = delete;
+	ResourceManager& operator=(ResourceManager const&) = delete;
+	ResourceManager& operator=(ResourceManager&&)	   = delete;
+	~ResourceManager() override					       = default;
 
-	ResourceManager			  (const ResourceManager&) = delete;
-	ResourceManager			  (ResourceManager&&)      = delete;
-	ResourceManager& operator=(const ResourceManager&) = delete;
-	ResourceManager& operator=(ResourceManager&&)      = delete;
-	~ResourceManager() override						   = default;
+	#pragma endregion
+
+	#pragma region Methods
+
+	/// @brief Provides a new importer type to the library.
+	template <typename TLoader> requires std::is_base_of_v<ResourceLoader, TLoader>
+	RkVoid ProvideLoader() noexcept;
+
+	/// @brief Tries to load the passed file.
+	template <CResource TResource>
+	ResourceHandle<TResource> Request(FilePath const& in_file_path);
 
 	#pragma endregion
 
@@ -55,16 +66,24 @@ struct ResourceManager final : Service
 
 		#pragma region Members
 
-		std::vector<std::unique_ptr<AssetImporter>> importers {};
-		std::unordered_map<FilePath, Resource*>  resources {};
+		std::vector<std::unique_ptr<ResourceLoader>>   m_loaders         {};
+		std::unordered_map<FilePath, ResourceManifest> m_manifests 		 {};
+		std::mutex									   m_manifests_mutex {};
 
 		#pragma endregion
 
 		#pragma region Methods
 
+		/// @brief Looks though the importers and returns the first compatible one or nullptr if not found.
+		ResourceLoader* GetCompatibleLoader(std::filesystem::path const& in_extension) const;
 
+		/// @brief Waits for in_loading_task to finish and exchanges the Resource pointer of the passed in_manifest.
+		IOTask<RkVoid> Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader) const noexcept;
 
 		#pragma endregion
 };
 
+
 END_RUKEN_NAMESPACE
+
+#include "Resources/ResourceManager.inl"

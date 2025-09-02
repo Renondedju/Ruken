@@ -10,7 +10,7 @@ StdFile::StdFile(FilePath const& in_path, std::filesystem::path const& in_os_pat
 	File {in_path}
 {
 	auto file_path = in_os_path.generic_string();
-	file_handle    = std::fopen(file_path.c_str(), "a+");
+	file_handle    = std::fopen(file_path.c_str(), "ab+");
 
 	if (!file_handle)
 		throw Exception(std::format("Failed to open file named : {}", file_path));

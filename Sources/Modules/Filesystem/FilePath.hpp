@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Types/FundamentalTypes.hpp"
 #include "Filesystem/EFilesystemLocation.hpp"
 
 #include <filesystem>
@@ -14,6 +15,11 @@ struct FilePath
 
 	std::string ToString() const noexcept
 	{ return (EFilesystemLocationToString(location) / path).generic_string(); }
+
+	RkBool operator==(FilePath const& in_other) const
+	{
+		return location == in_other.location &&	path == in_other.path;
+	}
 };
 
 END_RUKEN_NAMESPACE

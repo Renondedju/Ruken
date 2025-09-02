@@ -8,7 +8,12 @@ register_ruken_module(RkResources)
 target_sources(RkResources PUBLIC
     FILE_SET HEADERS FILES
         Resource.hpp
+        ResourceHandle.hpp
+        ResourceLoader.hpp
+        ResourceManifest.hpp
+        ResourceHandle.inl
         Assets/AssetImporter.hpp
+        Assets/ImportContext.hpp
         ResourceManager.hpp
 )
 
