@@ -56,10 +56,10 @@ ResourceHandle<TResource>::~ResourceHandle()
 #pragma endregion
 
 template<CResource TResource>
-ResourcePtr<TResource> ResourceHandle<TResource>::operator->() const noexcept
+ResourcePtr<TResource> ResourceHandle<TResource>::operator*() const noexcept
 {
 	if (m_manifest->load_task.Done())
-		return m_manifest->resource_ptr.load(std::memory_order_relaxed);
+		return std::dynamic_pointer_cast<TResource, Resource>(m_manifest->resource_ptr.load(std::memory_order_relaxed));
 
 	return nullptr;
 }

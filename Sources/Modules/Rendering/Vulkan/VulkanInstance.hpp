@@ -54,7 +54,7 @@ struct VulkanInstance final: Service
 		 * @return vk::InstanceCreateInfo.
 		 */
 		vk::InstanceCreateInfo MakeInstanceCreateInfo(
-			ServiceProvider&		    in_service_provider,
+			ServiceProvider const&		    in_service_provider,
 			std::vector<const RkChar*>& in_layers,
 			std::vector<const RkChar*>& in_extensions
 		) const;

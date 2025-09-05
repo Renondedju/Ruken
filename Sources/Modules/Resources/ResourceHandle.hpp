@@ -30,7 +30,7 @@ struct ResourceHandle
 	/// @note This operator is meant to be called periodically to make sure to point
 	///		  to the most up-to date version of the resource.
 	///		  Throw away the pointer as soon as you are done with the resource.
-	ResourcePtr<TResource> operator->() const noexcept;
+	ResourcePtr<TResource> operator*() const noexcept;
 
 	/// @returns The current load task.
 	IOTask<RkVoid> LoadTask() const;

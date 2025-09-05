@@ -34,9 +34,11 @@ struct RenderDevice final : Service
 	#pragma region Methods
 
 	// Getters
-	vk::raii::Instance&       GetInstance() const noexcept { return m_instance->instance; }
-	vk::raii::PhysicalDevice& GetPhysicalDevice() noexcept { return m_physical_device; }
-	vk::raii::Device&		  GetDevice()		  noexcept { return m_device; }
+	vk::raii::Instance&       GetInstance()      const noexcept { return m_instance->instance; }
+	vk::raii::PhysicalDevice& GetPhysicalDevice()      noexcept { return m_physical_device; }
+	vk::raii::Device&		  GetDevice()		       noexcept { return m_device; }
+	vk::raii::CommandBuffer&  GetCommandBuffer()       noexcept { return m_command_buffers[0]; }
+	vk::raii::Queue& GetQueue() { return m_queues.front(); }
 
 	#pragma endregion
 
@@ -51,6 +53,7 @@ struct RenderDevice final : Service
 		vk::raii::Device		 	 		   m_device;
 		std::vector<vk::raii::Queue> 		   m_queues;
 		vk::raii::CommandPool				   m_command_pool;
+		vk::raii::CommandBuffers			   m_command_buffers;
 
 		static inline std::vector<const RkChar*> s_extensions {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME,

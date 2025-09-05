@@ -63,7 +63,7 @@ class Logger final: public Service
 		template <typename... TArgs> RkVoid Info     (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
 		template <typename... TArgs> RkVoid Warning  (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
 		template <typename... TArgs> RkVoid Error    (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
-	    template <typename... TArgs> RkVoid Exception(std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args, std::exception_ptr in_exception) const noexcept;
+	    template <typename... TArgs> RkVoid Exception(std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
 
         /// @brief Adds the specified filter to this logger.
         RkVoid AddFilter(LogFilter const* in_filter) noexcept;

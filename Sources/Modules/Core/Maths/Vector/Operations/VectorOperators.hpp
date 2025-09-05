@@ -31,7 +31,7 @@ struct VectorOperators
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>                                                    \
     requires requires (TUnderlyingType in_lhs, TOtherUnderlyingType in_rhs) { in_lhs RUKEN_GLUE(in_operator,=) in_rhs; } \
     [[nodiscard]]                                                                                                        \
-    constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> RUKEN_GLUE(operator,in_operator)( \
+    constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> operator RUKEN_EXPAND(in_operator)( \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) const noexcept                                  \
     {                                                                                                                    \
         if constexpr (TDimensions >= TOtherDimensions)                                                                   \
@@ -59,7 +59,7 @@ struct VectorOperators
     #define RUKEN_VECTOR_ASSIGNMENT_OPERATOR_MIXIN(in_operator) \
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>                                                    \
     requires requires (TUnderlyingType in_lhs, TOtherUnderlyingType in_rhs) { in_lhs RUKEN_GLUE(in_operator,=) in_rhs; } \
-    constexpr TVector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(                                                   \
+    constexpr TVector& operator RUKEN_GLUE(in_operator,=)(                                                   \
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_vector) noexcept                                        \
     {                                                                                                                    \
         for (RkSize index {0ULL}; index < std::min(TDimensions, TOtherDimensions); ++index)                              \
@@ -76,7 +76,7 @@ struct VectorOperators
     template <typename TScalarType>                                                                           \
     requires requires (TUnderlyingType in_vector, TScalarType in_scalar) { in_vector in_operator in_scalar; } \
     [[nodiscard]]                                                                                             \
-    constexpr typename Helper::template CommonSizedVector<TScalarType> RUKEN_GLUE(operator,in_operator)(      \
+    constexpr typename Helper::template CommonSizedVector<TScalarType> operator RUKEN_EXPAND(in_operator)(      \
         TScalarType const& in_scalar) const noexcept                                                          \
     {                                                                                                         \
         using Type = CommonTypeFallback<TUnderlyingType, TUnderlyingType, TScalarType>;                       \
@@ -96,7 +96,7 @@ struct VectorOperators
     #define RUKEN_VECTOR_ASSIGNMENT_OPERATOR_SCALAR_MIXIN(in_operator) \
     template <typename TScalarType>                                                                                         \
     requires requires (TUnderlyingType in_vector, TScalarType in_scalar) { in_vector RUKEN_GLUE(in_operator,=) in_scalar; } \
-    constexpr TVector& RUKEN_GLUE(RUKEN_GLUE(operator,in_operator),=)(TScalarType const& in_scalar) noexcept                \
+    constexpr TVector& operator RUKEN_GLUE(in_operator,=)(TScalarType const& in_scalar) noexcept                \
     {                                                                                                                       \
         for (RkSize index {0ULL}; index < TDimensions; ++index)                                                             \
             static_cast<TVector*>(this)->data[index] RUKEN_GLUE(in_operator,=) static_cast<TUnderlyingType>(in_scalar);     \

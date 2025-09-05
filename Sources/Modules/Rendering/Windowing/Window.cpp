@@ -61,10 +61,53 @@ Window::Window(RenderDevice& in_device, Vector2px const& in_size, std::string_vi
 			.clipped			   = true,
 			.oldSwapchain   	   = nullptr,
 		});
+	}()},
+	m_image_views {[&] { // -- 4. Creating image views
+		std::vector<vk::raii::ImageView> views {};
+
+		for (auto const image : m_swapchain.getImages())
+		{
+			views.emplace_back(m_owner.GetDevice(), vk::ImageViewCreateInfo {
+				.image            = image,
+				.viewType         = vk::ImageViewType::e2D,
+				.format           = vk::Format::eR8G8B8A8Srgb,
+				.components       = vk::ComponentMapping {
+					.r = vk::ComponentSwizzle::eIdentity,
+					.g = vk::ComponentSwizzle::eIdentity,
+					.b = vk::ComponentSwizzle::eIdentity,
+					.a = vk::ComponentSwizzle::eIdentity
+				},
+				.subresourceRange = vk::ImageSubresourceRange {
+					.aspectMask     = vk::ImageAspectFlagBits::eColor,
+					.baseMipLevel   = 0,
+					.levelCount     = 1,
+					.baseArrayLayer = 0,
+					.layerCount     = 1
+				}
+			});
+		}
+
+		return views;
 	}()}
 {}
 
 Window::~Window()
 {
 	glfwDestroyWindow(m_window);
+}
+
+vk::Extent2D Window::GetExtent() const noexcept
+{
+	int width, height {};
+	glfwGetFramebufferSize(m_window, &width, &height);
+
+	return vk::Extent2D {
+		.width  = static_cast<uint32_t>(width),
+		.height = static_cast<uint32_t>(height)
+	};
+}
+
+RkBool Window::ShouldClose() const noexcept
+{
+	return glfwWindowShouldClose(m_window);
 }

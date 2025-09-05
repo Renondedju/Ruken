@@ -53,8 +53,7 @@ RkVoid Logger::Error(
 template<typename ... TArgs>
 RkVoid Logger::Exception(
 	std::string_view   const in_service_name,
-	std::format_string<TArgs...> in_format_string, TArgs&&... in_args,
-	std::exception_ptr const in_exception) const noexcept
+	std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_LOGGER_ZONES));
 
@@ -62,7 +61,7 @@ RkVoid Logger::Exception(
 		.level			  = ELogLevel::Error,
 		.service_provider = m_service_provider.GetName(),
 		.service_name	  = in_service_name,
-		.exception_ptr    = in_exception,
+		.exception_ptr    = std::current_exception(),
 		.message		  = std::format(in_format_string, std::forward<TArgs>(in_args)...)
 	});
 }

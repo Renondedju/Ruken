@@ -1,6 +1,7 @@
 #include "Rendering/RenderDevice.hpp"
 #include "Core/ServiceProvider.hpp"
 
+#include <thread>
 #include <ranges>
 #include <vulkan/vulkan_raii.hpp>
 
@@ -14,17 +15,17 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 	m_queue_create_infos {MakeQueueCreateInfo()},
 	m_device             {[&] {
 
-		vk::StructureChain const features { m_physical_device.getFeatures2<
+		// TODO: Feature sets (containing device features, extensions
+		//		 and ways to check for compatibility with a RenderDevice)
+		// Enabling core features
+		vk::StructureChain features { m_physical_device.getFeatures2<
 			vk::PhysicalDeviceFeatures2,
 			vk::PhysicalDeviceVulkan11Features,
-			vk::PhysicalDeviceDynamicRenderingFeatures,
-			vk::PhysicalDeviceSynchronization2Features
+			vk::PhysicalDeviceVulkan13Features
 		>()};
 
 		return m_physical_device.createDevice(vk::DeviceCreateInfo {
-			.sType 					 = vk::StructureType::eDeviceCreateInfo,
-			.pNext 					 = &features,
-			.flags 					 = {},
+			.pNext 					 = &features.get<>(),
 			.queueCreateInfoCount    = static_cast<uint32_t>(m_queue_create_infos.size()),
 			.pQueueCreateInfos 		 = m_queue_create_infos.data(),
 			.enabledLayerCount 		 = 0u,	      // Deprecated and ignored.
@@ -35,18 +36,18 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 		});
 	}()},
 	m_queues {m_device.getQueue2(vk::DeviceQueueInfo2 {
-		.sType 			  = vk::StructureType::eDeviceQueueInfo2,
-		.pNext 			  = nullptr,
-		.flags 			  = {},
 		.queueFamilyIndex = m_queue_create_infos[0].queueFamilyIndex,
 		.queueIndex		  = 0u
 	})},
-	m_command_pool {m_device.createCommandPool(vk::CommandPoolCreateInfo {
-		.sType 			  = vk::StructureType::eCommandPoolCreateInfo,
-		.pNext 			  = nullptr,
+	m_command_pool    {m_device.createCommandPool(vk::CommandPoolCreateInfo {
 		.flags 			  = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 		.queueFamilyIndex = m_queue_create_infos[0].queueFamilyIndex
-	})}
+	})},
+	m_command_buffers {m_device, vk::CommandBufferAllocateInfo {
+		.commandPool 		= m_command_pool,
+		.level		 		= vk::CommandBufferLevel::ePrimary,
+		.commandBufferCount = std::thread::hardware_concurrency()
+	}}
 {}
 
 std::vector<vk::DeviceQueueCreateInfo> RenderDevice::MakeQueueCreateInfo() const noexcept
