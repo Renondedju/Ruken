@@ -9,9 +9,9 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * @brief A thing that can be waited for. ex: generic events, synchronization primitives or an IO operation.
  *
- * Continuations will attempt to detach themselves upon destruction if the event has not been consumed.
- * If an awaitable can be destroyed before all of it's attached continuations,
- * you must make sure it is consumed by calling CPUAwaitable::Consume().
+ * Awaiters will attempt to detach themselves upon destruction if the event has not been consumed.
+ * If an awaitable can be destroyed before all of it's attached awaiters,
+ * you must make sure it is consumed by calling Awaitable::Consume().
  */
 struct Awaitable
 {

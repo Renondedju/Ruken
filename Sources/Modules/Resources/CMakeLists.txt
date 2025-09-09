@@ -12,6 +12,7 @@ target_sources(RkResources PUBLIC
         ResourceLoader.hpp
         ResourceManifest.hpp
         ResourceHandle.inl
+        ResourceLoadEvent.hpp
         Assets/AssetImporter.hpp
         Assets/ImportContext.hpp
         ResourceManager.hpp
@@ -19,6 +20,7 @@ target_sources(RkResources PUBLIC
 
 target_sources(RkResources PRIVATE
         ResourceManager.cpp
+        ResourceLoadEvent.cpp
         Assets/AssetImporter.cpp
 )
 

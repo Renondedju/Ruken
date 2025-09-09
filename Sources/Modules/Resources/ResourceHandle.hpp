@@ -32,8 +32,8 @@ struct ResourceHandle
 	///		  Throw away the pointer as soon as you are done with the resource.
 	ResourcePtr<TResource> operator*() const noexcept;
 
-	/// @returns The current load task.
-	IOTask<RkVoid> LoadTask() const;
+	/// @brief Returns an event that is triggered when the resource finished loading.
+	[[nodiscard]] ResourceLoadEvent const& LoadEvent() const;
 
 	#pragma endregion
 

@@ -1,4 +1,6 @@
 #include "Resources/ResourceManager.hpp"
+
+#include "Debug/Logging/Logger.hpp"
 #include "Resources/ResourceHandle.hpp"
 #include "Filesystem/Filesystem.hpp"
 
@@ -23,19 +25,29 @@ ResourceLoader* ResourceManager::GetCompatibleLoader(std::filesystem::path const
 IOTask<RkVoid> ResourceManager::Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader) const noexcept
 {
 	Filesystem* filesystem {m_service_provider.LocateService<Filesystem>()};
-
 	RUKEN_ASSERT(filesystem, "Cannot load resources without a filesystem.");
 
-	FileHandle    const file(filesystem->Open(in_manifest->path.resource_file));
-	std::vector<RkByte> data(file->GetFileSize());
+	try
+	{
+		FileHandle    const file(filesystem->Open(in_manifest->path.resource_file));
+		std::vector<RkByte> data(file	   ->GetFileSize());
 
-	co_await file->Read(data.data(), {}, data.size());
+		co_await file->Read(data.data(), {}, data.size());
 
-	ResourcePtr const resource {co_await in_loader->Load(LoadContext {
-		.services  = m_service_provider,
-		.file_path = in_manifest->path.resource_file,
-		.data      = std::move(data)
-	})};
+		ResourcePtr const resource {co_await in_loader->Load(LoadContext {
+			.services  = m_service_provider,
+			.file_path = in_manifest->path.resource_file,
+			.data      = std::move(data)
+		})};
 
-	in_manifest->resource_ptr.exchange(resource, std::memory_order_relaxed);
+		in_manifest->resource_ptr.exchange(resource, std::memory_order_relaxed);
+		in_manifest->load_event  .Trigger();
+	}
+	catch (...)
+	{
+		in_manifest->load_event  .Trigger(std::current_exception());
+
+		if (auto const* logger {m_service_provider.LocateService<Logger>()})
+			logger->Exception(service_name, "A resource could not be loaded.");
+	}
 }

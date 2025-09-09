@@ -16,6 +16,8 @@
 
 BEGIN_RUKEN_NAMESPACE
 
+using ResourceIdentifier = std::size_t;
+
 /**
  * @brief Imports and manages resources lifetime.
  *
@@ -60,15 +62,19 @@ struct ResourceManager final : Service
 	template <CResource TResource>
 	ResourceHandle<TResource> Request(FilePath const& in_file_path);
 
+	/// @brief Manually provides a resource to the manager.
+	template <CResource TResource>
+	ResourceHandle<TResource> Provide(TResource&& in_resource, ResourceIdentifier in_identifier) noexcept;
+
 	#pragma endregion
 
 	private:
 
 		#pragma region Members
 
-		std::vector<std::unique_ptr<ResourceLoader>>   m_loaders         {};
-		std::unordered_map<FilePath, ResourceManifest> m_manifests 		 {};
-		std::mutex									   m_manifests_mutex {};
+		std::vector		  <std::unique_ptr<ResourceLoader>>      m_loaders         {};
+		std::unordered_map<ResourceIdentifier, ResourceManifest> m_manifests 	   {};
+		std::mutex												 m_manifests_mutex {};
 
 		#pragma endregion
 

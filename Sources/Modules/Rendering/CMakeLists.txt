@@ -29,7 +29,9 @@ target_sources(RkRendering PUBLIC
         ShaderModule.hpp
         SlangImporter.hpp
         SpirvLoader.hpp
+        GPUFence.hpp
         Windowing/Window.hpp
+        Resources/Swapchain.hpp
         Vulkan/VulkanInstance.hpp
         Vulkan/VulkanLoaderInstance.hpp
 )
@@ -39,7 +41,9 @@ target_sources(RkRendering PRIVATE
         SlangImporter.cpp
         SpirvLoader.cpp
         ShaderModule.cpp
+        GPUFence.cpp
         Windowing/Window.cpp
+        Resources/Swapchain.cpp
         Vulkan/VulkanInstance.cpp
         Vulkan/VulkanLoaderInstance.cpp
 )

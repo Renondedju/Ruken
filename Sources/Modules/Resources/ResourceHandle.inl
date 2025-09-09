@@ -58,16 +58,16 @@ ResourceHandle<TResource>::~ResourceHandle()
 template<CResource TResource>
 ResourcePtr<TResource> ResourceHandle<TResource>::operator*() const noexcept
 {
-	if (m_manifest->load_task.Done())
+	if (m_manifest->load_event.Consumed())
 		return std::dynamic_pointer_cast<TResource, Resource>(m_manifest->resource_ptr.load(std::memory_order_relaxed));
 
 	return nullptr;
 }
 
 template<CResource TResource>
-IOTask<RkVoid> ResourceHandle<TResource>::LoadTask() const
+ResourceLoadEvent const& ResourceHandle<TResource>::LoadEvent() const
 {
-	return m_manifest->load_task;
+	return m_manifest->load_event;
 }
 
 END_RUKEN_NAMESPACE

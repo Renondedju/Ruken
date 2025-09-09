@@ -7,25 +7,12 @@ BEGIN_RUKEN_NAMESPACE
 /// @brief The base resource class.
 struct Resource
 {
-	#pragma region Lifetime
-
-	explicit Resource(FilePath const& in_resource_path) noexcept:
-		path {in_resource_path}
-	{}
-
+	Resource()							 = default;
 	Resource(Resource const&)			 = default;
 	Resource(Resource&&     )			 = default;
 	Resource& operator=(Resource const&) = default;
 	Resource& operator=(Resource&&     ) = default;
 	virtual ~Resource()          		 = default;
-
-	#pragma endregion
-
-	#pragma region Members
-
-	FilePath path;
-
-	#pragma endregion
 };
 
 template <typename TType>

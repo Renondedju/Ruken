@@ -13,16 +13,17 @@ RkVoid ResourceManager::ProvideLoader() noexcept
 template<CResource TResource>
 ResourceHandle<TResource> ResourceManager::Request(FilePath const& in_file_path)
 {
-	ResourceManifest* manifest {nullptr};
+	ResourceManifest*		 manifest   {nullptr};
+	ResourceIdentifier const identifier {std::hash<FilePath>()(in_file_path)};
 
 	{
 		std::lock_guard lock(m_manifests_mutex);
 
 		// 1 - Check if the handle already exists
-		if (m_manifests.contains(in_file_path))
-			return ResourceHandle<TResource>(m_manifests.at(in_file_path));
+		if (m_manifests.contains(identifier))
+			return ResourceHandle<TResource>(m_manifests.at(identifier));
 
-		manifest = &m_manifests[in_file_path];
+		manifest = &m_manifests[identifier];
 	}
 
 	// 2 - Start loading if not
@@ -34,7 +35,27 @@ ResourceHandle<TResource> ResourceManager::Request(FilePath const& in_file_path)
 
 	manifest->path.asset_file    = {};
 	manifest->path.resource_file = in_file_path;
-	manifest->load_task			 = Load(manifest, loader);
+
+	Load(manifest, loader);
+
+	return ResourceHandle<TResource>(*manifest);
+}
+
+template<CResource TResource>
+ResourceHandle<TResource> ResourceManager::Provide(TResource&& in_resource, ResourceIdentifier const in_identifier) noexcept
+{
+	ResourceManifest* manifest {nullptr};
+
+	{ // 1 - Get or create the manifest
+		std::lock_guard lock(m_manifests_mutex);
+		manifest = &m_manifests[in_identifier];
+	}
+
+	// 2 - "Load" the actual resource
+	manifest->path.asset_file    = {};
+	manifest->path.resource_file = {};
+	manifest->resource_ptr.exchange(std::make_shared<TResource>(std::move(in_resource)), std::memory_order_relaxed);
+	manifest->load_event  .Trigger();
 
 	return ResourceHandle<TResource>(*manifest);
 }
