@@ -8,6 +8,8 @@ BEGIN_RUKEN_NAMESPACE
 
 struct GPUImageView final: Resource
 {
+	vk::raii::ImageView image_view;
+
 	#pragma region Lifetime
 
 	/**
@@ -23,8 +25,6 @@ struct GPUImageView final: Resource
 	~GPUImageView() override					 = default;
 
 	#pragma endregion
-
-	vk::raii::ImageView image_view;
 };
 
 END_RUKEN_NAMESPACE

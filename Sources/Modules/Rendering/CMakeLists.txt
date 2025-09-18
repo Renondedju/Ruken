@@ -30,8 +30,13 @@ target_sources(RkRendering PUBLIC
         SlangImporter.hpp
         SpirvLoader.hpp
         GPUFence.hpp
+        Coroutines/GPUTask.hpp
+        Coroutines/GPUPromise.hpp
+        Coroutines/GPUPromise.inl
         Windowing/Window.hpp
         Resources/Swapchain.hpp
+        Resources/GPUBuffer.hpp
+        Resources/GPUImage.hpp
         Vulkan/VulkanInstance.hpp
         Vulkan/VulkanLoaderInstance.hpp
 )
@@ -42,8 +47,12 @@ target_sources(RkRendering PRIVATE
         SpirvLoader.cpp
         ShaderModule.cpp
         GPUFence.cpp
+        Coroutines/GPUTask.cpp
+        Coroutines/GPUPromise.cpp
         Windowing/Window.cpp
         Resources/Swapchain.cpp
+        Resources/GPUBuffer.cpp
+        Resources/GPUImage.cpp
         Vulkan/VulkanInstance.cpp
         Vulkan/VulkanLoaderInstance.cpp
 )

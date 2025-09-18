@@ -3,9 +3,7 @@
 USING_RUKEN_NAMESPACE
 
 ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
-						   FilePath            const& in_resource_path,
 						   std::vector<RkByte> const& in_spirv_code) noexcept:
-	Resource   {in_resource_path},
 	module     {in_service_provider.LocateService<RenderDevice>()->GetDevice(), vk::ShaderModuleCreateInfo {
 		.codeSize = in_spirv_code.size() * sizeof(RkByte),
 		.pCode    = reinterpret_cast<const uint32_t*>(in_spirv_code.data())

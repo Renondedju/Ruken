@@ -8,6 +8,8 @@ BEGIN_RUKEN_NAMESPACE
 
 struct Swapchain final : Resource
 {
+	vk::raii::SwapchainKHR swapchain;
+
 	#pragma region Lifetime
 
 	/**
@@ -21,12 +23,6 @@ struct Swapchain final : Resource
 	Swapchain& operator=(Swapchain const&) = delete;
 	Swapchain& operator=(Swapchain&&     ) = default;
 	~Swapchain() override				   = default;
-
-	#pragma endregion
-
-	#pragma region Members
-
-	vk::raii::SwapchainKHR swapchain;
 
 	#pragma endregion
 };

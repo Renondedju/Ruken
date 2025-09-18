@@ -1,4 +1,3 @@
-#include "SpirvLoader.hpp"
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
@@ -21,9 +20,12 @@
 #include "Rendering/SlangImporter.hpp"
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/ShaderModule.hpp"
+#include "Rendering/SpirvLoader.hpp"
 #include "Rendering/GPUFence.hpp"
 #include "Rendering/Resources/Swapchain.hpp"
 #include "Rendering/Resources/ImageView.hpp"
+#include "Rendering/Coroutines/GPUTask.hpp"
+#include "Rendering/Coroutines/GPUPromise.hpp"
 
 struct MainQueue : QueueHandle<MainQueue, 2048>
 {};
@@ -32,21 +34,20 @@ USING_RUKEN_NAMESPACE
 
 struct SwapchainImage
 {
-    ResourcePtr<Swapchain>    swapchain;
-    ResourcePtr<GPUImageView> view;
-    vk::Image                 image;
+    Swapchain    swapchain;
+    GPUImageView view;
+    vk::Image    image;
 };
 
-Task<MainQueue> RenderFrame(
+GPUTask DrawTriangle(
     RenderDevice&         in_render_device,
-    SwapchainImage const& in_swapchain_image)
+    SwapchainImage const& in_swapchain_image,
+    vk::Viewport   const& in_viewport,
+    vk::Extent2D   const& in_extent,
+    vk::Pipeline   const& in_pipeline)
 {
-    GPUFence                draw_fence                 {in_render_device.GetDevice(), {.flags = vk::FenceCreateFlagBits::eSignaled}};
-    vk::raii::Semaphore     present_complete_semaphore {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
-    vk::raii::Semaphore     render_finished_semaphore  {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
-    vk::raii::CommandBuffer const& command_buffer      {in_render_device.GetCommandBuffer()};
-
-    command_buffer.begin({});
+    vk::raii::Semaphore present_complete_semaphore {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
+    vk::raii::Semaphore render_finished_semaphore  {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
 
     /*
      * co_await image.TransitionLayout({
@@ -72,7 +73,7 @@ Task<MainQueue> RenderFrame(
         }
     };
 
-    command_buffer.pipelineBarrier2(vk::DependencyInfo {
+    GPU::command_buffer->pipelineBarrier2(vk::DependencyInfo {
         .dependencyFlags         = {},
         .imageMemoryBarrierCount = 1,
         .pImageMemoryBarriers    = &barrier
@@ -87,7 +88,7 @@ Task<MainQueue> RenderFrame(
      * RenderTask                       Render(Output<Image> out_image);
      *
      */
-    vk::RenderingAttachmentInfo attachmentInfo {
+    vk::RenderingAttachmentInfo const attachment_info {
         .imageView   = in_swapchain_image.view->image_view,
         .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
         .loadOp      = vk::AttachmentLoadOp::eClear,
@@ -95,29 +96,29 @@ Task<MainQueue> RenderFrame(
         .clearValue  = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f)
     };
 
-    command_buffer.beginRendering(vk::RenderingInfo {
+    GPU::command_buffer->beginRendering(vk::RenderingInfo {
         .renderArea = {
             .offset = { 0, 0 },
-            .extent = extent
+            .extent = in_extent
         },
         .layerCount           = 1,
         .colorAttachmentCount = 1,
-        .pColorAttachments    = &attachmentInfo
+        .pColorAttachments    = &attachment_info
     });
 
     // Actual coroutine code
-    command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, (*code)->pipeline);
-    command_buffer.setViewport(0, viewport);
-    command_buffer.setScissor (0, vk::Rect2D(vk::Offset2D(0, 0), extent));
-    command_buffer.draw(3, 1, 0, 0);
-    command_buffer.endRendering();
+    GPU::command_buffer->bindPipeline(vk::PipelineBindPoint::eGraphics, in_pipeline);
+    GPU::command_buffer->setViewport(0, in_viewport);
+    GPU::command_buffer->setScissor (0, vk::Rect2D(vk::Offset2D(0, 0), in_extent));
+    GPU::command_buffer->draw(3, 1, 0, 0);
+    GPU::command_buffer->endRendering();
 
     /*
      * co_await image.TransitionLayout({
      *      ...
      * });
      */
-    vk::ImageMemoryBarrier2 barrier2 {
+    vk::ImageMemoryBarrier2 const barrier2 {
         .srcStageMask   = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
         .srcAccessMask  = vk::AccessFlagBits2       ::eColorAttachmentWrite,
         .dstStageMask   = vk::PipelineStageFlagBits2::eBottomOfPipe,
@@ -136,31 +137,48 @@ Task<MainQueue> RenderFrame(
         }
     };
 
-    command_buffer.pipelineBarrier2(vk::DependencyInfo {
+    GPU::command_buffer->pipelineBarrier2(vk::DependencyInfo {
         .dependencyFlags         = {},
         .imageMemoryBarrierCount = 1,
         .pImageMemoryBarriers    = &barrier2
     });
-    // --
 
-    command_buffer.end();
+    co_return;
+}
 
-    // Later,
-    draw_fence.Reset();
+Task<MainQueue> RenderFrame(RenderDevice& in_render_device, Window& in_window, ResourceHandle<ShaderModule> const in_program)
+{
+    vk::raii::SwapchainKHR const& swapchain {in_window.GetSwapchain()};
+    vk::Extent2D           const  extent    {in_window.GetExtent()};
+    vk::Viewport           const  viewport  {
+        .x        = 0.0f, .y        = 0.0f,
+        .width    = static_cast<float>(extent.width),
+        .height   = static_cast<float>(extent.height),
+        .minDepth = 0.0f, .maxDepth = 1.0f
+    };
 
-    vk::PipelineStageFlags wait_destination_stage_mask { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+    GPUFence            draw_fence                 {in_render_device.GetDevice(), {.flags = vk::FenceCreateFlagBits::eSignaled}};
+    vk::raii::Semaphore present_complete_semaphore {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
+    vk::raii::Semaphore render_finished_semaphore  {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
 
-    in_render_device.GetQueue().submit(vk::SubmitInfo {
-        .waitSemaphoreCount   = 1,
-        .pWaitSemaphores      = &*present_complete_semaphore,
-        .pWaitDstStageMask    = &wait_destination_stage_mask,
-        .commandBufferCount   = 1,
-        .pCommandBuffers      = &*command_buffer,
-        .signalSemaphoreCount = 1,
-        .pSignalSemaphores    = &*render_finished_semaphore
-    }, draw_fence.fence);
+    auto [result, imageIndex] = swapchain.acquireNextImage(UINT64_MAX, *present_complete_semaphore, nullptr);
 
-    draw_fence.WaitSynchronously();
+    co_await DrawTriangle(in_render_device, SwapchainImage {
+        .swapchain = swapchain,
+        .image     = swapchain.getImages()[imageIndex],
+        .view      = in_window.GetViews ()[imageIndex],
+    }, viewport, extent, (*in_program)->pipeline);
+
+    auto _ = in_render_device.GetQueue().presentKHR(vk::PresentInfoKHR {
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores    = &*render_finished_semaphore,
+        .swapchainCount     = 1,
+        .pSwapchains        = &*swapchain,
+        .pImageIndices      = &imageIndex,
+        .pResults           = nullptr
+    });
+
+    co_return;
 }
 
 /**
@@ -171,16 +189,11 @@ Task<MainQueue> RenderFrame(
  */
 Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
 {
-    Logger          const* logger        {in_service_provider.LocateService<Logger>         ()};
-    AssetImporter   const* importer      {in_service_provider.LocateService<AssetImporter>  ()};
-    ResourceManager*       resources     {in_service_provider.LocateService<ResourceManager>()};
-    RenderDevice*          render_device {in_service_provider.LocateService<RenderDevice>   ()};
+    Logger    const* logger        {in_service_provider.LocateService<Logger>         ()};
+    ResourceManager* resources     {in_service_provider.LocateService<ResourceManager>()};
+    RenderDevice*    render_device {in_service_provider.LocateService<RenderDevice>   ()};
 
     try {
-        //co_await importer->Import(FilePath {
-        //    .location = EFilesystemLocation::ProjectDirectory,
-        //    .path     = "test.slang"
-        //});
 
         // Loading pipeline code
         auto const code {resources->Request<ShaderModule>(FilePath {
@@ -190,17 +203,6 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
 
         Window window {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
 
-        vk::raii::SwapchainKHR& swapchain {window.GetSwapchain()};
-        vk::Extent2D     		extent    {window.GetExtent()};
-        vk::Viewport     		viewport  {
-            .x        = 0.0f,
-            .y        = 0.0f,
-            .width    = static_cast<float>(extent.width),
-            .height   = static_cast<float>(extent.height),
-            .minDepth = 0.0f,
-            .maxDepth = 1.0f
-        };
-
         co_await code.LoadEvent();
 
         while (!window.ShouldClose())
@@ -208,22 +210,7 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
             FrameMark;
             glfwPollEvents();
             
-            auto [result, imageIndex] = swapchain.acquireNextImage(UINT64_MAX, *present_complete_semaphore, nullptr);
-
-            /*
-                WorkGraph graph {RenderFrame()};
-                render_device.Submit(graph);
-                ^ Creates and stores for the duration of the graph semaphores
-            */
-
-            auto _ = render_device->GetQueue().presentKHR(vk::PresentInfoKHR {
-                .waitSemaphoreCount = 1,
-                .pWaitSemaphores    = &*render_finished_semaphore,
-                .swapchainCount     = 1,
-                .pSwapchains        = &*swapchain,
-                .pImageIndices      = &imageIndex,
-                .pResults           = nullptr
-            });
+            co_await RenderFrame(*render_device, window, code);
         }
 
     } catch (Exception& in_exception) {
@@ -275,7 +262,7 @@ int main(int in_argc, char* in_argv[])
     AssetImporter*     importer   {services.ProvideService<AssetImporter>()};
     ResourceManager*   resources  {services.ProvideService<ResourceManager>()};
 
-    importer ->ProvideImporter<SlangImporter>();
+    importer ->ProvideImporter<SlangImporter>(); // TODO: Not used or working yet. Slang API is whack.
     resources->ProvideLoader  <SpirvLoader>  ();
 
     // 3. --- Running async main. ---

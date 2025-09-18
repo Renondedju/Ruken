@@ -13,7 +13,6 @@ struct ShaderModule final : Resource
 	#pragma region Lifetime
 
 	explicit ShaderModule(ServiceProvider     const& in_service_provider,
-						  FilePath	          const& in_resource_path,
 						  std::vector<RkByte> const& in_spirv_code) noexcept;
 
 	ShaderModule(ShaderModule const&) 		     = delete;
