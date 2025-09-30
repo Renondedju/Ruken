@@ -10,20 +10,25 @@ RkVoid ResourceManager::ProvideLoader() noexcept
 	m_loaders.emplace_back(std::make_unique<TLoader>());
 }
 
-template<CResource TResource>
+template<CResourceData TResource>
 ResourceHandle<TResource> ResourceManager::Request(FilePath const& in_file_path)
 {
-	ResourceManifest*		 manifest   {nullptr};
-	ResourceIdentifier const identifier {std::hash<FilePath>()(in_file_path)};
+	ResourceManifest* manifest {nullptr};
+	std::size_t	const hash     {std::hash<FilePath>()(in_file_path)};
+
+	auto deleter = [this, hash](ResourceManifest*) {
+		std::lock_guard lock(m_manifests_mutex);
+		m_manifests.erase(hash);
+	};
 
 	{
 		std::lock_guard lock(m_manifests_mutex);
 
 		// 1 - Check if the handle already exists
-		if (m_manifests.contains(identifier))
-			return ResourceHandle<TResource>(m_manifests.at(identifier));
+		if (m_manifests.contains(hash))
+			return ResourceHandle<TResource>(std::shared_ptr<ResourceManifest>(&m_manifests.at(hash), deleter));
 
-		manifest = &m_manifests[identifier];
+		manifest = &m_manifests[hash];
 	}
 
 	// 2 - Start loading if not
@@ -33,31 +38,9 @@ ResourceHandle<TResource> ResourceManager::Request(FilePath const& in_file_path)
 	if (!loader)
 		throw Exception(std::format("There is no available loader for the '{}' file extension.", extension.generic_string()));
 
-	manifest->path.asset_file    = {};
-	manifest->path.resource_file = in_file_path;
+	Load(manifest, loader, in_file_path);
 
-	Load(manifest, loader);
-
-	return ResourceHandle<TResource>(*manifest);
-}
-
-template<CResource TResource>
-ResourceHandle<TResource> ResourceManager::Provide(TResource&& in_resource, ResourceIdentifier const in_identifier) noexcept
-{
-	ResourceManifest* manifest {nullptr};
-
-	{ // 1 - Get or create the manifest
-		std::lock_guard lock(m_manifests_mutex);
-		manifest = &m_manifests[in_identifier];
-	}
-
-	// 2 - "Load" the actual resource
-	manifest->path.asset_file    = {};
-	manifest->path.resource_file = {};
-	manifest->resource_ptr.exchange(std::make_shared<TResource>(std::move(in_resource)), std::memory_order_relaxed);
-	manifest->load_event  .Trigger();
-
-	return ResourceHandle<TResource>(*manifest);
+	return ResourceHandle<TResource>(std::shared_ptr<ResourceManifest>(manifest, deleter));
 }
 
 END_RUKEN_NAMESPACE

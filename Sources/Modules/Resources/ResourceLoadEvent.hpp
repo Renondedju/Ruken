@@ -6,13 +6,22 @@ BEGIN_RUKEN_NAMESPACE
 
 struct ResourceLoadEvent : ManualResetEvent
 {
-	struct Awaiter : RUKEN_NAMESPACE::Awaiter
-	{
-		ResourceLoadEvent const& owner;
+	#pragma region Lifetime
 
-		/// @brief Throws if Trigger has been called with a non-null pointer.
-		void await_resume() const;
-	};
+	/**
+	 * Constructor.
+	 * @param in_triggered True if Trigger should be called during construction.
+	 */
+	explicit ResourceLoadEvent(RkBool in_triggered = false) noexcept;
+	ResourceLoadEvent(ResourceLoadEvent&&)	    		   = delete;
+	ResourceLoadEvent(ResourceLoadEvent const&) 		   = delete;
+	ResourceLoadEvent& operator=(ResourceLoadEvent const&) = delete;
+	ResourceLoadEvent& operator=(ResourceLoadEvent&&)      = delete;
+	~ResourceLoadEvent() = default;
+
+	#pragma endregion
+
+	struct Awaiter;
 
 	/// @brief Signals the end of a load operation.
 	RkVoid Trigger(std::exception_ptr const& in_exception = nullptr) noexcept;
@@ -23,6 +32,14 @@ struct ResourceLoadEvent : ManualResetEvent
 	private:
 
 		std::exception_ptr m_exception {};
+};
+
+struct ResourceLoadEvent::Awaiter : RUKEN_NAMESPACE::Awaiter
+{
+	ResourceLoadEvent const& owner;
+
+	/// @brief Throws if Trigger has been called with a non-null pointer.
+	void await_resume() const;
 };
 
 END_RUKEN_NAMESPACE

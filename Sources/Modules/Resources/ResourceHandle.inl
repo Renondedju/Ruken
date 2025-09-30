@@ -1,73 +1,39 @@
 #pragma once
 
 #include "Resources/ResourceHandle.hpp"
+#include "Core/Debug/Assert.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-#pragma region Lifetime
+template<CResourceData TData>
+ResourceHandle<TData>::ResourceHandle(std::shared_ptr<ResourceManifest>&& in_manifest) noexcept:
+   m_manifest {std::forward<std::shared_ptr<ResourceManifest>>(in_manifest)}
+{}
 
-template<CResource TResource>
-ResourceHandle<TResource>::ResourceHandle(ResourceManifest& in_manifest) noexcept:
-	m_manifest {&in_manifest}
+template<CResourceData TData>
+ResourceHandle<TData>::ResourceHandle() noexcept:
+   m_manifest {std::make_shared<ResourceManifest>()}
+{}
+
+template<CResourceData TData>
+RkVoid ResourceHandle<TData>::Exchange(ResourcePtr<TData>&& in_data) noexcept
 {
-	m_manifest->references.fetch_add(1, std::memory_order_relaxed);
+   RUKEN_ASSERT(in_data != nullptr, "in_data must be a valid pointer");
+
+   m_manifest->resource_ptr.exchange(ResourcePtrCast<ResourceData, TData>(in_data), std::memory_order_relaxed);
+   m_manifest->load_event  .Trigger ();
 }
 
-template<CResource TResource>
-ResourceHandle<TResource>::ResourceHandle(ResourceHandle const& in_other) noexcept
+template<CResourceData TData>
+ResourceLoadEvent const& ResourceHandle<TData>::LoadEvent() const
 {
-	m_manifest = in_other.m_manifest;
-	m_manifest->references.fetch_add(1, std::memory_order_relaxed);
+   return m_manifest->load_event;
 }
 
-template<CResource TResource>
-ResourceHandle<TResource>::ResourceHandle(ResourceHandle&& in_other) noexcept
+template<CResourceData TData>
+ResourcePtr<TData> ResourceHandle<TData>::Current() const noexcept
 {
-	m_manifest = std::move(in_other.m_manifest);
-	m_manifest->references.fetch_add(1, std::memory_order_relaxed);
-}
-
-template<CResource TResource>
-ResourceHandle<TResource>& ResourceHandle<TResource>::operator=(ResourceHandle const& in_other) noexcept
-{
-	m_manifest->references.fetch_sub(1, std::memory_order_relaxed);
-	m_manifest = in_other.m_manifest;
-	m_manifest->references.fetch_add(1, std::memory_order_relaxed);
-
-	return *this;
-}
-
-template<CResource TResource>
-ResourceHandle<TResource>& ResourceHandle<TResource>::operator=(ResourceHandle&& in_other) noexcept
-{
-	m_manifest->references.fetch_sub(1, std::memory_order_relaxed);
-	m_manifest = std::move(in_other.m_manifest);
-	m_manifest->references.fetch_add(1, std::memory_order_relaxed);
-
-	return *this;
-}
-
-template<CResource TResource>
-ResourceHandle<TResource>::~ResourceHandle()
-{
-	m_manifest->references.fetch_sub(1, std::memory_order_relaxed);
-}
-
-#pragma endregion
-
-template<CResource TResource>
-ResourcePtr<TResource> ResourceHandle<TResource>::operator*() const noexcept
-{
-	if (m_manifest->load_event.Consumed())
-		return std::dynamic_pointer_cast<TResource, Resource>(m_manifest->resource_ptr.load(std::memory_order_relaxed));
-
-	return nullptr;
-}
-
-template<CResource TResource>
-ResourceLoadEvent const& ResourceHandle<TResource>::LoadEvent() const
-{
-	return m_manifest->load_event;
+   return ResourcePtrCast<TData, ResourceData>(m_manifest->resource_ptr.load(std::memory_order_relaxed));
 }
 
 END_RUKEN_NAMESPACE

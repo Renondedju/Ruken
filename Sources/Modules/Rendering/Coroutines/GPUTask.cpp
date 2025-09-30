@@ -43,15 +43,9 @@ GPUTask::~GPUTask() noexcept
 	RemoveReference();
 }
 
-DynamicTask<> GPUTask::Submit(RenderDevice& in_device) noexcept
+Awaiter GPUTask::operator co_await() const noexcept
 {
-	GPUFence const fence {in_device.GetDevice(), {
-		.flags = vk::FenceCreateFlagBits::eSignaled
-	}};
-
-	m_handle->Submit(in_device, fence);
-
-	co_await fence;
+	return m_handle->operator co_await();
 }
 
 RkVoid GPUTask::MakeReference() const noexcept
@@ -62,6 +56,6 @@ RkVoid GPUTask::MakeReference() const noexcept
 
 RkVoid GPUTask::RemoveReference() const noexcept
 {
-	if (m_handle && m_handle->references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+	if (m_handle && m_handle->references.fetch_sub(1UZ, std::memory_order_acq_rel) == 1UZ)
 		std::coroutine_handle<GPUPromise>::from_promise(*m_handle).destroy();
 }

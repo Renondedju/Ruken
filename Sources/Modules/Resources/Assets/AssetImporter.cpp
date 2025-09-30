@@ -2,7 +2,7 @@
 
 #include "Core/JobSystem/Awaitables/Primitives/ParallelForEach.hpp"
 #include "Filesystem/Filesystem.hpp"
-#include "Resources/Resource.hpp"
+#include "Resources/ResourceData.hpp"
 
 USING_RUKEN_NAMESPACE
 

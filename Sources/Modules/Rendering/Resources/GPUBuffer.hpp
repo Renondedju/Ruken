@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Resources/Resource.hpp"
+#include "Core/Types/FundamentalTypes.hpp"
+#include "Resources/ResourceData.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
-class GPUBuffer final: Resource
+class GPUBuffer final: ResourceData
 {
 	vk::raii::Buffer buffer;
 

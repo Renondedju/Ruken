@@ -2,10 +2,10 @@
 
 USING_RUKEN_NAMESPACE
 
-void ResourceLoadEvent::Awaiter::await_resume() const
+ResourceLoadEvent::ResourceLoadEvent(RkBool const in_triggered) noexcept
 {
-	if (owner.m_exception)
-		std::rethrow_exception(owner.m_exception);
+	if (in_triggered)
+		Trigger();
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
@@ -22,8 +22,14 @@ RkVoid ResourceLoadEvent::Trigger(std::exception_ptr const& in_exception) noexce
 
 ResourceLoadEvent::Awaiter ResourceLoadEvent::operator co_await() const noexcept
 {
-	return Awaiter {
+	return ResourceLoadEvent::Awaiter {
 		ManualResetEvent::operator co_await(),
 		*this
 	};
+}
+
+void ResourceLoadEvent::Awaiter::await_resume() const
+{
+	if (owner.m_exception)
+		std::rethrow_exception(owner.m_exception);
 }

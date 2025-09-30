@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Maths/Vector/PixelVector2.hpp"
-#include "RenderDevice.hpp"
+#include "Resources/ResourceHandle.hpp"
+#include "Rendering/RenderDevice.hpp"
+#include "Rendering/Resources/GPUSwapchain.hpp"
+#include "Core/Maths/Vector/PixelVector2.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 #include <glfw/glfw3.h>
@@ -30,24 +32,29 @@ struct Window
 
 	#pragma region Methods
 
-	vk::raii::SurfaceKHR&   GetSurface  () noexcept { return m_surface; }
-	vk::raii::SwapchainKHR& GetSwapchain() noexcept { return m_swapchain; }
-	vk::Extent2D			GetExtent   () const noexcept;
-	auto& GetViews() noexcept {return m_image_views;}
-	RkBool					ShouldClose () const noexcept;
+	vk::raii::SurfaceKHR& GetSurface  () noexcept { return m_surface; }
+	GPUSwapchain&		  GetSwapchain() noexcept { return m_swapchain; }
+	vk::Extent2D		  GetExtent   () const noexcept;
+	RkBool				  ShouldClose () const noexcept;
 
 	#pragma endregion
 
-	protected:
+	private:
 
-		friend struct RenderDevice;
+		#pragma region Members
 
-		RenderDevice&          			 m_owner;
-		GLFWwindow*	           			 m_window;
-		vk::raii::SurfaceKHR   			 m_surface;
-		vk::raii::SwapchainKHR 			 m_swapchain;
-		std::vector<vk::raii::ImageView> m_image_views;
+		RenderDevice&        m_owner;
+		GLFWwindow*	         m_window;
+		vk::raii::SurfaceKHR m_surface;
+		GPUSwapchain	     m_swapchain;
 
+		#pragma endregion
+
+		#pragma region Methods
+
+		RkVoid RecreateSwapchain();
+
+		#pragma endregion
 };
 
 END_RUKEN_NAMESPACE

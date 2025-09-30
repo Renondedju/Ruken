@@ -7,7 +7,7 @@ register_ruken_module(RkResources)
 # Files
 target_sources(RkResources PUBLIC
     FILE_SET HEADERS FILES
-        Resource.hpp
+        ResourceData.hpp
         ResourceHandle.hpp
         ResourceLoader.hpp
         ResourceManifest.hpp

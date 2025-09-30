@@ -34,7 +34,7 @@ target_sources(RkRendering PUBLIC
         Coroutines/GPUPromise.hpp
         Coroutines/GPUPromise.inl
         Windowing/Window.hpp
-        Resources/Swapchain.hpp
+        Resources/GPUSwapchain.hpp
         Resources/GPUBuffer.hpp
         Resources/GPUImage.hpp
         Vulkan/VulkanInstance.hpp
@@ -50,7 +50,7 @@ target_sources(RkRendering PRIVATE
         Coroutines/GPUTask.cpp
         Coroutines/GPUPromise.cpp
         Windowing/Window.cpp
-        Resources/Swapchain.cpp
+        Resources/GPUSwapchain.cpp
         Resources/GPUBuffer.cpp
         Resources/GPUImage.cpp
         Vulkan/VulkanInstance.cpp

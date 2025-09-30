@@ -9,6 +9,8 @@ BEGIN_RUKEN_NAMESPACE
 
 struct GPUFence final : ManualResetEvent
 {
+	using Awaiter = Awaiter;
+
     #pragma region Lifetime
 
     /**
@@ -25,10 +27,16 @@ struct GPUFence final : ManualResetEvent
 
     #pragma endregion
 
+	#pragma region Members
+
     /// @brief   The actual vulkan fence.
     /// @warning /!\ Do not reset manually, call GPUFence::Reset() instead.
     vk::raii::Fence			fence;
 	vk::raii::Device const& device;
+
+	#pragma endregion
+
+	#pragma region Methods
 
     /// @brief Resets the fence and the underlying awaitable.
     RkVoid Reset() const noexcept;
@@ -39,7 +47,11 @@ struct GPUFence final : ManualResetEvent
 	/// @brief More CPU efficient wait but the running thread will be taken away from the application for a while.
 	RkVoid WaitSynchronously() const noexcept;
 
+	#pragma endregion
+
     private:
+
+		#pragma region Methods
 
         /**
          * Checks the status of a fence and signals the event or re-schedules itself if the fence is not yet ready.
@@ -47,6 +59,8 @@ struct GPUFence final : ManualResetEvent
          * @param in_event Associated GPUFence (ManualResetEvent) to signal.
          */
         static DynamicTask<> CheckFenceStatus(vk::raii::Fence const& in_fence, GPUFence const& in_event) noexcept;
+
+		#pragma endregion
 };
 
 END_RUKEN_NAMESPACE

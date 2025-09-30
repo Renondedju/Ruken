@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resources/Resource.hpp"
+#include "Resources/ResourceData.hpp"
 #include "Resources/ResourcePath.hpp"
 #include "Rendering/RenderDevice.hpp"
 
@@ -8,7 +8,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-struct ShaderModule final : Resource
+struct ShaderModule final : ResourceData
 {
 	#pragma region Lifetime
 

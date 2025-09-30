@@ -15,7 +15,7 @@ struct GPU
 	static inline thread_local vk::raii::CommandBuffer* command_buffer {nullptr};
 };
 
-struct GPUPromise
+struct GPUPromise: ManualResetEvent
 {
 	#pragma region Lifetime
 
@@ -32,17 +32,15 @@ struct GPUPromise
 
 	#pragma region Members
 
-	/// @brief Buffer containing
-	vk::raii::CommandBuffer& command_buffer;
+	/// @brief Render device used for execution.
+	RenderDevice&			 device;
 
 	/// @brief Promise lifetime is reference counted.
-	std::atomic_size_t references {1UZ};
+	std::atomic_size_t		 references {1UZ};
 
-	/// @brief The vulkan queue this promise is recording commands for.
-	//vk::QueueFlagBits vulkan_queue {vk::QueueFlagBits::eGraphics};
-
-	/// @brief Semaphore used to wait for another task between queues.
-	// std::optional<vk::raii::Semaphore> wait_task_semaphore;
+	/// @brief Buffer containing the list of commands to execute.
+	vk::raii::CommandBuffer& command_buffer;
+	vk::raii::Fence			 end_execution_fence;
 
 	#pragma endregion
 
@@ -78,8 +76,16 @@ struct GPUPromise::FinalSuspend
 	GPUPromise* promise;
 
 	bool await_ready () noexcept;
-	void await_suspend(std::coroutine_handle<>) noexcept;
+	bool await_suspend(std::coroutine_handle<>) noexcept;
 	void await_resume() noexcept;
+
+	/**
+	 * A CPU Task that waits for a fence to be signaled.
+	 * @param in_promise Promise to check the fence of.
+	 * @param in_task Task handle to keep alive the promise.
+	 * @return Async CPU task.
+	 */
+	static DynamicTask<> CheckFenceStatus(GPUPromise* in_promise, GPUTask in_task) noexcept;
 };
 
 #pragma endregion

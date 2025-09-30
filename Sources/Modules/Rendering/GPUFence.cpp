@@ -8,8 +8,13 @@ GPUFence::GPUFence(vk::raii::Device const& in_device, vk::FenceCreateInfo const&
 	device			 {in_device}
 {}
 
-DynamicTask<> GPUFence::CheckFenceStatus(vk::raii::Fence const& in_fence, GPUFence const& in_event) noexcept
+DynamicTask<> GPUFence::CheckFenceStatus(/*std::stop_token		in_stop_token,*/
+										 vk::raii::Fence const& in_fence,
+										 GPUFence		 const& in_event) noexcept
 {
+	/*if (in_stop_token.stop_requested())
+		co_return;
+	*/
 	vk::Result const status {in_fence.getStatus()};
 
 	if (status == vk::Result::eSuccess)
@@ -30,6 +35,7 @@ RkVoid GPUFence::Reset() const noexcept
 
 Awaiter GPUFence::operator co_await() const noexcept
 {
+	//TODO: Call only once
 	CheckFenceStatus(fence, *this);
 
 	return ManualResetEvent::operator co_await();

@@ -7,7 +7,7 @@
 #include "Resources/ResourceManifest.hpp"
 #include "Resources/ResourceHandle.hpp"
 #include "Resources/ResourceLoader.hpp"
-#include "Resources/Resource.hpp"
+#include "Resources/ResourceData.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/FilePath.hpp"
@@ -19,21 +19,23 @@ BEGIN_RUKEN_NAMESPACE
 using ResourceIdentifier = std::size_t;
 
 /**
- * @brief Imports and manages resources lifetime.
+ * @brief Loads resources from filesystem and roots them to a runtime handle.
  *
  * The resource pipeline starts from an asset file that we need to import.
  * Importing an asset allows us to extract multiple resources from it, as well as
  * applying some kind of pre-processing to optimize the runtime. (Ex.: A .fbx file containing multiple models).
- *		This process is usually done ahead of time, although you could make it happen at runtime with proper care.
- *		Importers are not (yet ?) required to use a Filesystem service to read an asset.
  *
+ * This process is usually done ahead of time, although you could make it happen at runtime with proper care.
+ * Importers are not (yet ?) required to use a Filesystem service to read an asset.
  * Resulting artifacts are then serialized to the filesystem, ready to be picked up by the runtime.
  *
- * | ----------- AHEAD OF TIME ------------ | ------------ RUNTIME -------------- |
- * |                                        |                                     |
+ * | ----------- AHEAD OF TIME ------------ | ------------ RUNTIME --------------------- |
+ * |                                        |                                            |
  *				   / Resource > Save \              / Resource > Load \
- * Asset > Import |> Resource > Save |> Filesystem |> Resource > Load |> Runtime
+ * Asset > Import |> Resource > Save |> Filesystem |> Resource > Load |> Runtime Handle
  *				   \ Resource > Save /              \ ...			  /
+ *
+ * @note The resource manager only emits a handle but does not contain the actual lifetime logic.
  */
 struct ResourceManager final : Service
 {
@@ -59,12 +61,8 @@ struct ResourceManager final : Service
 	RkVoid ProvideLoader() noexcept;
 
 	/// @brief Tries to load the passed file.
-	template <CResource TResource>
+	template <CResourceData TResource>
 	ResourceHandle<TResource> Request(FilePath const& in_file_path);
-
-	/// @brief Manually provides a resource to the manager.
-	template <CResource TResource>
-	ResourceHandle<TResource> Provide(TResource&& in_resource, ResourceIdentifier in_identifier) noexcept;
 
 	#pragma endregion
 
@@ -84,7 +82,7 @@ struct ResourceManager final : Service
 		ResourceLoader* GetCompatibleLoader(std::filesystem::path const& in_extension) const;
 
 		/// @brief Waits for in_loading_task to finish and exchanges the Resource pointer of the passed in_manifest.
-		IOTask<RkVoid> Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader) const noexcept;
+		IOTask<RkVoid> Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader, FilePath in_filepath) const noexcept;
 
 		#pragma endregion
 };

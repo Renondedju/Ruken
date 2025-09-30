@@ -22,21 +22,21 @@ ResourceLoader* ResourceManager::GetCompatibleLoader(std::filesystem::path const
 	return nullptr;
 }
 
-IOTask<RkVoid> ResourceManager::Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader) const noexcept
+IOTask<RkVoid> ResourceManager::Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader, FilePath in_filepath) const noexcept
 {
 	Filesystem* filesystem {m_service_provider.LocateService<Filesystem>()};
 	RUKEN_ASSERT(filesystem, "Cannot load resources without a filesystem.");
 
 	try
 	{
-		FileHandle    const file(filesystem->Open(in_manifest->path.resource_file));
+		FileHandle    const file(filesystem->Open(in_filepath));
 		std::vector<RkByte> data(file	   ->GetFileSize());
 
 		co_await file->Read(data.data(), {}, data.size());
 
 		ResourcePtr const resource {co_await in_loader->Load(LoadContext {
 			.services  = m_service_provider,
-			.file_path = in_manifest->path.resource_file,
+			.file_path = in_filepath,
 			.data      = std::move(data)
 		})};
 

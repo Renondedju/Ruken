@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resources/Resource.hpp"
+#include "Resources/ResourceData.hpp"
 #include "Resources/LoadContext.hpp"
 #include "Filesystem/IOJobQueue.hpp"
 

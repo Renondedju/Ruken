@@ -22,8 +22,8 @@
 #include "Rendering/ShaderModule.hpp"
 #include "Rendering/SpirvLoader.hpp"
 #include "Rendering/GPUFence.hpp"
-#include "Rendering/Resources/Swapchain.hpp"
-#include "Rendering/Resources/ImageView.hpp"
+#include "Rendering/Resources/GPUSwapchain.hpp"
+#include "Rendering/Resources/GPUImageView.hpp"
 #include "Rendering/Coroutines/GPUTask.hpp"
 #include "Rendering/Coroutines/GPUPromise.hpp"
 
@@ -34,21 +34,20 @@ USING_RUKEN_NAMESPACE
 
 struct SwapchainImage
 {
-    Swapchain    swapchain;
-    GPUImageView view;
-    vk::Image    image;
+    // This pointer needs to be kept alive for the image and view to stay valid.
+    ResourcePtr<GPUSwapchainData> owner;
+
+    vk::ImageView view;
+    vk::Image     image;
 };
 
 GPUTask DrawTriangle(
-    RenderDevice&         in_render_device,
+    RenderDevice&,
     SwapchainImage const& in_swapchain_image,
     vk::Viewport   const& in_viewport,
     vk::Extent2D   const& in_extent,
     vk::Pipeline   const& in_pipeline)
 {
-    vk::raii::Semaphore present_complete_semaphore {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
-    vk::raii::Semaphore render_finished_semaphore  {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
-
     /*
      * co_await image.TransitionLayout({
      *      ...
@@ -89,7 +88,7 @@ GPUTask DrawTriangle(
      *
      */
     vk::RenderingAttachmentInfo const attachment_info {
-        .imageView   = in_swapchain_image.view->image_view,
+        .imageView   = in_swapchain_image.view,
         .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
         .loadOp      = vk::AttachmentLoadOp::eClear,
         .storeOp     = vk::AttachmentStoreOp::eStore,
@@ -108,9 +107,9 @@ GPUTask DrawTriangle(
 
     // Actual coroutine code
     GPU::command_buffer->bindPipeline(vk::PipelineBindPoint::eGraphics, in_pipeline);
-    GPU::command_buffer->setViewport(0, in_viewport);
-    GPU::command_buffer->setScissor (0, vk::Rect2D(vk::Offset2D(0, 0), in_extent));
-    GPU::command_buffer->draw(3, 1, 0, 0);
+    GPU::command_buffer->setViewport (0, in_viewport);
+    GPU::command_buffer->setScissor  (0, vk::Rect2D(vk::Offset2D(0, 0), in_extent));
+    GPU::command_buffer->draw        (3, 1, 0, 0);
     GPU::command_buffer->endRendering();
 
     /*
@@ -148,32 +147,33 @@ GPUTask DrawTriangle(
 
 Task<MainQueue> RenderFrame(RenderDevice& in_render_device, Window& in_window, ResourceHandle<ShaderModule> const in_program)
 {
-    vk::raii::SwapchainKHR const& swapchain {in_window.GetSwapchain()};
-    vk::Extent2D           const  extent    {in_window.GetExtent()};
-    vk::Viewport           const  viewport  {
+    auto         const& pipeline_ptr  {in_program              .Current()};
+    auto         const& swapchain_ptr {in_window.GetSwapchain().Current()};
+    vk::Extent2D const  extent        {in_window.GetExtent()};
+    vk::Viewport const  viewport      {
         .x        = 0.0f, .y        = 0.0f,
         .width    = static_cast<float>(extent.width),
         .height   = static_cast<float>(extent.height),
         .minDepth = 0.0f, .maxDepth = 1.0f
     };
 
-    GPUFence            draw_fence                 {in_render_device.GetDevice(), {.flags = vk::FenceCreateFlagBits::eSignaled}};
-    vk::raii::Semaphore present_complete_semaphore {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
-    vk::raii::Semaphore render_finished_semaphore  {in_render_device.GetDevice(), vk::SemaphoreCreateInfo()};
+    GPUFence const acquire_image {in_render_device.GetDevice(), vk::FenceCreateInfo { .flags = {} }};
 
-    auto [result, imageIndex] = swapchain.acquireNextImage(UINT64_MAX, *present_complete_semaphore, nullptr);
+    auto [result, imageIndex] = swapchain_ptr->swapchain.acquireNextImage(UINT64_MAX, nullptr, acquire_image.fence);
+
+    acquire_image.WaitSynchronously();
 
     co_await DrawTriangle(in_render_device, SwapchainImage {
-        .swapchain = swapchain,
-        .image     = swapchain.getImages()[imageIndex],
-        .view      = in_window.GetViews ()[imageIndex],
-    }, viewport, extent, (*in_program)->pipeline);
+        .owner = swapchain_ptr,
+        .view  = swapchain_ptr->images_views         [imageIndex],
+        .image = swapchain_ptr->swapchain.getImages()[imageIndex],
+    }, viewport, extent, pipeline_ptr->pipeline);
 
-    auto _ = in_render_device.GetQueue().presentKHR(vk::PresentInfoKHR {
-        .waitSemaphoreCount = 1,
-        .pWaitSemaphores    = &*render_finished_semaphore,
+    std::ignore = in_render_device.GetQueue().presentKHR(vk::PresentInfoKHR {
+        .waitSemaphoreCount = 0,
+        .pWaitSemaphores    = nullptr,
         .swapchainCount     = 1,
-        .pSwapchains        = &*swapchain,
+        .pSwapchains        = &*swapchain_ptr->swapchain,
         .pImageIndices      = &imageIndex,
         .pResults           = nullptr
     });
@@ -209,6 +209,10 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
         {
             FrameMark;
             glfwPollEvents();
+
+            const RkChar* description {nullptr};
+            if (glfwGetError(&description) != GLFW_NO_ERROR)
+                throw Exception("GLFW Error: " + std::string(description));
             
             co_await RenderFrame(*render_device, window, code);
         }
@@ -226,16 +230,11 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
     co_return;
 }
 
-/**
- * Initializes services and waits for the async main function to request a stop.
- *
- * @param in_argc Argument count
- * @param in_argv Argument values
- * @return Error code
- */
-int main(int in_argc, char* in_argv[])
+/// @brief Initializes services and waits for the async main function to request a stop.
+int main([[maybe_unused]] int   in_arg_count,
+         [[maybe_unused]] char* in_arg_values[])
 {
-    // 1. --- Setup logging and general configuration. ---
+    // 1. --- Pre-initialization & Configuration ---
     ConsoleHandler console_handler {};
     DebugHandler   debug_handler   {};
 
@@ -252,8 +251,8 @@ int main(int in_argc, char* in_argv[])
     std::vector<const RkChar*> vulkan_layers     {};
     std::vector<const RkChar*> vulkan_extensions {};
 
-    // 2. --- Initializing services and core systems. ---
-    ServiceProvider    services   {"Root"};
+    // 2. --- Initializing services and core systems ---
+    ServiceProvider    services   {"Application"};
     Logger*            logger     {services.ProvideService<Logger>(handlers)};
     JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
     StdFilesystem*     filesystem {services.ProvideService<StdFilesystem>("../Assets")};
@@ -265,12 +264,12 @@ int main(int in_argc, char* in_argv[])
     importer ->ProvideImporter<SlangImporter>(); // TODO: Not used or working yet. Slang API is whack.
     resources->ProvideLoader  <SpirvLoader>  ();
 
-    // 3. --- Running async main. ---
+    // 3. --- Finally, running async main ---
     std::stop_source stop_source {};
     AsyncMain(stop_source, services);
 
-    // And waiting for it to complete as a worker.
+    // ... and waiting for it to complete as a worker.
     job_system->CallerAsWorker(stop_source.get_token(), "CPU Main");
 
-    return 0;
+    return EXIT_SUCCESS;
 }

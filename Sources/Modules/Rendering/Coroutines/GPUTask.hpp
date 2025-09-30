@@ -21,12 +21,7 @@ struct GPUTask
 
 	#pragma region Methods
 
-	/**
-	 * Creates a CPU Task that submits work to GPU and wait for its execution.
-	 * @param in_device Device to submit the work on.
-	 * @return
-	 */
-	DynamicTask<> Submit(RenderDevice& in_device) noexcept;
+	Awaiter operator co_await() const noexcept;
 
 	#pragma endregion
 

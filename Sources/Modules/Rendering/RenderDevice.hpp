@@ -38,7 +38,7 @@ struct RenderDevice final : Service
 	vk::raii::PhysicalDevice& GetPhysicalDevice()      noexcept { return m_physical_device; }
 	vk::raii::Device&		  GetDevice()		       noexcept { return m_device; }
 	vk::raii::CommandBuffer&  GetCommandBuffer()       noexcept { return m_command_buffers[0]; }
-	vk::raii::Queue& GetQueue() { return m_queues.front(); }
+	vk::raii::Queue&		  GetQueue()						{ return m_queues.front(); }
 
 	#pragma endregion
 
