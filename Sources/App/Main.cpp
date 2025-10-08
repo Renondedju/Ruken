@@ -23,7 +23,6 @@
 #include "Rendering/SpirvLoader.hpp"
 #include "Rendering/GPUFence.hpp"
 #include "Rendering/Resources/GPUSwapchain.hpp"
-#include "Rendering/Resources/GPUImageView.hpp"
 #include "Rendering/Coroutines/GPUTask.hpp"
 #include "Rendering/Coroutines/GPUPromise.hpp"
 
@@ -41,6 +40,63 @@ struct SwapchainImage
     vk::Image     image;
 };
 
+/*
+
+DynamicTask<> DrawFrame(Resources in_resources, Window& in_window, EntityAdmin& in_scene)
+{
+    // Filling draw buffers asynchronously
+    auto ecs_fill_buffers {in_scene.FillDrawBuffers()};
+
+    // Acquiring resources and keeping them alive for the duration of the GPU execution.
+    auto const& pipeline_ptr     {in_program              .Current()};
+    auto const& swapchain_ptr    {in_window.GetSwapchain().Current()};
+    auto const& occlusion_buffer {};
+
+    co_await ecs_fill_buffers;
+    co_await in_render_device.Submit([&] // Can not be a coroutine !!
+    {
+        OcclusionCulling(in_resources.occlusion_buffer, Matrix4x4::MVP(...));
+
+        SwapchainImage image {swapchain_ptr.AcquireNextImage()};
+
+        RenderShadowMaps();
+
+        GPUTask();
+
+    });
+}
+
+// First image usage:
+//      Clear + transition from VK_IMAGE_LAYOUT_UNDEFINED is required
+// OR
+//      Acquire
+
+GPUComputeTask OcclusionCulling(
+    GPUBuffer<RkBool>       & in_occlusion_buffer,
+    GPUBuffer<Vector3> const& in_entities,
+    Matrix4x4          const& in_camera_transform)
+{
+    // Registering accesses
+    auto occlusion_access = in_occlusion_buffer.WriteAccess({
+        .dstStageMask   = vk::PipelineStageFlagBits2::eComputeShader,
+        .dstAccessMask  = vk::AccessFlagBits2       ::eShaderWrite
+    });
+
+    auto position_read = in_entities.ReadAccess({
+        .dstStageMask   = vk::PipelineStageFlagBits2::eComputeShader,
+        .dstAccessMask  = vk::AccessFlagBits2       ::eShaderRead
+    });
+
+    GPU::command_buffer->pushConstants({
+        .buffers   = {occlusion_access, position_read},
+        .stageMask = vk::PipelineStageFlagBits2::eComputeShader
+    });
+
+    GPU::command_buffer->dispatch(in_pipeline);
+}
+
+*/
+
 GPUTask DrawTriangle(
     RenderDevice&,
     SwapchainImage const& in_swapchain_image,
@@ -49,7 +105,7 @@ GPUTask DrawTriangle(
     vk::Pipeline   const& in_pipeline)
 {
     /*
-     * co_await image.TransitionLayout({
+     * image.TransitionLayout({
      *      ...
      * });
      */
@@ -90,7 +146,7 @@ GPUTask DrawTriangle(
     vk::RenderingAttachmentInfo const attachment_info {
         .imageView   = in_swapchain_image.view,
         .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-        .loadOp      = vk::AttachmentLoadOp::eClear,
+        .loadOp      = vk::AttachmentLoadOp ::eClear,
         .storeOp     = vk::AttachmentStoreOp::eStore,
         .clearValue  = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f)
     };

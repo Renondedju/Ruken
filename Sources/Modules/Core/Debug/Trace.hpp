@@ -22,7 +22,7 @@ BEGIN_RUKEN_NAMESPACE
 /// A collection of functions and members used by the executive system to properly integrate the tracy profiler
 struct TracyUtilities
 {
-	___tracy_source_location_data* GetOrInsertSourceLocationData(std::source_location const& in_source_location, const char* in_name = nullptr, uint32_t const in_color = 0) noexcept;
+	___tracy_source_location_data* GetOrInsertSourceLocationData(std::source_location const& in_source_location, const char* in_name = nullptr, uint32_t in_color = 0) noexcept;
 
 	/**
 	 * Starts a tracy zone.
@@ -47,10 +47,12 @@ struct TracyUtilities
 
 	private:
 
-#ifdef RUKEN_TRACE_BUILD
+		#ifdef RUKEN_TRACE_BUILD
+
 		std::shared_mutex												        m_source_location_mutex     {};
 		std::unordered_map<std::source_location, ___tracy_source_location_data> m_source_location_registery {};
-#endif
+
+		#endif
 };
 
 static inline TracyUtilities s_tracy_utilities {};

@@ -33,6 +33,7 @@ target_sources(RkRendering PUBLIC
         Coroutines/GPUTask.hpp
         Coroutines/GPUPromise.hpp
         Coroutines/GPUPromise.inl
+        Coroutines/TracyVkUtilities.hpp
         Windowing/Window.hpp
         Resources/GPUSwapchain.hpp
         Resources/GPUBuffer.hpp
@@ -49,6 +50,7 @@ target_sources(RkRendering PRIVATE
         GPUFence.cpp
         Coroutines/GPUTask.cpp
         Coroutines/GPUPromise.cpp
+        Coroutines/TracyVkUtilities.cpp
         Windowing/Window.cpp
         Resources/GPUSwapchain.cpp
         Resources/GPUBuffer.cpp
@@ -66,5 +68,5 @@ endif ()
 file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Shaders ${RUKEN_SLANG_INCLUDE_DIR}/Ruken COPY_ON_ERROR SYMBOLIC)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SlangSearchPath.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Rendering/SlangSearchPath.hpp)
 
-target_compile_definitions(RkRendering PUBLIC VK_NO_PROTOTYPES VULKAN_HPP_NO_STRUCT_CONSTRUCTORS GLFW_INCLUDE_VULKAN)
+target_compile_definitions(RkRendering PUBLIC TRACY_VK_USE_SYMBOL_TABLE VK_NO_PROTOTYPES VULKAN_HPP_NO_STRUCT_CONSTRUCTORS GLFW_INCLUDE_VULKAN)
 target_link_libraries     (RkRendering PUBLIC RkCore Vulkan::Headers slang volk VulkanMemoryAllocator glfw)

@@ -55,6 +55,8 @@ VulkanInstance::VulkanInstance(
 VulkanInstance::~VulkanInstance()
 {
 	vkDestroyDebugUtilsMessengerEXT(*instance, debug_utils_messenger, nullptr);
+
+	volkFinalize();
 }
 
 vk::InstanceCreateInfo VulkanInstance::MakeInstanceCreateInfo(

@@ -42,6 +42,9 @@ struct GPUPromise: ManualResetEvent
 	vk::raii::CommandBuffer& command_buffer;
 	vk::raii::Fence			 end_execution_fence;
 
+	/// @brief Tracy instrumentation
+	std::unique_ptr<tracy::VkCtxScope> tracy_vk_scope {nullptr};
+
 	#pragma endregion
 
 	#pragma region Methods
@@ -49,13 +52,16 @@ struct GPUPromise: ManualResetEvent
 	struct InitialSuspend;
 	struct FinalSuspend;
 
-	InitialSuspend initial_suspend  () noexcept;
+	InitialSuspend initial_suspend  (RUKEN_INTERNAL_SOURCE_LOCATION) noexcept;
 	FinalSuspend   final_suspend    () noexcept;
 	GPUTask		   get_return_object() noexcept;
 
 	void unhandled_exception() noexcept;
 	void await_transform    (GPUTask const& in_task) noexcept;
 	void return_void        () noexcept;
+
+	/// @brief Called by final suspend when the GPU task is done executing.
+	RkBool SignalConsume() const noexcept;
 
 	#pragma endregion
 };
@@ -64,7 +70,8 @@ struct GPUPromise: ManualResetEvent
 
 struct GPUPromise::InitialSuspend
 {
-	GPUPromise* promise;
+	GPUPromise*			 promise;
+	std::source_location coroutine_location;
 
 	bool await_ready () noexcept;
 	void await_suspend(std::coroutine_handle<>) noexcept;

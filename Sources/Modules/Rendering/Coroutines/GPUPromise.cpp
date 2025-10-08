@@ -3,6 +3,8 @@
 
 #include <coroutine>
 
+#include "Coroutines/TracyVkUtilities.hpp"
+
 USING_RUKEN_NAMESPACE
 
 void GPUPromise::unhandled_exception() noexcept
@@ -23,10 +25,11 @@ void GPUPromise::await_transform(GPUTask const& in_task) noexcept
 
 #pragma region Coroutine Methods
 
-GPUPromise::InitialSuspend GPUPromise::initial_suspend() noexcept
+GPUPromise::InitialSuspend GPUPromise::initial_suspend(std::source_location const in_source_location) noexcept
 {
 	return InitialSuspend {
-		.promise = this
+		.promise			= this,
+		.coroutine_location = in_source_location
 	};
 }
 
@@ -40,6 +43,13 @@ GPUPromise::FinalSuspend GPUPromise::final_suspend() noexcept
 void GPUPromise::return_void() noexcept
 {}
 
+RkBool GPUPromise::SignalConsume() const noexcept
+{
+	TracyVkCollectHost(device.TracyContext())
+
+	return ManualResetEvent::SignalConsume();
+}
+
 bool GPUPromise::InitialSuspend::await_ready() noexcept
 {
 	return true;
@@ -52,9 +62,13 @@ void GPUPromise::InitialSuspend::await_resume() noexcept
 {
 	GPU::command_buffer   = std::addressof(promise->command_buffer);
 	promise->command_buffer.begin(vk::CommandBufferBeginInfo {
-		.flags			  = vk::CommandBufferUsageFlagBits::eOneTimeSubmit,
+		.flags			  = {},//vk::CommandBufferUsageFlagBits::,
 		.pInheritanceInfo = nullptr
 	});
+
+	promise->tracy_vk_scope = TracyVkUtilities::TracyVulkanZone(promise->device.TracyContext(),
+		*promise->command_buffer, coroutine_location, true
+	);
 }
 
 bool GPUPromise::FinalSuspend::await_ready() noexcept
@@ -64,6 +78,11 @@ bool GPUPromise::FinalSuspend::await_ready() noexcept
 
 bool GPUPromise::FinalSuspend::await_suspend(std::coroutine_handle<> const) noexcept
 {
+	// Tracy makes use of RAII to properly write timestamps
+	// but since the coroutine is kept alive until the end of GPU execution
+	// we need to manually call the destructor here.
+	promise->tracy_vk_scope.reset();
+
 	// Submission is done in place: one time submit flag,
 	// no keeping recorded buffers around, consistent with a regular CPU task.
 	promise->command_buffer.end();
