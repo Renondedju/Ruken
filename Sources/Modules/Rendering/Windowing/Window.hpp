@@ -52,6 +52,8 @@ struct Window
 
 		#pragma region Methods
 
+		static RkVoid GLFWFramebufferResizeCallback(GLFWwindow* window, int width, int height) noexcept;
+
 		RkVoid RecreateSwapchain();
 
 		#pragma endregion

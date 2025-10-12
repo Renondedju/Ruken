@@ -11,6 +11,7 @@ struct GPUSwapchainData final : ResourceData
 {
 	vk::raii::SwapchainKHR			 swapchain;
 	std::vector<vk::raii::ImageView> images_views;
+	std::vector<vk::raii::Semaphore> present_semaphores;
 
 	#pragma region Lifetime
 

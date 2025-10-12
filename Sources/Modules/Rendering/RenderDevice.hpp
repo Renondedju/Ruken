@@ -68,14 +68,16 @@ struct RenderDevice final : Service
 		#endif
 
 		static inline std::vector<const RkChar*> s_extensions {
-			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-			VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
-			VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
-			VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
+			vk::KHRSwapchainExtensionName,
+			vk::KHRSpirv14ExtensionName,
+			vk::KHRSynchronization2ExtensionName,
+			vk::KHRCreateRenderpass2ExtensionName,
+			vk::KHRDynamicRenderingExtensionName,
+			vk::KHRShaderDrawParametersExtensionName,
 
 			// Debug
-			VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME,
-			VK_EXT_CALIBRATED_TIMESTAMPS_EXTENSION_NAME
+			vk::EXTHostQueryResetExtensionName,
+			vk::EXTCalibratedTimestampsExtensionName
 		};
 
 		#pragma endregion

@@ -30,6 +30,7 @@ target_sources(RkRendering PUBLIC
         SlangImporter.hpp
         SpirvLoader.hpp
         GPUFence.hpp
+        GPUWorkGraph.hpp
         Coroutines/GPUTask.hpp
         Coroutines/GPUPromise.hpp
         Coroutines/GPUPromise.inl
@@ -48,6 +49,7 @@ target_sources(RkRendering PRIVATE
         SpirvLoader.cpp
         ShaderModule.cpp
         GPUFence.cpp
+        GPUWorkGraph.cpp
         Coroutines/GPUTask.cpp
         Coroutines/GPUPromise.cpp
         Coroutines/TracyVkUtilities.cpp
