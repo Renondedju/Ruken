@@ -11,10 +11,10 @@
 BEGIN_RUKEN_NAMESPACE
 
 struct JobSystem;
+struct SingleThreadSingleQueueExecutor;
 
 #pragma warning(push)
 #pragma warning(disable: 4324)
-
 // Disabled warning 4324: Structure was padded due to __declspec(align())
 // This is related to the way atomic values interacts with cache lines and is expected of the atomic_queue
 
@@ -29,7 +29,8 @@ struct JobSystem;
  */
 class JobQueue
 {
-	friend JobSystem; // calls OnRegister()
+	friend JobSystem;						 //
+	friend SingleThreadSingleQueueExecutor; // calls OnRegister()
 
 	#pragma region Members
 
@@ -59,9 +60,8 @@ class JobQueue
 	RkVoid OnRegister(WorkerRequestTree& in_request_tree, BinaryTreePath const& in_request_location) noexcept;
 
 	/**
-	 *
-	 * @param inout_concurrency
-	 * @return
+	 * Consumes a worker request if the concurrency allows it.
+	 * @param inout_concurrency Current concurrency of the queue.
 	 */
 	RkBool TryConsumeWorkerRequest(Concurrency& inout_concurrency) noexcept;
 

@@ -55,10 +55,12 @@ VulkanInstance::VulkanInstance(
 VulkanInstance::~VulkanInstance()
 {
 	vkDestroyDebugUtilsMessengerEXT(*instance, debug_utils_messenger, nullptr);
+
+	volkFinalize();
 }
 
 vk::InstanceCreateInfo VulkanInstance::MakeInstanceCreateInfo(
-	ServiceProvider&		    in_service_provider,
+	ServiceProvider const&		in_service_provider,
 	std::vector<const RkChar*>& in_layers,
 	std::vector<const RkChar*>& in_extensions) const
 {

@@ -1,0 +1,12 @@
+#pragma once
+
+#include "Core/Build/Namespace.hpp"
+
+BEGIN_RUKEN_NAMESPACE
+
+struct SlangSearchPath
+{
+    static inline constexpr const char* s_path {"${RUKEN_SLANG_INCLUDE_DIR}"};
+};
+
+END_RUKEN_NAMESPACE

@@ -7,11 +7,12 @@ BEGIN_RUKEN_NAMESPACE
 /**
  * Filesystem implementation of the underlying operating system's filesystem.
  */
-struct WindowsFilesystem final: Filesystem
+struct StdFilesystem final: Filesystem
 {
 	#pragma region Members
 
 	std::filesystem::path const project_path;
+	std::filesystem::path const imported_assets_path;
 	std::filesystem::path const tmp_path;
 
 	#pragma endregion
@@ -23,12 +24,12 @@ struct WindowsFilesystem final: Filesystem
 	 * @param in_service_provider Service provider instance.
 	 * @param in_project_path The root directory of the project, listed as ELocation::ProjectDirectory.
 	 */
-	explicit WindowsFilesystem(ServiceProvider& in_service_provider, std::filesystem::path const& in_project_path);
-	WindowsFilesystem           (WindowsFilesystem const& in_copy) = delete;
-	WindowsFilesystem           (WindowsFilesystem&&      in_move) = delete;
-	WindowsFilesystem& operator=(WindowsFilesystem const& in_copy) = delete;
-	WindowsFilesystem& operator=(WindowsFilesystem&&      in_move) = delete;
-	~WindowsFilesystem()								  override = default;
+	explicit StdFilesystem(ServiceProvider& in_service_provider, std::filesystem::path const& in_project_path);
+	StdFilesystem           (StdFilesystem const& in_copy) = delete;
+	StdFilesystem           (StdFilesystem&&      in_move) = delete;
+	StdFilesystem& operator=(StdFilesystem const& in_copy) = delete;
+	StdFilesystem& operator=(StdFilesystem&&      in_move) = delete;
+	~StdFilesystem()								  override = default;
 
 	#pragma endregion
 

@@ -2,10 +2,14 @@
 
 #include "Core/Service.hpp"
 #include "Core/Meta/Meta.hpp"
+#include "Build/BuildInfo.hpp"
 
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 
+#include <string>
+#include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_raii.hpp>
+#include <tracy/TracyVulkan.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -27,16 +31,19 @@ struct RenderDevice final : Service
 	RenderDevice		   (RenderDevice&&     ) = delete;
 	RenderDevice& operator=(const RenderDevice&) = delete;
 	RenderDevice& operator=(RenderDevice&&     ) = delete;
-	~RenderDevice() override				     = default;
+	~RenderDevice() override;
 
 	#pragma endregion
 
 	#pragma region Methods
 
 	// Getters
-	vk::raii::Instance&       GetInstance() const noexcept { return m_instance->instance; }
-	vk::raii::PhysicalDevice& GetPhysicalDevice() noexcept { return m_physical_device; }
-	vk::raii::Device&		  GetDevice()		  noexcept { return m_device; }
+	vk::raii::Instance&       GetInstance()      const noexcept { return m_instance->instance; }
+	vk::raii::PhysicalDevice& GetPhysicalDevice()      noexcept { return m_physical_device; }
+	vk::raii::Device&		  GetDevice()		       noexcept { return m_device; }
+	vk::raii::CommandBuffer&  GetCommandBuffer()       noexcept { return m_command_buffers[0]; }
+	vk::raii::Queue&		  GetQueue()						{ return m_queues.front(); }
+	TracyVkCtx				  TracyContext()     const noexcept { return m_tracy_context; }
 
 	#pragma endregion
 
@@ -46,14 +53,31 @@ struct RenderDevice final : Service
 
 		VulkanInstance*			 	 		   m_instance;
 		vk::raii::PhysicalDevice 	 		   m_physical_device;
+		std::string 						   m_name;
 		std::vector<RkFloat>		 		   m_queue_priorities;
 		std::vector<vk::DeviceQueueCreateInfo> m_queue_create_infos;
 		vk::raii::Device		 	 		   m_device;
 		std::vector<vk::raii::Queue> 		   m_queues;
 		vk::raii::CommandPool				   m_command_pool;
+		vk::raii::CommandBuffers			   m_command_buffers;
+
+		#ifdef RUKEN_TRACE_BUILD
+
+		TracyVkCtx m_tracy_context {};
+
+		#endif
 
 		static inline std::vector<const RkChar*> s_extensions {
-			VK_KHR_SWAPCHAIN_EXTENSION_NAME
+			vk::KHRSwapchainExtensionName,
+			vk::KHRSpirv14ExtensionName,
+			vk::KHRSynchronization2ExtensionName,
+			vk::KHRCreateRenderpass2ExtensionName,
+			vk::KHRDynamicRenderingExtensionName,
+			vk::KHRShaderDrawParametersExtensionName,
+
+			// Debug
+			vk::EXTHostQueryResetExtensionName,
+			vk::EXTCalibratedTimestampsExtensionName
 		};
 
 		#pragma endregion

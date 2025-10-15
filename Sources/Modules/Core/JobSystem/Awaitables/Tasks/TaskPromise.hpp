@@ -1,8 +1,7 @@
 #pragma once
 
 #include "JobSystem/Concepts/CQueueHandle.hpp"
-#include "JobSystem/Awaitables/Awaitable.hpp"
-#include "../../Concepts/CTaskResult.hpp"
+#include "JobSystem/Concepts/CTaskResult.hpp"
 #include "JobSystem/Awaitables/Primitives/ManualResetEvent.hpp"
 
 #include "Debug/Trace.hpp"

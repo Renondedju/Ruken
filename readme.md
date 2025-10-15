@@ -1,10 +1,9 @@
 # Ruken
  
 Ruken a is fully asynchronous, data oriented Vulkan based game engine. Link to the latest release [here](https://github.com/Renondedju/Ruken/releases).
+This is a toy project meant for experimentation.
 
-## Main Features 
-
-This project is meant for experimentation
+## Main Features
 
 ### Executive System
 

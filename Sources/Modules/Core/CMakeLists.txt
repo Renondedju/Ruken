@@ -10,8 +10,10 @@ set(TRACY_NO_FRAME_IMAGE ON)
 set(TRACY_NO_SAMPLING    ON)
 set(TRACY_NO_VERIFY      ON)
 
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.2.zip"      NAME tracy)
-CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
+# "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.2.zip"
+# Using a commit right after 0.12.2 to get TracyVkCollectHost. Master would require us to recompile the server.
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/7f6efe3bd4a06d6e460465c6f0f47f32df25685d.zip" NAME tracy)
+CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip"                   NAME atomic_queue)
 
 # atomic_queue has no CMake support and is a header only library
 if (atomic_queue_ADDED)
@@ -35,6 +37,7 @@ target_sources(RkCore PUBLIC
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
     JobSystem/Awaitables/Primitives/CountDownLatch.hpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.hpp
+    JobSystem/Awaitables/Primitives/Mutex.hpp
     JobSystem/Awaitables/Tasks/DynamicTask.hpp
     JobSystem/Awaitables/Tasks/Task.hpp
     JobSystem/Awaitables/Tasks/TaskPromise.hpp
@@ -46,6 +49,7 @@ target_sources(RkCore PUBLIC
     JobSystem/JobSystem.hpp
     JobSystem/Concurrency.hpp
     JobSystem/WorkerInfo.hpp
+    JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp
     Debug/Exception.hpp
     Service.hpp
     ServiceLoader.hpp
@@ -193,6 +197,7 @@ target_sources(RkCore PUBLIC
     JobSystem/Awaitables/Primitives/SharedMutex.hpp
     JobSystem/Awaitables/Primitives/SharedMutex.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.inl
+    JobSystem/Awaitables/Primitives/Mutex.inl
     JobSystem/Concepts/CTaskResult.hpp
     Debug/Logging/Handlers/DebugHandler.hpp
     Debug/Logging/Logger.inl
@@ -226,6 +231,7 @@ target_sources(RkCore PRIVATE
     JobSystem/Awaitables/Awaiter.cpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.cpp
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.cpp
+    JobSystem/Executors/SingleThreadSingleQueueExecutor.cpp
     Debug/Logging/Handlers/DebugHandler.cpp
     Service.cpp
     Containers/BinaryTreePath.cpp

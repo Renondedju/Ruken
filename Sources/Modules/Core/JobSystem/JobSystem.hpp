@@ -33,10 +33,12 @@ struct JobSystem final : Service
      * @param in_provider Parent service provider.
      * @param in_queues Registered queues.
      * @param in_bias_function Worker bias evaluation function. Called every time the size of the worker pool changes.
+     * @param in_worker_count Amount of workers to spawn.
      */
     explicit JobSystem(ServiceProvider&  in_provider,
 	    std::initializer_list<JobQueue*> in_queues,
-	    EvaluateWorkerBias			     in_bias_function) noexcept;
+	    EvaluateWorkerBias			     in_bias_function,
+	    RkSize							 in_worker_count = std::thread::hardware_concurrency() - 1UZ) noexcept;
 
      JobSystem			 (JobSystem const&) = delete;
      JobSystem			 (JobSystem&&)      = delete;

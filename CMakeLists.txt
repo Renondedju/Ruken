@@ -4,7 +4,10 @@ cmake_minimum_required(VERSION 3.28)
 set(CMAKE_CXX_STANDARD 23)
 
 # --- Project setup
-project(Ruken)
+project(Ruken
+    DESCRIPTION  "Ruken is a data-oriented Vulkan based game engine."
+    HOMEPAGE_URL "https://github.com/Renondedju/Ruken"
+)
 
 macro(set_bool var)
     if(${ARGN})
@@ -14,10 +17,15 @@ macro(set_bool var)
     endif()
 endmacro()
 
+# --- Values & options
+
+set     (RUKEN_EXECUTABLE_NAME       Ruken)
 set     (RUKEN_DEBUG_BUILD_TYPES     Debug RelWithDebInfo)
 set_bool(RUKEN_BUILD_HAS_DEBUG_INFO  ${CMAKE_BUILD_TYPE} IN_LIST RUKEN_DEBUG_BUILD_TYPES)
+set     (RUKEN_BINARY_DIR            ${CMAKE_BINARY_DIR})
 set     (RUKEN_GENERATED_SOURCES_DIR ${CMAKE_BINARY_DIR}/Generated)
 set     (RUKEN_SOURCES_DIR           ${CMAKE_CURRENT_LIST_DIR}/Sources)
+set     (RUKEN_CMAKE_DIR             ${RUKEN_SOURCES_DIR}/CMake)
 set     (RUKEN_MODULES_DIR           ${RUKEN_SOURCES_DIR}/Modules)
 set     (RUKEN_CORE_DIR              ${RUKEN_MODULES_DIR}/Core)
 
@@ -44,14 +52,14 @@ file(LOCK ${CPM_SOURCE_CACHE} DIRECTORY GUARD FILE RELEASE)
 get_property(RUKEN_MODULES_LIB GLOBAL PROPERTY RUKEN_MODULES_LIB)
 
 # --- Executable
-
 add_compile_definitions(UNICODE _UNICODE)
-add_executable(Ruken
-    Sources/App/Main.cpp
-    Sources/App/Test.hpp
+add_executable(${RUKEN_EXECUTABLE_NAME}
+        Sources/App/Main.cpp
+        Sources/App/Test.hpp
+        Sources/App/Rendering.hpp
+        Sources/App/Queues.hpp
 )
 
-target_compile_definitions(Ruken PRIVATE RUKEN_PROJECT_NAME="Ruken")
-target_include_directories(Ruken PRIVATE ${RUKEN_MODULES_DIR} ${RUKEN_GENERATED_SOURCES_DIR})
-
-target_link_libraries(Ruken ${RUKEN_MODULES_LIB})
+target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")
+target_include_directories(${RUKEN_EXECUTABLE_NAME} PRIVATE ${RUKEN_MODULES_DIR} ${RUKEN_GENERATED_SOURCES_DIR})
+target_link_libraries     (${RUKEN_EXECUTABLE_NAME} ${RUKEN_MODULES_LIB})

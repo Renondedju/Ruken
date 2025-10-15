@@ -11,7 +11,7 @@ BEGIN_RUKEN_NAMESPACE
 
 struct Service;
 
-/// @brief Locates and provides services.
+/// @brief Locates and provides services using a tree-like structure.
 class ServiceProvider
 {
     #pragma region Members
@@ -58,7 +58,7 @@ class ServiceProvider
          * @return Located service, could be null if the service is unavailable or unprovided.
          */
         template <typename TService>
-        [[nodiscard]] TService* LocateService() noexcept;
+        [[nodiscard]] TService* LocateService() const noexcept;
 
 	    /**
 	     * Similar to LocateService() but only checks in parent providers.
@@ -66,7 +66,7 @@ class ServiceProvider
 		 * @return Located service, could be null if the service is unavailable or unprovided.
 	     */
 	    template <typename TService>
-		[[nodiscard]] TService* LocateServiceParent() noexcept;
+		[[nodiscard]] TService* LocateServiceParent() const noexcept;
 
 		/// @brief Returns the parent locator
 		[[nodiscard]] ServiceProvider* GetParent() const noexcept;

@@ -17,10 +17,10 @@ struct Exception
 	const std::source_location source_location;
 
 	/**
-	 * @brief Default constructor
-	 * @param in_what Reason of the exception
-	 * @param in_stacktrace The stacktrace of the code that created this exception
-	 * @param in_source_location The source location of the code that created this exception
+	 * @brief Default constructor.
+	 * @param in_what Reason of the exception.
+	 * @param in_stacktrace The stacktrace of the code that created this exception.
+	 * @param in_source_location The source location of the code that created this exception.
 	 */
 	explicit Exception(std::string&&			   in_what,
 	                   std::stacktrace		const& in_stacktrace	  = std::stacktrace::current(),
@@ -62,6 +62,9 @@ struct std::formatter<RUKEN_NAMESPACE::Exception>: std::formatter<std::string>
 };
 
 /*
+ * I had some fun trying to implement a python like format for exceptions.
+ * It is super slow and would only really be appropriate for a console logger
+
 template <>
 struct std::formatter<RUKEN_NAMESPACE::Exception>: std::formatter<std::string>
 {

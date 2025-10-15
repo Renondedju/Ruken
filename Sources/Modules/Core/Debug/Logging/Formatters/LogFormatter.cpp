@@ -12,7 +12,6 @@ std::string LogFormatter::ComputeLabel(LogRecord const& in_record) const noexcep
         case ELogLevel::Info:    return "[Info]   ";
         case ELogLevel::Warning: return "[Warning]";
         case ELogLevel::Error:   return "[Error]  ";
-        case ELogLevel::Fatal:   return "[Fatal]  ";
     }
 
     return "";

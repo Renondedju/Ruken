@@ -21,7 +21,7 @@ TService* ServiceProvider::ProvideService(TArgs&&... in_args)
 }
 
 template <typename TService>
-TService* ServiceProvider::LocateService() noexcept
+TService* ServiceProvider::LocateService() const noexcept
 {
     // Locating the service
     auto const it = m_services.find(typeid(TService));
@@ -35,7 +35,7 @@ TService* ServiceProvider::LocateService() noexcept
 }
 
 template<typename TService>
-TService* ServiceProvider::LocateServiceParent() noexcept
+TService* ServiceProvider::LocateServiceParent() const noexcept
 {
     return m_parent ? m_parent->LocateService<TService>() : nullptr;
 }

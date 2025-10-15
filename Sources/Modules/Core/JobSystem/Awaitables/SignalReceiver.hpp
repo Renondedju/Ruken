@@ -25,7 +25,7 @@ struct SignalReceiver
 		}}
 	{}
 
-	SignalReceiver()			  			 = default;
+	SignalReceiver()			  					 = default;
 	SignalReceiver(const SignalReceiver&) 			 = default;
 	SignalReceiver(SignalReceiver&&     ) 			 = default;
 	SignalReceiver& operator=(const SignalReceiver&) = default;

@@ -8,7 +8,7 @@ enum class EAccessType: RkUint64
 { Read = 0, Write = 1 };
 
 /**
- * The SharedMutex class is a synchronization primitive that can be used to protect shared data
+ * The shared mutual exclusion structure is a synchronization primitive that can be used to protect shared data
  * from being simultaneously accessed by multiple threads. A SharedMutex has two levels of access:
  *   • shared    (ReadAccess)  - several threads can share ownership of the same mutex.
  *   • exclusive (WriteAccess) - only one thread can own the mutex.
@@ -39,13 +39,13 @@ struct SharedMutex
 
 	struct WriteAccess
 	{
-		explicit WriteAccess()						= default;
+		explicit WriteAccess()			   = default;
 		explicit WriteAccess(SharedMutex&) noexcept;
-		 WriteAccess(WriteAccess const&)   noexcept = delete;
+		 WriteAccess(WriteAccess const&)   = delete;
 		 WriteAccess(WriteAccess&&     )   noexcept;
 		~WriteAccess()		  			   noexcept;
 
-		WriteAccess& operator=(WriteAccess const&) noexcept = delete;
+		WriteAccess& operator=(WriteAccess const&) = delete;
 		WriteAccess& operator=(WriteAccess&&     ) noexcept;
 		TData&       operator*()                   noexcept;
 

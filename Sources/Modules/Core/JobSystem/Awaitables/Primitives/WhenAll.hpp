@@ -1,16 +1,22 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Primitives/CountDownLatch.hpp"
+#include <latch>
+
+#include "Core/JobSystem/Awaitables/Primitives/CountDownLatch.hpp"
+#include "Core/JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "Core/JobSystem/Concepts/CAwaitable.hpp"
 
 #include <utility>
+#include <ranges>
 
 BEGIN_RUKEN_NAMESPACE
+
+template <typename TAwaitable> using AwaiterType = decltype(std::declval<TAwaitable>().operator co_await());
+template <typename TAwaiter>   using ResumeType  = decltype(std::declval<TAwaiter  >().await_resume		());
 
 template <typename TAwaitable>
 struct WhenAll: CountDownLatch
 {
-	using TAwaiter = decltype(std::declval<TAwaitable>().operator co_await());
-
 	explicit WhenAll(std::vector<TAwaitable> const& in_awaitables) noexcept:
 		CountDownLatch {in_awaitables.size()},
 		m_awaiters     {in_awaitables.size()}
@@ -33,16 +39,21 @@ struct WhenAll: CountDownLatch
 
 	private:
 
-		std::vector<TAwaiter> m_awaiters;
+		std::vector<AwaiterType<TAwaitable>> m_awaiters;
 };
 
 template <typename... TAwaitables>
 auto WhenAllVariadic(TAwaitables const&... in_awaitables) ->
-	DynamicTask<std::tuple<decltype(std::declval<decltype(std::declval<TAwaitables>().operator co_await())>().await_resume())...>>
+	DynamicTask<     // Runs on the same queue as the caller
+		std::tuple< // And returns a tuple of all the result types of the passed awaitables
+			ResumeType<AwaiterType<TAwaitables>>...
+		>
+	>
 {
-	CountDownLatch															 latch    {sizeof...(TAwaitables)};
-	std::tuple<decltype(std::declval<TAwaitables>().operator co_await())...> awaiters {};
+	CountDownLatch							latch    {sizeof...(TAwaitables)};
+	std::tuple<AwaiterType<TAwaitables>...> awaiters {};
 
+	// co_await compiler transform
 	[&]<auto... Is>(std::index_sequence<Is...>)
 	{
 		([&](auto& in_awaiter, auto const& in_awaitable)
@@ -61,8 +72,9 @@ auto WhenAllVariadic(TAwaitables const&... in_awaitables) ->
 
 	co_await latch;
 
+	// Gathering results
 	co_return std::apply([&] <typename... TAwaiter> (TAwaiter&... in_awaiters) {
-		return std::tuple(std::forward<decltype(std::declval<TAwaiter>().await_resume())>(in_awaiters.await_resume())...);
+		return std::tuple(std::forward<ResumeType<TAwaiter>>(in_awaiters.await_resume())...);
 	}, awaiters);
 }
 

@@ -2,6 +2,7 @@
 
 #include "Core/Service.hpp"
 #include "Core/Meta/Meta.hpp"
+#include "Core/Debug/Exception.hpp"
 #include "Core/Debug/Logging/Filters/LogFilter.hpp"
 #include "Core/Debug/Logging/Handlers/LogHandler.hpp"
 
@@ -9,6 +10,7 @@
 #include <string_view>
 #include <forward_list>
 #include <tracy/Tracy.hpp>
+
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -32,7 +34,7 @@ class Logger final: public Service
     public:
 
         // Static name of the service, used by the kernel to report service errors
-        constexpr static const RkChar*   service_name = RUKEN_STRING(Logger);
+        constexpr static const RkChar* service_name = RUKEN_STRING(Logger);
 
         #pragma region Lifetime
 
@@ -56,12 +58,12 @@ class Logger final: public Service
 	     * @param in_format_string Format string.
 	     * @param in_args Format arguments.
 	     */
-	    template <typename... TArgs> RkVoid Log    (std::string_view in_service_name, ELogLevel in_level, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
-		template <typename... TArgs> RkVoid Debug  (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
-		template <typename... TArgs> RkVoid Info   (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
-		template <typename... TArgs> RkVoid Warning(std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
-		template <typename... TArgs> RkVoid Error  (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
-		template <typename... TArgs> RkVoid Fatal  (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
+	    template <typename... TArgs> RkVoid Log      (std::string_view in_service_name, ELogLevel in_level, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
+		template <typename... TArgs> RkVoid Debug    (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
+		template <typename... TArgs> RkVoid Info     (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
+		template <typename... TArgs> RkVoid Warning  (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
+		template <typename... TArgs> RkVoid Error    (std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
+	    template <typename... TArgs> RkVoid Exception(std::string_view in_service_name, std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept;
 
         /// @brief Adds the specified filter to this logger.
         RkVoid AddFilter(LogFilter const* in_filter) noexcept;

@@ -3,6 +3,11 @@
 #include "JobSystem/Awaitables/Tasks/TaskPromise.hpp"
 
 BEGIN_RUKEN_NAMESPACE
+template<CQueueHandle TQueueHandle, CTaskResult TResult>
+RkBool Task<TQueueHandle, TResult>::Done() const noexcept
+{
+	return m_coroutine_handle.done();
+}
 
 template<CQueueHandle TQueueHandle, CTaskResult TResult>
 auto Task<TQueueHandle, TResult>::operator co_await() const noexcept

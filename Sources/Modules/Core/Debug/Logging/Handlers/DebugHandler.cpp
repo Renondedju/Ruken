@@ -20,7 +20,6 @@ RkVoid DebugHandler::Handle([[maybe_unused]] LogRecord&& in_record) noexcept
 			color = 0xFFFFFF; break;
 		case ELogLevel::Warning: // Gold
 			color = 0xFFD700; break;
-		case ELogLevel::Fatal:
 		case ELogLevel::Error: // Red
 			color = 0xFF0000; break;
 	}

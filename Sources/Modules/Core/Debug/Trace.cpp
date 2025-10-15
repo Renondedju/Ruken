@@ -77,9 +77,7 @@ TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location,
 
 RkVoid TracyUtilities::TracyZoneEnd(TracyCZoneCtx const& out_context) noexcept
 {
-#ifdef TRACY_ENABLE
     TracyCZoneEnd(out_context);
-#endif
 }
 
 #ifdef TRACY_ENABLE

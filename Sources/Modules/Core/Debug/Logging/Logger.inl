@@ -13,6 +13,7 @@ RkVoid Logger::Log(
 		.level			  = in_level,
 		.service_provider = m_service_provider.GetName(),
 		.service_name	  = in_service_name,
+		.exception_ptr    = nullptr,
 		.message		  = std::format(in_format_string, std::forward<TArgs>(in_args)...)
 	});
 }
@@ -50,11 +51,19 @@ RkVoid Logger::Error(
 }
 
 template<typename ... TArgs>
-RkVoid Logger::Fatal(
-	std::string_view in_service_name,
+RkVoid Logger::Exception(
+	std::string_view   const in_service_name,
 	std::format_string<TArgs...> in_format_string, TArgs&&... in_args) const noexcept
 {
-	Log(in_service_name, ELogLevel::Fatal, in_format_string, std::forward<TArgs>(in_args)...);
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_LOGGER_ZONES));
+
+	Dispatch(LogRecord {
+		.level			  = ELogLevel::Error,
+		.service_provider = m_service_provider.GetName(),
+		.service_name	  = in_service_name,
+		.exception_ptr    = std::current_exception(),
+		.message		  = std::format(in_format_string, std::forward<TArgs>(in_args)...)
+	});
 }
 
 END_RUKEN_NAMESPACE

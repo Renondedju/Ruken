@@ -14,7 +14,7 @@ struct File
 {
 	#pragma region Members
 
-	const FilePath Path;
+	const FilePath path;
 
 	#pragma endregion
 
@@ -25,7 +25,7 @@ struct File
 	 * @param in_path Path of the file.
 	 */
 	explicit File(FilePath const& in_path) noexcept:
-		Path {in_path}
+		path {in_path}
 	{}
 
 	File           (File const& in_copy) = default;
@@ -61,7 +61,7 @@ struct File
 	 * @param in_size Number of bytes to write.
 	 * @return Number of bytes actually written.
 	 */
-	virtual IOTask<RkSize> Write(RkVoid* in_source, FileCursor in_start_position, RkSize in_size) = 0;
+	virtual IOTask<RkSize> Write(RkVoid const* in_source, FileCursor in_start_position, RkSize in_size) = 0;
 
 	#pragma endregion
 };
