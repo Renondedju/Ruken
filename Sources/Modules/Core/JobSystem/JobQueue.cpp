@@ -51,6 +51,8 @@ RkVoid JobQueue::TryConsumeJob(RkUint32 const in_max_attempts) noexcept
 
 RkVoid JobQueue::OnRegister(WorkerRequestTree& in_request_tree, BinaryTreePath const& in_request_location) noexcept
 {
+    RUKEN_ASSERT(m_request_tree == nullptr, "Job queues cannot be registered in more than one job system");
+
     m_request_tree     = &in_request_tree;
     m_request_location = in_request_location;
 }
@@ -100,25 +102,9 @@ RkVoid JobQueue::RunMultiple(std::stop_token const&)
     if (!TryConsumeWorkerRequest(concurrency))
         return;
 
-    //
-
-    // do
-    // {
-        //// Inner loop consumes jobs and checks if the queue still needs us.
-        //while (concurrency.ComputeRequest(-1) > 0 && !in_stop_token.stop_requested())
-        //{
-            // Consuming a maximum of 10 jobs before checking if we are still needed
-            for (int tasks = 0; tasks < 100; tasks++)
-                TryConsumeJob(50);
-
-            // Checking if the queue still needs us
-            // concurrency.packed_value = m_concurrency.load(std::memory_order_acquire);
-        //}
-
-    // The outer loop makes sure only one thread exits the queue at the same time to avoid overshooting requests.
-    // } while(!m_concurrency.compare_exchange_weak(concurrency,
-    //     concurrency - s_one_current_concurrency, std::memory_order_acq_rel)
-    // );
+    // Consuming a maximum of 100 jobs before checking if we are still needed
+    for (int tasks = 0; tasks < 100; tasks++)
+        TryConsumeJob(50);
 
     concurrency.packed_value = m_concurrency.fetch_sub(s_one_current_concurrency, std::memory_order_acq_rel) - s_one_current_concurrency;
 

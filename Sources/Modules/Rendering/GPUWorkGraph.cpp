@@ -36,16 +36,18 @@ DynamicTask<> GPUWorkGraph::Submit(
 	for (GPUWorkNode const& work_node : m_instructions)
 	{
 		// Image barriers
-		for (GPUImageAccess const& access : work_node.image_accesses)
+		for (GPUImageAccess const& access : work_node.image_accesses) {
 			if (auto& last {last_image_access [access.image]};  last != access) {
 				PipelineBarrier(buffer, last, access); last = access;
 			}
+		}
 
 		// Buffer barriers
-		for (GPUBufferAccess const& access : work_node.buffer_accesses)
+		for (GPUBufferAccess const& access : work_node.buffer_accesses) {
 			if (auto& last {last_buffer_access[access.buffer]}; last != access) {
 				PipelineBarrier(buffer, last, access); last = access;
 			}
+		}
 
 		work_node.record_callback.Record(buffer);
 	}
@@ -54,7 +56,7 @@ DynamicTask<> GPUWorkGraph::Submit(
 
 	// --- Submit time
 	GPUFence fence {m_owner.GetDevice(), vk::FenceCreateInfo {
-		.flags = {}//vk::FenceCreateFlagBits::eSignaled
+		.flags = {}
 	}};
 
 	static constexpr vk::PipelineStageFlags bottom {vk::PipelineStageFlagBits::eColorAttachmentOutput};

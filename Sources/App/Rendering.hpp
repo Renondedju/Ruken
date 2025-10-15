@@ -10,6 +10,8 @@
 #include "Rendering/Windowing/Window.hpp"
 #include "Rendering/Resources/GPUSwapchain.hpp"
 
+#include "Queues.hpp"
+
 USING_RUKEN_NAMESPACE
 
 struct SwapchainImage
@@ -71,7 +73,6 @@ struct PaintTriangle
 			.pColorAttachments    = &attachment_info
 		});
 
-		// Actual coroutine code
 		in_commands.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
 		in_commands.setViewport (0, viewport);
 		in_commands.setScissor  (0, vk::Rect2D(vk::Offset2D(0, 0), extent));
@@ -118,7 +119,7 @@ struct TestWindowRenderer
 	 * Renders a frame to a swapchain image.
 	 * @return Async dynamic task.
 	 */
-	DynamicTask<> RenderFrame() const noexcept
+	Task<ProcessingQueue> RenderFrame() const noexcept
 	{
 		// --- 1. Pre-configuration
 		auto		 		const& pipeline_ptr      {pipeline.Current()};

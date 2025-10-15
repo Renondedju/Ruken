@@ -35,21 +35,20 @@ RkVoid JobSystem::EvaluateWorkerBiases() noexcept
 JobSystem::JobSystem(
         ServiceProvider&                       in_provider,
         std::initializer_list<JobQueue*> const in_queues,
-        EvaluateWorkerBias               const in_bias_function) noexcept:
+        EvaluateWorkerBias               const in_bias_function,
+        RkSize                                 in_worker_count) noexcept:
     Service         {in_provider, typeid(JobSystem)},
     m_queues        {in_queues},
     m_bias_function {in_bias_function},
     m_request_tree  {in_queues.size()}
 {
-    RkSize const concurrency {std::thread::hardware_concurrency() - 1};
-
     m_service_provider.LocateService<Logger>()->Info(service_name,
-        "Starting job system with {} worker(s) and {} queue(s) (excluding the main thread)", concurrency, m_queues.size());
+        "Starting job system with {} worker(s) and {} queue(s)", in_worker_count, m_queues.size());
 
     // Registering queues
     for (auto&& [index, queue]: std::views::enumerate(m_queues))
     {
-        queue->SetMaximumConcurrency(std::thread::hardware_concurrency());
+        queue->SetMaximumConcurrency(in_worker_count);
         queue->OnRegister(m_request_tree, BinaryTreePath {
             .path      = static_cast<RkUint64>(index),
             .depth     = m_request_tree.tree.max_depth,
@@ -58,12 +57,15 @@ JobSystem::JobSystem(
     }
 
     // Starting workers
-    m_workers.reserve(concurrency);
-    for (RkSize index = 0ULL; index < concurrency; ++index)
-        m_workers.emplace_back(
-            std::bind_front(&JobSystem::CallerAsWorker, this),
-            std::move      ("CPU " + std::to_string(index))
-        );
+    if (in_worker_count > 0UZ)
+    {
+        m_workers.reserve(in_worker_count);
+        for (RkSize index = 0ULL; index < in_worker_count; ++index)
+            m_workers.emplace_back(
+                std::bind_front(&JobSystem::CallerAsWorker, this),
+                std::move      ("CPU " + std::to_string(index))
+            );
+    }
 }
 
 JobSystem::~JobSystem()

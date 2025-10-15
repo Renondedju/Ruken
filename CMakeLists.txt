@@ -57,6 +57,7 @@ add_executable(${RUKEN_EXECUTABLE_NAME}
         Sources/App/Main.cpp
         Sources/App/Test.hpp
         Sources/App/Rendering.hpp
+        Sources/App/Queues.hpp
 )
 
 target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")

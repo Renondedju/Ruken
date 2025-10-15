@@ -9,7 +9,7 @@ struct BinaryTreePath
 {
     RkUint64 path      {};   // Binary path of the node. bit 0 = left child, bit 1 = right child
     RkUint64 depth     {};  // Depth of the path.
-    RkUint64 max_depth {}; // Max depth of the
+    RkUint64 max_depth {}; // Max depth of the path.
 
     /**
       * Computes the amount of nodes required to store a tree of depth TDepth,

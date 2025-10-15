@@ -71,7 +71,7 @@ struct Recordable
 
 private:
 
-	RkVoid* m_instance_ptr										   {};
+	RkVoid* m_instance_ptr										         {};
 	RkVoid(*m_record_operation)(RkVoid*, vk::raii::CommandBuffer const&) {};
 };
 

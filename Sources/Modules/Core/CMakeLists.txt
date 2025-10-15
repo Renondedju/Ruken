@@ -49,6 +49,7 @@ target_sources(RkCore PUBLIC
     JobSystem/JobSystem.hpp
     JobSystem/Concurrency.hpp
     JobSystem/WorkerInfo.hpp
+    JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp
     Debug/Exception.hpp
     Service.hpp
     ServiceLoader.hpp
@@ -230,6 +231,7 @@ target_sources(RkCore PRIVATE
     JobSystem/Awaitables/Awaiter.cpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.cpp
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.cpp
+    JobSystem/Executors/SingleThreadSingleQueueExecutor.cpp
     Debug/Logging/Handlers/DebugHandler.cpp
     Service.cpp
     Containers/BinaryTreePath.cpp

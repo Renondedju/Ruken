@@ -3,6 +3,7 @@
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/WhenAll.hpp"
+#include "Core/JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp"
 
 #include "Core/Debug/Logging/Logger.hpp"
 #include "Core/Debug/Logging/Handlers/DebugHandler.hpp"
@@ -23,8 +24,7 @@
 #include "Rendering/ShaderModule.hpp"
 #include "Rendering/SpirvLoader.hpp"
 
-struct MainQueue       : QueueHandle<MainQueue      , 64  >{};
-struct ProcessingQueue : QueueHandle<ProcessingQueue, 2048>{};
+#include "Queues.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -48,7 +48,7 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
             .path     = "slang.spv",
         })};
 
-        Window window {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
+        Window window  {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
         TestWindowRenderer const test_window_renderer {
             .owner    = *render_device,
             .window   = window,
@@ -83,33 +83,32 @@ int main([[maybe_unused]] int   in_arg_count,
          [[maybe_unused]] char* in_arg_values[])
 {
     // 1. --- Pre-initialization & Configuration ---
-    ConsoleHandler console_handler {};
-    DebugHandler   debug_handler   {};
+    SingleThreadSingleQueueExecutor main_executor   {MainQueue::instance};
+    ConsoleHandler                  console_handler {};
+    DebugHandler                    debug_handler   {};
 
     std::initializer_list<LogHandler*> handlers { &console_handler, &debug_handler };
-    std::initializer_list              queues   { &MainQueue::instance, &IOJobQueue::instance };
+    std::initializer_list              queues   { &ProcessingQueue::instance, &IOJobQueue::instance };
 
-    auto worker_bias_function = [](RkUint64 const _, RkUint64 const in_current, JobSystem& __) {
+    auto worker_bias_function = [](RkUint64 const, RkUint64 const in_current, JobSystem&) {
         return BinaryTreePath {
             .path  = in_current < 3ULL ? 0b1ULL : 0b0ULL,
             .depth = 1
         }; // The first 3 threads will prioritize the IO queue.
     };
 
-    JobSystem::worker_info.current_queue = &MainQueue::GetInstance();
-
     std::vector<const RkChar*> vulkan_layers     {};
     std::vector<const RkChar*> vulkan_extensions {};
 
     // 2. --- Initializing services and core systems ---
-    ServiceProvider    services   {"Application"};
-    Logger*            logger     {services.ProvideService<Logger>(handlers)};
-    JobSystem*         job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
-    StdFilesystem*     filesystem {services.ProvideService<StdFilesystem>("../Assets")};
-    VulkanInstance*    vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
-    RenderDevice*      renderer   {services.ProvideService<RenderDevice>()};
-    AssetImporter*     importer   {services.ProvideService<AssetImporter>()};
-    ResourceManager*   resources  {services.ProvideService<ResourceManager>()};
+    ServiceProvider   services {"Application"};
+    auto* logger     {services.ProvideService<Logger>(handlers)};
+    auto* job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
+    auto* filesystem {services.ProvideService<StdFilesystem>("../Assets")};
+    auto* vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
+    auto* renderer   {services.ProvideService<RenderDevice>()};
+    auto* importer   {services.ProvideService<AssetImporter>()};
+    auto* resources  {services.ProvideService<ResourceManager>()};
 
     importer ->ProvideImporter<SlangImporter>(); // TODO: Not used or working yet. Slang API is whack.
     resources->ProvideLoader  <SpirvLoader>  ();
@@ -119,7 +118,7 @@ int main([[maybe_unused]] int   in_arg_count,
     AsyncMain(stop_source, services);
 
     // ... and waiting for it to complete as a worker.
-    job_system->CallerAsWorker(stop_source.get_token(), "CPU Main");
+    main_executor.CallerAsWorker(stop_source.get_token(), "CPU Main");
 
     return EXIT_SUCCESS;
 }
