@@ -15,9 +15,22 @@ enum class EAccessType: RkUint64
  *
  * @tparam TData Data type to be protected
  */
-template <std::default_initializable TData>
+template <typename TData>
 struct SharedMutex
 {
+	#pragma region Lifetime
+
+	/// @brief Forwards all passed arguments to TData(TArgs...)
+	template <typename... TArgs> requires std::constructible_from<TData, TArgs...>
+	explicit SharedMutex(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TData, TArgs...>);
+	SharedMutex			  (const SharedMutex&) = default;
+	SharedMutex			  (SharedMutex&&)      = default;
+	SharedMutex& operator=(const SharedMutex&) = default;
+	SharedMutex& operator=(SharedMutex&&)	   = default;
+	~SharedMutex()							   = default;
+
+	#pragma endregion
+
 	#pragma region Access
 
 	struct ReadAccess
@@ -31,6 +44,7 @@ struct SharedMutex
 		ReadAccess&  operator=(ReadAccess const&) noexcept;
 		ReadAccess&  operator=(ReadAccess&&     ) noexcept;
 		TData const& operator*()		    const noexcept;
+		TData const* operator->()		    const noexcept;
 
 	protected:
 
@@ -48,6 +62,7 @@ struct SharedMutex
 		WriteAccess& operator=(WriteAccess const&) = delete;
 		WriteAccess& operator=(WriteAccess&&     ) noexcept;
 		TData&       operator*()                   noexcept;
+		TData*		 operator->()		           noexcept;
 
 	protected:
 
