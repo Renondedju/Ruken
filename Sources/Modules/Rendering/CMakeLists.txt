@@ -30,6 +30,7 @@ target_sources(RkRendering PUBLIC
         SlangImporter.hpp
         SpirvLoader.hpp
         GPUFence.hpp
+        FamilyView.hpp
         GPUWorkGraph.hpp
         Coroutines/GPUTask.hpp
         Coroutines/GPUPromise.hpp

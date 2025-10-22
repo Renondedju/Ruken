@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Build/Namespace.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 template <typename TType>

@@ -10,6 +10,7 @@ BEGIN_RUKEN_NAMESPACE
 template <typename TAwaitable> using AwaiterType = decltype(std::declval<TAwaitable>().operator co_await());
 template <typename TAwaiter>   using ResumeType  = decltype(std::declval<TAwaiter  >().await_resume		());
 
+// TODO: implement a "sync" coroutine type that executes in place to ease implementation of these primitives.
 template <typename TAwaitable>
 struct SyncWait
 {

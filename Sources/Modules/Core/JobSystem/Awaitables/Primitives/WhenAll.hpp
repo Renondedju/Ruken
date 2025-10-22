@@ -1,7 +1,5 @@
 #pragma once
 
-#include <latch>
-
 #include "Core/JobSystem/Awaitables/Primitives/CountDownLatch.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/DynamicTask.hpp"
 #include "Core/JobSystem/Concepts/CAwaitable.hpp"
