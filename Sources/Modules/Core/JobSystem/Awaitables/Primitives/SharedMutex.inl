@@ -3,6 +3,8 @@
 #include "Core/Meta/Safety.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
+#include <atomic_queue/atomic_queue.h>
+
 BEGIN_RUKEN_NAMESPACE
 
 template<typename TData>

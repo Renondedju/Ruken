@@ -32,9 +32,6 @@ target_sources(RkRendering PUBLIC
         GPUFence.hpp
         FamilyView.hpp
         GPUWorkGraph.hpp
-        Coroutines/GPUTask.hpp
-        Coroutines/GPUPromise.hpp
-        Coroutines/GPUPromise.inl
         Coroutines/TracyVkUtilities.hpp
         Windowing/Window.hpp
         Resources/GPUSwapchain.hpp
@@ -51,8 +48,6 @@ target_sources(RkRendering PRIVATE
         ShaderModule.cpp
         GPUFence.cpp
         GPUWorkGraph.cpp
-        Coroutines/GPUTask.cpp
-        Coroutines/GPUPromise.cpp
         Coroutines/TracyVkUtilities.cpp
         Windowing/Window.cpp
         Resources/GPUSwapchain.cpp

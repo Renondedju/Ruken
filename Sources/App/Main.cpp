@@ -98,7 +98,10 @@ int main([[maybe_unused]] int   in_arg_count,
     };
 
     std::vector<const RkChar*> vulkan_layers     {};
-    std::vector<const RkChar*> vulkan_extensions {};
+    std::vector<const RkChar*> vulkan_extensions {
+        vk::KHRGetSurfaceCapabilities2ExtensionName,
+        vk::EXTSurfaceMaintenance1ExtensionName
+    };
 
     // 2. --- Initializing services and core systems ---
     ServiceProvider   services {"Application"};

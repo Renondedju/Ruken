@@ -65,13 +65,13 @@ struct RenderDevice final : Service
 		vk::raii::Device		 m_device;
 		std::string 			 m_name;
 
-		static inline std::vector s_extensions {
-			vk::KHRSwapchainExtensionName,
+		static inline std::vector<char const*> s_extensions {
+			vk::KHRSwapchainExtensionName,				// Presentation capability
+			vk::EXTSwapchainMaintenance1ExtensionName, // Allows to wait for presentation to end before deleting synchro
+
 			vk::KHRSpirv14ExtensionName,
 			vk::KHRSynchronization2ExtensionName,
-			vk::KHRCreateRenderpass2ExtensionName,
 			vk::KHRDynamicRenderingExtensionName,
-			vk::KHRShaderDrawParametersExtensionName,
 
 			// Debug
 			vk::EXTHostQueryResetExtensionName,

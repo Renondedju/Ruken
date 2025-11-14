@@ -7,7 +7,6 @@
 #include <vulkan/vulkan_raii.hpp>
 #include <tracy/TracyVulkan.hpp>
 
-#include "Coroutines/GPUPromise.hpp"
 #include "Debug/Logging/Logger.hpp"
 #include "JobSystem/SyncWait.hpp"
 #include "JobSystem/Awaitables/Primitives/SharedMutex.hpp"
@@ -27,6 +26,7 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 			vk::PhysicalDeviceFeatures2,
 			vk::PhysicalDeviceVulkan11Features,
 			vk::PhysicalDeviceVulkan13Features,
+			vk::PhysicalDeviceSwapchainMaintenance1FeaturesEXT,
 			// Debug
 			vk::PhysicalDeviceHostQueryResetFeatures
 		>()};
@@ -130,7 +130,7 @@ RkVoid RenderDevice::InitTracyVkContext() noexcept
 		m_tracy_context = TracyVkContextHostCalibrated(*m_instance->instance, *m_physical_device, *m_device,
 		                                               m_instance->instance.getDispatcher()->vkGetInstanceProcAddr,
 		                                               m_device			.getDispatcher()->vkGetDeviceProcAddr
-		)
+		);
 
 		TracyVkContextName(m_tracy_context, m_name.data(), m_name.size())
 	}

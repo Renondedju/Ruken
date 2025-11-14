@@ -1,7 +1,8 @@
 #pragma once
+
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include "Resources/ResourceData.hpp"
 
@@ -23,37 +24,85 @@ struct SwapchainImage
 	vk::Image     image;
 };
 
-/**
- * A render node, describes accesses and actual vulkan commands to execute.
- */
-struct PaintTriangle
+struct PreparePresentation final : GPUWorkNode
 {
+	explicit PreparePresentation(vk::Image const in_presentation_image) noexcept:
+		GPUWorkNode {
+			vk::QueueFlagBits::eGraphics, {
+				GPUImageAccess {
+					.image             = in_presentation_image,
+					.layout            = vk::ImageLayout::ePresentSrcKHR,
+					.stages            = vk::PipelineStageFlagBits2::eBottomOfPipe,
+					.access_flags      = {},
+					.subresource_range = {
+						.aspectMask     = vk::ImageAspectFlagBits::eColor,
+						.baseMipLevel   = 0,
+						.levelCount     = 1,
+						.baseArrayLayer = 0,
+						.layerCount     = 1
+					},
+				}
+			}, {}
+		}
+	{}
+
+	RkVoid Record(vk::raii::CommandBuffer const& in_command_buffer) override
+	{
+		// Presentation is not a command
+	}
+};
+
+/// @brief Draws a simple triangle to the screen
+struct PaintTriangle final : GPUWorkNode
+{
+	#pragma region Lifetime
+
+	PaintTriangle(
+		vk::ImageView const  in_view,
+		vk::Image	  const  in_image,
+		vk::Pipeline  const  in_pipeline,
+		vk::Viewport  const& in_viewport,
+		vk::Extent2D  const  in_extent
+	) noexcept:
+		GPUWorkNode {
+			vk::QueueFlagBits::eGraphics, {
+			GPUImageAccess {
+				.image             = in_image,
+				.layout            = vk::ImageLayout		   ::eColorAttachmentOptimal,
+				.stages            = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+				.access_flags      = vk::AccessFlagBits2       ::eColorAttachmentWrite,
+				.subresource_range = {
+					.aspectMask     = vk::ImageAspectFlagBits::eColor,
+					.baseMipLevel   = 0,
+					.levelCount     = 1,
+					.baseArrayLayer = 0,
+					.layerCount     = 1
+				}
+			}}, {}
+		},
+		view        {in_view},
+		image       {in_image},
+		pipeline    {in_pipeline},
+		viewport    {in_viewport},
+		extent      {in_extent}
+	{}
+
+	PaintTriangle(const PaintTriangle&) 		   = default;
+	PaintTriangle(PaintTriangle&&     ) 		   = default;
+	PaintTriangle& operator=(const PaintTriangle&) = delete;
+	PaintTriangle& operator=(PaintTriangle&&     ) = delete;
+	~PaintTriangle() override					   = default;
+
+	#pragma endregion
+
 	vk::ImageView view;
 	vk::Image	  image;
 	vk::Pipeline  pipeline;
 	vk::Viewport  viewport;
 	vk::Extent2D  extent;
 
-	/// @brief List of accesses. Needed for synchronisation.
-	std::vector<GPUBufferAccess> buffer_accesses {};
-	std::vector<GPUImageAccess > image_accesses  {
-		GPUImageAccess {
-			.image             = image,
-			.layout            = vk::ImageLayout		   ::eColorAttachmentOptimal,
-			.stages            = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-			.access_flags      = vk::AccessFlagBits2       ::eColorAttachmentWrite,
-			.subresource_range = {
-				.aspectMask     = vk::ImageAspectFlagBits::eColor,
-				.baseMipLevel   = 0,
-				.levelCount     = 1,
-				.baseArrayLayer = 0,
-				.layerCount     = 1
-			}
-		}
-	};
-
 	/// @brief Actual record command.
-	RkVoid Record(vk::raii::CommandBuffer const& in_commands) const
+	RkVoid Record(vk::raii::CommandBuffer const& in_commands) override
 	{
 		vk::RenderingAttachmentInfo const attachment_info {
 			.imageView   = view,
@@ -78,31 +127,6 @@ struct PaintTriangle
 		in_commands.setScissor  (0, vk::Rect2D(vk::Offset2D(0, 0), extent));
 		in_commands.draw        (3, 1, 0, 0);
 		in_commands.endRendering();
-
-		vk::ImageMemoryBarrier2 const barrier2 {
-			.srcStageMask   = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-			.srcAccessMask  = vk::AccessFlagBits2       ::eColorAttachmentWrite,
-			.dstStageMask   = vk::PipelineStageFlagBits2::eBottomOfPipe,
-			.dstAccessMask  = {},
-			.oldLayout      = vk::ImageLayout::eColorAttachmentOptimal,
-			.newLayout      = vk::ImageLayout::ePresentSrcKHR,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image               = image,
-			.subresourceRange    = {
-				.aspectMask     = vk::ImageAspectFlagBits::eColor,
-				.baseMipLevel   = 0,
-				.levelCount     = 1,
-				.baseArrayLayer = 0,
-				.layerCount     = 1
-			}
-		};
-
-		in_commands.pipelineBarrier2(vk::DependencyInfo {
-			.dependencyFlags         = {},
-			.imageMemoryBarrierCount = 1,
-			.pImageMemoryBarriers    = &barrier2
-		});
 	}
 };
 
@@ -142,33 +166,47 @@ struct TestWindowRenderer
 			.image = swapchain_ptr->swapchain.getImages()[image_index]
 		};
 
-		PaintTriangle painter {
-			.view     = swapchain_image.view,
-			.image    = swapchain_image.image,
-			.pipeline = pipeline_ptr->pipeline,
-			.viewport = viewport,
-			.extent   = extent,
-		};
-
 		// TODO: Ideally all the synchro should be contained in the program
 		GPUWorkGraph work_graph {owner};
-		work_graph.AddPass(GPUWorkNode {
-			.record_callback = Recordable(painter),
-			.image_accesses  = painter.image_accesses,
-			.buffer_accesses = painter.buffer_accesses
-		});
+
+		PaintTriangle draw_triangle {
+			swapchain_image.view,
+			swapchain_image.image,
+			pipeline_ptr->pipeline,
+			viewport,
+			extent,
+		};
+		PreparePresentation presentation {
+			swapchain_image.image
+		};
+
+		work_graph.AddWorkNode(draw_triangle);
+		work_graph.AddWorkNode(presentation);
 
 		// --- 3. Waiting for execution to keep resources alive during execution.
 		co_await work_graph.Submit(*acquire_semaphore, swapchain_ptr->present_semaphores[image_index]);
 
-		std::ignore = owner.GetQueue().presentKHR(vk::PresentInfoKHR {
-			.waitSemaphoreCount = 1,
-			.pWaitSemaphores    = &*swapchain_ptr->present_semaphores[image_index],
-			.swapchainCount     = 1,
-			.pSwapchains        = &*swapchain_ptr->swapchain,
-			.pImageIndices      = &image_index,
-			.pResults           = nullptr
-		});
+		GPUFence present_fence {owner.GetDevice(), vk::FenceCreateInfo()};
+
+		vk::StructureChain present_chain {
+			vk::PresentInfoKHR {
+				.waitSemaphoreCount = 1,
+				.pWaitSemaphores    = &*swapchain_ptr->present_semaphores[image_index],
+				.swapchainCount     = 1,
+				.pSwapchains        = &*swapchain_ptr->swapchain,
+				.pImageIndices      = &image_index,
+				.pResults           = nullptr
+			},
+			vk::SwapchainPresentFenceInfoEXT {
+				.swapchainCount = 1,
+				.pFences		= &*present_fence.fence
+			}
+		};
+
+		auto graphics_queue {co_await owner.FindQueueFamily(vk::QueueFlagBits::eGraphics)->AsyncWrite()};
+		std::ignore = graphics_queue->queue->presentKHR(present_chain.get<>());
+
+		present_fence.WaitSynchronously();
 
 		co_return;
 	};
