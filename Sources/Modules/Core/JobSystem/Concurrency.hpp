@@ -16,16 +16,17 @@ BEGIN_RUKEN_NAMESPACE
  */
 struct alignas(std::hardware_destructive_interference_size) Concurrency
 {
+	struct Fields
+	{
+		RkSize maximum   : 16 {255};
+		RkSize current   : 16 {0};
+		RkSize requested : 16 {0};
+		RkSize optimal   : 16 {0};
+	};
+
 	union
 	{
-		struct Fields
-		{
-			RkSize maximum   : 16 {255};
-			RkSize current   : 16 {0};
-			RkSize requested : 16 {0};
-			RkSize optimal   : 16 {0};
-		} fields {};
-
+		Fields fields {};
 		RkSize packed_value;
 	};
 

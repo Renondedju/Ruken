@@ -18,8 +18,6 @@ VulkanInstance::VulkanInstance(
 	std::vector<const RkChar*> in_extensions):
 	Service    {in_parent, typeid(VulkanInstance)},
 	app_info   { // TODO: Extend the ProjectInfo class with versions
-		.sType 				= vk::StructureType::eApplicationInfo,
-		.pNext 				= nullptr,
 		.pApplicationName   = ProjectInfo::ProjectName,
 		.applicationVersion = 0u,
 		.pEngineName   		= ProjectInfo::EngineName,
@@ -88,9 +86,6 @@ vk::InstanceCreateInfo VulkanInstance::MakeInstanceCreateInfo(
 	ValidateExtensions(in_extensions);
 
 	return vk::InstanceCreateInfo {
-		.sType = vk::StructureType::eInstanceCreateInfo,
-		.pNext = nullptr,
-		.flags = {},
 		.pApplicationInfo        = &app_info,
 		.enabledLayerCount       = static_cast<uint32_t>(in_layers.size()),
 		.ppEnabledLayerNames     = in_layers.data(),
@@ -130,10 +125,10 @@ RkVoid VulkanInstance::ValidateExtensions(std::vector<const RkChar*> const& in_e
 }
 
 VkBool32 VulkanInstance::DebugCallback(
-	VkDebugUtilsMessageSeverityFlagBitsEXT const in_message_severity,
-	VkDebugUtilsMessageTypeFlagsEXT		 	     in_message_type,
-	const VkDebugUtilsMessengerCallbackDataEXT*  in_callback_data,
-	void*										 in_user_data) noexcept
+					 VkDebugUtilsMessageSeverityFlagBitsEXT const in_message_severity,
+	[[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT		 	  in_message_type,
+					 const VkDebugUtilsMessengerCallbackDataEXT*  in_callback_data,
+					 void*										  in_user_data) noexcept
 {
 	Logger const* logger {static_cast<Logger*>(in_user_data)};
 

@@ -57,9 +57,10 @@ using RkByte = char;
 using RkFloat   = float;
 using RkDouble  = double;
 using RkLdouble = long double;
-using RkULLInt = unsigned long long int;
+using RkULLInt  = unsigned long long int;
 
 // Others
-using RkVoid = void;
+using RkErrno = int;
+using RkVoid  = void;
 
 END_RUKEN_NAMESPACE

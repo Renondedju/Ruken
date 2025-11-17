@@ -3,6 +3,7 @@
 #include "Build/Namespace.hpp"
 
 #include <string>
+#include <utility>
 
 BEGIN_RUKEN_NAMESPACE
 

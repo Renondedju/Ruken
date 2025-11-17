@@ -86,7 +86,7 @@ IOTask<RkVoid> SlangImporter::Import(ImportContext& in_context) noexcept
 	std::vector<slang::IComponentType*> component_types(entry_point_count + 1ULL, nullptr);
 
 	component_types[entry_points.size()] = module;
-	for (std::size_t entry_point {}; entry_point < entry_point_count; entry_point++)
+	for (SlangInt32 entry_point {}; entry_point < entry_point_count; entry_point++)
 	{
 		log_or_throw(SLANG_SUCCEEDED(
 			module->getDefinedEntryPoint(entry_point, &entry_points[entry_point]))

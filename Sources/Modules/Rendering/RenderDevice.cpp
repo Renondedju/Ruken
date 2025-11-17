@@ -96,7 +96,7 @@ SharedMutex<FamilyView>* RenderDevice::FindQueueFamily(vk::QueueFlags const in_q
 
 		// Score evaluation
 		if (RkUint32 const score = std::popcount(static_cast<VkFlags>(property.queueFlags)); score < best.second)
-			best = {index, score};
+			best = {static_cast<RkUint32>(index), score};
 	}
 
 	// --- 2. Throws exception or returning the best match.
@@ -132,7 +132,7 @@ RkVoid RenderDevice::InitTracyVkContext() noexcept
 		                                               m_device			.getDispatcher()->vkGetDeviceProcAddr
 		);
 
-		TracyVkContextName(m_tracy_context, m_name.data(), m_name.size())
+		TracyVkContextName(m_tracy_context, m_name.data(), static_cast<uint16_t>(m_name.size()))
 	}
 	else if (Logger const* logger {m_service_provider.LocateService<Logger>()})
 		logger->Warning(service_name, "GPU tracing is unavailable for device named {}", m_name.data());

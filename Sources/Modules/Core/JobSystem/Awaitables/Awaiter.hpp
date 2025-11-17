@@ -22,9 +22,9 @@ using AwaiterList = std::atomic<Awaiter*>;
  */
 struct Awaiter
 {
-	static inline auto const locked   {reinterpret_cast<Awaiter* const>(0x1)};
-	static inline auto const consumed {reinterpret_cast<Awaiter* const>(0x2)};
-	static inline auto const detached {reinterpret_cast<Awaiter* const>(0x3)};
+	static inline auto const locked   {reinterpret_cast<Awaiter*>(0x1)};
+	static inline auto const consumed {reinterpret_cast<Awaiter*>(0x2)};
+	static inline auto const detached {reinterpret_cast<Awaiter*>(0x3)};
 
 	AwaiterList*   head   {nullptr};   ///< Reference to the head of the list
 	AwaiterList    next   {detached}; ///< Next awaiter in the list

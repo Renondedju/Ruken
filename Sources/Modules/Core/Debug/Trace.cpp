@@ -7,9 +7,9 @@
 USING_RUKEN_NAMESPACE
 
 ___tracy_source_location_data* TracyUtilities::GetOrInsertSourceLocationData(
-    std::source_location const& in_source_location,
-    const    char*              in_name,
-    uint32_t const              in_color) noexcept
+    [[maybe_unused]] std::source_location const& in_source_location,
+    [[maybe_unused]] const    char*              in_name,
+    [[maybe_unused]] uint32_t const              in_color) noexcept
 {
 #ifdef TRACY_ENABLE
     {
@@ -31,7 +31,9 @@ ___tracy_source_location_data* TracyUtilities::GetOrInsertSourceLocationData(
 #endif
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(___tracy_source_location_data* in_source_data, bool in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(
+    [[maybe_unused]] ___tracy_source_location_data* in_source_data,
+    [[maybe_unused]] bool                           in_active) noexcept
 {
     TracyCZoneCtx ctx {};
 
@@ -75,7 +77,8 @@ TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location,
         GetOrInsertSourceLocationData(in_source_location, in_name.data(), in_color), in_active);
 }
 
-RkVoid TracyUtilities::TracyZoneEnd(TracyCZoneCtx const& out_context) noexcept
+RkVoid TracyUtilities::TracyZoneEnd(
+    [[maybe_unused]] TracyCZoneCtx const& out_context) noexcept
 {
     TracyCZoneEnd(out_context);
 }

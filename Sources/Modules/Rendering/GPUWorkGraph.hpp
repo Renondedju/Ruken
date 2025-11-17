@@ -115,7 +115,7 @@ struct GPUWorkNode
 	#pragma region Methods
 
 	/// @brief Records a list of commands to be executed from the passed command buffer.
-	virtual RkVoid Record(vk::raii::CommandBuffer const& in_command_buffer) {};
+	virtual RkVoid Record(vk::raii::CommandBuffer const&) {}
 
 	#pragma endregion
 };

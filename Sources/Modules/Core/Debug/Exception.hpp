@@ -7,6 +7,8 @@
 #include <stacktrace>
 #include <source_location>
 
+#include "Types/FundamentalTypes.hpp"
+
 BEGIN_RUKEN_NAMESPACE
 
 /// @brief The base exception
@@ -36,7 +38,7 @@ struct ErrnoException: Exception
 	 * @param in_stacktrace The stacktrace of the code that created this exception
 	 * @param in_source_location The source location of the code that created this exception
 	 */
-	explicit ErrnoException(errno_t				        in_error_number,
+	explicit ErrnoException(RkErrno				        in_error_number,
 	                        std::stacktrace		 const& in_stacktrace	   = std::stacktrace::current(),
 	                        std::source_location const& in_source_location = std::source_location::current());
 
@@ -45,7 +47,7 @@ struct ErrnoException: Exception
 	 * @param in_error_number Error number.
 	 * @return Error string.
 	 */
-	static std::string GetErrorString(errno_t in_error_number) noexcept;
+	static std::string GetErrorString(RkErrno in_error_number) noexcept;
 };
 
 END_RUKEN_NAMESPACE

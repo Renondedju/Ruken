@@ -4,9 +4,9 @@
 USING_RUKEN_NAMESPACE
 
 tracy::SourceLocationData* TracyVkUtilities::GetOrInsertSourceLocationData(
-	std::source_location const& in_source_location,
-	const    char*              in_name,
-	uint32_t const              in_color) noexcept
+	[[maybe_unused]] std::source_location const& in_source_location,
+	[[maybe_unused]] const    char*              in_name,
+	[[maybe_unused]] uint32_t const              in_color) noexcept
 {
 #ifdef TRACY_ENABLE
 	{
@@ -81,10 +81,10 @@ std::unique_ptr<tracy::VkCtxScope> TracyVkUtilities::TracyVulkanZone(
 }
 
 std::unique_ptr<tracy::VkCtxScope> TracyVkUtilities::TracyVulkanZone(
-	TracyVkCtx        		  const  in_context,
-	vk::CommandBuffer 		  const  in_command_buffer,
-	tracy::SourceLocationData const* in_source_data,
-	bool					  const  in_active) noexcept
+	[[maybe_unused]] TracyVkCtx        		   const  in_context,
+	[[maybe_unused]] vk::CommandBuffer 		   const  in_command_buffer,
+	[[maybe_unused]] tracy::SourceLocationData const* in_source_data,
+	[[maybe_unused]] bool					   const  in_active) noexcept
 {
 #ifdef TRACY_ENABLE
 	return std::make_unique<tracy::VkCtxScope>(in_context, in_source_data, in_command_buffer, TRACY_CALLSTACK, in_active);

@@ -1,19 +1,21 @@
 #pragma once
 
-#include "Build/BuildInfo.hpp"
 #include "Core/Build/Namespace.hpp"
 #include "Core/Debug/SourceLocation.hpp"
 #include "Core/Types/FundamentalTypes.hpp"
 
+#include <string_view>
 #include <vulkan/vulkan.hpp>
 #include <tracy/TracyVulkan.hpp>
-#include <string_view>
 
 #ifdef RUKEN_TRACE_BUILD
 
 #include <unordered_map>
 #include <shared_mutex>
 
+#else
+	namespace tracy
+	{ using SourceLocationData = void; }
 #endif
 
 BEGIN_RUKEN_NAMESPACE

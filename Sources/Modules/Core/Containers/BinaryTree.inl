@@ -2,6 +2,8 @@
 
 #include "Core/Containers/BinaryTree.hpp"
 
+#include <cmath>
+
 BEGIN_RUKEN_NAMESPACE
 
 template<typename TData>

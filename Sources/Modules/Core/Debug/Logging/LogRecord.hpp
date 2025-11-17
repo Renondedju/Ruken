@@ -3,6 +3,7 @@
 #include "Core/Debug/Logging/LogLevel.hpp"
 
 #include <string_view>
+#include <exception>
 #include <string>
 
 BEGIN_RUKEN_NAMESPACE

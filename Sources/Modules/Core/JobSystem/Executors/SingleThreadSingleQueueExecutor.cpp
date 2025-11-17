@@ -37,7 +37,7 @@ RkVoid SingleThreadSingleQueueExecutor::CallerAsWorker(
 			m_queue.RunMultiple(in_stop_token);
 		}
 		catch (std::exception& in_exception) {
-			const char* what {in_exception.what()};
+			[[maybe_unused]] const char* what {in_exception.what()};
 			TracyMessageC(what, strlen(what), 0xFF0000);
 		}
 	}

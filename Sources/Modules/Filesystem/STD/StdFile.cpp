@@ -2,13 +2,14 @@
 #include "Filesystem/STD/StdFile.hpp"
 #include "Filesystem/STD/StdFilesystem.hpp"
 
-#include "Utility/WindowsOS.hpp"
+#include <utility>
 
 USING_RUKEN_NAMESPACE
 
 StdFile::StdFile(FilePath const& in_path, std::filesystem::path const& in_os_path):
 	File {in_path}
 {
+	// TODO: Use fstream instead
 	auto file_path = in_os_path.generic_string();
 	file_handle    = std::fopen(file_path.c_str(), "ab+");
 
@@ -23,7 +24,7 @@ StdFile::~StdFile() noexcept
 
 IOTask<RkSize> StdFile::Read(RkVoid* in_destination, FileCursor const in_start_position, RkSize const in_size) const
 {
-	std::fseek(file_handle, in_start_position.offset, GetOrigin(in_start_position.position));
+	std::fseek(file_handle, static_cast<long>(in_start_position.offset), GetOrigin(in_start_position.position));
 	std::size_t bytes_read {std::fread(in_destination, sizeof(RkByte), in_size, file_handle)};
 
 	// TODO: Check if ferror and errno could catch an error from another thread.
@@ -35,7 +36,7 @@ IOTask<RkSize> StdFile::Read(RkVoid* in_destination, FileCursor const in_start_p
 
 IOTask<RkSize> StdFile::Write(RkVoid const* in_source, FileCursor const in_start_position, RkSize const in_size)
 {
-	std::fseek(file_handle, in_start_position.offset, GetOrigin(in_start_position.position));
+	std::fseek(file_handle, static_cast<long>(in_start_position.offset), GetOrigin(in_start_position.position));
 	std::size_t bytes_written {std::fwrite(in_source, sizeof(RkByte), in_size, file_handle)};
 
 	// TODO: Check if ferror and errno could catch an error from another thread.

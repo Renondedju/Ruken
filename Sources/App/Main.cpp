@@ -1,4 +1,3 @@
-#include "Rendering.hpp"
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
 #include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
@@ -24,6 +23,7 @@
 #include "Rendering/ShaderModule.hpp"
 #include "Rendering/SpirvLoader.hpp"
 
+#include "Rendering.hpp"
 #include "Queues.hpp"
 
 USING_RUKEN_NAMESPACE

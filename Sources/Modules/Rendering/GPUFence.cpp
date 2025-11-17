@@ -18,7 +18,7 @@ DynamicTask<> GPUFence::CheckFenceStatus(/*std::stop_token		in_stop_token,*/
 	vk::Result const status {in_fence.getStatus()};
 
 	if (status == vk::Result::eSuccess)
-		auto _ = in_event.SignalConsume(); // Signaling awaiters
+		in_event.SignalConsume(); // Signaling awaiters
 
 	if (status == vk::Result::eNotReady)
 		CheckFenceStatus(in_fence, in_event);  // Try again later ...
