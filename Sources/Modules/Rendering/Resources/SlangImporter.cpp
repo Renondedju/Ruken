@@ -1,5 +1,5 @@
-#include "Rendering/SlangImporter.hpp"
-#include "Rendering/ShaderModule.hpp"
+#include "Rendering/Resources/SlangImporter.hpp"
+#include "Rendering/Resources/ShaderModule.hpp"
 
 #include "Filesystem/Filesystem.hpp"
 #include "Core/Debug/Logging/Logger.hpp"

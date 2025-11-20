@@ -41,7 +41,7 @@ struct VulkanInstance final: Service
 	vk::raii::Context    	 context {};
 	vk::ApplicationInfo		 app_info;
 	vk::raii::Instance   	 instance;
-	VkDebugUtilsMessengerEXT debug_utils_messenger;
+	VkDebugUtilsMessengerEXT debug_utils_messenger {nullptr};
 
 	private:
 

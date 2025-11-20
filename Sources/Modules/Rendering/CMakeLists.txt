@@ -26,33 +26,37 @@ target_copy_slang_binaries(RkRendering ${RUKEN_BINARY_DIR})
 target_sources(RkRendering PUBLIC
         FILE_SET HEADERS FILES
         RenderDevice.hpp
-        ShaderModule.hpp
-        SlangImporter.hpp
-        SpirvLoader.hpp
         GPUFence.hpp
         FamilyView.hpp
-        GPUWorkGraph.hpp
-        Coroutines/TracyVkUtilities.hpp
-        Windowing/Window.hpp
+        Resources/ShaderModule.hpp
+        Resources/SlangImporter.hpp
+        Resources/SpirvLoader.hpp
         Resources/GPUSwapchain.hpp
         Resources/GPUBuffer.hpp
         Resources/GPUImage.hpp
+        WorkGraph/GPUWorkGraph.hpp
+        WorkGraph/GPUBufferAccess.hpp
+        WorkGraph/GPUImageAccess.hpp
+        WorkGraph/GPUWorkNode.hpp
+        WorkGraph/Recordable.hpp
+        Coroutines/TracyVkUtilities.hpp
+        Windowing/Window.hpp
         Vulkan/VulkanInstance.hpp
         Vulkan/VulkanLoaderInstance.hpp
 )
 
 target_sources(RkRendering PRIVATE
         RenderDevice.cpp
-        SlangImporter.cpp
-        SpirvLoader.cpp
-        ShaderModule.cpp
         GPUFence.cpp
-        GPUWorkGraph.cpp
-        Coroutines/TracyVkUtilities.cpp
-        Windowing/Window.cpp
+        Resources/SlangImporter.cpp
+        Resources/SpirvLoader.cpp
+        Resources/ShaderModule.cpp
         Resources/GPUSwapchain.cpp
         Resources/GPUBuffer.cpp
         Resources/GPUImage.cpp
+        WorkGraph/GPUWorkGraph.cpp
+        Coroutines/TracyVkUtilities.cpp
+        Windowing/Window.cpp
         Vulkan/VulkanInstance.cpp
         Vulkan/VulkanLoaderInstance.cpp
 )

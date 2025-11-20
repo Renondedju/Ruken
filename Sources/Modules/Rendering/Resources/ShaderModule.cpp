@@ -1,4 +1,4 @@
-#include "Rendering/ShaderModule.hpp"
+#include "ShaderModule.hpp"
 
 USING_RUKEN_NAMESPACE
 

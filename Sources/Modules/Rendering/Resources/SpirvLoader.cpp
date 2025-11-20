@@ -1,5 +1,5 @@
-#include "Rendering/SpirvLoader.hpp"
-#include "Rendering/ShaderModule.hpp"
+#include "Rendering/Resources/SpirvLoader.hpp"
+#include "Rendering/Resources/ShaderModule.hpp"
 
 USING_RUKEN_NAMESPACE
 

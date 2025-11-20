@@ -16,12 +16,12 @@
 #include "Resources/Assets/AssetImporter.hpp"
 #include "Resources/ResourceManager.hpp"
 
+#include "Rendering/RenderDevice.hpp"
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 #include "Rendering/Windowing/Window.hpp"
-#include "Rendering/SlangImporter.hpp"
-#include "Rendering/RenderDevice.hpp"
-#include "Rendering/ShaderModule.hpp"
-#include "Rendering/SpirvLoader.hpp"
+#include "Rendering/Resources/SlangImporter.hpp"
+#include "Rendering/Resources/ShaderModule.hpp"
+#include "Rendering/Resources/SpirvLoader.hpp"
 
 #include "Rendering.hpp"
 #include "Queues.hpp"

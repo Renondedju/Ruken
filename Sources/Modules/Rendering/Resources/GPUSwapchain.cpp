@@ -31,13 +31,5 @@ GPUSwapchainData::GPUSwapchainData(vk::raii::Device const& in_device, vk::Swapch
 		}
 
 		return views;
-	}()},
-	present_semaphores {[&] {
-		std::vector<vk::raii::Semaphore> semaphores {};
-
-		for (auto const _ : swapchain.getImages())
-			semaphores.emplace_back(in_device, vk::SemaphoreCreateInfo { .flags = {}});
-
-		return semaphores;
 	}()}
 {}

@@ -1,4 +1,4 @@
-#include "Rendering/GPUWorkGraph.hpp"
+#include "GPUWorkGraph.hpp"
 
 #include <map>
 #include <ranges>

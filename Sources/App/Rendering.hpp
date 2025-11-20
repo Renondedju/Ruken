@@ -6,8 +6,8 @@
 
 #include "Resources/ResourceData.hpp"
 
-#include "Rendering/GPUWorkGraph.hpp"
-#include "Rendering/ShaderModule.hpp"
+#include "../Modules/Rendering/WorkGraph/GPUWorkGraph.hpp"
+#include "../Modules/Rendering/Resources/ShaderModule.hpp"
 #include "Rendering/Windowing/Window.hpp"
 #include "Rendering/Resources/GPUSwapchain.hpp"
 
@@ -149,6 +149,7 @@ struct TestWindowRenderer
 		auto		 		const& pipeline_ptr      {pipeline.Current()};
 		auto         		const& swapchain_ptr     {window.GetSwapchain().Current()};
 		vk::raii::Semaphore const  acquire_semaphore {owner.GetDevice(), vk::SemaphoreCreateInfo()};
+		vk::raii::Semaphore const  submit_semaphore  {owner.GetDevice(), vk::SemaphoreCreateInfo()};
 		vk::Extent2D	    const  extent            {window.GetExtent()};
 		vk::Viewport	    const  viewport          {
 			.x        = 0.0f, .y        = 0.0f,
@@ -184,14 +185,13 @@ struct TestWindowRenderer
 		work_graph.AddWorkNode(presentation);
 
 		// --- 3. Waiting for execution to keep resources alive during execution.
-		co_await work_graph.Submit(*acquire_semaphore, swapchain_ptr->present_semaphores[image_index]);
+		co_await work_graph.Submit(*acquire_semaphore, submit_semaphore);
 
-		GPUFence present_fence {owner.GetDevice(), vk::FenceCreateInfo()};
-
-		vk::StructureChain present_chain {
+		GPUFence		   present_fence   {owner.GetDevice(), vk::FenceCreateInfo()};
+		vk::StructureChain structure_chain {
 			vk::PresentInfoKHR {
 				.waitSemaphoreCount = 1,
-				.pWaitSemaphores    = &*swapchain_ptr->present_semaphores[image_index],
+				.pWaitSemaphores    = &*submit_semaphore,
 				.swapchainCount     = 1,
 				.pSwapchains        = &*swapchain_ptr->swapchain,
 				.pImageIndices      = &image_index,
@@ -204,7 +204,7 @@ struct TestWindowRenderer
 		};
 
 		auto graphics_queue {co_await owner.FindQueueFamily(vk::QueueFlagBits::eGraphics)->AsyncWrite()};
-		std::ignore = graphics_queue->queue->presentKHR(present_chain.get<>());
+		std::ignore = graphics_queue->queue->presentKHR(structure_chain.get<>());
 
 		present_fence.WaitSynchronously();
 
