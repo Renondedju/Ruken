@@ -39,7 +39,7 @@ BEGIN_RUKEN_NAMESPACE
  */
 template<RkSize TRows, RkSize TColumns>
 struct RUKEN_EMPTY_BASES Matrix:
-    MatrixAccess       ::Member<TRows, TColumns>,
+    MatrixAccess::Member<TRows, TColumns>,
     MatrixConversions   <TRows, TColumns>,
     //MatrixInversion     <TRows, TColumns>,
     MatrixMultiplication<TRows, TColumns>,
@@ -75,8 +75,10 @@ struct RUKEN_EMPTY_BASES Matrix:
     constexpr Matrix() noexcept:
         data {0.0F}
     {
-        for (RkSize index {0ULL}; index < std::min(TRows, TColumns); ++index)
-			data[index + index * TRows] = 1.0F;
+        // Init with identity if square matrix
+        if constexpr (TRows == TColumns)
+            for (RkSize index {0ULL}; index < TRows; ++index)
+			    data[index + index * TRows] = 1.0F;
     }
 
     /**
@@ -84,15 +86,14 @@ struct RUKEN_EMPTY_BASES Matrix:
      * \tparam TTypes Value types
      * \param in_values values
      */
-    template <typename... TTypes>
-    requires (sizeof...(TTypes) == TRows * TColumns)
-    constexpr Matrix(TTypes... in_values) noexcept
+    template <typename... TTypes> requires (sizeof...(TTypes) == TRows * TColumns)
+    explicit constexpr Matrix(TTypes... in_values) noexcept
     {
         RkFloat values[] { static_cast<RkFloat>(in_values)... };
 
-        for (RkSize row {0ULL}; row < TRows; ++row)
-            for (RkSize column {0ULL}; column < TColumns; ++column)
-                data[row + column * TRows] = values[TColumns * row + column];
+        for (RkSize column {0ULL}; column < TColumns; ++column)
+            for (RkSize row {0ULL}; row < TRows; ++row)
+                data[column + row * TColumns] = values[column + row * TColumns];
     }
 
     #pragma endregion

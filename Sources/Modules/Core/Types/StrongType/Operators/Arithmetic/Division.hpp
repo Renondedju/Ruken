@@ -42,7 +42,7 @@ struct Division
      * \return Reference to the instance
      */
     template <typename TStrongType>
-    constexpr TStrongType& operator/=(this TStrongType& in_lhs, typename TStrongType::TUnderlying const& in_rhs) noexcept
+    constexpr TStrongType& operator/=(this TStrongType& in_lhs, TStrongType::TUnderlying const& in_rhs) noexcept
     {
         in_lhs = in_lhs / in_rhs;
         return in_lhs;
@@ -59,7 +59,7 @@ struct Division
     template <typename TStrongType>
     constexpr TStrongType operator/(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
     {
-        using TBase = typename TStrongType::TUnderlying;
+        using TBase = TStrongType::TUnderlying;
 
         return TStrongType(static_cast<TBase>(in_lhs) / static_cast<TBase>(in_rhs));
     }
@@ -75,7 +75,7 @@ struct Division
      * \return Value of the new instance
      */
     template <typename TStrongType>
-    constexpr TStrongType operator/(this TStrongType const& in_lhs, typename TStrongType::TUnderlying const& in_rhs) noexcept
+    constexpr TStrongType operator/(this TStrongType const& in_lhs, TStrongType::TUnderlying const& in_rhs) noexcept
     requires TAllowUnderlyingCooperation
     {
         return in_lhs / TStrongType(in_rhs);

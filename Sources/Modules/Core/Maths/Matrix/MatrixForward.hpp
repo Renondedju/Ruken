@@ -7,9 +7,9 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Matrix forward declaration
- * \tparam TRows Height or number of rows of the matrix
- * \tparam TColumns Width or number of columns of the matrix
+ * @brief Matrix forward declaration
+ * @tparam TRows Height or number of rows of the matrix
+ * @tparam TColumns Width or number of columns of the matrix
  */
 template<RkSize TRows, RkSize TColumns>
 struct RUKEN_EMPTY_BASES Matrix;

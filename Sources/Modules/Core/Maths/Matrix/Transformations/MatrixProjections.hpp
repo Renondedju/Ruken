@@ -43,10 +43,10 @@ struct MatrixProjections<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumn
         RkFloat const scale = 1.0F / Tan(in_fov / 2.0F);
 
         return Matrix<4, 4> {
-            scale / in_aspect, 0.0F ,  0.0F,                                              0.0F,
-            0.0F,              scale,  0.0F,                                              0.0F,
-            0.0F,              0.0F ,  static_cast<RkFloat>(in_far / (in_near - in_far)), static_cast<RkFloat>(-(in_far * in_near) / (in_far - in_near)),
-            0.0F,              0.0F , -1.0F,                                              0.0F
+            scale / in_aspect, 0.0F ,  0.0F,                        0.0F,
+            0.0F,              scale,  0.0F,                        0.0F,
+            0.0F,              0.0F ,  in_far / (in_near - in_far), -(in_far * in_near) / (in_far - in_near),
+            0.0F,              0.0F ,  1.0F,                        0.0F
         };
     }
 
@@ -68,14 +68,24 @@ struct MatrixProjections<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumn
             Meters const in_bottom, Meters const in_top, 
             Meters const in_near  , Meters const in_far) noexcept
     {
-        return Matrix<4, 4> {
-            static_cast<RkFloat>(2.0F / (in_right - in_left)), 0.0F, 0.0F, 0.0F,
-            0.0F, static_cast<RkFloat>(2.0F / (in_bottom - in_top)), 0.0F, 0.0F,
-            0.0F, 0.0F, static_cast<RkFloat>(1.0F / (in_near - in_far)), 0.0F,
+        // https://www.kdab.com/projection-matrices-with-vulkan-part-1/
+        // https://www.kdab.com/projection-matrices-with-vulkan-part-2/
+        // Post view correction is used. This matrix is specific to vulkan.
+        auto const top {-in_top};
+        auto const bot {-in_bottom};
 
-            static_cast<RkFloat>(-(in_right + in_left) / (in_right - in_left)),
-            static_cast<RkFloat>(-(in_bottom + in_top) / (in_bottom - in_top)),
-            static_cast<RkFloat>(in_near / (in_near - in_far)),
+        auto const rl {in_right - in_left};
+        auto const bt {bot      - top };
+        auto const nf {in_near  - in_far };
+
+        return Matrix<4, 4> {
+            2.0_m / rl, 0.0F, 0.0F, 0.0F,
+            0.0F, 2.0_m / bt, 0.0F, 0.0F,
+            0.0F, 0.0F, 1.0_m / nf, 0.0F,
+
+            -(in_right  + in_left) / rl,
+            -(bot + top) / bt,
+            in_near              / nf,
             1.0F
         };
     }

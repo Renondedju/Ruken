@@ -39,7 +39,7 @@ struct Multiplication
      * \return Reference to the instance
      */
     template <typename TStrongType>
-    constexpr TStrongType& operator*=(this TStrongType& in_lhs, typename TStrongType::TUnderlying const& in_rhs) noexcept
+    constexpr TStrongType& operator*=(this TStrongType& in_lhs, TStrongType::TUnderlying const& in_rhs) noexcept
     {
         in_lhs = in_lhs * in_rhs;
         return in_lhs;
@@ -56,7 +56,7 @@ struct Multiplication
     template <typename TStrongType>
     constexpr TStrongType operator*(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
     {
-        using TBase = typename TStrongType::TUnderlying;
+        using TBase = TStrongType::TUnderlying;
 
         return TStrongType(static_cast<TBase>(in_lhs) * static_cast<TBase>(in_rhs));
     }
@@ -72,25 +72,10 @@ struct Multiplication
      * \return Value of the new instance
      */
     template <typename TStrongType>
-    constexpr TStrongType operator*(this TStrongType const& in_lhs, typename TStrongType::TUnderlying const& in_rhs) noexcept
+    constexpr TStrongType operator*(this TStrongType const& in_lhs, TStrongType::TUnderlying const& in_rhs) noexcept
     requires TAllowUnderlyingCooperation
     {
         return in_lhs * TStrongType(in_rhs);
-    }
-
-    /**
-     * \brief Multiplication operator
-     *
-     * \param in_lhs Left-hand side operand
-     * \param in_rhs Right-hand side operand
-     *
-     * \return Value of the new instance
-     */
-    template <typename TStrongType>
-    constexpr TStrongType operator*(this typename TStrongType::UnderlyingType const& in_lhs, TStrongType const& in_rhs) noexcept
-    requires TAllowUnderlyingCooperation
-    {
-        return TStrongType(in_lhs) * in_rhs;
     }
 };
 

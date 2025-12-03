@@ -23,7 +23,7 @@ struct Subtraction
     template <typename TStrongType>
     constexpr TStrongType& operator-=(this TStrongType& in_lhs, TStrongType const& in_rhs) noexcept
     {
-        in_lhs.m_value -= in_rhs.m_value;
+        in_lhs = in_lhs - in_rhs;
 
         return in_lhs;
     }
@@ -39,7 +39,9 @@ struct Subtraction
     template <typename TStrongType>
     constexpr TStrongType operator-(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
     {
-        return TStrongType(in_lhs.m_value - in_rhs.m_value);
+        using TBase = TStrongType::TUnderlying;
+
+        return TStrongType(static_cast<TBase>(in_lhs) - static_cast<TBase>(in_rhs));
     }
 };
 

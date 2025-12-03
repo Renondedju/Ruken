@@ -24,7 +24,7 @@ struct MatrixAccess
     [[nodiscard]]
     static constexpr RkFloat const& At(Matrix<TRows, TColumns> const& in_matrix, RkSize const in_row, RkSize const in_column) noexcept
     {
-        return in_matrix.data[in_row + in_column * TRows];
+        return in_matrix.data[in_column + in_row * TColumns];
     }
 
     /**
@@ -40,7 +40,7 @@ struct MatrixAccess
     [[nodiscard]]
     static constexpr RkFloat& At(Matrix<TRows, TColumns>& in_matrix, RkSize const in_row, RkSize const in_column) noexcept
     {
-        return in_matrix.data[in_row + in_column * TRows];
+        return in_matrix.data[in_column + in_row * TColumns];
     }
 
     #pragma endregion
