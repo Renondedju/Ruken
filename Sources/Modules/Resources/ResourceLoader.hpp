@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 #include "Resources/LoadContext.hpp"
 #include "Filesystem/IOJobQueue.hpp"
 
@@ -27,7 +27,7 @@ struct ResourceLoader
 	 * @param in_context Load context
 	 * @return Load task.
 	 */
-	virtual IOTask<ResourcePtr<>> Load(LoadContext const& in_context) const = 0;
+	virtual IOTask<ResourcePtr<>> Load(LoadContext&& in_context) const = 0;
 
 	/// @returns a list of the supported file extensions.
 	virtual std::vector<std::string_view> SupportedExtensions() const noexcept = 0;

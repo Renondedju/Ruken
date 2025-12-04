@@ -8,6 +8,8 @@
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 
 #include <string>
+#include <volk.h>
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_raii.hpp>
 #include <tracy/TracyVulkan.hpp>
@@ -42,6 +44,7 @@ struct RenderDevice final : Service
 	vk::raii::Instance&       GetInstance()  const noexcept;
 	vk::raii::PhysicalDevice& GetPhysicalDevice()  noexcept;
 	vk::raii::Device&		  GetDevice()		   noexcept;
+	VmaAllocator			  GetAllocator() const noexcept;
 	TracyVkCtx				  TracyContext() const noexcept;
 
 	/**
@@ -52,6 +55,14 @@ struct RenderDevice final : Service
 	 * @return Pointer to a mutex protecting a vulkan queue family.
 	 */
 	SharedMutex<FamilyView>* FindQueueFamily(vk::QueueFlags in_queue_flags);
+
+	/**
+	 * Attempts to find a suitable memory type.
+	 * @param in_type_filter Bitmask filter.
+	 * @param in_properties Required memory properties.
+	 * @return Memory type index.
+	 */
+	RkUint32 FindMemoryType(RkUint32 in_type_filter, vk::MemoryPropertyFlags in_properties) const;
 
 	#pragma endregion
 
@@ -64,6 +75,7 @@ struct RenderDevice final : Service
 		vk::raii::PhysicalDevice m_physical_device;
 		vk::raii::Device		 m_device;
 		std::string 			 m_name;
+		VmaAllocator			 m_allocator;
 
 		static inline std::vector<char const*> s_extensions {
 			vk::KHRSwapchainExtensionName,				// Presentation capability

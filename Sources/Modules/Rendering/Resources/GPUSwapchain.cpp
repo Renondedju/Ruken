@@ -3,7 +3,7 @@
 USING_RUKEN_NAMESPACE
 
 GPUSwapchainData::GPUSwapchainData(vk::raii::Device const& in_device, vk::SwapchainCreateInfoKHR const& in_swapchain_create_info):
-	ResourceData {},
+	IResourceData {},
 	swapchain    {in_device.createSwapchainKHR(in_swapchain_create_info)},
 	images_views {[&] { // -- Creating image views
 		std::vector<vk::raii::ImageView> views {};

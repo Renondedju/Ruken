@@ -30,19 +30,19 @@ concept is_functor=std::is_class_v<std::decay_t<Fun>>&& requires(Fun&& t){
 };
 
 template<is_functor T>
-auto Arguments(T&& t) -> typename Signature<decltype(&std::decay_t<T>::operator())>::type;
+auto Arguments(T&& t)      -> Signature<decltype(&std::decay_t<T>::operator())>::type;
 
 template<is_functor T>
-auto Arguments(const T& t) -> typename Signature<decltype(&std::decay_t<T>::operator())>::type;
+auto Arguments(const T& t) -> Signature<decltype(&std::decay_t<T>::operator())>::type;
 
 template<is_fun T>
-auto Arguments(T&& t) -> typename Signature<T>::type;
+auto Arguments(T&& t)      -> Signature<T>::type;
 
 template<is_fun T>
-auto Arguments(const T& t) -> typename Signature<T>::type;
+auto Arguments(const T& t) -> Signature<T>::type;
 
 template<is_mem_fun T>
-auto Arguments(T&& t) -> typename Signature<std::decay_t<T>>::type;
+auto Arguments(T&& t)      -> Signature<std::decay_t<T>>::type;
 
 template<is_mem_fun T>
-auto Arguments(const T& t) -> typename Signature<std::decay_t<T>>::type;
+auto Arguments(const T& t) -> Signature<std::decay_t<T>>::type;

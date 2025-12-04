@@ -1,23 +1,19 @@
 #include "Rendering/RenderDevice.hpp"
+
 #include "Core/ServiceProvider.hpp"
+#include "Core/Debug/Logging/Logger.hpp"
+#include "Core/JobSystem/SyncWait.hpp"
+#include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
-#include <thread>
 #include <ranges>
-#include <volk.h>
-#include <vulkan/vulkan_raii.hpp>
-#include <tracy/TracyVulkan.hpp>
-
-#include "Debug/Logging/Logger.hpp"
-#include "JobSystem/SyncWait.hpp"
-#include "JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 USING_RUKEN_NAMESPACE
 
 RenderDevice::RenderDevice(ServiceProvider& in_parent):
-	Service			     {in_parent, typeid(RenderDevice)},
-	m_instance           {in_parent.LocateService<VulkanInstance>()},
-	m_physical_device    {SelectPhysicalDevice()},
-	m_device             {[&] {
+	Service			  {in_parent, typeid(RenderDevice)},
+	m_instance        {in_parent.LocateService<VulkanInstance>()},
+	m_physical_device {SelectPhysicalDevice()},
+	m_device          {[&] {
 
 		// TODO: Feature sets (containing device features, extensions
 		//		 and ways to check for compatibility with a RenderDevice)
@@ -44,7 +40,25 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 			.pEnabledFeatures		 = nullptr // Deprecated
 		});
 	}()},
-	m_name		   {m_physical_device.getProperties2().properties.deviceName.data()},
+	m_name		{m_physical_device.getProperties2().properties.deviceName.data()},
+	m_allocator	{[&] {
+
+		VmaVulkanFunctions			 vulkanFunctions { };
+		VmaAllocatorCreateInfo const allocatorCreateInfo {
+			.flags			  = {},//VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT,
+			.physicalDevice   = *m_physical_device,
+			.device           = *m_device,
+			.pVulkanFunctions = &vulkanFunctions,
+			.instance         = *m_instance->instance,
+			.vulkanApiVersion = VK_API_VERSION_1_4,
+		};
+
+		VmaAllocator allocator;
+		vmaImportVulkanFunctionsFromVolk(&allocatorCreateInfo, &vulkanFunctions);
+		vmaCreateAllocator				(&allocatorCreateInfo, &allocator);
+
+		return allocator;
+	}()},
 	m_family_views {m_physical_device.getQueueFamilyProperties().size()}
 {
 	FetchQueues();
@@ -57,6 +71,8 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 RenderDevice::~RenderDevice()
 {
 	TracyVkDestroy(m_tracy_context);
+
+	vmaDestroyAllocator(m_allocator);
 }
 
 vk::raii::Instance& RenderDevice::GetInstance() const noexcept
@@ -72,6 +88,11 @@ vk::raii::PhysicalDevice& RenderDevice::GetPhysicalDevice() noexcept
 vk::raii::Device& RenderDevice::GetDevice() noexcept
 {
 	return m_device;
+}
+
+VmaAllocator RenderDevice::GetAllocator() const noexcept
+{
+	return m_allocator;
 }
 
 TracyVkCtx RenderDevice::TracyContext() const noexcept
@@ -104,6 +125,19 @@ SharedMutex<FamilyView>* RenderDevice::FindQueueFamily(vk::QueueFlags const in_q
 		return nullptr;
 
 	return &m_family_views[best.first];
+}
+
+RkUint32 RenderDevice::FindMemoryType(RkUint32 const in_type_filter, vk::MemoryPropertyFlags const in_properties) const
+{
+	auto const memory_properties {m_physical_device.getMemoryProperties()};
+
+	for (RkUint32 i {0U}; i < memory_properties.memoryTypeCount; i++)
+		if ((in_type_filter & 1 << i) && (memory_properties.memoryTypes[i].propertyFlags & in_properties) == in_properties)
+			return i;
+
+	throw Exception("Failed to find a compatible GPU memory type");
+
+	std::unreachable();
 }
 
 RkVoid RenderDevice::InitTracyVkContext() noexcept

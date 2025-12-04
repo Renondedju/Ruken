@@ -99,4 +99,6 @@ struct RUKEN_EMPTY_BASES Matrix:
     #pragma endregion
 };
 
+using Matrix4x4 = Matrix<4, 4>;
+
 END_RUKEN_NAMESPACE

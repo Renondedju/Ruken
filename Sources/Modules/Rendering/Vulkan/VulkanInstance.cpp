@@ -4,9 +4,11 @@
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 
 #define VOLK_IMPLEMENTATION
+#define  VMA_IMPLEMENTATION
 
 #include <volk.h>
 #include <glfw/glfw3.h>
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_raii.hpp>
 

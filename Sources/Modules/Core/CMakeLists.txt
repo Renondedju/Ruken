@@ -22,6 +22,7 @@ endif()
 
 target_sources(RkCore PUBLIC
         FILE_SET HEADERS FILES
+    Time/Clock.hpp
     Bitwise/Bitmask.hpp
     Bitwise/Endian.hpp
     Bitwise/SizedBitmask.hpp
@@ -206,6 +207,7 @@ target_sources(RkCore PUBLIC
 )
 
 target_sources(RkCore PRIVATE
+    Time/Clock.cpp
     JobSystem/Awaitables/Primitives/CountDownLatch.cpp
     JobSystem/JobQueue.cpp
     JobSystem/JobSystem.cpp

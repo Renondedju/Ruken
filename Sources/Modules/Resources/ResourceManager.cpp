@@ -22,7 +22,7 @@ ResourceLoader* ResourceManager::GetCompatibleLoader(std::filesystem::path const
 	return nullptr;
 }
 
-IOTask<RkVoid> ResourceManager::Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader, FilePath in_filepath) const noexcept
+IOTask<RkVoid> ResourceManager::Load(ResourceManifest* in_manifest, ResourceLoader const* in_loader, FilePath const in_filepath) const noexcept
 {
 	Filesystem* filesystem {m_service_provider.LocateService<Filesystem>()};
 	RUKEN_ASSERT(filesystem, "Cannot load resources without a filesystem.");

@@ -8,18 +8,18 @@
 BEGIN_RUKEN_NAMESPACE
 
 /// @brief The base resource data class.
-struct ResourceData
+struct IResourceData
 {
-	ResourceData()								 = default;
-	ResourceData(ResourceData const&)			 = default;
-	ResourceData(ResourceData&&     )			 = default;
-	ResourceData& operator=(ResourceData const&) = default;
-	ResourceData& operator=(ResourceData&&     ) = default;
-	virtual ~ResourceData()          			 = default;
+	IResourceData()								 = default;
+	IResourceData(IResourceData const&)			 = default;
+	IResourceData(IResourceData&&     )			 = default;
+	IResourceData& operator=(IResourceData const&) = default;
+	IResourceData& operator=(IResourceData&&     ) = default;
+	virtual ~IResourceData()          			 = default;
 };
 
 template <typename TType>
-concept CResourceData = std::is_base_of_v<ResourceData, TType>;
+concept CResourceData = std::is_base_of_v<IResourceData, TType>;
 
 /// @brief Polymorphic reference-counted pointer.
 ///
@@ -27,7 +27,7 @@ concept CResourceData = std::is_base_of_v<ResourceData, TType>;
 /// When doing so, a pointer to the new resource is just swapped with the current one, but we might
 /// still be reading from the old one and cannot delete it just yet. Instead, std::shared_ptr is used
 /// to make sure cleanup is done only when everybody is done.
-template <CResourceData TData = ResourceData>
+template <CResourceData TData = IResourceData>
 using ResourcePtr = std::shared_ptr<TData>;
 
 /**
@@ -35,7 +35,7 @@ using ResourcePtr = std::shared_ptr<TData>;
  * @param in_ptr Pointer instance to cast.
  * @return Cast pointer instance.
  */
-template <CResourceData TTo, CResourceData TFrom = ResourceData>
+template <CResourceData TTo, CResourceData TFrom = IResourceData>
 ResourcePtr<TTo> ResourcePtrCast(const ResourcePtr<TFrom>& in_ptr)
 { return std::dynamic_pointer_cast<TTo, TFrom>(in_ptr); }
 

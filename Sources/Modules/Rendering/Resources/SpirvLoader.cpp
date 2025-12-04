@@ -8,7 +8,7 @@ std::vector<std::string_view> SpirvLoader::SupportedExtensions() const noexcept
 	return { ".spv", ".spirv" };
 }
 
-IOTask<ResourcePtr<>> SpirvLoader::Load(LoadContext const& in_context) const
+IOTask<ResourcePtr<>> SpirvLoader::Load(LoadContext&& in_context) const
 {
 	co_return std::make_shared<ShaderModule>(ShaderModule {
 		in_context.services, in_context.data

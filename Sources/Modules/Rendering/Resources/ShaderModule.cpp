@@ -1,4 +1,5 @@
-#include "ShaderModule.hpp"
+#include "Rendering/Resources/ShaderModule.hpp"
+#include "Rendering/Vertex.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -21,8 +22,25 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
 			.pSpecializationInfo = nullptr
 		}
 	},
-	layout {in_service_provider.LocateService<RenderDevice>()->GetDevice(), vk::PipelineLayoutCreateInfo {
-		.setLayoutCount         = 0,
+	descriptor_set_layout {[&](){
+		auto const& device {in_service_provider.LocateService<RenderDevice>()->GetDevice()};
+		constexpr vk::DescriptorSetLayoutBinding ubo_layout_binding {
+			.binding		    = 0,
+			.descriptorType     = vk::DescriptorType::eUniformBuffer,
+			.descriptorCount    = 1,
+			.stageFlags			= vk::ShaderStageFlagBits::eVertex,
+			.pImmutableSamplers = nullptr
+		};
+
+		return vk::raii::DescriptorSetLayout {device, vk::DescriptorSetLayoutCreateInfo {
+			.flags		  = {},
+			.bindingCount = 1,
+			.pBindings    = &ubo_layout_binding
+		}};
+	}()},
+	pipeline_layout {in_service_provider.LocateService<RenderDevice>()->GetDevice(), vk::PipelineLayoutCreateInfo {
+		.setLayoutCount         = 1,
+		.pSetLayouts			= &*descriptor_set_layout,
 		.pushConstantRangeCount = 0,
 	}},
 	pipeline {[&] {
@@ -37,8 +55,16 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
             .pDynamicStates    = dynamicStates.data()
         };
 
-        // --- Vertex input (empty for now)
-        vk::PipelineVertexInputStateCreateInfo vertexInputInfo {};
+        // --- Vertex input
+		auto bindingDescription    = Vertex::getBindingDescription();
+		auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+        vk::PipelineVertexInputStateCreateInfo vertexInputInfo {
+        	.vertexBindingDescriptionCount   = 1,
+        	.pVertexBindingDescriptions      = &bindingDescription,
+			.vertexAttributeDescriptionCount = attributeDescriptions.size(),
+        	.pVertexAttributeDescriptions    = attributeDescriptions.data()
+        };
 
         // --- Input assembly
         vk::PipelineInputAssemblyStateCreateInfo inputAssembly {
@@ -56,8 +82,8 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
         vk::PipelineRasterizationStateCreateInfo rasterizer {
             .depthClampEnable        = VK_FALSE,
             .rasterizerDiscardEnable = VK_FALSE,
-            .polygonMode             = vk::PolygonMode::eFill,
-            .cullMode                = vk::CullModeFlagBits::eBack,
+            .polygonMode             = vk::PolygonMode::eLine,
+            .cullMode                = vk::CullModeFlagBits::eNone,
             .frontFace               = vk::FrontFace::eClockwise,
             .depthBiasEnable         = VK_FALSE,
             .lineWidth               = 1.0f
@@ -100,7 +126,7 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
 			.pMultisampleState   = &multisampling,
 			.pColorBlendState    = &colorBlending,
 			.pDynamicState       = &dynamicState,
-			.layout              = layout,
+			.layout              = pipeline_layout,
 			.renderPass          = nullptr,
 			.subpass             = 0,
 		});

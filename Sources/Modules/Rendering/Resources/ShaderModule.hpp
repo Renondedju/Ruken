@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 #include "Resources/ResourcePath.hpp"
 #include "Rendering/RenderDevice.hpp"
 
@@ -8,7 +8,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-struct ShaderModule final : ResourceData
+struct ShaderModule final : IResourceData
 {
 	#pragma region Lifetime
 
@@ -28,8 +28,9 @@ struct ShaderModule final : ResourceData
 	vk::raii::ShaderModule						   module;
 	std::vector<vk::PipelineShaderStageCreateInfo> stages;
 
-	vk::raii::PipelineLayout layout;
-	vk::raii::Pipeline		 pipeline;
+	vk::raii::DescriptorSetLayout descriptor_set_layout; // may be multiple, one by stage
+	vk::raii::PipelineLayout	  pipeline_layout;
+	vk::raii::Pipeline			  pipeline;
 
 	#pragma endregion
 };

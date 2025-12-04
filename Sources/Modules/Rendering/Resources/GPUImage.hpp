@@ -1,22 +1,15 @@
 #pragma once
 
-#include "Core/Types/FundamentalTypes.hpp"
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
+#include "Rendering/RenderDevice.hpp"
 
-#include <vulkan/vulkan_raii.hpp>
+#include <vulkan/vulkan.hpp>
+#include <vk_mem_alloc.h>
 
 BEGIN_RUKEN_NAMESPACE
 
-class GPUImage final: ResourceData
+class GPUImage final: IResourceData
 {
-	vk::raii::Image	image;
-
-	// Synchronisation tracking
-	vk::PipelineStageFlagBits2 current_stage_flag;
-	vk::AccessFlagBits2        current_access_flag;
-	vk::ImageLayout            current_image_layout;
-	RkUint32				   current_queue_family {VK_QUEUE_FAMILY_IGNORED};
-
 	#pragma region Lifetime
 
 	/**
@@ -24,12 +17,20 @@ class GPUImage final: ResourceData
 	 * @param in_device Owning device.
 	 * @param in_create_info Image create info.
 	 */
-	GPUImage(vk::raii::Device const& in_device, vk::ImageCreateInfo const& in_create_info);
+	GPUImage(RenderDevice& in_device, vk::ImageCreateInfo const& in_create_info, VmaAllocationCreateInfo const& in_alloc_info);
 	GPUImage(GPUImage const&)			 = delete;
 	GPUImage(GPUImage&&     )			 = default;
 	GPUImage& operator=(GPUImage const&) = delete;
 	GPUImage& operator=(GPUImage&&     ) = default;
-	~GPUImage() override				 = default;
+	~GPUImage() override;
+
+	#pragma endregion
+
+	#pragma region Members
+
+	RenderDevice* device;
+	vk::Image     image;
+	VmaAllocation allocation;
 
 	#pragma endregion
 };

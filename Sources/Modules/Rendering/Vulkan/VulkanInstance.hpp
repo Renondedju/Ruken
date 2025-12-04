@@ -2,9 +2,8 @@
 
 #include "Rendering/Vulkan/VulkanLoaderInstance.hpp"
 
-#include "Types/FundamentalTypes.hpp"
+#include "Core/Meta/Meta.hpp"
 #include "Core/Service.hpp"
-#include "Meta/Meta.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 

@@ -6,7 +6,7 @@
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/File.hpp"
 
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 #include "ImportContext.hpp"
 
 #include <vector>

@@ -11,6 +11,7 @@ set(GLFW_BUILD_DOCS     OFF CACHE BOOL "")
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(GLFW_BUILD_TESTS    OFF CACHE BOOL "")
 
+CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
 CPMAddPackage(URL "https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip" NAME glfw)
 CPMAddPackage(URL "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.3.0.zip" NAME vma)
 CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.4.304.zip" NAME volk)
@@ -28,6 +29,8 @@ target_sources(RkRendering PUBLIC
         RenderDevice.hpp
         GPUFence.hpp
         FamilyView.hpp
+        Resources/ObjLoader.hpp
+        Resources/GPUMesh.hpp
         Resources/ShaderModule.hpp
         Resources/SlangImporter.hpp
         Resources/SpirvLoader.hpp
@@ -48,6 +51,8 @@ target_sources(RkRendering PUBLIC
 target_sources(RkRendering PRIVATE
         RenderDevice.cpp
         GPUFence.cpp
+        Resources/ObjLoader.cpp
+        Resources/GPUMesh.cpp
         Resources/SlangImporter.cpp
         Resources/SpirvLoader.cpp
         Resources/ShaderModule.cpp
@@ -70,5 +75,13 @@ endif ()
 file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Shaders ${RUKEN_SLANG_INCLUDE_DIR}/Ruken COPY_ON_ERROR SYMBOLIC)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SlangSearchPath.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Rendering/SlangSearchPath.hpp)
 
-target_compile_definitions(RkRendering PUBLIC TRACY_VK_USE_SYMBOL_TABLE VK_NO_PROTOTYPES VULKAN_HPP_NO_STRUCT_CONSTRUCTORS GLFW_INCLUDE_VULKAN)
-target_link_libraries     (RkRendering PUBLIC RkCore Vulkan::Headers slang volk VulkanMemoryAllocator glfw)
+target_compile_definitions(RkRendering PUBLIC
+        TRACY_VK_USE_SYMBOL_TABLE
+        VK_NO_PROTOTYPES
+        VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+        GLFW_INCLUDE_VULKAN
+        VMA_VULKAN_VERSION=1004000
+        VMA_STATIC_VULKAN_FUNCTIONS=0
+        VMA_DYNAMIC_VULKAN_FUNCTIONS=0
+)
+target_link_libraries     (RkRendering PUBLIC RkCore Vulkan::Headers slang volk VulkanMemoryAllocator glfw tinyobjloader)
