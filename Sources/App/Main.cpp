@@ -1,6 +1,6 @@
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
+#include "Core/JobSystem/Awaitables/AsyncTask/AsyncTask.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/WhenAll.hpp"
 #include "Core/JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp"
 
@@ -37,7 +37,7 @@ USING_RUKEN_NAMESPACE
  * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
  * @param in_service_provider Service Provider.
  */
-Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
+AsyncTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
 {
     Logger    const* logger        {in_service_provider.LocateService<Logger>         ()};
     Clock*           clock         {in_service_provider.LocateService<Clock>          ()};

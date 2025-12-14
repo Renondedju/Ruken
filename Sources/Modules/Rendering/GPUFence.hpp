@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/JobSystem/Awaitables/Primitives/ManualResetEvent.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "Core/JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 
@@ -9,7 +9,7 @@ BEGIN_RUKEN_NAMESPACE
 
 struct GPUFence final : ManualResetEvent
 {
-	using Awaiter = Awaiter;
+	using Awaiter = AsyncAwaiter;
 
     #pragma region Lifetime
 

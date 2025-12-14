@@ -9,16 +9,16 @@ RkVoid ManualResetEvent::Reset() const noexcept
 
 RkBool ManualResetEvent::Consumed() const noexcept
 {
-	return m_awaiter_list.load(std::memory_order_acquire) == Awaiter::consumed;
+	return m_awaiter_list.load(std::memory_order_acquire) == AsyncAwaiter::consumed;
 }
 
 RkBool ManualResetEvent::SignalConsume() const noexcept
 {
-	AwaiterList*   selection {&m_awaiter_list};
-	Awaiter const* previous  {nullptr};
-	Awaiter*   	   continuation;
+	AsyncAwaiterList*   selection {&m_awaiter_list};
+	AsyncAwaiter const* previous  {nullptr};
+	AsyncAwaiter*   	   continuation;
 
-	if (selection->load(std::memory_order_acquire) == Awaiter::consumed)
+	if (selection->load(std::memory_order_acquire) == AsyncAwaiter::consumed)
 		return false;
 
 	while(true)
@@ -26,7 +26,7 @@ RkBool ManualResetEvent::SignalConsume() const noexcept
 		do
 		{
 			// Checking for continuations to consume
-			if (selection->compare_exchange_strong(continuation = nullptr, Awaiter::consumed, std::memory_order_acq_rel))
+			if (selection->compare_exchange_strong(continuation = nullptr, AsyncAwaiter::consumed, std::memory_order_acq_rel))
 			{
 				// If there is not we need to notify the
 				// last awaiter before returning.
@@ -37,11 +37,11 @@ RkBool ManualResetEvent::SignalConsume() const noexcept
 			}
 
 			// If there are, waiting for any lock in the process
-		} while(continuation == Awaiter::locked);
+		} while(continuation == AsyncAwaiter::locked);
 
 		// If the value of status is still the same as before our last comparison
 		// then we can exchange the pointer for a completion pointer and notify the previous awaiter
-		if (selection->compare_exchange_weak(continuation, Awaiter::consumed, std::memory_order_acq_rel))
+		if (selection->compare_exchange_weak(continuation, AsyncAwaiter::consumed, std::memory_order_acq_rel))
 		{
 			// This is done this way in case it gets destroyed as a side effect
 			// and avoids us to read potentially unallocated memory in the code above.

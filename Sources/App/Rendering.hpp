@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/JobSystem/JobSystem.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
+#include "Core/JobSystem/Awaitables/AsyncTask/AsyncTask.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include "Core/Maths/Vector/DistanceVector3.hpp"
@@ -188,7 +188,7 @@ struct TestWindowRenderer
 	 * Renders a frame to a swapchain image.
 	 * @return Async dynamic task.
 	 */
-	Task<ProcessingQueue> RenderFrame(Seconds in_time) noexcept
+	AsyncTask<ProcessingQueue> RenderFrame(Seconds in_time) noexcept
 	{
 		auto const& pipeline_ptr  {pipeline				.Current()};
 		auto const& swapchain_ptr {window.GetSwapchain().Current()};

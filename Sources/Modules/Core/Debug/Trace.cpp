@@ -15,17 +15,17 @@ ___tracy_source_location_data* TracyUtilities::GetOrInsertSourceLocationData(
     {
         std::shared_lock shared_lock(m_source_location_mutex);
 
-        if (m_source_location_registery.contains(in_source_location))
-            return &m_source_location_registery.at(in_source_location);
+        if (m_source_location_registry.contains(in_source_location))
+            return &m_source_location_registry.at(in_source_location);
     }
 
     std::unique_lock unique_lock(m_source_location_mutex);
 
-    m_source_location_registery.try_emplace(in_source_location, ___tracy_source_location_data {
+    m_source_location_registry.try_emplace(in_source_location, ___tracy_source_location_data {
         in_name, in_source_location.function_name(), in_source_location.file_name(), in_source_location.line(), in_color
     });
 
-    return &m_source_location_registery.at(in_source_location);
+    return &m_source_location_registry.at(in_source_location);
 #else
     return nullptr;
 #endif

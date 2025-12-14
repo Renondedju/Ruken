@@ -1,26 +1,26 @@
-#include "JobSystem/Awaitables/Awaiter.hpp"
+#include "JobSystem/Awaitables/AsyncAwaiter.hpp"
 
 USING_RUKEN_NAMESPACE
 
-Awaiter::Awaiter(AwaiterList* in_head) noexcept:
+AsyncAwaiter::AsyncAwaiter(AsyncAwaiterList* in_head) noexcept:
 	head {in_head}
 {}
 
-Awaiter::Awaiter(Awaiter const& in_other) noexcept
+AsyncAwaiter::AsyncAwaiter(AsyncAwaiter const& in_other) noexcept
 {
 	head   = in_other.head;
 	signal = in_other.signal;
 	tag    = in_other.tag;
 }
 
-Awaiter::Awaiter(Awaiter&& in_other) noexcept
+AsyncAwaiter::AsyncAwaiter(AsyncAwaiter&& in_other) noexcept
 {
 	head   = std::move(in_other.head);
 	signal = std::move(in_other.signal);
 	tag    = std::move(in_other.tag);
 }
 
-Awaiter& Awaiter::operator=(Awaiter const& in_other) noexcept
+AsyncAwaiter& AsyncAwaiter::operator=(AsyncAwaiter const& in_other) noexcept
 {
 	TryDetach();
 
@@ -31,7 +31,7 @@ Awaiter& Awaiter::operator=(Awaiter const& in_other) noexcept
 	return *this;
 }
 
-Awaiter& Awaiter::operator=(Awaiter&& in_other) noexcept
+AsyncAwaiter& AsyncAwaiter::operator=(AsyncAwaiter&& in_other) noexcept
 {
 	TryDetach();
 
@@ -42,27 +42,27 @@ Awaiter& Awaiter::operator=(Awaiter&& in_other) noexcept
 	return *this;
 }
 
-RkBool Awaiter::await_ready() const noexcept
+RkBool AsyncAwaiter::await_ready() const noexcept
 {
 	return Consumed();
 }
 
-RkBool Awaiter::await_suspend(std::coroutine_handle<>) noexcept
+RkBool AsyncAwaiter::await_suspend(std::coroutine_handle<>) noexcept
 {
 	return TryAttach();
 }
 
-RkVoid Awaiter::await_resume() const noexcept
+RkVoid AsyncAwaiter::await_resume() const noexcept
 {}
 
-Awaiter::~Awaiter()
+AsyncAwaiter::~AsyncAwaiter()
 {
 	TryDetach();
 }
 
-RkBool Awaiter::TryAttach() noexcept
+RkBool AsyncAwaiter::TryAttach() noexcept
 {
-	Awaiter* head_value {head->load(std::memory_order_acquire)};
+	AsyncAwaiter* head_value {head->load(std::memory_order_acquire)};
 
 	do
 	{
@@ -88,19 +88,19 @@ RkBool Awaiter::TryAttach() noexcept
 	return true;
 }
 
-RkBool Awaiter::TryDetach() noexcept
+RkBool AsyncAwaiter::TryDetach() noexcept
 {
 	// If the awaiter hasn't been completed in due time,
 	// we need to detach it from the awaited event to cancel
 	// our wait without crashing later down the line
-	Awaiter const* next_val {next.load(std::memory_order_acquire)};
+	AsyncAwaiter const* next_val {next.load(std::memory_order_acquire)};
 	if (next_val == detached || next_val == consumed)
 		return false;
 
 	// Attempting to detach from the awaited event by looking for our
 	// address though the list of suspensions
-	AwaiterList* selection {head};
-	Awaiter*	 expected  {this};
+	AsyncAwaiterList* selection {head};
+	AsyncAwaiter*	 expected  {this};
 
 	// If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
 	while(!selection->compare_exchange_strong(expected, locked, std::memory_order_acq_rel, std::memory_order_acquire))
@@ -127,7 +127,7 @@ RkBool Awaiter::TryDetach() noexcept
 	return true;
 }
 
-RkBool Awaiter::Consumed() const noexcept
+RkBool AsyncAwaiter::Consumed() const noexcept
 {
 	return head && head->load(std::memory_order_acquire) == consumed;
 }

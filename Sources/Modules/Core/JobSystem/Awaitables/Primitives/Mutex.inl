@@ -97,8 +97,8 @@ RkBool Mutex<TData>::MutexAwaiter::await_ready() const noexcept
 template<typename TData>
 RkBool Mutex<TData>::MutexAwaiter::await_suspend(std::coroutine_handle<>) noexcept
 {
-	AwaiterList* selection {head};
-	Awaiter*     continuation;
+	AsyncAwaiterList* selection {head};
+	AsyncAwaiter*     continuation;
 
 	// Waiting for a lock on the head and acquiring it as soon as possible
 	while ((continuation = selection->exchange(locked, std::memory_order_acq_rel)) == locked)
@@ -114,7 +114,7 @@ RkBool Mutex<TData>::MutexAwaiter::await_suspend(std::coroutine_handle<>) noexce
 	next = nullptr;
 
 	// Finally, attaching and releasing the lock
-	if (Awaiter* first {continuation}; first == nullptr)
+	if (AsyncAwaiter* first {continuation}; first == nullptr)
 		head->store(this, std::memory_order_release);
 
 	else
@@ -140,25 +140,25 @@ typename Mutex<TData>::Access Mutex<TData>::MutexAwaiter::await_resume() const n
 }
 
 template<typename TData>
-template<std::predicate<Awaiter*> TPredicate>
+template<std::predicate<AsyncAwaiter*> TPredicate>
 RkUint64 Mutex<TData>::MutexAwaitable::SignalConsumeIf(TPredicate&& in_predicate) const noexcept
 {
 	RkUint64	 count	   {0ULL};
-	AwaiterList* selection {&m_awaiter_list};
-	Awaiter*	 previous  {nullptr};
-	Awaiter*     continuation;
+	AsyncAwaiterList* selection {&m_awaiter_list};
+	AsyncAwaiter*	 previous  {nullptr};
+	AsyncAwaiter*     continuation;
 
 	while(true)
 	{
 		// Waiting for a lock on the selection and acquiring it as soon as possible
-		while ((continuation = selection->exchange(Awaiter::locked, std::memory_order_acq_rel)) == Awaiter::locked)
+		while ((continuation = selection->exchange(AsyncAwaiter::locked, std::memory_order_acq_rel)) == AsyncAwaiter::locked)
 			atomic_queue::spin_loop_pause();
 
 		// Return if nothing can or should be consumed
 		if (continuation == nullptr || !in_predicate(continuation))
 		{
 			if (previous != nullptr) {
-				previous->next  .store(Awaiter::consumed, std::memory_order_release);
+				previous->next  .store(AsyncAwaiter::consumed, std::memory_order_release);
 				previous->signal.Invoke();
 				count++;
 			}
@@ -172,7 +172,7 @@ RkUint64 Mutex<TData>::MutexAwaitable::SignalConsumeIf(TPredicate&& in_predicate
 		// This is done this way in case it gets destroyed as a side effect
 		// and avoids us to read potentially unallocated memory in the code above.
 		if (previous != nullptr) {
-			previous->next  .store(Awaiter::consumed, std::memory_order_release);
+			previous->next  .store(AsyncAwaiter::consumed, std::memory_order_release);
 			previous->signal.Invoke();
 			count++;
 		}
@@ -186,7 +186,7 @@ RkUint64 Mutex<TData>::MutexAwaitable::SignalConsumeIf(TPredicate&& in_predicate
 template<typename TData>
 typename Mutex<TData>::MutexAwaiter Mutex<TData>::MutexAwaitable::operator co_await() const
 {
-	return MutexAwaiter { Awaiter { Awaitable::operator co_await() }, mutex };
+	return MutexAwaiter { AsyncAwaiter { AsyncAwaitable::operator co_await() }, mutex };
 }
 
 template<typename TData>
@@ -199,7 +199,7 @@ RkVoid Mutex<TData>::ConsumeNext() noexcept
 }
 
 template<typename TData>
-RkBool Mutex<TData>::CanSignal(Awaiter const*) const noexcept
+RkBool Mutex<TData>::CanSignal(AsyncAwaiter const*) const noexcept
 {
 	return !m_locked.test(std::memory_order_acquire);
 }

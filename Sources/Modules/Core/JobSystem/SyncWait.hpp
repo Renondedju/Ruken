@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/JobSystem/Awaitables/Awaiter.hpp"
+#include "Core/JobSystem/Awaitables/AsyncAwaiter.hpp"
 #include "Core/JobSystem/Awaitables/SignalReceiver.hpp"
 
 #include <atomic>

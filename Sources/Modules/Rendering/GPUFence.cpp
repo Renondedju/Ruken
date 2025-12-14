@@ -33,7 +33,7 @@ RkVoid GPUFence::Reset() const noexcept
 	device.resetFences(*fence);
 }
 
-Awaiter GPUFence::operator co_await() const noexcept
+AsyncAwaiter GPUFence::operator co_await() const noexcept
 {
 	//TODO: Call only once
 	CheckFenceStatus(fence, *this);

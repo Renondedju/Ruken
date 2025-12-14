@@ -49,8 +49,8 @@ struct TracyUtilities
 
 		#ifdef RUKEN_TRACE_BUILD
 
-		std::shared_mutex												        m_source_location_mutex     {};
-		std::unordered_map<std::source_location, ___tracy_source_location_data> m_source_location_registery {};
+		std::shared_mutex												        m_source_location_mutex    {};
+		std::unordered_map<std::source_location, ___tracy_source_location_data> m_source_location_registry {};
 
 		#endif
 };

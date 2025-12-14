@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Meta/Safety.hpp"
-#include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include <atomic_queue/atomic_queue.h>
 
@@ -138,7 +137,7 @@ RkVoid SharedMutex<TData>::ConsumeNext() noexcept
 }
 
 template<typename TData>
-RkBool SharedMutex<TData>::CanSignal(Awaiter const* in_awaiter) noexcept
+RkBool SharedMutex<TData>::CanSignal(AsyncAwaiter const* in_awaiter) noexcept
 {
 	// A negative concurrency represents write accesses
 	// Positive concurrency represents read accesses
@@ -153,18 +152,18 @@ RkBool SharedMutex<TData>::CanSignal(Awaiter const* in_awaiter) noexcept
 }
 
 template<typename TData>
-template<std::predicate<Awaiter*> TPredicate>
+template<std::predicate<AsyncAwaiter*> TPredicate>
 RkUint64 SharedMutex<TData>::MutexAwaitable::SignalConsumeIf(TPredicate&& in_predicate) const noexcept
 {
-	RkUint64	 count	   {0ULL};
-	AwaiterList* selection {&m_awaiter_list};
-	Awaiter*	 previous  {nullptr};
-	Awaiter*     continuation;
+	RkUint64	 	  count     {0ULL};
+	AsyncAwaiterList* selection {&m_awaiter_list};
+	AsyncAwaiter*     previous  {nullptr};
+	AsyncAwaiter*     continuation;
 
 	while(true)
 	{
 		// Waiting for a lock on the selection and acquiring it as soon as possible
-		while ((continuation = selection->exchange(Awaiter::locked, std::memory_order_acq_rel)) == Awaiter::locked)
+		while ((continuation = selection->exchange(Awaiter::locked, std::memory_order_acq_rel)) == RUKEN_NAMESPACE::AsyncAwaiter::locked)
 			atomic_queue::spin_loop_pause();
 
 		// Return if nothing can or should be consumed
@@ -197,16 +196,16 @@ RkUint64 SharedMutex<TData>::MutexAwaitable::SignalConsumeIf(TPredicate&& in_pre
 }
 
 template<typename TData>
-RkBool SharedMutex<TData>::MutexAwaiter::await_ready() const noexcept
+RkBool SharedMutex<TData>::MutexAwaitable::Awaiter::await_ready() const noexcept
 {
 	return false;
 }
 
 template<typename TData>
-RkBool SharedMutex<TData>::MutexAwaiter::await_suspend(std::coroutine_handle<>) noexcept
+RkBool SharedMutex<TData>::MutexAwaitable::Awaiter::await_suspend(std::coroutine_handle<>) noexcept
 {
-	AwaiterList* selection {head};
-	Awaiter*     continuation;
+	AsyncAwaiterList* selection {head};
+	AsyncAwaiter*     continuation;
 
 	// Waiting for a lock on the head and acquiring it as soon as possible
 	while ((continuation = selection->exchange(locked, std::memory_order_acq_rel)) == locked)
@@ -222,7 +221,7 @@ RkBool SharedMutex<TData>::MutexAwaiter::await_suspend(std::coroutine_handle<>) 
 	next = nullptr;
 
 	// Finally, attaching and releasing the lock
-	if (Awaiter* first {continuation}; first == nullptr)
+	if (RUKEN_NAMESPACE::AsyncAwaiter* first {continuation}; first == nullptr)
 		head->store(this, std::memory_order_release);
 
 	else
@@ -242,33 +241,46 @@ RkBool SharedMutex<TData>::MutexAwaiter::await_suspend(std::coroutine_handle<>) 
 }
 
 template<typename TData>
-template<typename TAccess>
-auto SharedMutex<TData>::MakeAwaitable(EAccessType in_access_type) noexcept
+SharedMutex<TData>::ReadAccess SharedMutex<TData>::ReadAwaitable::Awaiter::await_resume() const noexcept
 {
-	/// Creating the structure acting as the lock
-	struct AccessAwaitable: MutexAwaitable
-	{
-		auto operator co_await() const
-		{
-			/// Composing
-			struct AccessAwaiter: MutexAwaiter
-			{
-				auto await_resume() const noexcept
-				{ return TAccess(*this->mutex); }
+	return ReadAccess(*this->mutex);
+}
 
-			} awaiter { this->mutex->m_awaitable.operator co_await(), this->mutex };
+template<typename TData>
+SharedMutex<TData>::ReadAwaitable::Awaiter SharedMutex<TData>::ReadAwaitable::operator co_await() const
+{
+	Awaiter awaiter { mutex->m_awaitable.operator co_await(), mutex };
+	awaiter.tag = static_cast<RkUint64>(EAccessType::Read);
+	return awaiter;
+}
 
-			awaiter.tag = static_cast<RkUint64>(this->access_type);
+template<typename TData>
+SharedMutex<TData>::WriteAccess SharedMutex<TData>::WriteAwaitable::Awaiter::await_resume() const noexcept
+{
+	return WriteAccess(*this->mutex);
+}
 
-			return awaiter;
-		}
+template<typename TData>
+SharedMutex<TData>::WriteAwaitable::Awaiter SharedMutex<TData>::WriteAwaitable::operator co_await() const
+{
+	Awaiter awaiter { mutex->m_awaitable.operator co_await(), mutex };
+	awaiter.tag = static_cast<RkUint64>(EAccessType::Write);
+	return awaiter;
+}
+
+template<typename TData>
+SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncRead() noexcept
+{
+	return ReadAwaitable {
+		.mutex = this
 	};
+}
 
-	return AccessAwaitable {
-		MutexAwaitable {
-			.mutex		 = this,
-			.access_type = in_access_type
-		}
+template<typename TData>
+SharedMutex<TData>::WriteAwaitable SharedMutex<TData>::AsyncWrite() noexcept
+{
+	return WriteAwaitable {
+		.mutex = this
 	};
 }
 
