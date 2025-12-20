@@ -27,7 +27,7 @@ auto AsyncTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
-auto AsyncTaskPromiseBase<TQueueHandle, TResult>::initial_suspend(this auto& in_self, std::source_location in_source_location) noexcept
+auto AsyncTaskPromiseBase<TQueueHandle, TResult>::initial_suspend(this auto&& in_self, std::source_location in_source_location) noexcept
 {
 	// Coroutine is scheduled when instantiated
     struct Awaiter: std::suspend_always
@@ -64,7 +64,7 @@ auto AsyncTaskPromiseBase<TQueueHandle, TResult>::final_suspend() noexcept
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
-RkVoid AsyncTaskPromiseBase<TQueueHandle, TResult>::Signal(this auto& in_self) noexcept
+RkVoid AsyncTaskPromiseBase<TQueueHandle, TResult>::Signal(this auto&& in_self) noexcept
 {
 	// When an asynchronous wait is over we need to schedule the coroutine back for execution
 	TQueueHandle::GetInstance().Push(
@@ -73,13 +73,13 @@ RkVoid AsyncTaskPromiseBase<TQueueHandle, TResult>::Signal(this auto& in_self) n
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
-auto AsyncTaskPromiseBase<TQueueHandle, TResult>::get_return_object(this auto& in_self) noexcept
+auto AsyncTaskPromiseBase<TQueueHandle, TResult>::get_return_object(this auto&& in_self) noexcept
 {
 	return AsyncTask<TQueueHandle, TResult> {in_self};
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
-auto AsyncTaskPromiseBase<TQueueHandle, TResult>::operator co_await(this auto& in_self) noexcept
+auto AsyncTaskPromiseBase<TQueueHandle, TResult>::operator co_await(this auto&& in_self) noexcept
 {
 	return AsyncTaskAwaiter<TQueueHandle, TResult> {
 		std::move(in_self.ManualResetEvent::operator co_await()), &in_self

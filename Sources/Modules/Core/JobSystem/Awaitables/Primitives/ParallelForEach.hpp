@@ -53,9 +53,7 @@ auto ParallelForeach(TRange const& in_value_container, TFunction&& in_function) 
 		awaitable = std::forward<ParallelForEachAwaitable<TRange, TFunction>>(in_function(value));
 
 	// And waiting for all of them to complete
-	co_return std::forward<std::vector<
-		typename AwaitableTraits<ParallelForEachAwaitable<TRange, TFunction>>::AwaitResult
-	>>(co_await WhenAll(awaitables));
+	co_return co_await WhenAll(awaitables);
 }
 
 END_RUKEN_NAMESPACE

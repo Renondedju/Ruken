@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/JobSystem/Awaitables/Primitives/CountDownLatch.hpp"
+#include "Core/JobSystem/Awaitables/SyncTask/SyncTask.hpp"
 #include "Core/JobSystem/Awaitables/AwaitableTraits.hpp"
-#include "JobSystem/Awaitables/SyncTask/SyncTask.hpp"
 
 #include <utility>
 #include <ranges>
@@ -103,14 +103,13 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 	>
 {
 	CountDownLatch												  latch    {sizeof...(TAwaitables)};
-	std::tuple<typename AwaitableTraits<TAwaitables>::Awaiter...> awaiters {};
+	std::tuple<typename AwaitableTraits<TAwaitables>::Awaiter...> awaiters {in_awaitables.operator co_await()...};
 
 	// co_await compiler transform
 	[&]<auto... Is>(std::index_sequence<Is...>)
 	{
-		([&](auto& in_awaiter, auto const& in_awaitable)
+		([&](auto& in_awaiter) // foreach awaiter
 		{
-			in_awaiter		  = in_awaitable.operator co_await();
 			in_awaiter.signal = SignalReceiver(latch);
 
 			// Trying to suspend
@@ -119,7 +118,7 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 				return;
 
 			latch.Signal();
-		}(std::get<Is>(awaiters), in_awaitables), ...);
+		}(std::get<Is>(awaiters)), ...);
 	}(std::index_sequence_for<TAwaitables...>{});
 
 	co_await latch;
@@ -143,14 +142,13 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 	SyncTask<>
 {
 	CountDownLatch												  latch    {sizeof...(TAwaitables)};
-	std::tuple<typename AwaitableTraits<TAwaitables>::Awaiter...> awaiters {};
+	std::tuple<typename AwaitableTraits<TAwaitables>::Awaiter...> awaiters {in_awaitables.operator co_await()...};
 
 	// co_await compiler transform
 	[&]<auto... Is>(std::index_sequence<Is...>)
 	{
-		([&](auto& in_awaiter, auto const& in_awaitable)
+		([&](auto& in_awaiter) // foreach awaiter
 		{
-			in_awaiter		  = in_awaitable.operator co_await();
 			in_awaiter.signal = SignalReceiver(latch);
 
 			// Trying to suspend
@@ -159,15 +157,15 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 				return;
 
 			latch.Signal();
-		}(std::get<Is>(awaiters), in_awaitables), ...);
+		}(std::get<Is>(awaiters)), ...);
 	}(std::index_sequence_for<TAwaitables...>{});
 
 	co_await latch;
 
 	// Gathering results
-	[&] <typename... TAwaiter> (TAwaiter&... in_awaiters) {
+	std::apply([&] <typename... TAwaiter> (TAwaiter&... in_awaiters) {
 		(in_awaiters.await_resume(), ...);
-	}(awaiters);
+	}, awaiters);
 }
 
 END_RUKEN_NAMESPACE

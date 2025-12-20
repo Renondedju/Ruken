@@ -39,8 +39,8 @@ USING_RUKEN_NAMESPACE
  */
 AsyncTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
 {
-    Logger    const* logger        {in_service_provider.LocateService<Logger>         ()};
-    Clock*           clock         {in_service_provider.LocateService<Clock>          ()};
+    Logger const*    logger        {in_service_provider.LocateService<Logger>         ()};
+    Clock  const*    clock         {in_service_provider.LocateService<Clock>          ()};
     ResourceManager* resources     {in_service_provider.LocateService<ResourceManager>()};
     RenderDevice*    render_device {in_service_provider.LocateService<RenderDevice>   ()};
 
@@ -64,8 +64,8 @@ AsyncTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider
             .mesh     = mesh
         };
 
-        co_await mesh.LoadEvent();
-        co_await code.LoadEvent();
+        // Waiting for every resource to load
+        co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
 
         // Main loop
         while (!window.ShouldClose())

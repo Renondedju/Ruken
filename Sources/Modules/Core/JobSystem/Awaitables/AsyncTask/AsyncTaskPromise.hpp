@@ -5,13 +5,11 @@
 #include "JobSystem/Awaitables/CoroutineTracingUtils.hpp"
 #include "JobSystem/Awaitables/Primitives/ManualResetEvent.hpp"
 
-#include "Debug/Trace.hpp"
-
 #include <source_location>
 #include <variant>
 
 BEGIN_RUKEN_NAMESPACE
-#define RUKEN_CURRENT_SOURCE_LOCATION [[maybe_unused]] std::source_location in_source_location = std::source_location::current()
+#define RUKEN_CURRENT_SOURCE_LOCATION [[maybe_unused]] std::source_location = std::source_location::current()
 
 template <IsQueueHandle TQueueHandle, typename TResult>
 struct AsyncTask;
@@ -33,13 +31,13 @@ struct AsyncTaskPromiseBase: CoroutineTracingUtils, ManualResetEvent
 	std::atomic<RkSize> references {1ULL};
 
 	/// @returns an awaiter that waits for the task to return or throw an exception.
-	auto operator co_await(this auto&) noexcept;
+	auto operator co_await(this auto&&) noexcept;
 
 	/// @brief Called when an asynchronous wait is over
-	RkVoid Signal(this auto&) noexcept;
+	RkVoid Signal(this auto&&) noexcept;
 
 	/// @brief Instantiates and returns the task handle.
-	auto get_return_object(this auto&) noexcept;
+	auto get_return_object(this auto&&) noexcept;
 
 	/// @brief Composes and returns a new awaitable that inherits from TAwaitable to
 	///		   inject behavior such as automatic tracing and task resuming.
@@ -47,7 +45,7 @@ struct AsyncTaskPromiseBase: CoroutineTracingUtils, ManualResetEvent
 	auto await_transform(TAwaitable const& in_awaitable, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
 
 	// Coroutine lifetime
-	auto initial_suspend(this auto&, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
+	auto initial_suspend(this auto&&, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
 	auto final_suspend  () noexcept;
 };
 

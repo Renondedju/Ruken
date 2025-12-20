@@ -37,3 +37,5 @@ struct SyncTask
 };
 
 END_RUKEN_NAMESPACE
+
+#include "JobSystem/Awaitables/SyncTask/SyncTask.inl"

@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
 
-# --- Language setup
-set(CMAKE_CXX_STANDARD 23)
-
 # --- Project setup
 project(Ruken
     DESCRIPTION  "Ruken is a data-oriented Vulkan based game engine."
@@ -21,13 +18,19 @@ endmacro()
 
 set     (RUKEN_EXECUTABLE_NAME       Ruken)
 set     (RUKEN_DEBUG_BUILD_TYPES     Debug RelWithDebInfo)
+set     (RUKEN_OPTIMIZED_BUILD_TYPES Release RelWithDebInfo)
 set_bool(RUKEN_BUILD_HAS_DEBUG_INFO  ${CMAKE_BUILD_TYPE} IN_LIST RUKEN_DEBUG_BUILD_TYPES)
+set_bool(RUKEN_BUILD_IS_OPTIMIZED    ${CMAKE_BUILD_TYPE} IN_LIST RUKEN_OPTIMIZED_BUILD_TYPES)
 set     (RUKEN_BINARY_DIR            ${CMAKE_BINARY_DIR})
 set     (RUKEN_GENERATED_SOURCES_DIR ${CMAKE_BINARY_DIR}/Generated)
 set     (RUKEN_SOURCES_DIR           ${CMAKE_CURRENT_LIST_DIR}/Sources)
 set     (RUKEN_CMAKE_DIR             ${RUKEN_SOURCES_DIR}/CMake)
 set     (RUKEN_MODULES_DIR           ${RUKEN_SOURCES_DIR}/Modules)
 set     (RUKEN_CORE_DIR              ${RUKEN_MODULES_DIR}/Core)
+
+# --- Language setup
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${RUKEN_BUILD_IS_OPTIMIZED})
 
 option(RUKEN_HEADLESS_BUILD          "Disables all form of rendering and presentation" OFF)
 option(RUKEN_TRACE_BUILD             "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})

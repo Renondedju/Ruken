@@ -15,11 +15,11 @@ struct SyncTaskAwaiter
 
 	explicit SyncTaskAwaiter  () = default;
 	explicit SyncTaskAwaiter  (SyncTaskPromise<TResult>* in_promise) noexcept;
-	SyncTaskAwaiter 		  (SyncTaskAwaiter const&) = default;
-	SyncTaskAwaiter 		  (SyncTaskAwaiter&&     ) = default;
-	SyncTaskAwaiter& operator=(SyncTaskAwaiter const&) = default;
-	SyncTaskAwaiter& operator=(SyncTaskAwaiter&&	 ) = default;
-	~SyncTaskAwaiter() noexcept;
+	SyncTaskAwaiter 		  (SyncTaskAwaiter const&) = delete;
+	SyncTaskAwaiter 		  (SyncTaskAwaiter&&     ) noexcept;
+	SyncTaskAwaiter& operator=(SyncTaskAwaiter const&) = delete;
+	SyncTaskAwaiter& operator=(SyncTaskAwaiter&&	 ) noexcept;
+	~SyncTaskAwaiter()								   noexcept;
 
 	#pragma endregion
 
@@ -34,7 +34,6 @@ struct SyncTaskAwaiter
 	#pragma region Members
 
 	SyncTaskPromise<TResult>* promise {nullptr};
-	std::coroutine_handle<>   continuation   {};
 
 	#pragma endregion
 };

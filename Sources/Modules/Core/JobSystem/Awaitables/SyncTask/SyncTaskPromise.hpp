@@ -1,13 +1,14 @@
 #pragma once
 
-#include "JobSystem/Awaitables/CoroutineTracingUtils.hpp"
-#include "JobSystem/Awaitables/AwaitableTraits.hpp"
 #include "JobSystem/Queues/JobQueue.hpp"
+#include "JobSystem/Awaitables/AwaitableTraits.hpp"
+#include "JobSystem/Awaitables/CoroutineTracingUtils.hpp"
 
+#include <source_location>
 #include <variant>
 
 BEGIN_RUKEN_NAMESPACE
-#define RUKEN_CURRENT_SOURCE_LOCATION [[maybe_unused]] std::source_location in_source_location = std::source_location::current()
+#define RUKEN_CURRENT_SOURCE_LOCATION [[maybe_unused]] std::source_location = std::source_location::current()
 
 template <typename TResult>
 struct SyncTask;
@@ -26,16 +27,17 @@ struct SyncTask;
 template <typename TResult>
 struct SyncTaskPromiseBase: CoroutineTracingUtils
 {
-	JobQueue* queue {nullptr};
+	JobQueue*				queue {nullptr};
+	std::coroutine_handle<> continuation {};
 
 	/// @returns an awaiter that waits for the task to return or throw an exception.
-	auto operator co_await(this auto&) noexcept;
+	auto operator co_await(this auto&&) noexcept;
 
 	/// @brief Called when an asynchronous wait is over
-	RkVoid Signal(this auto&) noexcept;
+	RkVoid Signal(this auto&&) noexcept;
 
 	/// @brief Instantiates and returns the task handle.
-	auto get_return_object(this auto&) noexcept;
+	auto get_return_object(this auto&&) noexcept;
 
 	/// @brief Composes and returns a new awaitable that inherits from TAwaitable to
 	///		   inject behavior such as automatic tracing and task resuming.
@@ -43,7 +45,7 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 	auto await_transform(TAwaitable const& in_awaitable, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
 
 	// Coroutine lifetime
-	auto initial_suspend(this auto&, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
+	auto initial_suspend(this auto&&, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
 	auto final_suspend  () noexcept;
 };
 
@@ -51,19 +53,20 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 template <typename TResult>
 struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 {
-	std::variant<TResult, std::exception_ptr> result;
+	std::variant<TResult, std::exception_ptr> result {};
 
 	// Coroutine exit
 	void unhandled_exception()				   noexcept;
 	void return_value(TResult&&	     in_value) noexcept;
-	void return_value(TResult const& in_value) noexcept;
+	void return_value(TResult const& in_value) noexcept
+		requires (!std::is_move_assignable_v<TResult> && !std::is_move_constructible_v<TResult>);
 };
 
 // Result-less specialization
 template <>
 struct SyncTaskPromise<RkVoid>: SyncTaskPromiseBase<RkVoid>
 {
-	std::exception_ptr exception;
+	std::exception_ptr exception {};
 
 	// Coroutine exit
 	void unhandled_exception() noexcept;

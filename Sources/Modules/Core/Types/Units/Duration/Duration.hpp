@@ -90,11 +90,11 @@ struct StrongTypeSuffix<Minutes>
 // Type literals
 
 constexpr Milliseconds operator"" _ms (RkLdouble in_duration) noexcept;
-constexpr Milliseconds operator"" _ms (RkSize    in_duration) noexcept;
+constexpr Milliseconds operator"" _ms (RkULLInt  in_duration) noexcept;
 constexpr Seconds      operator"" _sec(RkLdouble in_duration) noexcept;
-constexpr Seconds      operator"" _sec(RkSize    in_duration) noexcept;
+constexpr Seconds      operator"" _sec(RkULLInt  in_duration) noexcept;
 constexpr Minutes      operator"" _min(RkLdouble in_duration) noexcept;
-constexpr Minutes      operator"" _min(RkSize    in_duration) noexcept;
+constexpr Minutes      operator"" _min(RkULLInt  in_duration) noexcept;
 
 #include "Duration.inl"
 

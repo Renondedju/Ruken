@@ -2,8 +2,6 @@
 
 #include "Core/JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.hpp"
 
-#include <coroutine>
-
 BEGIN_RUKEN_NAMESPACE
 
 /**
@@ -21,7 +19,7 @@ struct AsyncTask
 	#pragma region Lifetime
 
 	explicit AsyncTask() = default;
-	explicit AsyncTask(AsyncTaskPromise<TQueueHandle, TResult>& in_parent) noexcept;
+	explicit AsyncTask(promise_type& in_parent) noexcept;
 	AsyncTask 		    (AsyncTask const&) noexcept;
 	AsyncTask 		    (AsyncTask&&     ) noexcept;
 	AsyncTask& operator=(AsyncTask const&) noexcept;
@@ -38,8 +36,8 @@ struct AsyncTask
 
 	private:
 
-		AsyncTaskPromise<TQueueHandle, TResult>*					   m_parent {nullptr};
-		std::coroutine_handle<AsyncTaskPromise<TQueueHandle, TResult>> m_handle {};
+		promise_type*					    m_parent {nullptr};
+		std::coroutine_handle<promise_type> m_handle {};
 };
 
 END_RUKEN_NAMESPACE

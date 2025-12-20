@@ -32,17 +32,17 @@ target_sources(RkCore PUBLIC
     Build/Namespace.hpp
     Containers/LinkedChunkList.hpp
     Containers/LinkedChunkListNode.hpp
-        JobSystem/Queues/IsQueueHandle.hpp
-        JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.inl
+    JobSystem/Queues/IsQueueHandle.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
     JobSystem/Awaitables/Primitives/CountDownLatch.hpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.hpp
     JobSystem/Awaitables/Primitives/Mutex.hpp
-        JobSystem/Awaitables/AsyncTask/DynamicTask.hpp
-        JobSystem/Awaitables/AsyncTask/AsyncTask.hpp
-        JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.hpp
+    JobSystem/Awaitables/AsyncTask/DynamicTask.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTask.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.hpp
     JobSystem/Awaitables/AsyncAwaitable.hpp
-        JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.hpp
     JobSystem/Queues/JobQueue.hpp
     JobSystem/Queues/DynamicQueue.hpp
     JobSystem/Queues/QueueHandle.hpp
@@ -50,12 +50,12 @@ target_sources(RkCore PUBLIC
     JobSystem/Concurrency.hpp
     JobSystem/WorkerInfo.hpp
     JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp
-    JobSystem/Awaitables/SyncTask/SyncTask.hpp
-    JobSystem/Awaitables/SyncTask/SyncTask.inl
     JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp
     JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.inl
     JobSystem/Awaitables/SyncTask/SyncTaskPromise.hpp
     JobSystem/Awaitables/SyncTask/SyncTaskPromise.inl
+    JobSystem/Awaitables/SyncTask/SyncTask.hpp
+    JobSystem/Awaitables/SyncTask/SyncTask.inl
     Debug/Exception.hpp
     Service.hpp
     ServiceLoader.hpp
