@@ -1,10 +1,7 @@
-
 #pragma once
 
 #include "Build/Namespace.hpp"
-
 #include "Types/FundamentalTypes.hpp"
-
 #include "ECS/ArchetypeFingerprint.hpp"
 #include "ECS/Safety/AnyComponentType.hpp"
 

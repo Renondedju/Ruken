@@ -10,7 +10,7 @@ USING_RUKEN_NAMESPACE
 
 struct CounterSystem final: System
 {
-    explicit CounterSystem(EntityAdmin& in_admin) : System(in_admin)
+    explicit CounterSystem(Universe& in_admin) : System(in_admin)
     {
         // Setup of the different event handlers
         SetupEventHandler<StartHandler>();

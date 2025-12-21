@@ -1,4 +1,3 @@
-
 #include "ECS/ComponentBase.hpp"
 
 USING_RUKEN_NAMESPACE

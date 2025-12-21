@@ -23,8 +23,8 @@ target_sources(RkECS PUBLIC
     ComponentView.inl
     EEventName.hpp
     Entity.hpp
-    EntityAdmin.hpp
-    EntityAdmin.inl
+        Universe.hpp
+        Universe.inl
     EventHandler.hpp
     EventHandler.inl
     EventHandlerBase.hpp
@@ -51,7 +51,7 @@ target_sources(RkECS PRIVATE
     Archetype.cpp
     Entity.cpp
     EventHandlerBase.cpp
-    EntityAdmin.cpp
+        Universe.cpp
     Range.cpp
     TagComponent.cpp
     System.cpp

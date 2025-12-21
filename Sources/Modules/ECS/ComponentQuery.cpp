@@ -1,4 +1,3 @@
-
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/Archetype.hpp"
 

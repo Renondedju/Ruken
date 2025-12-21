@@ -1,16 +1,16 @@
 #include "ECS/System.hpp"
-#include "ECS/EntityAdmin.hpp"
+#include "ECS/Universe.hpp"
 #include "ECS/EventHandlerBase.hpp"
 
 #include "JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 USING_RUKEN_NAMESPACE
 
-EntityAdmin::EntityAdmin(ServiceProvider& in_service_provider) noexcept:
-    Service {in_service_provider, typeid(EntityAdmin)}
+Universe::Universe(ServiceProvider& in_service_provider) noexcept:
+    Service {in_service_provider, typeid(Universe)}
 { }
 
-DynamicTask<> EntityAdmin::ExecuteEvent(EEventName const in_event_name) const noexcept
+DynamicTask<> Universe::ExecuteEvent(EEventName const in_event_name) const noexcept
 {
     for (auto const& system: m_systems)
         if (auto const handler = system->GetEventHandler(in_event_name))

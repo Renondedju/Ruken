@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <memory>
@@ -12,7 +11,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-class EntityAdmin;
+class Universe;
 class EventHandlerBase;
 
 /**
@@ -20,9 +19,9 @@ class EventHandlerBase;
  * \note Systems are a way to logically order event handlers, to treat a particular type of data
  * \see System::EventHandler
  *
- * It is important to notice that for lots of actions, you don’t care about the specific type of an entity;
+ * It is important to notice that for lots of actions, you donï¿½t care about the specific type of an entity;
  * what you care about is specific properties of these entities.
- * E.g. for rendering all you need is a mesh and a transform matrix; you don’t care if the entity is a player or a tree.
+ * E.g. for rendering all you need is a mesh and a transform matrix; you donï¿½t care if the entity is a player or a tree.
  */
 class System
 {
@@ -46,7 +45,7 @@ class System
 
         #pragma region Members
 
-        EntityAdmin& m_admin;
+        Universe& m_admin;
 
         #pragma endregion
 
@@ -67,7 +66,7 @@ class System
 
         #pragma region Constructors
 
-        System(EntityAdmin& in_admin) noexcept;
+        System(Universe& in_admin) noexcept;
 
         System(System const& in_copy) = default;
         System(System&&      in_move) = default;

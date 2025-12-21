@@ -1,4 +1,3 @@
-
 #include "ECS/Range.hpp"
 
 USING_RUKEN_NAMESPACE

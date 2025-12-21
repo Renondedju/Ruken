@@ -1,3 +1,5 @@
+#pragma once
+
 template <ComponentFieldType... TFields>
 template <RkSize... TIds>
 RkSize Component<TFields...>::EnsureStorageSpaceHelper(RkSize in_size, std::index_sequence<TIds...>) noexcept

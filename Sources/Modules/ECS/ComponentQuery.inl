@@ -1,3 +1,4 @@
+#pragma once
 
 template <AnyComponentType ... TComponents>
 RkVoid ComponentQuery::SetupInclusionQuery() noexcept

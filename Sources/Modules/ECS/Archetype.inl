@@ -1,3 +1,4 @@
+#pragma once
 
 template <AnyComponentType... TComponents>
 Archetype::Archetype(Tag<TComponents...>) noexcept:

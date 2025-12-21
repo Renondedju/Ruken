@@ -1,3 +1,4 @@
+#pragma once
 
 template <EventHandlerType TEventHandler>
 RkVoid System::SetupEventHandler() noexcept

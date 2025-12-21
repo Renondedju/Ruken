@@ -1,7 +1,7 @@
 #pragma once
 
 template <SystemType TSystem>
-RkVoid EntityAdmin::CreateSystem() noexcept
+RkVoid Universe::CreateSystem() noexcept
 {
     std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
 
@@ -13,7 +13,7 @@ RkVoid EntityAdmin::CreateSystem() noexcept
 }
 
 template <AnyComponentType... TComponents>
-Archetype* EntityAdmin::CreateArchetype() noexcept
+Archetype* Universe::CreateArchetype() noexcept
 {
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
 
@@ -32,7 +32,7 @@ Archetype* EntityAdmin::CreateArchetype() noexcept
 }
 
 template <AnyComponentType... TComponents>
-Entity EntityAdmin::CreateEntity() noexcept
+Entity Universe::CreateEntity() noexcept
 {
     // Looking for the archetype of the entity
     ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
@@ -40,7 +40,7 @@ Entity EntityAdmin::CreateEntity() noexcept
     Archetype* target_archetype;
 
     // If we didn't found any corresponding archetypes, creating it
-    if (m_archetypes.find(targeted_fingerprint) == m_archetypes.end())
+    if (!m_archetypes.contains(targeted_fingerprint))
         target_archetype = CreateArchetype<TComponents...>();
     else
         target_archetype = m_archetypes[targeted_fingerprint].get();
@@ -49,10 +49,10 @@ Entity EntityAdmin::CreateEntity() noexcept
 }
 
 template <ExclusiveComponentType TComponent>
-TComponent& EntityAdmin::GetExclusiveComponent() noexcept
+TComponent& Universe::GetExclusiveComponent() noexcept
 {
     // If we didn't found any corresponding component, creating it
-    if (m_exclusive_components.find(TComponent::GetId()) == m_exclusive_components.end())
+    if (!m_exclusive_components.contains(TComponent::GetId()))
         m_exclusive_components.emplace(TComponent::GetId(), std::make_unique<TComponent>());
 
     return *static_cast<TComponent*>(m_exclusive_components.at(TComponent::GetId()).get());

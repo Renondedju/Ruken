@@ -1,4 +1,3 @@
-
 #include "ECS/EventHandlerBase.hpp"
 
 USING_RUKEN_NAMESPACE
