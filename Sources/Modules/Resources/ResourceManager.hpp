@@ -7,7 +7,7 @@
 #include "Resources/ResourceManifest.hpp"
 #include "Resources/ResourceHandle.hpp"
 #include "Resources/ResourceLoader.hpp"
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/FilePath.hpp"

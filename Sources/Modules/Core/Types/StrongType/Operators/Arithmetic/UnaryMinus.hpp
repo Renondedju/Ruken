@@ -20,7 +20,9 @@ struct UnaryMinus
     template <typename TStrongType>
     constexpr TStrongType operator-(this TStrongType const& in_instance) noexcept
     {
-        return TStrongType(-in_instance.m_value);
+        using TBase = TStrongType::TUnderlying;
+
+        return TStrongType(-static_cast<TBase>(in_instance));
     }
 };
 

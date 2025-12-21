@@ -20,7 +20,9 @@ struct Decrement
     template <typename TStrongType>
     constexpr TStrongType& operator--(this TStrongType& in_instance) noexcept
     {
-        --in_instance.m_value;
+        using TBase = TStrongType::TUnderlying;
+
+        --static_cast<TBase>(in_instance);
         return in_instance;
     }
 
@@ -32,7 +34,9 @@ struct Decrement
     template <typename TStrongType>
     constexpr TStrongType operator--(this TStrongType& in_instance, RkInt) noexcept
     {
-        return TStrongType(in_instance.m_value--);
+        using TBase = TStrongType::TUnderlying;
+
+        return TStrongType(static_cast<TBase>(in_instance)--);
     }
 };
 

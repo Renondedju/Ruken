@@ -34,7 +34,7 @@ struct ResourceLoadEvent : ManualResetEvent
 		std::exception_ptr m_exception {};
 };
 
-struct ResourceLoadEvent::Awaiter : RUKEN_NAMESPACE::Awaiter
+struct ResourceLoadEvent::Awaiter: AsyncAwaiter
 {
 	ResourceLoadEvent const& owner;
 

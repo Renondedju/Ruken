@@ -1,6 +1,6 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Awaitable.hpp"
+#include "JobSystem/Awaitables/AsyncAwaitable.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -60,7 +60,7 @@ struct Mutex
 
 		#pragma region Awaitables
 
-		struct MutexAwaiter: Awaiter
+		struct MutexAwaiter: AsyncAwaiter
 		{
 			Mutex* mutex;
 
@@ -69,7 +69,7 @@ struct Mutex
 			Access await_resume ()						  const noexcept;
 		};
 
-		struct MutexAwaitable: Awaitable
+		struct MutexAwaitable: AsyncAwaitable
 		{
 			Mutex* mutex;
 
@@ -78,7 +78,7 @@ struct Mutex
 			 * @param in_predicate Predicate indicating if the passed awaiter should be consumed.
 			 * @returns True if the method consumed any awaiters.
 			 */
-			template <std::predicate<Awaiter*> TPredicate>
+			template <std::predicate<AsyncAwaiter*> TPredicate>
 			RkUint64 SignalConsumeIf(TPredicate&& in_predicate) const noexcept;
 
 			/// @returns An awaiter.
@@ -112,7 +112,7 @@ struct Mutex
 		 * @param in_awaiter Awaiter to check for. (unused)
 		 * @return True if the awaiter can be signaled.
 		 */
-		RkBool CanSignal(Awaiter const* in_awaiter) const noexcept;
+		RkBool CanSignal(AsyncAwaiter const* in_awaiter) const noexcept;
 
 		#pragma endregion
 };

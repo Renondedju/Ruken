@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Build/Namespace.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "Core/JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 #include "ECS/ComponentQuery.hpp"
 #include "ECS/EEventName.hpp"

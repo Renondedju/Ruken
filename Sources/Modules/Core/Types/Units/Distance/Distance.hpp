@@ -23,71 +23,52 @@ struct RUKEN_EMPTY_BASES Distance final:
     Comparison,
     Stream
 {
-    #pragma region Constructors
+    #pragma region Lifetime
 
-    using StrongType<RkFloat, Distance<TUnitType>>::StrongType;
+    using StrongType<RkFloat, Distance>::StrongType;
 
-    constexpr Distance()                        = default;
-    constexpr Distance(Distance const& in_copy) = default;
-    constexpr Distance(Distance&&      in_move) = default;
-             ~Distance()                        = default;
+    constexpr Distance()                           = default;
+    constexpr Distance           (Distance const&) = default;
+    constexpr Distance           (Distance&&     ) = default;
+    constexpr Distance& operator=(Distance const&) = default;
+    constexpr Distance& operator=(Distance&&     ) = default;
+             ~Distance()                           = default;
 
     #pragma endregion
 
     #pragma region Operators
 
-    constexpr Distance& operator=(Distance const& in_copy) = default;
-    constexpr Distance& operator=(Distance&&      in_move) = default;
+    /// @brief Kilometers distance conversion
+    [[nodiscard]] constexpr operator Distance<EDistanceUnit::Kilometers>() const noexcept;
 
-    /**
-     * \brief Kilometers distance conversion
-     */
-    [[nodiscard]]
-    constexpr operator Distance<EDistanceUnit::Kilometers>() const noexcept;
+    /// @brief Meters distance conversion
+    [[nodiscard]] constexpr operator Distance<EDistanceUnit::Meters>() const noexcept;
 
-    /**
-     * \brief Meters distance conversion
-     */
-    [[nodiscard]]
-    constexpr operator Distance<EDistanceUnit::Meters>() const noexcept;
-
-    /**
-     * \brief Centimeters distance conversion
-     */
-    [[nodiscard]]
-    constexpr operator Distance<EDistanceUnit::Centimeters>() const noexcept;
+	/// @brief Centimeters distance conversion
+    [[nodiscard]] constexpr operator Distance<EDistanceUnit::Centimeters>() const noexcept;
 
     #pragma endregion
 };
 
 // Type aliases
-
 using Centimeters = Distance<EDistanceUnit::Centimeters>;
 using Meters      = Distance<EDistanceUnit::Meters>;
 using Kilometers  = Distance<EDistanceUnit::Kilometers>;
 
 // Suffixes
-
 template<>
 struct StrongTypeSuffix<Centimeters>
-{
-    static constexpr const RkChar* suffix = " cm";
-};
+{ static constexpr const RkChar* suffix = " cm"; };
 
 template<>
 struct StrongTypeSuffix<Meters>
-{
-    static constexpr const RkChar* suffix = " m";
-};
+{ static constexpr const RkChar* suffix = " m"; };
 
 template<>
 struct StrongTypeSuffix<Kilometers>
-{
-    static constexpr const RkChar* suffix = " km";
-};
+{ static constexpr const RkChar* suffix = " km"; };
 
 // Type literals
-
 constexpr Centimeters operator"" _cm(RkLdouble in_distance) noexcept;
 constexpr Centimeters operator"" _cm(RkULLInt  in_distance) noexcept;
 constexpr Kilometers  operator"" _km(RkLdouble in_distance) noexcept;

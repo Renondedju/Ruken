@@ -3,6 +3,6 @@
 USING_RUKEN_NAMESPACE
 
 GPUImageViewData::GPUImageViewData(vk::raii::Device const& in_owner, vk::ImageViewCreateInfo const& in_create_info):
-	ResourceData {},
+	IResourceData {},
 	image_view   {in_owner, in_create_info}
 {}

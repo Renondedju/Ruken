@@ -2,11 +2,14 @@
 
 #include "Core/Service.hpp"
 #include "Core/Meta/Meta.hpp"
-#include "Build/BuildInfo.hpp"
+#include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
+#include "Rendering/FamilyView.hpp"
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 
 #include <string>
+#include <volk.h>
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_raii.hpp>
 #include <tracy/TracyVulkan.hpp>
@@ -37,13 +40,29 @@ struct RenderDevice final : Service
 
 	#pragma region Methods
 
-	// Getters
-	vk::raii::Instance&       GetInstance()      const noexcept { return m_instance->instance; }
-	vk::raii::PhysicalDevice& GetPhysicalDevice()      noexcept { return m_physical_device; }
-	vk::raii::Device&		  GetDevice()		       noexcept { return m_device; }
-	vk::raii::CommandBuffer&  GetCommandBuffer()       noexcept { return m_command_buffers[0]; }
-	vk::raii::Queue&		  GetQueue()						{ return m_queues.front(); }
-	TracyVkCtx				  TracyContext()     const noexcept { return m_tracy_context; }
+	// --- Device & Instance
+	vk::raii::Instance&       GetInstance()  const noexcept;
+	vk::raii::PhysicalDevice& GetPhysicalDevice()  noexcept;
+	vk::raii::Device&		  GetDevice()		   noexcept;
+	VmaAllocator			  GetAllocator() const noexcept;
+	TracyVkCtx				  TracyContext() const noexcept;
+
+	/**
+	 * Returns the best suited queue family supporting every passed flags.
+	 * If no family is compatible, nullptr will be returned instead.
+	 *
+	 * @param in_queue_flags Requested queue flags.
+	 * @return Pointer to a mutex protecting a vulkan queue family.
+	 */
+	SharedMutex<FamilyView>* FindQueueFamily(vk::QueueFlags in_queue_flags);
+
+	/**
+	 * Attempts to find a suitable memory type.
+	 * @param in_type_filter Bitmask filter.
+	 * @param in_properties Required memory properties.
+	 * @return Memory type index.
+	 */
+	RkUint32 FindMemoryType(RkUint32 in_type_filter, vk::MemoryPropertyFlags in_properties) const;
 
 	#pragma endregion
 
@@ -51,41 +70,44 @@ struct RenderDevice final : Service
 
 		#pragma region Members
 
-		VulkanInstance*			 	 		   m_instance;
-		vk::raii::PhysicalDevice 	 		   m_physical_device;
-		std::string 						   m_name;
-		std::vector<RkFloat>		 		   m_queue_priorities;
-		std::vector<vk::DeviceQueueCreateInfo> m_queue_create_infos;
-		vk::raii::Device		 	 		   m_device;
-		std::vector<vk::raii::Queue> 		   m_queues;
-		vk::raii::CommandPool				   m_command_pool;
-		vk::raii::CommandBuffers			   m_command_buffers;
+		// --- Device & Instance
+		VulkanInstance*			 m_instance;
+		vk::raii::PhysicalDevice m_physical_device;
+		vk::raii::Device		 m_device;
+		std::string 			 m_name;
+		VmaAllocator			 m_allocator;
 
-		#ifdef RUKEN_TRACE_BUILD
+		static inline std::vector<char const*> s_extensions {
+			vk::KHRSwapchainExtensionName,				// Presentation capability
+			vk::EXTSwapchainMaintenance1ExtensionName, // Allows to wait for presentation to end before deleting synchro
 
-		TracyVkCtx m_tracy_context {};
-
-		#endif
-
-		static inline std::vector<const RkChar*> s_extensions {
-			vk::KHRSwapchainExtensionName,
 			vk::KHRSpirv14ExtensionName,
 			vk::KHRSynchronization2ExtensionName,
-			vk::KHRCreateRenderpass2ExtensionName,
 			vk::KHRDynamicRenderingExtensionName,
-			vk::KHRShaderDrawParametersExtensionName,
 
 			// Debug
 			vk::EXTHostQueryResetExtensionName,
 			vk::EXTCalibratedTimestampsExtensionName
 		};
 
+		// --- Queues
+		std::vector<vk::raii::Queue>	     m_queues		 {};
+		std::vector<vk::raii::CommandPool>   m_command_pools {};
+		std::vector<SharedMutex<FamilyView>> m_family_views;
+
+		// --- Instrumentation
+		TracyVkCtx m_tracy_context {};
+
 		#pragma endregion
 
 		#pragma region Methods
 
+		/// @brief Checks for support and inits tracy vulkan context.
+		RkVoid InitTracyVkContext() noexcept;
+
 		vk::raii::PhysicalDevice			   SelectPhysicalDevice() const noexcept;
 		std::vector<vk::DeviceQueueCreateInfo> MakeQueueCreateInfo () const noexcept;
+		RkVoid								   FetchQueues		   () noexcept;
 
 		#pragma endregion
 };

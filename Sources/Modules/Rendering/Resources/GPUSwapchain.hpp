@@ -1,17 +1,16 @@
 #pragma once
 
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 #include "Resources/ResourceHandle.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
-struct GPUSwapchainData final : ResourceData
+struct GPUSwapchainData final : IResourceData
 {
 	vk::raii::SwapchainKHR			 swapchain;
 	std::vector<vk::raii::ImageView> images_views;
-	std::vector<vk::raii::Semaphore> present_semaphores;
 
 	#pragma region Lifetime
 

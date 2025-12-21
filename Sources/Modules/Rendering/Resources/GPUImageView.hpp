@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 #include "Resources/ResourceHandle.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
-struct GPUImageViewData final: ResourceData
+struct GPUImageViewData final: IResourceData
 {
 	vk::raii::ImageView image_view;
 

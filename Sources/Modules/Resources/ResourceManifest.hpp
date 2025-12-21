@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 #include "Resources/ResourceLoadEvent.hpp"
 
 #include <atomic>

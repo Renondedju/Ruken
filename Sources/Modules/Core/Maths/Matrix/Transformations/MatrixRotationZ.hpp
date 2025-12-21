@@ -12,15 +12,10 @@ BEGIN_RUKEN_NAMESPACE
  * \brief Implements the rotation matrix on the z axis
  * \tparam TRows Number of rows of the matrix
  * \tparam TColumns Number of columns of the matrix
- * \tparam TSfinae Special parameter allowing selection of class specialization to enable or disable some functions 
  */
-template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
-struct MatrixRotationZ
-{};
-
-// Z rotation matrix requires at least a 2x2 matrix
 template <RkSize TRows, RkSize TColumns>
-struct MatrixRotationZ<TRows, TColumns, std::enable_if_t<TRows >= 2 && TColumns >= 2>>
+	requires (TRows >= 2 && TColumns >= 2)
+struct MatrixRotationZ
 {
     /**
      * \brief Creates a rotation matrix for the Z axis

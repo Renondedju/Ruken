@@ -1,10 +1,10 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Awaitable.hpp"
+#include "JobSystem/Awaitables/AsyncAwaitable.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-struct AutomaticResetEvent: Awaitable
+struct AutomaticResetEvent: AsyncAwaitable
 {
 	/// @brief Signals a completion to all the attached awaiters.
 	RkBool Signal() const noexcept;
@@ -14,7 +14,7 @@ struct AutomaticResetEvent: Awaitable
 	 * @param in_signal_if Predicate indicating if the passed awaiter should be signaled.
 	 * @returns True if the method signaled any awaiters.
 	 */
-	template <std::predicate<Awaiter*> TSignalIf>
+	template <std::predicate<AsyncAwaiter*> TSignalIf>
 	RkBool SignalIf(TSignalIf&& in_signal_if) const noexcept;
 };
 

@@ -58,7 +58,7 @@ RkBool Window::ShouldClose() const noexcept
 	return glfwWindowShouldClose(m_window);
 }
 
-RkVoid Window::GLFWFramebufferResizeCallback(GLFWwindow* window, int width, int height) noexcept
+RkVoid Window::GLFWFramebufferResizeCallback(GLFWwindow* window, int, int) noexcept
 {
 	static_cast<Window*>(glfwGetWindowUserPointer(window))->RecreateSwapchain();
 }

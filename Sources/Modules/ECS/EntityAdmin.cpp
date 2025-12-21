@@ -2,7 +2,7 @@
 #include "ECS/EntityAdmin.hpp"
 #include "ECS/EventHandlerBase.hpp"
 
-#include "JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 USING_RUKEN_NAMESPACE
 

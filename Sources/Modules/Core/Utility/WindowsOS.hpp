@@ -100,9 +100,17 @@ struct WindowsException final : Exception
 		LPSTR message_buffer {nullptr};
 
 		//Ask Win32 to give us the string version of that message ID.
-		//The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
-		auto value = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_FROM_SYSTEM ,
-					   GetModuleHandleA("ntdll.dll"), in_error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&message_buffer), 0, nullptr);
+		//The parameters we pass in, tell Win32 to create the buffer that holds the
+		//message for us (because we don't yet know how long the message string will be).
+		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+					   FORMAT_MESSAGE_IGNORE_INSERTS  |
+					   FORMAT_MESSAGE_FROM_HMODULE    |
+					   FORMAT_MESSAGE_FROM_SYSTEM,
+			GetModuleHandleA("ntdll.dll"),
+			in_error_code,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			reinterpret_cast<LPSTR>(&message_buffer), 0, nullptr
+		);
 
 		reason = message_buffer;
 

@@ -4,17 +4,17 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template<std::predicate<Awaiter*> TSignalIf>
+template<std::predicate<AsyncAwaiter*> TSignalIf>
 RkBool AutomaticResetEvent::SignalIf(TSignalIf&& in_signal_if) const noexcept
 {
-	AwaiterList const* selection {&m_awaiter_list};
-	Awaiter*           previous  {nullptr};
-	Awaiter*	       continuation;
+	AsyncAwaiterList const* selection {&m_awaiter_list};
+	AsyncAwaiter*           previous  {nullptr};
+	AsyncAwaiter*	       continuation;
 
 	while (true)
 	{
 		// Waiting for any locks
-		while ((continuation = selection->load(std::memory_order_acquire)) == Awaiter::locked)
+		while ((continuation = selection->load(std::memory_order_acquire)) == AsyncAwaiter::locked)
 			;
 
 		// We can signal the previous awaiter.

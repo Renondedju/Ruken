@@ -2,7 +2,7 @@
 
 #include "Core/JobSystem/Awaitables/Primitives/ParallelForEach.hpp"
 #include "Filesystem/Filesystem.hpp"
-#include "Resources/ResourceData.hpp"
+#include "Resources/IResourceData.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -33,9 +33,9 @@ IOTask<RkVoid> AssetImporter::Import(FilePath const& in_file_path) const noexcep
 
 	// For each extracted resource, writing it back to disk
 	co_await ParallelForeach(context.resources,
-		[&](ImportContext::ResourceData const& in_resource) -> DynamicTask<RkVoid> {
+		[&](ImportContext::ResourceData const& in_resource) -> IOTask<RkSize> {
 
-		co_await filesystem
+		return filesystem
 			->Open (in_resource.path)
 			->Write(in_resource.data.data(), {}, in_resource.data.size());
 	});

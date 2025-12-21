@@ -10,15 +10,9 @@ BEGIN_RUKEN_NAMESPACE
  * \brief Implements translation matrix
  * \tparam TRows Number of rows of the matrix
  * \tparam TColumns Number of columns of the matrix
- * \tparam TSfinae Special parameter allowing selection of class specialization to enable or disable some functions 
  */
-template <RkSize TRows, RkSize TColumns, typename TSfinae = RkVoid>
-struct MatrixTranslation
-{};
-
-// Requires a 4x4 matrix
 template <RkSize TRows, RkSize TColumns>
-struct MatrixTranslation<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumns == 4>>
+struct MatrixTranslation
 {
     /**
      * \brief Generates a translation matrix.
@@ -27,12 +21,13 @@ struct MatrixTranslation<TRows, TColumns, std::enable_if_t<TRows == 4 && TColumn
      */
     [[nodiscard]]
     static Matrix<TRows, TColumns> TranslationMatrix(Vector3m const& in_translation) noexcept
+        requires (TRows == 4 && TColumns == 4)
     {
-        return {
-            1.0F,  0.0F,  0.0F,  static_cast<RkFloat>(in_translation.x),
-            0.0F,  1.0F,  0.0F,  static_cast<RkFloat>(in_translation.y),
-            0.0F,  0.0F,  1.0F,  static_cast<RkFloat>(in_translation.z),
-            0.0F,  0.0F,  0.0F,  1.0F
+        return Matrix<4, 4> {
+            1.0F, 0.0F, 0.0F, 0.0F,
+            0.0F, 1.0F, 0.0F, 0.0F,
+            0.0F, 0.0F, 1.0F, 0.0F,
+            in_translation.x, in_translation.y, in_translation.z, 1.0F
         };
     }
 };

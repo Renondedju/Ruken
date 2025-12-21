@@ -19,13 +19,13 @@ BEGIN_RUKEN_NAMESPACE
 template<EDurationUnit TUnitType>
 struct RUKEN_EMPTY_BASES Duration final:
     StrongType<RkFloat, Duration<TUnitType>>,
-    Arithmetic<Duration<TUnitType>>,
-    Comparison<Duration<TUnitType>>,
-    Stream    <Duration<TUnitType>>
+    Arithmetic,
+    Comparison,
+    Stream
 {
     #pragma region Constructors
 
-    using StrongType<RkFloat, Duration<TUnitType>>::StrongType;
+    using StrongType<RkFloat, Duration>::StrongType;
 
     constexpr Duration()                        = default;
     constexpr Duration(Duration const& in_copy) = default;
@@ -90,11 +90,11 @@ struct StrongTypeSuffix<Minutes>
 // Type literals
 
 constexpr Milliseconds operator"" _ms (RkLdouble in_duration) noexcept;
-constexpr Milliseconds operator"" _ms (RkSize    in_duration) noexcept;
+constexpr Milliseconds operator"" _ms (RkULLInt  in_duration) noexcept;
 constexpr Seconds      operator"" _sec(RkLdouble in_duration) noexcept;
-constexpr Seconds      operator"" _sec(RkSize    in_duration) noexcept;
+constexpr Seconds      operator"" _sec(RkULLInt  in_duration) noexcept;
 constexpr Minutes      operator"" _min(RkLdouble in_duration) noexcept;
-constexpr Minutes      operator"" _min(RkSize    in_duration) noexcept;
+constexpr Minutes      operator"" _min(RkULLInt  in_duration) noexcept;
 
 #include "Duration.inl"
 

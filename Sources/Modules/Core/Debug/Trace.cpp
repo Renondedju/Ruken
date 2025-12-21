@@ -7,31 +7,33 @@
 USING_RUKEN_NAMESPACE
 
 ___tracy_source_location_data* TracyUtilities::GetOrInsertSourceLocationData(
-    std::source_location const& in_source_location,
-    const    char*              in_name,
-    uint32_t const              in_color) noexcept
+    [[maybe_unused]] std::source_location const& in_source_location,
+    [[maybe_unused]] const    char*              in_name,
+    [[maybe_unused]] uint32_t const              in_color) noexcept
 {
 #ifdef TRACY_ENABLE
     {
         std::shared_lock shared_lock(m_source_location_mutex);
 
-        if (m_source_location_registery.contains(in_source_location))
-            return &m_source_location_registery.at(in_source_location);
+        if (m_source_location_registry.contains(in_source_location))
+            return &m_source_location_registry.at(in_source_location);
     }
 
     std::unique_lock unique_lock(m_source_location_mutex);
 
-    m_source_location_registery.try_emplace(in_source_location, ___tracy_source_location_data {
+    m_source_location_registry.try_emplace(in_source_location, ___tracy_source_location_data {
         in_name, in_source_location.function_name(), in_source_location.file_name(), in_source_location.line(), in_color
     });
 
-    return &m_source_location_registery.at(in_source_location);
+    return &m_source_location_registry.at(in_source_location);
 #else
     return nullptr;
 #endif
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(___tracy_source_location_data* in_source_data, bool in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(
+    [[maybe_unused]] ___tracy_source_location_data* in_source_data,
+    [[maybe_unused]] bool                           in_active) noexcept
 {
     TracyCZoneCtx ctx {};
 
@@ -75,7 +77,8 @@ TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location,
         GetOrInsertSourceLocationData(in_source_location, in_name.data(), in_color), in_active);
 }
 
-RkVoid TracyUtilities::TracyZoneEnd(TracyCZoneCtx const& out_context) noexcept
+RkVoid TracyUtilities::TracyZoneEnd(
+    [[maybe_unused]] TracyCZoneCtx const& out_context) noexcept
 {
     TracyCZoneEnd(out_context);
 }

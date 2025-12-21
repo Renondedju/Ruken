@@ -1,6 +1,6 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Awaitable.hpp"
+#include "JobSystem/Awaitables/AsyncAwaitable.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -15,9 +15,22 @@ enum class EAccessType: RkUint64
  *
  * @tparam TData Data type to be protected
  */
-template <std::default_initializable TData>
+template <typename TData>
 struct SharedMutex
 {
+	#pragma region Lifetime
+
+	/// @brief Forwards all passed arguments to TData(TArgs...)
+	template <typename... TArgs> requires std::constructible_from<TData, TArgs...>
+	explicit SharedMutex(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TData, TArgs...>);
+	SharedMutex			  (const SharedMutex&) = default;
+	SharedMutex			  (SharedMutex&&)      = default;
+	SharedMutex& operator=(const SharedMutex&) = default;
+	SharedMutex& operator=(SharedMutex&&)	   = default;
+	~SharedMutex()							   = default;
+
+	#pragma endregion
+
 	#pragma region Access
 
 	struct ReadAccess
@@ -31,6 +44,7 @@ struct SharedMutex
 		ReadAccess&  operator=(ReadAccess const&) noexcept;
 		ReadAccess&  operator=(ReadAccess&&     ) noexcept;
 		TData const& operator*()		    const noexcept;
+		TData const* operator->()		    const noexcept;
 
 	protected:
 
@@ -48,6 +62,7 @@ struct SharedMutex
 		WriteAccess& operator=(WriteAccess const&) = delete;
 		WriteAccess& operator=(WriteAccess&&     ) noexcept;
 		TData&       operator*()                   noexcept;
+		TData*		 operator->()		           noexcept;
 
 	protected:
 
@@ -56,33 +71,11 @@ struct SharedMutex
 
 	#pragma endregion
 
-	#pragma region Methods
+	#pragma region Awaitables
 
-	/// @brief Creates an awaitable that returns access to the underlying data.
-	auto AsyncRead () noexcept { return MakeAwaitable<ReadAccess >(EAccessType::Read ); }
-	auto AsyncWrite() noexcept { return MakeAwaitable<WriteAccess>(EAccessType::Write); }
-
-	#pragma endregion
-
-	private:
-
-		#pragma region Awaitables
-
-		struct MutexAwaitable: Awaitable
-		{
-			SharedMutex* mutex;
-			EAccessType  access_type;
-
-			/**
-			 * @brief Signals & consumes the attached awaiters until in_predicate returns false.
-			 * @param in_predicate Predicate indicating if the passed awaiter should be consumed.
-			 * @returns True if the method consumed any awaiters.
-			 */
-			template <std::predicate<Awaiter*> TPredicate>
-			RkUint64 SignalConsumeIf(TPredicate&& in_predicate) const noexcept;
-		};
-
-		struct MutexAwaiter: Awaiter
+	struct MutexAwaitable: AsyncAwaitable
+	{
+		struct Awaiter: AsyncAwaiter
 		{
 			SharedMutex* mutex;
 
@@ -90,7 +83,46 @@ struct SharedMutex
 			RkBool await_suspend(std::coroutine_handle<>)       noexcept;
 		};
 
-		#pragma endregion
+		/**
+		 * @brief Signals & consumes the attached awaiters until in_predicate returns false.
+		 * @param in_predicate Predicate indicating if the passed awaiter should be consumed.
+		 * @returns True if the method consumed any awaiters.
+		 */
+		template <std::predicate<AsyncAwaiter*> TPredicate>
+		RkUint64 SignalConsumeIf(TPredicate&& in_predicate) const noexcept;
+	};
+
+	struct ReadAwaitable
+	{
+		SharedMutex* mutex;
+
+		struct Awaiter: MutexAwaitable::Awaiter
+		{ ReadAccess await_resume() const noexcept; };
+
+		Awaiter operator co_await() const;
+	};
+
+	struct WriteAwaitable
+	{
+		SharedMutex* mutex;
+
+		struct Awaiter: MutexAwaitable::Awaiter
+		{ WriteAccess await_resume() const noexcept; };
+
+		Awaiter operator co_await() const;
+	};
+
+	#pragma endregion
+
+	#pragma region Methods
+
+	/// @brief Returns an awaitable to read or write to the underlying data.
+	ReadAwaitable  AsyncRead () noexcept;
+	WriteAwaitable AsyncWrite() noexcept;
+
+	#pragma endregion
+
+	private:
 
 		friend ReadAccess;
 		friend WriteAccess;
@@ -106,15 +138,6 @@ struct SharedMutex
 		#pragma region Methods
 
 		/**
-		 * Creates an async event that returns access to the underlying data
-		 * @tparam TAccess Access class
-		 * @param in_access_type Access type
-		 * @return Awaitable instance
-		 */
-		template <typename TAccess>
-		auto MakeAwaitable(EAccessType in_access_type) noexcept;
-
-		/**
 		* Consumes the following awaiters if any.
 		* The method is thread safe and will only trigger if concurrency equals 0.
 		*/
@@ -125,7 +148,7 @@ struct SharedMutex
 		 * @param in_awaiter Awaiter to check for.
 		 * @return True if the awaiter can be signaled.
 		 */
-		RkBool CanSignal(Awaiter const* in_awaiter) noexcept;
+		RkBool CanSignal(AsyncAwaiter const* in_awaiter) noexcept;
 
 		#pragma endregion
 };

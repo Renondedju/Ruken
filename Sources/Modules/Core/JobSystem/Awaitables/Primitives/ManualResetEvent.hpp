@@ -1,10 +1,10 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Awaitable.hpp"
+#include "JobSystem/Awaitables/AsyncAwaitable.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-struct ManualResetEvent: Awaitable
+struct ManualResetEvent: AsyncAwaitable
 {
 	/// @return Returns true if the event has already been completed, false otherwise
 	[[nodiscard]]

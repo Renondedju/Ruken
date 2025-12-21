@@ -42,7 +42,7 @@ struct Modulo
     template<typename TStrongType>
     constexpr TStrongType operator%(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
     {
-		using TBase = typename TStrongType::TUnderlying;
+		using TBase = TStrongType::TUnderlying;
 
         return TStrongType(static_cast<TBase>(in_lhs) % static_cast<TBase>(in_rhs));
     }

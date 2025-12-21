@@ -1,34 +1,42 @@
 #pragma once
 
-#include "Core/Types/FundamentalTypes.hpp"
-#include "Resources/ResourceData.hpp"
+#include "Rendering/RenderDevice.hpp"
+#include "Resources/IResourceData.hpp"
 
-#include <vulkan/vulkan_raii.hpp>
+#include <vulkan/vulkan.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 
-class GPUBuffer final: ResourceData
+struct GPUBuffer final: IResourceData
 {
-	vk::raii::Buffer buffer;
-
-	// Synchronisation tracking
-	vk::PipelineStageFlagBits2 current_stage_flag;
-	vk::AccessFlagBits2        current_access_flag;
-	RkUint32				   current_queue_family {VK_QUEUE_FAMILY_IGNORED};
-
 	#pragma region Lifetime
 
 	/**
 	 * Constructor.
 	 * @param in_device Owning device.
 	 * @param in_create_info Buffer create info.
+	 * @param in_alloc_info Allocation info.
 	 */
-	GPUBuffer(vk::raii::Device const& in_device, vk::BufferCreateInfo const& in_create_info);
+	explicit GPUBuffer(
+		RenderDevice&				   in_device,
+		vk::BufferCreateInfo    const& in_create_info,
+		VmaAllocationCreateInfo const& in_alloc_info
+	);
+
 	GPUBuffer(GPUBuffer const&)			   = delete;
 	GPUBuffer(GPUBuffer&&     )			   = default;
 	GPUBuffer& operator=(GPUBuffer const&) = delete;
 	GPUBuffer& operator=(GPUBuffer&&     ) = default;
-	~GPUBuffer() override				   = default;
+	~GPUBuffer() override;
+
+	#pragma endregion
+
+	#pragma region Members
+
+	RenderDevice*  device;
+	vk::DeviceSize size;
+	vk::Buffer     buffer;
+	VmaAllocation  allocation;
 
 	#pragma endregion
 };

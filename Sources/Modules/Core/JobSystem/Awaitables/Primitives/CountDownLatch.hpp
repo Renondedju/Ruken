@@ -1,6 +1,6 @@
 #pragma once
 
-#include "JobSystem/Awaitables/Awaitable.hpp"
+#include "JobSystem/Awaitables/AsyncAwaitable.hpp"
 #include "JobSystem/Awaitables/Primitives/ManualResetEvent.hpp"
 
 BEGIN_RUKEN_NAMESPACE

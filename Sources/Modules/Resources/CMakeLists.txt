@@ -7,7 +7,7 @@ register_ruken_module(RkResources)
 # Files
 target_sources(RkResources PUBLIC
     FILE_SET HEADERS FILES
-        ResourceData.hpp
+        IResourceData.hpp
         ResourceHandle.hpp
         ResourceLoader.hpp
         ResourceManifest.hpp
@@ -16,12 +16,14 @@ target_sources(RkResources PUBLIC
         Assets/AssetImporter.hpp
         Assets/ImportContext.hpp
         ResourceManager.hpp
+        MemoryStreamBuffer.hpp
 )
 
 target_sources(RkResources PRIVATE
         ResourceManager.cpp
         ResourceLoadEvent.cpp
         Assets/AssetImporter.cpp
+        MemoryStreamBuffer.cpp
 )
 
 target_link_libraries(RkResources PUBLIC RkCore)

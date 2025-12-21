@@ -20,8 +20,9 @@ RkVoid JobSystem::ProcessQueue(JobQueue* in_queue, RkBool const in_sticky, std::
         else
             in_queue->RunMultiple(in_stop_token);
     }
-    catch (std::exception& in_exception) {
-        const char* what {in_exception.what()};
+    catch (std::exception& in_exception)
+    {
+        [[maybe_unused]] const char* what {in_exception.what()};
         TracyMessageC(what, strlen(what), 0xFF0000);
     }
 }
@@ -42,13 +43,13 @@ JobSystem::JobSystem(
     m_bias_function {in_bias_function},
     m_request_tree  {in_queues.size()}
 {
-    m_service_provider.LocateService<Logger>()->Info(service_name,
-        "Starting job system with {} worker(s) and {} queue(s)", in_worker_count, m_queues.size());
+    if (auto const logger {m_service_provider.LocateService<Logger>()})
+        logger->Info(service_name, "Starting job system with {} worker(s) and {} queue(s)", in_worker_count, m_queues.size());
 
     // Registering queues
     for (auto&& [index, queue]: std::views::enumerate(m_queues))
     {
-        queue->SetMaximumConcurrency(in_worker_count);
+        queue->SetMaximumConcurrency(static_cast<RkUint16>(in_worker_count));
         queue->OnRegister(m_request_tree, BinaryTreePath {
             .path      = static_cast<RkUint64>(index),
             .depth     = m_request_tree.tree.max_depth,

@@ -2,6 +2,8 @@
 
 #include "Core/Containers/BinaryTreePath.hpp"
 
+#include <memory>
+
 BEGIN_RUKEN_NAMESPACE
 
 /**

@@ -41,24 +41,26 @@ class StrongType
 
         using TUnderlying = TBase;
 
-        #pragma region Constructors
+        #pragma region Lifetime
 
-        template<typename TType>
-        requires std::is_convertible_v<TType, TBase>
+        /// @brief Copy conversion constructor
+        template<typename TType> requires std::is_convertible_v<TType, TBase>
         explicit constexpr StrongType(TType const& in_copy) noexcept:
             m_value {static_cast<TBase>(in_copy)}
         {}
 
-        template<typename TType>
-        requires std::is_convertible_v<TType, TBase>
+        /// @brief Move conversion constructor
+        template<typename TType> requires std::is_convertible_v<TType, TBase>
         explicit constexpr StrongType(TType&& in_move) noexcept:
             m_value {static_cast<TBase>(std::forward<TType>(in_move))}
         {}
 
-        constexpr StrongType()                          = default;
-        constexpr StrongType(StrongType const& in_copy) = default;
-        constexpr StrongType(StrongType&&      in_move) = default;
-                 ~StrongType()                          = default;
+        constexpr StrongType()                             = default;
+        constexpr StrongType           (StrongType const&) = default;
+        constexpr StrongType           (StrongType&&     ) = default;
+        constexpr StrongType& operator=(StrongType const&) = default;
+        constexpr StrongType& operator=(StrongType&&     ) = default;
+                 ~StrongType()                             = default;
 
         #pragma endregion
 
@@ -67,19 +69,12 @@ class StrongType
         template <typename TType>
         requires std::is_convertible_v<TBase, TType>
         explicit constexpr operator TType&() noexcept
-        {
-            return m_value;
-        }
+        { return static_cast<TType&>(m_value); }
 
         template <typename TType>
         requires std::is_convertible_v<TBase, TType>
         explicit constexpr operator TType const&() const noexcept
-        {
-            return m_value;
-        }
-
-        constexpr StrongType& operator=(StrongType const& in_copy) = default;
-        constexpr StrongType& operator=(StrongType&&      in_move) = default;
+        { return static_cast<TType const&>(m_value); }
 
         #pragma endregion
 };

@@ -4,6 +4,7 @@
 
 #include "Types/StrongType/Operators/Comparison/Less.hpp"
 #include "Types/StrongType/Operators/Comparison/Equal.hpp"
+#include "Types/StrongType/Operators/Comparison/MinMax.hpp"
 #include "Types/StrongType/Operators/Comparison/Greater.hpp"
 #include "Types/StrongType/Operators/Comparison/NotEqual.hpp"
 #include "Types/StrongType/Operators/Comparison/LessEqual.hpp"
@@ -18,6 +19,7 @@ BEGIN_RUKEN_NAMESPACE
 struct RUKEN_EMPTY_BASES Comparison:
     Less,
     Equal,
+    MinMax,
     Greater,
     NotEqual,
     LessEqual,

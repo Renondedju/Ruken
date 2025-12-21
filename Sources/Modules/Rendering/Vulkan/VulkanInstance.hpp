@@ -2,13 +2,13 @@
 
 #include "Rendering/Vulkan/VulkanLoaderInstance.hpp"
 
-#include "Types/FundamentalTypes.hpp"
+#include "Core/Meta/Meta.hpp"
 #include "Core/Service.hpp"
-#include "Meta/Meta.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 
 BEGIN_RUKEN_NAMESPACE
+
 
 /// @brief Stores and manages the project-wide Vulkan instance.
 struct VulkanInstance final: Service
@@ -40,7 +40,7 @@ struct VulkanInstance final: Service
 	vk::raii::Context    	 context {};
 	vk::ApplicationInfo		 app_info;
 	vk::raii::Instance   	 instance;
-	VkDebugUtilsMessengerEXT debug_utils_messenger;
+	VkDebugUtilsMessengerEXT debug_utils_messenger {nullptr};
 
 	private:
 

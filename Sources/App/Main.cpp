@@ -1,7 +1,6 @@
-#include "Rendering.hpp"
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
-#include "Core/JobSystem/Awaitables/Tasks/Task.hpp"
+#include "Core/JobSystem/Awaitables/AsyncTask/AsyncTask.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/WhenAll.hpp"
 #include "Core/JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp"
 
@@ -10,6 +9,7 @@
 #include "Core/Debug/Logging/Handlers/ConsoleHandler.hpp"
 
 #include "Core/Maths/Vector/PixelVector2.hpp"
+#include "Core/Time/Clock.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
 #include "Filesystem/STD/StdFilesystem.hpp"
@@ -17,13 +17,16 @@
 #include "Resources/Assets/AssetImporter.hpp"
 #include "Resources/ResourceManager.hpp"
 
+#include "Rendering/RenderDevice.hpp"
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 #include "Rendering/Windowing/Window.hpp"
-#include "Rendering/SlangImporter.hpp"
-#include "Rendering/RenderDevice.hpp"
-#include "Rendering/ShaderModule.hpp"
-#include "Rendering/SpirvLoader.hpp"
+#include "Rendering/Resources/SlangImporter.hpp"
+#include "Rendering/Resources/ShaderModule.hpp"
+#include "Rendering/Resources/SpirvLoader.hpp"
+#include "Rendering/Resources/ObjLoader.hpp"
+#include "Rendering/Resources/GPUMesh.hpp"
 
+#include "Rendering.hpp"
 #include "Queues.hpp"
 
 USING_RUKEN_NAMESPACE
@@ -34,35 +37,43 @@ USING_RUKEN_NAMESPACE
  * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
  * @param in_service_provider Service Provider.
  */
-Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
+AsyncTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
 {
-    Logger    const* logger        {in_service_provider.LocateService<Logger>         ()};
+    Logger const*    logger        {in_service_provider.LocateService<Logger>         ()};
+    Clock  const*    clock         {in_service_provider.LocateService<Clock>          ()};
     ResourceManager* resources     {in_service_provider.LocateService<ResourceManager>()};
     RenderDevice*    render_device {in_service_provider.LocateService<RenderDevice>   ()};
 
     try {
 
-        // Loading pipeline code
+        // Loading resources
         auto const code {resources->Request<ShaderModule>(FilePath {
             .location = EFilesystemLocation::ProjectDirectory,
             .path     = "slang.spv",
         })};
+        auto const mesh {resources->Request<GPUMesh>(FilePath {
+            .location = EFilesystemLocation::ProjectDirectory,
+            .path     = "suzanne.obj",
+        })};
 
-        Window window  {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
-        TestWindowRenderer const test_window_renderer {
+        Window             window  {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
+        TestWindowRenderer test_window_renderer {
             .owner    = *render_device,
             .window   = window,
-            .pipeline = code
+            .pipeline = code,
+            .mesh     = mesh
         };
 
-        co_await code.LoadEvent();
+        // Waiting for every resource to load
+        co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
 
+        // Main loop
         while (!window.ShouldClose())
         {
             FrameMark;
 
             glfwPollEvents();
-            co_await test_window_renderer.RenderFrame();
+            co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
         }
 
     } catch (Exception& in_exception) {
@@ -82,6 +93,8 @@ Task<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider cons
 int main([[maybe_unused]] int   in_arg_count,
          [[maybe_unused]] char* in_arg_values[])
 {
+    ZoneScoped;
+
     // 1. --- Pre-initialization & Configuration ---
     SingleThreadSingleQueueExecutor main_executor   {MainQueue::instance};
     ConsoleHandler                  console_handler {};
@@ -98,10 +111,14 @@ int main([[maybe_unused]] int   in_arg_count,
     };
 
     std::vector<const RkChar*> vulkan_layers     {};
-    std::vector<const RkChar*> vulkan_extensions {};
+    std::vector<const RkChar*> vulkan_extensions {
+        vk::KHRGetSurfaceCapabilities2ExtensionName,
+        vk::EXTSurfaceMaintenance1ExtensionName
+    };
 
     // 2. --- Initializing services and core systems ---
     ServiceProvider   services {"Application"};
+    auto* clock      {services.ProvideService<Clock>()};
     auto* logger     {services.ProvideService<Logger>(handlers)};
     auto* job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
     auto* filesystem {services.ProvideService<StdFilesystem>("../Assets")};
@@ -112,6 +129,7 @@ int main([[maybe_unused]] int   in_arg_count,
 
     importer ->ProvideImporter<SlangImporter>(); // TODO: Not used or working yet. Slang API is whack.
     resources->ProvideLoader  <SpirvLoader>  ();
+    resources->ProvideLoader  <ObjLoader>    ();
 
     // 3. --- Finally, running async main ---
     std::stop_source stop_source {};

@@ -20,14 +20,15 @@ struct MatrixTransposition
      * \brief Transposes the matrix
      * \return Transposed matrix
      */
+    template <typename TThis>
     [[nodiscard]]
-    constexpr Matrix<TColumns, TRows> Transposed() const noexcept
+    constexpr Matrix<TColumns, TRows> Transposed(this TThis const& in_this) noexcept
     {
         Matrix<TColumns, TRows> transposed;
 
         for (RkSize row {0ULL}; row < TRows; ++row)
             for (RkSize column {0ULL}; column < TColumns; ++column)
-                MatrixAccess::At(transposed, column, row) = MatrixAccess::At(*static_cast<Matrix<TRows, TColumns> const*>(this), row, column);
+                MatrixAccess::At(transposed, column, row) = MatrixAccess::At(in_this, row, column);
 
         return transposed;
     }

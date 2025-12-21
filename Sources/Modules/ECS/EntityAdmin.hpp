@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "Core/Service.hpp"
-#include "JobSystem/Awaitables/Tasks/DynamicTask.hpp"
+#include "JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
 #include "ECS/System.hpp"

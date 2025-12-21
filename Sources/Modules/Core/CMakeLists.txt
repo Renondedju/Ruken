@@ -10,10 +10,8 @@ set(TRACY_NO_FRAME_IMAGE ON)
 set(TRACY_NO_SAMPLING    ON)
 set(TRACY_NO_VERIFY      ON)
 
-# "https://github.com/wolfpld/tracy/archive/refs/tags/v0.12.2.zip"
-# Using a commit right after 0.12.2 to get TracyVkCollectHost. Master would require us to recompile the server.
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/7f6efe3bd4a06d6e460465c6f0f47f32df25685d.zip" NAME tracy)
-CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip"                   NAME atomic_queue)
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.13.0.zip"      NAME tracy)
+CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
 
 # atomic_queue has no CMake support and is a header only library
 if (atomic_queue_ADDED)
@@ -24,6 +22,8 @@ endif()
 
 target_sources(RkCore PUBLIC
         FILE_SET HEADERS FILES
+    JobSystem/Awaitables/AwaitableTraits.hpp
+    Time/Clock.hpp
     Bitwise/Bitmask.hpp
     Bitwise/Endian.hpp
     Bitwise/SizedBitmask.hpp
@@ -32,17 +32,17 @@ target_sources(RkCore PUBLIC
     Build/Namespace.hpp
     Containers/LinkedChunkList.hpp
     Containers/LinkedChunkListNode.hpp
-    JobSystem/Concepts/CAwaitable.hpp
-    JobSystem/Concepts/CQueueHandle.hpp
+    JobSystem/Queues/IsQueueHandle.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
     JobSystem/Awaitables/Primitives/CountDownLatch.hpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.hpp
     JobSystem/Awaitables/Primitives/Mutex.hpp
-    JobSystem/Awaitables/Tasks/DynamicTask.hpp
-    JobSystem/Awaitables/Tasks/Task.hpp
-    JobSystem/Awaitables/Tasks/TaskPromise.hpp
-    JobSystem/Awaitables/Awaitable.hpp
-    JobSystem/Awaitables/Tasks/TaskAwaiter.hpp
+    JobSystem/Awaitables/AsyncTask/DynamicTask.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTask.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.hpp
+    JobSystem/Awaitables/AsyncAwaitable.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.hpp
     JobSystem/Queues/JobQueue.hpp
     JobSystem/Queues/DynamicQueue.hpp
     JobSystem/Queues/QueueHandle.hpp
@@ -50,6 +50,12 @@ target_sources(RkCore PUBLIC
     JobSystem/Concurrency.hpp
     JobSystem/WorkerInfo.hpp
     JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp
+    JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp
+    JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.inl
+    JobSystem/Awaitables/SyncTask/SyncTaskPromise.hpp
+    JobSystem/Awaitables/SyncTask/SyncTaskPromise.inl
+    JobSystem/Awaitables/SyncTask/SyncTask.hpp
+    JobSystem/Awaitables/SyncTask/SyncTask.inl
     Debug/Exception.hpp
     Service.hpp
     ServiceLoader.hpp
@@ -180,7 +186,7 @@ target_sources(RkCore PUBLIC
     Bitwise/Bitmask.inl
     Bitwise/SizedBitmask.inl
     Containers/LinkedChunkList.inl
-    JobSystem/Awaitables/Task.inl
+        JobSystem/Awaitables/AsyncTask/AsyncTask.inl
     Service.inl
     ServiceProvider.inl
     Maths/Quaternion/Quaternion.inl
@@ -189,16 +195,15 @@ target_sources(RkCore PUBLIC
     Types/Units/Duration/Duration.inl
     Debug/Trace.hpp
     Debug/SourceLocation.hpp
-    JobSystem/Awaitables/TaskPromise.inl
+        JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.inl
     Meta/FirstOf.hpp
     JobSystem/Awaitables/Primitives/WhenAll.hpp
     JobSystem/Awaitables/SignalReceiver.hpp
-    JobSystem/Awaitables/Awaiter.hpp
+        JobSystem/Awaitables/AsyncAwaiter.hpp
     JobSystem/Awaitables/Primitives/SharedMutex.hpp
     JobSystem/Awaitables/Primitives/SharedMutex.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.inl
     JobSystem/Awaitables/Primitives/Mutex.inl
-    JobSystem/Concepts/CTaskResult.hpp
     Debug/Logging/Handlers/DebugHandler.hpp
     Debug/Logging/Logger.inl
     Containers/BinaryTree.hpp
@@ -208,6 +213,7 @@ target_sources(RkCore PUBLIC
 )
 
 target_sources(RkCore PRIVATE
+    Time/Clock.cpp
     JobSystem/Awaitables/Primitives/CountDownLatch.cpp
     JobSystem/JobQueue.cpp
     JobSystem/JobSystem.cpp
@@ -227,8 +233,8 @@ target_sources(RkCore PRIVATE
     Maths/Utility.cpp
     Utility/Benchmark.cpp
     Debug/Trace.cpp
-    JobSystem/Awaitables/Awaitable.cpp
-    JobSystem/Awaitables/Awaiter.cpp
+    JobSystem/Awaitables/AsyncAwaitable.cpp
+    JobSystem/Awaitables/AsyncAwaiter.cpp
     JobSystem/Awaitables/Primitives/ManualResetEvent.cpp
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.cpp
     JobSystem/Executors/SingleThreadSingleQueueExecutor.cpp

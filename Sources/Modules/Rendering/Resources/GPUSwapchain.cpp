@@ -3,7 +3,7 @@
 USING_RUKEN_NAMESPACE
 
 GPUSwapchainData::GPUSwapchainData(vk::raii::Device const& in_device, vk::SwapchainCreateInfoKHR const& in_swapchain_create_info):
-	ResourceData {},
+	IResourceData {},
 	swapchain    {in_device.createSwapchainKHR(in_swapchain_create_info)},
 	images_views {[&] { // -- Creating image views
 		std::vector<vk::raii::ImageView> views {};
@@ -31,13 +31,5 @@ GPUSwapchainData::GPUSwapchainData(vk::raii::Device const& in_device, vk::Swapch
 		}
 
 		return views;
-	}()},
-	present_semaphores {[&] {
-		std::vector<vk::raii::Semaphore> semaphores {};
-
-		for (auto const _ : swapchain.getImages())
-			semaphores.emplace_back(in_device, vk::SemaphoreCreateInfo { .flags = {}});
-
-		return semaphores;
 	}()}
 {}

@@ -20,7 +20,7 @@ RkVoid ResourceHandle<TData>::Exchange(ResourcePtr<TData>&& in_data) noexcept
 {
    RUKEN_ASSERT(in_data != nullptr, "in_data must be a valid pointer");
 
-   m_manifest->resource_ptr.exchange(ResourcePtrCast<ResourceData, TData>(in_data), std::memory_order_relaxed);
+   m_manifest->resource_ptr.exchange(ResourcePtrCast<IResourceData, TData>(in_data), std::memory_order_relaxed);
    m_manifest->load_event  .Trigger ();
 }
 
@@ -33,7 +33,7 @@ ResourceLoadEvent const& ResourceHandle<TData>::LoadEvent() const
 template<CResourceData TData>
 ResourcePtr<TData> ResourceHandle<TData>::Current() const noexcept
 {
-   return ResourcePtrCast<TData, ResourceData>(m_manifest->resource_ptr.load(std::memory_order_relaxed));
+   return ResourcePtrCast<TData, IResourceData>(m_manifest->resource_ptr.load(std::memory_order_relaxed));
 }
 
 END_RUKEN_NAMESPACE
