@@ -1,12 +1,12 @@
 #include "ECS/System.hpp"
-#include "ECS/EventHandlerBase.hpp"
+#include "ECS/SystemEventHandler.hpp"
 
 #include <ranges>
 
 USING_RUKEN_NAMESPACE
 
-System::System(Universe& in_admin) noexcept:
-    m_admin {in_admin}
+System::System(Universe& in_universe) noexcept:
+    m_universe {in_universe}
 { }
 
 RkVoid System::BindArchetype(Archetype& in_archetype) noexcept
@@ -16,7 +16,7 @@ RkVoid System::BindArchetype(Archetype& in_archetype) noexcept
             event_handler->AddArchetypeReference(in_archetype);
 }
 
-EventHandlerBase* System::GetEventHandler(EEventName const in_event_name) const noexcept
+SystemEventHandler* System::GetEventHandler(EEventName const in_event_name) const noexcept
 {
     if (m_handlers.contains(in_event_name))
         return m_handlers.at(in_event_name).get();

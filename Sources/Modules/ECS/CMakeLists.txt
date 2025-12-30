@@ -7,56 +7,41 @@ register_ruken_module(RkECS)
 # Files
 target_sources(RkECS PUBLIC
         FILE_SET HEADERS FILES
-    Test/CounterSystem.hpp
     Archetype.hpp
     Archetype.inl
-    ArchetypeFingerprint.hpp
-    ArchetypeFingerprint.inl
-    Component.hpp
-    Component.inl
-    ComponentBase.hpp
-    ComponentCounter.hpp
-    ComponentField.hpp
+        ComponentFingerprint.hpp
+        ComponentFingerprint.inl
+    Components/EntityComponent.hpp
+    Components/EntityComponent.inl
+    Components/Component.hpp
     ComponentQuery.hpp
     ComponentQuery.inl
     ComponentView.hpp
     ComponentView.inl
     EEventName.hpp
     Entity.hpp
-        Universe.hpp
-        Universe.inl
-    EventHandler.hpp
-    EventHandler.inl
-    EventHandlerBase.hpp
-    ExclusiveComponent.hpp
+    Universe.hpp
+    Universe.inl
+    SystemEventHandler.hpp
+    Components/UniverseComponent.hpp
     Range.hpp
     System.hpp
     System.inl
-    TagComponent.hpp
-    Test/CounterComponent.hpp
-    Safety/ViewType.hpp
-    Safety/TagComponentType.hpp
-    Safety/SystemType.hpp
-    Safety/ExclusiveComponentType.hpp
-    Safety/EventHandlerType.hpp
-    Safety/ComponentType.hpp
-    Safety/ComponentFieldType.hpp
-    Safety/AnyComponentType.hpp
+    Components/TagComponent.hpp
     Meta/ItemHelper.hpp
-    Meta/FieldHelper.hpp
     Meta/ComponentHelper.hpp
 )
 
 target_sources(RkECS PRIVATE
     Archetype.cpp
     Entity.cpp
-    EventHandlerBase.cpp
-        Universe.cpp
+    SystemEventHandler.cpp
+    Universe.cpp
     Range.cpp
-    TagComponent.cpp
+    Components/TagComponent.cpp
     System.cpp
     ComponentQuery.cpp
-    ComponentBase.cpp
+    Components/Component.cpp
 )
 
 if (MSVC)

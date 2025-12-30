@@ -1,5 +1,6 @@
 #pragma once
 
+#include <span>
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -11,10 +12,6 @@
 #include "ECS/System.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/EEventName.hpp"
-
-#include "ECS/Safety/SystemType.hpp"
-#include "ECS/Safety/AnyComponentType.hpp"
-#include "ECS/Safety/ExclusiveComponentType.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -46,13 +43,15 @@ struct Universe final: Service
      */
     DynamicTask<> ExecuteEvent(EEventName in_event_name) const noexcept;
 
+
+
     // --- Entity / Systems lifetime manipulation
 
     /**
      * @brief Creates a system and adds it to the world
      * @tparam TSystem System type to push to the entity admin
      */
-    template <SystemType TSystem>
+    template <IsSystem TSystem>
     RkVoid CreateSystem() noexcept;
 
     /**
@@ -60,7 +59,7 @@ struct Universe final: Service
      * @tparam TComponents Components to attach to the new entity
      * @return Created entity id
      */
-    template <AnyComponentType... TComponents>
+    template <IsComponent... TComponents>
     Entity CreateEntity() noexcept;
 
     /**
@@ -77,9 +76,9 @@ struct Universe final: Service
 
 		#pragma region Members
 
-		std::vector<std::unique_ptr<System>>                       m_systems              {};
-		std::unordered_map<RkSize, std::unique_ptr<ComponentBase>> m_exclusive_components {};
-		std::unordered_map<ArchetypeFingerprint, std::unique_ptr<Archetype>> m_archetypes {};
+		std::vector		  <std::unique_ptr<System>>                m_systems              {};
+		std::unordered_map<RkSize, std::unique_ptr<Component>>	   m_exclusive_components {};
+		std::unordered_map<ComponentFingerprint, std::unique_ptr<Archetype>> m_archetypes {};
 
 		#pragma endregion
 

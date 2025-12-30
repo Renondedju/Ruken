@@ -1,6 +1,6 @@
 #pragma once
 
-template <AnyComponentType... TComponents>
+template <IsArchetypeComponent... TComponents>
 Archetype::Archetype(Tag<TComponents...>) noexcept:
     m_fingerprint {ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>()}
 {
@@ -8,7 +8,7 @@ Archetype::Archetype(Tag<TComponents...>) noexcept:
     (m_components.try_emplace(TComponents::GetId(), std::make_unique<TComponents>(this)), ...);
 }
 
-template <AnyComponentType TComponent>
+template <IsArchetypeComponent TComponent>
 TComponent& Archetype::GetComponent() noexcept
 {
     return static_cast<TComponent&>(*m_components[TComponent::GetId()]);

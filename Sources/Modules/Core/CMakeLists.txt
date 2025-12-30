@@ -179,7 +179,8 @@ target_sources(RkCore PUBLIC
     Types/Units/Duration/EDurationUnit.hpp
     Types/Units/Pixels.hpp
     Types/FundamentalTypes.hpp
-    Types/NonVoid.hpp
+    Types/Concepts/IsIntegral.hpp
+    Types/Concepts/NonVoid.hpp
     Utility/Benchmark.hpp
     Utility/Todo.hpp
     Utility/WindowsOS.hpp

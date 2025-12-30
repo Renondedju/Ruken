@@ -107,4 +107,4 @@ class LinkedChunkList
 
 #include "LinkedChunkList.inl"
 
-    END_RUKEN_NAMESPACE
+END_RUKEN_NAMESPACE

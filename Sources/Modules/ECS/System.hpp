@@ -3,16 +3,12 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Build/Namespace.hpp"
-
-#include "ECS/Archetype.hpp"
 #include "ECS/EEventName.hpp"
-#include "ECS/Safety/EventHandlerType.hpp"
+#include "ECS/SystemEventHandler.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
-class Universe;
-class EventHandlerBase;
+struct Universe;
 
 /**
  * \brief Systems transform data. They implement the logic that modifies the components.
@@ -28,16 +24,16 @@ class System
     public:
 
         // Helpers, allows for shorter declarations later on
-        template <ComponentFieldType... TFields> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TFields...>;
-        template <ComponentFieldType... TFields> using StartEventHandler  = EventHandler<EEventName::OnStart , TFields...>;
-        template <ComponentFieldType... TFields> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TFields...>;
+        // template <IsComponent... TComponents> using UpdateEventHandler = EventHandler<EEventName::OnUpdate, TComponents...>;
+        // template <IsComponent... TComponents> using StartEventHandler  = EventHandler<EEventName::OnStart , TComponents...>;
+        // template <IsComponent... TComponents> using EndEventHandler    = EventHandler<EEventName::OnEnd   , TComponents...>;
 
     private:
 
         #pragma region Members
 
         // Event handlers, used for the update of the system
-        std::unordered_map<EEventName, std::unique_ptr<EventHandlerBase>> m_handlers {};
+        std::unordered_map<EEventName, std::unique_ptr<SystemEventHandler>> m_handlers {};
 
         #pragma endregion
 
@@ -45,7 +41,7 @@ class System
 
         #pragma region Members
 
-        Universe& m_admin;
+        Universe& m_universe;
 
         #pragma endregion
 
@@ -64,13 +60,14 @@ class System
 
     public:
 
-        #pragma region Constructors
+        #pragma region Lifetime
 
-        System(Universe& in_admin) noexcept;
-
-        System(System const& in_copy) = default;
-        System(System&&      in_move) = default;
-        virtual ~System()             = default;
+        explicit System(Universe& in_universe) noexcept;
+        System& operator=(System const&) = delete;
+        System& operator=(System&&     ) = delete;
+        System           (System const&) = default;
+        System           (System&&     ) = default;
+        virtual ~System()                = default;
 
         #pragma endregion
 
@@ -87,14 +84,7 @@ class System
          * \param in_event_name Event name
          * \return Event handler instance or nullptr
          */
-        EventHandlerBase* GetEventHandler(EEventName in_event_name) const noexcept;
-
-        #pragma endregion
-
-        #pragma region Operators
-
-        System& operator=(System const& in_copy) = delete;
-        System& operator=(System&&      in_move) = delete;
+        SystemEventHandler* GetEventHandler(EEventName in_event_name) const noexcept;
 
         #pragma endregion
 };

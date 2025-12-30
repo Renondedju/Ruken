@@ -9,7 +9,7 @@ USING_RUKEN_NAMESPACE
 
 #pragma region Methods
 
-ArchetypeFingerprint const& Archetype::GetFingerprint() const noexcept
+ComponentFingerprint const& Archetype::GetFingerprint() const noexcept
 {
     return m_fingerprint;
 }

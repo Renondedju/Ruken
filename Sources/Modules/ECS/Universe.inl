@@ -15,7 +15,7 @@ RkVoid Universe::CreateSystem() noexcept
 template <AnyComponentType... TComponents>
 Archetype* Universe::CreateArchetype() noexcept
 {
-    ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
+    ComponentFingerprint const targeted_fingerprint = ComponentFingerprint::CreateFingerPrintFrom<TComponents...>();
 
     // Creating the actual instance
     std::unique_ptr<Archetype> new_archetype = std::make_unique<Archetype>(Tag<TComponents...>());
@@ -35,7 +35,7 @@ template <AnyComponentType... TComponents>
 Entity Universe::CreateEntity() noexcept
 {
     // Looking for the archetype of the entity
-    ArchetypeFingerprint const targeted_fingerprint = ArchetypeFingerprint::CreateFingerPrintFrom<TComponents...>();
+    ComponentFingerprint const targeted_fingerprint = ComponentFingerprint::CreateFingerPrintFrom<TComponents...>();
 
     Archetype* target_archetype;
 

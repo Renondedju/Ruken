@@ -1,23 +1,21 @@
+#pragma once
 
-template <RkSize TSize, typename TChunk>
-template <typename... TData, internal::CheckIntegralTypes<TData...>>
+template <RkSize TSize, IsIntegral TChunk>
+template <IsIntegral... TData>
 constexpr SizedBitmask<TSize, TChunk>::SizedBitmask(TData... in_data) noexcept:
     m_data {}
-{
-    Add(in_data...);
-}
-
+{ Add(in_data...); }
 
 // --- Methods
 
-template <RkSize TSize, typename TChunk>
-template <typename... TData, internal::CheckIntegralTypes<TData...>>
+template <RkSize TSize, IsIntegral TChunk>
+template <IsIntegral... TData>
 constexpr RkBool SizedBitmask<TSize, TChunk>::HasAll(TData... in_data) const noexcept
 {
     return (((m_data[in_data / sizeof_chunk] & TChunk(1) << (in_data % sizeof_chunk)) == TChunk(1) << (in_data % sizeof_chunk)) && ...);
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkBool SizedBitmask<TSize, TChunk>::HasAll(SizedBitmask const& in_bitmask) const noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
@@ -27,14 +25,14 @@ constexpr RkBool SizedBitmask<TSize, TChunk>::HasAll(SizedBitmask const& in_bitm
     return true;
 }
 
-template <RkSize TSize, typename TChunk>
-template <typename... TData, internal::CheckIntegralTypes<TData...>>
+template <RkSize TSize, IsIntegral TChunk>
+template <IsIntegral... TData>
 constexpr RkBool SizedBitmask<TSize, TChunk>::HasOne(TData... in_data) const noexcept
 {
     return ((m_data[in_data / sizeof_chunk] & TChunk(1) << (in_data % sizeof_chunk)) || ...);
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkBool SizedBitmask<TSize, TChunk>::HasOne(SizedBitmask const& in_bitmask) const noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
@@ -44,7 +42,7 @@ constexpr RkBool SizedBitmask<TSize, TChunk>::HasOne(SizedBitmask const& in_bitm
     return false;
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkUint16 SizedBitmask<TSize, TChunk>::Popcnt() const noexcept
 {
     // I know that __popcnt16, __popcnt, __popcnt64 is a thing but I don't want to be dependent
@@ -66,41 +64,41 @@ constexpr RkUint16 SizedBitmask<TSize, TChunk>::Popcnt() const noexcept
     return count;
 }
 
-template <RkSize TSize, typename TChunk>
-template <typename... TData, internal::CheckIntegralTypes<TData...>>
+template <RkSize TSize, IsIntegral TChunk>
+template <IsIntegral... TData>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Add(TData... in_data) noexcept
 {
     ((m_data[in_data / sizeof_chunk] |= (TChunk(1) << (in_data % sizeof_chunk))), ...);
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Add(SizedBitmask const& in_bitmask) noexcept
 {
     for(RkSize index = 0; index < TSize; ++index)
         m_data[index] |= in_bitmask.m_data[index];
 }
 
-template <RkSize TSize, typename TChunk>
-template <typename... TData, internal::CheckIntegralTypes<TData...>>
+template <RkSize TSize, IsIntegral TChunk>
+template <IsIntegral... TData>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Remove(TData... in_data) noexcept
 {
     ((m_data[in_data / sizeof_chunk] &= ~(TChunk(1) << (in_data % sizeof_chunk))), ...);
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Remove(SizedBitmask const& in_bitmask) noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
         m_data[index] &= ~in_bitmask.m_data[index];
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Clear() noexcept
 {
     memset(m_data, 0, sizeof(m_data));
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkSize SizedBitmask<TSize, TChunk>::HashCode() const noexcept
 {
     RkSize hash = 0;
@@ -110,7 +108,7 @@ constexpr RkSize SizedBitmask<TSize, TChunk>::HashCode() const noexcept
     return hash;
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 template <typename TLambdaType, typename TPreCast>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Foreach(TLambdaType in_lambda) const noexcept
 {
@@ -122,19 +120,19 @@ constexpr RkVoid SizedBitmask<TSize, TChunk>::Foreach(TLambdaType in_lambda) con
 
 // --- Operators
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr SizedBitmask<TSize, TChunk> SizedBitmask<TSize, TChunk>::operator+(SizedBitmask const& in_bitmask) const noexcept
 {
-    return SizedBitmask<TSize, TChunk>(m_data | in_bitmask.m_data);
+    return SizedBitmask(m_data | in_bitmask.m_data);
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr SizedBitmask<TSize, TChunk> SizedBitmask<TSize, TChunk>::operator-(SizedBitmask const& in_bitmask) const noexcept
 {
-    return SizedBitmask<TSize, TChunk>(m_data - in_bitmask.m_data);
+    return SizedBitmask(m_data - in_bitmask.m_data);
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr RkBool SizedBitmask<TSize, TChunk>::operator==(SizedBitmask const& in_other) const noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
@@ -144,14 +142,14 @@ constexpr RkBool SizedBitmask<TSize, TChunk>::operator==(SizedBitmask const& in_
     return true;
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr SizedBitmask<TSize, TChunk>& SizedBitmask<TSize, TChunk>::operator+=(SizedBitmask const& in_bitmask) noexcept
 {
     Add(in_bitmask);
     return *this;
 }
 
-template <RkSize TSize, typename TChunk>
+template <RkSize TSize, IsIntegral TChunk>
 constexpr SizedBitmask<TSize, TChunk>& SizedBitmask<TSize, TChunk>::operator-=(SizedBitmask const& in_bitmask) noexcept
 {
     Remove(in_bitmask);

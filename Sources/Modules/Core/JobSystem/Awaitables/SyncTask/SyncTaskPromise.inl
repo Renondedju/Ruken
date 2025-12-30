@@ -1,6 +1,6 @@
 #pragma once
 
-#include "JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp"
+#include "Core/JobSystem/Awaitables/SyncTask/SyncTaskPromise.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

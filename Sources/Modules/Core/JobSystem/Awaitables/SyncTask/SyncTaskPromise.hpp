@@ -21,7 +21,7 @@ struct SyncTask;
  * Differences with async tasks include:
  *	- Lazy execution: Execution is only started upon await, and only one await can be done per task.
  *	- Always runs in the same queue as the caller.
- *	- Stackfull coroutine.
+ *	- Probably is a stackfull coroutine (there is no reliable way to measure that yet in c++26).
  *	- Unique handle that moves results instead of copying when available.
  */
 template <typename TResult>

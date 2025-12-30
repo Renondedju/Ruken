@@ -1,18 +1,9 @@
 #pragma once
 
-#include "Core/Build/Namespace.hpp"
 #include "Core/Types/FundamentalTypes.hpp"
-
-#include <type_traits>
+#include "Core/Types/Concepts/IsIntegral.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-
-namespace internal
-{
-    // Used by the SizedBitmask to check if all passed types are integral types
-    template <typename... TTypes>
-    using CheckIntegralTypes = std::enable_if_t<std::conjunction_v<std::is_integral<TTypes>...>, RkBool>;
-}
 
 /**
  * \brief A bitmask can be used to store multiple flags into a single integer.
@@ -26,132 +17,120 @@ namespace internal
  *       If you use less than 64 flags, then TSize should stay at one and you should decrease
  *       the chunk size accordingly to match your needs.
  */
-template <RkSize TSize, typename TChunk = RkSize>
-class SizedBitmask
+template <RkSize TSize, IsIntegral TChunk = RkSize>
+struct SizedBitmask
 {
-    static_assert(std::is_integral_v<TChunk>, "TChunk must be an integral type");
+	static constexpr RkSize sizeof_chunk = sizeof(TChunk) * 8;
+	static constexpr RkSize flags_count  = TSize * sizeof_chunk;
 
-    private:
+	#pragma region Constructors
 
-        #pragma region Members
+	template <IsIntegral... TData>
+	constexpr SizedBitmask(TData... in_data) noexcept;
+	SizedBitmask& operator= (SizedBitmask const&) = default;
+	SizedBitmask& operator= (SizedBitmask&&     ) = default;
+	SizedBitmask            (SizedBitmask const&) = default;
+	SizedBitmask            (SizedBitmask&&     ) = default;
+	~SizedBitmask()                               = default;
 
-        TChunk m_data[TSize];
+	#pragma endregion
 
-        #pragma endregion
+	#pragma region Methods
 
-    public:
+	/**
+	 * @brief Checks if the bitmask has all the flags passed as enabled.
+	 * @tparam TData Flags to check must be an integral type
+	 * @param in_data Flags to check
+	 * @return True if the bitmask has all the specified flags enabled
+	 *
+	 * @warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+	 *          this function will result in an undefined behavior, you must make sure that your values are correct !
+	 */
+	template <IsIntegral... TData>
+	[[nodiscard]] constexpr RkBool HasAll(TData... in_data)               const noexcept;
+	[[nodiscard]] constexpr RkBool HasAll(SizedBitmask const& in_bitmask) const noexcept;
 
-        static constexpr RkSize sizeof_chunk = sizeof(TChunk) * 8; 
-        static constexpr RkSize flags_count  = TSize * sizeof_chunk;
+	/**
+	 * @brief Checks if the bitmask has at least one the flags passed as enabled.
+	 * @tparam TData Flags to check must be an integral type
+	 * @param in_data Flags to check
+	 * @return True if the bitmask has at least one of the specified flags enabled
+	 *
+	 * @warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+	 *          this function will result in an undefined behavior, you must make sure that your values are correct !
+	 */
+	template <IsIntegral... TData>
+	[[nodiscard]] constexpr RkBool HasOne(TData... in_data)               const noexcept;
+	[[nodiscard]] constexpr RkBool HasOne(SizedBitmask const& in_bitmask) const noexcept;
 
-        #pragma region Constructors
+	/**
+	 * @brief Returns the number of enabled flags in the bitmask.
+	 *        The implementation is based on the Brian Kernighan's Algorithm.
+	 *
+	 * @return Number of enabled flags
+	 * @note Time Complexity: O(log n).
+	 */
+	[[nodiscard]] constexpr RkUint16 Popcnt() const noexcept;
 
-        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        constexpr SizedBitmask(TData... in_data) noexcept;
+	/**
+	 * @brief Enables the specified flags.
+	 * @tparam TData Flags to enable must be an integral type
+	 * @param in_data Flags to enable
+	 *
+	 * @warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+	 *          this function will result in an undefined behavior, you must make sure that your values are correct !
+	 */
+	template <IsIntegral... TData>
+	constexpr RkVoid Add(TData... in_data)               noexcept;
+	constexpr RkVoid Add(SizedBitmask const& in_bitmask) noexcept;
 
-        constexpr SizedBitmask(SizedBitmask const& in_copy) = default;
-        constexpr SizedBitmask(SizedBitmask&&      in_move) = default;
-                 ~SizedBitmask()                            = default;
+	/**
+	 * @brief Disables the specified flags.
+	 * @tparam TData Flags to disable must be an integral type
+	 * @param in_data Flags to disable
+	 *
+	 * @warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
+	 *          this function will result in an undefined behavior, you must make sure that your values are correct !
+	 */
+	template <IsIntegral... TData>
+	constexpr RkVoid Remove(TData... in_data)               noexcept;
+	constexpr RkVoid Remove(SizedBitmask const& in_bitmask) noexcept;
 
-        #pragma endregion
+	/// @brief Clears the bitmask.
+	constexpr RkVoid Clear() noexcept;
 
-        #pragma region Methods
+	/**
+	 * @brief Creates a hash code for the given bitmask
+	 * @return Generated hash code
+	 */
+	constexpr RkSize HashCode() const noexcept;
 
-        /**
-         * \brief Checks if the bitmask has all the flags passed as enabled.
-         * \tparam TData Flags to check must be an integral type
-         * \param in_data Flags to check 
-         * \return True if the bitmask has all the specified flags enabled
-         *
-         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
-         *          this function will result in an undefined behavior, you must make sure that your values are correct !
-         */
-        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        [[nodiscard]] constexpr RkBool HasAll(TData... in_data)               const noexcept;
-        [[nodiscard]] constexpr RkBool HasAll(SizedBitmask const& in_bitmask) const noexcept;
+	/**
+	 * @brief Executes a function pointer on each enabled flag in the bitmask.
+	 * @tparam TLambdaType Type of the lambda, the signature of the function used must be RkVoid (*in_lambda)(TEnumType in_flag)
+	 * @tparam TPreCast Type to cast the value into before sending it into the predicate
+	 * @param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
+	 */
+	template <typename TLambdaType, typename TPreCast = TChunk>
+	constexpr RkVoid Foreach(TLambdaType in_lambda) const noexcept;
 
-        /**
-         * \brief Checks if the bitmask has at least one the flags passed as enabled.
-         * \tparam TData Flags to check must be an integral type
-         * \param in_data Flags to check 
-         * \return True if the bitmask has at least one of the specified flags enabled
-         *
-         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
-         *          this function will result in an undefined behavior, you must make sure that your values are correct !
-         */
-        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        [[nodiscard]] constexpr RkBool HasOne(TData... in_data)               const noexcept;
-        [[nodiscard]] constexpr RkBool HasOne(SizedBitmask const& in_bitmask) const noexcept;
+	#pragma endregion
 
-        /**
-         * \brief Returns the number of enabled flags in the bitmask.
-         *        The implementation is based on the Brian Kernighan's Algorithm.
-         *
-         * \return Number of enabled flags
-         * \note Time Complexity: O(log n).
-         */
-        [[nodiscard]] constexpr RkUint16 Popcnt() const noexcept;
+	#pragma region Operators
 
-        /**
-         * \brief Enables the specified flags.
-         * \tparam TData Flags to enable must be an integral type
-         * \param in_data Flags to enable
-         *
-         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
-         *          this function will result in an undefined behavior, you must make sure that your values are correct !
-         */
-        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        constexpr RkVoid Add(TData... in_data)               noexcept;
-        constexpr RkVoid Add(SizedBitmask const& in_bitmask) noexcept;
+	constexpr SizedBitmask  operator+ (SizedBitmask const& in_bitmask) const noexcept;
+	constexpr SizedBitmask  operator- (SizedBitmask const& in_bitmask) const noexcept;
+	constexpr RkBool        operator==(SizedBitmask const& in_other)   const noexcept;
+	constexpr SizedBitmask& operator+=(SizedBitmask const& in_bitmask)       noexcept;
+	constexpr SizedBitmask& operator-=(SizedBitmask const& in_bitmask)       noexcept;
 
-        /**
-         * \brief Disables the specified flags.
-         * \tparam TData Flags to disable must be an integral type
-         * \param in_data Flags to disable
-         *
-         * \warning If one of the passed flag is bigger than the max amount of flags stored in the bitmask,
-         *          this function will result in an undefined behavior, you must make sure that your values are correct !
-         */
-        template <typename... TData, internal::CheckIntegralTypes<TData...> = true>
-        constexpr RkVoid Remove(TData... in_data)               noexcept;
-        constexpr RkVoid Remove(SizedBitmask const& in_bitmask) noexcept;
+	#pragma endregion
 
-        /**
-         * \brief Clears the bitmask.
-         */
-        constexpr RkVoid Clear() noexcept;
+	private:
 
-        /**
-         * \brief Creates a hash code for the given bitmask
-         * \return Generated hash code
-         */
-        constexpr RkSize HashCode() const noexcept;
-
-        /**
-         * \brief Executes a function pointer on each enabled flag in the bitmask.
-         * \tparam TLambdaType Type of the lambda, the signature of the function used must be RkVoid (*in_lambda)(TEnumType in_flag)
-         * \tparam TPreCast Type to cast the value into before sending it into the predicate
-         * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
-         */
-        template <typename TLambdaType, typename TPreCast = TChunk>
-        constexpr RkVoid Foreach(TLambdaType in_lambda) const noexcept;
-
-        #pragma endregion 
-
-        #pragma region Operators
-
-        SizedBitmask& operator= (SizedBitmask const& in_copy) noexcept = default;
-        SizedBitmask& operator= (SizedBitmask&&      in_move) noexcept = default;
-
-        constexpr SizedBitmask  operator+ (SizedBitmask const& in_bitmask) const noexcept;
-        constexpr SizedBitmask  operator- (SizedBitmask const& in_bitmask) const noexcept;
-        constexpr RkBool       operator==(SizedBitmask const& in_other)   const noexcept;
-        constexpr SizedBitmask& operator+=(SizedBitmask const& in_bitmask)       noexcept;
-        constexpr SizedBitmask& operator-=(SizedBitmask const& in_bitmask)       noexcept;
-
-        #pragma endregion
+		TChunk m_data[TSize];
 };
 
 #include "SizedBitmask.inl"
 
-    END_RUKEN_NAMESPACE
+END_RUKEN_NAMESPACE

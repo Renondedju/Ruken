@@ -28,6 +28,7 @@
 
 #include "Rendering.hpp"
 #include "Queues.hpp"
+#include "Universe.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -126,6 +127,7 @@ int main([[maybe_unused]] int   in_arg_count,
     auto* renderer   {services.ProvideService<RenderDevice>()};
     auto* importer   {services.ProvideService<AssetImporter>()};
     auto* resources  {services.ProvideService<ResourceManager>()};
+    auto* universe   {services.ProvideService<Universe>()};
 
     importer ->ProvideImporter<SlangImporter>(); // TODO: Not used or working yet. Slang API is whack.
     resources->ProvideLoader  <SpirvLoader>  ();
