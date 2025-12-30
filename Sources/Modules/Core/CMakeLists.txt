@@ -188,6 +188,7 @@ target_sources(RkCore PUBLIC
     Bitwise/SizedBitmask.inl
     Containers/LinkedChunkList.inl
         JobSystem/Awaitables/AsyncTask/AsyncTask.inl
+        JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp
     Service.inl
     ServiceProvider.inl
     Maths/Quaternion/Quaternion.inl

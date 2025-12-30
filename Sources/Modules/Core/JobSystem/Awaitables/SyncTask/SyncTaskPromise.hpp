@@ -3,9 +3,9 @@
 #include "JobSystem/Queues/JobQueue.hpp"
 #include "JobSystem/Awaitables/AwaitableTraits.hpp"
 #include "JobSystem/Awaitables/CoroutineTracingUtils.hpp"
+#include "JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp"
 
 #include <source_location>
-#include <variant>
 
 BEGIN_RUKEN_NAMESPACE
 #define RUKEN_CURRENT_SOURCE_LOCATION [[maybe_unused]] std::source_location = std::source_location::current()
@@ -27,8 +27,9 @@ struct SyncTask;
 template <typename TResult>
 struct SyncTaskPromiseBase: CoroutineTracingUtils
 {
-	JobQueue*				queue {nullptr};
-	std::coroutine_handle<> continuation {};
+	JobQueue*		         queue		  {nullptr};
+	SyncTaskResult<TResult>* result_ptr   {nullptr};
+	std::coroutine_handle<>  continuation {nullptr};
 
 	/// @returns an awaiter that waits for the task to return or throw an exception.
 	auto operator co_await(this auto&&) noexcept;
@@ -53,8 +54,6 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 template <typename TResult>
 struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 {
-	std::variant<TResult, std::exception_ptr> result {};
-
 	// Coroutine exit
 	void unhandled_exception()				   noexcept;
 	void return_value(TResult&&	     in_value) noexcept;
@@ -66,11 +65,9 @@ struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 template <>
 struct SyncTaskPromise<RkVoid>: SyncTaskPromiseBase<RkVoid>
 {
-	std::exception_ptr exception {};
-
 	// Coroutine exit
-	void unhandled_exception() noexcept;
-	void return_void        () noexcept;
+	void unhandled_exception() const noexcept;
+	void return_void        () const noexcept;
 };
 
 #undef RUKEN_CURRENT_SOURCE_LOCATION

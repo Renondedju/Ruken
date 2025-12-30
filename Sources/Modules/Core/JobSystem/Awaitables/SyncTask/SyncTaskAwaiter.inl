@@ -14,6 +14,8 @@ template<typename TResult>
 SyncTaskAwaiter<TResult>& SyncTaskAwaiter<TResult>::operator=(SyncTaskAwaiter&& in_move) noexcept
 {
 	std::swap(promise, in_move.promise);
+
+	return *this;
 }
 
 template<typename TResult>
@@ -27,14 +29,6 @@ template<typename TResult>
 SyncTaskAwaiter<TResult>::SyncTaskAwaiter(SyncTaskPromise<TResult>* in_promise) noexcept:
 	promise {in_promise}
 {}
-
-template<typename TResult>
-SyncTaskAwaiter<TResult>::~SyncTaskAwaiter() noexcept
-{
-	// The wait is done, result has been moved out of the promise.
-	if (promise)
-		std::coroutine_handle<SyncTaskPromise<TResult>>::from_promise(*promise).destroy();
-}
 
 template<typename TResult>
 std::coroutine_handle<> SyncTaskAwaiter<TResult>::await_suspend(std::coroutine_handle<> in_continuation) noexcept

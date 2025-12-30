@@ -19,7 +19,7 @@ struct SyncTaskAwaiter
 	SyncTaskAwaiter 		  (SyncTaskAwaiter&&     ) noexcept;
 	SyncTaskAwaiter& operator=(SyncTaskAwaiter const&) = delete;
 	SyncTaskAwaiter& operator=(SyncTaskAwaiter&&	 ) noexcept;
-	~SyncTaskAwaiter()								   noexcept;
+	~SyncTaskAwaiter()								   = default;
 
 	#pragma endregion
 

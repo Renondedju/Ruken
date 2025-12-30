@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/JobSystem/Awaitables/SyncTask/SyncTaskPromise.hpp"
+#include "Core/JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -66,13 +66,15 @@ auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 	{
 		SyncTaskPromiseBase* promise;
 
-		// Resuming the parent coroutine.
+		// Resuming the parent coroutine if there is any
+		bool await_ready() const noexcept
+		{ return promise->continuation == nullptr; }
+
 		std::coroutine_handle<> await_suspend(std::coroutine_handle<>) const noexcept
 		{ return promise->continuation; }
 	};
 
-	// Coroutine is destroyed by handle at the end of a wait
-	return FinalSuspendAwaiter<Awaiter> {
+	return FinalSuspendAwaiter<std::suspend_never> {
 		Awaiter {{}, this}, this
 	};
 }
@@ -83,33 +85,38 @@ void SyncTaskPromise<TResult>::unhandled_exception() noexcept
 	std::exception_ptr const ptr {std::current_exception()};
 	this->ReportException(ptr);
 
-	result = ptr;
+	if (this->result_receiver)
+		this->result_receiver->m_result = ptr;
 }
 
-inline void SyncTaskPromise<RkVoid>::unhandled_exception() noexcept
+inline void SyncTaskPromise<RkVoid>::unhandled_exception() const noexcept
 {
 	std::exception_ptr const ptr {std::current_exception()};
 	ReportException(ptr);
 
-	exception = ptr;
+	if (result_ptr)
+		*result_ptr = ptr;
 }
 
-inline void SyncTaskPromise<RkVoid>::return_void() noexcept
+inline void SyncTaskPromise<RkVoid>::return_void() const noexcept
 {
-	exception = nullptr;
+	if (result_ptr)
+		*result_ptr = nullptr;
 }
 
 template<typename TResult>
 void SyncTaskPromise<TResult>::return_value(TResult&& in_value) noexcept
 {
-	result.template emplace<TResult>(std::forward<TResult>(in_value));
+	if (this->result_ptr)
+		this->result_ptr->template emplace<TResult>(std::forward<TResult>(in_value));
 }
 
 template<typename TResult>
 void SyncTaskPromise<TResult>::return_value(TResult const& in_value) noexcept
 	requires (!std::is_move_assignable_v<TResult> && !std::is_move_constructible_v<TResult>)
 {
-	result = std::forward<TResult>(in_value);
+	if (this->result_ptr)
+		*this->result_ptr = std::forward<TResult>(in_value);
 }
 
 END_RUKEN_NAMESPACE

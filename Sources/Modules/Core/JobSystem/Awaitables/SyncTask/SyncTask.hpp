@@ -1,6 +1,7 @@
 #pragma once
 
 #include "JobSystem/Awaitables/SyncTask/SyncTaskPromise.hpp"
+#include "JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -23,7 +24,7 @@ struct SyncTask
 	SyncTask 		   (SyncTask&&     ) = default;
 	SyncTask& operator=(SyncTask const&) = delete;
 	SyncTask& operator=(SyncTask&&     ) = default;
-	~SyncTask()							 = default;
+	~SyncTask();
 
 	#pragma endregion
 
@@ -32,8 +33,9 @@ struct SyncTask
 
 	private:
 
-		promise_type*						m_parent {nullptr};
+		SyncTaskResult<TResult>				m_result {};
 		std::coroutine_handle<promise_type> m_handle {};
+		promise_type*						m_parent {nullptr};
 };
 
 END_RUKEN_NAMESPACE
