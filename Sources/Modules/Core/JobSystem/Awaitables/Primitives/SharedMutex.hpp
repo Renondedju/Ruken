@@ -117,8 +117,10 @@ struct SharedMutex
 	#pragma region Methods
 
 	/// @brief Returns an awaitable to read or write to the underlying data.
-	ReadAwaitable  AsyncRead () noexcept;
-	WriteAwaitable AsyncWrite() noexcept;
+	ReadAwaitable  AsyncRead  () const noexcept;
+	WriteAwaitable AsyncWrite ()	   noexcept;
+	ReadAwaitable  AsyncAccess() const noexcept;
+	WriteAwaitable AsyncAccess()	   noexcept;
 
 	#pragma endregion
 

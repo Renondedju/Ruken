@@ -28,10 +28,10 @@ struct AsyncAwaiter
 	static inline auto const consumed {reinterpret_cast<AsyncAwaiter*>(0x2)};
 	static inline auto const detached {reinterpret_cast<AsyncAwaiter*>(0x3)};
 
-	AsyncAwaiterList*   head   {nullptr};   ///< Reference to the head of the list
-	AsyncAwaiterList    next   {detached}; ///< Next awaiter in the list
-	SignalReceiver signal {};		 ///< Callback to trigger when the wait is over
-	RkUint64       tag    {};       ///< User defined value used in the implementation of the signal/consuming algorythm
+	AsyncAwaiterList* head   {nullptr};   ///< Reference to the head of the list
+	AsyncAwaiterList  next   {detached}; ///< Next awaiter in the list
+	SignalReceiver    signal {};		///< Callback to trigger when the wait is over
+	RkUint64          tag    {};       ///< User defined value used in the implementation of the signal/consuming algorythm
 
 	#pragma region Lifetime
 

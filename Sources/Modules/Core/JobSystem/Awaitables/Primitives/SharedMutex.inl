@@ -269,7 +269,7 @@ SharedMutex<TData>::WriteAwaitable::Awaiter SharedMutex<TData>::WriteAwaitable::
 }
 
 template<typename TData>
-SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncRead() noexcept
+SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncRead() const noexcept
 {
 	return ReadAwaitable {
 		.mutex = this
@@ -278,6 +278,22 @@ SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncRead() noexcept
 
 template<typename TData>
 SharedMutex<TData>::WriteAwaitable SharedMutex<TData>::AsyncWrite() noexcept
+{
+	return WriteAwaitable {
+		.mutex = this
+	};
+}
+
+template<typename TData>
+SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncAccess() const noexcept
+{
+	return ReadAwaitable {
+		.mutex = this
+	};
+}
+
+template<typename TData>
+SharedMutex<TData>::WriteAwaitable SharedMutex<TData>::AsyncAccess() noexcept
 {
 	return WriteAwaitable {
 		.mutex = this
