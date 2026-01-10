@@ -16,8 +16,8 @@ BEGIN_RUKEN_NAMESPACE
  * @param  in_awaitables Awaitables to wait for.
  * @return A vector containing the result of all the waits.
  */
-template <IsAsyncAwaitableRange TRange>
-requires (!AwaitableRangeTraits<TRange>::await_result_void)
+template <IsAwaitableRange TRange>
+	requires (!AwaitableRangeTraits<TRange>::await_result_void)
 auto WhenAll(TRange const& in_awaitables) noexcept ->
 	SyncTask<std::vector<typename AwaitableRangeTraits<TRange>::AwaitResult>>
 {
@@ -31,8 +31,10 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
 	// co_await compiler transform
 	for (auto const& [awaitable, awaiter] : std::views::zip(in_awaitables, awaiters))
 	{
-		awaiter		   = awaitable.operator co_await();
-		awaiter.signal = SignalReceiver(latch);
+		awaiter = awaitable.operator co_await();
+
+		if constexpr (IsAsyncAwaiter<TAwaiter>)
+			awaiter.signal = SignalReceiver(latch);
 
 		// Trying to suspend & checking if the wait is already over
 		if (awaiter.await_ready() || !awaiter.await_suspend(std::coroutine_handle()))
@@ -55,8 +57,8 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
  * @tparam TRange		 A sized range type.
  * @param  in_awaitables Awaitables to wait for.
  */
-template <IsAsyncAwaitableRange TRange>
-requires AwaitableRangeTraits<TRange>::await_result_void
+template <IsAwaitableRange TRange>
+	requires AwaitableRangeTraits<TRange>::await_result_void
 auto WhenAll(TRange const& in_awaitables) noexcept ->
 	SyncTask<>
 {
@@ -68,8 +70,10 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
 	// co_await compiler transform
 	for (auto const& [awaitable, awaiter] : std::views::zip(in_awaitables, awaiters))
 	{
-		awaiter		   = awaitable.operator co_await();
-		awaiter.signal = SignalReceiver(latch);
+		awaiter = awaitable.operator co_await();
+
+		if constexpr (IsAsyncAwaiter<TAwaiter>)
+			awaiter.signal = SignalReceiver(latch);
 
 		// Trying to suspend & checking if the wait is already over
 		if (awaiter.await_ready() || !awaiter.await_suspend(std::coroutine_handle()))
@@ -93,8 +97,8 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
  * @param  in_awaitables Awaitables to wait for.
  * @return A tuple containing the result of all the waits.
  */
-template <IsAsyncAwaitable... TAwaitables>
-requires (!AwaitableTraits<TAwaitables>::await_result_void && ...)
+template <IsAwaitable... TAwaitables>
+	requires (!AwaitableTraits<TAwaitables>::await_result_void && ...)
 auto WhenAll(TAwaitables const&... in_awaitables) ->
 	SyncTask<     // Runs on the same queue as the caller
 		std::tuple< // And returns a tuple of all the result types of the passed awaitables
@@ -108,16 +112,15 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 	// co_await compiler transform
 	[&]<auto... Is>(std::index_sequence<Is...>)
 	{
-		([&](auto& in_awaiter) // foreach awaiter
+		([&]<typename TAwaiter>(TAwaiter& in_awaiter) // foreach awaiter
 		{
-			in_awaiter.signal = SignalReceiver(latch);
+			if constexpr (IsAsyncAwaiter<TAwaiter>)
+				in_awaiter.signal = SignalReceiver(latch);
 
 			// Trying to suspend
-			if (!in_awaiter.await_ready  () &&
-				 in_awaiter.await_suspend(std::coroutine_handle()))
-				return;
+			if (in_awaiter.await_ready() && in_awaiter.await_suspend(std::coroutine_handle()))
+				latch.Signal();
 
-			latch.Signal();
 		}(std::get<Is>(awaiters)), ...);
 	}(std::index_sequence_for<TAwaitables...>{});
 
@@ -136,7 +139,7 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
  * @tparam TAwaitables   Awaitable types to wait for.
  * @param  in_awaitables Awaitables to wait for.
  */
-template <IsAsyncAwaitable... TAwaitables>
+template <IsAwaitable... TAwaitables>
 requires (AwaitableTraits<TAwaitables>::await_result_void || ...)
 auto WhenAll(TAwaitables const&... in_awaitables) ->
 	SyncTask<>
@@ -147,16 +150,15 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 	// co_await compiler transform
 	[&]<auto... Is>(std::index_sequence<Is...>)
 	{
-		([&](auto& in_awaiter) // foreach awaiter
+		([&]<typename TAwaiter>(TAwaiter& in_awaiter) // foreach awaiter
 		{
-			in_awaiter.signal = SignalReceiver(latch);
+			if constexpr (IsAsyncAwaiter<TAwaiter>)
+				in_awaiter.signal = SignalReceiver(latch);
 
 			// Trying to suspend
-			if (!in_awaiter.await_ready  () &&
-				 in_awaiter.await_suspend(std::coroutine_handle()))
-				return;
+			if (in_awaiter.await_ready() || in_awaiter.await_suspend(std::coroutine_handle()))
+				latch.Signal();
 
-			latch.Signal();
 		}(std::get<Is>(awaiters)), ...);
 	}(std::index_sequence_for<TAwaitables...>{});
 
@@ -167,5 +169,15 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
 		(in_awaiters.await_resume(), ...);
 	}, awaiters);
 }
+
+/**
+ * Waits simultaneously for all the passed awaitables.
+ *
+ * @tparam TAwaitables   Awaitable types to wait for.
+ * @param  in_awaitables Awaitables to wait for.
+ */
+template <typename... TAwaitables>
+auto WhenAll(std::tuple<TAwaitables...> in_awaitables)
+{ return std::apply(WhenAll, in_awaitables); }
 
 END_RUKEN_NAMESPACE

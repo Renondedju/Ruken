@@ -29,6 +29,9 @@ concept IsAsyncAwaitable = requires (TType const& in_awaitable) {
 };
 
 template <typename TType>
+concept IsAwaitableRange = std::ranges::range<TType> && IsAwaitable<std::ranges::range_value_t<TType>>;
+
+template <typename TType>
 concept IsAsyncAwaitableRange = std::ranges::range<TType> && IsAsyncAwaitable<std::ranges::range_value_t<TType>>;
 
 template <IsAsyncAwaitable TAwaitable>
