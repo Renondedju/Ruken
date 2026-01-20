@@ -31,7 +31,7 @@ struct MatrixLookAt
     {
         Vector3m const forward{(in_to - in_from   ).Normalized()};
         Vector3m const right  {forward.Cross(in_up).Normalized()};
-        Vector3m const up     {right.Cross(forward)};
+        Vector3m const up     {right  .Cross(forward)};
 
         return Matrix<3, 4> {
              right  .x,  right  .y,  right  .z, -right  .Dot(in_from),

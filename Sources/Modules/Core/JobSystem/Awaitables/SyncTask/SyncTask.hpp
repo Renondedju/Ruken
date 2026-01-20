@@ -33,7 +33,7 @@ struct SyncTask
 
 	private:
 
-		SyncTaskResult<TResult>				m_result {};
+		mutable SyncTaskResult<TResult>		m_result {};
 		std::coroutine_handle<promise_type> m_handle {};
 		promise_type*						m_parent {nullptr};
 };

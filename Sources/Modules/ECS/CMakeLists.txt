@@ -9,24 +9,21 @@ target_sources(RkECS PUBLIC
         FILE_SET HEADERS FILES
     Archetype.hpp
     Archetype.inl
-        ComponentFingerprint.hpp
-        ComponentFingerprint.inl
+    Components/ComponentFingerprint.hpp
+    Components/ComponentFingerprint.inl
     Components/EntityComponent.hpp
     Components/EntityComponent.inl
     Components/Component.hpp
-    ComponentQuery.hpp
-    ComponentQuery.inl
-    ComponentView.hpp
-    ComponentView.inl
+    Components/ComponentQuery.hpp
     EEventName.hpp
     Entity.hpp
     Universe.hpp
     Universe.inl
-    SystemEventHandler.hpp
+    Systems/SystemEventHandler.hpp
     Components/UniverseComponent.hpp
     Range.hpp
-    System.hpp
-    System.inl
+    Systems/System.hpp
+    Systems/System.inl
     Components/TagComponent.hpp
     Meta/ItemHelper.hpp
     Meta/ComponentHelper.hpp
@@ -35,17 +32,11 @@ target_sources(RkECS PUBLIC
 target_sources(RkECS PRIVATE
     Archetype.cpp
     Entity.cpp
-    SystemEventHandler.cpp
+    Systems/SystemEventHandler.cpp
     Universe.cpp
     Range.cpp
     Components/TagComponent.cpp
-    System.cpp
-    ComponentQuery.cpp
-    Components/Component.cpp
+    Systems/System.cpp
 )
 
-if (MSVC)
-    target_compile_options(RkECS PUBLIC /Zc:preprocessor)
-endif ()
-
-target_link_libraries     (RkECS PUBLIC RkCore)
+target_link_libraries(RkECS PUBLIC RkCore)

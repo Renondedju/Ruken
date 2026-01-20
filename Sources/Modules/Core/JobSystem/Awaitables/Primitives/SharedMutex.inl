@@ -12,6 +12,16 @@ SharedMutex<TData>::SharedMutex(TArgs&&... in_args) noexcept(std::is_nothrow_con
 	m_data {std::forward<TArgs>(in_args)...}
 {}
 
+template<typename TData>
+SharedMutex<TData>::SharedMutex(SharedMutex const& in_copy) noexcept:
+	m_data {in_copy.m_data}
+{}
+
+template<typename TData>
+SharedMutex<TData>::SharedMutex(SharedMutex&& in_move) noexcept:
+	m_data {std::move(in_move.m_data)}
+{}
+
 #pragma region Access
 
 template<typename TData>
@@ -112,13 +122,13 @@ SharedMutex<TData>::WriteAccess& SharedMutex<TData>::WriteAccess::operator=(Writ
 }
 
 template<typename TData>
-TData& SharedMutex<TData>::WriteAccess::operator*() noexcept
+TData& SharedMutex<TData>::WriteAccess::operator*() const noexcept
 {
 	return m_mutex->m_data;
 }
 
 template<typename TData>
-TData* SharedMutex<TData>::WriteAccess::operator->() noexcept
+TData* SharedMutex<TData>::WriteAccess::operator->() const noexcept
 {
 	return &m_mutex->m_data;
 }
@@ -271,8 +281,9 @@ SharedMutex<TData>::WriteAwaitable::Awaiter SharedMutex<TData>::WriteAwaitable::
 template<typename TData>
 SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncRead() const noexcept
 {
+	// Constness is enforced by the awaitable instead of the mutex pointer to allow duplication
 	return ReadAwaitable {
-		.mutex = this
+		.mutex = const_cast<SharedMutex*>(this)
 	};
 }
 
@@ -287,8 +298,9 @@ SharedMutex<TData>::WriteAwaitable SharedMutex<TData>::AsyncWrite() noexcept
 template<typename TData>
 SharedMutex<TData>::ReadAwaitable SharedMutex<TData>::AsyncAccess() const noexcept
 {
+	// Constness is enforced by the awaitable instead of the mutex pointer to allow duplication
 	return ReadAwaitable {
-		.mutex = this
+		.mutex =  const_cast<SharedMutex*>(this)
 	};
 }
 

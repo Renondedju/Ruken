@@ -1,13 +1,12 @@
 #pragma once
 
 #include "Core/Build/Namespace.hpp"
+#include "Core/Types/FundamentalTypes.hpp"
 
 #include <string>
 #include <format>
 #include <stacktrace>
 #include <source_location>
-
-#include "Types/FundamentalTypes.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

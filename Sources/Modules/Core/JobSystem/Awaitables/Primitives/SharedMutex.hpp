@@ -23,9 +23,9 @@ struct SharedMutex
 	/// @brief Forwards all passed arguments to TData(TArgs...)
 	template <typename... TArgs> requires std::constructible_from<TData, TArgs...>
 	explicit SharedMutex(TArgs&&... in_args) noexcept(std::is_nothrow_constructible_v<TData, TArgs...>);
-	SharedMutex			  (const SharedMutex&) = default;
-	SharedMutex			  (SharedMutex&&)      = default;
-	SharedMutex& operator=(const SharedMutex&) = default;
+	SharedMutex			  (SharedMutex const&) noexcept;
+	SharedMutex			  (SharedMutex&&)      noexcept;
+	SharedMutex& operator=(SharedMutex const&) = default;
 	SharedMutex& operator=(SharedMutex&&)	   = default;
 	~SharedMutex()							   = default;
 
@@ -61,8 +61,8 @@ struct SharedMutex
 
 		WriteAccess& operator=(WriteAccess const&) = delete;
 		WriteAccess& operator=(WriteAccess&&     ) noexcept;
-		TData&       operator*()                   noexcept;
-		TData*		 operator->()		           noexcept;
+		TData&       operator*()             const noexcept;
+		TData*		 operator->()		     const noexcept;
 
 	protected:
 

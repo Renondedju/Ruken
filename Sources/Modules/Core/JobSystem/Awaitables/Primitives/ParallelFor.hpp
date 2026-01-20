@@ -8,51 +8,51 @@ template <typename TIterator, std::invocable<TIterator> TFunction>
 using ParallelForAwaitable = std::invoke_result_t<TFunction, TIterator>;
 
 /**
- * Invokes in_function for each iterator value and waits for all the returned awaitables.
+ * Invokes in_function for each index value and waits for all the returned awaitables.
  *
- * @tparam TIterator   Iterator type.
- * @tparam TFunction   Method to invoke for each iterator value. Must return an awaitable.
- * @param  in_start	   Start iterator.
- * @param  in_end	   End Iterator.
- * @param  in_function Method to invoke for each iterator value. Must return an awaitable.
+ * @tparam TIndex	   Index type.
+ * @tparam TFunction   Method to invoke for each index value. Must return an awaitable.
+ * @param  in_start	   Start index.
+ * @param  in_end	   End index.
+ * @param  in_function Method to invoke for each index value. Must return an awaitable.
  * @return An awaitable.
  */
-template <typename TIterator, std::invocable<TIterator> TFunction>
-	requires AwaitableTraits<ParallelForAwaitable<TIterator, TFunction>>::await_result_void
-SyncTask<> ParallelFor(TIterator in_start, TIterator in_end, TFunction&& in_function) noexcept
+template <typename TIndex, std::invocable<TIndex> TFunction>
+	requires AwaitableTraits<ParallelForAwaitable<TIndex, TFunction>>::await_result_void
+SyncTask<> ParallelFor(TIndex in_start, TIndex in_end, TFunction&& in_function) noexcept
 {
 	// Constructing awaitables
-	std::vector<ParallelForAwaitable<TIterator, TFunction>> awaitables {std::distance(in_start, in_end)};
+	std::vector<ParallelForAwaitable<TIndex, TFunction>> awaitables(in_end - in_start);
 	auto awaitable_it {awaitables.begin()};
-	for (TIterator iterator {in_start}; iterator != in_end; ++iterator)
-		*(awaitable_it++) = in_function(iterator);
+	for (TIndex index {in_start}; index != in_end; ++index)
+		*(awaitable_it++) = in_function(index);
 
 	// And waiting for all of them to complete
 	co_await WhenAll(awaitables);
 }
 
 /**
- * Invokes in_function for each iterator value and waits for all the returned awaitables.
+ * Invokes in_function for each index value and waits for all the returned awaitables.
  *
- * @tparam TIterator   Iterator type.
- * @tparam TFunction   Method to invoke for each iterator value. Must return an awaitable.
- * @param  in_start	   Start iterator.
- * @param  in_end	   End Iterator.
- * @param  in_function Method to invoke for each iterator value. Must return an awaitable.
- * @return An awaitable that returns a vector of the results.
+ * @tparam TIndex	   Index type.
+ * @tparam TFunction   Method to invoke for each index value. Must return an awaitable.
+ * @param  in_start	   Start index.
+ * @param  in_end	   End index.
+ * @param  in_function Method to invoke for each index value. Must return an awaitable.
+ * @return An awaitable.
  */
-template <typename TIterator, std::invocable<TIterator> TFunction>
-	requires (!AwaitableTraits<ParallelForAwaitable<TIterator, TFunction>>::await_result_void)
-auto ParallelFor(TIterator in_start, TIterator in_end, TFunction&& in_function) noexcept ->
+template <typename TIndex, std::invocable<TIndex> TFunction>
+	requires (!AwaitableTraits<ParallelForAwaitable<TIndex, TFunction>>::await_result_void)
+auto ParallelFor(TIndex in_start, TIndex in_end, TFunction&& in_function) noexcept ->
 	SyncTask<std::vector<
-		typename AwaitableTraits<ParallelForAwaitable<TIterator, TFunction>>::AwaitResult
+		typename AwaitableTraits<ParallelForAwaitable<TIndex, TFunction>>::AwaitResult
 	>>
 {
 	// Constructing awaitables
-	std::vector<ParallelForAwaitable<TIterator, TFunction>> awaitables {std::distance(in_start, in_end)};
+	std::vector<ParallelForAwaitable<TIndex, TFunction>> awaitables(in_end - in_start);
 	auto awaitable_it {awaitables.begin()};
-	for (TIterator iterator {in_start}; iterator != in_end; ++iterator)
-		*(awaitable_it++) = in_function(iterator);
+	for (TIndex index {in_start}; index != in_end; ++index)
+		*(awaitable_it++) = in_function(index);
 
 	// And waiting for all of them to complete
 	co_await WhenAll(awaitables);

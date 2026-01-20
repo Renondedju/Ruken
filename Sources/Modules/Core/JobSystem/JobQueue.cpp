@@ -24,7 +24,7 @@ RkBool JobQueue::TryConsumeWorkerRequest(Concurrency& inout_concurrency) noexcep
         }
 
         // If the caller is needed then we need to update the concurrency of the queue
-    } while(!m_concurrency.compare_exchange_weak(inout_concurrency,
+    } while(!m_concurrency.compare_exchange_weak(inout_concurrency.packed_value,
         inout_concurrency + s_one_current_concurrency - s_one_requested_concurrency, std::memory_order_acq_rel)
     );
 

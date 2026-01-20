@@ -12,9 +12,9 @@ template <typename TAwaiter>   using ResumeType  = decltype(std::declval<TAwaite
 
 // TODO: implement a "sync" coroutine type that executes in place to ease implementation of these primitives.
 template <typename TAwaitable>
-struct SyncWait
+struct SleepWait
 {
-	explicit SyncWait(TAwaitable const& in_awaitable);
+	explicit SleepWait(TAwaitable const& in_awaitable);
 
 	ResumeType<AwaiterType<TAwaitable>>& Result() noexcept;
 
@@ -28,7 +28,7 @@ struct SyncWait
 };
 
 template<typename TAwaitable>
-SyncWait<TAwaitable>::SyncWait(TAwaitable const& in_awaitable)
+SleepWait<TAwaitable>::SleepWait(TAwaitable const& in_awaitable)
 {
 	AwaiterType<TAwaitable> awaiter {in_awaitable.operator co_await()};
 	awaiter.signal = SignalReceiver(*this);
@@ -40,13 +40,13 @@ SyncWait<TAwaitable>::SyncWait(TAwaitable const& in_awaitable)
 }
 
 template<typename TAwaitable>
-ResumeType<AwaiterType<TAwaitable>>& SyncWait<TAwaitable>::Result() noexcept
+ResumeType<AwaiterType<TAwaitable>>& SleepWait<TAwaitable>::Result() noexcept
 {
 	return m_result;
 }
 
 template<typename TAwaitable>
-RkVoid SyncWait<TAwaitable>::Signal() noexcept
+RkVoid SleepWait<TAwaitable>::Signal() noexcept
 {
 	m_wait_condition.test_and_set();
 	m_wait_condition.notify_all  ();

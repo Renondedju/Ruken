@@ -2,7 +2,7 @@
 
 #include "Core/ServiceProvider.hpp"
 #include "Core/Debug/Logging/Logger.hpp"
-#include "Core/JobSystem/SyncWait.hpp"
+#include "Core/JobSystem/SleepWait.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
 #include <ranges>
@@ -205,7 +205,7 @@ RkVoid RenderDevice::FetchQueues() noexcept
 
 	for (RkUint32 i = 0; i < m_family_views.size(); i++)
 	{
-		auto& access = SyncWait(m_family_views[i].AsyncWrite()).Result();
+		auto& access = SleepWait(m_family_views[i].AsyncWrite()).Result();
 		auto& queue  = m_queues	      .emplace_back(m_device, i, 0);
 		auto& pool   = m_command_pools.emplace_back(m_device, vk::CommandPoolCreateInfo {
             .flags			  = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,

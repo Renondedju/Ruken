@@ -15,7 +15,7 @@ struct WorkerRequestTree
 {
     BinaryTree<std::atomic_uint64_t> tree;
     std::condition_variable_any      sleep_variable {};
-    TracyLockable(std::mutex       , sleep_mutex);
+    TracyLockableN(std::mutex      , sleep_mutex, "Worker sleep mutex");
 
     static inline thread_local RkUint64 fair_path {};
 
@@ -37,7 +37,7 @@ struct WorkerRequestTree
 
         tree.nodes[in_leaf.GetIndex()].fetch_add(1, std::memory_order_acq_rel);
 
-        for (int depth = 0; depth < tree.max_depth; ++depth)
+        for (RkUint64 depth {}; depth < tree.max_depth; ++depth)
         {
             in_leaf.Parent();
             tree.nodes[in_leaf.GetIndex()].fetch_add(1, std::memory_order_acq_rel);
@@ -68,7 +68,7 @@ struct WorkerRequestTree
         // return anymore without going all the way down,
         // Otherwise we would leave the tree in an invalid state.
 
-        for (int depth {}; depth < tree.max_depth; ++depth)
+        for (RkUint64 depth {}; depth < tree.max_depth; ++depth)
         {
             // Use the preferred path up to its depth and fall-back to a fair path after that
             path.ChildFromBias(depth < in_preferred_path.depth ? in_preferred_path.path : GetFairPath(depth));

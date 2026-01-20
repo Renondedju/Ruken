@@ -21,7 +21,6 @@ SyncTaskAwaiter<TResult>& SyncTaskAwaiter<TResult>::operator=(SyncTaskAwaiter&& 
 template<typename TResult>
 RkBool SyncTaskAwaiter<TResult>::await_ready() const noexcept
 {
-	// Lazy tasks are ran when awaited and thus will never be ready before.
 	return false;
 }
 
@@ -44,15 +43,15 @@ auto SyncTaskAwaiter<TResult>::await_resume() const
 {
 	if constexpr (std::is_void_v<TResult>)
 	{
-		if (promise->exception)
-			std::rethrow_exception(promise->exception);
+		if (*promise->result_ptr)
+			std::rethrow_exception(*promise->result_ptr);
 	}
 	else
 	{
-		if (std::holds_alternative<std::exception_ptr>(promise->result))
-			std::rethrow_exception(std::get<std::exception_ptr>(promise->result));
+		if (std::holds_alternative<std::exception_ptr>(*promise->result_ptr))
+			std::rethrow_exception(std::get<std::exception_ptr>(*promise->result_ptr));
 
-		return std::move(std::get<TResult>(promise->result));
+		return std::move(std::get<TResult>(*promise->result_ptr));
 	}
 }
 

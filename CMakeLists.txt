@@ -62,8 +62,8 @@ add_executable(${RUKEN_EXECUTABLE_NAME}
         Sources/App/Rendering.hpp
         Sources/App/Queues.hpp
         Sources/App/Components.hpp
-        Sources/App/Systems/ApplyTransformSystem.hpp
-        Sources/App/Systems/ApplyTransformSystem.cpp
+        Sources/App/Systems/ApplyTransformHandler.hpp
+        Sources/App/Systems/ApplyTransformHandler.cpp
 )
 
 target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")

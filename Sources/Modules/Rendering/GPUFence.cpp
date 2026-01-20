@@ -43,6 +43,8 @@ AsyncAwaiter GPUFence::operator co_await() const noexcept
 
 RkVoid GPUFence::WaitSynchronously() const noexcept
 {
+	ZoneScoped;
+
 	while (device.waitForFences(*fence, true, UINT64_MAX) != vk::Result::eSuccess)
 		;
 }

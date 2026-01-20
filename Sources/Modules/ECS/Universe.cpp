@@ -1,8 +1,8 @@
-#include "ECS/System.hpp"
 #include "ECS/Universe.hpp"
-#include "ECS/SystemEventHandler.hpp"
+#include "ECS/Systems/System.hpp"
+#include "ECS/Systems/SystemEventHandler.hpp"
 
-#include <ranges>
+#include "Core/JobSystem/Awaitables/Primitives/ParallelForEach.hpp"
 
 USING_RUKEN_NAMESPACE
 
@@ -10,19 +10,20 @@ Universe::Universe(ServiceProvider& in_service_provider) noexcept:
     Service {in_service_provider, typeid(Universe)}
 { }
 
-auto& Universe::ListArchetypes() noexcept
+SyncTask<> Universe::ExecuteEvent(EECSEventName const in_event_name) noexcept
 {
-    return m_archetypes;
-}
-
-DynamicTask<> Universe::ExecuteEvent(EEventName const in_event_name) noexcept
-{
-    for (System const& system: m_systems)
+    std::vector<SyncTask<>> handlers {};
+    for (std::unique_ptr<System> const& system: m_systems)
     {
-        if (SystemEventHandler* handler {system->GetEventHandler(in_event_name)})
-        {
-            handler->
+        SystemEventHandler* handler {system->GetEventHandler(in_event_name)};
+        if (!handler)
+            continue;
 
-        }
+        // !! Lock acquisition MUST be done synchronously to ensure proper execution ordering. !!
+        for (auto& [fingerprint, archetype] : m_archetypes)
+            if (handler->component_query({}, fingerprint))
+                handlers.emplace_back(handler->ScheduleExecution(*this, *archetype));
     }
+
+    co_await WhenAll(handlers);
 }

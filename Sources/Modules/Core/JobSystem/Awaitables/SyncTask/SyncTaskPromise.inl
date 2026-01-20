@@ -74,7 +74,7 @@ auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 		{ return promise->continuation; }
 	};
 
-	return FinalSuspendAwaiter<std::suspend_never> {
+	return FinalSuspendAwaiter<Awaiter> {
 		Awaiter {{}, this}, this
 	};
 }
@@ -85,8 +85,8 @@ void SyncTaskPromise<TResult>::unhandled_exception() noexcept
 	std::exception_ptr const ptr {std::current_exception()};
 	this->ReportException(ptr);
 
-	if (this->result_receiver)
-		this->result_receiver->m_result = ptr;
+	if (this->result_ptr)
+		*this->result_ptr = ptr;
 }
 
 inline void SyncTaskPromise<RkVoid>::unhandled_exception() const noexcept

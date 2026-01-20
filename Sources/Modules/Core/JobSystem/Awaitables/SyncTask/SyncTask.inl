@@ -4,8 +4,8 @@ BEGIN_RUKEN_NAMESPACE
 
 template<typename TResult>
 SyncTask<TResult>::SyncTask(SyncTaskPromise<TResult>& in_parent) noexcept:
-	m_parent {std::addressof(in_parent)},
-	m_handle {std::coroutine_handle<SyncTaskPromise<TResult>>::from_promise(in_parent)}
+	m_handle {std::coroutine_handle<SyncTaskPromise<TResult>>::from_promise(in_parent)},
+	m_parent {std::addressof(in_parent)}
 {}
 
 template<typename TResult>

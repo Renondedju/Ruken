@@ -43,7 +43,7 @@ class JobQueue
 	// Worker synchronisation
 	BinaryTreePath       m_request_location {};
 	WorkerRequestTree*   m_request_tree     {nullptr};
-	std::atomic_uint64_t m_concurrency      {Concurrency().packed_value};
+	std::atomic<RkSize>  m_concurrency      {Concurrency().packed_value};
 
 	static inline thread_local JobQueue* th_last_push_queue		   {nullptr};
 	static inline thread_local RkBool    th_last_push_emit_request {false};

@@ -4,11 +4,8 @@ cmake_minimum_required(VERSION 3.28)
 include(${RUKEN_SOURCES_DIR}/CMake/RkModule.cmake)
 register_ruken_module(RkCore)
 
-set(TRACY_ENABLE         ${RUKEN_TRACE_BUILD})
-set(TRACY_ON_DEMAND      OFF)
-set(TRACY_NO_FRAME_IMAGE ON)
-set(TRACY_NO_SAMPLING    ON)
-set(TRACY_NO_VERIFY      ON)
+set(TRACY_ENABLE    ${RUKEN_TRACE_BUILD})
+set(TRACY_NO_VERIFY ON)
 
 CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.13.0.zip"      NAME tracy)
 CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
@@ -30,8 +27,6 @@ target_sources(RkCore PUBLIC
     Build/Attributes.hpp
     Build/ProjectInfo.hpp
     Build/Namespace.hpp
-    Containers/LinkedChunkList.hpp
-    Containers/LinkedChunkListNode.hpp
     JobSystem/Queues/IsQueueHandle.hpp
     JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp
@@ -43,6 +38,8 @@ target_sources(RkCore PUBLIC
     JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.hpp
     JobSystem/Awaitables/AsyncAwaitable.hpp
     JobSystem/Awaitables/AsyncTask/AsyncTaskAwaiter.hpp
+    JobSystem/Awaitables/Primitives/ParallelFor.hpp
+    JobSystem/Awaitables/Primitives/ParallelForEach.hpp
     JobSystem/Queues/JobQueue.hpp
     JobSystem/Queues/DynamicQueue.hpp
     JobSystem/Queues/QueueHandle.hpp
@@ -126,7 +123,7 @@ target_sources(RkCore PUBLIC
     Meta/MinimumType.hpp
     Meta/PassConst.hpp
     Meta/Safety.hpp
-    Meta/Tag.hpp
+        Meta/Empty.hpp
     Meta/TupleApply.hpp
     Meta/TupleHasType.hpp
     Meta/TupleIndex.hpp
@@ -186,7 +183,6 @@ target_sources(RkCore PUBLIC
     Utility/WindowsOS.hpp
     Bitwise/Bitmask.inl
     Bitwise/SizedBitmask.inl
-    Containers/LinkedChunkList.inl
         JobSystem/Awaitables/AsyncTask/AsyncTask.inl
         JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp
     Service.inl

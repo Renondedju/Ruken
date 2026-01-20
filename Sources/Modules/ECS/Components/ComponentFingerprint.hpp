@@ -20,9 +20,9 @@ struct ComponentFingerprint: SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / sizeof(RkSi
     static ComponentFingerprint CreateFingerPrintFrom() noexcept;
 };
 
-#include "ECS/ComponentFingerprint.inl"
-
 END_RUKEN_NAMESPACE
+
+#include "ECS/Components/ComponentFingerprint.inl"
 
 #pragma region std::hash
 

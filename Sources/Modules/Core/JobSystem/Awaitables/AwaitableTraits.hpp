@@ -34,16 +34,25 @@ concept IsAwaitableRange = std::ranges::range<TType> && IsAwaitable<std::ranges:
 template <typename TType>
 concept IsAsyncAwaitableRange = std::ranges::range<TType> && IsAsyncAwaitable<std::ranges::range_value_t<TType>>;
 
-template <IsAsyncAwaitable TAwaitable>
+template <IsAwaiter TAwaiter>
+struct AwaiterTraits
+{
+	using AwaitSuspendResult = decltype(std::declval<TAwaiter>().await_suspend(std::coroutine_handle()));
+	using AwaitResumeResult  = decltype(std::declval<TAwaiter>().await_resume  ());
+
+	static constexpr RkBool await_result_void = std::is_void_v<AwaitResumeResult>;
+};
+
+template <IsAwaitable TAwaitable>
 struct AwaitableTraits
 {
 	using Awaiter	  = decltype(std::declval<TAwaitable>().operator co_await());
-	using AwaitResult = decltype(std::declval<Awaiter>   ().await_resume     ());
+	using AwaitResult = AwaiterTraits<Awaiter>::AwaitResumeResult;
 
-	static constexpr RkBool await_result_void = std::is_void_v<AwaitResult>;
+	static constexpr RkBool await_result_void = AwaiterTraits<Awaiter>::await_result_void;
 };
 
-template <IsAsyncAwaitableRange TAwaitableRange>
+template <IsAwaitableRange TAwaitableRange>
 struct AwaitableRangeTraits
 {
 	using Awaitable   = std::ranges::range_value_t<TAwaitableRange>;
@@ -53,5 +62,38 @@ struct AwaitableRangeTraits
 	static constexpr RkBool await_result_void = AwaitableTraits<Awaitable>::await_result_void;
 };
 
+/**
+ * @brief await_suspend can return void, bool or std::coroutine_handle<>.
+ *		  This method mimics the behavior of the compiler transform.
+ *
+ * @tparam TAwaiter  Awaiter type.
+ * @param in_awaiter Awaiter to suspend.
+ * @return True if suspension has been done, false if it failed.
+ */
+template <IsAwaiter TAwaiter>
+RkBool DoAwaitSuspend(TAwaiter& in_awaiter)
+{
+	using AwaitSuspendResult = AwaiterTraits<TAwaiter>::AwaitSuspendResult;
+
+	// await suspend returns void
+	if constexpr (std::is_void_v<AwaitSuspendResult>)
+	{
+		in_awaiter.await_suspend(std::noop_coroutine());
+		return true;
+	}
+
+	// await suspend returns bool
+	if constexpr (std::is_same_v<AwaitSuspendResult, RkBool>)
+		return in_awaiter.await_suspend(std::noop_coroutine());
+
+	// await suspend returns std::coroutine_handle<>
+	if constexpr (std::is_same_v<AwaitSuspendResult, std::coroutine_handle<>>)
+	{
+		in_awaiter.await_suspend(std::noop_coroutine()).resume();
+		return true;
+	}
+
+	std::unreachable();
+}
 
 END_RUKEN_NAMESPACE

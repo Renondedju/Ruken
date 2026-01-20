@@ -1,17 +1,17 @@
 #pragma once
 
-#include <span>
 #include <vector>
 #include <memory>
 #include <unordered_map>
 
 #include "Core/Service.hpp"
-#include "JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
+#include "Core/JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
-#include "ECS/System.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/EEventName.hpp"
+#include "ECS/Systems/System.hpp"
+#include "ECS/Components/UniverseComponent.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -39,11 +39,10 @@ struct Universe final: Service
 
     /**
      * @brief Starts the execution of an event type
+     * @warning Only one event must be ran at once for a single universe.
      * @param in_event_name Event type to execute
      */
-    DynamicTask<> ExecuteEvent(EEventName in_event_name) const noexcept;
-
-
+    SyncTask<> ExecuteEvent(EECSEventName in_event_name) noexcept;
 
     // --- Entity / Systems lifetime manipulation
 
@@ -60,15 +59,15 @@ struct Universe final: Service
      * @return Created entity id
      */
     template <IsComponent... TComponents>
-    Entity CreateEntity() noexcept;
+    RkVoid CreateEntities(RkSize in_count) noexcept;
 
     /**
      * @brief Returns an exclusive component or instantiate it if needed
      * @tparam TComponent Component to access
      * @return Exclusive component reference
      */
-    template <ExclusiveComponentType TComponent>
-    TComponent& GetExclusiveComponent() noexcept;
+    template <IsUniverseComponent TComponent>
+    TComponent& GetUniverseComponent() noexcept;
 
     #pragma endregion
 
@@ -76,8 +75,8 @@ struct Universe final: Service
 
 		#pragma region Members
 
-		std::vector		  <std::unique_ptr<System>>                m_systems              {};
-		std::unordered_map<RkSize, std::unique_ptr<Component>>	   m_exclusive_components {};
+		std::vector       <						 std::unique_ptr<System   >> m_systems    {};
+		std::unordered_map<ComponentFingerprint, std::unique_ptr<Component>> m_components {};
 		std::unordered_map<ComponentFingerprint, std::unique_ptr<Archetype>> m_archetypes {};
 
 		#pragma endregion
@@ -88,7 +87,7 @@ struct Universe final: Service
 		 * @brief Creates a new archetype and handles any setup co-routine
 		 * @tparam TComponents Component types
 		 */
-		template <AnyComponentType... TComponents>
+		template <IsComponent... TComponents>
 		Archetype* CreateArchetype() noexcept;
 
 		#pragma endregion

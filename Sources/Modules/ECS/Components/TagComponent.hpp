@@ -19,11 +19,10 @@ struct TagComponent: ArchetypeComponent
 
     #pragma endregion
 
-    /**
-     * @note Since a tag component does not contain any data, this method does nothing
-     * @copydoc ArchetypeComponent::EnsureStorageSpace
-     */
-    [[nodiscard]] RkSize EnsureStorageSpace(RkSize in_size) noexcept override;
+	SyncTask<> CreateEntities(RkSize in_count = 1) noexcept override;
 };
+
+template<typename TType>
+using TagComponentType = std::is_base_of<TagComponent, TType>;
 
 END_RUKEN_NAMESPACE

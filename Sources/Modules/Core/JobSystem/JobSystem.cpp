@@ -111,7 +111,7 @@ RkSize JobSystem::GetWorkerCount() const noexcept
 
 RkUint64 JobSystem::GetBiasForQueue(JobQueue const* in_queue) const noexcept
 {
-    for (int i = 0; i < m_queues.size(); ++i)
+    for (decltype(m_queues)::size_type i {}; i < m_queues.size(); ++i)
         if (m_queues[i] == in_queue)
             return i;
 

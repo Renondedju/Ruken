@@ -29,54 +29,68 @@
 #include "Rendering.hpp"
 #include "Queues.hpp"
 #include "Universe.hpp"
+#include "Systems/ApplyTransformHandler.hpp"
 
 USING_RUKEN_NAMESPACE
 
 /**
  * Asynchronous main.
  *
- * @param in_stop_source Stop token. Used to prompt the main thread to go out of scope.
  * @param in_service_provider Service Provider.
  */
-AsyncTask<MainQueue> AsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
+AsyncTask<MainQueue> AsyncMain(ServiceProvider const& in_service_provider) noexcept
 {
-    Logger const*    logger        {in_service_provider.LocateService<Logger>         ()};
+    // --- 1. Init
     Clock  const*    clock         {in_service_provider.LocateService<Clock>          ()};
     ResourceManager* resources     {in_service_provider.LocateService<ResourceManager>()};
     RenderDevice*    render_device {in_service_provider.LocateService<RenderDevice>   ()};
+    Universe*        universe      {in_service_provider.LocateService<Universe>       ()};
+
+    auto const code {resources->Request<ShaderModule>(FilePath
+        { .location = EFilesystemLocation::ProjectDirectory, .path = "slang.spv"   })};
+    auto const mesh {resources->Request<GPUMesh     >(FilePath
+        { .location = EFilesystemLocation::ProjectDirectory, .path = "suzanne.obj" })};
+
+    Window             window  {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
+    TestWindowRenderer test_window_renderer {
+        .owner    = *render_device,
+        .window   = window,
+        .pipeline = code,
+        .mesh     = mesh
+    };
+
+    // Waiting for resources
+    co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
+
+    // --- 2. Start
+    co_await universe->ExecuteEvent(EECSEventName::OnStart);
+/*
+    // --- 3. Main Loop
+    while (!window.ShouldClose())
+    {
+        FrameMark;
+
+        glfwPollEvents();
+        co_await universe->ExecuteEvent(EECSEventName::OnUpdate);
+        co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
+    }
+*/
+    // --- 4. Cleanup
+    co_await universe->ExecuteEvent(EECSEventName::OnEnd);
+}
+
+/**
+ * Runs async main and logs any caught exceptions.
+ *
+ * @param in_stop_source Program stop source.
+ * @param in_service_provider Service Provider.
+ */
+AsyncTask<MainQueue> TryCatchAsyncMain(std::stop_source& in_stop_source, ServiceProvider const& in_service_provider)
+{
+    Logger const* logger {in_service_provider.LocateService<Logger>()};
 
     try {
-
-        // Loading resources
-        auto const code {resources->Request<ShaderModule>(FilePath {
-            .location = EFilesystemLocation::ProjectDirectory,
-            .path     = "slang.spv",
-        })};
-        auto const mesh {resources->Request<GPUMesh>(FilePath {
-            .location = EFilesystemLocation::ProjectDirectory,
-            .path     = "suzanne.obj",
-        })};
-
-        Window             window  {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
-        TestWindowRenderer test_window_renderer {
-            .owner    = *render_device,
-            .window   = window,
-            .pipeline = code,
-            .mesh     = mesh
-        };
-
-        // Waiting for every resource to load
-        co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
-
-        // Main loop
-        while (!window.ShouldClose())
-        {
-            FrameMark;
-
-            glfwPollEvents();
-            co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
-        }
-
+        co_await AsyncMain(in_service_provider);
     } catch (Exception& in_exception) {
         if (logger) logger->Exception("", "Async main has been interrupted : {}", in_exception.reason);
     } catch (std::exception& in_exception) {
@@ -129,13 +143,16 @@ int main([[maybe_unused]] int   in_arg_count,
     auto* resources  {services.ProvideService<ResourceManager>()};
     auto* universe   {services.ProvideService<Universe>()};
 
-    importer ->ProvideImporter<SlangImporter>(); // TODO: Not used or working yet. Slang API is whack.
-    resources->ProvideLoader  <SpirvLoader>  ();
-    resources->ProvideLoader  <ObjLoader>    ();
+    importer ->ProvideImporter<SlangImporter> (); // TODO: Not used or working yet. Slang API is whack.
+    resources->ProvideLoader  <SpirvLoader>   ();
+    resources->ProvideLoader  <ObjLoader>     ();
+    universe ->CreateSystem   <ApplyTransform>();
+
+    universe->CreateEntities<Position, Rotation, Transform>(1'000'000);
 
     // 3. --- Finally, running async main ---
-    std::stop_source stop_source {};
-    AsyncMain(stop_source, services);
+    std::stop_source  stop_source {};
+    TryCatchAsyncMain(stop_source, services);
 
     // ... and waiting for it to complete as a worker.
     main_executor.CallerAsWorker(stop_source.get_token(), "CPU Main");

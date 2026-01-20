@@ -1,59 +1,51 @@
 #pragma once
 
-template <SystemType TSystem>
+template <IsSystem TSystem>
 RkVoid Universe::CreateSystem() noexcept
 {
-    std::unique_ptr<TSystem> system = std::make_unique<TSystem>(*this);
-
-    m_systems.emplace_back(std::move(system));
-
-    // Binding relevant archetypes
-    for (auto& archetype_ptr: m_archetypes | std::views::values)
-        system->BindArchetype(*archetype_ptr);
+    m_systems.emplace_back(std::make_unique<TSystem>(*this));
 }
 
-template <AnyComponentType... TComponents>
+template <IsComponent... TComponents>
 Archetype* Universe::CreateArchetype() noexcept
 {
     ComponentFingerprint const targeted_fingerprint = ComponentFingerprint::CreateFingerPrintFrom<TComponents...>();
 
     // Creating the actual instance
-    std::unique_ptr<Archetype> new_archetype = std::make_unique<Archetype>(Tag<TComponents...>());
+    std::unique_ptr<Archetype> new_archetype {
+        new Archetype(Empty<TComponents...>{})
+    };
 
     // We need to get the pointer before moving it
     Archetype* archetype_ptr = new_archetype.get();
     m_archetypes[targeted_fingerprint] = std::move(new_archetype);
 
-    // Binding the archetype to every relevant system
-    for (auto&& system: m_systems)
-        system->BindArchetype(*archetype_ptr);
-
-    return archetype_ptr; 
+    return archetype_ptr;
 }
 
-template <AnyComponentType... TComponents>
-Entity Universe::CreateEntity() noexcept
+template <IsComponent... TComponents>
+RkVoid Universe::CreateEntities(RkSize const in_count) noexcept
 {
     // Looking for the archetype of the entity
     ComponentFingerprint const targeted_fingerprint = ComponentFingerprint::CreateFingerPrintFrom<TComponents...>();
 
     Archetype* target_archetype;
 
-    // If we didn't found any corresponding archetypes, creating it
+    // If we didn't find any corresponding archetypes, creating it
     if (!m_archetypes.contains(targeted_fingerprint))
         target_archetype = CreateArchetype<TComponents...>();
     else
         target_archetype = m_archetypes[targeted_fingerprint].get();
 
-    return target_archetype->CreateEntity();
+    target_archetype->CreateEntities(in_count);
 }
 
-template <ExclusiveComponentType TComponent>
-TComponent& Universe::GetExclusiveComponent() noexcept
+template<IsUniverseComponent TComponent>
+TComponent& Universe::GetUniverseComponent() noexcept
 {
-    // If we didn't found any corresponding component, creating it
-    if (!m_exclusive_components.contains(TComponent::GetId()))
-        m_exclusive_components.emplace(TComponent::GetId(), std::make_unique<TComponent>());
+    // If we didn't find any corresponding component, creating it
+    if (!m_components.contains(ComponentIDFactory::StaticID<TComponent>()))
+        m_components.emplace(ComponentIDFactory::StaticID<TComponent>(), std::make_unique<TComponent>());
 
-    return *static_cast<TComponent*>(m_exclusive_components.at(TComponent::GetId()).get());
+    return *static_cast<TComponent*>(m_components.at(ComponentIDFactory::StaticID<TComponent>()).get());
 }

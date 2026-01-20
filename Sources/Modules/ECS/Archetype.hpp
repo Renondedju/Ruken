@@ -4,12 +4,13 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Meta/Tag.hpp"
+#include "Core/Meta/Empty.hpp"
 
 #include "ECS/Range.hpp"
 #include "ECS/Entity.hpp"
-#include "ECS/ComponentFingerprint.hpp"
+#include "ECS/Components/EntityComponent.hpp"
 #include "ECS/Components/ArchetypeComponent.hpp"
+#include "ECS/Components/ComponentFingerprint.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -35,13 +36,12 @@ class Archetype
 
         #pragma region Members
 
-        ComponentFingerprint m_fingerprint      {};
-        std::list<Range>     m_entities         {};
-        RkSize               m_entities_count   {0ULL};
-        RkSize               m_free_space_count {0ULL};
+        ComponentFingerprint m_fingerprint;
+        RkSize               m_entities_per_chunk;
+        RkSize               m_entities_count     {0ULL};
 
-        // Component storage
-        std::unordered_map<ComponentID, std::unique_ptr<ArchetypeComponent>> m_components {};
+        // Component storage, only holds entity components
+        std::unordered_map<ComponentID, std::unique_ptr<ArchetypeComponent>> m_entity_storage {};
 
         #pragma endregion 
 
@@ -50,11 +50,11 @@ class Archetype
         #pragma region Lifetime
 
         template <IsArchetypeComponent... TComponents>
-        explicit Archetype(Tag<TComponents...>) noexcept;
-        Archetype& operator=(Archetype const&) = default;
-        Archetype& operator=(Archetype&&     ) = default;
-        Archetype           (Archetype const&) = default;
-        Archetype           (Archetype&&     ) = default;
+        explicit Archetype(Empty<TComponents...>) noexcept;
+        Archetype& operator=(Archetype const&) = delete;
+        Archetype& operator=(Archetype&&     ) = delete;
+        Archetype           (Archetype const&) = delete;
+        Archetype           (Archetype&&     ) = delete;
         ~Archetype()                           = default;
 
         #pragma endregion
@@ -62,29 +62,26 @@ class Archetype
         #pragma region Methods
 
         // Getters
-        [[nodiscard]] std::list<Range>     const& GetEntitiesRanges() const noexcept;
-        [[nodiscard]] RkSize                      GetEntitiesCount () const noexcept;
-        [[nodiscard]] ComponentFingerprint const& GetFingerprint   () const noexcept;
+        [[nodiscard]] RkSize                      GetChunkSize    () const noexcept;
+        [[nodiscard]] RkSize                      GetEntitiesCount() const noexcept;
+        [[nodiscard]] ComponentFingerprint const& GetFingerprint  () const noexcept;
 
         /**
          * @brief Returns a component of the passed type stored in this archetype
          * @tparam TComponent Component to look for
-         * @note Passing a component type that does not exists in this archetype will result in a crash
+         * @note Passing a component type that does not exist in this archetype will result in a crash
          * @return Found component
          */
-        template<IsArchetypeComponent TComponent>
-        [[nodiscard]]
-        TComponent& GetComponent() noexcept;
+        template<IsEntityComponent TComponent>
+        [[nodiscard]] TComponent& GetComponent() noexcept;
 
         /**
-         * @brief Creates an entity in the archetype
-         * @return Entity handle.
+         * @brief Creates a set amount of entities in the archetype
          * @see Entity for lifetime info
          * @note Make sure to reinitialize your components after creating a new entity since the memory is pooled and thus
          *       almost never de-allocated. New memory will be allocated only if the archetype has no more empty spaces to fill
          */
-        [[nodiscard]]
-        Entity CreateEntity() noexcept;
+        RkVoid CreateEntities(RkSize in_count = 1) noexcept;
 
         /**
          * @brief Deletes an entity from the archetype
@@ -95,6 +92,6 @@ class Archetype
         #pragma endregion
 };
 
-#include "ECS/Archetype.inl"
-
 END_RUKEN_NAMESPACE
+
+#include "ECS/Archetype.inl"
