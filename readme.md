@@ -5,12 +5,13 @@ This is a toy project meant for experimentation.
 
 Here is the table of content :
 <!-- TOC -->
-* [Philosophy](#philosophy)
-* [Main Features](#main-features)
-  * [Job System](#job-system)
-    * [1. Tasks](#1-tasks)
-    * [2. Awaitables](#2-awaitables)
-  * [Strong Typing](#strong-typing)
+* [Ruken](#ruken)
+  * [Philosophy](#philosophy)
+  * [Main Features](#main-features)
+    * [Job System](#job-system)
+      * [1. Tasks](#1-tasks)
+      * [2. Awaitables](#2-awaitables)
+  * [To Do](#to-do)
 <!-- TOC -->
 
 ## Philosophy
@@ -29,7 +30,7 @@ have their own window manager, world state etc...
 
 ```mermaid
 graph BT;
-    Engine[Engine]-.->Client-1;
+    Engine-.->Client-1;
     Engine-.->Client-2;
     Engine-.->Client-3;
     Engine-.->Client-4;
@@ -117,9 +118,18 @@ Waiting can be then done in 2 ways:
  - Synchronously (or blocking): meaning that the wait will be 'inlined' into the caller.
  - Asynchronously: execution of the caller is not paused and end of the wait is notified via a configurable callback. (see SignalReceiver)
 
---- 
+---
 
-## Strong Typing & Maths
+## To Do
+
+There are a lot of things I plan on doing with this engine, of which I keep track of using the list bellow in no particular order:
+
+- Modularization of the code *(instead of using headers)*
+- Hot Reloading of modules
+- Automatic hot reloading of resources with a file watchdog
+- Automatic serialization *(waiting for c++26's compile time reflexion)*
+- Unit Testing
+- Visual Editor *(c++26)*
 
 
 
