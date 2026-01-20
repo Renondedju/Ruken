@@ -44,15 +44,13 @@ class StrongType
         #pragma region Lifetime
 
         /// @brief Copy conversion constructor
-        template<typename TType> requires std::is_convertible_v<TType, TBase>
-        explicit constexpr StrongType(TType const& in_copy) noexcept:
-            m_value {static_cast<TBase>(in_copy)}
+        explicit constexpr StrongType(TBase const& in_copy) noexcept:
+            m_value {in_copy}
         {}
 
         /// @brief Move conversion constructor
-        template<typename TType> requires std::is_convertible_v<TType, TBase>
-        explicit constexpr StrongType(TType&& in_move) noexcept:
-            m_value {static_cast<TBase>(std::forward<TType>(in_move))}
+        explicit constexpr StrongType(TBase&& in_move) noexcept:
+            m_value {std::forward<TBase>(in_move)}
         {}
 
         constexpr StrongType()                             = default;

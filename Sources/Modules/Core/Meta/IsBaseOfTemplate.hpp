@@ -18,6 +18,6 @@ struct IsBaseOfTemplateImpl
 };
 
 template <template <typename...> class TBase, typename TDerived>
-using IsBaseOfTemplate = typename IsBaseOfTemplateImpl<TBase, TDerived>::Type;
+using IsBaseOfTemplate = IsBaseOfTemplateImpl<TBase, TDerived>::Type;
 
 END_RUKEN_NAMESPACE

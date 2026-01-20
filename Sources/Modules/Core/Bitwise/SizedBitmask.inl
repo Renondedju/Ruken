@@ -4,7 +4,7 @@ template <RkSize TSize, IsIntegral TChunk>
 template <IsIntegral... TData>
 constexpr SizedBitmask<TSize, TChunk>::SizedBitmask(TData... in_data) noexcept:
     m_data {}
-{ Add(in_data...); }
+{ Set(in_data...); }
 
 // --- Methods
 
@@ -66,13 +66,13 @@ constexpr RkUint16 SizedBitmask<TSize, TChunk>::Popcnt() const noexcept
 
 template <RkSize TSize, IsIntegral TChunk>
 template <IsIntegral... TData>
-constexpr RkVoid SizedBitmask<TSize, TChunk>::Add(TData... in_data) noexcept
+constexpr RkVoid SizedBitmask<TSize, TChunk>::Set(TData... in_data) noexcept
 {
     ((m_data[in_data / sizeof_chunk] |= (TChunk(1) << (in_data % sizeof_chunk))), ...);
 }
 
 template <RkSize TSize, IsIntegral TChunk>
-constexpr RkVoid SizedBitmask<TSize, TChunk>::Add(SizedBitmask const& in_bitmask) noexcept
+constexpr RkVoid SizedBitmask<TSize, TChunk>::Set(SizedBitmask const& in_bitmask) noexcept
 {
     for(RkSize index = 0; index < TSize; ++index)
         m_data[index] |= in_bitmask.m_data[index];
@@ -80,13 +80,13 @@ constexpr RkVoid SizedBitmask<TSize, TChunk>::Add(SizedBitmask const& in_bitmask
 
 template <RkSize TSize, IsIntegral TChunk>
 template <IsIntegral... TData>
-constexpr RkVoid SizedBitmask<TSize, TChunk>::Remove(TData... in_data) noexcept
+constexpr RkVoid SizedBitmask<TSize, TChunk>::Clear(TData... in_data) noexcept
 {
     ((m_data[in_data / sizeof_chunk] &= ~(TChunk(1) << (in_data % sizeof_chunk))), ...);
 }
 
 template <RkSize TSize, IsIntegral TChunk>
-constexpr RkVoid SizedBitmask<TSize, TChunk>::Remove(SizedBitmask const& in_bitmask) noexcept
+constexpr RkVoid SizedBitmask<TSize, TChunk>::Clear(SizedBitmask const& in_bitmask) noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
         m_data[index] &= ~in_bitmask.m_data[index];
@@ -123,13 +123,19 @@ constexpr RkVoid SizedBitmask<TSize, TChunk>::Foreach(TLambdaType in_lambda) con
 template <RkSize TSize, IsIntegral TChunk>
 constexpr SizedBitmask<TSize, TChunk> SizedBitmask<TSize, TChunk>::operator+(SizedBitmask const& in_bitmask) const noexcept
 {
-    return SizedBitmask(m_data | in_bitmask.m_data);
+    SizedBitmask new_bitmask {*this};
+    new_bitmask.Set(in_bitmask);
+
+    return new_bitmask;
 }
 
 template <RkSize TSize, IsIntegral TChunk>
 constexpr SizedBitmask<TSize, TChunk> SizedBitmask<TSize, TChunk>::operator-(SizedBitmask const& in_bitmask) const noexcept
 {
-    return SizedBitmask(m_data - in_bitmask.m_data);
+    SizedBitmask new_bitmask {*this};
+    new_bitmask.Clear(in_bitmask);
+
+    return new_bitmask;
 }
 
 template <RkSize TSize, IsIntegral TChunk>

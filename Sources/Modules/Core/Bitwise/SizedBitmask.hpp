@@ -81,8 +81,8 @@ struct SizedBitmask
 	 *          this function will result in an undefined behavior, you must make sure that your values are correct !
 	 */
 	template <IsIntegral... TData>
-	constexpr RkVoid Add(TData... in_data)               noexcept;
-	constexpr RkVoid Add(SizedBitmask const& in_bitmask) noexcept;
+	constexpr RkVoid Set(TData... in_data)               noexcept;
+	constexpr RkVoid Set(SizedBitmask const& in_bitmask) noexcept;
 
 	/**
 	 * @brief Disables the specified flags.
@@ -93,8 +93,8 @@ struct SizedBitmask
 	 *          this function will result in an undefined behavior, you must make sure that your values are correct !
 	 */
 	template <IsIntegral... TData>
-	constexpr RkVoid Remove(TData... in_data)               noexcept;
-	constexpr RkVoid Remove(SizedBitmask const& in_bitmask) noexcept;
+	constexpr RkVoid Clear(TData... in_data)               noexcept;
+	constexpr RkVoid Clear(SizedBitmask const& in_bitmask) noexcept;
 
 	/// @brief Clears the bitmask.
 	constexpr RkVoid Clear() noexcept;
