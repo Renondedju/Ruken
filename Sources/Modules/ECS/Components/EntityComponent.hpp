@@ -62,12 +62,7 @@ struct EntityComponent: ArchetypeComponent
 		 */
 		RkSize FillChunk(RkSize in_count, ChunkAccess const& in_chunk);
 
-	SyncTask<> UselessTask()
-	{
-		co_return;
-	}
-
-	#pragma endregion
+		#pragma endregion
 };
 
 template <typename TType>

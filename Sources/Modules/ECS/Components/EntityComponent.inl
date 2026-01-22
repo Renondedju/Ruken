@@ -13,10 +13,6 @@ EntityComponent<TData>::EntityComponent(RkSize const in_chunk_elements) noexcept
 template<NonVoid TData>
 SyncTask<> EntityComponent<TData>::CreateEntities(RkSize const in_count) noexcept
 {
-    {
-        auto task = UselessTask();
-    }
-
     // TODO: LIST LOCK, THIS IS NOT SAFE
     // For simplicity, we are going to wait for every chunk at once
     RkSize                   remaining    {in_count};

@@ -92,7 +92,7 @@ RkVoid TracyUtilities::TracyZoneEnd(
         ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_ALLOC_ZONES));
 
         auto const ptr {std::malloc(in_count)};
-        TracyAllocS(ptr, in_count, 30);
+        TracyAlloc(ptr, in_count);
         return ptr;
     }
 
@@ -100,7 +100,7 @@ RkVoid TracyUtilities::TracyZoneEnd(
     {
         ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_ALLOC_ZONES));
 
-        TracyFreeS(in_ptr, 30);
+        TracyFree(in_ptr);
         std::free(in_ptr);
     }
 
@@ -108,7 +108,7 @@ RkVoid TracyUtilities::TracyZoneEnd(
     {
         ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_ALLOC_ZONES));
 
-        TracyFreeS(in_ptr, 30);
+        TracyFree(in_ptr);
         std::free(in_ptr);
     }
 
