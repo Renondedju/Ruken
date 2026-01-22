@@ -64,7 +64,7 @@ AsyncTask<MainQueue> AsyncMain(ServiceProvider const& in_service_provider) noexc
 
     // --- 2. Start
     co_await universe->ExecuteEvent(EECSEventName::OnStart);
-/*
+
     // --- 3. Main Loop
     while (!window.ShouldClose())
     {
@@ -74,7 +74,7 @@ AsyncTask<MainQueue> AsyncMain(ServiceProvider const& in_service_provider) noexc
         co_await universe->ExecuteEvent(EECSEventName::OnUpdate);
         co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
     }
-*/
+
     // --- 4. Cleanup
     co_await universe->ExecuteEvent(EECSEventName::OnEnd);
 }
@@ -148,7 +148,7 @@ int main([[maybe_unused]] int   in_arg_count,
     resources->ProvideLoader  <ObjLoader>     ();
     universe ->CreateSystem   <ApplyTransform>();
 
-    universe->CreateEntities<Position, Rotation, Transform>(1'000'000);
+    universe->CreateEntities<Position>(1'000'000);
 
     // 3. --- Finally, running async main ---
     std::stop_source  stop_source {};

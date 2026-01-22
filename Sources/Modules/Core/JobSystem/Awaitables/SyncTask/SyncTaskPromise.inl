@@ -66,12 +66,14 @@ auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 	{
 		SyncTaskPromiseBase* promise;
 
-		// Resuming the parent coroutine if there is any
-		bool await_ready() const noexcept
-		{ return promise->continuation == nullptr; }
+		std::coroutine_handle<> await_suspend(std::coroutine_handle<> const in_coro) const noexcept
+		{
+			// Returning a coroutine handle in final suspend only suspends the coroutine without destroying it.
+			// We need to do it manually to avoid leaks.
+			in_coro.destroy();
 
-		std::coroutine_handle<> await_suspend(std::coroutine_handle<>) const noexcept
-		{ return promise->continuation; }
+			return promise->continuation;
+		}
 	};
 
 	return FinalSuspendAwaiter<Awaiter> {
