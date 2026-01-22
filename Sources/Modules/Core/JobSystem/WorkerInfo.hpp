@@ -15,9 +15,9 @@ class JobQueue;
  */
 struct WorkerInfo
 {
-    std::string    name          {"Unnamed worker"};
-    JobQueue*      current_queue {nullptr};
-    BinaryTreePath queue_bias    {};
+    std::string_view name          {"Unnamed worker"};
+    JobQueue*        current_queue {nullptr};
+    BinaryTreePath   queue_bias    {};
 };
 
 END_RUKEN_NAMESPACE

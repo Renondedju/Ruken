@@ -29,7 +29,10 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 {
 	JobQueue*		         queue		  {nullptr};
 	SyncTaskResult<TResult>* result_ptr   {nullptr};
-	std::coroutine_handle<>  continuation {nullptr};
+	std::coroutine_handle<>  continuation {std::noop_coroutine()};
+
+	/// @brief Operator new used to allocate coroutine body
+	RkVoid* operator new(RkSize in_size);
 
 	/// @returns an awaiter that waits for the task to return or throw an exception.
 	auto operator co_await(this auto&&) noexcept;

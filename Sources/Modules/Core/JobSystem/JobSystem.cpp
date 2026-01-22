@@ -75,7 +75,7 @@ JobSystem::~JobSystem()
         thread.request_stop();
 }
 
-RkVoid JobSystem::CallerAsWorker(std::stop_token&& in_stop_token, std::string_view const in_worker_name) noexcept
+RkVoid JobSystem::CallerAsWorker(std::stop_token&& in_stop_token, std::string const in_worker_name) noexcept
 {
     { // Registering the thread as a worker
         std::lock_guard lock {m_workers_mtx};
@@ -85,7 +85,7 @@ RkVoid JobSystem::CallerAsWorker(std::stop_token&& in_stop_token, std::string_vi
     }
 
     worker_info.name = in_worker_name;
-    tracy::SetThreadNameWithHint(worker_info.name.c_str(), 1);
+    tracy::SetThreadNameWithHint(worker_info.name.data(), 1);
 
     // -- Main Routine
     while (!in_stop_token.stop_requested())

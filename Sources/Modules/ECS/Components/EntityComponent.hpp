@@ -37,13 +37,37 @@ struct EntityComponent: ArchetypeComponent
 
     #pragma endregion
 
-	SyncTask<> CreateEntities(RkSize in_count = 1) noexcept override;
-
-	RkSize FillChunk(ChunkAccess const& in_chunk, RkSize in_count);
+	#pragma region Members
 
 	/// @brief Data chunks
 	std::list<SharedMutex<Chunk>> storage;
-	RkSize const		   chunk_elements;
+
+	/// @brief Amount of elements in a single chunk
+	RkSize const chunk_elements;
+
+	#pragma endregion
+
+	#pragma region Methods
+
+	/// @inheritdoc ArchetypeComponent::CreateEntities
+	SyncTask<> CreateEntities(RkSize in_count = 1) noexcept override;
+
+	private:
+
+		/**
+		 * @brief Attempts to allocate in_count amount of entities in the passed chunk
+		 * @param in_count Amount of entities to allocate.
+		 * @param in_chunk Chunk to allocate entities into.
+		 * @returns Actual amount of entities allocated.
+		 */
+		RkSize FillChunk(RkSize in_count, ChunkAccess const& in_chunk);
+
+	SyncTask<> UselessTask()
+	{
+		co_return;
+	}
+
+	#pragma endregion
 };
 
 template <typename TType>

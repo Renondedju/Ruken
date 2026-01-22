@@ -14,8 +14,8 @@ SingleThreadSingleQueueExecutor::SingleThreadSingleQueueExecutor(JobQueue& in_qu
 }
 
 RkVoid SingleThreadSingleQueueExecutor::CallerAsWorker(
-	std::stop_token&&      in_stop_token,
-	std::string_view const in_worker_name) noexcept
+	std::stop_token&& in_stop_token,
+	std::string const in_worker_name) noexcept
 {
 	static std::atomic_flag s_threads {};
 
@@ -23,7 +23,7 @@ RkVoid SingleThreadSingleQueueExecutor::CallerAsWorker(
 
 	JobSystem::worker_info.name			 = in_worker_name;
 	JobSystem::worker_info.current_queue = &m_queue;
-	tracy::SetThreadNameWithHint(JobSystem::worker_info.name.c_str(), 1);
+	tracy::SetThreadNameWithHint(JobSystem::worker_info.name.data(), 1);
 
 	// -- Main Routine
 	while (!in_stop_token.stop_requested())

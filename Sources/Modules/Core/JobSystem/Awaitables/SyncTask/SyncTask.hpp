@@ -21,9 +21,9 @@ struct SyncTask
 	explicit SyncTask() = default;
 	explicit SyncTask(promise_type& in_parent) noexcept;
 	SyncTask 		   (SyncTask const&) = delete;
-	SyncTask 		   (SyncTask&&     ) = default;
+	SyncTask 		   (SyncTask&&     ) noexcept;
 	SyncTask& operator=(SyncTask const&) = delete;
-	SyncTask& operator=(SyncTask&&     ) = default;
+	SyncTask& operator=(SyncTask&&     ) noexcept;
 	~SyncTask();
 
 	#pragma endregion

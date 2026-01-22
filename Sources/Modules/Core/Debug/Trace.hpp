@@ -22,7 +22,8 @@ BEGIN_RUKEN_NAMESPACE
 /// A collection of functions and members used by the executive system to properly integrate the tracy profiler
 struct TracyUtilities
 {
-	___tracy_source_location_data* GetOrInsertSourceLocationData(std::source_location const& in_source_location, const char* in_name = nullptr, uint32_t in_color = 0) noexcept;
+	___tracy_source_location_data* GetOrInsertSourceLocationData(std::source_location const& in_source_location,
+		const char* in_name = nullptr, uint32_t in_color = 0) noexcept;
 
 	/**
 	 * Starts a tracy zone.
@@ -32,10 +33,10 @@ struct TracyUtilities
 	 * @param in_active True if the zone is active, false otherwise
 	 * @returns Zone context
 	 */
-	static TracyCZoneCtx TracyZone(std::source_location in_source_location, std::string_view in_name , uint32_t in_color, bool in_active) noexcept;
-	static TracyCZoneCtx TracyZone(std::source_location in_source_location, std::string_view in_name ,                    bool in_active) noexcept;
-	static TracyCZoneCtx TracyZone(std::source_location in_source_location, uint32_t		 in_color,                    bool in_active) noexcept;
-	static TracyCZoneCtx TracyZone(std::source_location in_source_location,							                      bool in_active) noexcept;
+	static TracyCZoneCtx TracyZone(std::source_location const& in_source_location, std::string_view in_name , uint32_t in_color, bool in_active) noexcept;
+	static TracyCZoneCtx TracyZone(std::source_location const& in_source_location, std::string_view in_name ,                    bool in_active) noexcept;
+	static TracyCZoneCtx TracyZone(std::source_location const& in_source_location, uint32_t		    in_color,                    bool in_active) noexcept;
+	static TracyCZoneCtx TracyZone(std::source_location const& in_source_location,							                     bool in_active) noexcept;
 
 	static TracyCZoneCtx TracyZone(___tracy_source_location_data* in_source_data, bool in_active) noexcept;
 

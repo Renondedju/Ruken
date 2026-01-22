@@ -30,6 +30,9 @@ struct AsyncTaskPromiseBase: CoroutineTracingUtils, ManualResetEvent
 	// Async tasks are reference counted.
 	std::atomic<RkSize> references {1ULL};
 
+	/// @brief Operator new used to allocate coroutine body
+	RkVoid* operator new(RkSize in_size);
+
 	/// @returns an awaiter that waits for the task to return or throw an exception.
 	auto operator co_await(this auto&&) noexcept;
 

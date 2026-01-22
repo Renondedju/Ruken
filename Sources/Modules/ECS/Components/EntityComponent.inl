@@ -13,6 +13,10 @@ EntityComponent<TData>::EntityComponent(RkSize const in_chunk_elements) noexcept
 template<NonVoid TData>
 SyncTask<> EntityComponent<TData>::CreateEntities(RkSize const in_count) noexcept
 {
+    {
+        auto task = UselessTask();
+    }
+
     // TODO: LIST LOCK, THIS IS NOT SAFE
     // For simplicity, we are going to wait for every chunk at once
     RkSize                   remaining    {in_count};
@@ -22,35 +26,21 @@ SyncTask<> EntityComponent<TData>::CreateEntities(RkSize const in_count) noexcep
 
     // Filling existing chunks
     for (ChunkAccess const& chunk: chunk_access)
-        remaining -= FillChunk(chunk, remaining);
+        remaining -= FillChunk(remaining, chunk);
 
     // Creating new chunks if needed
     while (remaining > 0)
-    {
-        Chunk chunk {};
-        chunk.reserve(chunk_elements);
-        remaining -= FillChunk(co_await storage.emplace_back(std::move(SharedMutex<Chunk>{
-            std::move(chunk)
-        })).AsyncWrite(), remaining);
-    }
+        remaining -= FillChunk(remaining, co_await storage.emplace_back(SharedMutex<Chunk>{}).AsyncWrite());
 
     co_return;
 }
 
-/*
 template<NonVoid TData>
-SyncTask<> EntityComponent<TData>::DeleteEntity(RkSize const in_index) noexcept
+RkSize EntityComponent<TData>::FillChunk(RkSize const in_count, ChunkAccess const& in_chunk)
 {
-    RkSize const chunk_index {in_index / chunk_elements};
+    if (in_chunk->capacity() != chunk_elements)
+        in_chunk->reserve(chunk_elements);
 
-    // TODO: LIST LOCK, THIS IS NOT SAFE
-
-}
-*/
-
-template<NonVoid TData>
-RkSize EntityComponent<TData>::FillChunk(ChunkAccess const& in_chunk, RkSize const in_count)
-{
     RkSize const allocated {std::min(in_count, in_chunk->capacity() - in_chunk->size())};
 
     for (RkSize i {0}; i <= allocated; i++)

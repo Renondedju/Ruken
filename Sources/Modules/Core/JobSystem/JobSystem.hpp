@@ -55,7 +55,7 @@ struct JobSystem final : Service
      * @param in_stop_token Stop token, the method won't return until a stop is requested.
      * @param in_worker_name Name of the worker.
      */
-    RkVoid CallerAsWorker(std::stop_token&& in_stop_token, std::string_view in_worker_name) noexcept;
+    RkVoid CallerAsWorker(std::stop_token&& in_stop_token, std::string in_worker_name) noexcept;
 
     /**
      * Returns the current amount of workers in the system.

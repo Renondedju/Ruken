@@ -5,14 +5,26 @@
 BEGIN_RUKEN_NAMESPACE
 
 template<typename TResult>
+RkVoid* SyncTaskPromiseBase<TResult>::operator new(RkSize const in_size)
+{
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
+	return ::operator new(in_size);
+}
+
+template<typename TResult>
 auto SyncTaskPromiseBase<TResult>::operator co_await(this auto&& in_self) noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	return SyncTaskAwaiter<TResult>(&in_self);
 }
 
 template<typename TResult>
 auto SyncTaskPromiseBase<TResult>::get_return_object(this auto&& in_self) noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	return SyncTask<TResult>(in_self);
 }
 
@@ -22,6 +34,8 @@ auto SyncTaskPromiseBase<TResult>::await_transform(
 	TAwaitable const&    in_awaitable,
 	std::source_location in_source_location) noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	using TAwaiter = decltype(std::declval<TAwaitable>().operator co_await());
 
 	AwaitTransformAwaiter<TAwaiter> awaiter {
@@ -43,6 +57,8 @@ auto SyncTaskPromiseBase<TResult>::await_transform(
 template<typename TResult>
 RkVoid SyncTaskPromiseBase<TResult>::Signal(this auto&& in_self) noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	// When an asynchronous wait is over we need to schedule the coroutine back for execution
 	in_self.queue->Push(std::coroutine_handle<decltype(in_self)>::from_promise(in_self));
 }
@@ -52,6 +68,8 @@ auto SyncTaskPromiseBase<TResult>::initial_suspend(
 	this auto&&				   in_self,
 	std::source_location const in_source_location) noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	// Coroutine is started when waited for
 	return InitialSuspendAwaiter<std::suspend_always> {
 		.promise        = &in_self,
@@ -62,6 +80,8 @@ auto SyncTaskPromiseBase<TResult>::initial_suspend(
 template<typename TResult>
 auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	struct Awaiter: std::suspend_always
 	{
 		SyncTaskPromiseBase* promise;
@@ -84,6 +104,8 @@ auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 template<typename TResult>
 void SyncTaskPromise<TResult>::unhandled_exception() noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	std::exception_ptr const ptr {std::current_exception()};
 	this->ReportException(ptr);
 
@@ -93,6 +115,8 @@ void SyncTaskPromise<TResult>::unhandled_exception() noexcept
 
 inline void SyncTaskPromise<RkVoid>::unhandled_exception() const noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	std::exception_ptr const ptr {std::current_exception()};
 	ReportException(ptr);
 
@@ -102,6 +126,8 @@ inline void SyncTaskPromise<RkVoid>::unhandled_exception() const noexcept
 
 inline void SyncTaskPromise<RkVoid>::return_void() const noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	if (result_ptr)
 		*result_ptr = nullptr;
 }
@@ -109,6 +135,8 @@ inline void SyncTaskPromise<RkVoid>::return_void() const noexcept
 template<typename TResult>
 void SyncTaskPromise<TResult>::return_value(TResult&& in_value) noexcept
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	if (this->result_ptr)
 		this->result_ptr->template emplace<TResult>(std::forward<TResult>(in_value));
 }
@@ -117,6 +145,8 @@ template<typename TResult>
 void SyncTaskPromise<TResult>::return_value(TResult const& in_value) noexcept
 	requires (!std::is_move_assignable_v<TResult> && !std::is_move_constructible_v<TResult>)
 {
+	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
 	if (this->result_ptr)
 		*this->result_ptr = std::forward<TResult>(in_value);
 }

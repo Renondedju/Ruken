@@ -48,28 +48,30 @@ TracyCZoneCtx TracyUtilities::TracyZone(
     return ctx;
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location, bool const in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location, bool const in_active) noexcept
 {
     return TracyZone(
         ::RUKEN_NAMESPACE::s_tracy_utilities.GetOrInsertSourceLocationData(in_source_location),
         in_active);
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location, std::string_view const in_name, bool const in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location,
+    std::string_view const in_name, bool const in_active) noexcept
 {
     return TracyZone(
         ::RUKEN_NAMESPACE::s_tracy_utilities.GetOrInsertSourceLocationData(in_source_location, in_name.data()),
         in_active);
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location, uint32_t const in_color, bool const in_active) noexcept
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location,
+    uint32_t const in_color, bool const in_active) noexcept
 {
     return TracyZone(
         ::RUKEN_NAMESPACE::s_tracy_utilities.GetOrInsertSourceLocationData(in_source_location, nullptr, in_color),
         in_active);
 }
 
-TracyCZoneCtx TracyUtilities::TracyZone(std::source_location in_source_location,
+TracyCZoneCtx TracyUtilities::TracyZone(std::source_location const& in_source_location,
     std::string_view const in_name, uint32_t const in_color, bool const in_active) noexcept
 {
     return TracyZone(
@@ -87,21 +89,27 @@ RkVoid TracyUtilities::TracyZoneEnd(
 
     void* operator new (RkSize const in_count)
     {
-        auto const ptr {malloc(in_count)};
-        TracyAlloc(ptr, in_count);
+        ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_ALLOC_ZONES));
+
+        auto const ptr {std::malloc(in_count)};
+        TracyAllocS(ptr, in_count, 30);
         return ptr;
     }
 
     void operator delete(void* in_ptr) noexcept
     {
-        TracyFree(in_ptr);
-        free     (in_ptr);
+        ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_ALLOC_ZONES));
+
+        TracyFreeS(in_ptr, 30);
+        std::free(in_ptr);
     }
 
     void operator delete(void* in_ptr, std::size_t) noexcept
     {
-        TracyFree(in_ptr);
-        free     (in_ptr);
+        ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_ALLOC_ZONES));
+
+        TracyFreeS(in_ptr, 30);
+        std::free(in_ptr);
     }
 
 #endif

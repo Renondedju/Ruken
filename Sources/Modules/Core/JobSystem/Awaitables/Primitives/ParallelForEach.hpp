@@ -23,6 +23,9 @@ template <std::ranges::sized_range TRange, typename TFunction>
 	requires AwaitableTraits<ParallelForEachAwaitable<TRange, TFunction>>::await_result_void
 SyncTask<> ParallelForeach(TRange const& in_value_container, TFunction&& in_function) noexcept
 {
+	if (std::ranges::size(in_value_container) == 0)
+		co_return;
+
 	// Constructing awaitables
 	std::vector<ParallelForEachAwaitable<TRange, TFunction>> awaitables {std::ranges::size(in_value_container)};
 	for (auto const& [value, awaitable] : std::views::zip(in_value_container, awaitables))
@@ -45,6 +48,9 @@ template <std::ranges::sized_range TRange, typename TFunction>
 	requires AwaitableTraits<ParallelForEachAwaitable<TRange, TFunction>>::await_result_void
 SyncTask<> ParallelForeach(TRange& in_value_container, TFunction&& in_function) noexcept
 {
+	if (std::ranges::size(in_value_container) == 0)
+		co_return;
+
 	// Constructing awaitables
 	std::vector<ParallelForEachAwaitable<TRange, TFunction>> awaitables {std::ranges::size(in_value_container)};
 	for (auto [value, awaitable] : std::views::zip(in_value_container, awaitables))
@@ -70,13 +76,16 @@ auto ParallelForeach(TRange const& in_value_container, TFunction&& in_function) 
 		typename AwaitableTraits<ParallelForEachAwaitable<TRange, TFunction>>::AwaitResult
 	>>
 {
+	if (std::ranges::size(in_value_container) == 0)
+		co_return {};
+
 	// Constructing awaitables
 	std::vector<ParallelForEachAwaitable<TRange, TFunction>> awaitables {std::ranges::size(in_value_container)};
 	for (auto const& [value, awaitable] : std::views::zip(in_value_container, awaitables))
 		awaitable = std::forward<ParallelForEachAwaitable<TRange, TFunction>>(in_function(value));
 
 	// And waiting for all of them to complete
-	co_return co_await WhenAll(awaitables);
+	co_return std::move(co_await WhenAll(awaitables));
 }
 
 /**
@@ -95,13 +104,16 @@ auto ParallelForeach(TRange& in_value_container, TFunction&& in_function) noexce
 		typename AwaitableTraits<ParallelForEachAwaitable<TRange, TFunction>>::AwaitResult
 	>>
 {
+	if (std::ranges::size(in_value_container) == 0)
+		co_return {};
+
 	// Constructing awaitables
 	std::vector<ParallelForEachAwaitable<TRange, TFunction>> awaitables {std::ranges::size(in_value_container)};
 	for (auto [value, awaitable] : std::views::zip(in_value_container, awaitables))
 		awaitable = std::forward<ParallelForEachAwaitable<TRange, TFunction>>(in_function(value));
 
 	// And waiting for all of them to complete
-	co_return co_await WhenAll(awaitables);
+	co_return std::move(co_await WhenAll(awaitables));
 }
 
 END_RUKEN_NAMESPACE

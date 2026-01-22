@@ -248,7 +248,7 @@ include(${RUKEN_SOURCES_DIR}/CMake/CheckGit.cmake)
 string(TOUPPER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME_TOUPPER)
 
 configure_file(Build/BuildInfo.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Build/BuildInfo.hpp)
-target_include_directories(RkCore PUBLIC ${RUKEN_GENERATED_SOURCES_DIR}) # THIS IS A WORKAROUND. Config files should be handled by the module
+target_include_directories(RkCore PUBLIC ${RUKEN_GENERATED_SOURCES_DIR}) # TODO: THIS IS A WORKAROUND. Config files should be handled by the module
 CheckGitSetup()
 
 # --- Link dependencies
