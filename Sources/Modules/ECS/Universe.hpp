@@ -9,7 +9,7 @@
 
 #include "ECS/Entity.hpp"
 #include "ECS/Archetype.hpp"
-#include "ECS/EEventName.hpp"
+#include "ECS/EECSEventName.hpp"
 #include "ECS/Systems/System.hpp"
 #include "ECS/Components/UniverseComponent.hpp"
 

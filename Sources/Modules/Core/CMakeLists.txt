@@ -240,7 +240,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             -fsized-deallocation                     # required by libbacktrace
             --param=destructive-interference-size=64 # makes sure consumers have the same value
     )
-    target_link_libraries (RkCore PUBLIC -lstdc++_libbacktrace)
+    target_link_libraries (RkCore PUBLIC -lstdc++exp) # Prior to GCC14 you should be using -lstdc++_libbacktrace instead
 endif ()
 
 target_link_libraries(RkCore PUBLIC atomic_queue git_version TracyClient)

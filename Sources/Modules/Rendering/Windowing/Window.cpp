@@ -1,5 +1,5 @@
 #include "Rendering/Windowing/Window.hpp"
-#include "Maths/Vector/PixelVector2.hpp"
+#include "Maths/Vector/PixelVector.hpp"
 #include "Debug/Exception.hpp"
 
 #include <vulkan/vulkan_raii.hpp>

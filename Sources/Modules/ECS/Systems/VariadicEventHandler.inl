@@ -17,7 +17,7 @@ SyncTask<> VariadicEventHandler<TComponents...>::ScheduleExecution(
 	RkSize const chunk_count {in_archetype.GetEntitiesCount() / chunk_size};
 
 	// Wait here is needed to
-	co_await ParallelFor(0ULL, chunk_count, [&](RkSize const in_chunk_index) {
+	co_await ParallelFor(0uz, chunk_count, [&](RkSize const in_chunk_index) {
 		return ProcessChunk(in_chunk_index, universe_awaitables, entity_storage_iterators);
 	});
 

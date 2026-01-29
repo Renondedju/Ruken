@@ -15,7 +15,7 @@ target_sources(RkECS PUBLIC
     Components/EntityComponent.inl
     Components/Component.hpp
     Components/ComponentQuery.hpp
-    EEventName.hpp
+        EECSEventName.hpp
     Entity.hpp
     Universe.hpp
     Universe.inl

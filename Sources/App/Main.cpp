@@ -8,7 +8,7 @@
 #include "Core/Debug/Logging/Handlers/DebugHandler.hpp"
 #include "Core/Debug/Logging/Handlers/ConsoleHandler.hpp"
 
-#include "Core/Maths/Vector/PixelVector2.hpp"
+//#include "Core/Maths/Vector/PixelVector2.hpp"
 #include "Core/Time/Clock.hpp"
 
 #include "Filesystem/IOJobQueue.hpp"
@@ -16,7 +16,7 @@
 
 #include "Resources/Assets/AssetImporter.hpp"
 #include "Resources/ResourceManager.hpp"
-
+/*
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/Vulkan/VulkanInstance.hpp"
 #include "Rendering/Windowing/Window.hpp"
@@ -27,6 +27,7 @@
 #include "Rendering/Resources/GPUMesh.hpp"
 
 #include "Rendering.hpp"
+*/
 #include "Queues.hpp"
 #include "Universe.hpp"
 #include "Systems/ApplyTransformHandler.hpp"
@@ -43,14 +44,14 @@ AsyncTask<MainQueue> AsyncMain(ServiceProvider const& in_service_provider) noexc
     // --- 1. Init
     Clock  const*    clock         {in_service_provider.LocateService<Clock>          ()};
     ResourceManager* resources     {in_service_provider.LocateService<ResourceManager>()};
-    RenderDevice*    render_device {in_service_provider.LocateService<RenderDevice>   ()};
+    //RenderDevice*    render_device {in_service_provider.LocateService<RenderDevice>   ()};
     Universe*        universe      {in_service_provider.LocateService<Universe>       ()};
 
-    auto const code {resources->Request<ShaderModule>(FilePath
-        { .location = EFilesystemLocation::ProjectDirectory, .path = "slang.spv"   })};
-    auto const mesh {resources->Request<GPUMesh     >(FilePath
-        { .location = EFilesystemLocation::ProjectDirectory, .path = "suzanne.obj" })};
-
+    //auto const code {resources->Request<ShaderModule>(FilePath
+    //    { .location = EFilesystemLocation::ProjectDirectory, .path = "slang.spv"   })};
+    //auto const mesh {resources->Request<GPUMesh     >(FilePath
+    //    { .location = EFilesystemLocation::ProjectDirectory, .path = "suzanne.obj" })};
+/*
     Window             window  {*render_device, Constants<Vector2px>::standard_definition, "Coucou"};
     TestWindowRenderer test_window_renderer {
         .owner    = *render_device,
@@ -58,25 +59,27 @@ AsyncTask<MainQueue> AsyncMain(ServiceProvider const& in_service_provider) noexc
         .pipeline = code,
         .mesh     = mesh
     };
-
+*/
     // Waiting for resources
-    co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
+    //co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
 
     // --- 2. Start
     co_await universe->ExecuteEvent(EECSEventName::OnStart);
 
     // --- 3. Main Loop
-    while (!window.ShouldClose())
+    for (int i {0}; i <= 1000; i++)
     {
         FrameMark;
 
-        glfwPollEvents();
+        //glfwPollEvents();
         co_await universe->ExecuteEvent(EECSEventName::OnUpdate);
-        co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
+        //co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
     }
 
     // --- 4. Cleanup
     co_await universe->ExecuteEvent(EECSEventName::OnEnd);
+
+    co_return;
 }
 
 /**
@@ -111,6 +114,8 @@ int main([[maybe_unused]] int   in_arg_count,
     ZoneScoped;
 
     // 1. --- Pre-initialization & Configuration ---
+    std::set_terminate(&TerminateHandler);
+
     SingleThreadSingleQueueExecutor main_executor   {MainQueue::instance};
     ConsoleHandler                  console_handler {};
     DebugHandler                    debug_handler   {};
@@ -124,31 +129,31 @@ int main([[maybe_unused]] int   in_arg_count,
             .depth = 1
         }; // The first 3 threads will prioritize the IO queue.
     };
-
+/*
     std::vector<const RkChar*> vulkan_layers     {};
     std::vector<const RkChar*> vulkan_extensions {
         vk::KHRGetSurfaceCapabilities2ExtensionName,
         vk::EXTSurfaceMaintenance1ExtensionName
     };
-
+*/
     // 2. --- Initializing services and core systems ---
     ServiceProvider   services {"Application"};
     auto* clock      {services.ProvideService<Clock>()};
     auto* logger     {services.ProvideService<Logger>(handlers)};
     auto* job_system {services.ProvideService<JobSystem>(queues, worker_bias_function)};
     auto* filesystem {services.ProvideService<StdFilesystem>("../Assets")};
-    auto* vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
-    auto* renderer   {services.ProvideService<RenderDevice>()};
+    //auto* vulkan     {services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
+    //auto* renderer   {services.ProvideService<RenderDevice>()};
     auto* importer   {services.ProvideService<AssetImporter>()};
     auto* resources  {services.ProvideService<ResourceManager>()};
     auto* universe   {services.ProvideService<Universe>()};
 
-    importer ->ProvideImporter<SlangImporter> (); // TODO: Not used or working yet. Slang API is whack.
-    resources->ProvideLoader  <SpirvLoader>   ();
-    resources->ProvideLoader  <ObjLoader>     ();
+    //importer ->ProvideImporter<SlangImporter> (); // TODO: Not used or working yet. Slang API is whack.
+    //resources->ProvideLoader  <SpirvLoader>   ();
+    //resources->ProvideLoader  <ObjLoader>     ();
     universe ->CreateSystem   <ApplyTransform>();
 
-    universe->CreateEntities<Position>(1'000'000);
+    //universe->CreateEntities<Position>(1'000'000);
 
     // 3. --- Finally, running async main ---
     std::stop_source  stop_source {};

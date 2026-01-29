@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Bitwise/Bitmask.hpp"
-#include "Build/Namespace.hpp"
+#include "Core/Bitwise/Bitmask.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

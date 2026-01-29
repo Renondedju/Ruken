@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Maths/Vector/DistanceVector3.hpp"
+#include "Maths/Vector/DistanceVector.hpp"
 
 #include <vulkan/vulkan.hpp>
 

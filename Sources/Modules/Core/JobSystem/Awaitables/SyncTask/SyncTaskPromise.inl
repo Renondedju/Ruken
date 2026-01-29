@@ -78,26 +78,33 @@ auto SyncTaskPromiseBase<TResult>::initial_suspend(
 }
 
 template<typename TResult>
-auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
+auto SyncTaskPromiseBase<TResult>::final_suspend(this auto& in_self) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	struct Awaiter: std::suspend_always
+	struct Awaiter
 	{
-		SyncTaskPromiseBase* promise;
+		decltype(in_self) promise;
 
-		std::coroutine_handle<> await_suspend(std::coroutine_handle<> const in_coro) const noexcept
+		bool await_ready() const noexcept
+		{ return promise.continuation == nullptr; }
+
+		std::coroutine_handle<> await_suspend(std::coroutine_handle<> const) noexcept
 		{
-			// Returning a coroutine handle in final suspend only suspends the coroutine without destroying it.
-			// We need to do it manually to avoid leaks.
-			in_coro.destroy();
+			auto next {promise.continuation};
 
-			return promise->continuation;
+			// TODO: There is a leak here !
+			//		 but destroying the coroutine here
+			// in_coro.destroy();
+
+			return next;
 		}
+
+		static void await_resume() noexcept {}
 	};
 
 	return FinalSuspendAwaiter<Awaiter> {
-		Awaiter {{}, this}, this
+		Awaiter {in_self}, &in_self
 	};
 }
 

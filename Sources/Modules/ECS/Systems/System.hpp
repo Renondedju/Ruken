@@ -3,7 +3,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "ECS/EEventName.hpp"
+#include "ECS/EECSEventName.hpp"
 #include "ECS/Systems/SystemEventHandler.hpp"
 
 BEGIN_RUKEN_NAMESPACE

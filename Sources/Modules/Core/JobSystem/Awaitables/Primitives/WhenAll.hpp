@@ -105,7 +105,7 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
  */
 template <IsAwaitable... TAwaitables>
 	requires (!AwaitableTraits<TAwaitables>::await_result_void && ...)
-auto WhenAll(TAwaitables const&... in_awaitables) ->
+auto WhenAll(TAwaitables const&... in_awaitables) noexcept ->
 	SyncTask<     // Runs on the same queue as the caller
 		std::tuple< // And returns a tuple of all the result types of the passed awaitables
 			typename AwaitableTraits<TAwaitables>::AwaitResult...
@@ -150,7 +150,7 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
  */
 template <IsAwaitable... TAwaitables>
 	requires (AwaitableTraits<TAwaitables>::await_result_void || ...)
-auto WhenAll(TAwaitables const&... in_awaitables) ->
+auto WhenAll(TAwaitables const&... in_awaitables) noexcept ->
 	SyncTask<>
 {
 	if constexpr (sizeof...(TAwaitables) == 0)
@@ -190,7 +190,7 @@ auto WhenAll(TAwaitables const&... in_awaitables) ->
  */
 template <IsAwaitable... TAwaitables>
 	requires (AwaitableTraits<TAwaitables>::await_result_void && ...)
-auto WhenAll(std::tuple<TAwaitables...> in_awaitables) ->
+auto WhenAll(std::tuple<TAwaitables...> in_awaitables) noexcept ->
 	SyncTask<>
 {
 	return std::apply([](TAwaitables const&... in_args) {
@@ -206,7 +206,7 @@ auto WhenAll(std::tuple<TAwaitables...> in_awaitables) ->
  */
 template <IsAwaitable... TAwaitables>
 	requires (!AwaitableTraits<TAwaitables>::await_result_void && ...)
-auto WhenAll(std::tuple<TAwaitables...> in_awaitables) ->
+auto WhenAll(std::tuple<TAwaitables...> in_awaitables) noexcept ->
 	SyncTask<     // Runs on the same queue as the caller
 		std::tuple< // And returns a tuple of all the result types of the passed awaitables
 			typename AwaitableTraits<TAwaitables>::AwaitResult...

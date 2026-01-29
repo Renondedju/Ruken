@@ -19,6 +19,8 @@ Here is the table of content :
 Ruken aims to be used like a configurable, consumable CMake framework or library instead of being a kind of
 environment you have to build into and that isolates your code from the outside world.
 
+For this matter, the implementation can currently be compiled with msvc and gcc, is compatible with Windows and Linux and is tested on ARMv7 and x64. 
+
 The engine is separated into a list of 'modules' or libraries basically that can be mixed and matched 
 at will to build any kind of process intensive applications, not just games.  
 Modules implement various 'services' which are basic building block of an application. 
@@ -43,7 +45,7 @@ This is notably why the concept of 'frames' is not clearly defined by the engine
 ---
 ### Job System
 
-A lot of things in Ruken is based off of the (asynchronous) job system, that is a combination of 2 things:
+A lot of things in Ruken are based off of the (asynchronous) job system, that is a combination of 2 things:
  - Tasks (or coroutines)
  - Awaitables
 
@@ -51,7 +53,7 @@ Let's start with tasks...
 
 #### 1. Tasks
 
-Tasks are scheduled to queues. Queues are used to dispatch tasks among threads with some kind of priority.
+Tasks are scheduled to queues. Queues are used to dispatch tasks among worker threads with some kind of priority.
 This is meant to be configurable, notably using the 'WorkerRequestTree' class, although I am not completely satisfied with the current implementation.
 
 Tasks are coroutines, that can be executed synchronously or asynchronously based on your needs:
@@ -122,7 +124,7 @@ Waiting can be then done in 2 ways:
 
 ## To Do
 
-There are a lot of things I plan on doing with this engine, of which I keep track of using the list bellow in no particular order:
+There are a lot of things I plan on doing with this engine, of which I keep track of using the list bellow, in no particular order:
 
 - Modularization of the code *(instead of using headers)*
 - Hot Reloading of modules
@@ -130,6 +132,7 @@ There are a lot of things I plan on doing with this engine, of which I keep trac
 - Automatic serialization *(waiting for c++26's compile time reflexion)*
 - Unit Testing
 - Visual Editor *(c++26)*
+- Command parser
 
 
 

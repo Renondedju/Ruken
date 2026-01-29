@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Rendering/Rendering/UV.hpp"
-#include "Maths/Vector/DistanceVector3.hpp"
+#include "Maths/Vector/DistanceVector.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Core/Debug/Assert.hpp"
+#include "Core/Build/Attributes.hpp"
 #include "Core/Bitwise/SizedBitmask.hpp"
 #include "Core/Types/FundamentalTypes.hpp"
 
@@ -13,7 +14,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Creates an enum that matches every conditions required to be used used as a bitmask
+ * \brief Creates an enum that matches every conditions required to be used as a bitmask
  * \param name Name of the enum to create
  */
 #define RUKEN_BITMASK(name, ...) enum class name : MinimumTypeT<RUKEN_GET_ARG_COUNT(##__VA_ARGS__)> { ##__VA_ARGS__ }; \
@@ -38,7 +39,7 @@ namespace internal
  * \note Enum classes are supported
  */
 template <typename TEnumType>
-class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type_t<TEnumType>>
+class RUKEN_NO_VTABLE Bitmask : public SizedBitmask<1, std::underlying_type_t<TEnumType>>
 {
     RUKEN_STATIC_ASSERT(std::is_enum_v<TEnumType>, "Cannot create a Bitmask from a non enum type");
 
@@ -125,4 +126,4 @@ class __declspec(novtable) Bitmask : public SizedBitmask<1, std::underlying_type
 
 #include "Bitmask.inl"
 
-    END_RUKEN_NAMESPACE
+END_RUKEN_NAMESPACE

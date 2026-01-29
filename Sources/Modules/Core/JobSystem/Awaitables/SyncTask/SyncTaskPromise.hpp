@@ -29,7 +29,7 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 {
 	JobQueue*		         queue		  {nullptr};
 	SyncTaskResult<TResult>* result_ptr   {nullptr};
-	std::coroutine_handle<>  continuation {std::noop_coroutine()};
+	std::coroutine_handle<>  continuation {nullptr};
 
 	/// @brief Operator new used to allocate coroutine body
 	RkVoid* operator new(RkSize in_size);
@@ -50,7 +50,7 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 
 	// Coroutine lifetime
 	auto initial_suspend(this auto&&, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
-	auto final_suspend  () noexcept;
+	auto final_suspend  (this auto&) noexcept;
 };
 
 // Result specialization

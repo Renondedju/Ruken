@@ -8,9 +8,10 @@
 #include <stacktrace>
 #include <source_location>
 
-BEGIN_RUKEN_NAMESPACE
+#include "Debug/Logging/Logger.hpp"
 
-/// @brief The base exception
+BEGIN_RUKEN_NAMESPACE
+	/// @brief The base exception
 struct Exception
 {
 	std::string                reason;
@@ -48,6 +49,9 @@ struct ErrnoException: Exception
 	 */
 	static std::string GetErrorString(RkErrno in_error_number) noexcept;
 };
+
+/// @brief std::terminate handler. Attempts to catch the terminating exception, logs it to std::cerr and exits the program.
+[[noreturn]] RkVoid TerminateHandler() noexcept;
 
 END_RUKEN_NAMESPACE
 

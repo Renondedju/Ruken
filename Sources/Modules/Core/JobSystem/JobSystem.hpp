@@ -77,13 +77,13 @@ struct JobSystem final : Service
 
 		#pragma region Members
 
+		EvaluateWorkerBias m_bias_function {};
+		WorkerRequestTree  m_request_tree;
+
 		mutable TracyLockable(std::shared_mutex,		 m_workers_mtx);
 		std::unordered_map<std::thread::id, WorkerInfo*> m_workers_map {};
 		std::vector		  <JobQueue*>					 m_queues	   {};
 		std::vector       <std::jthread>				 m_workers     {};
-
-		EvaluateWorkerBias m_bias_function {};
-		WorkerRequestTree  m_request_tree;
 
 		#pragma endregion
 

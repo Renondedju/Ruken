@@ -70,4 +70,4 @@ add_executable(${RUKEN_EXECUTABLE_NAME}
 
 target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")
 target_include_directories(${RUKEN_EXECUTABLE_NAME} PRIVATE ${RUKEN_MODULES_DIR} ${RUKEN_GENERATED_SOURCES_DIR})
-target_link_libraries     (${RUKEN_EXECUTABLE_NAME} ${RUKEN_MODULES_LIB})
+target_link_libraries     (${RUKEN_EXECUTABLE_NAME} PRIVATE ${RUKEN_MODULES_LIB} -fsanitize=address)

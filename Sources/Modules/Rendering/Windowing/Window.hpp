@@ -3,7 +3,7 @@
 #include "Resources/ResourceHandle.hpp"
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/Resources/GPUSwapchain.hpp"
-#include "Core/Maths/Vector/PixelVector2.hpp"
+#include "Core/Maths/Vector/PixelVector.hpp"
 
 #include <vulkan/vulkan_raii.hpp>
 #include <glfw/glfw3.h>

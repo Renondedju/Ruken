@@ -2,7 +2,7 @@
 
 #include "../Modules/ECS/Components/EntityComponent.hpp"
 #include "Core/Maths/Matrix/Matrix.hpp"
-#include "Core/Maths/Vector/DistanceVector3.hpp"
+#include "Core/Maths/Vector/DistanceVector.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

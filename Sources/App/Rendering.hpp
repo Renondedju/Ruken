@@ -4,7 +4,7 @@
 #include "Core/JobSystem/Awaitables/AsyncTask/AsyncTask.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
-#include "Core/Maths/Vector/DistanceVector3.hpp"
+#include "Core/Maths/Vector/DistanceVector.hpp"
 
 #include "Rendering/Windowing/Window.hpp"
 #include "Rendering/WorkGraph/GPUWorkGraph.hpp"
