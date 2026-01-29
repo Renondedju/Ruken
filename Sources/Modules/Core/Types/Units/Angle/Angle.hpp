@@ -20,7 +20,9 @@ BEGIN_RUKEN_NAMESPACE
 template<EAngleUnit TUnitType>
 struct RUKEN_EMPTY_BASES Angle final:
     StrongType<RkFloat, Angle<TUnitType>>,
-    Arithmetic, Comparison, Stream
+    Arithmetic         <Angle<TUnitType>>,
+    Comparison,
+    Stream
 {
     using StrongType<RkFloat, Angle>::StrongType;
     using StrongType<RkFloat, Angle>::operator=;

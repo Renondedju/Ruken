@@ -19,7 +19,7 @@ BEGIN_RUKEN_NAMESPACE
 template<EDurationUnit TUnitType>
 struct RUKEN_EMPTY_BASES Duration final:
     StrongType<RkFloat, Duration<TUnitType>>,
-    Arithmetic,
+    Arithmetic         <Duration<TUnitType>>,
     Comparison,
     Stream
 {

@@ -34,15 +34,15 @@ struct VectorSlerp
      */
     template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]]
-    static constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Slerp(
+    static constexpr Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Slerp(
         Vector<TDimensions, TUnderlyingType>           const& in_source,
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_destination,
         RkFloat                                        const  in_ratio) noexcept
     {
-        RkFloat const dot   = VectorDot<TVector>::Dot(in_source, in_destination);
+        RkFloat const dot   = VectorDot<TDimensions, TVector>::Dot(in_source, in_destination);
         Radians const theta = static_cast<Radians>(ArcCos(static_cast<Radians>(dot)) * in_ratio);
 
-        return in_source * Cos(theta) + VectorNormalization<TVector>::Normalized(in_source - in_destination * dot) * Sin(theta);
+        return in_source * Cos(theta) + VectorNormalization<TDimensions, TVector>::Normalized(in_source - in_destination * dot) * Sin(theta);
     }
 
     #pragma endregion

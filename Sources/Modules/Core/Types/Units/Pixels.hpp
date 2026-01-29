@@ -11,7 +11,7 @@ BEGIN_RUKEN_NAMESPACE
 
 struct RUKEN_EMPTY_BASES Pixels final:
     StrongType<RkInt, Pixels>,
-    Arithmetic,
+    Arithmetic       <Pixels>,
     Comparison,
     Stream
 {

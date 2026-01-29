@@ -1,23 +1,20 @@
-
 #pragma once
 
-#include "Types/Units/Pixels.hpp"
-#include "Build/Attributes.hpp"
+#include "Core/Types/Units/Pixels.hpp"
+#include "Core/Build/Attributes.hpp"
 
-#include "Maths/Vector/Operations/VectorOperators.hpp"
-#include "Maths/Vector/Operations/VectorMinMax.hpp"
-#include "Maths/Vector/Operations/VectorLerp.hpp"
-#include "Maths/Vector/Helper/VectorForward.hpp"
-#include "Maths/Constants.hpp"
+#include "Core/Maths/Vector/Operations/VectorOperators.hpp"
+#include "Core/Maths/Vector/Operations/VectorMinMax.hpp"
+#include "Core/Maths/Vector/Operations/VectorLerp.hpp"
+#include "Core/Maths/Vector/Helper/VectorForward.hpp"
+#include "Core/Maths/Constants.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 #pragma warning( push )
 #pragma warning( disable:4201 )
 
-/**
- * \brief Two dimensional pixel vector
- */
+/// @brief Two-dimensional pixel vector
 template <>
 struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
     VectorOperators<2, Pixels>,
@@ -70,15 +67,57 @@ struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
     #pragma endregion
 };
 
+/// @brief Three-dimensional pixel vector
+template <>
+struct RUKEN_EMPTY_BASES Vector<3, Pixels> final:
+	VectorOperators<3, Pixels>,
+	VectorMinMax   <3, Pixels>,
+	VectorLerp     <3, Pixels>
+{
+	#pragma region Members
+
+	union
+	{
+		Pixels data[3];
+
+		struct
+		{
+			Pixels x;
+			Pixels y;
+			Pixels z;
+		};
+		struct
+		{
+			Pixels width;
+			Pixels height;
+			Pixels depth;
+		};
+	};
+
+	#pragma endregion
+
+	#pragma region Constructors
+
+	constexpr Vector() noexcept:
+		data {0_px, 0_px, 0_px}
+	{}
+
+	constexpr Vector(Pixels const in_width, Pixels const in_height, Pixels const in_depth) noexcept:
+		data {in_width, in_height, in_depth}
+	{}
+
+	#pragma endregion
+};
+
 #pragma warning( pop )
 
 using Vector2px = Vector<2, Pixels>;
+using Vector3px = Vector<3, Pixels>;
 
 template <>
 struct Constants<Vector2px>
 {
     // Desktop definitions
-
     static constexpr Vector2px standard_definition {640_px , 480_px }; // SD (Standard Definition) - 480p
     static constexpr Vector2px high_definition     {1280_px, 720_px }; // HD (High Definition) - 720p
 	static constexpr Vector2px full_hd             {1920_px, 1080_px}; // Full HD (FHD) - 1080p
@@ -87,7 +126,6 @@ struct Constants<Vector2px>
 	static constexpr Vector2px full_ultra_hd       {7680_px, 4320_px}; // Full Ultra HD - 8K / 4320p
 
 	// Mobile definitions
-
 	static constexpr Vector2px iphone_se {750_px , 1334_px};
 	static constexpr Vector2px iphone_8  {750_px , 1334_px};
 	static constexpr Vector2px iphone_x  {1125_px, 2436_px};

@@ -191,9 +191,9 @@ struct VectorOperators
      * \tparam TOtherUnderlyingType Underlying type to convert from
      */
     template <RkSize TOtherDimensions, typename TOtherUnderlyingType>
-    requires   std::is_convertible_v<TOtherUnderlyingType, TUnderlyingType>
-    explicit (!std::is_convertible_v<TUnderlyingType, TOtherUnderlyingType>)
+        requires std::is_convertible_v<TOtherUnderlyingType, TUnderlyingType>
     [[nodiscard]]
+    explicit (!std::is_convertible_v<TUnderlyingType, TOtherUnderlyingType>)
     constexpr operator Vector<TOtherDimensions, TOtherUnderlyingType>() const noexcept(
         noexcept(std::is_nothrow_convertible_v<TUnderlyingType, TOtherUnderlyingType>))
     {

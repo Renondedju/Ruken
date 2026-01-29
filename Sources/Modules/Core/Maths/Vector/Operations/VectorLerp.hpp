@@ -31,7 +31,7 @@ struct VectorLerp
      */
     template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]]
-    static constexpr typename Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Lerp(
+    static constexpr Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Lerp(
         Vector<TDimensions, TUnderlyingType>           const& in_source,
         Vector<TOtherDimensions, TOtherUnderlyingType> const& in_destination,
         RkFloat                                        const  in_ratio) noexcept

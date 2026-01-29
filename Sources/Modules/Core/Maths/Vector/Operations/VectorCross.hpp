@@ -32,7 +32,7 @@ struct VectorCross
      */
     template<typename TOtherUnderlyingType>
     requires requires (TUnderlyingType in_a, TOtherUnderlyingType in_b) { in_a * in_b - in_b * in_a; }
-    [[nodiscard]] static constexpr typename Helper::template CommonSizedVector<TOtherUnderlyingType> Cross(
+    [[nodiscard]] static constexpr Helper::template CommonSizedVector<TOtherUnderlyingType> Cross(
         Vector<TDimensions, TUnderlyingType>      const& in_vector,
         Vector<TDimensions, TOtherUnderlyingType> const& in_other_vector) noexcept
     {
@@ -60,7 +60,7 @@ struct VectorCross
      * \param in_other_vector Right hand side vector
      * \return Cross product
      */
-    template<typename TOtherUnderlyingType>
+    template <typename TOtherUnderlyingType>
     requires requires (TUnderlyingType in_a, TOtherUnderlyingType in_b) { in_a * in_b - in_b * in_a; }
     [[nodiscard]] constexpr auto Cross(Vector<TDimensions, TOtherUnderlyingType> const& in_other_vector) const noexcept
     {

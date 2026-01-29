@@ -10,6 +10,7 @@ BEGIN_RUKEN_NAMESPACE
  * This class is meant to be used in conjunction with the StrongType class.
  * This allows for better and quicker operator integrations to named types.
  */
+template <typename TStrongType>
 struct Subtraction
 {
     /**
@@ -20,8 +21,7 @@ struct Subtraction
      *
      * \return Reference to the instance
      */
-    template <typename TStrongType>
-    constexpr TStrongType& operator-=(this TStrongType& in_lhs, TStrongType const& in_rhs) noexcept
+    friend constexpr TStrongType& operator-=(TStrongType& in_lhs, TStrongType const& in_rhs) noexcept
     {
         in_lhs = in_lhs - in_rhs;
 
@@ -36,8 +36,7 @@ struct Subtraction
      *
      * \return Value of the new instance
      */
-    template <typename TStrongType>
-    constexpr TStrongType operator-(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
+    friend constexpr TStrongType operator-(TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
     {
         using TBase = TStrongType::TUnderlying;
 

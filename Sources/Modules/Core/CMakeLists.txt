@@ -68,23 +68,9 @@ target_sources(RkCore PUBLIC
     Debug/Logging/Logger.hpp
     Debug/Logging/LogLevel.hpp
     Debug/Logging/LogRecord.hpp
-    Maths/Matrix/Operations/MatrixAccess.hpp
-    Maths/Matrix/Operations/MatrixConversions.hpp
     Maths/Matrix/Operations/MatrixInversion.hpp
-    Maths/Matrix/Operations/MatrixMultiplication.hpp
     Maths/Matrix/Operations/MatrixOstream.hpp
     Maths/Matrix/Operations/MatrixTransposition.hpp
-    Maths/Matrix/Operations/MatrixUtility.hpp
-    Maths/Matrix/Transformations/MatrixClipSpace.hpp
-    Maths/Matrix/Transformations/MatrixLookAt.hpp
-    Maths/Matrix/Transformations/MatrixModel.hpp
-    Maths/Matrix/Transformations/MatrixProjections.hpp
-    Maths/Matrix/Transformations/MatrixRotation.hpp
-    Maths/Matrix/Transformations/MatrixRotationX.hpp
-    Maths/Matrix/Transformations/MatrixRotationY.hpp
-    Maths/Matrix/Transformations/MatrixRotationZ.hpp
-    Maths/Matrix/Transformations/MatrixScale.hpp
-    Maths/Matrix/Transformations/MatrixTranslation.hpp
     Maths/Matrix/Matrix.hpp
     Maths/Matrix/MatrixForward.hpp
     Maths/Quaternion/Quaternion.hpp
@@ -98,12 +84,9 @@ target_sources(RkCore PUBLIC
     Maths/Vector/Operations/VectorNormalization.hpp
     Maths/Vector/Operations/VectorOperators.hpp
     Maths/Vector/Operations/VectorSlerp.hpp
-    Maths/Vector/AngleVector2.hpp
-    Maths/Vector/AngleVector3.hpp
-    Maths/Vector/DistanceVector2.hpp
-    Maths/Vector/DistanceVector3.hpp
-    Maths/Vector/PixelVector2.hpp
-    Maths/Vector/PixelVector3.hpp
+    Maths/Vector/AngleVector.hpp
+    Maths/Vector/DistanceVector.hpp
+    Maths/Vector/PixelVector.hpp
     Maths/Constants.hpp
     Maths/Easing.hpp
     Maths/Math.hpp
@@ -252,4 +235,12 @@ target_include_directories(RkCore PUBLIC ${RUKEN_GENERATED_SOURCES_DIR}) # TODO:
 CheckGitSetup()
 
 # --- Link dependencies
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(RkCore PUBLIC
+            -fsized-deallocation                     # required by libbacktrace
+            --param=destructive-interference-size=64 # makes sure consumers have the same value
+    )
+    target_link_libraries (RkCore PUBLIC -lstdc++_libbacktrace)
+endif ()
+
 target_link_libraries(RkCore PUBLIC atomic_queue git_version TracyClient)

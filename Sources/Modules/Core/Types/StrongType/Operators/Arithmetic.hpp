@@ -18,9 +18,11 @@ BEGIN_RUKEN_NAMESPACE
  * \brief Module gathering all common arithmetic operators
  * \see StrongType
  */
+template <typename TStrongType>
 struct RUKEN_EMPTY_BASES Arithmetic:
     Modulo,
-    Addition,         Subtraction,
+    Addition   <TStrongType>,
+    Subtraction<TStrongType>,
     Multiplication<>, Division<>,
     Increment,        Decrement,
     UnaryPlus,        UnaryMinus

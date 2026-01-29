@@ -19,7 +19,7 @@ BEGIN_RUKEN_NAMESPACE
 template<EDistanceUnit TUnitType>
 struct RUKEN_EMPTY_BASES Distance final:
     StrongType<RkFloat, Distance<TUnitType>>,
-    Arithmetic,
+    Arithmetic		   <Distance<TUnitType>>,
     Comparison,
     Stream
 {
