@@ -36,7 +36,6 @@ struct AsyncTask
 
 	private:
 
-		promise_type*					    m_parent {nullptr};
 		std::coroutine_handle<promise_type> m_handle {};
 };
 

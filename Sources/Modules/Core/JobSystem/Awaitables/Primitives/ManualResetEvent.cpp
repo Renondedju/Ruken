@@ -16,7 +16,7 @@ RkBool ManualResetEvent::SignalConsume() const noexcept
 {
 	AsyncAwaiterList*   selection {&m_awaiter_list};
 	AsyncAwaiter const* previous  {nullptr};
-	AsyncAwaiter*   	   continuation;
+	AsyncAwaiter*   	continuation;
 
 	if (selection->load(std::memory_order_acquire) == AsyncAwaiter::consumed)
 		return false;

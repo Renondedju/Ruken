@@ -16,7 +16,7 @@ auto AsyncTaskPromiseBase<TQueueHandle, TResult>::await_transform(
 	using TAwaiter = decltype(std::declval<TAwaitable>().operator co_await());
 
 	AwaitTransformAwaiter<TAwaiter> awaiter {
-		in_awaitable.operator co_await(),
+		std::move(in_awaitable.operator co_await()),
 		this, in_source_location
 	};
 
@@ -86,14 +86,6 @@ auto AsyncTaskPromiseBase<TQueueHandle, TResult>::get_return_object(this auto&& 
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
 	return AsyncTask<TQueueHandle, TResult> {in_self};
-}
-
-template<IsQueueHandle TQueueHandle, typename TResult>
-RkVoid* AsyncTaskPromiseBase<TQueueHandle, TResult>::operator new(RkSize const in_size)
-{
-	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
-
-	return ::operator new(in_size);
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
