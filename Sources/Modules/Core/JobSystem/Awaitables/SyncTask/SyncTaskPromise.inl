@@ -1,29 +1,28 @@
 #pragma once
 
 #include "Core/JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp"
+#include "Build/BuildInfo.hpp"
+
+#include <coroutine>
 
 BEGIN_RUKEN_NAMESPACE
-
-template<typename TResult>
-RkVoid* SyncTaskPromiseBase<TResult>::operator new(RkSize const in_size)
-{
-	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
-
-	return ::operator new(in_size);
-}
 
 template<typename TResult>
 auto SyncTaskPromiseBase<TResult>::operator co_await(this auto&& in_self) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	return SyncTaskAwaiter<TResult>(&in_self);
+	return SyncTaskAwaiter<TResult> {
+		in_self.ManualResetEvent::operator co_await(), &in_self
+	};
 }
 
 template<typename TResult>
 auto SyncTaskPromiseBase<TResult>::get_return_object(this auto&& in_self) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
+
+	in_self.queue = JobSystem::worker_info.current_queue;
 
 	return SyncTask<TResult>(in_self);
 }
@@ -44,12 +43,9 @@ auto SyncTaskPromiseBase<TResult>::await_transform(
 	};
 
 	// When a wait is asynchronous, the execution of the coroutine will not be resumed automatically.
-	// Instead, we need to install a callback to be notified of the event and schedule the coroutine back for execution.
+	// Instead, we need to install a callback to be notified of the event and resume the coroutine.
 	if constexpr (IsAsyncAwaitable<TAwaitable>)
-	{
 		awaiter.signal = SignalReceiver(*this);
-		queue		   = JobSystem::worker_info.current_queue;
-	}
 
 	return awaiter;
 }
@@ -59,52 +55,38 @@ RkVoid SyncTaskPromiseBase<TResult>::Signal(this auto&& in_self) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	// When an asynchronous wait is over we need to schedule the coroutine back for execution
+	// When an asynchronous wait is over coroutine is scheduled back to its original queue.
 	in_self.queue->Push(std::coroutine_handle<decltype(in_self)>::from_promise(in_self));
 }
 
 template<typename TResult>
-auto SyncTaskPromiseBase<TResult>::initial_suspend(
-	this auto&&				   in_self,
-	std::source_location const in_source_location) noexcept
+auto SyncTaskPromiseBase<TResult>::initial_suspend(std::source_location const in_source_location) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	// Coroutine is started when waited for
-	return InitialSuspendAwaiter<std::suspend_always> {
-		.promise        = &in_self,
-		.start_location = in_source_location
+	// Coroutine is ran in place
+	return InitialSuspendAwaiter<std::suspend_never> {
+		{}, this, in_source_location
 	};
 }
 
 template<typename TResult>
-auto SyncTaskPromiseBase<TResult>::final_suspend(this auto& in_self) noexcept
+auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	struct Awaiter
+	// Coroutine is reference counted for destruction
+	struct Awaiter: std::suspend_always
 	{
-		decltype(in_self) promise;
+		SyncTaskPromiseBase* promise;
 
-		bool await_ready() const noexcept
-		{ return promise.continuation == nullptr; }
-
-		std::coroutine_handle<> await_suspend(std::coroutine_handle<> const) noexcept
-		{
-			auto next {promise.continuation};
-
-			// TODO: There is a leak here !
-			//		 but destroying the coroutine here
-			// in_coro.destroy();
-
-			return next;
+		RkBool await_ready() const noexcept {
+			return promise->references.fetch_sub(1, std::memory_order_acq_rel) == 1;
 		}
-
-		static void await_resume() noexcept {}
 	};
 
 	return FinalSuspendAwaiter<Awaiter> {
-		Awaiter {in_self}, &in_self
+		Awaiter {{}, this}, this
 	};
 }
 
@@ -115,28 +97,26 @@ void SyncTaskPromise<TResult>::unhandled_exception() noexcept
 
 	std::exception_ptr const ptr {std::current_exception()};
 	this->ReportException(ptr);
-
-	if (this->result_ptr)
-		*this->result_ptr = ptr;
+	this->result = ptr;
+	this->SignalConsume();
 }
 
-inline void SyncTaskPromise<RkVoid>::unhandled_exception() const noexcept
+inline void SyncTaskPromise<RkVoid>::unhandled_exception() noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
 	std::exception_ptr const ptr {std::current_exception()};
 	ReportException(ptr);
-
-	if (result_ptr)
-		*result_ptr = ptr;
+	exception = ptr;
+	SignalConsume();
 }
 
-inline void SyncTaskPromise<RkVoid>::return_void() const noexcept
+inline void SyncTaskPromise<RkVoid>::return_void() noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (result_ptr)
-		*result_ptr = nullptr;
+	exception = nullptr;
+	SignalConsume();
 }
 
 template<typename TResult>
@@ -144,8 +124,8 @@ void SyncTaskPromise<TResult>::return_value(TResult&& in_value) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (this->result_ptr)
-		this->result_ptr->template emplace<TResult>(std::forward<TResult>(in_value));
+	this->result.template emplace<TResult>(std::forward<TResult>(in_value));
+	this->SignalConsume();
 }
 
 template<typename TResult>
@@ -154,8 +134,8 @@ void SyncTaskPromise<TResult>::return_value(TResult const& in_value) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (this->result_ptr)
-		*this->result_ptr = std::forward<TResult>(in_value);
+	this->result = std::forward<TResult>(in_value);
+	this->SignalConsume();
 }
 
 END_RUKEN_NAMESPACE

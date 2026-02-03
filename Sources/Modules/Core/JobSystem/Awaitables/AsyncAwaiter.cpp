@@ -100,7 +100,7 @@ RkBool AsyncAwaiter::TryDetach() noexcept
 	// Attempting to detach from the awaited event by looking for our
 	// address though the list of suspensions
 	AsyncAwaiterList* selection {head};
-	AsyncAwaiter*	 expected  {this};
+	AsyncAwaiter*	  expected  {this};
 
 	// If this awaiter is the one we were looking for, then we lock it to ensure nobody swaps our `next` pointer
 	while(!selection->compare_exchange_strong(expected, locked, std::memory_order_acq_rel, std::memory_order_acquire))

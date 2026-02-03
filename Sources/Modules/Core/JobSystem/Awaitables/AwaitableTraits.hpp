@@ -19,6 +19,9 @@ template <typename TType>
 concept IsAsyncAwaiter = IsAwaiter<TType> && std::derived_from<TType, AsyncAwaiter>;
 
 template <typename TType>
+concept IsSyncAwaiter  = IsAwaiter<TType>;
+
+template <typename TType>
 concept IsAwaitable = requires (TType const& in_awaitable) {
 	{ in_awaitable.operator co_await() } -> IsAwaiter;
 };
@@ -68,29 +71,35 @@ struct AwaitableRangeTraits
  *
  * @tparam TAwaiter  Awaiter type.
  * @param in_awaiter Awaiter to suspend.
- * @return True if suspension has been done, false if it failed.
+ * @return True if suspension will be completed asynchronously, false if it already has been completed.
  */
 template <IsAwaiter TAwaiter>
 RkBool DoAwaitSuspend(TAwaiter& in_awaiter)
 {
 	using AwaitSuspendResult = AwaiterTraits<TAwaiter>::AwaitSuspendResult;
 
-	// await suspend returns void
-	if constexpr (std::is_void_v<AwaitSuspendResult>)
-	{
+	if constexpr (std::is_void_v<AwaitSuspendResult>) {
 		in_awaiter.await_suspend(std::noop_coroutine());
-		return true;
+		return IsAsyncAwaiter<TAwaiter>;
 	}
 
-	// await suspend returns bool
 	if constexpr (std::is_same_v<AwaitSuspendResult, RkBool>)
 		return in_awaiter.await_suspend(std::noop_coroutine());
 
-	// await suspend returns std::coroutine_handle<>
+	// suspension is a coroutine handle to resume
 	if constexpr (std::is_same_v<AwaitSuspendResult, std::coroutine_handle<>>)
 	{
-		in_awaiter.await_suspend(std::noop_coroutine()).resume();
-		return true;
+		std::coroutine_handle<> const suspension {in_awaiter.await_suspend(std::noop_coroutine())};
+		suspension.resume();
+
+		RUKEN_ASSERT(IsSyncAwaiter<TAwaiter> && suspension.done(),
+			"Suspension is synchronous and coroutine handle is not done after resuming. "
+			"TAwaiter should probably be asynchronous."
+		);
+
+		// If the suspension coroutine isn't already done,
+		// that means it will be completed asynchronously instead
+		return !suspension.done();
 	}
 
 	std::unreachable();

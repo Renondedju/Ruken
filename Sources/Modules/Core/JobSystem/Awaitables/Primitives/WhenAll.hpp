@@ -92,7 +92,7 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
 	// Finally: even if we don't gather results, we still need
 	// to resume the awaiters to let them know we are done waiting for them.
 	// This can be used to propagate exceptions for example.
-	for (auto const& awaiter : awaiters)
+	for (auto& awaiter : awaiters)
 		awaiter.await_resume();
 }
 

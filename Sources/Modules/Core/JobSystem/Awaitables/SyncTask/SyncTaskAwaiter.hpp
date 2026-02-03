@@ -9,31 +9,30 @@ struct SyncTaskPromise;
 
 /// @brief An awaiter of synchronous tasks
 template <typename TResult>
-struct SyncTaskAwaiter
+struct SyncTaskAwaiter: AsyncAwaiter
 {
 	#pragma region Lifetime
 
 	explicit SyncTaskAwaiter  () = default;
-	explicit SyncTaskAwaiter  (SyncTaskPromise<TResult>* in_promise) noexcept;
+	explicit SyncTaskAwaiter  (AsyncAwaiter const& in_async_awaiter, SyncTaskPromise<TResult>* in_promise) noexcept;
 	SyncTaskAwaiter 		  (SyncTaskAwaiter const&) = delete;
-	SyncTaskAwaiter 		  (SyncTaskAwaiter&&     ) noexcept;
+	SyncTaskAwaiter 		  (SyncTaskAwaiter&&     ) = default;
 	SyncTaskAwaiter& operator=(SyncTaskAwaiter const&) = delete;
-	SyncTaskAwaiter& operator=(SyncTaskAwaiter&&	 ) noexcept;
+	SyncTaskAwaiter& operator=(SyncTaskAwaiter&&	 ) = default;
 	~SyncTaskAwaiter()								   = default;
 
 	#pragma endregion
 
 	#pragma region Coroutine Methods
 
-	std::coroutine_handle<> await_suspend(std::coroutine_handle<>) noexcept;
-	RkBool    			    await_ready ()					 const noexcept;
-	auto					await_resume()					 const;
+	auto await_resume();
 
 	#pragma endregion
 
 	#pragma region Members
 
 	SyncTaskPromise<TResult>* promise {nullptr};
+	SyncTaskResult <TResult>  result  {nullptr};
 
 	#pragma endregion
 };

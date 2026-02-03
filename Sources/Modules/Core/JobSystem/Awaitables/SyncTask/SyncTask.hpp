@@ -1,7 +1,6 @@
 #pragma once
 
 #include "JobSystem/Awaitables/SyncTask/SyncTaskPromise.hpp"
-#include "JobSystem/Awaitables/SyncTask/SyncTaskAwaiter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -29,13 +28,12 @@ struct SyncTask
 	#pragma endregion
 
 	/// @returns an awaiter that waits for the task to return or throw an exception.
-	SyncTaskAwaiter<TResult> operator co_await() const noexcept;
+	auto operator co_await() const noexcept;
 
 	private:
 
-		mutable SyncTaskResult<TResult>		m_result {};
 		std::coroutine_handle<promise_type> m_handle {};
-		promise_type*						m_parent {nullptr};
+		RkBool								m_ran    {false};
 };
 
 END_RUKEN_NAMESPACE

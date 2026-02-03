@@ -1,9 +1,10 @@
 #pragma once
 
-#include "JobSystem/Queues/JobQueue.hpp"
-#include "JobSystem/Awaitables/AwaitableTraits.hpp"
-#include "JobSystem/Awaitables/CoroutineTracingUtils.hpp"
-#include "JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp"
+#include "Core/JobSystem/Queues/JobQueue.hpp"
+#include "Core/JobSystem/Awaitables/AwaitableTraits.hpp"
+#include "Core/JobSystem/Awaitables/CoroutineTracingUtils.hpp"
+#include "Core/JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp"
+#include "Core/JobSystem/Awaitables/Primitives/ManualResetEvent.hpp"
 
 #include <source_location>
 
@@ -14,25 +15,24 @@ template <typename TResult>
 struct SyncTask;
 
 /**
- * @brief A synchronous or lazy task.
- * This is mainly used to implement complex synchronisation algorythm and is overall
- * more performant at the cost of some flexibility.
+ * @brief A synchronous or synchronization task.
+ * @tparam TResult Return value of the task.
+ *
+ * This is mainly used to implement various synchronization algorithms as the coroutine is always ran synchronously when instantiated.
+ * Execution is scheduled back to the original queue when an asynchronous wait is over.
+ * This is useful in scenarios where code execution needs to follow a precise order.
+ * Because of this 'inlining' behavior, these tasks are meant to be somewhat lightweight to avoid slowing down asynchronous parallel waits.
  *
  * Differences with async tasks include:
- *	- Lazy execution: Execution is only started upon await, and only one await can be done per task.
- *	- Always runs in the same queue as the caller.
- *	- Probably is a stackfull coroutine (there is no reliable way to measure that yet in c++26).
- *	- Unique handle that moves results instead of copying when available.
+ *	- Execution is started by the caller on instantiation (instead of being scheduled to a queue).
+ *	- Can be a stackfull coroutine (there is no reliable way to measure that yet in c++26).
+ *	- Unique handle that moves results instead of copying when available. Only one await can be done per task.
  */
 template <typename TResult>
-struct SyncTaskPromiseBase: CoroutineTracingUtils
+struct SyncTaskPromiseBase: CoroutineTracingUtils, ManualResetEvent
 {
-	JobQueue*		         queue		  {nullptr};
-	SyncTaskResult<TResult>* result_ptr   {nullptr};
-	std::coroutine_handle<>  continuation {nullptr};
-
-	/// @brief Operator new used to allocate coroutine body
-	RkVoid* operator new(RkSize in_size);
+	JobQueue*			queue   {nullptr};
+	std::atomic<RkSize> references {2ULL};
 
 	/// @returns an awaiter that waits for the task to return or throw an exception.
 	auto operator co_await(this auto&&) noexcept;
@@ -49,14 +49,16 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils
 	auto await_transform(TAwaitable const& in_awaitable, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
 
 	// Coroutine lifetime
-	auto initial_suspend(this auto&&, RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
-	auto final_suspend  (this auto&) noexcept;
+	auto initial_suspend(RUKEN_CURRENT_SOURCE_LOCATION) noexcept;
+	auto final_suspend  () noexcept;
 };
 
 // Result specialization
 template <typename TResult>
 struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 {
+	std::variant<TResult, std::exception_ptr> result;
+
 	// Coroutine exit
 	void unhandled_exception()				   noexcept;
 	void return_value(TResult&&	     in_value) noexcept;
@@ -68,9 +70,11 @@ struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 template <>
 struct SyncTaskPromise<RkVoid>: SyncTaskPromiseBase<RkVoid>
 {
+	std::exception_ptr exception;
+
 	// Coroutine exit
-	void unhandled_exception() const noexcept;
-	void return_void        () const noexcept;
+	void unhandled_exception() noexcept;
+	void return_void        () noexcept;
 };
 
 #undef RUKEN_CURRENT_SOURCE_LOCATION
