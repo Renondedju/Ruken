@@ -191,6 +191,7 @@ target_sources(RkCore PUBLIC
     JobSystem/WorkerRequestTree.hpp
     Containers/BinaryTreePath.hpp
     Containers/BinaryTree.inl
+    Debug/TraceAllocations.hpp
 )
 
 target_sources(RkCore PRIVATE
@@ -223,6 +224,7 @@ target_sources(RkCore PRIVATE
     Service.cpp
     Containers/BinaryTreePath.cpp
     Debug/Exception.cpp
+    Debug/TraceAllocations.cpp
 )
 
 # --- Config file

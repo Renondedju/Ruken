@@ -37,7 +37,7 @@ struct CoroutineTracingUtils
 		CoroutineTracingUtils* promise;
 		std::source_location   start_location;
 
-		auto await_resume() const noexcept(noexcept(TInherited::await_resume()))
+		auto await_resume() noexcept(noexcept(TInherited::await_resume()))
 		{ TRACY_BEGIN_ZONE(promise->zone, start_location, true); return TInherited::await_resume(); }
 	};
 
@@ -47,10 +47,10 @@ struct CoroutineTracingUtils
 		CoroutineTracingUtils* promise;
 		std::source_location   await_location;
 
-		auto await_ready()  const noexcept(noexcept(TInherited::await_ready()))
+		auto await_ready() noexcept(noexcept(TInherited::await_ready()))
 		{ TRACY_END_ZONE(promise->zone); return TInherited::await_ready(); }
 
-		auto await_resume() const noexcept(noexcept(TInherited::await_resume()))
+		auto await_resume() noexcept(noexcept(TInherited::await_resume()))
 		{
 			TRACY_BEGIN_ZONE(promise->zone, await_location, true);
 
@@ -66,7 +66,7 @@ struct CoroutineTracingUtils
 	{
 		CoroutineTracingUtils* promise;
 
-		auto await_ready() const noexcept(noexcept(TInherited::await_ready()))
+		auto await_ready() noexcept(noexcept(TInherited::await_ready()))
 		{ TRACY_END_ZONE(promise->zone); return TInherited::await_ready(); }
 	};
 

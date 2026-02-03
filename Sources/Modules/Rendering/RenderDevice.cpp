@@ -205,14 +205,13 @@ RkVoid RenderDevice::FetchQueues() noexcept
 
 	for (RkUint32 i = 0; i < m_family_views.size(); i++)
 	{
-		auto& access = SleepWait(m_family_views[i].AsyncWrite()).Result();
-		auto& queue  = m_queues	      .emplace_back(m_device, i, 0);
-		auto& pool   = m_command_pools.emplace_back(m_device, vk::CommandPoolCreateInfo {
+		SleepWait   wait {m_family_views[i].AsyncWrite()};
+		auto const& family_view_access    {wait.Result()};
+
+		family_view_access->queue        = &m_queues	   .emplace_back(m_device, i, 0);
+		family_view_access->command_pool = &m_command_pools.emplace_back(m_device, vk::CommandPoolCreateInfo {
             .flags			  = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
             .queueFamilyIndex = i
         });
-
-		access->queue        = &queue;
-		access->command_pool = &pool;
 	}
 }

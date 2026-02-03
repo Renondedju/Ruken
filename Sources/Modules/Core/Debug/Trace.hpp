@@ -4,6 +4,7 @@
 #include "Core/Build/Namespace.hpp"
 #include "Core/Debug/SourceLocation.hpp"
 #include "Core/Types/FundamentalTypes.hpp"
+#include "Core/Debug/TraceAllocations.hpp"
 
 #include <tracy/TracyC.h>
 #include <string_view>
@@ -50,24 +51,34 @@ struct TracyUtilities
 
 		#ifdef RUKEN_TRACE_BUILD
 
-		std::shared_mutex												        m_source_location_mutex    {};
-		std::unordered_map<std::source_location, ___tracy_source_location_data> m_source_location_registry {};
+		std::unordered_map<
+			std::source_location, ___tracy_source_location_data,
+			std::hash    <std::source_location>,
+			std::equal_to<std::source_location>,
+			UntrackedAllocator<std::pair<const std::source_location, ___tracy_source_location_data>
+		>>				  m_source_location_registry {};
+		std::shared_mutex m_source_location_mutex    {};
 
 		#endif
 };
 
-static inline TracyUtilities s_tracy_utilities {};
+
+/*
+ * This value is leaked intentionally. This pointer stores a registry used by tracy for coroutine source location data.
+ * Unfortunately sometimes this value is destroyed before tracy and triggers a read after free error (static initialization order fiasco).
+ *
+ * Transient zones could have been used instead at the cost of a new allocation for each coroutine resume operation,
+ * which I don't want to pay for. Additionally, to make sure this leak won't show up in tracy itself,
+ * a special new overload is used.
+ */
+static inline TracyUtilities* s_tracy_utilities {new (TracyNoAllocationTracking{}) TracyUtilities()};
 
 #ifdef TRACY_ENABLE
-
-#define TRACY_BEGIN_ZONE(in_zone, ...) in_zone = TracyUtilities::TracyZone(__VA_ARGS__)
-#define TRACY_END_ZONE(in_zone) TracyUtilities::TracyZoneEnd(in_zone)
-
+	#define TRACY_BEGIN_ZONE(in_zone, ...) in_zone = TracyUtilities::TracyZone(__VA_ARGS__)
+	#define TRACY_END_ZONE(in_zone)					 TracyUtilities::TracyZoneEnd(in_zone)
 #else
-
-#define TRACY_BEGIN_ZONE(in_zone, ...)
-#define TRACY_END_ZONE(in_zone)
-
+	#define TRACY_BEGIN_ZONE(in_zone, ...)
+	#define TRACY_END_ZONE(in_zone)
 #endif
 
 END_RUKEN_NAMESPACE

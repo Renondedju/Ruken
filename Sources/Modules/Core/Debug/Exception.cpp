@@ -38,7 +38,8 @@ std::string ErrnoException::GetErrorString(RkErrno const in_error_number) noexce
 RkVoid ruken::TerminateHandler() noexcept
 {
 	auto log {[&](std::string_view const in_message) noexcept {
-		std::cerr << in_message << std::endl;
+		std::cerr << in_message				    << std::endl;
+		std::cerr << std::stacktrace::current() << std::endl;
 	}};
 
 	try
