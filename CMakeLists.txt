@@ -32,6 +32,7 @@ set     (RUKEN_CORE_DIR              ${RUKEN_MODULES_DIR}/Core)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${RUKEN_BUILD_IS_OPTIMIZED})
 
+option(RUKEN_ASAN_ENABLED             "Enables the address sanitizer for the whole project." OFF)
 option(RUKEN_HEADLESS_BUILD           "Disables all form of rendering and presentation" OFF)
 option(RUKEN_TRACE_BUILD              "Enables support for the tracy profiler" ${RUKEN_BUILD_HAS_DEBUG_INFO})
 option(RUKEN_BREAK_ON_ERROR           "When on, a break interrupt will be generated on errors" ${RUKEN_BUILD_HAS_DEBUG_INFO})
@@ -39,6 +40,13 @@ option(RUKEN_TRACE_SHOW_WORKER_ZONES  "When on, tracy will also report the activ
 option(RUKEN_TRACE_SHOW_ALLOC_ZONES   "When on, tracy will also trace allocation operators" OFF)
 option(RUKEN_TRACE_SHOW_PROMISE_ZONES "When on, tracy will also trace coroutine promise methods" OFF)
 option(RUKEN_TRACE_SHOW_LOGGER_ZONES  "When on, tracy will also report the activity of loggers" OFF)
+
+if(RUKEN_ASAN_ENABLED)
+    string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}\n")
+    add_compile_options(-fsanitize=address)
+    add_link_options   (-fsanitize=address)
+endif()
 
 if (NOT EXISTS ${RUKEN_GENERATED_SOURCES_DIR})
     file(MAKE_DIRECTORY ${RUKEN_GENERATED_SOURCES_DIR})
@@ -70,4 +78,4 @@ add_executable(${RUKEN_EXECUTABLE_NAME}
 
 target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")
 target_include_directories(${RUKEN_EXECUTABLE_NAME} PRIVATE ${RUKEN_MODULES_DIR} ${RUKEN_GENERATED_SOURCES_DIR})
-target_link_libraries     (${RUKEN_EXECUTABLE_NAME} PRIVATE ${RUKEN_MODULES_LIB} -fsanitize=address)
+target_link_libraries     (${RUKEN_EXECUTABLE_NAME} PRIVATE ${RUKEN_MODULES_LIB})
