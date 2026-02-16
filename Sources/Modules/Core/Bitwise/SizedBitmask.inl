@@ -19,7 +19,7 @@ template <RkSize TSize, IsIntegral TChunk>
 constexpr RkBool SizedBitmask<TSize, TChunk>::HasAll(SizedBitmask const& in_bitmask) const noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
-        if (!((m_data[index] & in_bitmask.m_data[index]) == in_bitmask.m_data[index]))
+        if ((m_data[index] & in_bitmask.m_data[index]) != in_bitmask.m_data[index])
             return false;
 
     return true;
@@ -36,7 +36,7 @@ template <RkSize TSize, IsIntegral TChunk>
 constexpr RkBool SizedBitmask<TSize, TChunk>::HasOne(SizedBitmask const& in_bitmask) const noexcept
 {
     for (RkSize index = 0; index < TSize; ++index)
-        if ((m_data[index] & in_bitmask.m_data[index]))
+        if (m_data[index] & in_bitmask.m_data[index])
             return true;
 
     return false;
@@ -68,7 +68,9 @@ template <RkSize TSize, IsIntegral TChunk>
 template <IsIntegral... TData>
 constexpr RkVoid SizedBitmask<TSize, TChunk>::Set(TData... in_data) noexcept
 {
-    ((m_data[in_data / sizeof_chunk] |= (TChunk(1) << (in_data % sizeof_chunk))), ...);
+    (
+        (m_data[in_data / sizeof_chunk] |= TChunk(1) << (in_data % sizeof_chunk))
+    , ...);
 }
 
 template <RkSize TSize, IsIntegral TChunk>

@@ -8,6 +8,7 @@
 #include "Core/JobSystem/Awaitables/AsyncTask/DynamicTask.hpp"
 
 #include "ECS/Entity.hpp"
+#include "ECS/ECSTask.hpp"
 #include "ECS/Archetype.hpp"
 #include "ECS/EECSEventName.hpp"
 #include "ECS/Systems/System.hpp"
@@ -42,7 +43,7 @@ struct Universe final: Service
      * @warning Only one event must be ran at once for a single universe.
      * @param in_event_name Event type to execute
      */
-    SyncTask<> ExecuteEvent(EECSEventName in_event_name) noexcept;
+    ECSTask<RkVoid> ExecuteEvent(EECSEventName in_event_name) noexcept;
 
     // --- Entity / Systems lifetime manipulation
 

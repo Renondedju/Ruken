@@ -122,6 +122,18 @@ struct Matrix
         requires (TRows == 4 && TColumns == 4);
 
     /**
+     * @brief Returns the clip space of the Vulkan API.
+     *
+     * This matrix is generally used in conjunction with a projection matrix to convert an object from the view space to the clip space
+     * This matrix allows to do the following transformations:
+     *  Position.y = -Position.y;
+     *  Position.z = (Position.z + Position.w) / 2.0;
+     */
+    [[nodiscard]]
+    constexpr static Matrix ClipSpace() noexcept
+        requires (TRows == 4 && TColumns == 4);
+
+    /**
      * @brief Creates a 3D rotation matrix.
      *
      * @param in_angle_x X Angle of the matrix.

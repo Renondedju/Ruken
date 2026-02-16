@@ -105,6 +105,17 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::OrthogonalProjectionM
 }
 
 template<RkSize TRows, RkSize TColumns>
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ClipSpace() noexcept requires (TRows == 4 && TColumns == 4)
+{
+	return Matrix<4, 4> {
+		1.0F,  0.0F,  0.0F,  0.0F,
+		0.0F, -1.0F,  0.0F,  0.0F,
+		0.0F,  0.0F, -1.0F,  0.0F,
+		0.0F,  0.0F,  0.0F,  1.0F
+	};
+}
+
+template<RkSize TRows, RkSize TColumns>
 constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(
 	Radians const in_angle_x,
 	Radians const in_angle_y,

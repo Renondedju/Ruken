@@ -13,7 +13,7 @@ auto SyncTaskPromiseBase<TResult>::operator co_await(this auto&& in_self) noexce
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
 	return SyncTaskAwaiter<TResult> {
-		in_self.ManualResetEvent::operator co_await(), &in_self
+		std::move(in_self.ManualResetEvent::operator co_await()), &in_self
 	};
 }
 

@@ -55,7 +55,7 @@ auto ParallelFor(TIndex in_start, TIndex in_end, TFunction&& in_function) noexce
 		*(awaitable_it++) = in_function(index);
 
 	// And waiting for all of them to complete
-	co_await WhenAll(awaitables);
+	co_return co_await WhenAll(awaitables);
 }
 
 END_RUKEN_NAMESPACE

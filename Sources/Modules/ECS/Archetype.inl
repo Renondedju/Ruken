@@ -17,14 +17,24 @@ Archetype::Archetype(Empty<TComponents...>) noexcept:
 
     // Lambda unwraps entity components
     [&]<auto... TValues>(std::index_sequence<TValues...>)
-    {
-        ([&]<IsEntityComponent TEntityComponent>(Empty<TEntityComponent>)
-        {
+    { ([&]<IsEntityComponent TEntityComponent>(Empty<TEntityComponent>) {
+
             // Computing entity chunk sizes
             m_entities_per_chunk = std::min(m_entities_per_chunk, TEntityComponent::min_entities_per_chunk);
 
+        }(Empty<std::tuple_element_t<TValues, EntityComponents>>{}), ...);
+    }(std::make_index_sequence<std::tuple_size_v<EntityComponents>>());
+
+
+    // Lambda unwraps entity components
+    [&]<auto... TValues>(std::index_sequence<TValues...>)
+    { ([&]<IsEntityComponent TEntityComponent>(Empty<TEntityComponent>) {
+
             // Setting up storage.
-            m_entity_storage.try_emplace(ComponentIDFactory::StaticID<TEntityComponent>(), std::make_unique<TEntityComponent>(m_entities_per_chunk));
+            m_entity_storage.try_emplace(
+                ComponentIDFactory::StaticID<TEntityComponent>(),
+                std::make_unique<TEntityComponent>(m_entities_per_chunk)
+            );
 
         }(Empty<std::tuple_element_t<TValues, EntityComponents>>{}), ...);
     }(std::make_index_sequence<std::tuple_size_v<EntityComponents>>());
@@ -33,7 +43,9 @@ Archetype::Archetype(Empty<TComponents...>) noexcept:
 template <IsEntityComponent TComponent>
 TComponent& Archetype::GetComponent() noexcept
 {
-    return static_cast<TComponent&>(*m_entity_storage[ComponentIDFactory::StaticID<TComponent>()]);
+    auto& component {m_entity_storage.at(ComponentIDFactory::StaticID<TComponent>())};
+
+    return static_cast<TComponent&>(*component.get());
 }
 
 END_RUKEN_NAMESPACE

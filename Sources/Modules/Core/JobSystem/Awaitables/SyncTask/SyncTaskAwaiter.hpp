@@ -32,7 +32,6 @@ struct SyncTaskAwaiter: AsyncAwaiter
 	#pragma region Members
 
 	SyncTaskPromise<TResult>* promise {nullptr};
-	SyncTaskResult <TResult>  result  {nullptr};
 
 	#pragma endregion
 };

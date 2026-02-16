@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ECS/ECSTask.hpp"
 #include "ECS/Universe.hpp"
 #include "ECS/Systems/SystemEventHandler.hpp"
 #include "ECS/Components/EntityComponent.hpp"
@@ -20,7 +21,8 @@ struct VariadicEventHandler: SystemEventHandler
 
 	explicit VariadicEventHandler() noexcept:
 		SystemEventHandler {[](ComponentFingerprint const& in_universe, ComponentFingerprint const& in_archetype) {
-			return (in_universe + in_archetype).HasAll(ComponentFingerprint::CreateFingerPrintFrom<TComponents...>());
+			auto const query_fingerprint {ComponentFingerprint::CreateFingerPrintFrom<TComponents...>()};
+			return (in_universe + in_archetype).HasAll(query_fingerprint);
 		}}
 	{}
 
@@ -86,14 +88,10 @@ struct VariadicEventHandler: SystemEventHandler
 		/**
 		 * Acquires the component locks and dispatches the actual handler logic.
 		 * @param in_chunk_index Chunk index being processed
-		 * @param in_universe_awaitables Universe components access awaitables.
-		 * @param in_entity_storage_iterators Tuple of entity component storage chunk iterators.
+		 * @param in_component_access Components access.
 		 * @return Sync task handle.
 		 */
-		SyncTask<> ProcessChunk(
-			RkSize			  		in_chunk_index,
-			UniverseAwaitables& 	in_universe_awaitables,
-			EntityStorageIterators& in_entity_storage_iterators) noexcept;
+		ECSTask<RkVoid> ProcessChunk(RkSize in_chunk_index, SyncTask<ComponentAccess> in_component_access) noexcept;
 
 		// Various helpers hiding ugly variadic logic
 		EntityStorageIterators GetEntityStorageIterators     (Archetype& in_archetype);

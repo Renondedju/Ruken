@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Awaitables/AsyncTask/AsyncTask.hpp"
 #include "Core/JobSystem/Awaitables/Primitives/SharedMutex.hpp"
 
@@ -14,10 +13,9 @@
 
 #include "Resources/IResourceData.hpp"
 
-#include "Queues.hpp"
-
 #include <tiny_obj_loader.h>
 
+#include "ECSTask.hpp"
 #include "Maths/Matrix/Matrix.hpp"
 #include "Types/Units/Duration/Duration.hpp"
 
@@ -188,7 +186,7 @@ struct TestWindowRenderer
 	 * Renders a frame to a swapchain image.
 	 * @return Async dynamic task.
 	 */
-	AsyncTask<ProcessingQueue> RenderFrame(Seconds in_time) noexcept
+	AsyncTask<ECSJobQueue> RenderFrame(Seconds in_time) noexcept
 	{
 		auto const& pipeline_ptr  {pipeline				.Current()};
 		auto const& swapchain_ptr {window.GetSwapchain().Current()};
@@ -215,7 +213,7 @@ struct TestWindowRenderer
 				Constants<Vector3m>::one / 2
 			),
 			.view  	    = {},
-			.projection = Matrix4x4::OrthogonalProjectionMatrix(-1_m, 1_m, -1_m, 1_m, 1_cm, 1_km) * Matrix4x4::ClipSpace()
+			.projection = Matrix4x4{}/*Matrix4x4::OrthogonalProjectionMatrix(-1_m, 1_m, -1_m, 1_m, 1_cm, 1_km) /** Matrix4x4::ClipSpace()*/
 		};
 
 		vmaCopyMemoryToAllocation(ubo.device->GetAllocator(), &ubo_data, ubo.allocation, 0, sizeof(UniformBufferObject));

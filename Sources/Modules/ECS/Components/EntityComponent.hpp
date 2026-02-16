@@ -19,7 +19,7 @@ struct EntityComponent: ArchetypeComponent
 	// The whole point of data oriented programming is to optimize space and time locality
 	// to properly utilize the cache and prefetcher. These 2 constants are used to make sure the data chunks
 	// have a proper minimal size.
-	static constexpr RkSize min_chunk_size		   = 1 << 15; // 2^15 = 32Kb
+	static constexpr RkSize min_chunk_size		   = 1 << 17; // 2^17 = 1.31Mb
 	static constexpr RkSize min_entities_per_chunk = min_chunk_size / sizeof(TData);
 
 	using Chunk       = std::vector<TData>;

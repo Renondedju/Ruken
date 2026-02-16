@@ -1,6 +1,7 @@
 #include "Debug/TraceAllocations.hpp"
 #include "Build/BuildInfo.hpp"
 
+#include <cstdlib>
 #include <tracy/Tracy.hpp>
 
 void* operator new(std::size_t const _Size, RUKEN_NAMESPACE::TracyNoAllocationTracking)

@@ -10,7 +10,7 @@ Universe::Universe(ServiceProvider& in_service_provider) noexcept:
     Service {in_service_provider, typeid(Universe)}
 { }
 
-SyncTask<> Universe::ExecuteEvent(EECSEventName const in_event_name) noexcept
+ECSTask<RkVoid> Universe::ExecuteEvent(EECSEventName const in_event_name) noexcept
 {
     std::vector<SyncTask<>> handlers {};
     for (std::unique_ptr<System> const& system: m_systems)
@@ -22,7 +22,7 @@ SyncTask<> Universe::ExecuteEvent(EECSEventName const in_event_name) noexcept
         // !! Lock acquisition MUST be done synchronously to ensure proper execution ordering. !!
         for (auto& [fingerprint, archetype] : m_archetypes)
             if (handler->component_query({}, fingerprint))
-                handlers.emplace_back(handler->ScheduleExecution(*this, *archetype));
+                handlers.emplace_back(handler->ScheduleExecution(*this, *archetype.get()));
     }
 
     co_await WhenAll(handlers);

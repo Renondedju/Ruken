@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tracy/Tracy.hpp>
+
 #include "Debug/Assert.hpp"
 #include "ServiceProvider.hpp"
 
@@ -10,6 +12,8 @@ template<typename TService, typename... TArgs>
 TService* ServiceProvider::ProvideService(TArgs&&... in_args)
     noexcept(std::is_nothrow_constructible_v<TService, ServiceProvider&, TArgs...>)
 {
+    ZoneScoped;
+
     TService* new_service {new TService(*this, std::forward<TArgs>(in_args)...)};
 
     std::type_index const service_id {new_service->GetServiceID()};

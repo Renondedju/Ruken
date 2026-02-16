@@ -13,7 +13,7 @@ BEGIN_RUKEN_NAMESPACE
  * @brief Stores a bitmask holding data about the types of a group of component.
  *        This allows for fast archetype comparisons and fast component queries. 
  */
-struct ComponentFingerprint: SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / sizeof(RkSize) * 8, RkSize>
+struct ComponentFingerprint: SizedBitmask<RUKEN_MAX_ECS_COMPONENTS / (sizeof(RkSize) * 8), RkSize>
 {
     /// @brief Creates a new fingerprint and setups traits based on the passed components
     template <IsComponent... TComponents>

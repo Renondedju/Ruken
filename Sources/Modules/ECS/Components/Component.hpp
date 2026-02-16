@@ -32,9 +32,19 @@ struct ComponentIDFactory
     template <IsComponent TComponent>
     static ComponentID StaticID()
     {
-        static ComponentID id(s_next_id++);
-        return id;
+        // 'const TComponent' and 'TComponent' are not the same type and would yield different ids
+        return StaticIDImplementation<std::remove_const_t<TComponent>>();
     }
+
+    private:
+
+        /// @returns the static class ID of the inheriting component.
+        template <IsComponent TComponent>
+        static ComponentID StaticIDImplementation()
+        {
+            static ComponentID id(s_next_id++);
+            return id;
+        }
 };
 
 END_RUKEN_NAMESPACE

@@ -23,7 +23,7 @@ struct SyncTask
 	SyncTask 		   (SyncTask&&     ) noexcept;
 	SyncTask& operator=(SyncTask const&) = delete;
 	SyncTask& operator=(SyncTask&&     ) noexcept;
-	~SyncTask();
+	~SyncTask()						     noexcept;
 
 	#pragma endregion
 
@@ -32,8 +32,7 @@ struct SyncTask
 
 	private:
 
-		std::coroutine_handle<promise_type> m_handle {};
-		RkBool								m_ran    {false};
+		promise_type* m_promise {nullptr};
 };
 
 END_RUKEN_NAMESPACE

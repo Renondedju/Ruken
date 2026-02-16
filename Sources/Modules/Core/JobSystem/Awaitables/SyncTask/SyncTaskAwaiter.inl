@@ -20,15 +20,15 @@ auto SyncTaskAwaiter<TResult>::await_resume()
 
 	if constexpr (std::is_void_v<TResult>)
 	{
-		if (result)
-			std::rethrow_exception(result);
+		if (promise->exception)
+			std::rethrow_exception(promise->exception);
 	}
 	else
 	{
-		if (std::holds_alternative<std::exception_ptr>(result))
-			std::rethrow_exception(std::get<std::exception_ptr>(result));
+		if (std::holds_alternative<std::exception_ptr>(promise->result))
+			std::rethrow_exception(std::get<std::exception_ptr>(promise->result));
 
-		return std::move(std::get<TResult>(result));
+		return std::move(std::get<TResult>(promise->result));
 	}
 }
 
