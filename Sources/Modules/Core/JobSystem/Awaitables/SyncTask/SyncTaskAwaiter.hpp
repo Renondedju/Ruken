@@ -25,7 +25,7 @@ struct SyncTaskAwaiter: AsyncAwaiter
 
 	#pragma region Coroutine Methods
 
-	auto await_resume();
+	decltype(auto) await_resume();
 
 	#pragma endregion
 

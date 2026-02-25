@@ -14,7 +14,7 @@ SyncTaskAwaiter<TResult>::SyncTaskAwaiter(
 {}
 
 template<typename TResult>
-auto SyncTaskAwaiter<TResult>::await_resume()
+decltype(auto) SyncTaskAwaiter<TResult>::await_resume()
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
@@ -28,7 +28,7 @@ auto SyncTaskAwaiter<TResult>::await_resume()
 		if (std::holds_alternative<std::exception_ptr>(promise->result))
 			std::rethrow_exception(std::get<std::exception_ptr>(promise->result));
 
-		return std::move(std::get<TResult>(promise->result));
+		return std::get<TResult>(std::move(promise->result));
 	}
 }
 

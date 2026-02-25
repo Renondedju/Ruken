@@ -124,7 +124,7 @@ void SyncTaskPromise<TResult>::return_value(TResult&& in_value) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	this->result.template emplace<TResult>(std::forward<TResult>(in_value));
+	this->result.emplace<TResult>(std::move(in_value));
 	this->SignalConsume();
 }
 
@@ -134,7 +134,7 @@ void SyncTaskPromise<TResult>::return_value(TResult const& in_value) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	this->result = std::forward<TResult>(in_value);
+	this->result = in_value;
 	this->SignalConsume();
 }
 

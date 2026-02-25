@@ -57,7 +57,7 @@ struct SyncTaskPromiseBase: CoroutineTracingUtils, ManualResetEvent
 template <typename TResult>
 struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 {
-	std::variant<TResult, std::exception_ptr> result;
+	std::variant<std::exception_ptr, TResult> result {};
 
 	// Coroutine exit
 	void unhandled_exception()				   noexcept;
@@ -70,7 +70,7 @@ struct SyncTaskPromise: SyncTaskPromiseBase<TResult>
 template <>
 struct SyncTaskPromise<RkVoid>: SyncTaskPromiseBase<RkVoid>
 {
-	std::exception_ptr exception;
+	std::exception_ptr exception {nullptr};
 
 	// Coroutine exit
 	void unhandled_exception() noexcept;

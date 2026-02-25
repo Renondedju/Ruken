@@ -40,10 +40,8 @@ SharedMutex<TData>::ReadAccess::ReadAccess(ReadAccess const& in_other) noexcept:
 
 template<typename TData>
 SharedMutex<TData>::ReadAccess::ReadAccess(ReadAccess&& in_other) noexcept:
-	m_mutex {in_other.m_mutex}
-{
-	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_add(1, std::memory_order_acq_rel));
-}
+	m_mutex {std::exchange(in_other.m_mutex, nullptr)}
+{}
 
 template<typename TData>
 SharedMutex<TData>::ReadAccess::~ReadAccess() noexcept
@@ -70,8 +68,7 @@ SharedMutex<TData>::ReadAccess& SharedMutex<TData>::ReadAccess::operator=(ReadAc
 	if (m_mutex && m_mutex->m_concurrency.fetch_sub(1, std::memory_order_acq_rel) == 1)
 		m_mutex->ConsumeNext();
 
-	m_mutex = std::move(in_other.m_mutex);
-	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_add(1, std::memory_order_acq_rel));
+	m_mutex = std::exchange(in_other.m_mutex, nullptr);
 
 	return *this;
 }
@@ -97,10 +94,8 @@ SharedMutex<TData>::WriteAccess::WriteAccess(SharedMutex& in_mutex) noexcept:
 
 template<typename TData>
 SharedMutex<TData>::WriteAccess::WriteAccess(WriteAccess&& in_other) noexcept:
-	m_mutex {in_other.m_mutex}
-{
-	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_sub(1, std::memory_order_acq_rel));
-}
+	m_mutex {std::exchange(in_other.m_mutex, nullptr)}
+{}
 
 template<typename TData>
 SharedMutex<TData>::WriteAccess::~WriteAccess() noexcept
@@ -115,8 +110,7 @@ SharedMutex<TData>::WriteAccess& SharedMutex<TData>::WriteAccess::operator=(Writ
 	if (m_mutex && m_mutex->m_concurrency.fetch_add(1, std::memory_order_acq_rel) == -1)
 		m_mutex->ConsumeNext();
 
-	m_mutex = std::move(in_other.m_mutex);
-	RUKEN_SAFE_POINTER_CALL(m_mutex, m_concurrency.fetch_sub(1, std::memory_order_acq_rel));
+	m_mutex = std::exchange(in_other.m_mutex, nullptr);
 
 	return *this;
 }
