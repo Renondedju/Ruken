@@ -1,8 +1,23 @@
-//
-// Created by Basile on 19/02/2026.
-//
+#pragma once
 
-#ifndef RUKEN_RAIISENTINEL_HPP
-#define RUKEN_RAIISENTINEL_HPP
+#include "Build/Namespace.hpp"
+#include "Types/FundamentalTypes.hpp"
 
-#endif //RUKEN_RAIISENTINEL_HPP
+BEGIN_RUKEN_NAMESPACE
+
+/// @brief A utility class that logs RAII operations.
+struct RAIISentinel
+{
+	// Members
+	static inline RkUint64 s_instance_index_pool {0ULL};
+				  RkUint64 m_instance_index		 {s_instance_index_pool++};
+
+	RAIISentinel();
+	RAIISentinel(const RAIISentinel&);
+	RAIISentinel(RAIISentinel&&);
+	RAIISentinel& operator=(const RAIISentinel&);
+	RAIISentinel& operator=(RAIISentinel&&);
+	~RAIISentinel();
+};
+
+END_RUKEN_NAMESPACE

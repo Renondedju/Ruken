@@ -11,7 +11,8 @@
 #include "Debug/Logging/Logger.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-	/// @brief The base exception
+
+/// @brief The base exception
 struct Exception
 {
 	std::string                reason;
