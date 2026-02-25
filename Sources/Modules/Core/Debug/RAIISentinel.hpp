@@ -1,0 +1,8 @@
+//
+// Created by Basile on 19/02/2026.
+//
+
+#ifndef RUKEN_RAIISENTINEL_HPP
+#define RUKEN_RAIISENTINEL_HPP
+
+#endif //RUKEN_RAIISENTINEL_HPP
