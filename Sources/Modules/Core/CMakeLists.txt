@@ -21,6 +21,7 @@ target_sources(RkCore PUBLIC
         FILE_SET HEADERS FILES
     JobSystem/Awaitables/AwaitableTraits.hpp
     Time/Clock.hpp
+        Debug/RAIISentinel.hpp
     Bitwise/Bitmask.hpp
     Bitwise/Endian.hpp
     Bitwise/SizedBitmask.hpp
@@ -196,6 +197,7 @@ target_sources(RkCore PUBLIC
 
 target_sources(RkCore PRIVATE
     Time/Clock.cpp
+        Debug/RAIISentinel.cpp
     JobSystem/Awaitables/Primitives/CountDownLatch.cpp
     JobSystem/JobQueue.cpp
     JobSystem/JobSystem.cpp

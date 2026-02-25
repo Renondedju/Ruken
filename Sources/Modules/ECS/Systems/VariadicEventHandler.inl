@@ -20,10 +20,7 @@ SyncTask<> VariadicEventHandler<TComponents...>::ScheduleExecution(
 	co_await ParallelFor(0uz, chunk_count, [&](RkSize const in_chunk_index)
 	{
 		EntityAwaitables		    entity_awaitables {GetEntityStorageAwaiters(entity_storage_iterators)};
-		SyncTask<ComponentAccess>&& component_access  {WhenAll(std::tuple_cat(
-			std::move(universe_awaitables),
-			std::move(entity_awaitables  )))
-		};
+		SyncTask<ComponentAccess>&& component_access  {WhenAll(std::tuple_cat(universe_awaitables, entity_awaitables))};
 
 		return ProcessChunk(in_chunk_index, std::move(component_access));
 	});
@@ -34,7 +31,8 @@ ECSTask<RkVoid> VariadicEventHandler<TComponents...>::ProcessChunk(
 	RkSize const     		  in_chunk_index,
 	SyncTask<ComponentAccess> in_component_access) noexcept
 {
-	ComponentAccess component_accesses {co_await    in_component_access};
+	// Wait access task is moved to automatic storage to be destroyed
+	ComponentAccess component_accesses {co_await in_component_access};
 	RkSize const    chunk_size 		   {std::get<0>(component_accesses)->size()};
 
 	Execute(in_chunk_index, chunk_size, component_accesses);

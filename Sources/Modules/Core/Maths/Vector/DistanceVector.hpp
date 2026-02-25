@@ -141,7 +141,7 @@ struct RUKEN_EMPTY_BASES Vector<4, Distance<TDistanceUnit>> final:
 
 	union
 	{
-		Distance<TDistanceUnit> data[3];
+		Distance<TDistanceUnit> data[4];
 
 		struct
 		{

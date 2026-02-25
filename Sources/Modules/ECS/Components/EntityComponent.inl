@@ -39,7 +39,7 @@ RkSize EntityComponent<TData>::FillChunk(RkSize const in_count, ChunkAccess cons
 
     RkSize const allocated {std::min(in_count, in_chunk->capacity() - in_chunk->size())};
 
-    for (RkSize i {0}; i <= allocated; i++)
+    for (RkSize i {0}; i < allocated; i++)
         in_chunk->emplace_back(TData{});
 
     return allocated;

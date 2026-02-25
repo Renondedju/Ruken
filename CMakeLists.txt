@@ -70,6 +70,8 @@ add_executable(${RUKEN_EXECUTABLE_NAME}
         Sources/App/Main.cpp
         Sources/App/Test.hpp
         Sources/App/Rendering.hpp
+        Sources/App/Application.cpp
+        Sources/App/Application.hpp
         Sources/App/Components.hpp
         Sources/App/Systems/ApplyTransformHandler.hpp
         Sources/App/Systems/ApplyTransformHandler.cpp
