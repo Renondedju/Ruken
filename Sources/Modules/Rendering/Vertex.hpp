@@ -8,8 +8,8 @@ BEGIN_RUKEN_NAMESPACE
 
 struct Vertex
 {
-	alignas(16) Vector3m position {};
-	//alignas(32) Vector3m color    {0.0_m, 1.0_m, 0.0_m};
+	Vector3m position {1.0_m, 1.0_m, 1.0_m};
+	//Vector3m color    {0.0_m, 1.0_m, 0.0_m};
 
 	static vk::VertexInputBindingDescription getBindingDescription() {
 		return { 0, sizeof(Vertex), vk::VertexInputRate::eVertex };
@@ -18,7 +18,7 @@ struct Vertex
 	static std::array<vk::VertexInputAttributeDescription, 1> getAttributeDescriptions() {
 		return {
 			vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, position)),
-			//vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, color))
+			//vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32Sfloat, offsetof(Vertex, color   ))
 		};
 	}
 };

@@ -213,7 +213,7 @@ struct TestWindowRenderer
 				Constants<Vector3m>::one / 2
 			),
 			.view  	    = Matrix4x4 {},
-			.projection = Matrix4x4 {}/*Matrix4x4::OrthogonalProjectionMatrix(-1_m, 1_m, -1_m, 1_m, 1_cm, 1_km) /** Matrix4x4::ClipSpace()*/
+			.projection = Matrix4x4::OrthogonalProjectionMatrix(-1_m, 1_m, -1_m, 1_m, 1_cm, 1_km) * Matrix4x4::ClipSpace()
 		};
 
 		vmaCopyMemoryToAllocation(ubo.device->GetAllocator(), &ubo_data, ubo.allocation, 0, sizeof(UniformBufferObject));

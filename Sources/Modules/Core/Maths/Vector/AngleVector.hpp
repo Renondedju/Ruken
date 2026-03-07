@@ -15,7 +15,7 @@ BEGIN_RUKEN_NAMESPACE
 #pragma warning( disable:4201 )
 
 template <RkSize TSize, EAngleUnit TAngleUnit>
-struct AngleVectorOperations:
+struct RUKEN_EMPTY_BASES AngleVectorOperations:
 	VectorOperators<TSize, Angle<TAngleUnit>>,
 	VectorMinMax   <TSize, Angle<TAngleUnit>>,
 	VectorSlerp    <TSize, Angle<TAngleUnit>>,

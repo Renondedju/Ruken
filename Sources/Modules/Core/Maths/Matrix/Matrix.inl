@@ -39,9 +39,9 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::LookAtMatrix(
 	Vector3m const up     {right  .Cross(forward)};
 
 	return Matrix<3, 4> {
-		right   .x,  right  .y,  right  .z, -right  .Dot(in_from),
-		up      .x,  up     .y,  up     .z, -up     .Dot(in_from),
-		-forward.x, -forward.y, -forward.z,  forward.Dot(in_from)
+		right   .x(),  right  .y(),  right  .z(), -right  .Dot(in_from),
+		up      .x(),  up     .y(),  up     .z(), -up     .Dot(in_from),
+		-forward.x(), -forward.y(), -forward.z(),  forward.Dot(in_from)
 	};
 }
 
@@ -154,15 +154,15 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(
 
 	// The matrix will implicitly be converted to the requested size if needed
 	return Matrix<3, 3> {
-		cos_angle + static_cast<RkFloat>(in_axis.x * in_axis.x) * (1 - cos_angle),
-		in_axis.x * in_axis.y * (1 - cos_angle) - in_axis.z * sin_angle,
-		in_axis.x * in_axis.z * (1 - cos_angle) + in_axis.y * sin_angle,
-		in_axis.y * in_axis.x * (1 - cos_angle) + in_axis.z * sin_angle,
-		cos_angle + static_cast<RkFloat>(in_axis.y * in_axis.y) * (1 - cos_angle),
-		in_axis.y * in_axis.z * (1 - cos_angle) - in_axis.x * sin_angle,
-		in_axis.z * in_axis.x * (1 - cos_angle) - in_axis.y * sin_angle,
-		in_axis.z * in_axis.y * (1 - cos_angle) + in_axis.x * sin_angle,
-		cos_angle + static_cast<RkFloat>(in_axis.z * in_axis.z) * (1 - cos_angle),
+		cos_angle + static_cast<RkFloat>(in_axis.x() * in_axis.x()) * (1 - cos_angle),
+		in_axis.x() * in_axis.y() * (1 - cos_angle) - in_axis.z() * sin_angle,
+		in_axis.x() * in_axis.z() * (1 - cos_angle) + in_axis.y() * sin_angle,
+		in_axis.y() * in_axis.x() * (1 - cos_angle) + in_axis.z() * sin_angle,
+		cos_angle + static_cast<RkFloat>(in_axis.y() * in_axis.y()) * (1 - cos_angle),
+		in_axis.y() * in_axis.z() * (1 - cos_angle) - in_axis.x() * sin_angle,
+		in_axis.z() * in_axis.x() * (1 - cos_angle) - in_axis.y() * sin_angle,
+		in_axis.z() * in_axis.y() * (1 - cos_angle) + in_axis.x() * sin_angle,
+		cos_angle + static_cast<RkFloat>(in_axis.z() * in_axis.z()) * (1 - cos_angle),
 	};
 }
 
@@ -252,7 +252,7 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::TranslationMatrix(Vec
 		1.0F, 0.0F, 0.0F, 0.0F,
 		0.0F, 1.0F, 0.0F, 0.0F,
 		0.0F, 0.0F, 1.0F, 0.0F,
-		in_translation.x, in_translation.y, in_translation.z, 1.0F
+		in_translation.x(), in_translation.y(), in_translation.z(), 1.0F
 	};
 }
 

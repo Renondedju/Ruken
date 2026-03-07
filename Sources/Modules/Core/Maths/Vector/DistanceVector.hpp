@@ -19,7 +19,7 @@ BEGIN_RUKEN_NAMESPACE
 #pragma warning( disable:4201 )
 
 template <RkSize TSize, EDistanceUnit TDistanceUnit>
-struct DistanceVectorOperations:
+struct RUKEN_EMPTY_BASES DistanceVectorOperations:
 	VectorNormalization<TSize, Distance<TDistanceUnit>>,
 	VectorOperators    <TSize, Distance<TDistanceUnit>>,
 	VectorMinMax       <TSize, Distance<TDistanceUnit>>,
@@ -36,7 +36,7 @@ struct DistanceVectorOperations:
  * @tparam TDistanceUnit Distance unit of the vector.
  */
 template <RkSize TSize, EDistanceUnit TDistanceUnit>
-struct RUKEN_EMPTY_BASES Vector<TSize, Distance<TDistanceUnit>> final:
+struct RUKEN_EMPTY_BASES alignas(16) Vector<TSize, Distance<TDistanceUnit>> final:
 	DistanceVectorOperations<TSize, TDistanceUnit>
 {
 	#pragma region Members
@@ -50,26 +50,24 @@ struct RUKEN_EMPTY_BASES Vector<TSize, Distance<TDistanceUnit>> final:
 
 /// @brief Two-dimensional distance vector specialization
 template <EDistanceUnit TDistanceUnit>
-struct RUKEN_EMPTY_BASES Vector<2, Distance<TDistanceUnit>> final:
+struct RUKEN_EMPTY_BASES alignas(16) Vector<2, Distance<TDistanceUnit>> final:
 	DistanceVectorOperations<2, TDistanceUnit>
 {
-	#pragma region Members
+	Distance<TDistanceUnit> data[2];
 
-	union
-	{
-		Distance<TDistanceUnit> data[2];
+	#pragma region Getters/Setters
 
-		struct
-		{
-			Distance<TDistanceUnit> x;
-			Distance<TDistanceUnit> y;
-		};
-		struct
-		{
-			Distance<TDistanceUnit> width;
-			Distance<TDistanceUnit> height;
-		};
-	};
+	Distance<TDistanceUnit>&	   x()       noexcept { return data[0]; }
+	Distance<TDistanceUnit> const& x() const noexcept { return data[0]; }
+
+	Distance<TDistanceUnit>&	   y()       noexcept { return data[1]; }
+	Distance<TDistanceUnit> const& y() const noexcept { return data[1]; }
+
+	Distance<TDistanceUnit>&	   Width ()       noexcept { return data[0]; }
+	Distance<TDistanceUnit> const& Width () const noexcept { return data[0]; }
+
+	Distance<TDistanceUnit>&	   Height()       noexcept { return data[1]; }
+	Distance<TDistanceUnit> const& Height() const noexcept { return data[1]; }
 
 	#pragma endregion
 
@@ -90,30 +88,32 @@ struct RUKEN_EMPTY_BASES Vector<2, Distance<TDistanceUnit>> final:
 
 /// @brief Three-dimensional distance vector specialization
 template <EDistanceUnit TDistanceUnit>
-struct RUKEN_EMPTY_BASES Vector<3, Distance<TDistanceUnit>> final:
+struct RUKEN_EMPTY_BASES alignas(16) Vector<3, Distance<TDistanceUnit>> final:
 	DistanceVectorOperations<3, TDistanceUnit>
 {
-    #pragma region Members
+	Distance<TDistanceUnit> data[3];
 
-    union
-	{
-	    Distance<TDistanceUnit> data[3];
+	#pragma region Getters/Setters
 
-	    struct
-	    {
-	        Distance<TDistanceUnit> x;
-			Distance<TDistanceUnit> y;
-			Distance<TDistanceUnit> z;
-	    };
-		struct
-	    {
-	        Distance<TDistanceUnit> width;
-			Distance<TDistanceUnit> height;
-			Distance<TDistanceUnit> depth;
-	    };
-	};
+	Distance<TDistanceUnit>&	   x()       noexcept { return data[0]; }
+	Distance<TDistanceUnit> const& x() const noexcept { return data[0]; }
 
-    #pragma endregion
+	Distance<TDistanceUnit>&	   y()       noexcept { return data[1]; }
+	Distance<TDistanceUnit> const& y() const noexcept { return data[1]; }
+
+	Distance<TDistanceUnit>&	   z()       noexcept { return data[2]; }
+	Distance<TDistanceUnit> const& z() const noexcept { return data[2]; }
+
+	Distance<TDistanceUnit>&	   Width ()       noexcept { return data[0]; }
+	Distance<TDistanceUnit> const& Width () const noexcept { return data[0]; }
+
+	Distance<TDistanceUnit>&	   Height()       noexcept { return data[1]; }
+	Distance<TDistanceUnit> const& Height() const noexcept { return data[1]; }
+
+	Distance<TDistanceUnit>&	   Depth ()       noexcept { return data[2]; }
+	Distance<TDistanceUnit> const& Depth () const noexcept { return data[2]; }
+
+	#pragma endregion
 
     #pragma region Constructors
 
@@ -134,23 +134,24 @@ struct RUKEN_EMPTY_BASES Vector<3, Distance<TDistanceUnit>> final:
 
 /// @brief Four-dimensional distance vector specialization
 template <EDistanceUnit TDistanceUnit>
-struct RUKEN_EMPTY_BASES Vector<4, Distance<TDistanceUnit>> final:
+struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 	DistanceVectorOperations<4, TDistanceUnit>
 {
-	#pragma region Members
+	Distance<TDistanceUnit> data[4];
 
-	union
-	{
-		Distance<TDistanceUnit> data[4];
+	#pragma region Getters/Setters
 
-		struct
-		{
-			Distance<TDistanceUnit> x;
-			Distance<TDistanceUnit> y;
-			Distance<TDistanceUnit> z;
-			Distance<TDistanceUnit> w;
-		};
-	};
+	Distance<TDistanceUnit>&	   x()       noexcept { return data[0]; }
+	Distance<TDistanceUnit> const& x() const noexcept { return data[0]; }
+
+	Distance<TDistanceUnit>&	   y()       noexcept { return data[1]; }
+	Distance<TDistanceUnit> const& y() const noexcept { return data[1]; }
+
+	Distance<TDistanceUnit>&	   z()       noexcept { return data[2]; }
+	Distance<TDistanceUnit> const& z() const noexcept { return data[2]; }
+
+	Distance<TDistanceUnit>&	   w()       noexcept { return data[3]; }
+	Distance<TDistanceUnit> const& w() const noexcept { return data[3]; }
 
 	#pragma endregion
 

@@ -1,5 +1,6 @@
 #include "Rendering/Resources/GPUMesh.hpp"
 
+#include <ranges>
 #include <vk_mem_alloc.h>
 
 USING_RUKEN_NAMESPACE

@@ -9,6 +9,7 @@
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
+#include <ranges>
 
 USING_RUKEN_NAMESPACE
 
@@ -48,18 +49,20 @@ IOTask<ResourcePtr<>> ObjLoader::Load(LoadContext&& in_context) const
 			in_context.file_path.ToString(), warn);
 	}
 
-	for (auto const& shape : shapes)
-	for (auto const& index : shape.mesh.indices)
+	vertices.resize(attrib.vertices.size() / 3);
+	for (auto const& [index, vertex] : std::views::enumerate(vertices))
 	{
-		indices .push_back(indices.size());
-		vertices.push_back(Vertex {
-			.position = Vector3m {
-				static_cast<Meters>(attrib.vertices[3 * index.vertex_index + 0]),
-				static_cast<Meters>(attrib.vertices[3 * index.vertex_index + 1]),
-				static_cast<Meters>(attrib.vertices[3 * index.vertex_index + 2])
-			}
-		});
+		vertex.position.data[0] = (Meters)attrib.vertices[3 * index + 0];
+		vertex.position.data[1] = (Meters)attrib.vertices[3 * index + 1];
+		vertex.position.data[2] = (Meters)attrib.vertices[3 * index + 2];
 	}
-	
+
+	for (auto const& shape : shapes)
+	{
+		indices.append_range(shape.mesh.indices | std::views::transform([](const tinyobj::index_t& in_index) {
+			return in_index.vertex_index;
+		}));
+	}
+
 	co_return std::make_shared<GPUMesh>(*device, vertices, indices);
 }
