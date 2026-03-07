@@ -7,7 +7,8 @@
 BEGIN_RUKEN_NAMESPACE
 
 template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns>::Matrix() noexcept
+constexpr Matrix<TRows, TColumns>::Matrix() noexcept:
+	data {}
 {
 	// Init with identity if square matrix
 	if constexpr (is_square)
@@ -39,10 +40,18 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::LookAtMatrix(
 	Vector3m const up     {right  .Cross(forward)};
 
 	return Matrix<3, 4> {
+		 right.x(),           up.x(),         -forward.x(),
+		 right.y(),           up.y(),         -forward.y(),
+		 right.z(),           up.z(),         -forward.z(),
+		-right.Dot(in_from), -up.Dot(in_from), forward.Dot(in_from)
+	};
+/*
+	return Matrix<3, 4> {
 		right   .x(),  right  .y(),  right  .z(), -right  .Dot(in_from),
 		up      .x(),  up     .y(),  up     .z(), -up     .Dot(in_from),
 		-forward.x(), -forward.y(), -forward.z(),  forward.Dot(in_from)
 	};
+	*/
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -51,7 +60,7 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ModelMatrix(
 	Quaternion const& in_rotation,
 	Vector3m   const& in_scale) noexcept requires (TRows == 4 && TColumns == 4)
 {
-	return Matrix::ScaleMatrix		(in_scale) *
+	return Matrix::ScaleMatrix		(in_scale)    *
 	       Matrix::RotationMatrix3D (in_rotation) *
 	       Matrix::TranslationMatrix(in_position);
 }
@@ -63,14 +72,20 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::PerspectiveProjection
 	Meters  const in_near,
 	Meters  const in_far) noexcept requires (TRows == 4 && TColumns == 4)
 {
-	RkFloat const scale = 1.0F / Tan(in_fov / 2.0F);
+	// https://www.kdab.com/projection-matrices-with-vulkan-part-1/
+	// https://www.kdab.com/projection-matrices-with-vulkan-part-2/
+	// Post view correction is used. This matrix is specific to vulkan.
+	RkFloat const fov_tangent = Tan(in_fov / 2.0F);
+
+	Meters const far  {-in_far};
+	Meters const near {-in_near};
 
 	return Matrix<4, 4> {
-		scale / in_aspect, 0.0F ,  0.0F,                        0.0F,
-		0.0F,              scale,  0.0F,                        0.0F,
-		0.0F,              0.0F ,  in_far / (in_near - in_far), -(in_far * in_near) / (in_far - in_near),
-		0.0F,              0.0F ,  1.0F,                        0.0F
-	};
+		in_aspect / fov_tangent, 0.0F,  0.0F, 0.0F,
+		0.0F, 1.0f / fov_tangent, 0.0F, 0.0F,
+		0.0F, 0.0F, -far / (far - near),          1.0F,
+		0.0F, 0.0F, -(far * near) / (far - near), 0.0F
+	} * Matrix4x4::ClipSpace();
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -87,10 +102,9 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::OrthogonalProjectionM
 	// Post view correction is used. This matrix is specific to vulkan.
 	auto const top {-in_top};
 	auto const bot {-in_bottom};
-
-	auto const rl {in_right - in_left};
-	auto const bt {bot      - top };
-	auto const nf {in_near  - in_far };
+	auto const rl  {in_right - in_left};
+	auto const bt  {bot      - top };
+	auto const nf  {in_near  - in_far };
 
 	return Matrix<4, 4> {
 		2.0_m / rl, 0.0F, 0.0F, 0.0F,
@@ -101,7 +115,7 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::OrthogonalProjectionM
 		-(bot + top) / bt,
 		in_near      / nf,
 		1.0F
-	};
+	} * Matrix4x4::ClipSpace();
 }
 
 template<RkSize TRows, RkSize TColumns>

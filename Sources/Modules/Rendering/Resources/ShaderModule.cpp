@@ -82,8 +82,8 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
         vk::PipelineRasterizationStateCreateInfo rasterizer {
             .depthClampEnable        = VK_FALSE,
             .rasterizerDiscardEnable = VK_FALSE,
-            .polygonMode             = vk::PolygonMode::eLine,
-            .cullMode                = vk::CullModeFlagBits::eNone,
+            .polygonMode             = vk::PolygonMode::eFill,
+            .cullMode                = vk::CullModeFlagBits::eBack,
             .frontFace               = vk::FrontFace::eClockwise,
             .depthBiasEnable         = VK_FALSE,
             .lineWidth               = 1.0f

@@ -190,6 +190,9 @@ struct TestWindowRenderer
 	{
 		auto const& pipeline_ptr  {pipeline				.Current()};
 		auto const& swapchain_ptr {window.GetSwapchain().Current()};
+		auto const  extent        {window.GetExtent()};
+		auto const  aspect_ratio  {static_cast<RkFloat>(extent.width) / static_cast<RkFloat>(extent.height)};
+
 		++frame_index;
 
 		// --- 1 Uniform buffer
@@ -206,14 +209,18 @@ struct TestWindowRenderer
 			.usage = VMA_MEMORY_USAGE_AUTO
 		}};
 
+		RkFloat z_position { Sin(static_cast<Radians>(static_cast<RkFloat>(in_time))) * 2.0f + 5.0f};
+
 		UniformBufferObject const ubo_data {
 			.model 	    = Matrix4x4::ModelMatrix(
-				{0_m, 0_m, 10_m},
+				{0_m, 0_m, static_cast<Meters>(z_position)},
 				{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
-				Constants<Vector3m>::one / 2
+				Constants<Vector3m>::one
 			),
-			.view  	    = Matrix4x4 {},
-			.projection = Matrix4x4::OrthogonalProjectionMatrix(-1_m, 1_m, -1_m, 1_m, 1_cm, 1_km) * Matrix4x4::ClipSpace()
+			.view  	    = Matrix4x4 {},//Matrix4x4::LookAtMatrix({0_m, 1_m, -1_m}, {0_m, 0_m, 5_m}, Constants<Vector3m>::up),
+			.projection =// Matrix4x4 {}
+			Matrix4x4::OrthogonalProjectionMatrix(-2_m, 2_m, -2_m, 2_m, 1_cm, 1_km)
+			//Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
 		};
 
 		vmaCopyMemoryToAllocation(ubo.device->GetAllocator(), &ubo_data, ubo.allocation, 0, sizeof(UniformBufferObject));
@@ -237,7 +244,6 @@ struct TestWindowRenderer
 		// --- 1.2 Pipeline & swapchain setup
 		vk::raii::Semaphore const  acquire_semaphore {owner .GetDevice(), vk::SemaphoreCreateInfo()};
 		vk::raii::Semaphore const  submit_semaphore  {owner .GetDevice(), vk::SemaphoreCreateInfo()};
-		vk::Extent2D	    const  extent            {window.GetExtent()};
 		vk::Viewport	    const  viewport          {
 			.x        = 0.0f, .y        = 0.0f,
 			.width    = static_cast<float>(extent.width),
