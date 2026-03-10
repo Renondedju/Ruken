@@ -75,13 +75,12 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::PerspectiveProjection
 	// https://www.kdab.com/projection-matrices-with-vulkan-part-1/
 	// https://www.kdab.com/projection-matrices-with-vulkan-part-2/
 	// Post view correction is used. This matrix is specific to vulkan.
-	RkFloat const fov_tangent = Tan(in_fov / 2.0F);
-
-	Meters const far  {-in_far};
-	Meters const near {-in_near};
+	RkFloat const fov_tangent {Tan(in_fov / 2.0F)};
+	Meters  const far         {-in_far};
+	Meters  const near        {-in_near};
 
 	return Matrix<4, 4> {
-		in_aspect / fov_tangent, 0.0F,  0.0F, 0.0F,
+		fov_tangent / in_aspect, 0.0F,  0.0F, 0.0F,
 		0.0F, 1.0f / fov_tangent, 0.0F, 0.0F,
 		0.0F, 0.0F, -far / (far - near),          1.0F,
 		0.0F, 0.0F, -(far * near) / (far - near), 0.0F

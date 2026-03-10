@@ -82,7 +82,7 @@ RkVoid Window::RecreateSwapchain()
 	// Because of that sub-resources need to all be contained in GPUSwapchainData. Otherwise, consumers might
 	// read from the new swapchain and the old image views at the same time.
 	// TODO: This might be an architectural issue to watch out for.
-	m_swapchain.Exchange(std::make_shared<GPUSwapchainData>(m_owner.GetDevice(), vk::SwapchainCreateInfoKHR {
+	m_swapchain.Exchange(std::make_shared<GPUSwapchainData>(m_owner, vk::SwapchainCreateInfoKHR {
 		.flags                 = {},
 		.surface               = m_surface,
 		.minImageCount         = 2,

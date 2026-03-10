@@ -28,6 +28,8 @@ struct SwapchainImage
 
 	vk::ImageView view;
 	vk::Image     image;
+	vk::ImageView depth_view;
+	vk::Image	  depth_image;
 };
 
 struct PreparePresentation final : GPUWorkNode
@@ -64,8 +66,10 @@ struct DrawMesh final : GPUWorkNode
 	#pragma region Lifetime
 
 	DrawMesh(
-		vk::ImageView      const  in_view,
-		vk::Image	       const  in_image,
+		vk::ImageView      const  in_framebuffer_view,
+		vk::ImageView	   const  in_depth_view,
+		vk::Image	       const  in_framebuffer_image,
+		vk::Image          const  in_depth_image,
 		vk::Pipeline       const  in_pipeline,
 		vk::PipelineLayout const  in_layout,
 		ResourcePtr<GPUMesh>      in_mesh,
@@ -76,7 +80,7 @@ struct DrawMesh final : GPUWorkNode
 		GPUWorkNode {
 			vk::QueueFlagBits::eGraphics, {
 			GPUImageAccess {
-				.image             = in_image,
+				.image             = in_framebuffer_image,
 				.layout            = vk::ImageLayout		   ::eColorAttachmentOptimal,
 				.stages            = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.access_flags      = vk::AccessFlagBits2       ::eColorAttachmentWrite,
@@ -87,16 +91,29 @@ struct DrawMesh final : GPUWorkNode
 					.baseArrayLayer = 0,
 					.layerCount     = 1
 				}
+			},
+			GPUImageAccess {
+				.image             = in_depth_image,
+				.layout            = vk::ImageLayout		   ::eDepthAttachmentOptimal,
+				.stages            = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+				.access_flags      = vk::AccessFlagBits2       ::eDepthStencilAttachmentWrite,
+				.subresource_range = {
+					.aspectMask     = vk::ImageAspectFlagBits::eDepth,
+					.baseMipLevel   = 0,
+					.levelCount     = 1,
+					.baseArrayLayer = 0,
+					.layerCount     = 1
+				}
 			}}, {}
 		},
-		view     {in_view},
-		image    {in_image},
-		pipeline {in_pipeline},
-		layout   {in_layout},
-		mesh     {in_mesh},
-		viewport {in_viewport},
-		extent   {in_extent},
-		set	     {in_set}
+		framebuffer_view {in_framebuffer_view},
+		depth_view       {in_depth_view},
+		pipeline 		 {in_pipeline},
+		layout   		 {in_layout},
+		mesh     		 {in_mesh},
+		viewport 		 {in_viewport},
+		extent   		 {in_extent},
+		set	     		 {in_set}
 	{}
 
 	DrawMesh(const DrawMesh&) 		     = default;
@@ -107,8 +124,9 @@ struct DrawMesh final : GPUWorkNode
 
 	#pragma endregion
 
-	vk::ImageView        view;
-	vk::Image	         image;
+	vk::ImageView        framebuffer_view;
+	vk::ImageView        depth_view;
+
 	vk::Pipeline         pipeline;
 	vk::PipelineLayout   layout;
 	ResourcePtr<GPUMesh> mesh;
@@ -119,12 +137,20 @@ struct DrawMesh final : GPUWorkNode
 	/// @brief Actual record command.
 	RkVoid Record(vk::raii::CommandBuffer const& in_commands) override
 	{
-		vk::RenderingAttachmentInfo const attachment_info {
-			.imageView   = view,
+		vk::RenderingAttachmentInfo const color_attachment_info {
+			.imageView   = framebuffer_view,
 			.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
 			.loadOp      = vk::AttachmentLoadOp ::eClear,
 			.storeOp     = vk::AttachmentStoreOp::eStore,
 			.clearValue  = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f)
+		};
+
+		vk::RenderingAttachmentInfo const depth_attachment_info {
+			.imageView   = depth_view,
+			.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+			.loadOp      = vk::AttachmentLoadOp ::eClear,
+			.storeOp     = vk::AttachmentStoreOp::eDontCare,
+			.clearValue  = vk::ClearDepthStencilValue(1.0f, 0),
 		};
 
 		in_commands.beginRendering(vk::RenderingInfo {
@@ -134,7 +160,8 @@ struct DrawMesh final : GPUWorkNode
 			},
 			.layerCount           = 1,
 			.colorAttachmentCount = 1,
-			.pColorAttachments    = &attachment_info
+			.pColorAttachments    = &color_attachment_info,
+			.pDepthAttachment	  = &depth_attachment_info,
 		});
 
 		in_commands.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
@@ -219,8 +246,8 @@ struct TestWindowRenderer
 			),
 			.view  	    = Matrix4x4 {},//Matrix4x4::LookAtMatrix({0_m, 1_m, -1_m}, {0_m, 0_m, 5_m}, Constants<Vector3m>::up),
 			.projection =// Matrix4x4 {}
-			Matrix4x4::OrthogonalProjectionMatrix(-2_m, 2_m, -2_m, 2_m, 1_cm, 1_km)
-			//Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
+			//Matrix4x4::OrthogonalProjectionMatrix(-2_m, 2_m, -2_m, 2_m, 1_cm, 1_km)
+			Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
 		};
 
 		vmaCopyMemoryToAllocation(ubo.device->GetAllocator(), &ubo_data, ubo.allocation, 0, sizeof(UniformBufferObject));
@@ -255,9 +282,11 @@ struct TestWindowRenderer
 		auto [result, image_index] = swapchain_ptr->swapchain.acquireNextImage(UINT64_MAX, *acquire_semaphore, nullptr);
 
 		SwapchainImage const swapchain_image {
-			.owner = swapchain_ptr,
-			.view  = swapchain_ptr->images_views		 [image_index],
-			.image = swapchain_ptr->swapchain.getImages()[image_index]
+			.owner       = swapchain_ptr,
+			.view        = swapchain_ptr->images_views		   [image_index],
+			.image       = swapchain_ptr->swapchain.getImages()[image_index],
+			.depth_view  = swapchain_ptr->depth_image_view,
+			.depth_image = swapchain_ptr->depth_image,
 		};
 
 		// TODO: Ideally all the synchro should be contained in the program
@@ -265,7 +294,9 @@ struct TestWindowRenderer
 
 		DrawMesh draw_triangle {
 			swapchain_image.view,
+			swapchain_image.depth_view,
 			swapchain_image.image,
+			swapchain_image.depth_image,
 			pipeline_ptr->pipeline,
 			pipeline_ptr->pipeline_layout,
 			mesh.Current(),
