@@ -19,7 +19,7 @@ struct GPUSwapchainData final : IResourceData
 	std::vector<vk::raii::ImageView> images_views;
 
 	// Depth Attachment
-	vk::raii::Image		depth_image;
+	vk::Image			depth_image;
 	vk::raii::ImageView	depth_image_view;
 	VmaAllocation       depth_allocation;
 
@@ -35,7 +35,7 @@ struct GPUSwapchainData final : IResourceData
 	GPUSwapchainData(GPUSwapchainData&&     )			 = default;
 	GPUSwapchainData& operator=(GPUSwapchainData const&) = delete;
 	GPUSwapchainData& operator=(GPUSwapchainData&&     ) = default;
-	~GPUSwapchainData() override						 = default;
+	~GPUSwapchainData() override;
 
 	#pragma endregion
 };

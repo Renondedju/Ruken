@@ -34,9 +34,9 @@ GPUMesh::GPUMesh(
 	vmaCopyMemoryToAllocation(in_device.GetAllocator(), in_indices .data(), indices .allocation, 0, indices .size);
 }
 
-RkVoid GPUMesh::Draw(vk::raii::CommandBuffer const& in_command_buffer) const noexcept
+RkVoid GPUMesh::Draw(vk::raii::CommandBuffer const& in_command_buffer, RkUint32 const in_instance_count) const noexcept
 {
 	in_command_buffer.bindVertexBuffers(0, vertices.buffer, {0});
 	in_command_buffer.bindIndexBuffer  (indices.buffer, 0, vk::IndexType::eUint32);
-	in_command_buffer.drawIndexed	   (indices.size / sizeof(RkUint32), 1, 0, 0, 0);
+	in_command_buffer.drawIndexed	   (indices.size / sizeof(RkUint32), in_instance_count, 0, 0, 0);
 }

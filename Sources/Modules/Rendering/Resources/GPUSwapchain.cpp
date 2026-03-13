@@ -34,7 +34,7 @@ GPUSwapchainData::GPUSwapchainData(RenderDevice& in_device, vk::SwapchainCreateI
 
 		return views;
 	}()},
-	depth_image {in_device.GetDevice(), [&] {
+	depth_image {[&] {
 
 		vk::ImageCreateInfo const depth_image_create_info {
 			.imageType     = vk::ImageType::e2D,
@@ -52,7 +52,7 @@ GPUSwapchainData::GPUSwapchainData(RenderDevice& in_device, vk::SwapchainCreateI
 			.initialLayout = vk::ImageLayout::eUndefined,
 		};
 
-		VmaAllocationCreateInfo vma_allocation_create_info{
+		constexpr VmaAllocationCreateInfo vma_allocation_create_info{
 			.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
 			.usage = VMA_MEMORY_USAGE_AUTO
 		};
@@ -72,3 +72,8 @@ GPUSwapchainData::GPUSwapchainData(RenderDevice& in_device, vk::SwapchainCreateI
 		}
 	}, nullptr)}
 {}
+
+GPUSwapchainData::~GPUSwapchainData()
+{
+	vmaDestroyImage(render_device->GetAllocator(), depth_image, depth_allocation);
+}

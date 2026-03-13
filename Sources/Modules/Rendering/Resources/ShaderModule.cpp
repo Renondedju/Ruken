@@ -24,18 +24,27 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
 	},
 	descriptor_set_layout {[&]{
 		auto const& device {in_service_provider.LocateService<RenderDevice>()->GetDevice()};
-		constexpr vk::DescriptorSetLayoutBinding ubo_layout_binding {
-			.binding		    = 0,
-			.descriptorType     = vk::DescriptorType::eUniformBuffer,
-			.descriptorCount    = 1,
-			.stageFlags			= vk::ShaderStageFlagBits::eVertex,
-			.pImmutableSamplers = nullptr
+		constexpr std::array bindings {
+			vk::DescriptorSetLayoutBinding {  // Per View Data
+				.binding		    = 0,
+				.descriptorType     = vk::DescriptorType::eUniformBuffer,
+				.descriptorCount    = 1,
+				.stageFlags			= vk::ShaderStageFlagBits::eVertex,
+				.pImmutableSamplers = nullptr
+			},
+			vk::DescriptorSetLayoutBinding { // Per Instance Data
+				.binding		    = 1,
+				.descriptorType     = vk::DescriptorType::eStorageBuffer,
+				.descriptorCount    = 1,
+				.stageFlags			= vk::ShaderStageFlagBits::eVertex,
+				.pImmutableSamplers = nullptr
+			}
 		};
 
 		return vk::raii::DescriptorSetLayout {device, vk::DescriptorSetLayoutCreateInfo {
 			.flags		  = {},
-			.bindingCount = 1,
-			.pBindings    = &ubo_layout_binding
+			.bindingCount = bindings.size(),
+			.pBindings    = bindings.data()
 		}};
 	}()},
 	pipeline_layout {in_service_provider.LocateService<RenderDevice>()->GetDevice(), vk::PipelineLayoutCreateInfo {

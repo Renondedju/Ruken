@@ -34,8 +34,9 @@ struct GPUMesh final: IResourceData
 	/**
 	 * Binds the vertex and index buffers to the passed command buffer.
 	 * @param in_command_buffer Command buffer to bind to.
+	 * @param in_instance_count Number of instances to render
 	 */
-	RkVoid Draw(vk::raii::CommandBuffer const& in_command_buffer) const noexcept;
+	RkVoid Draw(vk::raii::CommandBuffer const& in_command_buffer, RkUint32 in_instance_count = 1) const noexcept;
 
 	#pragma endregion
 

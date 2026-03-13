@@ -169,17 +169,21 @@ struct DrawMesh final : GPUWorkNode
 		in_commands.setScissor  (0, vk::Rect2D(vk::Offset2D(0, 0), extent));
 		in_commands.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, layout, 0, set, nullptr);
 
-		mesh->Draw(in_commands);
+		mesh->Draw(in_commands, 3);
 
 		in_commands.endRendering();
 	}
 };
 
-struct UniformBufferObject
+struct PerViewData
 {
-	alignas(16) Matrix<4, 4> model;
-	alignas(16) Matrix<4, 4> view;
-	alignas(16) Matrix<4, 4> projection;
+	alignas(16) Matrix<4, 4> view	    {};
+	alignas(16) Matrix<4, 4> projection {};
+};
+
+struct PerInstanceData
+{
+	alignas(16) Matrix<4, 4> model {};
 };
 
 /**
@@ -192,15 +196,19 @@ struct TestWindowRenderer
 	ResourceHandle<ShaderModule> pipeline;
 	ResourceHandle<GPUMesh>		 mesh;
 
-	vk::DescriptorPoolSize   pool_size		 {vk::DescriptorType::eUniformBuffer, 10};
+	std::array<vk::DescriptorPoolSize, 2>    pool_sizes		 {
+		vk::DescriptorPoolSize {vk::DescriptorType::eUniformBuffer, 10},
+		vk::DescriptorPoolSize {vk::DescriptorType::eStorageBuffer, 10}
+	};
 	vk::raii::DescriptorPool descriptor_pool {owner.GetDevice(), vk::DescriptorPoolCreateInfo {
 		.flags         = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-		.maxSets       = pool_size.descriptorCount,
-		.poolSizeCount = 1,
-		.pPoolSizes    = &pool_size
+		.maxSets       = 10,
+		.poolSizeCount = static_cast<uint32_t>(pool_sizes.size()),
+		.pPoolSizes    = pool_sizes.data()
 	}};
-	std::vector<vk::DescriptorSetLayout> layouts {pool_size.descriptorCount, *pipeline.Current()->descriptor_set_layout};
-	vk::raii::DescriptorSets descriptor_sets {owner.GetDevice(), vk::DescriptorSetAllocateInfo {
+
+	std::vector<vk::DescriptorSetLayout> layouts {10, *pipeline.Current()->descriptor_set_layout};
+	vk::raii::DescriptorSets	 descriptor_sets {owner.GetDevice(), vk::DescriptorSetAllocateInfo {
 		.descriptorPool		= descriptor_pool,
 		.descriptorSetCount = static_cast<RkUint32>(layouts.size()), // Dependency to the pipeline !
 								// Needs to be stored in shader module with a maximum amount of simultaneous invocations
@@ -222,11 +230,37 @@ struct TestWindowRenderer
 
 		++frame_index;
 
-		// --- 1 Uniform buffer
-		vk::DeviceSize ubo_size {sizeof(UniformBufferObject)};
-		GPUBuffer      ubo      {owner, vk::BufferCreateInfo {
+		// --- 1 Uniform buffers
+		RkFloat z_position { Sin(static_cast<Radians>(static_cast<RkFloat>(in_time))) * 2.0f + 5.0f};
+
+		PerViewData const per_view_data {
+			.view  	    = Matrix4x4 {},//Matrix4x4::LookAtMatrix({0_m, 1_m, -1_m}, {0_m, 0_m, 5_m}, Constants<Vector3m>::up),
+			.projection = Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
+		};
+		std::array const per_instance_data {
+			PerInstanceData {
+				.model = Matrix4x4::ModelMatrix(
+					{0_m, 0_m, static_cast<Meters>(z_position)},
+					{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
+					Constants<Vector3m>::one
+			)},
+			PerInstanceData {
+				.model = Matrix4x4::ModelMatrix(
+					{3_m, 0_m, static_cast<Meters>(z_position)},
+					{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
+					Constants<Vector3m>::one
+			)},
+			PerInstanceData {
+				.model = Matrix4x4::ModelMatrix(
+					{-3_m, 0_m, static_cast<Meters>(z_position)},
+					{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
+					Constants<Vector3m>::one
+			)},
+		};
+
+		GPUBuffer per_view_buffer {owner, vk::BufferCreateInfo {
 			.flags                 = {},
-			.size                  = ubo_size,
+			.size                  = sizeof(per_view_data),
 			.usage                 = vk::BufferUsageFlagBits::eUniformBuffer,
 			.sharingMode           = vk::SharingMode::eExclusive,
 			.queueFamilyIndexCount = 0,
@@ -235,38 +269,50 @@ struct TestWindowRenderer
 			.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
 			.usage = VMA_MEMORY_USAGE_AUTO
 		}};
+		GPUBuffer per_instance_buffer {owner, vk::BufferCreateInfo {
+			.flags                 = {},
+			.size                  = sizeof(per_instance_data),
+			.usage                 = vk::BufferUsageFlagBits::eStorageBuffer,
+			.sharingMode           = vk::SharingMode::eExclusive,
+			.queueFamilyIndexCount = 0,
+			.pQueueFamilyIndices   = nullptr
+		}, VmaAllocationCreateInfo {
+			.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+			.usage = VMA_MEMORY_USAGE_AUTO
+		}};
 
-		RkFloat z_position { Sin(static_cast<Radians>(static_cast<RkFloat>(in_time))) * 2.0f + 5.0f};
+		vmaCopyMemoryToAllocation(per_view_buffer.device->GetAllocator(), &per_view_data,     per_view_buffer    .allocation, 0, sizeof(per_view_data));
+		vmaCopyMemoryToAllocation(per_view_buffer.device->GetAllocator(), &per_instance_data, per_instance_buffer.allocation, 0, sizeof(per_instance_data));
 
-		UniformBufferObject const ubo_data {
-			.model 	    = Matrix4x4::ModelMatrix(
-				{0_m, 0_m, static_cast<Meters>(z_position)},
-				{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
-				Constants<Vector3m>::one
-			),
-			.view  	    = Matrix4x4 {},//Matrix4x4::LookAtMatrix({0_m, 1_m, -1_m}, {0_m, 0_m, 5_m}, Constants<Vector3m>::up),
-			.projection =// Matrix4x4 {}
-			//Matrix4x4::OrthogonalProjectionMatrix(-2_m, 2_m, -2_m, 2_m, 1_cm, 1_km)
-			Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
-		};
-
-		vmaCopyMemoryToAllocation(ubo.device->GetAllocator(), &ubo_data, ubo.allocation, 0, sizeof(UniformBufferObject));
-
-		vk::DescriptorBufferInfo buffer_info {
-			.buffer = ubo.buffer,
+		vk::DescriptorBufferInfo view_buffer_info {
+			.buffer = per_view_buffer.buffer,
 			.offset = 0,
-			.range  = ubo_size
+			.range  = per_view_buffer.size
 		};
-		vk::WriteDescriptorSet write_descriptors {
-			.dstSet           = descriptor_sets[frame_index % swapchain_ptr->images_views.size()],
-			.dstBinding       = 0,
-			.dstArrayElement  = 0,
-			.descriptorCount  = 1,
-			.descriptorType   = vk::DescriptorType::eUniformBuffer,
-			.pBufferInfo      = &buffer_info,
+		vk::DescriptorBufferInfo instance_buffer_info {
+			.buffer = per_instance_buffer.buffer,
+			.offset = 0,
+			.range  = per_instance_buffer.size
 		};
 
-		owner.GetDevice().updateDescriptorSets(write_descriptors, {});
+		owner.GetDevice().updateDescriptorSets({
+			vk::WriteDescriptorSet {
+				.dstSet           = descriptor_sets[frame_index % swapchain_ptr->images_views.size()],
+				.dstBinding       = 0,
+				.dstArrayElement  = 0,
+				.descriptorCount  = 1,
+				.descriptorType   = vk::DescriptorType::eUniformBuffer,
+				.pBufferInfo      = &view_buffer_info,
+			}, vk::WriteDescriptorSet {
+				.dstSet           = descriptor_sets[frame_index % swapchain_ptr->images_views.size()],
+				.dstBinding       = 1,
+				.dstArrayElement  = 0,
+				.descriptorCount  = 1,
+				.descriptorType   = vk::DescriptorType::eStorageBuffer,
+				.pBufferInfo      = &instance_buffer_info,
+			}},
+			{}
+		);
 
 		// --- 1.2 Pipeline & swapchain setup
 		vk::raii::Semaphore const  acquire_semaphore {owner .GetDevice(), vk::SemaphoreCreateInfo()};
