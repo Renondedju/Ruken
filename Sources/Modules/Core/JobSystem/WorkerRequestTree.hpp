@@ -9,7 +9,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * A synchronisation structure used to prioritize tasks between a number of threads.
+ * A synchronization structure used to prioritize tasks between a number of threads.
  */
 struct WorkerRequestTree
 {

@@ -21,6 +21,11 @@ template <typename TIndex, std::invocable<TIndex> TFunction>
 	requires AwaitableTraits<ParallelForAwaitable<TIndex, TFunction>>::await_result_void
 SyncTask<> ParallelFor(TIndex in_start, TIndex in_end, TFunction&& in_function) noexcept
 {
+	// Early out
+	RUKEN_ASSERT(in_start <= in_end, "in_start must be less than in_end");
+	if (in_start == in_end)
+		co_return;
+
 	// Constructing awaitables
 	std::vector<ParallelForAwaitable<TIndex, TFunction>> awaitables(in_end - in_start);
 	auto awaitable_it {awaitables.begin()};
@@ -48,6 +53,11 @@ auto ParallelFor(TIndex in_start, TIndex in_end, TFunction&& in_function) noexce
 		typename AwaitableTraits<ParallelForAwaitable<TIndex, TFunction>>::AwaitResult
 	>>
 {
+	// Early out
+	RUKEN_ASSERT(in_start <= in_end, "in_start must be less than in_end");
+	if (in_start == in_end)
+		co_return;
+
 	// Constructing awaitables
 	std::vector<ParallelForAwaitable<TIndex, TFunction>> awaitables(in_end - in_start);
 	auto awaitable_it {awaitables.begin()};

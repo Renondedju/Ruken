@@ -27,9 +27,9 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
 	if (std::ranges::size(in_awaitables) == 0)
 		co_return {};
 
-	CountDownLatch        latch    {std::ranges::size(in_awaitables)};
-	std::vector<TAwaiter> awaiters {std::ranges::size(in_awaitables)};
-	std::vector<TResult>  results  {std::ranges::size(in_awaitables)};
+	CountDownLatch        latch   (std::ranges::size(in_awaitables));
+	std::vector<TAwaiter> awaiters(std::ranges::size(in_awaitables));
+	std::vector<TResult>  results (std::ranges::size(in_awaitables));
 
 	// co_await compiler transform
 	for (auto const& [awaitable, awaiter] : std::views::zip(in_awaitables, awaiters))
@@ -70,8 +70,8 @@ auto WhenAll(TRange const& in_awaitables) noexcept ->
 	if (std::ranges::size(in_awaitables) == 0)
 		co_return;
 
-	CountDownLatch		  latch    {std::ranges::size(in_awaitables)};
-	std::vector<TAwaiter> awaiters {std::ranges::size(in_awaitables)};
+	CountDownLatch		  latch   (std::ranges::size(in_awaitables));
+	std::vector<TAwaiter> awaiters(std::ranges::size(in_awaitables));
 
 	// co_await compiler transform
 	for (auto const& [awaitable, awaiter] : std::views::zip(in_awaitables, awaiters))

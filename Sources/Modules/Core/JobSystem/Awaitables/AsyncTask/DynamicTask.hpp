@@ -5,7 +5,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-template <typename  TResult = RkVoid>
+template <typename TResult = RkVoid>
 using DynamicTask = AsyncTask<DynamicQueue, TResult>;
 
 END_RUKEN_NAMESPACE
