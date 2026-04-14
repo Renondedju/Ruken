@@ -16,7 +16,9 @@
 #include <tiny_obj_loader.h>
 
 #include "ECSTask.hpp"
+#include "Coroutines/TracyVkUtilities.hpp"
 #include "Maths/Matrix/Matrix.hpp"
+#include "Simulation/Flock.hpp"
 #include "Types/Units/Duration/Duration.hpp"
 
 USING_RUKEN_NAMESPACE
@@ -169,7 +171,7 @@ struct DrawMesh final : GPUWorkNode
 		in_commands.setScissor  (0, vk::Rect2D(vk::Offset2D(0, 0), extent));
 		in_commands.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, layout, 0, set, nullptr);
 
-		mesh->Draw(in_commands, 3);
+		mesh->Draw(in_commands, 10'000);
 
 		in_commands.endRendering();
 	}
@@ -221,7 +223,7 @@ struct TestWindowRenderer
 	 * Renders a frame to a swapchain image.
 	 * @return Async dynamic task.
 	 */
-	AsyncTask<ECSJobQueue> RenderFrame(Seconds in_time) noexcept
+	AsyncTask<ECSJobQueue> RenderFrame(Seconds in_time, Flock& in_flock) noexcept
 	{
 		auto const& pipeline_ptr  {pipeline				.Current()};
 		auto const& swapchain_ptr {window.GetSwapchain().Current()};
@@ -231,32 +233,11 @@ struct TestWindowRenderer
 		++frame_index;
 
 		// --- 1 Uniform buffers
-		RkFloat z_position { Sin(static_cast<Radians>(static_cast<RkFloat>(in_time))) * 2.0f + 5.0f};
-
 		PerViewData const per_view_data {
 			.view  	    = Matrix4x4 {},//Matrix4x4::LookAtMatrix({0_m, 1_m, -1_m}, {0_m, 0_m, 5_m}, Constants<Vector3m>::up),
 			.projection = Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
 		};
-		std::array const per_instance_data {
-			PerInstanceData {
-				.model = Matrix4x4::ModelMatrix(
-					{0_m, 0_m, static_cast<Meters>(z_position)},
-					{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
-					Constants<Vector3m>::one
-			)},
-			PerInstanceData {
-				.model = Matrix4x4::ModelMatrix(
-					{3_m, 0_m, static_cast<Meters>(z_position)},
-					{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
-					Constants<Vector3m>::one
-			)},
-			PerInstanceData {
-				.model = Matrix4x4::ModelMatrix(
-					{-3_m, 0_m, static_cast<Meters>(z_position)},
-					{0_deg, static_cast<Degrees>(static_cast<RkFloat>(in_time * 40.0f)), 0_deg},
-					Constants<Vector3m>::one
-			)},
-		};
+		auto& per_instance_data = in_flock.GetTransforms();
 
 		GPUBuffer per_view_buffer {owner, vk::BufferCreateInfo {
 			.flags                 = {},
@@ -271,7 +252,7 @@ struct TestWindowRenderer
 		}};
 		GPUBuffer per_instance_buffer {owner, vk::BufferCreateInfo {
 			.flags                 = {},
-			.size                  = sizeof(per_instance_data),
+			.size                  = per_instance_data.size() * sizeof(Matrix4x4),
 			.usage                 = vk::BufferUsageFlagBits::eStorageBuffer,
 			.sharingMode           = vk::SharingMode::eExclusive,
 			.queueFamilyIndexCount = 0,
@@ -281,8 +262,8 @@ struct TestWindowRenderer
 			.usage = VMA_MEMORY_USAGE_AUTO
 		}};
 
-		vmaCopyMemoryToAllocation(per_view_buffer.device->GetAllocator(), &per_view_data,     per_view_buffer    .allocation, 0, sizeof(per_view_data));
-		vmaCopyMemoryToAllocation(per_view_buffer.device->GetAllocator(), &per_instance_data, per_instance_buffer.allocation, 0, sizeof(per_instance_data));
+		vmaCopyMemoryToAllocation(per_view_buffer    .device->GetAllocator(), &per_view_data,           per_view_buffer    .allocation, 0, per_view_buffer    .size);
+		vmaCopyMemoryToAllocation(per_instance_buffer.device->GetAllocator(), per_instance_data.data(), per_instance_buffer.allocation, 0, per_instance_buffer.size);
 
 		vk::DescriptorBufferInfo view_buffer_info {
 			.buffer = per_view_buffer.buffer,

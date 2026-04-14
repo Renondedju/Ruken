@@ -5,7 +5,7 @@
 
 USING_RUKEN_NAMESPACE
 
-struct MainQueue : QueueHandle<MainQueue, 64>{};
+struct MainQueue : QueueHandle<MainQueue, 64> {};
 
 /// @brief Main application structure.
 struct Application

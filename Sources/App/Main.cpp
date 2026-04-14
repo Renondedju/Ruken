@@ -6,11 +6,11 @@
 #include "Core/JobSystem/JobSystem.hpp"
 #include "Core/JobSystem/Queues/QueueHandle.hpp"
 #include "Core/JobSystem/Executors/SingleThreadSingleQueueExecutor.hpp"
-#include "ECS/ECSTask.hpp"
 #include "Filesystem/IOJobQueue.hpp"
 
 // App headers
 #include "Application.hpp"
+#include "ECSTask.hpp"
 
 USING_RUKEN_NAMESPACE
 

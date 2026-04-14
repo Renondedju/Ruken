@@ -19,6 +19,8 @@ BEGIN_RUKEN_NAMESPACE
  */
 [[nodiscard]] RkFloat Lerp(RkFloat in_source, RkFloat in_destination, RkFloat in_ratio) noexcept;
 
+[[nodiscard]] RkFloat SmoothStep(RkFloat in_source, RkFloat in_destination, RkFloat in_ratio) noexcept;
+
 /**
  * \brief PingPongs in_value, so that it is never larger than in_range and never smaller than 0.0.
  *

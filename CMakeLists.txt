@@ -68,13 +68,14 @@ get_property(RUKEN_MODULES_LIB GLOBAL PROPERTY RUKEN_MODULES_LIB)
 add_compile_definitions(UNICODE _UNICODE)
 add_executable(${RUKEN_EXECUTABLE_NAME}
         Sources/App/Main.cpp
+        Sources/App/Simulation/Flock.hpp
+        Sources/App/Simulation/Flock.cpp
         Sources/App/Test.hpp
         Sources/App/Rendering.hpp
         Sources/App/Application.cpp
         Sources/App/Application.hpp
-        Sources/App/Components.hpp
-        Sources/App/Systems/ApplyTransformHandler.hpp
-        Sources/App/Systems/ApplyTransformHandler.cpp
+        Sources/App/Simulation/HashGrid.hpp
+        Sources/App/Simulation/HashGrid.cpp
 )
 
 target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")

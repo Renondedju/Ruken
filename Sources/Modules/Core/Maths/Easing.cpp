@@ -12,6 +12,12 @@ RkFloat RUKEN_NAMESPACE::Lerp(RkFloat const in_source, RkFloat const in_destinat
     return in_source + in_ratio * (in_destination - in_source);
 }
 
+RkFloat RUKEN_NAMESPACE::SmoothStep(RkFloat const in_source, RkFloat const in_destination, RkFloat const in_ratio) noexcept
+{
+    RkFloat const value = Clamp01((in_ratio - in_source) / (in_destination - in_source));
+    return value * value * (3.0f - 2.0f * value);
+}
+
 RkFloat RUKEN_NAMESPACE::PingPong(RkFloat const in_value, RkFloat const in_range) noexcept
 {
     return in_range - Abs(Repeat(in_value, 2.0F * in_range) - in_range);

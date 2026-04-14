@@ -50,7 +50,7 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<TSize, Distance<TDistanceUnit>> fina
 
 /// @brief Two-dimensional distance vector specialization
 template <EDistanceUnit TDistanceUnit>
-struct RUKEN_EMPTY_BASES alignas(16) Vector<2, Distance<TDistanceUnit>> final:
+struct RUKEN_EMPTY_BASES alignas(8) Vector<2, Distance<TDistanceUnit>> final:
 	DistanceVectorOperations<2, TDistanceUnit>
 {
 	Distance<TDistanceUnit> data[2];

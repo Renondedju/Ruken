@@ -18,7 +18,7 @@ BEGIN_RUKEN_NAMESPACE
  * \param in_angle Input angle
  * \return Arc cosine of in_value
  */
-[[nodiscard]] RkFloat ArcCos(Radians in_angle) noexcept;
+[[nodiscard]] Radians ArcCos(RkFloat in_angle) noexcept;
 
 /**
  * \brief Compute the sine of an angle given in radians
@@ -32,7 +32,7 @@ BEGIN_RUKEN_NAMESPACE
  * \param in_angle Input angle
  * \return Sinus of in_value
  */
-[[nodiscard]] RkFloat ArcSin(Radians in_angle) noexcept;
+[[nodiscard]] Radians ArcSin(RkFloat in_angle) noexcept;
 
 /**
  * \brief Compute the tangent of an angle given in radians
@@ -46,6 +46,6 @@ BEGIN_RUKEN_NAMESPACE
  * \param in_angle Input angle
  * \return The tangent of in_value
  */
-[[nodiscard]] RkFloat ArcTan(Radians in_angle) noexcept;
+[[nodiscard]] Radians ArcTan(RkFloat in_angle) noexcept;
 
 END_RUKEN_NAMESPACE

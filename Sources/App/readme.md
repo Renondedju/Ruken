@@ -1,0 +1,1 @@
+This directory contains a test application implementing a boid simulation.

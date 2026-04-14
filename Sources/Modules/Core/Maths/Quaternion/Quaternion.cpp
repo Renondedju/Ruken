@@ -30,6 +30,17 @@ Quaternion::Quaternion(Radians const in_angle_x,
     z = cos_x * cos_y * sin_z + sin_x * sin_y * cos_z;
 }
 
+Quaternion::Quaternion(Vector3m const in_axis,
+                       Radians  const in_angle) noexcept
+{
+    Vector3m const axis {in_axis.Normalized()};
+    RkFloat  const sin  {Sin(in_angle / 2.0f)};
+
+    w = Cos(in_angle / 2.0f);
+    x = static_cast<RkFloat>(axis.x()) * sin;
+    y = static_cast<RkFloat>(axis.y()) * sin;
+    z = static_cast<RkFloat>(axis.z()) * sin;
+}
 #pragma endregion
 
 #pragma region Methods
@@ -84,7 +95,7 @@ Quaternion Quaternion::Slerp(Quaternion const& in_lhs,
                              RkFloat    const  in_ratio) noexcept
 {
     RkFloat const dot_result {Quaternion::Dot(in_lhs, in_rhs)};
-    Radians const abs_dot    {Abs   (dot_result)};
+    RkFloat const abs_dot    {Abs   (dot_result)};
     Radians const theta      {ArcCos(abs_dot)};
     RkFloat const sin_theta  {Sin   (theta)};
 

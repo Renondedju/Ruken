@@ -67,15 +67,16 @@ struct VariadicEventHandler: SystemEventHandler
 	/// @brief Executes the actual content of the handler
 	virtual RkVoid Execute(RkSize in_chunk_index, RkSize in_chunk_size, ComponentAccess& in_access_tuple) const noexcept = 0;
 
+	/// @brief Returns
 	template <IsComponent TComponent>
-	static auto& Fetch(ComponentAccess& in_access_tuple, RkSize in_index) noexcept
+	static auto& Fetch(ComponentAccess& in_access_tuple) noexcept
 	{
 		static constexpr auto index {TupleIndex<
 			std::remove_cv_t<TComponent>,
 			typename TupleRemoveCvRef<AddressableComponents>::Type
 		>::value};
 
-		return (*std::get<index>(in_access_tuple))[in_index];
+		return *std::get<index>(in_access_tuple);
 	}
 
 	private:
