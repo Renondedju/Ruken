@@ -110,8 +110,6 @@ AsyncTask<ECSJobQueue> Flock::ApplyCohesionIntent() noexcept
 	m_cohesion_hash_map.cell_size = cohesion_distance;
 	co_await ParallelForChunk(0uz, m_boids, 256uz, [&](RkSize const in_index)
 	{
-		ZoneScopedN("Hash position");
-
 		m_cohesion_hash_map.SetHashIndex(m_positions[in_index], in_index);
 	});
 
@@ -124,8 +122,6 @@ AsyncTask<ECSJobQueue> Flock::ApplyCohesionIntent() noexcept
 
 	// 3 -- Compute cohesion vectors
 	co_await ParallelForChunk(0uz, m_boids, 64uz, [&](RkSize const in_index) {
-
-		ZoneScopedN("Compute Cohesion Vector");
 
 		// Get a reference position
 	    Vector3m const position = m_positions[in_index];
@@ -152,8 +148,6 @@ AsyncTask<ECSJobQueue> Flock::ApplyCohesionIntent() noexcept
 	// 4 -- Apply results
 	co_await ParallelForChunk(0uz, m_boids, 128uz, [&](RkSize const in_index) {
 
-		ZoneScopedN("Apply Cohesion Vector");
-
 		Vector3m const flock_center {
 			m_number_flockmates[in_index] == 0 ? Constants<Vector3m>::zero
 			: (m_flock_center[in_index] / m_number_flockmates[in_index] - m_positions[in_index]).Normalized()
@@ -175,8 +169,6 @@ AsyncTask<ECSJobQueue> Flock::ApplySeparationIntent() noexcept
 	m_avoidance_hash_map.cell_size = separation_distance;
 	co_await ParallelForChunk(0uz, m_boids, 256uz, [&](RkSize const in_index)
 	{
-		ZoneScopedN("Hash position");
-
 		m_avoidance_hash_map.SetHashIndex(m_positions[in_index], in_index);
 	});
 
@@ -190,8 +182,6 @@ AsyncTask<ECSJobQueue> Flock::ApplySeparationIntent() noexcept
 	// 3 -- Compute separation vectors
 	co_await ParallelForChunk(0uz, m_boids, 64uz, [&](RkSize const in_index)
 	{
-		ZoneScopedN("Compute Separation Vector");
-
 		// Get a reference position
 		Vector3m const position = m_positions[in_index];
 		m_avoidance_heading[in_index] = Constants<Vector3m>::zero;
@@ -214,8 +204,6 @@ AsyncTask<ECSJobQueue> Flock::ApplySeparationIntent() noexcept
 	// 4 -- Apply Avoidance Vectors
 	co_await ParallelForChunk(0uz, m_boids, 128uz, [&](RkSize const in_index)
 	{
-		ZoneScopedN("Apply Avoidance Vector");
-
 		Vector3m const direction {
 			m_number_flockmates[in_index] == 0 ? Constants<Vector3m>::zero
 			: (m_avoidance_heading[in_index] / m_number_flockmates[in_index]).Normalized()
@@ -236,8 +224,6 @@ AsyncTask<ECSJobQueue> Flock::ApplyHeightIntent(Seconds const& in_delta_time) no
 {
 	co_await ParallelForChunk(0uz, m_boids, 128uz, [&](RkSize const in_index)
 	{
-		ZoneScopedN("Height Intent");
-
 		RkFloat  const level_distance {Abs(static_cast<RkFloat>(m_positions[in_index].y() - target_height))};
 		RkFloat	 const intent_weight  {SmoothStep(0.0f, Abs(static_cast<RkFloat>(target_height_range)), level_distance)};
 		Vector3m const next_position  {m_positions[in_index] + m_velocities[in_index] * static_cast<RkFloat>(in_delta_time)};
@@ -251,8 +237,6 @@ AsyncTask<ECSJobQueue> Flock::MoveBoids(Seconds const& in_delta_time)
 {
 	co_await ParallelForChunk(0uz, m_boids, 128uz, [&](RkSize const in_index)
 	{
-		ZoneScopedN("Move Boid");
-
 		m_velocities   [in_index]  = IntegrateVelocity(in_index, in_delta_time);
 		m_positions    [in_index] += m_velocities[in_index] * static_cast<RkFloat>(in_delta_time);
 		m_accelerations[in_index]  = Constants<Vector3m>::zero;
@@ -278,14 +262,15 @@ AsyncTask<ECSJobQueue> Flock::ApplyTransform()
 {
 	co_await ParallelForChunk(0uz, m_boids, 128uz, [&](RkSize const in_index)
 	{
-		//auto const direction {m_velocities[in_index].Normalized()};
-		//auto const right	 {direction.Cross(Constants<Vector3m>::up)};
-		//auto const forward   {right    .Cross(Constants<Vector3m>::up)};
-		//Quaternion const rotation (right, ArcCos(-forward.Dot(direction)))
+		auto const direction {m_velocities[in_index].Normalized()};
+		auto const right	 {Constants<Vector3m>::up.Cross(direction)};
+		auto const forward   {direction.Cross(right)};
+
+		Quaternion const rotation (-right, ArcCos(forward.Dot(direction)));
 
 		m_render_matrices[in_index] = Matrix4x4::ModelMatrix(
 			m_positions[in_index],
-			Quaternion(),
+			rotation,
 			Constants<Vector3m >::one / 3.0f
 		);
 	});

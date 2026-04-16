@@ -66,7 +66,7 @@ struct HashGrid
 	 * @param in_hash Hash to look for.
 	 * @return Index of the first occurrence of the passed hash. May be null.
 	 */
-	std::optional<RkSize> SearchFirst(RkUint32 in_hash) const noexcept;
+	std::optional<RkUint32> SearchFirst(RkUint32 in_hash) const noexcept;
 };
 
 END_RUKEN_NAMESPACE

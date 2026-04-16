@@ -62,7 +62,7 @@ struct PreparePresentation final : GPUWorkNode
 	}
 };
 
-/// @brief Draws a simple triangle to the screen
+/// @brief Draws a simple mesh to the screen
 struct DrawMesh final : GPUWorkNode
 {
 	#pragma region Lifetime
@@ -234,7 +234,7 @@ struct TestWindowRenderer
 
 		// --- 1 Uniform buffers
 		PerViewData const per_view_data {
-			.view  	    = Matrix4x4 {},//Matrix4x4::LookAtMatrix({0_m, 1_m, -1_m}, {0_m, 0_m, 5_m}, Constants<Vector3m>::up),
+			.view  	    = Matrix4x4::LookAtMatrix({0_m, 3_m, -3_m}, {0_m, 0_m, 0_m}, Constants<Vector3m>::up),
 			.projection = Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
 		};
 		auto& per_instance_data = in_flock.GetTransforms();

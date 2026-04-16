@@ -20,15 +20,15 @@ struct Flock
 	// Params
 	RkFloat alignment_weight    {40.0f};
 	RkFloat cohesion_weight     {15.0f};
-	RkFloat avoidance_weight    {75.0f};
-	RkFloat height_weight       {5.0f};
-	RkFloat target_weight       {2.5f};
+	RkFloat avoidance_weight    {150.0f};
+	RkFloat height_weight       {70.0f};
+	RkFloat target_weight       {20.0f};
 	Meters  target_height		{0.0f};
 	Meters  target_height_range {1.0f};
 	RkFloat minimal_boid_speed  {7.0f};
 	RkFloat maximal_boid_speed  {10.0f};
-	Meters  cohesion_distance   {150_cm};
-	Meters  separation_distance {50_cm};
+	Meters  cohesion_distance   {200_cm};
+	Meters  separation_distance {150_cm};
 	Vector3m target_position    {0_m, 0_m, 0_m};
 
 	#pragma endregion

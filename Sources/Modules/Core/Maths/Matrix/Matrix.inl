@@ -35,15 +35,15 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::LookAtMatrix(
 	Vector3m const& in_to,
 	Vector3m const& in_up) noexcept requires ((TRows == 3 || TRows == 4) && TColumns == 4)
 {
-	Vector3m const forward{(in_to - in_from   ).Normalized()};
-	Vector3m const right  {forward.Cross(in_up).Normalized()};
-	Vector3m const up     {right  .Cross(forward)};
+	Vector3m const forward {(in_to - in_from)     .Normalized()};
+	Vector3m const right   {in_up  .Cross(forward).Normalized()};
+	Vector3m const up      {forward.Cross(right)  .Normalized()};
 
-	return Matrix<3, 4> {
-		 right.x(),           up.x(),         -forward.x(),
-		 right.y(),           up.y(),         -forward.y(),
-		 right.z(),           up.z(),         -forward.z(),
-		-right.Dot(in_from), -up.Dot(in_from), forward.Dot(in_from)
+	return Matrix<4, 4> {
+		 right.x(),           up.x(),           forward.x(), 		  0.0f,
+		 right.y(),           up.y(),           forward.y(), 		  0.0f,
+		 right.z(),           up.z(),           forward.z(), 		  0.0f,
+		-right.Dot(in_from), -up.Dot(in_from), -forward.Dot(in_from), 1.0f
 	};
 /*
 	return Matrix<3, 4> {

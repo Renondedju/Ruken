@@ -79,7 +79,7 @@ AsyncTask<MainQueue> Application::AsyncMain()
 	})};
 
 	// Initializing the simulation (boids)
-	Flock flock {20'000};
+	Flock flock {10'000};
 
 	Window             window  {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
 	TestWindowRenderer test_window_renderer {

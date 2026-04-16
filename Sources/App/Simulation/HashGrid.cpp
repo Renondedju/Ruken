@@ -40,11 +40,11 @@ RkVoid HashGrid::SortHashes()
 	});
 }
 
-std::optional<RkSize> HashGrid::SearchFirst(RkUint32 const in_hash) const noexcept
+std::optional<RkUint32> HashGrid::SearchFirst(RkUint32 const in_hash) const noexcept
 {
-	RkInt64 			  left   {0};
-	RkInt64 			  right  {static_cast<RkInt64>(hash_map.size()) - 1};
-	std::optional<RkSize> result {std::nullopt};
+	RkInt64 			    left   {0};
+	RkInt64 			    right  {static_cast<RkInt64>(hash_map.size()) - 1};
+	std::optional<RkUint32> result {std::nullopt};
 
 	while (left <= right)
 	{
@@ -52,7 +52,7 @@ std::optional<RkSize> HashGrid::SearchFirst(RkUint32 const in_hash) const noexce
 		RkUint32 const mid_hash {hash_map[mid].hash};
 
 		if (mid_hash == in_hash) {
-			result = mid;
+			result = static_cast<RkUint32>(mid);
 			right  = mid - 1uz;
 		} else if (mid_hash < in_hash) {
 			left   = mid + 1uz;

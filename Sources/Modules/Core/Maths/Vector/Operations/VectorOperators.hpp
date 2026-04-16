@@ -161,7 +161,7 @@ struct VectorOperators
         TVector vector;
 
         for(RkSize index {0ULL}; index < TDimensions; ++index)
-            vector.data[index] = -static_cast<TVector*>(this)->data[index];
+            vector.data[index] = -static_cast<TVector const*>(this)->data[index];
 
         return vector;
     }
