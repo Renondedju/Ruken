@@ -10,7 +10,7 @@ std::vector<std::string_view> SpirvLoader::SupportedExtensions() const noexcept
 
 IOTask<ResourcePtr<>> SpirvLoader::Load(LoadContext&& in_context) const
 {
-	co_return std::make_shared<ShaderModule>(ShaderModule {
-		in_context.services, in_context.data
+	co_return std::make_shared<SpirvCode>(SpirvCode {
+		std::move(in_context.data)
 	});
 }

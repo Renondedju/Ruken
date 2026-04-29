@@ -31,12 +31,21 @@ struct GPUBuffer final: IResourceData
 
 	#pragma endregion
 
+	#pragma region Methods
+
+	RkVoid Update(RkSize in_offset, RkSize in_size, RkVoid const* in_data) const;
+
+	#pragma endregion
+
 	#pragma region Members
 
 	RenderDevice*  device;
-	vk::DeviceSize size;
-	vk::Buffer     buffer;
-	VmaAllocation  allocation;
+	RkVoid*        mapping    {};
+	VmaAllocation  allocation {};
+
+	vk::DeviceSize 			 size;
+	vk::Buffer     			 buffer;
+	vk::DescriptorBufferInfo buffer_info {};
 
 	#pragma endregion
 };

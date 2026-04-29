@@ -10,12 +10,12 @@ BEGIN_RUKEN_NAMESPACE
 /// @brief The base resource data class.
 struct IResourceData
 {
-	IResourceData()								 = default;
-	IResourceData(IResourceData const&)			 = default;
-	IResourceData(IResourceData&&     )			 = default;
+	IResourceData()								   = default;
+	IResourceData(IResourceData const&)			   = default;
+	IResourceData(IResourceData&&     )			   = default;
 	IResourceData& operator=(IResourceData const&) = default;
 	IResourceData& operator=(IResourceData&&     ) = default;
-	virtual ~IResourceData()          			 = default;
+	virtual ~IResourceData()          			   = default;
 };
 
 template <typename TType>

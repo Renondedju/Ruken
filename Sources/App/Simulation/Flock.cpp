@@ -9,18 +9,18 @@
 
 USING_RUKEN_NAMESPACE
 
-Flock::Flock(RkSize const in_size):
-	m_boids              {in_size},
-	m_positions          {in_size, Constants<Vector3m>::zero},
-	m_velocities         {in_size},
-	m_accelerations      {in_size, Constants<Vector3m>::zero},
-	m_cohesion_hash_map  {in_size},
-	m_avoidance_hash_map {in_size},
-	m_flock_heading      {in_size},
-	m_avoidance_heading  {in_size},
-	m_flock_center       {in_size},
-	m_number_flockmates  (in_size),
-	m_render_matrices    {in_size}
+Flock::Flock(RkSize const in_size, RenderDevice& in_device):
+	m_boids                  {in_size},
+	m_positions              {in_size, Constants<Vector3m>::zero},
+	m_velocities             {in_size},
+	m_accelerations          {in_size, Constants<Vector3m>::zero},
+	m_cohesion_hash_map      {in_size},
+	m_avoidance_hash_map     {in_size},
+	m_flock_heading          {in_size},
+	m_avoidance_heading      {in_size},
+	m_flock_center           {in_size},
+	m_number_flockmates      (in_size),
+	m_render_matrices        {in_size}
 {
 	std::random_device 			   device 	    {};
 	std::mt19937	   			   random 	    {device()};

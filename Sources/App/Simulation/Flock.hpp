@@ -6,9 +6,11 @@
 #include "Core/Types/Units/Duration/Duration.hpp"
 #include "Core/JobSystem/Awaitables/AsyncTask/AsyncTask.hpp"
 
-#include <vector>
+#include "Rendering/RenderDevice.hpp"
 
 #include "HashGrid.hpp"
+
+#include <vector>
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -38,8 +40,9 @@ struct Flock
 	/**
 	 * Default constructor.
 	 * @param in_size Amount of boids to summon
+	 * @param in_device
 	 */
-	explicit Flock(RkSize in_size);
+	explicit Flock(RkSize in_size, RenderDevice& in_device);
 	Flock(Flock const&) 		   = delete;
 	Flock(Flock&&)      		   = delete;
 	Flock& operator=(Flock const&) = delete;
@@ -50,9 +53,10 @@ struct Flock
 
 	AsyncTask<ECSJobQueue> Update(ServiceProvider const& in_service_provider) noexcept;
 
-	std::vector<Matrix4x4> const& GetTransforms() const noexcept { return m_render_matrices; }
+	std::vector<Matrix4x4> const&  GetTransforms() const noexcept { return m_render_matrices; }
+	RkSize						   BoidCount    () const noexcept { return m_boids; }
 
-private:
+	private:
 
 		#pragma region Members
 
@@ -69,6 +73,8 @@ private:
 		std::vector<Vector3m>  m_avoidance_heading;
 		std::vector<Vector3m>  m_flock_center;
 		std::vector<RkUint16>  m_number_flockmates;
+
+		// GPU data
 		std::vector<Matrix4x4> m_render_matrices;
 
 		#pragma endregion

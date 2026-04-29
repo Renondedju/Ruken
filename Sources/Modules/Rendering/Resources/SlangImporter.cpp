@@ -70,11 +70,11 @@ IOTask<RkVoid> SlangImporter::Import(ImportContext& in_context) noexcept
 	// --- 2. Acquiring the section lock & loading module.
 	Slang::ComPtr<slang::IModule> module {};
 
-	auto const  session {co_await m_session};
+	auto const session {co_await m_session};
 	module   = session->loadModuleFromSourceString(      // ! Requires sources, the call attempts to read from the
 		path.path		    .generic_string().c_str(),  //  ! underlying filesystem, bypassing the RkFilesystem module.
 		path.path.filename().generic_string().c_str(), //   ! Will fail if attempted on a packaged build or any kind of
-		data.data(), diagnostics.writeRef()	      //    ! exotic configuration without direct access to the sources.
+		data.data(), diagnostics.writeRef()	          //    ! exotic configuration without direct access to the sources.
 	);
 
 	log_or_throw(module != nullptr);
@@ -82,14 +82,14 @@ IOTask<RkVoid> SlangImporter::Import(ImportContext& in_context) noexcept
 	// --- 3. Retrieving entry points
 	std::size_t const entry_point_count {static_cast<std::size_t>(module->getDefinedEntryPointCount())};
 
-	std::vector<slang::IEntryPoint*>    entry_points   (entry_point_count       , nullptr);
-	std::vector<slang::IComponentType*> component_types(entry_point_count + 1ULL, nullptr);
+	std::vector<Slang::ComPtr<slang::IEntryPoint>>    entry_points   (entry_point_count       , nullptr);
+	std::vector<Slang::ComPtr<slang::IComponentType>> component_types(entry_point_count + 1ULL, nullptr);
 
 	component_types[entry_points.size()] = module;
 	for (SlangInt32 entry_point {}; entry_point < entry_point_count; entry_point++)
 	{
 		log_or_throw(SLANG_SUCCEEDED(
-			module->getDefinedEntryPoint(entry_point, &entry_points[entry_point]))
+			module->getDefinedEntryPoint(entry_point, entry_points[entry_point].writeRef()))
 		);
 
 		component_types[entry_point] = entry_points[entry_point];
@@ -100,7 +100,7 @@ IOTask<RkVoid> SlangImporter::Import(ImportContext& in_context) noexcept
 	Slang::ComPtr<slang::IComponentType> linked_program   {};
 
 	log_or_throw(SLANG_SUCCEEDED(
-		session->createCompositeComponentType(component_types.data(), component_types.size(), program.writeRef(),
+		session->createCompositeComponentType(reinterpret_cast<slang::IComponentType**>(component_types.data()), component_types.size(), program.writeRef(),
 	diagnostics.writeRef())));
 
 	log_or_throw(SLANG_SUCCEEDED(

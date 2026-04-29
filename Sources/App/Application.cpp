@@ -19,6 +19,8 @@
 #include "Rendering/Resources/SpirvLoader.hpp"
 #include "Rendering/Resources/ObjLoader.hpp"
 #include "Rendering/Resources/GPUMesh.hpp"
+#include "Rendering/Shaders/CameraData.hpp"
+#include "Rendering/Shaders/GridParameters.hpp"
 
 // App includes
 #include "Application.hpp"
@@ -68,29 +70,38 @@ AsyncTask<MainQueue> Application::AsyncMain()
 	resources->ProvideLoader  <SpirvLoader>   ();
 	resources->ProvideLoader  <ObjLoader>     ();
 
-	auto const code {resources->Request<ShaderModule>(FilePath {
+	auto const boid_code {resources->Request<SpirvCode>(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
-		.path = "slang.spv"
+		.path = "Basic.spv"
 	})};
-
-	auto const mesh {resources->Request<GPUMesh     >(FilePath {
+	auto const grid_code {resources->Request<SpirvCode>(FilePath {
+		.location = EFilesystemLocation::ProjectDirectory,
+		.path = "Grid.spv"
+	})};
+	auto const boid_mesh {resources->Request<GPUMesh  >(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
 		.path = "arrow.obj"
 	})};
 
-	// Initializing the simulation (boids)
-	Flock flock {10'000};
-
-	Window             window  {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
-	TestWindowRenderer test_window_renderer {
-		.owner    = *renderer,
-		.window   = window,
-		.pipeline = code,
-		.mesh     = mesh
-	};
+	Flock flock {10'000, *renderer};
 
 	// Waiting for resources
-	co_await WhenAll(mesh.LoadEvent(), code.LoadEvent());
+	co_await WhenAll(
+		boid_mesh.LoadEvent(),
+		boid_code.LoadEvent(),
+		grid_code.LoadEvent()
+	);
+
+	Window             window      {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
+	TestWindowRenderer test_window_renderer {
+		.owner     = *renderer,
+		.window    = window,
+		.boid_code = *boid_code.Current(),
+		.grid_code = *grid_code.Current(),
+		.mesh      = boid_mesh,
+		.flock     = flock,
+	};
+
 
 	// --- 2. Start
 	FrameMark;
@@ -103,7 +114,7 @@ AsyncTask<MainQueue> Application::AsyncMain()
 
 		glfwPollEvents();
 		co_await flock.Update(root_services);
-		co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation(), flock);
+		co_await test_window_renderer.RenderFrame();
 	}
 
 	// --- 4. Cleanup

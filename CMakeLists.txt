@@ -76,6 +76,7 @@ add_executable(${RUKEN_EXECUTABLE_NAME}
         Sources/App/Application.hpp
         Sources/App/Simulation/HashGrid.hpp
         Sources/App/Simulation/HashGrid.cpp
+        Sources/Modules/Rendering/Shaders/CameraData.hpp
 )
 
 target_compile_definitions(${RUKEN_EXECUTABLE_NAME} PRIVATE RUKEN_PROJECT_NAME="${RUKEN_EXECUTABLE_NAME}")

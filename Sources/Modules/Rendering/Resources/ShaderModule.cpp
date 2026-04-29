@@ -3,11 +3,12 @@
 
 USING_RUKEN_NAMESPACE
 
-ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
-						   std::vector<RkByte> const& in_spirv_code) noexcept:
-	module     {in_service_provider.LocateService<RenderDevice>()->GetDevice(), vk::ShaderModuleCreateInfo {
-		.codeSize = in_spirv_code.size() * sizeof(RkByte),
-		.pCode    = reinterpret_cast<const uint32_t*>(in_spirv_code.data())
+ShaderModule::ShaderModule(RenderDevice&							   in_device,
+						   SpirvCode						    const& in_spirv_code,
+						   std::vector<vk::DescriptorSetLayout> const& in_set_layouts) noexcept:
+	module {in_device.GetDevice(), vk::ShaderModuleCreateInfo {
+		.codeSize = in_spirv_code.spirv_code.size() * sizeof(RkByte),
+		.pCode    = reinterpret_cast<const uint32_t*>(in_spirv_code.spirv_code.data())
 	}},
 	stages {
 		{
@@ -22,39 +23,13 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
 			.pSpecializationInfo = nullptr
 		}
 	},
-	descriptor_set_layout {[&]{
-		auto const& device {in_service_provider.LocateService<RenderDevice>()->GetDevice()};
-		constexpr std::array bindings {
-			vk::DescriptorSetLayoutBinding {  // Per View Data
-				.binding		    = 0,
-				.descriptorType     = vk::DescriptorType::eUniformBuffer,
-				.descriptorCount    = 1,
-				.stageFlags			= vk::ShaderStageFlagBits::eVertex,
-				.pImmutableSamplers = nullptr
-			},
-			vk::DescriptorSetLayoutBinding { // Per Instance Data
-				.binding		    = 1,
-				.descriptorType     = vk::DescriptorType::eStorageBuffer,
-				.descriptorCount    = 1,
-				.stageFlags			= vk::ShaderStageFlagBits::eVertex,
-				.pImmutableSamplers = nullptr
-			}
-		};
-
-		return vk::raii::DescriptorSetLayout {device, vk::DescriptorSetLayoutCreateInfo {
-			.flags		  = {},
-			.bindingCount = bindings.size(),
-			.pBindings    = bindings.data()
-		}};
-	}()},
-	pipeline_layout {in_service_provider.LocateService<RenderDevice>()->GetDevice(), vk::PipelineLayoutCreateInfo {
-		.setLayoutCount         = 1,
-		.pSetLayouts			= &*descriptor_set_layout,
+	pipeline_layout {in_device.GetDevice(), vk::PipelineLayoutCreateInfo {
+		.setLayoutCount         = static_cast<uint32_t>(in_set_layouts.size()),
+		.pSetLayouts			= in_set_layouts.data(),
 		.pushConstantRangeCount = 0,
 	}},
 	pipeline {[&] {
-		vk::raii::Device const& device	{in_service_provider.LocateService<RenderDevice>()->GetDevice()};
-		std::vector		  dynamicStates {
+		std::vector	dynamicStates {
             vk::DynamicState::eViewport,
             vk::DynamicState::eScissor
         };
@@ -130,10 +105,10 @@ ShaderModule::ShaderModule(ServiceProvider     const& in_service_provider,
         vk::PipelineRenderingCreateInfo pipeline_rendering_create_info {
              .colorAttachmentCount    = static_cast<uint32_t>(formats.size()),
              .pColorAttachmentFormats = formats.data(),
-        	.depthAttachmentFormat    = vk::Format::eD32Sfloat
+        	 .depthAttachmentFormat    = vk::Format::eD32Sfloat
         };
 
-		return vk::raii::Pipeline(device, nullptr, vk::GraphicsPipelineCreateInfo {
+		return vk::raii::Pipeline(in_device.GetDevice(), nullptr, vk::GraphicsPipelineCreateInfo {
 			.pNext      		 = &pipeline_rendering_create_info,
 			.stageCount 		 = static_cast<uint32_t>(stages.size()),
 			.pStages    		 = stages.data(),
