@@ -269,6 +269,55 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::TranslationMatrix(Vec
 	};
 }
 
+template<RkSize TRows, RkSize TColumns>
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::Inverted() noexcept requires (TRows == 4 && TColumns == 4)
+{
+	float A2323 = (*this)[2, 2] * (*this)[3, 3] - (*this)[2, 3] * (*this)[3, 2];
+	float A1323 = (*this)[2, 1] * (*this)[3, 3] - (*this)[2, 3] * (*this)[3, 1];
+	float A1223 = (*this)[2, 1] * (*this)[3, 2] - (*this)[2, 2] * (*this)[3, 1];
+	float A0323 = (*this)[2, 0] * (*this)[3, 3] - (*this)[2, 3] * (*this)[3, 0];
+	float A0223 = (*this)[2, 0] * (*this)[3, 2] - (*this)[2, 2] * (*this)[3, 0];
+	float A0123 = (*this)[2, 0] * (*this)[3, 1] - (*this)[2, 1] * (*this)[3, 0];
+	float A2313 = (*this)[1, 2] * (*this)[3, 3] - (*this)[1, 3] * (*this)[3, 2];
+	float A1313 = (*this)[1, 1] * (*this)[3, 3] - (*this)[1, 3] * (*this)[3, 1];
+	float A1213 = (*this)[1, 1] * (*this)[3, 2] - (*this)[1, 2] * (*this)[3, 1];
+	float A2312 = (*this)[1, 2] * (*this)[2, 3] - (*this)[1, 3] * (*this)[2, 2];
+	float A1312 = (*this)[1, 1] * (*this)[2, 3] - (*this)[1, 3] * (*this)[2, 1];
+	float A1212 = (*this)[1, 1] * (*this)[2, 2] - (*this)[1, 2] * (*this)[2, 1];
+	float A0313 = (*this)[1, 0] * (*this)[3, 3] - (*this)[1, 3] * (*this)[3, 0];
+	float A0213 = (*this)[1, 0] * (*this)[3, 2] - (*this)[1, 2] * (*this)[3, 0];
+	float A0312 = (*this)[1, 0] * (*this)[2, 3] - (*this)[1, 3] * (*this)[2, 0];
+	float A0212 = (*this)[1, 0] * (*this)[2, 2] - (*this)[1, 2] * (*this)[2, 0];
+	float A0113 = (*this)[1, 0] * (*this)[3, 1] - (*this)[1, 1] * (*this)[3, 0];
+	float A0112 = (*this)[1, 0] * (*this)[2, 1] - (*this)[1, 1] * (*this)[2, 0];
+
+	float det = (*this)[0, 0] * ((*this)[1, 1] * A2323 - (*this)[1, 2] * A1323 + (*this)[1, 3] * A1223)
+			  - (*this)[0, 1] * ((*this)[1, 0] * A2323 - (*this)[1, 2] * A0323 + (*this)[1, 3] * A0223)
+			  + (*this)[0, 2] * ((*this)[1, 0] * A1323 - (*this)[1, 1] * A0323 + (*this)[1, 3] * A0123)
+	          - (*this)[0, 3] * ((*this)[1, 0] * A1223 - (*this)[1, 1] * A0223 + (*this)[1, 2] * A0123);
+
+	det = 1.0f / det;
+
+	return Matrix {
+	   det *   ((*this)[1, 1] * A2323 - (*this)[1, 2] * A1323 + (*this)[1, 3] * A1223),
+	   det * - ((*this)[0, 1] * A2323 - (*this)[0, 2] * A1323 + (*this)[0, 3] * A1223),
+	   det *   ((*this)[0, 1] * A2313 - (*this)[0, 2] * A1313 + (*this)[0, 3] * A1213),
+	   det * - ((*this)[0, 1] * A2312 - (*this)[0, 2] * A1312 + (*this)[0, 3] * A1212),
+	   det * - ((*this)[1, 0] * A2323 - (*this)[1, 2] * A0323 + (*this)[1, 3] * A0223),
+	   det *   ((*this)[0, 0] * A2323 - (*this)[0, 2] * A0323 + (*this)[0, 3] * A0223),
+	   det * - ((*this)[0, 0] * A2313 - (*this)[0, 2] * A0313 + (*this)[0, 3] * A0213),
+	   det *   ((*this)[0, 0] * A2312 - (*this)[0, 2] * A0312 + (*this)[0, 3] * A0212),
+	   det *   ((*this)[1, 0] * A1323 - (*this)[1, 1] * A0323 + (*this)[1, 3] * A0123),
+	   det * - ((*this)[0, 0] * A1323 - (*this)[0, 1] * A0323 + (*this)[0, 3] * A0123),
+	   det *   ((*this)[0, 0] * A1313 - (*this)[0, 1] * A0313 + (*this)[0, 3] * A0113),
+	   det * - ((*this)[0, 0] * A1312 - (*this)[0, 1] * A0312 + (*this)[0, 3] * A0112),
+	   det * - ((*this)[1, 0] * A1223 - (*this)[1, 1] * A0223 + (*this)[1, 2] * A0123),
+	   det *   ((*this)[0, 0] * A1223 - (*this)[0, 1] * A0223 + (*this)[0, 2] * A0123),
+	   det * - ((*this)[0, 0] * A1213 - (*this)[0, 1] * A0213 + (*this)[0, 2] * A0113),
+	   det *   ((*this)[0, 0] * A1212 - (*this)[0, 1] * A0212 + (*this)[0, 2] * A0112),
+	};
+}
+
 #pragma endregion
 
 #pragma region Operators

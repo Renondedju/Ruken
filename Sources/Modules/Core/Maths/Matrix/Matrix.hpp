@@ -20,7 +20,6 @@ BEGIN_RUKEN_NAMESPACE
  */
 template<RkSize TRows, RkSize TColumns>
 struct Matrix
-    //MatrixInversion     <TRows, TColumns>,
 {
     #pragma region Members
 
@@ -207,6 +206,11 @@ struct Matrix
      */
     [[nodiscard]]
     constexpr static Matrix TranslationMatrix(Vector3m const& in_translation) noexcept
+        requires (TRows == 4 && TColumns == 4);
+
+
+    [[nodiscard]]
+    constexpr Matrix Inverted() noexcept
         requires (TRows == 4 && TColumns == 4);
 
     #pragma endregion
