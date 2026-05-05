@@ -72,15 +72,15 @@ AsyncTask<MainQueue> Application::AsyncMain()
 
 	auto const boid_code {resources->Request<SpirvCode>(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
-		.path = "Basic.spv"
+		.path     = "Basic.spv"
 	})};
 	auto const grid_code {resources->Request<SpirvCode>(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
-		.path = "Grid.spv"
+		.path     = "Grid.spv"
 	})};
 	auto const boid_mesh {resources->Request<GPUMesh  >(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
-		.path = "arrow.obj"
+		.path     = "arrow.obj"
 	})};
 
 	Flock flock {10'000, *renderer};
@@ -92,7 +92,7 @@ AsyncTask<MainQueue> Application::AsyncMain()
 		grid_code.LoadEvent()
 	);
 
-	Window             window      {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
+	Window             window {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
 	TestWindowRenderer test_window_renderer {
 		.owner     = *renderer,
 		.window    = window,
@@ -102,11 +102,7 @@ AsyncTask<MainQueue> Application::AsyncMain()
 		.flock     = flock,
 	};
 
-
-	// --- 2. Start
-	FrameMark;
-
-	// --- 3. Main Loop
+	// --- 2. Main Loop
 	while (!window.ShouldClose())
 	{
 		FrameMark;
@@ -114,10 +110,10 @@ AsyncTask<MainQueue> Application::AsyncMain()
 
 		glfwPollEvents();
 		co_await flock.Update(root_services);
-		co_await test_window_renderer.RenderFrame();
+		co_await test_window_renderer.RenderFrame(clock->TimeSinceCreation());
 	}
 
-	// --- 4. Cleanup
+	// --- 3. Cleanup
 	co_return;
 }
 

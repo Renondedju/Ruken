@@ -14,6 +14,16 @@ BEGIN_RUKEN_NAMESPACE
 
 struct CameraData
 {
+	explicit CameraData(Vector3m const& in_position, Matrix4x4 const& in_view, Matrix4x4 const& in_projection) noexcept:
+		world_position  		 {in_position},
+		view					 {in_view},
+		projection				 {in_projection},
+		view_projection 		 {view * projection},
+		inverted_view			 {view		.Inverted()},
+		inverted_projection 	 {projection.Inverted()},
+		inverted_view_projection {inverted_projection * inverted_view}
+	{}
+
 	alignas(16) Vector3m  world_position;
 
 	alignas(16) Matrix4x4 view;
@@ -44,7 +54,7 @@ struct CameraDataStorage
 	explicit CameraDataStorage(RenderDevice& in_device, vk::DescriptorPool const in_pool, RkUint32 const in_instances):
 		binding  {
 			.binding		    = 0,
-			.descriptorType     = in_instances == 1 ? vk::DescriptorType::eUniformBuffer : vk::DescriptorType::eUniformBuffer,
+			.descriptorType     = vk::DescriptorType::eUniformBuffer,
 			.descriptorCount    = 1,
 			.stageFlags		    = vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex,
 			.pImmutableSamplers = nullptr,

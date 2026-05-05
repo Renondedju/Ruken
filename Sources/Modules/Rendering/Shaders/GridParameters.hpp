@@ -9,15 +9,16 @@ BEGIN_RUKEN_NAMESPACE
 
 struct GridParameters
 {
-	// plane_normal is expected to be one of the origin vectors
-	Vector3m plane_normal = Constants<Vector3m>::up;
-	float    grid_opacity = 1.0f;
+	float    grid_opacity = 0.25f;
 	float    axis_opacity = 1.0f;
 
+	// plane_normal is expected to be one of the origin vectors
+	Vector3m plane_normal = Constants<Vector3m>::up;
+
 	// Colors picked from blender's theme
-	Vector3m x_axis_color = Vector3m(0.70_m, 0.32_m, 0.32_m);
-	Vector3m y_axis_color = Vector3m(0.38_m, 0.53_m, 0.16_m);
-	Vector3m z_axis_color = Vector3m(0.29_m, 0.50_m, 0.79_m);
+	Vector3m x_axis_color = Vector3m(0.58_m, 0.24_m, 0.29_m); // Red
+	Vector3m y_axis_color = Vector3m(0.29_m, 0.50_m, 0.79_m); // Blue
+	Vector3m z_axis_color = Vector3m(0.39_m, 0.55_m, 0.15_m); // Green
 };
 
 struct GridParametersStorage
@@ -30,7 +31,7 @@ struct GridParametersStorage
 	explicit GridParametersStorage(RenderDevice& in_device, vk::DescriptorPool const in_pool, RkUint32 const in_instances):
 		binding  {
 			.binding		    = 0,
-			.descriptorType     = in_instances == 1 ? vk::DescriptorType::eUniformBuffer : vk::DescriptorType::eUniformBuffer,
+			.descriptorType     = vk::DescriptorType::eUniformBuffer,
 			.descriptorCount    = 1,
 			.stageFlags		    = vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex,
 			.pImmutableSamplers = nullptr,

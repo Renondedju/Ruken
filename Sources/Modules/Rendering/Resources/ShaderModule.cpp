@@ -89,9 +89,15 @@ ShaderModule::ShaderModule(RenderDevice&							   in_device,
 
         // --- Color blending
         vk::PipelineColorBlendAttachmentState color_blend_attachment {
-            .blendEnable    = vk::False,
-            .colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
-                              vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA
+            .blendEnable         = vk::True,
+        	.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha,
+        	.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha,
+        	.colorBlendOp		 = vk::BlendOp	  ::eAdd,
+        	.srcAlphaBlendFactor = vk::BlendFactor::eOne,
+        	.dstAlphaBlendFactor = vk::BlendFactor::eZero,
+        	.alphaBlendOp		 = vk::BlendOp	  ::eAdd,
+            .colorWriteMask      = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
+                                   vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA
         };
 
         vk::PipelineColorBlendStateCreateInfo color_blending {
@@ -105,7 +111,7 @@ ShaderModule::ShaderModule(RenderDevice&							   in_device,
         vk::PipelineRenderingCreateInfo pipeline_rendering_create_info {
              .colorAttachmentCount    = static_cast<uint32_t>(formats.size()),
              .pColorAttachmentFormats = formats.data(),
-        	 .depthAttachmentFormat    = vk::Format::eD32Sfloat
+        	 .depthAttachmentFormat   = vk::Format::eD32Sfloat
         };
 
 		return vk::raii::Pipeline(in_device.GetDevice(), nullptr, vk::GraphicsPipelineCreateInfo {

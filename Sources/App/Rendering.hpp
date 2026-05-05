@@ -150,7 +150,7 @@ struct DrawMesh final : GPUWorkNode
 			.imageView   = depth_view,
 			.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
 			.loadOp      = vk::AttachmentLoadOp ::eClear,
-			.storeOp     = vk::AttachmentStoreOp::eDontCare,
+			.storeOp     = vk::AttachmentStoreOp::eStore,
 			.clearValue  = vk::ClearDepthStencilValue(1.0f, 0),
 		};
 
@@ -171,6 +171,114 @@ struct DrawMesh final : GPUWorkNode
 		in_commands.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, layout, 0, sets, nullptr);
 
 		mesh->Draw(in_commands, 10'000);
+
+		in_commands.endRendering();
+	}
+};
+
+/// @brief Draws a simple mesh to the screen
+struct DrawGrid final : GPUWorkNode
+{
+	#pragma region Lifetime
+
+	DrawGrid(
+		vk::ImageView        const  in_framebuffer_view,
+		vk::ImageView	     const  in_depth_view,
+		vk::Image	         const  in_framebuffer_image,
+		vk::Image            const  in_depth_image,
+		vk::Pipeline         const  in_pipeline,
+		vk::PipelineLayout   const  in_layout,
+		vk::Viewport         const& in_viewport,
+		vk::Extent2D         const  in_extent,
+		std::vector<vk::DescriptorSet> const& in_sets
+	) noexcept:
+		GPUWorkNode {
+			vk::QueueFlagBits::eGraphics, {
+			GPUImageAccess {
+				.image             = in_framebuffer_image,
+				.layout            = vk::ImageLayout		   ::eColorAttachmentOptimal,
+				.stages            = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+				.access_flags      = vk::AccessFlagBits2       ::eColorAttachmentWrite,
+				.subresource_range = {
+					.aspectMask     = vk::ImageAspectFlagBits::eColor,
+					.baseMipLevel   = 0,
+					.levelCount     = 1,
+					.baseArrayLayer = 0,
+					.layerCount     = 1
+				}
+			},
+			GPUImageAccess {
+				.image             = in_depth_image,
+				.layout            = vk::ImageLayout		   ::eDepthAttachmentOptimal,
+				.stages            = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+				.access_flags      = vk::AccessFlagBits2       ::eDepthStencilAttachmentRead,
+				.subresource_range = {
+					.aspectMask     = vk::ImageAspectFlagBits::eDepth,
+					.baseMipLevel   = 0,
+					.levelCount     = 1,
+					.baseArrayLayer = 0,
+					.layerCount     = 1
+				}
+			}}, {}
+		},
+		framebuffer_view {in_framebuffer_view},
+		depth_view       {in_depth_view},
+		pipeline 		 {in_pipeline},
+		layout   		 {in_layout},
+		viewport 		 {in_viewport},
+		extent   		 {in_extent},
+		sets	     	 {in_sets}
+	{}
+
+	DrawGrid(const DrawGrid&) 		     = default;
+	DrawGrid(DrawGrid&&     ) 		     = default;
+	DrawGrid& operator=(const DrawGrid&) = delete;
+	DrawGrid& operator=(DrawGrid&&     ) = delete;
+	~DrawGrid() override				 = default;
+
+	#pragma endregion
+
+	vk::ImageView        framebuffer_view;
+	vk::ImageView        depth_view;
+	vk::Pipeline         pipeline;
+	vk::PipelineLayout   layout;
+	vk::Viewport         viewport;
+	vk::Extent2D         extent;
+	std::vector<vk::DescriptorSet> sets;
+
+	/// @brief Actual record command.
+	RkVoid Record(vk::raii::CommandBuffer const& in_commands) override
+	{
+		vk::RenderingAttachmentInfo const color_attachment_info {
+			.imageView   = framebuffer_view,
+			.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+			.loadOp      = vk::AttachmentLoadOp ::eLoad,
+			.storeOp     = vk::AttachmentStoreOp::eStore,
+		};
+
+		vk::RenderingAttachmentInfo const depth_attachment_info {
+			.imageView   = depth_view,
+			.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+			.loadOp      = vk::AttachmentLoadOp ::eLoad,
+			.storeOp     = vk::AttachmentStoreOp::eDontCare,
+		};
+
+		in_commands.beginRendering(vk::RenderingInfo {
+			.renderArea = {
+				.offset = { 0, 0 },
+				.extent = extent
+			},
+			.layerCount           = 1,
+			.colorAttachmentCount = 1,
+			.pColorAttachments    = &color_attachment_info,
+			.pDepthAttachment	  = &depth_attachment_info,
+		});
+
+		in_commands.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
+		in_commands.setViewport (0, viewport);
+		in_commands.setScissor  (0, vk::Rect2D(vk::Offset2D(0, 0), extent));
+		in_commands.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, layout, 0, sets, nullptr);
+		in_commands.draw(6, 1, 0, 0);
 
 		in_commands.endRendering();
 	}
@@ -211,7 +319,7 @@ struct TestWindowRenderer
 	 * Renders a frame to a swapchain image.
 	 * @return Async dynamic task.
 	 */
-	AsyncTask<ECSJobQueue> RenderFrame() noexcept
+	AsyncTask<ECSJobQueue> RenderFrame(Seconds in_time) noexcept
 	{
 		auto const& swapchain_ptr {window.GetSwapchain().Current()};
 		auto const  buffer_index  {frame_index % swapchain_ptr->images_views.size()};
@@ -220,12 +328,20 @@ struct TestWindowRenderer
 
 		++frame_index;
 
+		float    distance {10.0f};
+		Vector3m position {
+			(Meters)(Sin(45_deg) * distance),
+			(Meters)distance,
+			(Meters)(Cos(45_deg) * distance)
+		};
+
 		// --- 1 Uniform buffers
 		transform_buffer_storage.Update(flock.GetTransforms(), buffer_index);
 		grid_parameters_storage .Update(GridParameters { }	 , buffer_index);
 		camera_data_storage	    .Update(CameraData {
-			.view  	    = Matrix4x4::LookAtMatrix({0_m, 3_m, -3_m}, {0_m, 0_m, 0_m}, Constants<Vector3m>::up),
-			.projection = Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km)
+			position,
+			Matrix4x4::LookAtMatrix(position, {0_m, 0_m, 0_m}, Constants<Vector3m>::up),
+			Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km),
 		}, buffer_index);
 
 		// --- 1.2 Pipeline & swapchain setup
@@ -267,11 +383,26 @@ struct TestWindowRenderer
 				camera_data_storage		.sets[buffer_index],
 			}
 		};
+		DrawGrid draw_grid {
+			swapchain_image.view,
+			swapchain_image.depth_view,
+			swapchain_image.image,
+			swapchain_image.depth_image,
+			grid_shader.pipeline,
+			grid_shader.pipeline_layout,
+			viewport,
+			extent,
+			{
+				grid_parameters_storage.sets[buffer_index],
+				camera_data_storage	   .sets[buffer_index],
+			}
+		};
 		PreparePresentation presentation {
 			swapchain_image.image
 		};
 
 		work_graph.AddWorkNode(draw_triangle);
+		work_graph.AddWorkNode(draw_grid);
 		work_graph.AddWorkNode(presentation);
 
 		// --- 3. Waiting for execution to keep resources alive during execution.

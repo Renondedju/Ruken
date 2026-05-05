@@ -25,7 +25,7 @@ struct TransformBufferStorage
 		buffer_size     {sizeof(Matrix4x4) * in_buffer_elements},
 		binding {
 			.binding		    = 0,
-			.descriptorType     = in_instances == 1 ? vk::DescriptorType::eStorageBuffer : vk::DescriptorType::eStorageBuffer,
+			.descriptorType     = vk::DescriptorType::eStorageBuffer,
 			.descriptorCount    = 1,
 			.stageFlags		    = vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex,
 			.pImmutableSamplers = nullptr,
