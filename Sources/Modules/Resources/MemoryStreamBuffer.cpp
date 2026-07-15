@@ -10,6 +10,7 @@ MemoryStreamBuffer::MemoryStreamBuffer(RkByte* in_begin, RkByte* in_end) noexcep
 std::streambuf::pos_type MemoryStreamBuffer::seekoff(
 	off_type			   const in_off,
 	std::ios_base::seekdir const in_dir,
+	[[maybe_unused]]
 	std::ios_base::openmode		 in_which)
 {
 	if (in_dir == std::ios_base::cur)

@@ -21,7 +21,7 @@ struct GPUSwapchainData final : IResourceData
 	// Depth Attachment
 	vk::Image			depth_image;
 	vk::raii::ImageView	depth_image_view;
-	VmaAllocation       depth_allocation;
+	VmaAllocation       depth_allocation {};
 
 	#pragma region Lifetime
 

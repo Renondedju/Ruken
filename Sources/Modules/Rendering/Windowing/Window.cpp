@@ -12,8 +12,8 @@ Window::Window(RenderDevice& in_device, Vector2px const& in_size, std::string_vi
 	m_window    {[&] { // -- 1. Creating the window
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		auto const window = glfwCreateWindow(
-			static_cast<int>(in_size.width ),
-			static_cast<int>(in_size.height),
+			static_cast<int>(in_size.Width() ),
+			static_cast<int>(in_size.Height()),
 			in_name.data(), nullptr, nullptr
 		);
 
@@ -81,13 +81,12 @@ RkVoid Window::RecreateSwapchain()
 	// Exchange is atomic
 	// Because of that sub-resources need to all be contained in GPUSwapchainData. Otherwise, consumers might
 	// read from the new swapchain and the old image views at the same time.
-	// TODO: This might be an architectural issue to watch out for.
 	m_swapchain.Exchange(std::make_shared<GPUSwapchainData>(m_owner, vk::SwapchainCreateInfoKHR {
 		.flags                 = {},
 		.surface               = m_surface,
-		.minImageCount         = 2,
-		.imageFormat	       = vk::Format::eR8G8B8A8Srgb,
-		.imageColorSpace       = vk::ColorSpaceKHR::eSrgbNonlinear,
+		.minImageCount         = capabilities.minImageCount,
+		.imageFormat	       = formats[0].format,
+		.imageColorSpace       = formats[0].colorSpace,
 		.imageExtent           = extent,
 		.imageArrayLayers      = 1,
 		.imageUsage		       = vk::ImageUsageFlagBits::eColorAttachment,

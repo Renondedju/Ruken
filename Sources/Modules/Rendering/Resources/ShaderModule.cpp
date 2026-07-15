@@ -107,7 +107,7 @@ ShaderModule::ShaderModule(RenderDevice&							   in_device,
         };
 
         // --- Create the pipeline
-		std::vector formats { vk::Format::eR8G8B8A8Srgb };
+		std::vector formats {vk::Format::eB8G8R8A8Unorm }; //{ vk::Format::eB8G8R8A8Srgb };
         vk::PipelineRenderingCreateInfo pipeline_rendering_create_info {
              .colorAttachmentCount    = static_cast<uint32_t>(formats.size()),
              .pColorAttachmentFormats = formats.data(),

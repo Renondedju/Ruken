@@ -25,7 +25,7 @@ IOTask<ResourcePtr<>> ObjLoader::Load(LoadContext&& in_context) const
 
 	// Converting data buffer to a stream
 	MemoryStreamBuffer stream_buffer {&*in_context.data.begin(), &*(in_context.data.end() - 1)};
-	std::istream       data_stream   {&stream_buffer, false};
+	std::istream       data_stream   (&stream_buffer);
 
 	// Mesh Data
 	std::vector<Vertex>   			 vertices  {};

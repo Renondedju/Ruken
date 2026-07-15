@@ -84,4 +84,4 @@ target_compile_definitions(RkRendering PUBLIC
         VMA_STATIC_VULKAN_FUNCTIONS=0
         VMA_DYNAMIC_VULKAN_FUNCTIONS=0
 )
-target_link_libraries     (RkRendering PUBLIC RkCore Vulkan::Headers slang volk VulkanMemoryAllocator glfw tinyobjloader)
+target_link_libraries(RkRendering PUBLIC RkCore RkResources Vulkan::Headers slang volk VulkanMemoryAllocator glfw tinyobjloader)

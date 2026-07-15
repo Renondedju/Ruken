@@ -39,9 +39,9 @@ JobSystem::JobSystem(
         EvaluateWorkerBias               const in_bias_function,
         RkSize                                 in_worker_count) noexcept:
     Service         {in_provider, typeid(JobSystem)},
-    m_queues        {in_queues},
     m_bias_function {in_bias_function},
-    m_request_tree  {in_queues.size()}
+    m_request_tree  {in_queues.size()},
+    m_queues        {in_queues}
 {
     if (auto const logger {m_service_provider.LocateService<Logger>()})
         logger->Info(service_name, "Starting job system with {} worker(s) and {} queue(s)", in_worker_count, m_queues.size());

@@ -17,7 +17,13 @@ GPUMesh::GPUMesh(
 		.sharingMode = vk::SharingMode        ::eExclusive,
 	}, VmaAllocationCreateInfo {
 		.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
-		.usage = VMA_MEMORY_USAGE_AUTO
+		.usage = VMA_MEMORY_USAGE_AUTO,
+		.requiredFlags  = {},
+		.preferredFlags = {},
+		.memoryTypeBits = {},
+		.pool	   = nullptr,
+		.pUserData = nullptr,
+		.priority  = {}
 	}},
 
 	indices {in_device, vk::BufferCreateInfo {
@@ -27,7 +33,13 @@ GPUMesh::GPUMesh(
 		.sharingMode = vk::SharingMode		  ::eExclusive,
 	}, VmaAllocationCreateInfo {
 		.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
-		.usage = VMA_MEMORY_USAGE_AUTO
+		.usage = VMA_MEMORY_USAGE_AUTO,
+		.requiredFlags  = {},
+		.preferredFlags = {},
+		.memoryTypeBits = {},
+		.pool	   = nullptr,
+		.pUserData = nullptr,
+		.priority  = {}
 	}}
 {
 	vmaCopyMemoryToAllocation(in_device.GetAllocator(), in_vertices.data(), vertices.allocation, 0, vertices.size);

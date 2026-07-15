@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <new>
 
-#pragma warning(push)
-#pragma warning(disable:4324) // 'ruken::Concurrency': structure was padded due to alignment specifier
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning(push)
+	#pragma warning(disable:4324) // 'ruken::Concurrency': structure was padded due to alignment specifier
+#endif
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -51,7 +53,9 @@ static constexpr Concurrency s_one_current_concurrency   { .fields = { .maximum 
 static constexpr Concurrency s_one_maximum_concurrency   { .fields = { .maximum = 1, .current = 0, .requested = 0, .optimal = 0} };
 static constexpr Concurrency s_one_requested_concurrency { .fields = { .maximum = 0, .current = 0, .requested = 1, .optimal = 0} };
 
-#pragma warning(pop) // 'ruken::Concurrency': structure was padded due to alignment specifier
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning(pop) // 'ruken::Concurrency': structure was padded due to alignment specifier
+#endif
 
 static_assert(sizeof(Concurrency) <= std::hardware_constructive_interference_size);
 

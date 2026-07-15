@@ -20,8 +20,10 @@ struct VectorMinMax
 
     #pragma region Static Methods
 
-    #pragma warning( push )
-    #pragma warning( disable:4702 ) // Unreachable code (due to if constexpr)
+    #ifdef RUKEN_COMPILER_MSVC
+        #pragma warning( push )
+        #pragma warning( disable:4702 ) // Unreachable code (due to if constexpr)
+    #endif
 
     /**
      * \brief Returns a vector that is made from the largest components of two vectors
@@ -93,7 +95,10 @@ struct VectorMinMax
         return vector;
     }
 
-    #pragma warning( pop )
+
+    #ifdef RUKEN_COMPILER_MSVC
+        #pragma warning( pop )
+    #endif
 
     #pragma endregion
 

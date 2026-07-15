@@ -6,15 +6,15 @@ USING_RUKEN_NAMESPACE
 
 RkUint32 HashGrid::MakeHash(Vector3m in_position) const noexcept
 {
-	return  static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.x() / cell_size))) * 73856093ui32 ^
-			static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.y() / cell_size))) * 19349663ui32 ^
-			static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.z() / cell_size))) * 83492791ui32;
+	return  static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.x() / cell_size))) * static_cast<RkUint32>(73856093) ^
+			static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.y() / cell_size))) * static_cast<RkUint32>(19349663) ^
+			static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.z() / cell_size))) * static_cast<RkUint32>(83492791);
 }
 
 RkUint32 HashGrid::MakeHash(Vector2m in_position) const noexcept
 {
-	return  static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.x() / cell_size))) * 73856093ui32 ^
-			static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.y() / cell_size))) * 19349663ui32;
+	return  static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.x() / cell_size))) * static_cast<RkUint32>(73856093) ^
+			static_cast<RkUint32>(Floor(static_cast<RkFloat>(in_position.y() / cell_size))) * static_cast<RkUint32>(19349663);
 }
 
 RkVoid HashGrid::SetHashIndex(Vector3m const in_position, RkUint32 const in_entity_index) noexcept

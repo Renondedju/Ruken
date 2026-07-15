@@ -11,8 +11,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-#pragma warning( push )
-#pragma warning( disable:4201 )
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning( push )
+	#pragma warning( disable:4201 )
+#endif
 
 /// @brief Two-dimensional pixel vector
 template <>
@@ -21,25 +23,23 @@ struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
     VectorMinMax   <2, Pixels>,
     VectorLerp     <2, Pixels>
 {
-    #pragma region Members
+	Pixels data[2];
 
-    union
-	{
-	    Pixels data[2];
+	#pragma region Getters/Setters
 
-	    struct
-	    {
-	        Pixels x;
-			Pixels y;
-	    };
-		struct
-	    {
-	        Pixels width;
-	        Pixels height;
-	    };
-	};
+	Pixels&		  x()       noexcept { return data[0]; }
+	Pixels const& x() const noexcept { return data[0]; }
 
-    #pragma endregion
+	Pixels&		  y()       noexcept { return data[1]; }
+	Pixels const& y() const noexcept { return data[1]; }
+
+	Pixels&		  Width ()       noexcept { return data[0]; }
+	Pixels const& Width () const noexcept { return data[0]; }
+
+	Pixels&		  Height()       noexcept { return data[1]; }
+	Pixels const& Height() const noexcept { return data[1]; }
+
+	#pragma endregion
 
     #pragma region Constructors
 
@@ -61,7 +61,7 @@ struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
 	 */
 	constexpr RkFloat AspectRatio() const noexcept
 	{
-	    return static_cast<RkFloat>(width) / static_cast<RkFloat>(height);
+	    return static_cast<RkFloat>(Width()) / static_cast<RkFloat>(Height());
 	}
 
     #pragma endregion
@@ -74,25 +74,27 @@ struct RUKEN_EMPTY_BASES Vector<3, Pixels> final:
 	VectorMinMax   <3, Pixels>,
 	VectorLerp     <3, Pixels>
 {
-	#pragma region Members
+	Pixels data[3];
 
-	union
-	{
-		Pixels data[3];
+	#pragma region Getters/Setters
 
-		struct
-		{
-			Pixels x;
-			Pixels y;
-			Pixels z;
-		};
-		struct
-		{
-			Pixels width;
-			Pixels height;
-			Pixels depth;
-		};
-	};
+	Pixels&	      x()       noexcept { return data[0]; }
+	Pixels const& x() const noexcept { return data[0]; }
+
+	Pixels&	      y()       noexcept { return data[1]; }
+	Pixels const& y() const noexcept { return data[1]; }
+
+	Pixels&	      z()       noexcept { return data[2]; }
+	Pixels const& z() const noexcept { return data[2]; }
+
+	Pixels&	      Width ()       noexcept { return data[0]; }
+	Pixels const& Width () const noexcept { return data[0]; }
+
+	Pixels&	      Height()       noexcept { return data[1]; }
+	Pixels const& Height() const noexcept { return data[1]; }
+
+	Pixels&	      Depth ()       noexcept { return data[2]; }
+	Pixels const& Depth () const noexcept { return data[2]; }
 
 	#pragma endregion
 
@@ -109,7 +111,9 @@ struct RUKEN_EMPTY_BASES Vector<3, Pixels> final:
 	#pragma endregion
 };
 
-#pragma warning( pop )
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning( pop )
+#endif
 
 using Vector2px = Vector<2, Pixels>;
 using Vector3px = Vector<3, Pixels>;

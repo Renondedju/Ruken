@@ -13,10 +13,12 @@ BEGIN_RUKEN_NAMESPACE
 struct JobSystem;
 struct SingleThreadSingleQueueExecutor;
 
-#pragma warning(push)
-#pragma warning(disable: 4324)
-// Disabled warning 4324: Structure was padded due to __declspec(align())
-// This is related to the way atomic values interacts with cache lines and is expected of the atomic_queue
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning(push)
+	#pragma warning(disable: 4324)
+	// Disabled warning 4324: Structure was padded due to __declspec(align())
+	// This is related to the way atomic values interacts with cache lines and is expected of the atomic_queue
+#endif
 
 /**
  * @brief A primitive allowing the categorization and prioritization of tasks.
@@ -118,6 +120,8 @@ class JobQueue
         #pragma endregion
 };
 
-#pragma warning(pop)
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning(pop)
+#endif
 
 END_RUKEN_NAMESPACE

@@ -94,7 +94,7 @@ struct Mutex
 		TData		     m_data;
 		std::atomic_flag m_locked    {};
 		MutexAwaitable   m_awaitable {
-			.mutex = this
+			{}, this
 		};
 
 		#pragma endregion

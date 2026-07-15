@@ -13,7 +13,7 @@ struct StdFilesystem final: Filesystem
 
 	std::filesystem::path const project_path;
 	std::filesystem::path const imported_assets_path;
-	std::filesystem::path const tmp_path;
+	//std::filesystem::path const tmp_path;
 
 	#pragma endregion
 
@@ -29,7 +29,7 @@ struct StdFilesystem final: Filesystem
 	StdFilesystem           (StdFilesystem&&      in_move) = delete;
 	StdFilesystem& operator=(StdFilesystem const& in_copy) = delete;
 	StdFilesystem& operator=(StdFilesystem&&      in_move) = delete;
-	~StdFilesystem()								  override = default;
+	~StdFilesystem()						      override = default;
 
 	#pragma endregion
 

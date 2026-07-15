@@ -26,7 +26,7 @@ struct StrongTypeSuffix<Pixels>
     static constexpr const RkChar* suffix = " px";
 };
 
-constexpr Pixels operator"" _px(RkSize const in_pixels) noexcept
+constexpr Pixels operator""_px(RkULLInt const in_pixels) noexcept
 {
     return Pixels(static_cast<RkInt32>(in_pixels));
 }

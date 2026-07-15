@@ -5,8 +5,8 @@
 #include "Resources/Assets/AssetImporter.hpp"
 #include "Rendering/SlangSearchPath.hpp"
 
-#include <slang/slang.h>
-#include <slang/slang-com-ptr.h>
+#include <slang.h>
+#include <slang-com-ptr.h>
 
 BEGIN_RUKEN_NAMESPACE
 

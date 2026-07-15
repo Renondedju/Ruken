@@ -7,8 +7,9 @@ USING_RUKEN_NAMESPACE
 StdFilesystem::StdFilesystem(ServiceProvider& in_service_provider, std::filesystem::path const& in_project_path):
 	Filesystem           {in_service_provider},
 	project_path         {in_project_path},
-    imported_assets_path {in_project_path / "Imports"},
-	tmp_path			 {std::filesystem::temp_directory_path()}
+    imported_assets_path {in_project_path / "Imports"}
+	// TODO: Returns the windows temporary folder when using WSL, causing an exception to be raised.
+	//tmp_path			 {std::filesystem::temp_directory_path()}
 {
 	if (auto const logger {m_service_provider.LocateService<Logger>()})
 		logger->Info(service_name,"Opened a standard filesystem at {}",
@@ -34,8 +35,10 @@ std::filesystem::path StdFilesystem::GetPathFromLocation(EFilesystemLocation con
 	{
 		case EFilesystemLocation::ProjectDirectory:
 			return std::filesystem::absolute(project_path);
-		case EFilesystemLocation::Temporary:
-			return std::filesystem::absolute(tmp_path);
+
+		// TODO: Returns the windows temporary folder when using WSL, causing an exception to be raised.
+		//case EFilesystemLocation::Temporary:
+		//	return std::filesystem::absolute(tmp_path);
 		case EFilesystemLocation::ImportedAssets:
 			return std::filesystem::absolute(imported_assets_path);
 

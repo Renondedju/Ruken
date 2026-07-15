@@ -40,7 +40,7 @@ struct VectorSlerp
         RkFloat                                        const  in_ratio) noexcept
     {
         RkFloat const dot   = VectorDot<TDimensions, TVector>::Dot(in_source, in_destination);
-        Radians const theta = static_cast<Radians>(ArcCos(static_cast<Radians>(dot)) * in_ratio);
+        Radians const theta = static_cast<Radians>(ArcCos(dot) * in_ratio);
 
         return in_source * Cos(theta) + VectorNormalization<TDimensions, TVector>::Normalized(in_source - in_destination * dot) * Sin(theta);
     }

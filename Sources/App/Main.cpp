@@ -42,7 +42,7 @@ int main([[maybe_unused]] int   in_arg_count,
     application.root_services.ProvideService<JobSystem>(queues, worker_bias_function);
 
     // 3. --- Finally, running async main ---
-    std::stop_source  stop_source {};
+    std::stop_source stop_source {};
     application.TryCatchAsyncMain(stop_source);
 
     // ... and waiting for it to complete as a worker.

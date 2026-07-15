@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Meta/Meta.hpp"
@@ -108,8 +107,10 @@ struct VectorOperators
 
     #pragma region Operators
 
-    #pragma warning( push )
-    #pragma warning( disable:4702 ) // Unreachable code (due to if constexpr)
+    #ifdef RUKEN_COMPILER_MSVC
+        #pragma warning( push )
+        #pragma warning( disable:4702 ) // Unreachable code (due to if constexpr)
+    #endif
 
     // Vector - Vector operators
 
@@ -119,7 +120,9 @@ struct VectorOperators
     RUKEN_VECTOR_OPERATOR_MIXIN(*)
     RUKEN_VECTOR_OPERATOR_MIXIN(%)
 
-    #pragma warning( pop )
+    #ifdef RUKEN_COMPILER_MSVC
+        #pragma warning( pop )
+    #endif
 
     // Vector - Scalar operators
 

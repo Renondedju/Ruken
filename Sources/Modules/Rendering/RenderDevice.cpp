@@ -155,7 +155,7 @@ RkVoid RenderDevice::InitTracyVkContext() noexcept
 				host_calibrated = true;
 
 		if constexpr (BuildInfo::SystemID == BuildInfo::EOperatingSystem::Linux)
-			if (time_domain == vk::TimeDomainKHR::eClockMonotonic)
+			if (time_domain == vk::TimeDomainKHR::eClockMonotonicRaw)
 				host_calibrated = true;
 	}
 
@@ -163,7 +163,7 @@ RkVoid RenderDevice::InitTracyVkContext() noexcept
 	{
 		m_tracy_context = TracyVkContextHostCalibrated(*m_instance->instance, *m_physical_device, *m_device,
 		                                               m_instance->instance.getDispatcher()->vkGetInstanceProcAddr,
-		                                               m_device			.getDispatcher()->vkGetDeviceProcAddr
+		                                               m_device			   .getDispatcher()->vkGetDeviceProcAddr
 		);
 
 		TracyVkContextName(m_tracy_context, m_name.data(), static_cast<uint16_t>(m_name.size()))

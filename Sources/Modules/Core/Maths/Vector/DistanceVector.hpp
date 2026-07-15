@@ -15,8 +15,10 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-#pragma warning( push )
-#pragma warning( disable:4201 )
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning( push )
+	#pragma warning( disable:4201 )
+#endif
 
 template <RkSize TSize, EDistanceUnit TDistanceUnit>
 struct RUKEN_EMPTY_BASES DistanceVectorOperations:
@@ -176,7 +178,9 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 
 #pragma endregion
 
-#pragma warning( pop )
+#ifdef RUKEN_COMPILER_MSVC
+	#pragma warning( pop )
+#endif
 
 using Vector2cm = Vector<2, Centimeters>;
 using Vector2m  = Vector<2, Meters>;

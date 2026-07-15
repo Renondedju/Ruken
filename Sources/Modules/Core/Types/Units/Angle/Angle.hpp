@@ -65,10 +65,10 @@ struct StrongTypeSuffix<Radians>
 
 // Type literals
 
-constexpr Degrees operator"" _deg(RkLdouble in_angle) noexcept;
-constexpr Degrees operator"" _deg(RkULLInt  in_angle) noexcept;
-constexpr Radians operator"" _rad(RkLdouble in_angle) noexcept;
-constexpr Radians operator"" _rad(RkULLInt  in_angle) noexcept;
+constexpr Degrees operator""_deg(RkLdouble in_angle) noexcept;
+constexpr Degrees operator""_deg(RkULLInt  in_angle) noexcept;
+constexpr Radians operator""_rad(RkLdouble in_angle) noexcept;
+constexpr Radians operator""_rad(RkULLInt  in_angle) noexcept;
 
 #include "Angle.inl"
 

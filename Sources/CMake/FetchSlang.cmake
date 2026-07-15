@@ -172,7 +172,7 @@ if (SLANG_LIB_FOUND)
 			IMPORTED_NO_SONAME TRUE
 		)
 		set_target_properties(slang-glslang PROPERTIES
-			IMPORTED_LOCATION "${Slang_ROOT}/bin/slang-glslang.so"
+			IMPORTED_LOCATION "${Slang_ROOT}/lib/libslang-glslang.so"
 			IMPORTED_NO_SONAME TRUE
 		)
 	elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")

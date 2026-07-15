@@ -40,32 +40,32 @@ constexpr Distance<EDistanceUnit::Meters>::operator Distance<EDistanceUnit::Cent
 
 // Type literals
 
-constexpr Centimeters operator"" _cm(RkLdouble const in_distance) noexcept
+constexpr Centimeters operator""_cm(RkLdouble const in_distance) noexcept
 {
     return Centimeters(static_cast<Centimeters::TUnderlying>(in_distance));
 }
 
-constexpr Centimeters operator"" _cm(RkULLInt const in_distance) noexcept
+constexpr Centimeters operator""_cm(RkULLInt const in_distance) noexcept
 {
     return Centimeters(static_cast<Centimeters::TUnderlying>(in_distance));
 }
 
-constexpr Meters operator"" _m(RkLdouble const in_distance) noexcept
+constexpr Meters operator""_m(RkLdouble const in_distance) noexcept
 {
     return Meters(static_cast<Meters::TUnderlying>(in_distance));
 }
 
-constexpr Meters operator"" _m(RkULLInt const in_distance) noexcept
+constexpr Meters operator""_m(RkULLInt const in_distance) noexcept
 {
     return Meters(static_cast<Meters::TUnderlying>(in_distance));
 }
 
-constexpr Kilometers operator"" _km(RkLdouble const in_distance) noexcept
+constexpr Kilometers operator""_km(RkLdouble const in_distance) noexcept
 {
     return Kilometers(static_cast<Kilometers::TUnderlying>(in_distance));
 }
 
-constexpr Kilometers operator"" _km(RkULLInt const in_distance) noexcept
+constexpr Kilometers operator""_km(RkULLInt const in_distance) noexcept
 {
     return Kilometers(static_cast<Kilometers::TUnderlying>(in_distance));
 }

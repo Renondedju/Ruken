@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
@@ -69,12 +68,12 @@ struct StrongTypeSuffix<Kilometers>
 { static constexpr const RkChar* suffix = " km"; };
 
 // Type literals
-constexpr Centimeters operator"" _cm(RkLdouble in_distance) noexcept;
-constexpr Centimeters operator"" _cm(RkULLInt  in_distance) noexcept;
-constexpr Kilometers  operator"" _km(RkLdouble in_distance) noexcept;
-constexpr Kilometers  operator"" _km(RkULLInt  in_distance) noexcept;
-constexpr Meters      operator"" _m (RkLdouble in_distance) noexcept;
-constexpr Meters      operator"" _m (RkULLInt  in_distance) noexcept;
+constexpr Centimeters operator""_cm(RkLdouble in_distance) noexcept;
+constexpr Centimeters operator""_cm(RkULLInt  in_distance) noexcept;
+constexpr Kilometers  operator""_km(RkLdouble in_distance) noexcept;
+constexpr Kilometers  operator""_km(RkULLInt  in_distance) noexcept;
+constexpr Meters      operator""_m (RkLdouble in_distance) noexcept;
+constexpr Meters      operator""_m (RkULLInt  in_distance) noexcept;
 
 #include "Distance.inl"
 

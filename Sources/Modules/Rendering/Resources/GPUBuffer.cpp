@@ -10,7 +10,7 @@ GPUBuffer::GPUBuffer(RenderDevice& in_device, vk::BufferCreateInfo const& in_cre
 	VkBuffer init_buffer;
 	vmaCreateBuffer(device->GetAllocator(), &*in_create_info, &in_alloc_info, &init_buffer, &allocation, nullptr);
 	buffer		= init_buffer;
-	buffer_info = {
+	buffer_info = vk::DescriptorBufferInfo {
 		.buffer = buffer,
 		.offset = 0,
 		.range  = size

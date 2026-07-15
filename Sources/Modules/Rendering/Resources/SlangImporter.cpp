@@ -4,8 +4,8 @@
 #include "Filesystem/Filesystem.hpp"
 #include "Core/Debug/Logging/Logger.hpp"
 
-#include <slang/slang.h>
-#include <slang/slang-com-ptr.h>
+#include <slang.h>
+#include <slang-com-ptr.h>
 
 USING_RUKEN_NAMESPACE
 
