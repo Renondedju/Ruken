@@ -64,8 +64,8 @@ auto SyncTaskPromiseBase<TResult>::initial_suspend(std::source_location const in
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	// Coroutine is ran in place
-	return InitialSuspendAwaiter<std::suspend_never> {
+	// Coroutine is run in place
+	return InitialSuspendAwaiter< std::suspend_never> {
 		{}, this, in_source_location
 	};
 }

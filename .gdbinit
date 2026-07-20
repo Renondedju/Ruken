@@ -1,2 +1,2 @@
 set non-stop off
-source Sources/Debug/lldb_coro_debugging.py
+source Sources/Debug/gdb_coro_debugging.py

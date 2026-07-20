@@ -1,8 +1,8 @@
 #pragma once
+#include <iostream>
 
 BEGIN_RUKEN_NAMESPACE
-
-template<typename TResult>
+	template<typename TResult>
 SyncTask<TResult>::SyncTask(SyncTaskPromise<TResult>& in_parent) noexcept:
 	m_promise {&in_parent}
 {}

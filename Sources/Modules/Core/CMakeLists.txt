@@ -7,15 +7,8 @@ register_ruken_module(RkCore)
 set(TRACY_ENABLE    ${RUKEN_TRACE_BUILD})
 set(TRACY_NO_VERIFY ON)
 
-CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.13.0.zip"      NAME tracy)
-CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.5.zip" NAME atomic_queue)
-
-# atomic_queue has no CMake support and is a header only library
-if (atomic_queue_ADDED)
-    FILE(GLOB atomic_queue_sources ${atomic_queue_SOURCE_DIR}/include/atomic_queue/*.h)
-    add_library(atomic_queue INTERFACE ${atomic_queue_sources})
-    target_include_directories(atomic_queue INTERFACE $<BUILD_INTERFACE:${atomic_queue_SOURCE_DIR}/include>)
-endif()
+CPMAddPackage(URL "https://github.com/wolfpld/tracy/archive/refs/tags/v0.13.1.zip"        NAME tracy)
+CPMAddPackage(URL "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.9.2.zip" NAME atomic_queue)
 
 target_sources(RkCore PUBLIC
         FILE_SET HEADERS FILES
@@ -247,4 +240,4 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries (RkCore PUBLIC -lstdc++exp) # Prior to GCC14 you should be using -lstdc++_libbacktrace instead
 endif ()
 
-target_link_libraries(RkCore PUBLIC atomic_queue git_version TracyClient)
+target_link_libraries(RkCore PUBLIC atomic_queue::atomic_queue git_version TracyClient)

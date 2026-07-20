@@ -80,7 +80,7 @@ IOTask<RkVoid> SlangImporter::Import(ImportContext& in_context) noexcept
 	log_or_throw(module != nullptr);
 
 	// --- 3. Retrieving entry points
-	std::size_t const entry_point_count {static_cast<std::size_t>(module->getDefinedEntryPointCount())};
+	SlangInt32 const entry_point_count {module->getDefinedEntryPointCount()};
 
 	std::vector<Slang::ComPtr<slang::IEntryPoint>>    entry_points   (entry_point_count       , nullptr);
 	std::vector<Slang::ComPtr<slang::IComponentType>> component_types(entry_point_count + 1ULL, nullptr);

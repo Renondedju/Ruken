@@ -31,14 +31,14 @@ SyncTask<> ParallelForChunk(
 	if (in_start == in_end)
 		co_return;
 
-	RkSize const 					 items      {in_end - in_start};
-	RkSize const 					 iterations {static_cast<RkSize>(Ceil(items / static_cast<float>(in_chunk_size)))};
-	std::vector<DynamicTask<RkVoid>> awaitables {iterations};
+	RkSize const 			   items      {in_end - in_start};
+	RkSize const 			   iterations {static_cast<RkSize>(Ceil(items / static_cast<float>(in_chunk_size)))};
+	std::vector<DynamicTask<>> awaitables {iterations};
 
 	// Constructing awaitables
 	for (RkSize i = 0; i < iterations; ++i)
 	{
-		awaitables[i] = [&](TIndex const in_start_index, TIndex const in_count) -> DynamicTask<RkVoid>
+		awaitables[i] = [&](TIndex const in_start_index, TIndex const in_count) -> DynamicTask<>
 		{
 			for (TIndex index {0}; index < in_count; ++index)
 				in_function(in_start_index + index);
