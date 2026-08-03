@@ -72,7 +72,7 @@ if (NOT EXISTS ${RUKEN_SLANG_INCLUDE_DIR})
 endif ()
 
 # Adding shaders to the slang include directory as the 'Ruken' module.
-file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Shaders ${RUKEN_SLANG_INCLUDE_DIR}/Ruken COPY_ON_ERROR SYMBOLIC)
+file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/Shaders ${RUKEN_SLANG_INCLUDE_DIR}/Ruken SYMBOLIC)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SlangSearchPath.hpp.in ${RUKEN_GENERATED_SOURCES_DIR}/Rendering/SlangSearchPath.hpp)
 
 target_compile_definitions(RkRendering PUBLIC

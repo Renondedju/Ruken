@@ -19,8 +19,11 @@ SyncTask<TResult>& SyncTask<TResult>::operator=(SyncTask&& in_move) noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (m_promise && m_promise->references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+	if (m_promise && m_promise->references.fetch_sub(1, std::memory_order_release) == 1)
+	{
+		std::atomic_thread_fence(std::memory_order_acquire);
 		std::coroutine_handle<promise_type>::from_promise(*m_promise).destroy();
+	}
 
 	m_promise = std::exchange(in_move.m_promise, nullptr);
 
@@ -32,8 +35,11 @@ SyncTask<TResult>::~SyncTask() noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (m_promise && m_promise->references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+	if (m_promise && m_promise->references.fetch_sub(1, std::memory_order_release) == 1)
+	{
+		std::atomic_thread_fence(std::memory_order_acquire);
 		std::coroutine_handle<promise_type>::from_promise(*m_promise).destroy();
+	}
 }
 
 template<typename TResult>

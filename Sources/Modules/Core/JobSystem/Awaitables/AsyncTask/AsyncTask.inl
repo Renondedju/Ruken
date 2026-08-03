@@ -25,7 +25,7 @@ AsyncTask<TQueueHandle, TResult>::AsyncTask(AsyncTaskPromise<TQueueHandle, TResu
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	m_handle.promise().references.fetch_add(1, std::memory_order_acq_rel);
+	m_handle.promise().references.fetch_add(1, std::memory_order_relaxed);
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
@@ -35,7 +35,7 @@ AsyncTask<TQueueHandle, TResult>::AsyncTask(AsyncTask const& in_other) noexcept:
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
 	if (m_handle)
-		m_handle.promise().references.fetch_add(1, std::memory_order_acq_rel);
+		m_handle.promise().references.fetch_add(1, std::memory_order_relaxed);
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
@@ -45,7 +45,7 @@ AsyncTask<TQueueHandle, TResult>::AsyncTask(AsyncTask&& in_other) noexcept:
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
 	if (m_handle)
-		m_handle.promise().references.fetch_add(1, std::memory_order_acq_rel);
+		m_handle.promise().references.fetch_add(1, std::memory_order_relaxed);
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
@@ -53,8 +53,11 @@ AsyncTask<TQueueHandle, TResult>::~AsyncTask() noexcept
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (m_handle && m_handle.promise().references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+	if (m_handle && m_handle.promise().references.fetch_sub(1, std::memory_order_release) == 1)
+	{
+		std::atomic_thread_fence(std::memory_order_acquire);
 		m_handle.destroy();
+	}
 }
 
 template<IsQueueHandle TQueueHandle, typename TResult>
@@ -62,13 +65,16 @@ AsyncTask<TQueueHandle, TResult>& AsyncTask<TQueueHandle, TResult>::operator=(As
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (m_handle && m_handle.promise().references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+	if (m_handle && m_handle.promise().references.fetch_sub(1, std::memory_order_release) == 1)
+	{
+		std::atomic_thread_fence(std::memory_order_acquire);
 		m_handle.destroy();
+	}
 
 	m_handle = in_other.m_handle;
 
 	if (m_handle)
-		m_handle.promise().references.fetch_add(1, std::memory_order_acq_rel);
+		m_handle.promise().references.fetch_add(1, std::memory_order_relaxed);
 
 	return *this;
 }
@@ -78,13 +84,16 @@ AsyncTask<TQueueHandle, TResult>& AsyncTask<TQueueHandle, TResult>::operator=(As
 {
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
-	if (m_handle && m_handle.promise().references.fetch_sub(1, std::memory_order_acq_rel) == 1)
+	if (m_handle && m_handle.promise().references.fetch_sub(1, std::memory_order_release) == 1)
+	{
+		std::atomic_thread_fence(std::memory_order_acquire);
 		m_handle.destroy();
+	}
 
 	m_handle = std::move(in_other.m_handle);
 
 	if (m_handle)
-		m_handle.promise().references.fetch_add(1, std::memory_order_acq_rel);
+		m_handle.promise().references.fetch_add(1, std::memory_order_relaxed);
 
 	return *this;
 }

@@ -76,17 +76,24 @@ auto SyncTaskPromiseBase<TResult>::final_suspend() noexcept
 	ZoneNamed(__tracy, static_cast<bool>(RUKEN_TRACE_SHOW_PROMISE_ZONES));
 
 	// Coroutine is reference counted for destruction
-	struct Awaiter: std::suspend_always
+	struct Awaiter
 	{
-		SyncTaskPromiseBase* promise;
+		[[nodiscard]]
+		static RkBool await_ready () noexcept { return false; }
+		static RkVoid await_resume() noexcept {}
 
-		RkBool await_ready() const noexcept {
-			return promise->references.fetch_sub(1, std::memory_order_acq_rel) == 1;
+		RkVoid await_suspend(std::coroutine_handle<SyncTaskPromise<TResult>> in_handle) const noexcept
+		{
+			if (in_handle.promise().references.fetch_sub(1, std::memory_order_release) == 1)
+			{
+				std::atomic_thread_fence(std::memory_order_acquire);
+				in_handle.destroy();
+			}
 		}
 	};
 
 	return FinalSuspendAwaiter<Awaiter> {
-		Awaiter {{}, this}, this
+		Awaiter {}, this
 	};
 }
 
