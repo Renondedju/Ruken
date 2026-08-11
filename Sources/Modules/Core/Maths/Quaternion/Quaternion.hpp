@@ -1,9 +1,7 @@
-
 #pragma once
 
-//#include "Maths/Matrix/Matrix.hpp"
-#include "Types/Units/Angle/Angle.hpp"
-#include "Maths/Vector/DistanceVector.hpp"
+#include "Core/Types/Units/Angle/Angle.hpp"
+#include "Core/Maths/Vector/DistanceVector.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -121,6 +119,14 @@ struct Quaternion
     static Quaternion Slerp(Quaternion const& in_lhs, Quaternion const& in_rhs, RkFloat in_ratio) noexcept;
 
     /**
+     * Creates a rotation that points in the direction vector.
+     * @param in_direction Direction to point to.
+     * @param in_up Up vector.
+     * @return Rotation.
+     */
+    static Quaternion LookAt(Vector3m in_direction, Vector3m in_up = Constants<Vector3m>::up) noexcept;
+
+    /**
      * @brief Computes the dot product between two quaternions
      * 
      * @param in_lhs Left hand side quaternion
@@ -151,14 +157,14 @@ struct Quaternion
     #pragma region Operators
 
     /**
-     * \brief Multiplies 2 quaternions together. This effectively represents combines the two rotations.
+     * @brief Multiplies 2 quaternions together. This effectively combines the two rotations.
      *
      * Rotating by the product lhs * rhs is the same as applying the two rotations in sequence: lhs first and then rhs,
      * relative to the reference frame resulting from lhs rotation. Note that this means rotations are not commutative,
      * so lhs * rhs does not give the same rotation as rhs * lhs.
      *
-     * \param in_other Right hand side quaternion
-     * \return Resulting rotation
+     * @param in_other Right hand side quaternion
+     * @return Resulting rotation
      */
     [[nodiscard]]
     constexpr Quaternion  operator*(Quaternion const& in_other) const noexcept;
@@ -182,6 +188,6 @@ struct Constants<Quaternion>
     static constexpr Quaternion identity = Quaternion();
 };
 
-#include "Quaternion.inl"
+END_RUKEN_NAMESPACE
 
-	END_RUKEN_NAMESPACE
+#include "Quaternion.inl"

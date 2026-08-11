@@ -1,4 +1,3 @@
-
 #include "Maths/Math.hpp"
 #include "Maths/Utility.hpp"
 #include "Maths/Trigonometry.hpp"
@@ -66,52 +65,18 @@ Quaternion& Quaternion::Normalized() noexcept
 
 #pragma region Static Methods
 
-template <RkBool TShortestPath>
-Quaternion Quaternion::Lerp(Quaternion const& in_lhs,
-                            Quaternion const& in_rhs,
-                            RkFloat    const  in_ratio) noexcept
+Quaternion Quaternion::LookAt(Vector3m const in_direction, Vector3m const in_up) noexcept
 {
-    RkFloat const conjugate_ratio = 1.0F - in_ratio;
+    // Project in_direction onto the plane who's normal vector is in_up
+    Vector3m   const projection     {in_up * in_direction.Dot(in_up)};
+    Vector3m   const flat_direction {in_direction - projection};
+    Quaternion const flat_rotation  {in_up.Cross(flat_direction), ArcCos(in_direction.Dot(flat_direction))};
 
-    if constexpr (TShortestPath)
-    {
-        RkFloat const sign = Quaternion::Dot(in_lhs, in_rhs) < 0.0F ? -1.0F : 1.0F;
 
-        return Quaternion(conjugate_ratio * in_lhs.w + sign * in_ratio * in_rhs.w,
-                          conjugate_ratio * in_lhs.x + sign * in_ratio * in_rhs.x,
-                          conjugate_ratio * in_lhs.y + sign * in_ratio * in_rhs.y,
-                          conjugate_ratio * in_lhs.z + sign * in_ratio * in_rhs.z);
-    }
 
-    return Quaternion(conjugate_ratio * in_lhs.w + in_ratio * in_rhs.w,
-                      conjugate_ratio * in_lhs.x + in_ratio * in_rhs.x,
-                      conjugate_ratio * in_lhs.y + in_ratio * in_rhs.y,
-                      conjugate_ratio * in_lhs.z + in_ratio * in_rhs.z);
-}
+    Quaternion const up_rotation    {};
 
-template <RkBool TShortestPath>
-Quaternion Quaternion::Slerp(Quaternion const& in_lhs,
-                             Quaternion const& in_rhs,
-                             RkFloat    const  in_ratio) noexcept
-{
-    RkFloat const dot_result {Quaternion::Dot(in_lhs, in_rhs)};
-    RkFloat const abs_dot    {Abs   (dot_result)};
-    Radians const theta      {ArcCos(abs_dot)};
-    RkFloat const sin_theta  {Sin   (theta)};
-
-    Quaternion const a = Quaternion::Scale(in_lhs, Sin(static_cast<Radians>(1.0F - in_ratio)) * static_cast<RkFloat>(theta) / sin_theta);
-
-    if constexpr (TShortestPath)
-    {
-        RkFloat    const sign = dot_result < 0.0F ? -1.0F : 1.0F;
-        Quaternion const b    = Quaternion::Scale(in_rhs, Sin(static_cast<Radians>(sign * in_ratio) * theta) / sin_theta);
-
-        return Quaternion::Add(a, b).Normalized();
-    }
-
-    Quaternion const b = Quaternion::Scale(in_rhs, Sin(static_cast<Radians>(in_ratio) * theta) / sin_theta);
-
-    return Quaternion::Add(a, b).Normalized();
+    return flat_rotation * up_rotation;
 }
 
 RkFloat Quaternion::Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept
