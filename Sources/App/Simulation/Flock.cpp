@@ -1,15 +1,15 @@
 #include "Flock.hpp"
 
-#include <random>
-
 #include "Core/JobSystem/Awaitables/Primitives/ParallelForChunk.hpp"
 #include "Core/Maths/Utility.hpp"
 #include "Core/Time/Clock.hpp"
-#include "Maths/Easing.hpp"
+#include "Core/Maths/Easing.hpp"
+
+#include <random>
 
 USING_RUKEN_NAMESPACE
 
-Flock::Flock(RkSize const in_size, RenderDevice& in_device):
+Flock::Flock(RkSize const in_size):
 	m_boids                  {in_size},
 	m_positions              {in_size, Constants<Vector3m>::zero},
 	m_velocities             {in_size},

@@ -34,8 +34,5 @@ struct Application
 	 */
 	AsyncTask<MainQueue> AsyncMain();
 
-	/// @brief A test main I use to debug stuff.
-	AsyncTask<MainQueue> AsyncTestMain();
-
 	#pragma endregion
 };

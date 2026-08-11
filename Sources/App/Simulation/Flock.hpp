@@ -40,9 +40,8 @@ struct Flock
 	/**
 	 * Default constructor.
 	 * @param in_size Amount of boids to summon
-	 * @param in_device
 	 */
-	explicit Flock(RkSize in_size, RenderDevice& in_device);
+	explicit Flock(RkSize in_size);
 	Flock(Flock const&) 		   = delete;
 	Flock(Flock&&)      		   = delete;
 	Flock& operator=(Flock const&) = delete;

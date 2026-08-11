@@ -70,40 +70,40 @@ AsyncTask<MainQueue> Application::AsyncMain()
 	resources->ProvideLoader  <SpirvLoader>   ();
 	resources->ProvideLoader  <ObjLoader>     ();
 
-	auto const boid_code {resources->Request<SpirvCode>(FilePath {
-		.location = EFilesystemLocation::ProjectDirectory,
-		.path     = "Basic.spv"
-	})};
 	auto const grid_code {resources->Request<SpirvCode>(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
 		.path     = "Grid.spv"
+	})};
+	auto const boid_code {resources->Request<SpirvCode>(FilePath {
+		.location = EFilesystemLocation::ProjectDirectory,
+		.path     = "Basic.spv"
 	})};
 	auto const boid_mesh {resources->Request<GPUMesh  >(FilePath {
 		.location = EFilesystemLocation::ProjectDirectory,
 		.path     = "arrow.obj"
 	})};
 
-	Flock flock {10'000, *renderer};
+	Flock flock {10'000};
 
 	// Waiting for resources
 	co_await WhenAll(
-		boid_mesh.LoadEvent(),
+		grid_code.LoadEvent(),
 		boid_code.LoadEvent(),
-		grid_code.LoadEvent()
+		boid_mesh.LoadEvent()
 	);
 
-	Window             window {*renderer, Constants<Vector2px>::standard_definition, "Coucou"};
 	TestWindowRenderer test_window_renderer {
-		.owner     = *renderer,
-		.window    = window,
-		.boid_code = *boid_code.Current(),
-		.grid_code = *grid_code.Current(),
-		.mesh      = boid_mesh,
-		.flock     = flock,
+		.owner      = *renderer,
+		.window     = *window,
+		.boid_code  = *boid_code.Current(),
+		.grid_code  = *grid_code.Current(),
+		.mesh       = boid_mesh,
+		.controller = *controller,
+		.flock      = flock,
 	};
 
 	// --- 2. Main Loop
-	while (!window.ShouldClose())
+	while (!window->ShouldClose())
 	{
 		FrameMark;
 		clock->Tick();
@@ -114,10 +114,5 @@ AsyncTask<MainQueue> Application::AsyncMain()
 	}
 
 	// --- 3. Cleanup
-	co_return;
-}
-
-AsyncTask<MainQueue> Application::AsyncTestMain()
-{
 	co_return;
 }
