@@ -13,7 +13,11 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 	Service			  {in_parent, typeid(RenderDevice)},
 	m_instance        {in_parent.LocateService<VulkanInstance>()},
 	m_physical_device {SelectPhysicalDevice()},
+	m_name			  {m_physical_device.getProperties2().properties.deviceName.data()},
 	m_device          {[&] {
+
+		if (auto const logger = in_parent.LocateService<Logger>())
+			logger->Info(service_name, "Attempting to initialize a render device named : {}", m_name);
 
 		// TODO: Feature sets (containing device features, extensions
 		//		 and ways to check for compatibility with a RenderDevice)
@@ -33,14 +37,11 @@ RenderDevice::RenderDevice(ServiceProvider& in_parent):
 			.pNext 					 = &features.get<>(),
 			.queueCreateInfoCount    = static_cast<uint32_t>(queue_create_info.size()),
 			.pQueueCreateInfos 		 = queue_create_info.data(),
-			.enabledLayerCount 		 = 0u,	       // Deprecated and ignored.
-			.ppEnabledLayerNames	 = nullptr,   // Deprecated and ignored.
 			.enabledExtensionCount	 = static_cast<uint32_t>(s_extensions.size()),
 			.ppEnabledExtensionNames = s_extensions.data(),
 			.pEnabledFeatures		 = nullptr // Deprecated
 		});
 	}()},
-	m_name		{m_physical_device.getProperties2().properties.deviceName.data()},
 	m_allocator	{[&] {
 
 		VmaVulkanFunctions			 vulkanFunctions { };
@@ -125,19 +126,6 @@ SharedMutex<FamilyView>* RenderDevice::FindQueueFamily(vk::QueueFlags const in_q
 		return nullptr;
 
 	return &m_family_views[best.first];
-}
-
-RkUint32 RenderDevice::FindMemoryType(RkUint32 const in_type_filter, vk::MemoryPropertyFlags const in_properties) const
-{
-	auto const memory_properties {m_physical_device.getMemoryProperties()};
-
-	for (RkUint32 i {0U}; i < memory_properties.memoryTypeCount; i++)
-		if ((in_type_filter & 1 << i) && (memory_properties.memoryTypes[i].propertyFlags & in_properties) == in_properties)
-			return i;
-
-	throw Exception("Failed to find a compatible GPU memory type");
-
-	std::unreachable();
 }
 
 RkVoid RenderDevice::InitTracyVkContext() noexcept

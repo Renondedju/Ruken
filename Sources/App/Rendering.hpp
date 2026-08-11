@@ -294,6 +294,7 @@ struct TestWindowRenderer
 	SpirvCode&              boid_code;
 	SpirvCode&              grid_code;
 	ResourceHandle<GPUMesh> mesh;
+	CameraController&		controller;
 	Flock&					flock;
 
 	std::array<vk::DescriptorPoolSize, 2> pool_sizes {
@@ -308,7 +309,7 @@ struct TestWindowRenderer
 		.pPoolSizes    = pool_sizes.data()
 	}};
 
-	TransformBufferStorage transform_buffer_storage {owner, descriptor_pool, 10'000, 3};
+	TransformBufferStorage transform_buffer_storage {owner, descriptor_pool, flock.BoidCount(), 3};
 	GridParametersStorage  grid_parameters_storage  {owner, descriptor_pool, 3};
 	CameraDataStorage      camera_data_storage	    {owner, descriptor_pool, 3};
 	ShaderModule	       boid_shader 				{owner, boid_code, std::vector{*transform_buffer_storage.layout, *camera_data_storage.layout}};
@@ -323,34 +324,26 @@ struct TestWindowRenderer
 	{
 		auto const& swapchain_ptr {window.GetSwapchain().Current()};
 		auto const  buffer_index  {frame_index % swapchain_ptr->images_views.size()};
-		auto const  extent        {window.GetExtent()};
-		auto const  aspect_ratio  {static_cast<RkFloat>(extent.width) / static_cast<RkFloat>(extent.height)};
+		auto const  size          {window.GetSize()};
+		auto const  extent        {vk::Extent2D {
+			.width  = static_cast<RkUint32>(size.Width ()),
+			.height = static_cast<RkUint32>(size.Height()),
+		}};
 
 		++frame_index;
-
-		float    distance {10.0f};
-		Vector3m position {
-			(Meters)(Sin(45_deg) * distance),
-			(Meters)distance,
-			(Meters)(Cos(45_deg) * distance)
-		};
 
 		// --- 1 Uniform buffers
 		transform_buffer_storage.Update(flock.GetTransforms(), buffer_index);
 		grid_parameters_storage .Update(GridParameters { }	 , buffer_index);
-		camera_data_storage	    .Update(CameraData {
-			position,
-			Matrix4x4::LookAtMatrix(position, {0_m, 0_m, 0_m}, Constants<Vector3m>::up),
-			Matrix4x4::PerspectiveProjectionMatrix(90_deg, aspect_ratio, 1_cm, 1_km),
-		}, buffer_index);
+		camera_data_storage	    .Update(controller.Update()  , buffer_index);
 
 		// --- 1.2 Pipeline & swapchain setup
 		vk::raii::Semaphore const  acquire_semaphore {owner .GetDevice(), vk::SemaphoreCreateInfo()};
 		vk::raii::Semaphore const  submit_semaphore  {owner .GetDevice(), vk::SemaphoreCreateInfo()};
 		vk::Viewport	    const  viewport          {
 			.x        = 0.0f, .y        = 0.0f,
-			.width    = static_cast<float>(extent.width),
-			.height   = static_cast<float>(extent.height),
+			.width    = static_cast<float>(size.Width ()),
+			.height   = static_cast<float>(size.Height()),
 			.minDepth = 0.0f, .maxDepth = 1.0f
 		};
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/ServiceProvider.hpp"
+#include "Core/Types/FundamentalTypes.hpp"
 
 #include <string_view>
 

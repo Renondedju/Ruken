@@ -15,7 +15,7 @@ VulkanLoaderInstance::VulkanLoaderInstance()
 		throw Exception("Cannot initialize GLFW.");
 }
 
-VulkanLoaderInstance::~VulkanLoaderInstance()
+VulkanLoaderInstance::~VulkanLoaderInstance() noexcept
 {
 	glfwTerminate();
 	volkFinalize ();

@@ -56,14 +56,6 @@ struct RenderDevice final : Service
 	 */
 	SharedMutex<FamilyView>* FindQueueFamily(vk::QueueFlags in_queue_flags);
 
-	/**
-	 * Attempts to find a suitable memory type.
-	 * @param in_type_filter Bitmask filter.
-	 * @param in_properties Required memory properties.
-	 * @return Memory type index.
-	 */
-	RkUint32 FindMemoryType(RkUint32 in_type_filter, vk::MemoryPropertyFlags in_properties) const;
-
 	#pragma endregion
 
 	private:
@@ -73,8 +65,8 @@ struct RenderDevice final : Service
 		// --- Device & Instance
 		VulkanInstance*			 m_instance;
 		vk::raii::PhysicalDevice m_physical_device;
-		vk::raii::Device		 m_device;
 		std::string 			 m_name;
+		vk::raii::Device		 m_device;
 		VmaAllocator			 m_allocator;
 
 		static inline std::vector<char const*> s_extensions {

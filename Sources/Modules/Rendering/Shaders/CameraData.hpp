@@ -24,6 +24,8 @@ struct CameraData
 		inverted_view_projection {inverted_projection * inverted_view}
 	{}
 
+	// This struct is uploaded to the GPU as is.
+	// Modifications here should be matched with the slang counterpart.
 	alignas(16) Vector3m  world_position;
 
 	alignas(16) Matrix4x4 view;

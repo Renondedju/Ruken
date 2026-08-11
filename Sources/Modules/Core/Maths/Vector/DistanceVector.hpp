@@ -59,6 +59,9 @@ struct RUKEN_EMPTY_BASES alignas(8) Vector<2, Distance<TDistanceUnit>> final:
 
 	#pragma region Getters/Setters
 
+	Distance<TDistanceUnit>&	   operator[](RkSize in_offset)		  noexcept { return data[in_offset]; }
+	Distance<TDistanceUnit> const& operator[](RkSize in_offset) const noexcept { return data[in_offset]; }
+
 	Distance<TDistanceUnit>&	   x()       noexcept { return data[0]; }
 	Distance<TDistanceUnit> const& x() const noexcept { return data[0]; }
 
@@ -96,6 +99,9 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<3, Distance<TDistanceUnit>> final:
 	Distance<TDistanceUnit> data[3];
 
 	#pragma region Getters/Setters
+
+	Distance<TDistanceUnit>&	   operator[](RkSize in_offset)		  noexcept { return data[in_offset]; }
+	Distance<TDistanceUnit> const& operator[](RkSize in_offset) const noexcept { return data[in_offset]; }
 
 	Distance<TDistanceUnit>&	   x()       noexcept { return data[0]; }
 	Distance<TDistanceUnit> const& x() const noexcept { return data[0]; }
@@ -142,6 +148,9 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 	Distance<TDistanceUnit> data[4];
 
 	#pragma region Getters/Setters
+
+	Distance<TDistanceUnit>&	   operator[](RkSize in_offset)		  noexcept { return data[in_offset]; }
+	Distance<TDistanceUnit> const& operator[](RkSize in_offset) const noexcept { return data[in_offset]; }
 
 	Distance<TDistanceUnit>&	   x()       noexcept { return data[0]; }
 	Distance<TDistanceUnit> const& x() const noexcept { return data[0]; }

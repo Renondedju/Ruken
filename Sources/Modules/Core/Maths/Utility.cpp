@@ -1,4 +1,3 @@
-
 #include <cmath>
 
 #include "Maths/Utility.hpp"

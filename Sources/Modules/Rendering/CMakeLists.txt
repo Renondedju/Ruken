@@ -12,7 +12,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(GLFW_BUILD_TESTS    OFF CACHE BOOL "")
 
 CPMAddPackage(URL "https://github.com/tinyobjloader/tinyobjloader/archive/refs/tags/v2.0.0rc13.zip" NAME tinyobjloader)
-CPMAddPackage(URL "https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip" NAME glfw)
+CPMAddPackage(URL "https://github.com/glfw/glfw/releases/download/3.5.1/glfw-3.5.1.zip" NAME glfw)
 CPMAddPackage(URL "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.3.0.zip" NAME vma)
 CPMAddPackage(URL "https://github.com/zeux/volk/archive/refs/tags/1.4.304.zip" NAME volk)
 
@@ -44,8 +44,12 @@ target_sources(RkRendering PUBLIC
         WorkGraph/Recordable.hpp
         Coroutines/TracyVkUtilities.hpp
         Windowing/Window.hpp
+        Windowing/WindowCallbackReceiver.hpp
         Vulkan/VulkanInstance.hpp
         Vulkan/VulkanLoaderInstance.hpp
+        Shaders/CameraData.hpp
+        Shaders/GridParameters.hpp
+        Shaders/TransformBuffer.hpp
 )
 
 target_sources(RkRendering PRIVATE

@@ -24,6 +24,8 @@
 
 // App includes
 #include "Application.hpp"
+
+#include "CameraController.hpp"
 #include "Rendering.hpp"
 #include "Universe.hpp"
 #include "Simulation/Flock.hpp"
@@ -58,12 +60,14 @@ AsyncTask<MainQueue> Application::AsyncMain()
 	};
 
 	// --- 1. Init
-	auto* clock      {root_services.LocateService <Clock>()};
-	auto* filesystem {root_services.ProvideService<StdFilesystem>("../Assets")};
-	auto* vulkan     {root_services.ProvideService<VulkanInstance>(vulkan_layers, vulkan_extensions)};
-	auto* renderer   {root_services.ProvideService<RenderDevice>()};
-	auto* importer   {root_services.ProvideService<AssetImporter>()};
-	auto* resources  {root_services.ProvideService<ResourceManager>()};
+	auto* clock      {root_services.LocateService <Clock		   >()};
+	auto* filesystem {root_services.ProvideService<StdFilesystem   >("../Assets")};
+	auto* vulkan     {root_services.ProvideService<VulkanInstance  >(vulkan_layers, vulkan_extensions)};
+	auto* renderer   {root_services.ProvideService<RenderDevice    >()};
+	auto* importer   {root_services.ProvideService<AssetImporter   >()};
+	auto* resources  {root_services.ProvideService<ResourceManager >()};
+	auto* window     {root_services.ProvideService<Window		   >(Constants<Vector2px>::standard_definition, "Boids Demo")};
+	auto* controller {root_services.ProvideService<CameraController>()};
 
 	// Initializing resources
 	importer ->ProvideImporter<SlangImporter> (); // TODO: Not used or working yet. Slang API is whack.

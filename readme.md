@@ -1,7 +1,7 @@
 # Ruken
  
-Ruken a is fully asynchronous, data oriented and Vulkan based game engine. Link to the latest release [here](https://github.com/Renondedju/Ruken/releases).
-This is a toy project meant for experimentation.
+Ruken is fully asynchronous, data oriented and Vulkan based game engine. Link to the latest release [here](https://github.com/Renondedju/Ruken/releases).  
+No generative AI was used and will ever be used for the development of this project. This is a toy project meant for experimentation.
 
 Here is the table of content :
 <!-- TOC -->

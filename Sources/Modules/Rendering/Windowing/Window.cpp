@@ -7,13 +7,27 @@
 
 USING_RUKEN_NAMESPACE
 
-Window::Window(RenderDevice& in_device, Vector2px const& in_size, std::string_view const in_name):
-	m_owner     {in_device},
+Window::Window(ServiceProvider& in_service_provider, Vector2px const& in_initial_size, std::string_view const in_name):
+	Service		{in_service_provider, typeid(Window)},
+	m_owner     {[&] -> RenderDevice& {
+
+		RenderDevice* device {in_service_provider.LocateService<RenderDevice>()};
+		if (!device)
+			throw Exception(
+				std::format(
+					"The window named '{}' could not be initialized because the service "
+					"provider named '{}' has not been able to locate a RenderDevice.",
+					in_name.data(), in_service_provider.GetName().data()
+				)
+			);
+
+		return *device;
+	}()},
 	m_window    {[&] { // -- 1. Creating the window
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		auto const window = glfwCreateWindow(
-			static_cast<int>(in_size.Width() ),
-			static_cast<int>(in_size.Height()),
+			static_cast<int>(in_initial_size.Width() ),
+			static_cast<int>(in_initial_size.Height()),
 			in_name.data(), nullptr, nullptr
 		);
 
@@ -33,7 +47,16 @@ Window::Window(RenderDevice& in_device, Vector2px const& in_size, std::string_vi
 		return vk::raii::SurfaceKHR {m_owner.GetInstance(), surface};
 	}()}
 {
+	// Setting up handlers
 	glfwSetFramebufferSizeCallback(m_window, &Window::GLFWFramebufferResizeCallback);
+	glfwSetMouseButtonCallback    (m_window, &Window::GLFWMouseButtonCallback);
+	glfwSetScrollCallback         (m_window, &Window::GLFWScrollCallback);
+	glfwSetCursorPosCallback      (m_window, &Window::GLFWCursorPositionCallback);
+	glfwSetCursorEnterCallback    (m_window, &Window::GLFWCursorEnterExitCallback);
+	glfwSetKeyCallback            (m_window, &Window::GLFWKeyCallback);
+	glfwSetCharCallback           (m_window, &Window::GLFWCharacterCallback);
+	glfwSetDropCallback           (m_window, &Window::GLFWDropCallback);
+
 	RecreateSwapchain();
 }
 
@@ -42,14 +65,13 @@ Window::~Window()
 	glfwDestroyWindow(m_window);
 }
 
-vk::Extent2D Window::GetExtent() const noexcept
+Vector2px Window::GetSize() const noexcept
 {
 	int width, height {};
 	glfwGetFramebufferSize(m_window, &width, &height);
 
-	return vk::Extent2D {
-		.width  = static_cast<uint32_t>(width),
-		.height = static_cast<uint32_t>(height)
+	return Vector2px {
+		static_cast<Pixels>(width), static_cast<Pixels>(height)
 	};
 }
 
@@ -58,9 +80,87 @@ RkBool Window::ShouldClose() const noexcept
 	return glfwWindowShouldClose(m_window);
 }
 
-RkVoid Window::GLFWFramebufferResizeCallback(GLFWwindow* window, int, int) noexcept
+GLFWwindow* Window::GLFWHandle() const noexcept
 {
-	static_cast<Window*>(glfwGetWindowUserPointer(window))->RecreateSwapchain();
+	return m_window;
+}
+
+RkVoid Window::AddCallbackReceiver(WindowCallbackReceiver* in_callback_receiver) noexcept
+{
+	m_callback_receivers.emplace_back(in_callback_receiver);
+}
+
+RkVoid Window::GLFWFramebufferResizeCallback(GLFWwindow* in_window, int const in_width, int const in_height)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	window->RecreateSwapchain();
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->FramebufferResizeCallback(*window, in_width, in_height);
+}
+
+RkVoid Window::GLFWMouseButtonCallback(GLFWwindow* in_window, int const in_button, int const in_action, int const in_mods)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->MouseButtonCallback(*window, in_button, in_action, in_mods);
+}
+
+RkVoid Window::GLFWScrollCallback(GLFWwindow* in_window, double const in_x_offset, double const in_y_offset)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->ScrollCallback(*window, in_x_offset, in_y_offset);
+}
+
+RkVoid Window::GLFWCursorPositionCallback(GLFWwindow* in_window, double const in_x_position, double const in_y_position)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->CursorPositionCallback(*window, in_x_position, in_y_position);
+}
+
+RkVoid Window::GLFWCursorEnterExitCallback(GLFWwindow* in_window, int const in_entered)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->CursorEnterExitCallback(*window, in_entered);
+}
+
+RkVoid Window::GLFWKeyCallback(GLFWwindow* in_window, int const in_key, int const in_scancode, int const in_action, int const in_modifiers)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->KeyCallback(*window, in_key, in_scancode, in_action, in_modifiers);
+}
+
+RkVoid Window::GLFWCharacterCallback(GLFWwindow* in_window, unsigned int const in_character)
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->CharacterCallback(*window, in_character);
+}
+
+RkVoid Window::GLFWDropCallback(GLFWwindow* in_window, int const in_path_count, const char* in_paths[])
+{
+	Window* window {static_cast<Window*>(glfwGetWindowUserPointer(in_window))};
+	RUKEN_ASSERT(window != nullptr, "The glfw window user pointer should be set.");
+
+	for (auto* receiver : window->m_callback_receivers)
+		receiver->DropCallback(*window, in_path_count, in_paths);
 }
 
 RkVoid Window::RecreateSwapchain()

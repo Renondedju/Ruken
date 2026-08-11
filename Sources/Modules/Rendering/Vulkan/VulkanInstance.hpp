@@ -9,7 +9,6 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-
 /// @brief Stores and manages the project-wide Vulkan instance.
 struct VulkanInstance final: Service
 {

@@ -4,7 +4,7 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-/// @brief Volk instance
+/// @brief Volk & GLFW instance
 struct VulkanLoaderInstance
 {
 	explicit VulkanLoaderInstance();

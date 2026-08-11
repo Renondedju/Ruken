@@ -7,9 +7,10 @@
 #include <typeindex>
 #include <unordered_map>
 
-BEGIN_RUKEN_NAMESPACE
+#include "Types/FundamentalTypes.hpp"
 
-struct Service;
+BEGIN_RUKEN_NAMESPACE
+	struct Service;
 
 /// @brief Locates and provides services using a tree-like structure.
 class ServiceProvider
@@ -40,13 +41,13 @@ class ServiceProvider
         #pragma region Methods
 
         /**
-         * \brief Provides and holds a service to allow others parts of the code to locate it later on if needed
+         * @brief Provides and holds a service to allow others parts of the code to locate it later on if needed
          *
-         * \tparam TService Service type, must inherit from the Service class
-         * \tparam TArgs TService constructor types, excluding the service provider instance type
-         * \param in_args Arguments to pass to the TService constructor, excluding the service provider instance.
-         * \warning Providing a service that has already been provided will override the previous instance.
-         * \return New service instance.
+         * @tparam TService Service type, must inherit from the Service class
+         * @tparam TArgs TService constructor types, excluding the service provider instance type
+         * @param in_args Arguments to pass to the TService constructor, excluding the service provider instance.
+         * @warning Providing a service that has already been provided will override the previous instance.
+         * @return New service instance.
          */
         template <typename TService, typename... TArgs>
 			requires std::is_constructible_v<TService, ServiceProvider&, TArgs...>

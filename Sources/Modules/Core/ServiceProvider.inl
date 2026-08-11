@@ -1,9 +1,10 @@
 #pragma once
 
-#include <tracy/Tracy.hpp>
+#include "Core/Service.hpp"
+#include "Core/Debug/Assert.hpp"
+#include "Core/ServiceProvider.hpp"
 
-#include "Debug/Assert.hpp"
-#include "ServiceProvider.hpp"
+#include <tracy/Tracy.hpp>
 
 BEGIN_RUKEN_NAMESPACE
 

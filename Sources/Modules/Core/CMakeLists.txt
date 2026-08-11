@@ -14,7 +14,7 @@ target_sources(RkCore PUBLIC
         FILE_SET HEADERS FILES
     JobSystem/Awaitables/AwaitableTraits.hpp
     Time/Clock.hpp
-        Debug/RAIISentinel.hpp
+    Debug/RAIISentinel.hpp
     Bitwise/Bitmask.hpp
     Bitwise/Endian.hpp
     Bitwise/SizedBitmask.hpp
@@ -160,8 +160,8 @@ target_sources(RkCore PUBLIC
     Utility/WindowsOS.hpp
     Bitwise/Bitmask.inl
     Bitwise/SizedBitmask.inl
-        JobSystem/Awaitables/AsyncTask/AsyncTask.inl
-        JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp
+    JobSystem/Awaitables/AsyncTask/AsyncTask.inl
+    JobSystem/Awaitables/SyncTask/SyncTaskResult.hpp
     Service.inl
     ServiceProvider.inl
     Maths/Quaternion/Quaternion.inl
@@ -170,11 +170,11 @@ target_sources(RkCore PUBLIC
     Types/Units/Duration/Duration.inl
     Debug/Trace.hpp
     Debug/SourceLocation.hpp
-        JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.inl
+    JobSystem/Awaitables/AsyncTask/AsyncTaskPromise.inl
     Meta/FirstOf.hpp
     JobSystem/Awaitables/Primitives/WhenAll.hpp
     JobSystem/Awaitables/SignalReceiver.hpp
-        JobSystem/Awaitables/AsyncAwaiter.hpp
+    JobSystem/Awaitables/AsyncAwaiter.hpp
     JobSystem/Awaitables/Primitives/SharedMutex.hpp
     JobSystem/Awaitables/Primitives/SharedMutex.inl
     JobSystem/Awaitables/Primitives/AutomaticResetEvent.inl
@@ -190,7 +190,7 @@ target_sources(RkCore PUBLIC
 
 target_sources(RkCore PRIVATE
     Time/Clock.cpp
-        Debug/RAIISentinel.cpp
+    Debug/RAIISentinel.cpp
     JobSystem/Awaitables/Primitives/CountDownLatch.cpp
     JobSystem/JobQueue.cpp
     JobSystem/JobSystem.cpp

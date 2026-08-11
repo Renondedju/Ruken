@@ -15,10 +15,10 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * \brief Compute the arc cosine of an angle given in radians
- * \param in_angle Input angle
+ * \param in_dot Input angle
  * \return Arc cosine of in_value
  */
-[[nodiscard]] Radians ArcCos(RkFloat in_angle) noexcept;
+[[nodiscard]] Radians ArcCos(RkFloat in_dot) noexcept;
 
 /**
  * \brief Compute the sine of an angle given in radians

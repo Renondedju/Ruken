@@ -10,9 +10,9 @@ RkFloat RUKEN_NAMESPACE::Cos(Radians const in_angle) noexcept
     return std::cosf(static_cast<RkFloat>(in_angle));
 }
 
-Radians RUKEN_NAMESPACE::ArcCos(RkFloat const in_angle) noexcept
+Radians RUKEN_NAMESPACE::ArcCos(RkFloat const in_dot) noexcept
 {
-    return static_cast<Radians>(std::acosf(in_angle));
+    return static_cast<Radians>(std::acosf(in_dot));
 }
 
 RkFloat RUKEN_NAMESPACE::Sin(Radians const in_angle) noexcept
