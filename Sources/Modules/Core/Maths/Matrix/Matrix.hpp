@@ -228,6 +228,10 @@ struct Matrix
         requires (TColumns == TOtherRows)
     constexpr Matrix<TRows, TOtherColumns> operator*(Matrix<TOtherRows, TOtherColumns> const& in_matrix) const noexcept;
 
+    template <RkSize TVectorSize, EDistanceUnit TDistanceUnit>
+        requires (TColumns == TVectorSize)
+    constexpr Vector<TVectorSize, Distance<TDistanceUnit>> operator*(Vector<TVectorSize, Distance<TDistanceUnit>> const& in_vector) const noexcept;
+
     /**
      * @brief Multiplies this matrix with another and assigns the result into this matrix (A = A * B).
      * @param in_matrix Other matrix to be multiplied with.

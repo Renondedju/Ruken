@@ -341,6 +341,23 @@ constexpr Matrix<TRows, TOtherColumns> Matrix<TRows, TColumns>::operator*
 }
 
 template<RkSize TRows, RkSize TColumns>
+template<RkSize TVectorSize, EDistanceUnit TDistanceUnit> requires (TColumns == TVectorSize)
+constexpr Vector<TVectorSize, Distance<TDistanceUnit>>  Matrix<TRows, TColumns>::operator*
+	(Vector<TVectorSize, Distance<TDistanceUnit>> const& in_vector) const noexcept
+{
+	Vector<TVectorSize, Distance<TDistanceUnit>> new_vector;
+
+	for (RkSize row {0ULL}; row < TRows; ++row)
+	{
+		new_vector[row] = Distance<TDistanceUnit>(.0f);
+		for (RkSize other_row {0ULL}; other_row < TVectorSize; ++other_row)
+			new_vector[row] += Distance<TDistanceUnit>((*this)[row, other_row] * static_cast<RkFloat>(in_vector[other_row]));
+	}
+
+	return new_vector;
+}
+
+template<RkSize TRows, RkSize TColumns>
 constexpr Matrix<TRows, TColumns>& Matrix<TRows, TColumns>::operator*=(Matrix const& in_matrix) noexcept
 {
 	*this = *this * in_matrix;
