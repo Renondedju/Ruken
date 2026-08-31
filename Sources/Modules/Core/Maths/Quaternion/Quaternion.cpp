@@ -70,13 +70,12 @@ Quaternion Quaternion::LookAt(Vector3m const in_direction, Vector3m const in_up)
     // Project in_direction onto the plane who's normal vector is in_up
     Vector3m   const projection     {in_up * in_direction.Dot(in_up)};
     Vector3m   const flat_direction {in_direction - projection};
-    Quaternion const flat_rotation  {in_up.Cross(flat_direction), ArcCos(in_direction.Dot(flat_direction))};
 
+    // Rotations
+    Quaternion const yaw   {in_up,                     ArcCos(Constants<Vector3m>::forward.Dot(flat_direction))};
+    Quaternion const pitch {in_up.Cross(in_direction), ArcCos(flat_direction              .Dot(in_direction  ))};
 
-
-    Quaternion const up_rotation    {};
-
-    return flat_rotation * up_rotation;
+    return yaw * pitch;
 }
 
 RkFloat Quaternion::Dot(Quaternion const& in_lhs, Quaternion const& in_rhs) noexcept

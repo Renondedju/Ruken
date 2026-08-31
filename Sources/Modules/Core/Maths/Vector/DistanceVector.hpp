@@ -137,6 +137,16 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<3, Distance<TDistanceUnit>> final:
 		data {in_x, in_y, in_z}
 	{}
 
+	constexpr Vector(Vector<2, Distance<TDistanceUnit>> const& in_xy,
+					 Distance<TDistanceUnit>			const  in_z) noexcept:
+		data {in_xy.x(), in_xy.y(), in_z}
+	{}
+
+	constexpr Vector(Distance<TDistanceUnit>			const  in_x,
+					 Vector<2, Distance<TDistanceUnit>> const& in_yz) noexcept:
+		data {in_x, in_yz.x(), in_yz.y()}
+	{}
+
     #pragma endregion
 };
 
@@ -181,6 +191,52 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 					 Distance<TDistanceUnit> const in_w) noexcept:
 		data {in_x, in_y, in_z, in_w}
 	{}
+
+	constexpr Vector(Vector<2, Distance<TDistanceUnit>> const& in_xy,
+					 Distance<TDistanceUnit>			const  in_z,
+					 Distance<TDistanceUnit>			const  in_w) noexcept:
+		data {in_xy.x(), in_xy.y(), in_z, in_w}
+	{}
+
+	constexpr Vector(Distance<TDistanceUnit>			const  in_x,
+					 Vector<2, Distance<TDistanceUnit>> const& in_yz,
+					 Distance<TDistanceUnit>			const  in_w) noexcept:
+		data {in_x, in_yz.x(), in_yz.y(), in_w}
+	{}
+
+	constexpr Vector(Distance<TDistanceUnit>			const  in_x,
+					 Distance<TDistanceUnit>			const  in_y,
+					 Vector<2, Distance<TDistanceUnit>> const& in_zw) noexcept:
+		data {in_x, in_y, in_zw.x(), in_zw.y()}
+	{}
+
+	constexpr Vector(Vector<2, Distance<TDistanceUnit>> const& in_xy,
+					 Vector<2, Distance<TDistanceUnit>> const& in_zw) noexcept:
+		data {in_xy.x(), in_xy.y(), in_zw.x(), in_zw.y()}
+	{}
+
+	constexpr Vector(Vector<3, Distance<TDistanceUnit>> const& in_xyz,
+					 Distance<TDistanceUnit>			const  in_w	) noexcept:
+		data {in_xyz.x(), in_xyz.y(), in_xyz.z(), in_w}
+	{}
+
+	constexpr Vector(Distance<TDistanceUnit>			const  in_x,
+					 Vector<3, Distance<TDistanceUnit>> const& in_yzw) noexcept:
+		data {in_x, in_yzw.x(), in_yzw.y(), in_yzw.z()}
+	{}
+
+	#pragma endregion
+
+	#pragma region Methods
+
+	Vector<3, Distance<TDistanceUnit>> Homogenize() const noexcept
+	{
+		return Vector<3, Distance<TDistanceUnit>>{
+			data[0] / data[3],
+			data[1] / data[3],
+			data[2] / data[3],
+		};
+	}
 
 	#pragma endregion
 };

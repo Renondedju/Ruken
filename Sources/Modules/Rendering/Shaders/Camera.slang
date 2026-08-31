@@ -2,8 +2,6 @@ module Camera;
 
 public struct CameraData
 {
-    public float3   world_position;
-
     public float4x4 view;
     public float4x4 projection;
     public float4x4 view_projection;
@@ -11,4 +9,9 @@ public struct CameraData
     public float4x4 inverted_view;
     public float4x4 inverted_projection;
     public float4x4 inverted_view_projection;
+
+    public float3   world_position;
+    public float3   near_plane_position;
+    public float3   far_plane_position;
+    public float3   forward;
 };

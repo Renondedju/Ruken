@@ -14,20 +14,21 @@ BEGIN_RUKEN_NAMESPACE
 
 struct CameraData
 {
-	explicit CameraData(Vector3m const& in_position, Matrix4x4 const& in_view, Matrix4x4 const& in_projection) noexcept:
-		world_position  		 {in_position},
+	explicit CameraData(Matrix4x4 const& in_view, Matrix4x4 const& in_projection) noexcept:
 		view					 {in_view},
 		projection				 {in_projection},
 		view_projection 		 {view * projection},
 		inverted_view			 {view		.Inverted()},
 		inverted_projection 	 {projection.Inverted()},
-		inverted_view_projection {inverted_projection * inverted_view}
+		inverted_view_projection {inverted_projection * inverted_view},
+		world_position			 {Meters(inverted_view.data[12]), Meters(inverted_view.data[13]), Meters(inverted_view.data[14])},
+		near_plane_position      {(inverted_view_projection * Vector4m(0_m, 0_m, -1_m, 1_m)).Homogenize()},
+		far_plane_position       {(inverted_view_projection * Vector4m(0_m, 0_m,  1_m, 1_m)).Homogenize()},
+		forward					 {(far_plane_position - near_plane_position).Normalized()}
 	{}
 
 	// This struct is uploaded to the GPU as is.
 	// Modifications here should be matched with the slang counterpart.
-	alignas(16) Vector3m  world_position;
-
 	alignas(16) Matrix4x4 view;
 	alignas(16) Matrix4x4 projection;
 	alignas(16) Matrix4x4 view_projection;
@@ -35,6 +36,11 @@ struct CameraData
 	alignas(16) Matrix4x4 inverted_view;
 	alignas(16) Matrix4x4 inverted_projection;
 	alignas(16) Matrix4x4 inverted_view_projection;
+
+	alignas(16) Vector3m  world_position;
+	alignas(16) Vector3m  near_plane_position;
+	alignas(16) Vector3m  far_plane_position;
+	alignas(16) Vector3m  forward;
 };
 
 /**

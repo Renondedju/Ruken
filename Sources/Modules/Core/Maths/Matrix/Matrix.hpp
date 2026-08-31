@@ -210,7 +210,7 @@ struct Matrix
 
 
     [[nodiscard]]
-    constexpr Matrix Inverted() noexcept
+    constexpr Matrix Inverted() const noexcept
         requires (TRows == 4 && TColumns == 4);
 
     #pragma endregion

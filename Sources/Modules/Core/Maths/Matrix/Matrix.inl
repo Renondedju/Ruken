@@ -270,7 +270,7 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::TranslationMatrix(Vec
 }
 
 template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::Inverted() noexcept requires (TRows == 4 && TColumns == 4)
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::Inverted() const noexcept requires (TRows == 4 && TColumns == 4)
 {
 	float A2323 = (*this)[2, 2] * (*this)[3, 3] - (*this)[2, 3] * (*this)[3, 2];
 	float A1323 = (*this)[2, 1] * (*this)[3, 3] - (*this)[2, 3] * (*this)[3, 1];

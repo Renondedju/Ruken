@@ -32,7 +32,7 @@ struct CameraController : Service, WindowCallbackReceiver
 
 	RkVoid ScrollCallback		 (Window& in_window, double in_x_offset, double in_y_offset)	override;
 	RkVoid MouseButtonCallback   (Window& in_window, int in_button, int in_action, int in_mods) override;
-	RkVoid CursorPositionCallback(Window& in_window, double in_x_position, double in_y_offset)  override;
+	RkVoid CursorPositionCallback(Window& in_window, double in_x_position, double in_y_position)  override;
 
 	#pragma endregion
 
@@ -44,24 +44,35 @@ struct CameraController : Service, WindowCallbackReceiver
 		RkVoid Rotate      ();
 		RkVoid Zoom		   (RkFloat in_offset);
 		RkVoid Move        ();
-		RkVoid Pan         ();
+		RkVoid Pan         (Vector2px in_start, Vector2px in_end);
 
 		#pragma endregion
 
 		#pragma region members
 
+		enum class EMovementMode
+		{
+			None,
+			Pan
+		};
+
 		// Services
 		Window*	   m_window;
 		Clock*     m_clock;
 
+		// Movement
+		Vector2px	  m_screen_start_position {};
+		Vector3m	   m_world_start_position {};
+		EMovementMode m_current_movement_mode {EMovementMode::None};
+
 		// Camera interpolation data
 		Vector3m   m_current_position {};
-		Quaternion m_current_rotation {};
-		Vector3m   m_target_position  {};
-		Quaternion m_target_rotation  {};
+		Quaternion m_current_rotation {Quaternion {10_deg, -0_deg, 0_deg}};
+		Vector3m   m_target_position  {m_current_position};
+		Quaternion m_target_rotation  {m_current_rotation};
 
 		// Data to be uploaded on the GPU
-		CameraData m_camera_data    {{}, {}, {}};
+		CameraData m_camera_data    {{}, {}};
 
 		#pragma endregion
 };

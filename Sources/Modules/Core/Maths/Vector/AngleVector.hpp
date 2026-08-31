@@ -117,6 +117,16 @@ struct RUKEN_EMPTY_BASES Vector<3, Angle<TAngleUnit>> final:
 		data {in_pitch, in_yaw, in_roll}
 	{}
 
+	constexpr Vector(Vector<2, Angle<TAngleUnit>> const& in_xy,
+					 Angle<TAngleUnit>			  const  in_z) noexcept:
+		data {in_xy.x(), in_xy.y(), in_z}
+	{}
+
+	constexpr Vector(Angle<TAngleUnit>			  const  in_x,
+					 Vector<2, Angle<TAngleUnit>> const& in_yz) noexcept:
+		data {in_x, in_yz.x(), in_yz.y()}
+	{}
+
 	#pragma endregion
 };
 

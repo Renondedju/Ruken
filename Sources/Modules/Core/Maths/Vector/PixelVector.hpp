@@ -27,6 +27,9 @@ struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
 
 	#pragma region Getters/Setters
 
+	Pixels&	      operator[](RkSize const in_offset)	   noexcept { return data[in_offset]; }
+	Pixels const& operator[](RkSize const in_offset) const noexcept { return data[in_offset]; }
+
 	Pixels&		  x()       noexcept { return data[0]; }
 	Pixels const& x() const noexcept { return data[0]; }
 
@@ -78,6 +81,9 @@ struct RUKEN_EMPTY_BASES Vector<3, Pixels> final:
 
 	#pragma region Getters/Setters
 
+	Pixels&	      operator[](RkSize const in_offset)	   noexcept { return data[in_offset]; }
+	Pixels const& operator[](RkSize const in_offset) const noexcept { return data[in_offset]; }
+
 	Pixels&	      x()       noexcept { return data[0]; }
 	Pixels const& x() const noexcept { return data[0]; }
 
@@ -106,6 +112,16 @@ struct RUKEN_EMPTY_BASES Vector<3, Pixels> final:
 
 	constexpr Vector(Pixels const in_width, Pixels const in_height, Pixels const in_depth) noexcept:
 		data {in_width, in_height, in_depth}
+	{}
+
+	constexpr Vector(Vector<2, Pixels> const& in_xy,
+					 Pixels			   const  in_depth) noexcept:
+	data {in_xy.x(), in_xy.y(), in_depth}
+	{}
+
+	constexpr Vector(Pixels			   const  in_width,
+					 Vector<2, Pixels> const& in_yz) noexcept:
+		data {in_width, in_yz.x(), in_yz.y()}
 	{}
 
 	#pragma endregion

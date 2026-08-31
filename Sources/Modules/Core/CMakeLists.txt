@@ -87,7 +87,8 @@ target_sources(RkCore PUBLIC
     Maths/MinMax.hpp
     Maths/Trigonometry.hpp
     Maths/Utility.hpp
-    Maths/Vector4f.hpp
+    Maths/Vector/VectorCast.hpp
+    Maths/Vector/ScalarVector.hpp
     Debug/Assert.hpp
     Meta/CommonTypeFallback.hpp
     Meta/CopyConst.hpp
@@ -100,7 +101,7 @@ target_sources(RkCore PUBLIC
     Meta/MinimumType.hpp
     Meta/PassConst.hpp
     Meta/Safety.hpp
-        Meta/Empty.hpp
+    Meta/Empty.hpp
     Meta/TupleApply.hpp
     Meta/TupleHasType.hpp
     Meta/TupleIndex.hpp
