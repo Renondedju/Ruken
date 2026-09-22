@@ -39,89 +39,84 @@ namespace internal
  * \note Enum classes are supported
  */
 template <typename TEnumType>
-class RUKEN_NO_VTABLE Bitmask : public SizedBitmask<1, std::underlying_type_t<TEnumType>>
+struct RUKEN_NO_VTABLE Bitmask : SizedBitmask<1, std::underlying_type_t<TEnumType>>
 {
     RUKEN_STATIC_ASSERT(std::is_enum_v<TEnumType>, "Cannot create a Bitmask from a non enum type");
 
-    public:
+    using Parent         = SizedBitmask<1, std::underlying_type_t<TEnumType>>;
+    using UnderlyingType = std::underlying_type_t<TEnumType>;
 
-        using Parent         = SizedBitmask<1, std::underlying_type_t<TEnumType>>;
-        using UnderlyingType = std::underlying_type_t<TEnumType>;
+    #pragma region Lifetime
 
-        #pragma region Constructors
+    template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
+    explicit constexpr Bitmask(TData... in_data) noexcept;
+    constexpr  Bitmask(Bitmask const&) = default;
+    constexpr  Bitmask(Bitmask&&     ) = default;
+    Bitmask& operator=(Bitmask const&) = default;
+    Bitmask& operator=(Bitmask&&     ) = default;
+    ~Bitmask()                noexcept = default;
 
-        template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        constexpr Bitmask(TData... in_data) noexcept;
+    #pragma endregion
 
-        constexpr Bitmask(Bitmask const& in_copy) = default;
-        constexpr Bitmask(Bitmask&&      in_move) = default;
+    #pragma region Methods
 
-        #pragma endregion
+    /**
+     * \brief Checks if the bitmask has all the flags passed as enabled.
+     * \tparam TData Types of the flags to check
+     * \param in_data Flags to check
+     * \return True if the bitmask has all the specified flags enabled
+     */
+    template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
+    [[nodiscard]] constexpr RkBool HasAll(TData...       in_data)    const noexcept;
+    [[nodiscard]] constexpr RkBool HasAll(Bitmask const& in_bitmask) const noexcept;
 
-        ~Bitmask() noexcept = default;
+    /**
+     * \brief Checks if the bitmask has at least one the flags passed as enabled.
+     * \tparam TData Types of the flags to check
+     * \param in_data Flags to check
+     * \return True if the bitmask has at least one of the specified flags enabled
+     */
+    template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
+    [[nodiscard]] constexpr RkBool HasOne(TData...       in_data)    const noexcept;
+    [[nodiscard]] constexpr RkBool HasOne(Bitmask const& in_bitmask) const noexcept;
 
-        #pragma region Methods
+    /**
+     * \brief Enables the specified flags.
+     * \tparam TData Types of the flags to enable
+     * \param in_data Flags to enable
+     */
+    template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
+    constexpr RkVoid Add(TData...       in_data)    noexcept;
+    constexpr RkVoid Add(Bitmask const& in_bitmask) noexcept;
 
-        /**
-         * \brief Checks if the bitmask has all the flags passed as enabled.
-         * \tparam TData Types of the flags to check
-         * \param in_data Flags to check
-         * \return True if the bitmask has all the specified flags enabled
-         */
-        template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        [[nodiscard]] constexpr RkBool HasAll(TData...       in_data)    const noexcept;
-        [[nodiscard]] constexpr RkBool HasAll(Bitmask const& in_bitmask) const noexcept;
+    /**
+     * \brief Disables the specified flags.
+     * \tparam TData Types of the flags to disable
+     * \param in_data Flags to disable
+     */
+    template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
+    constexpr RkVoid Remove(TData...       in_data)    noexcept;
+    constexpr RkVoid Remove(Bitmask const& in_bitmask) noexcept;
 
-        /**
-         * \brief Checks if the bitmask has at least one the flags passed as enabled.
-         * \tparam TData Types of the flags to check
-         * \param in_data Flags to check
-         * \return True if the bitmask has at least one of the specified flags enabled
-         */
-        template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        [[nodiscard]] constexpr RkBool HasOne(TData...       in_data)    const noexcept;
-        [[nodiscard]] constexpr RkBool HasOne(Bitmask const& in_bitmask) const noexcept;
+    /**
+     * \brief Executes a function pointer on each enabled flag in the bitmask.
+     * \tparam TLambdaType Type of the lambda, the signature of the function used must be RkVoid (*in_lambda)(TEnumType in_flag)
+     * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
+     */
+    template <typename TLambdaType>
+    constexpr RkVoid Foreach(TLambdaType in_lambda) const noexcept;
 
-        /**
-         * \brief Enables the specified flags.
-         * \tparam TData Types of the flags to enable
-         * \param in_data Flags to enable
-         */
-        template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        constexpr RkVoid Add(TData...       in_data)    noexcept;
-        constexpr RkVoid Add(Bitmask const& in_bitmask) noexcept;
+    #pragma endregion
 
-        /**
-         * \brief Disables the specified flags.
-         * \tparam TData Types of the flags to disable
-         * \param in_data Flags to disable
-         */
-        template <typename... TData, internal::AreEnumType<TEnumType, TData...> = true>
-        constexpr RkVoid Remove(TData...       in_data)    noexcept;
-        constexpr RkVoid Remove(Bitmask const& in_bitmask) noexcept;
+    #pragma region Operators
 
-        /**
-         * \brief Executes a function pointer on each enabled flag in the bitmask.
-         * \tparam TLambdaType Type of the lambda, the signature of the function used must be RkVoid (*in_lambda)(TEnumType in_flag)
-         * \param in_lambda Function pointer or lambda (in case of a lambda, this will automatically be inlined by the compiler)
-         */
-        template <typename TLambdaType>
-        constexpr RkVoid Foreach(TLambdaType in_lambda) const noexcept;
+    [[nodiscard]] constexpr Bitmask operator-(TEnumType const& in_bit) const noexcept;
+    [[nodiscard]] constexpr Bitmask operator+(TEnumType const& in_bit) const noexcept;
 
-        #pragma endregion
+    constexpr Bitmask& operator-=(TEnumType const& in_bit) noexcept;
+    constexpr Bitmask& operator+=(TEnumType const& in_bit) noexcept;
 
-        #pragma region Operators
-
-        Bitmask& operator= (Bitmask const& in_copy) = default;
-        Bitmask& operator= (Bitmask&&      in_move) = default;
-
-        [[nodiscard]] constexpr Bitmask operator-(TEnumType const& in_bit) const noexcept;
-        [[nodiscard]] constexpr Bitmask operator+(TEnumType const& in_bit) const noexcept;
-
-        constexpr Bitmask& operator-=(TEnumType const& in_bit) noexcept;
-        constexpr Bitmask& operator+=(TEnumType const& in_bit) noexcept;
-
-        #pragma endregion
+    #pragma endregion
 };
 
 #include "Bitmask.inl"
