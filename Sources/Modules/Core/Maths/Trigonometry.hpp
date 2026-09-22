@@ -48,4 +48,12 @@ BEGIN_RUKEN_NAMESPACE
  */
 [[nodiscard]] Radians ArcTan(RkFloat in_angle) noexcept;
 
+/**
+ * \brief Compute the arc tangent of an angle given in radians
+ * \param in_x
+ * \param in_y
+ * \return The tangent of in_value
+ */
+[[nodiscard]] Radians ArcTan2(RkFloat in_x, RkFloat in_y) noexcept;
+
 END_RUKEN_NAMESPACE

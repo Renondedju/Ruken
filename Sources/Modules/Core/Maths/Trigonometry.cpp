@@ -34,3 +34,8 @@ Radians RUKEN_NAMESPACE::ArcTan(RkFloat const in_angle) noexcept
 {
     return static_cast<Radians>(std::atanf(in_angle));
 }
+
+Radians RUKEN_NAMESPACE::ArcTan2(RkFloat const in_x, RkFloat const in_y) noexcept
+{
+    return static_cast<Radians>(std::atan2f(in_x, in_y));
+}
