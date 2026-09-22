@@ -2,10 +2,10 @@
 
 #include "Core/Types/Units/Angle/Angle.hpp"
 #include "Core/Maths/Vector/DistanceVector.hpp"
+#include "Maths/Vector/AngleVector.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-
-/**
+	/**
  * \brief Quaternion class, used to represent 3D orientations and rotations.
  *
  * Unit quaternions provide a convenient mathematical notation for representing orientations and rotations of objects in three dimensions.
@@ -42,19 +42,17 @@ struct Quaternion
 
     /**
      * @brief Creates a quaternion with the given rotations (using euler angles)
-     * 
-     * @param in_angle_x Angle to rotate around the x axis
-     * @param in_angle_y Angle to rotate around the y axis
-     * @param in_angle_z Angle to rotate around the z axis
+     * @param in_euler_rotation x y and z angles.
      */
-    Quaternion(Radians in_angle_x, Radians in_angle_y, Radians in_angle_z) noexcept;
+    explicit Quaternion(Vector3rad const& in_euler_rotation) noexcept;
+    explicit Quaternion(Vector2rad const& in_euler_rotation) noexcept;
 
     /**
      * @brief Creates a quaternion that rotates around a given axis.
      * @param in_axis Axis of rotation.
      * @param in_angle How much to rotate about.
      */
-    Quaternion(Vector3m in_axis, Radians in_angle) noexcept;
+    Quaternion(Vector3m const& in_axis, Radians in_angle) noexcept;
 
     #pragma endregion
 
@@ -65,6 +63,7 @@ struct Quaternion
      * @returns Quaternion instance
      */
     constexpr Quaternion& Invert() noexcept;
+	Quaternion Inverted() const noexcept;
 
     /**
      * @brief Computes the square length of the quaternion
@@ -84,7 +83,13 @@ struct Quaternion
      * @brief Sets the magnitude of the quaternion to 1 while keeping the original orientation
      * @return Quaternion instance
      */
-    Quaternion& Normalized() noexcept;
+    Quaternion& Normalize() noexcept;
+	Quaternion Normalized() const noexcept;
+
+    /// @returns A vector pointing in the direction of the rotation
+    Vector3m ToDirectionVector() const noexcept;
+
+	Vector3rad Euler() const noexcept;
 
     #pragma endregion
 
@@ -120,11 +125,11 @@ struct Quaternion
 
     /**
      * Creates a rotation that points in the direction vector.
-     * @param in_direction Direction to point to.
+     * @param in_forward Direction to point to.
      * @param in_up Up vector.
      * @return Rotation.
      */
-    static Quaternion LookAt(Vector3m in_direction, Vector3m in_up = Constants<Vector3m>::up) noexcept;
+    static Quaternion LookAt(Vector3m in_forward, Vector3m in_up = Constants<Vector3m>::up) noexcept;
 
     /**
      * @brief Computes the dot product between two quaternions
@@ -167,7 +172,10 @@ struct Quaternion
      * @return Resulting rotation
      */
     [[nodiscard]]
-    constexpr Quaternion  operator*(Quaternion const& in_other) const noexcept;
+    constexpr Quaternion  operator* (Quaternion const& in_other) const noexcept;
+    constexpr Quaternion& operator*=(Quaternion const& in_other)       noexcept;
+
+	constexpr Vector3m    operator*(Vector3m const& in_vector) const noexcept;
 
     constexpr Quaternion& operator=(Quaternion const& in_copy) = default;
     constexpr Quaternion& operator=(Quaternion&&	  in_move) = default;

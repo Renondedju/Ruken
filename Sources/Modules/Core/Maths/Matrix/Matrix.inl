@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Core/Maths/Matrix/Matrix.hpp"
-
-#include <cstring>
+#include "Core/Debug/Assert.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -45,13 +44,6 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::LookAtMatrix(
 		 right.z(),           up.z(),           forward.z(), 		  0.0f,
 		-right.Dot(in_from), -up.Dot(in_from), -forward.Dot(in_from), 1.0f
 	};
-/*
-	return Matrix<3, 4> {
-		right   .x(),  right  .y(),  right  .z(), -right  .Dot(in_from),
-		up      .x(),  up     .y(),  up     .z(), -up     .Dot(in_from),
-		-forward.x(), -forward.y(), -forward.z(),  forward.Dot(in_from)
-	};
-	*/
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -63,6 +55,15 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ModelMatrix(
 	return Matrix::ScaleMatrix		(in_scale)    *
 	       Matrix::RotationMatrix3D (in_rotation) *
 	       Matrix::TranslationMatrix(in_position);
+}
+
+template<RkSize TRows, RkSize TColumns>
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ModelMatrix(
+	Vector3m   const& in_position,
+	Quaternion const& in_rotation) noexcept requires (TRows == 4 && TColumns == 4)
+{
+	return Matrix::RotationMatrix3D (in_rotation) *
+		   Matrix::TranslationMatrix(in_position);
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -129,31 +130,21 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ClipSpace() noexcept 
 }
 
 template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(
-	Radians const in_angle_x,
-	Radians const in_angle_y,
-	Radians const in_angle_z) noexcept requires (TRows >= 3 && TColumns >= 3)
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(Vector3rad const& in_euler_angles) noexcept
+	requires (TRows >= 3 && TColumns >= 3)
 {
-	RkFloat const cos_x = Cos(in_angle_x);
-	RkFloat const sin_x = Sin(in_angle_x);
-	RkFloat const cos_y = Cos(in_angle_y);
-	RkFloat const sin_y = Sin(in_angle_y);
-	RkFloat const cos_z = Cos(in_angle_z);
-	RkFloat const sin_z = Sin(in_angle_z);
+	RkFloat const cos_x = Cos(in_euler_angles.x());
+	RkFloat const sin_x = Sin(in_euler_angles.x());
+	RkFloat const cos_y = Cos(in_euler_angles.y());
+	RkFloat const sin_y = Sin(in_euler_angles.y());
+	RkFloat const cos_z = Cos(in_euler_angles.z());
+	RkFloat const sin_z = Sin(in_euler_angles.z());
 
 	// The resulting matrix will implicitly be converted to the requested size if needed
 	return Matrix<3, 3> {
-		cos_z * cos_y - sin_z * sin_x * sin_y,
-		-sin_z * cos_x,
-		cos_z * sin_y + sin_z * sin_x * cos_y,
-
-		sin_z * cos_y + cos_z * sin_x * sin_y,
-		cos_z * cos_x,
-		sin_z * sin_y - cos_z * sin_x * cos_y,
-
-		-cos_x * sin_y,
-		sin_x,
-		cos_x * cos_y
+		cos_z * cos_y - sin_z * sin_x * sin_y, sin_z * cos_y + cos_z * sin_x * sin_y, -cos_x * sin_y,
+		-sin_z * cos_x,						   cos_z * cos_x, sin_x,
+		cos_z * sin_y + sin_z * sin_x * cos_y, sin_z * sin_y - cos_z * sin_x * cos_y, cos_x * cos_y
 	};
 }
 
@@ -168,13 +159,13 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(
 	// The matrix will implicitly be converted to the requested size if needed
 	return Matrix<3, 3> {
 		cos_angle + static_cast<RkFloat>(in_axis.x() * in_axis.x()) * (1 - cos_angle),
-		in_axis.x() * in_axis.y() * (1 - cos_angle) - in_axis.z() * sin_angle,
-		in_axis.x() * in_axis.z() * (1 - cos_angle) + in_axis.y() * sin_angle,
 		in_axis.y() * in_axis.x() * (1 - cos_angle) + in_axis.z() * sin_angle,
-		cos_angle + static_cast<RkFloat>(in_axis.y() * in_axis.y()) * (1 - cos_angle),
-		in_axis.y() * in_axis.z() * (1 - cos_angle) - in_axis.x() * sin_angle,
 		in_axis.z() * in_axis.x() * (1 - cos_angle) - in_axis.y() * sin_angle,
+		in_axis.x() * in_axis.y() * (1 - cos_angle) - in_axis.z() * sin_angle,
+		cos_angle + static_cast<RkFloat>(in_axis.y() * in_axis.y()) * (1 - cos_angle),
 		in_axis.z() * in_axis.y() * (1 - cos_angle) + in_axis.x() * sin_angle,
+		in_axis.x() * in_axis.z() * (1 - cos_angle) + in_axis.y() * sin_angle,
+		in_axis.y() * in_axis.z() * (1 - cos_angle) - in_axis.x() * sin_angle,
 		cos_angle + static_cast<RkFloat>(in_axis.z() * in_axis.z()) * (1 - cos_angle),
 	};
 }
@@ -188,18 +179,21 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(Quat
 	RkFloat const sqr_z (in_value.z * in_value.z);
 
 	// The matrix will implicitly be converted to the requested size if needed
+	/*
 	return Matrix<3, 3> {
-		1 - 2 * (sqr_y + sqr_z),
-		2 * (in_value.x * in_value.y - in_value.z * in_value.w),
-		2 * (in_value.x * in_value.z + in_value.y * in_value.w),
+		1 - 2 * (sqr_y + sqr_z), 2 * (in_value.x * in_value.y - in_value.z * in_value.w), 2 * (in_value.x * in_value.z + in_value.y * in_value.w),
 
-		2 * (in_value.x * in_value.y + in_value.z * in_value.w),
-		1 - 2 * (sqr_x + sqr_z),
-		2 * (in_value.y * in_value.z - in_value.x * in_value.w),
+		2 * (in_value.x * in_value.y + in_value.z * in_value.w), 1 - 2 * (sqr_x + sqr_z), 2 * (in_value.y * in_value.z - in_value.x * in_value.w),
 
-		2 * (in_value.x * in_value.z - in_value.y * in_value.w),
-		2 * (in_value.y * in_value.z + in_value.x * in_value.w),
-		1 - 2 * (sqr_x + sqr_y)
+		2 * (in_value.x * in_value.z - in_value.y * in_value.w), 2 * (in_value.y * in_value.z + in_value.x * in_value.w), 1 - 2 * (sqr_x + sqr_y)
+	};
+	*/
+	return Matrix<3, 3> {
+		1 - 2 * (sqr_y + sqr_z), 2 * (in_value.x * in_value.y + in_value.z * in_value.w), 2 * (in_value.x * in_value.z - in_value.y * in_value.w),
+
+		2 * (in_value.x * in_value.y - in_value.z * in_value.w), 1 - 2 * (sqr_x + sqr_z), 2 * (in_value.y * in_value.z + in_value.x * in_value.w),
+
+		2 * (in_value.x * in_value.z + in_value.y * in_value.w), 2 * (in_value.y * in_value.z - in_value.x * in_value.w), 1 - 2 * (sqr_x + sqr_y)
 	};
 }
 
@@ -212,8 +206,8 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrixX(Radia
 
 	return Matrix<3, 3> {
 		1.0F,  0.0F,  0.0F,
-		0.0F,  cos,   -sin,
-		0.0F,  sin,    cos
+		0.0F,  cos,   sin,
+		0.0F, -sin,   cos
 	};
 }
 
@@ -225,9 +219,9 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrixY(Radia
 	RkFloat const sin = Sin(in_angle);
 
 	return Matrix<3, 3> {
-		cos,  0.0F,   sin,
+		cos ,  0.0F, -sin,
 		0.0F,  1.0F,  0.0F,
-		-sin,  0.0F,   cos
+		sin ,  0.0F,  cos
 	};
 }
 
@@ -239,8 +233,8 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrixZ(Radia
 	RkFloat const sin = Sin(in_angle);
 
 	return Matrix<2, 2> {
-		cos,  -sin,
-		sin,   cos
+		 cos, sin,
+		-sin, cos
 	};
 }
 
@@ -329,12 +323,12 @@ constexpr Matrix<TRows, TOtherColumns> Matrix<TRows, TColumns>::operator*
 {
 	Matrix<TRows, TOtherColumns> new_matrix;
 
-	for (RkSize row    {0ULL}; row    < TRows;         ++row)
-	for (RkSize column {0ULL}; column < TOtherColumns; ++column)
+	for (RkSize row			 {0ULL}; row		  < TRows;         ++row)
+	for (RkSize other_column {0ULL}; other_column < TOtherColumns; ++other_column)
 	{
-		new_matrix[row, column] = 0.0F;
-		for (RkSize other_row {0ULL}; other_row < TOtherRows; ++other_row)
-			new_matrix[row, column] += (*this)[row, other_row] * in_matrix[other_row, column];
+		new_matrix[row, other_column] = 0.0F;
+		for (RkSize column {0ULL}; column < TColumns; ++column)
+			new_matrix[row, other_column] += (*this)[row, column] * in_matrix[column, other_column];
 	}
 
 	return new_matrix;
@@ -347,11 +341,11 @@ constexpr Vector<TVectorSize, Distance<TDistanceUnit>>  Matrix<TRows, TColumns>:
 {
 	Vector<TVectorSize, Distance<TDistanceUnit>> new_vector;
 
-	for (RkSize row {0ULL}; row < TRows; ++row)
+	for (RkSize row	{0ULL}; row < TRows; ++row)
 	{
-		new_vector[row] = Distance<TDistanceUnit>(.0f);
-		for (RkSize other_row {0ULL}; other_row < TVectorSize; ++other_row)
-			new_vector[row] += Distance<TDistanceUnit>((*this)[row, other_row] * static_cast<RkFloat>(in_vector[other_row]));
+		new_vector[row] = Distance<TDistanceUnit>(0.0F);
+		for (RkSize column {0ULL}; column < TVectorSize; ++column)
+			new_vector[row] += Distance<TDistanceUnit>((*this)[column, row]) * in_vector[column];
 	}
 
 	return new_vector;

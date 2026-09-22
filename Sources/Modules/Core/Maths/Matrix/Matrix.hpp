@@ -12,7 +12,7 @@ BEGIN_RUKEN_NAMESPACE
  * A transformation matrix can perform arbitrary linear 3D transformations (i.e. translation, rotation, scale, shear etc.)
  * and perspective transformations using homogenous coordinates.
  *
- * Matrices in Ruken are column major;
+ * Matrices in Ruken are row major;
  * i.e. the position of a transformation matrix is in the last column, and the first three columns contain x, y, and z-axes.
  *
  * @tparam TRows Height or number of rows of the matrix
@@ -84,7 +84,20 @@ struct Matrix
         requires (TRows == 4 && TColumns == 4);
 
     /**
+     * @brief Model matrix, also called TRS (Transform Rotation Scale)
+     *
+     * @param in_position Model position
+     * @param in_rotation Model rotation
+     */
+    [[nodiscard]]
+    constexpr static Matrix ModelMatrix(
+            Vector3m   const& in_position,
+            Quaternion const& in_rotation) noexcept
+        requires (TRows == 4 && TColumns == 4);
+
+    /**
      * @brief Creates a perspective projection matrix
+     * Post view correction is used. This matrix is specific to vulkan.
      *
      * @param in_fov Field of view
      * @param in_aspect Aspect ratio of the viewport
@@ -103,6 +116,7 @@ struct Matrix
 
     /**
      * @brief Creates an orthogonal projection matrix
+     * Post view correction is used. This matrix is specific to vulkan.
      *
      * @param in_left Left plane distance
      * @param in_right Right plane distance
@@ -134,14 +148,11 @@ struct Matrix
 
     /**
      * @brief Creates a 3D rotation matrix.
-     *
-     * @param in_angle_x X Angle of the matrix.
-     * @param in_angle_y Y Angle of the matrix.
-     * @param in_angle_z Z Angle of the matrix.
+     * @param in_euler_angles Euler angles.
      * @return Rotation matrix.
      */
     [[nodiscard]]
-    constexpr static Matrix RotationMatrix3D(Radians in_angle_x, Radians in_angle_y, Radians in_angle_z) noexcept
+    constexpr static Matrix RotationMatrix3D(Vector3rad const& in_euler_angles) noexcept
         requires (TRows >= 3 && TColumns >= 3);
 
     /**
@@ -261,6 +272,7 @@ struct Matrix
 };
 
 using Matrix4x4 = Matrix<4, 4>;
+using Matrix3x3 = Matrix<3, 3>;
 
 END_RUKEN_NAMESPACE
 

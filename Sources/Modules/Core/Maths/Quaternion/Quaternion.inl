@@ -60,12 +60,12 @@ Quaternion Quaternion::Slerp(Quaternion const& in_lhs,
         RkFloat    const sign = dot_result < 0.0F ? -1.0F : 1.0F;
         Quaternion const b    = Scale(in_rhs, Sin(static_cast<Radians>(sign * in_ratio) * theta) / sin_theta);
 
-        return Add(a, b).Normalized();
+        return Add(a, b).Normalize();
     }
 
     Quaternion const b = Scale(in_rhs, Sin(static_cast<Radians>(in_ratio) * theta) / sin_theta);
 
-    return Add(a, b).Normalized();
+    return Add(a, b).Normalize();
 }
 
 constexpr Quaternion& Quaternion::Invert() noexcept
@@ -92,6 +92,22 @@ constexpr Quaternion Quaternion::operator*(Quaternion const& in_other) const noe
                       w * in_other.x + in_other.w * x + (y * in_other.z - in_other.y * z),
                       w * in_other.y + in_other.w * y + (z * in_other.x - in_other.z * x),
                       w * in_other.z + in_other.w * z + (x * in_other.y - in_other.x * y));
+}
+
+constexpr Quaternion& Quaternion::operator*=(Quaternion const& in_other) noexcept
+{
+    *this = *this * in_other;
+
+    return *this;
+}
+
+constexpr Vector3m Quaternion::operator*(Vector3m const& in_vector) const noexcept
+{
+    Vector3m const axis {static_cast<Meters>(x), static_cast<Meters>(y), static_cast<Meters>(z)};
+    Vector3m const uv   {axis.Cross(in_vector)};
+    Vector3m const uuv  {axis.Cross(uv)};
+
+    return in_vector + ((uv * w) + uuv) * 2.0f;
 }
 
 #pragma endregion
