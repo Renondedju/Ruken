@@ -174,6 +174,11 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 	Distance<TDistanceUnit>&	   w()       noexcept { return data[3]; }
 	Distance<TDistanceUnit> const& w() const noexcept { return data[3]; }
 
+	auto xyz() const noexcept { return Vector<3, Distance<TDistanceUnit>>{ data[0], data[1], data[2]}; }
+	auto xy () const noexcept { return Vector<2, Distance<TDistanceUnit>>{ data[0], data[1]}; }
+	auto xz () const noexcept { return Vector<2, Distance<TDistanceUnit>>{ data[0], data[2]}; }
+	auto yz () const noexcept { return Vector<2, Distance<TDistanceUnit>>{ data[1], data[2]}; }
+
 	#pragma endregion
 
 	#pragma region Constructors
@@ -234,7 +239,7 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 		return Vector<3, Distance<TDistanceUnit>>{
 			data[0] / data[3],
 			data[1] / data[3],
-			data[2] / data[3],
+			data[2] / data[3]
 		};
 	}
 

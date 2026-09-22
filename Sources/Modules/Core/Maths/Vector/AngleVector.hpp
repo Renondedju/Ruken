@@ -45,23 +45,28 @@ struct RUKEN_EMPTY_BASES Vector<2, Angle<TAngleUnit>> final:
 {
     #pragma region Members
 
-    union
-	{
-	    Angle<TAngleUnit> data[2];
-
-	    struct
-	    {
-	        Angle<TAngleUnit> x;
-			Angle<TAngleUnit> y;
-	    };
-		struct
-	    {
-	        Angle<TAngleUnit> pitch;
-			Angle<TAngleUnit> yaw;
-	    };
-	};
+	Angle<TAngleUnit> data[2];
 
     #pragma endregion
+
+	#pragma region Getters/Setters
+
+	Angle<TAngleUnit>&	     operator[](RkSize in_offset)		  noexcept { return data[in_offset]; }
+	Angle<TAngleUnit> const& operator[](RkSize in_offset) const noexcept { return data[in_offset]; }
+
+	Angle<TAngleUnit>&	     x()       noexcept { return data[0]; }
+	Angle<TAngleUnit> const& x() const noexcept { return data[0]; }
+
+	Angle<TAngleUnit>&	     y()       noexcept { return data[1]; }
+	Angle<TAngleUnit> const& y() const noexcept { return data[1]; }
+
+	Angle<TAngleUnit>&	     Pitch()       noexcept { return data[0]; }
+	Angle<TAngleUnit> const& Pitch() const noexcept { return data[0]; }
+
+	Angle<TAngleUnit>&	     Yaw()       noexcept { return data[1]; }
+	Angle<TAngleUnit> const& Yaw() const noexcept { return data[1]; }
+
+	#pragma endregion
 
     #pragma region Constructors
 
@@ -83,23 +88,36 @@ struct RUKEN_EMPTY_BASES Vector<3, Angle<TAngleUnit>> final:
 {
 	#pragma region Members
 
-	union
-	{
-		Angle<TAngleUnit> data[3];
+	Angle<TAngleUnit> data[3];
 
-		struct
-		{
-			Angle<TAngleUnit> x;
-			Angle<TAngleUnit> y;
-			Angle<TAngleUnit> z;
-		};
-		struct
-		{
-			Angle<TAngleUnit> pitch;
-			Angle<TAngleUnit> yaw;
-			Angle<TAngleUnit> roll;
-		};
-	};
+	#pragma endregion
+
+	#pragma region Getters/Setters
+
+	#pragma region Getters/Setters
+
+	Angle<TAngleUnit>&	     operator[](RkSize in_offset)		  noexcept { return data[in_offset]; }
+	Angle<TAngleUnit> const& operator[](RkSize in_offset) const noexcept { return data[in_offset]; }
+
+	Angle<TAngleUnit>&	     x()       noexcept { return data[0]; }
+	Angle<TAngleUnit> const& x() const noexcept { return data[0]; }
+
+	Angle<TAngleUnit>&	     y()       noexcept { return data[1]; }
+	Angle<TAngleUnit> const& y() const noexcept { return data[1]; }
+
+	Angle<TAngleUnit>&	     z()       noexcept { return data[2]; }
+	Angle<TAngleUnit> const& z() const noexcept { return data[2]; }
+
+	Angle<TAngleUnit>&	     Pitch()       noexcept { return data[0]; }
+	Angle<TAngleUnit> const& Pitch() const noexcept { return data[0]; }
+
+	Angle<TAngleUnit>&	     Yaw()       noexcept { return data[1]; }
+	Angle<TAngleUnit> const& Yaw() const noexcept { return data[1]; }
+
+	Angle<TAngleUnit>&	     Roll()       noexcept { return data[2]; }
+	Angle<TAngleUnit> const& Roll() const noexcept { return data[2]; }
+
+	#pragma endregion
 
 	#pragma endregion
 
