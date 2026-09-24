@@ -1,10 +1,10 @@
-
 #pragma once
 
 #include "Build/Attributes.hpp"
 
 #include "Types/StrongType/Operators/Stream/OutputStream.hpp"
 #include "Types/StrongType/Operators/Stream/InputStream.hpp"
+#include "Types/StrongType/Operators/Stream/StrongTypeFormatter.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 

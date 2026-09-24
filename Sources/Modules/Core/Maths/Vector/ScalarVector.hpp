@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Maths/Vector/Helper/VectorForward.hpp"
+#include "Core/Maths/Vector/Operations/VectorFormatter.hpp"
 #include "Core/Maths/Vector/Operations/VectorLerp.hpp"
 #include "Core/Maths/Vector/Operations/VectorMinMax.hpp"
 #include "Core/Maths/Vector/Operations/VectorOperators.hpp"
@@ -344,3 +345,14 @@ using Vector4i = Vector<4, RkInt>;
 #pragma endregion
 
 END_RUKEN_NAMESPACE
+
+// Format specializations
+template <RkSize TDimensions, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Vector<TDimensions, RUKEN_NAMESPACE::RkFloat>, TChar> :
+	RUKEN_NAMESPACE::VectorFormatter<TDimensions, RUKEN_NAMESPACE::RkFloat, TChar>
+{};
+
+template <RkSize TDimensions, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Vector<TDimensions, RUKEN_NAMESPACE::RkInt>, TChar> :
+	RUKEN_NAMESPACE::VectorFormatter<TDimensions, RUKEN_NAMESPACE::RkInt, TChar>
+{};

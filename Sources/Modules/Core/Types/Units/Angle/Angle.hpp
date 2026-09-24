@@ -53,18 +53,13 @@ using Radians = Angle<EAngleUnit::Radian>;
 
 template<>
 struct StrongTypeSuffix<Degrees>
-{
-    static constexpr const RkChar* suffix = " deg";
-};
+{ static constexpr const RkChar* suffix = " deg"; };
 
 template<>
 struct StrongTypeSuffix<Radians>
-{
-    static constexpr const RkChar* suffix = " rad";
-};
+{ static constexpr const RkChar* suffix = " rad"; };
 
 // Type literals
-
 constexpr Degrees operator""_deg(RkLdouble in_angle) noexcept;
 constexpr Degrees operator""_deg(RkULLInt  in_angle) noexcept;
 constexpr Radians operator""_rad(RkLdouble in_angle) noexcept;
@@ -73,14 +68,21 @@ constexpr Radians operator""_rad(RkULLInt  in_angle) noexcept;
 #include "Angle.inl"
 
 
-    // Constants
-
+// Constants
 template <>
 struct Constants<Radians>
 {
     static constexpr Radians pi   = 3.14159265358979323846_rad;
     static constexpr Radians pi_2 = 1.57079632679489661923_rad; // pi / 2
     static constexpr Radians pi_4 = 0.78539816339744830962_rad; // pi / 4
+
+    static constexpr Radians pi_times_2 = pi * 2.0f;
 };
 
 END_RUKEN_NAMESPACE
+
+// Formatting specialization
+template <RUKEN_NAMESPACE::EAngleUnit TUnitType, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Angle<TUnitType>, TChar> :
+    RUKEN_NAMESPACE::StrongTypeFormatter<RUKEN_NAMESPACE::Angle<TUnitType>, TChar>
+{};

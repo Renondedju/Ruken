@@ -10,8 +10,6 @@ BEGIN_RUKEN_NAMESPACE
  */
 template <typename TStrongType>
 struct StrongTypeSuffix
-{
-    static constexpr const RkChar* suffix = "";
-};
+{ static constexpr const RkChar* suffix = ""; };
 
 END_RUKEN_NAMESPACE

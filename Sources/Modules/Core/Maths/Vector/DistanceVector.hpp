@@ -1,17 +1,18 @@
 #pragma once
 
-#include "Build/Attributes.hpp"
-#include "Types/Units/Distance/Distance.hpp"
-#include "Maths/Vector/Helper/VectorForward.hpp"
+#include "Core/Build/Attributes.hpp"
+#include "Core/Types/Units/Distance/Distance.hpp"
+#include "Core/Maths/Vector/Helper/VectorForward.hpp"
 
-#include "Maths/Vector/Operations/VectorNormalization.hpp"
-#include "Maths/Vector/Operations/VectorOperators.hpp"
-#include "Maths/Vector/Operations/VectorLength.hpp"
-#include "Maths/Vector/Operations/VectorMinMax.hpp"
-#include "Maths/Vector/Operations/VectorCross.hpp"
-#include "Maths/Vector/Operations/VectorSlerp.hpp"
-#include "Maths/Vector/Operations/VectorLerp.hpp"
-#include "Maths/Vector/Operations/VectorDot.hpp"
+#include "Core/Maths/Vector/Operations/VectorFormatter.hpp"
+#include "Core/Maths/Vector/Operations/VectorNormalization.hpp"
+#include "Core/Maths/Vector/Operations/VectorOperators.hpp"
+#include "Core/Maths/Vector/Operations/VectorLength.hpp"
+#include "Core/Maths/Vector/Operations/VectorMinMax.hpp"
+#include "Core/Maths/Vector/Operations/VectorCross.hpp"
+#include "Core/Maths/Vector/Operations/VectorSlerp.hpp"
+#include "Core/Maths/Vector/Operations/VectorLerp.hpp"
+#include "Core/Maths/Vector/Operations/VectorDot.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -415,3 +416,9 @@ struct Constants<Vector<4, Distance<TDistanceUnit>>>
 #pragma endregion
 
 END_RUKEN_NAMESPACE
+
+// Format specialization
+template <RkSize TDimensions, RUKEN_NAMESPACE::EDistanceUnit TDistanceUnit, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Vector<TDimensions, RUKEN_NAMESPACE::Distance<TDistanceUnit>>, TChar> :
+	RUKEN_NAMESPACE::VectorFormatter<TDimensions, RUKEN_NAMESPACE::Distance<TDistanceUnit>, TChar>
+{};

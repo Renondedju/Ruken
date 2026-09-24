@@ -153,6 +153,7 @@ target_sources(RkCore PUBLIC
     Types/Units/Duration/Duration.hpp
     Types/Units/Duration/EDurationUnit.hpp
     Types/Units/Pixels.hpp
+        Types/StrongType/Operators/Stream/StrongTypeFormatter.hpp
     Types/FundamentalTypes.hpp
     Types/Concepts/IsIntegral.hpp
     Types/Concepts/NonVoid.hpp

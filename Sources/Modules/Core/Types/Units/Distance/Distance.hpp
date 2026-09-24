@@ -78,3 +78,9 @@ constexpr Meters      operator""_m (RkULLInt  in_distance) noexcept;
 #include "Distance.inl"
 
 END_RUKEN_NAMESPACE
+
+// Formatting specialization
+template <RUKEN_NAMESPACE::EDistanceUnit TUnitType, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Distance<TUnitType>, TChar> :
+	RUKEN_NAMESPACE::StrongTypeFormatter<RUKEN_NAMESPACE::Distance<TUnitType>, TChar>
+{};

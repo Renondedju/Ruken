@@ -61,34 +61,25 @@ struct RUKEN_EMPTY_BASES Duration final:
 };
 
 // Type aliases
-
 using Milliseconds = Duration<EDurationUnit::Millisecond>;
 using Seconds      = Duration<EDurationUnit::Second>;
 using Minutes      = Duration<EDurationUnit::Minute>;
 
 // Suffixes
-
 template<>
 struct StrongTypeSuffix<Milliseconds>
-{
-    static constexpr const RkChar* suffix = " ms";
-};
+{ static constexpr const RkChar* suffix = " ms"; };
 
 template<>
 struct StrongTypeSuffix<Seconds>
-{
-    static constexpr const RkChar* suffix = " sec";
-};
+{ static constexpr const RkChar* suffix = " sec"; };
 
 template<>
 struct StrongTypeSuffix<Minutes>
-{
-    static constexpr const RkChar* suffix = " min";
-};
+{ static constexpr const RkChar* suffix = " min"; };
 
 
 // Type literals
-
 constexpr Milliseconds operator""_ms (RkLdouble in_duration) noexcept;
 constexpr Milliseconds operator""_ms (RkULLInt  in_duration) noexcept;
 constexpr Seconds      operator""_sec(RkLdouble in_duration) noexcept;
@@ -99,3 +90,9 @@ constexpr Minutes      operator""_min(RkULLInt  in_duration) noexcept;
 #include "Duration.inl"
 
 END_RUKEN_NAMESPACE
+
+// Formatting specialization
+template <RUKEN_NAMESPACE::EDurationUnit TUnitType, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Duration<TUnitType>, TChar> :
+	RUKEN_NAMESPACE::StrongTypeFormatter<RUKEN_NAMESPACE::Duration<TUnitType>, TChar>
+{};

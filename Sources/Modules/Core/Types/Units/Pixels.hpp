@@ -19,12 +19,9 @@ struct RUKEN_EMPTY_BASES Pixels final:
 };
 
 // Suffixes
-
 template<>
 struct StrongTypeSuffix<Pixels>
-{
-    static constexpr const RkChar* suffix = " px";
-};
+{ static constexpr const RkChar* suffix = " px"; };
 
 constexpr Pixels operator""_px(RkULLInt const in_pixels) noexcept
 {
@@ -34,3 +31,9 @@ constexpr Pixels operator""_px(RkULLInt const in_pixels) noexcept
 #include "Types/Units/Pixels.hpp"
 
 END_RUKEN_NAMESPACE
+
+// Formatting specialization
+template <typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Pixels, TChar> :
+    RUKEN_NAMESPACE::StrongTypeFormatter<RUKEN_NAMESPACE::Pixels, TChar>
+{};

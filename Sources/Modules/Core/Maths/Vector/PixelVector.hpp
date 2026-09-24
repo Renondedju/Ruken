@@ -3,6 +3,7 @@
 #include "Core/Types/Units/Pixels.hpp"
 #include "Core/Build/Attributes.hpp"
 
+#include "Core/Maths/Vector/Operations/VectorFormatter.hpp"
 #include "Core/Maths/Vector/Operations/VectorOperators.hpp"
 #include "Core/Maths/Vector/Operations/VectorMinMax.hpp"
 #include "Core/Maths/Vector/Operations/VectorLerp.hpp"
@@ -156,3 +157,9 @@ struct Constants<Vector2px>
 };
 
 END_RUKEN_NAMESPACE
+
+// Format specialization
+template <RkSize TDimensions, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Vector<TDimensions, RUKEN_NAMESPACE::Pixels>, TChar> :
+	RUKEN_NAMESPACE::VectorFormatter<TDimensions, RUKEN_NAMESPACE::Pixels, TChar>
+{};

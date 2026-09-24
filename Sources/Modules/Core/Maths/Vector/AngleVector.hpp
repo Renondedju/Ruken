@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Types/Units/Angle/Angle.hpp"
-#include "Build/Attributes.hpp"
-#include "Maths/Vector/Helper/VectorForward.hpp"
-
-#include "Maths/Vector/Operations/VectorOperators.hpp"
-#include "Maths/Vector/Operations/VectorMinMax.hpp"
-#include "Maths/Vector/Operations/VectorSlerp.hpp"
-#include "Maths/Vector/Operations/VectorLerp.hpp"
+#include "Core/Build/Attributes.hpp"
+#include "Core/Types/Units/Angle/Angle.hpp"
+#include "Core/Maths/Vector/Helper/VectorForward.hpp"
+#include "Core/Maths/Vector/Operations/VectorFormatter.hpp"
+#include "Core/Maths/Vector/Operations/VectorOperators.hpp"
+#include "Core/Maths/Vector/Operations/VectorMinMax.hpp"
+#include "Core/Maths/Vector/Operations/VectorSlerp.hpp"
+#include "Core/Maths/Vector/Operations/VectorLerp.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
@@ -156,3 +156,9 @@ using Vector3deg = Vector<3, Degrees>;
 using Vector3rad = Vector<3, Radians>;
 
 END_RUKEN_NAMESPACE
+
+// Format specialization
+template <RkSize TDimensions, RUKEN_NAMESPACE::EAngleUnit TAngleUnit, typename TChar>
+struct std::formatter<RUKEN_NAMESPACE::Vector<TDimensions, RUKEN_NAMESPACE::Angle<TAngleUnit>>, TChar> :
+	RUKEN_NAMESPACE::VectorFormatter<TDimensions, RUKEN_NAMESPACE::Angle<TAngleUnit>, TChar>
+{};
