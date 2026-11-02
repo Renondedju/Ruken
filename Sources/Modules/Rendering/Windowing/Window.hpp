@@ -36,11 +36,12 @@ struct Window: Service
 
 	#pragma region Methods
 
-	vk::raii::SurfaceKHR& GetSurface  ()       noexcept { return m_surface; }
-	GPUSwapchain&		  GetSwapchain()       noexcept { return m_swapchain; }
-	Vector2px			  GetSize	  () const noexcept;
-	RkBool				  ShouldClose () const noexcept;
-	GLFWwindow*			  GLFWHandle  () const noexcept;
+	vk::raii::SurfaceKHR& GetSurface       ()       noexcept { return m_surface; }
+	GPUSwapchain&		  GetSwapchain     ()       noexcept { return m_swapchain; }
+	Vector2px			  GetSize	       () const noexcept;
+	Vector2px			  GetCursorPosition() const noexcept;
+	RkBool				  ShouldClose      () const noexcept;
+	GLFWwindow*			  GLFWHandle       () const noexcept;
 
 	RkVoid AddCallbackReceiver(WindowCallbackReceiver* in_callback_receiver) noexcept;
 

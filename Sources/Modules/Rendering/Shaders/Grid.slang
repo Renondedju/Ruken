@@ -123,8 +123,8 @@ VertexOutput vertMain(uint in_vertex_id : SV_VertexID)
 
     // Computing near and far plane world positions for each pixel of the viewport.
     float2 position  = positions[in_vertex_id];
-    float4 ray_start = mul(camera_data.inverted_view_projection, float4(position, 0.0, 1.0));
-    float4 ray_end   = mul(camera_data.inverted_view_projection, float4(position, 1.0, 1.0));
+    float4 ray_start = mul(float4(position, 0.0, 1.0), camera_data.inverted_view_projection);
+    float4 ray_end   = mul(float4(position, 1.0, 1.0), camera_data.inverted_view_projection);
 
     ray_start /= ray_start.w;
     ray_end   /= ray_end  .w;
@@ -143,7 +143,7 @@ FragmentOutput fragMain(VertexOutput in_vertex)
 {
     // 1. Computing view ray-plane intersection position
     float3 world_position = RayPlaneIntersection(in_vertex.ray_origin, in_vertex.ray_direction, grid_parameters.plane_normal);
-    float4 ndc_position   = mul(camera_data.view_projection, float4(world_position, 1.0));
+    float4 ndc_position   = mul(float4(world_position, 1.0), camera_data.view_projection);
     float  grid_depth     = (ndc_position /= ndc_position.w).z;
 
     // 2. Fading

@@ -76,6 +76,7 @@ target_sources(RkCore PUBLIC
     Maths/Vector/Operations/VectorLerp.hpp
     Maths/Vector/Operations/VectorMinMax.hpp
     Maths/Vector/Operations/VectorNormalization.hpp
+    Maths/Vector/Operations/VectorHomogenize.hpp
     Maths/Vector/Operations/VectorOperators.hpp
     Maths/Vector/Operations/VectorSlerp.hpp
     Maths/Vector/AngleVector.hpp
@@ -89,6 +90,7 @@ target_sources(RkCore PUBLIC
     Maths/Utility.hpp
     Maths/Vector/VectorCast.hpp
     Maths/Vector/ScalarVector.hpp
+    Maths/SphericalCoord.hpp
     Debug/Assert.hpp
     Meta/CommonTypeFallback.hpp
     Meta/CopyConst.hpp
@@ -153,7 +155,7 @@ target_sources(RkCore PUBLIC
     Types/Units/Duration/Duration.hpp
     Types/Units/Duration/EDurationUnit.hpp
     Types/Units/Pixels.hpp
-        Types/StrongType/Operators/Stream/StrongTypeFormatter.hpp
+    Types/StrongType/Operators/Stream/StrongTypeFormatter.hpp
     Types/FundamentalTypes.hpp
     Types/Concepts/IsIntegral.hpp
     Types/Concepts/NonVoid.hpp
@@ -210,6 +212,7 @@ target_sources(RkCore PRIVATE
     Maths/MinMax.cpp
     Maths/Trigonometry.cpp
     Maths/Utility.cpp
+    Maths/SphericalCoord.cpp
     Utility/Benchmark.cpp
     Debug/Trace.cpp
     JobSystem/Awaitables/AsyncAwaitable.cpp

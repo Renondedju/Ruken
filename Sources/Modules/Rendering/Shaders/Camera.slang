@@ -14,4 +14,6 @@ public struct CameraData
     public float3   near_plane_position;
     public float3   far_plane_position;
     public float3   forward;
+    public float3   up;
+    public float3   right;
 };

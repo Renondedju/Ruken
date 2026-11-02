@@ -5,7 +5,7 @@
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief NotEqual operator class
+ * @brief NotEqual operator class
  * 
  * This class is meant to be used in conjunction with the StrongType class.
  * This allows for better and quicker operator integrations to named types.
@@ -13,17 +13,18 @@ BEGIN_RUKEN_NAMESPACE
 struct NotEqual
 {
     /**
-     * \brief NotEqual operator
-     *
-     * \param in_lhs Left-hand side operand
-     * \param in_rhs Right-hand side operand
-     *
-     * \return True if the left operand is not equal to the right operand, false otherwise.
+     * @brief NotEqual operator
+     * @param in_lhs Left-hand side operand
+     * @param in_rhs Right-hand side operand
+     * @return True if the left operand is not equal to the right operand, false otherwise.
      */
     template <typename TStrongType>
     constexpr bool operator!=(this TStrongType const& in_lhs, TStrongType const& in_rhs) noexcept
     {
     	using TBase = TStrongType::TUnderlying;
+
+    	if constexpr (std::is_floating_point_v<TBase>)
+    		return !RelativelyClose(static_cast<TBase>(in_lhs), static_cast<TBase>(in_rhs));
 
     	return static_cast<TBase>(in_lhs) != static_cast<TBase>(in_rhs);
     }

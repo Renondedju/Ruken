@@ -22,7 +22,7 @@ VertexOutput vertMain(VertexInput in_vertex, uint in_instance_id : SV_InstanceID
     float4x4     model = instance_data[in_instance_id];
 
     output.local_position = in_vertex.position.xyz;
-    output.sv_position    = mul(camera_data.projection, mul(camera_data.view, mul(model, float4(in_vertex.position, 1.0))));
+    output.sv_position    = mul(float4(in_vertex.position, 1.0), mul(model, camera_data.view_projection));
 
     return output;
 }

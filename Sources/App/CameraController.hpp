@@ -1,7 +1,9 @@
 #pragma once
 
 // Engine
-#include "Core/JobSystem/Awaitables/Primitives/AutomaticResetEvent.hpp"
+#include "Core/Maths/Plane.hpp"
+#include "Core/Maths/SphericalCoord.hpp"
+#include "Core/Bitwise/Bitmask.hpp"
 
 // App
 #include "ECSTask.hpp"
@@ -30,9 +32,9 @@ struct CameraController : Service, WindowCallbackReceiver
 	/// @returns Camera data to render the current frame with.
 	CameraData Update() noexcept;
 
-	RkVoid ScrollCallback		 (Window& in_window, double in_x_offset, double in_y_offset)	override;
-	RkVoid MouseButtonCallback   (Window& in_window, int in_button, int in_action, int in_mods) override;
-	RkVoid CursorPositionCallback(Window& in_window, double in_x_position, double in_y_position)  override;
+	RkVoid ScrollCallback		 (Window& in_window, double in_x_offset, double in_y_offset)	 override;
+	RkVoid MouseButtonCallback   (Window& in_window, int in_button, int in_action, int in_mods)  override;
+	RkVoid CursorPositionCallback(Window& in_window, double in_x_position, double in_y_position) override;
 
 	#pragma endregion
 
@@ -40,39 +42,54 @@ struct CameraController : Service, WindowCallbackReceiver
 
 		#pragma region Methods
 
-		RkVoid RotateAround();
-		RkVoid Rotate      ();
-		RkVoid Zoom		   (RkFloat in_offset);
-		RkVoid Move        ();
-		RkVoid Pan         (Vector2px in_start, Vector2px in_end);
+		RkVoid RotateAroundFocus(Vector2px in_start, Vector2px in_end) noexcept;
+		RkVoid Rotate			(Vector2px in_start, Vector2px in_end) noexcept;
+		RkVoid Pan   			(Vector2px in_start, Vector2px in_end) noexcept;
+		RkVoid Zoom  			(RkFloat in_offset) 				   noexcept;
+		RkVoid ZoomFov			(RkFloat in_offset) 				   noexcept;
+		RkVoid HandleMovement	()									   noexcept;
+
+		RkVoid UpdateFocusDistance() noexcept;
 
 		#pragma endregion
 
 		#pragma region members
 
-		enum class EMovementMode
-		{
-			None,
-			Pan
-		};
+		enum struct EPositionUpdateMode { Linear, Spherical };
+		enum struct EUpdateMode         { Continuous, Once, None };
+		enum struct ECursorMode         { Free, PanCamera, RotateCamera, RotateCameraAroundFocus };
 
 		// Services
-		Window*	   m_window;
-		Clock*     m_clock;
+		Window*	    m_window;
+		Clock*      m_clock;
 
 		// Movement
-		Vector2px	  m_screen_start_position {};
-		Vector3m	   m_world_start_position {};
-		EMovementMode m_current_movement_mode {EMovementMode::None};
+		Meters	            m_focus_distance	  	{25_m};
+		Vector2px           m_screen_start_position {};
+		ECursorMode         m_cursor_mode		    {ECursorMode::Free};
+		EUpdateMode         m_focus_update_mode		{EUpdateMode::None};
+		EPositionUpdateMode m_position_update_mode  {EPositionUpdateMode::Linear};
 
 		// Camera interpolation data
-		Vector3m   m_current_position {};
-		Quaternion m_current_rotation {Quaternion {10_deg, -0_deg, 0_deg}};
-		Vector3m   m_target_position  {m_current_position};
-		Quaternion m_target_rotation  {m_current_rotation};
+		Radians		   m_current_fov        {90_deg};
+		Radians        m_target_fov         {m_current_fov};
+		Vector3m   	   m_current_position   {};
+		Vector3m   	   m_target_position    {m_current_position};
+		SphericalCoord m_current_rotation   {Quaternion({20_deg, 0_deg, 0_deg}) * Constants<Vector3m>::forward};
+		SphericalCoord m_target_rotation    {m_current_rotation};
 
 		// Data to be uploaded on the GPU
-		CameraData m_camera_data    {{}, {}};
+		CameraData m_camera_data        {{}, {}};
+
+		// Constants & Magic numbers that feels good. Lower values are snappier.
+		constexpr static RkFloat s_position_lerp_speed {0.00002f};
+		constexpr static RkFloat s_rotation_lerp_speed {0.000001f};
+		constexpr static RkFloat      s_fov_lerp_speed {0.0005f};
+		constexpr static Radians    s_fov_scroll_speed {5_deg};
+		constexpr static Plane3		    s_ground_plane {
+			.origin = Constants<Vector3m>::zero,
+			.normal = Constants<Vector3m>::up
+		};
 
 		#pragma endregion
 };

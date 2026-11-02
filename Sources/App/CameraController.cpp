@@ -11,6 +11,8 @@
 
 #include <tracy/Tracy.hpp>
 
+#include "Maths/Easing.hpp"
+
 CameraController::CameraController(ServiceProvider& in_service_provider) noexcept:
 	Service  {in_service_provider, typeid(CameraController)},
 	m_window {in_service_provider.LocateService<Window>()},
@@ -26,60 +28,81 @@ CameraData CameraController::Update() noexcept
 {
 	ZoneScoped;
 
-	// Magic numbers that feels good
-	constexpr RkFloat position_lerp_speed {0.00070f};
-	constexpr RkFloat rotation_lerp_speed {0.00015f};
+	HandleMovement();
 
-	// 1 - Interpolating
-	Seconds    const  delta_time   {m_clock->LastTickDuration()};
-	RkFloat    const  t_position   {1.0f - Pow(position_lerp_speed, static_cast<RkFloat>(delta_time))};
-	RkFloat    const  t_rotation   {1.0f - Pow(rotation_lerp_speed, static_cast<RkFloat>(delta_time))};
-	Vector3m   const  new_position {Vector3m  ::Lerp(m_current_position, m_target_position, t_position)};
-	Quaternion const  new_rotation {Quaternion::Lerp(m_current_rotation, m_target_rotation, t_rotation)};
+	// 1 - Clamping targets
+	m_target_fov				 = Clamp<Radians>(m_target_fov, 10_deg, 140_deg);
+	m_target_rotation.angles.x() = Clamp(m_target_rotation.angles.x(),
+		-Constants<Radians>::pi_2,
+		 Constants<Radians>::pi_2
+	);
 
-	// 2 - Updating the actual values
-	m_current_position = new_position;
-	m_current_rotation = new_rotation;
-	m_camera_data	   = CameraData {
-		Matrix4x4::ModelMatrix(m_current_position, m_current_rotation, Constants<Vector3m>::one),
-		Matrix4x4::PerspectiveProjectionMatrix(90_deg, m_window->GetSize().AspectRatio(), 1_cm, 10_km),
+	// 2 - Interpolation
+ 	RkFloat  const delta_time  {m_clock->LastTickDuration()};
+	RkFloat  const t_position  {1.0f - Pow(s_position_lerp_speed, delta_time)};
+	RkFloat  const t_rotation  {1.0f - Pow(s_rotation_lerp_speed, delta_time)};
+	RkFloat  const t_fov       {1.0f - Pow(     s_fov_lerp_speed, delta_time)};
+	RkFloat  const ratio	   {m_window->GetSize().AspectRatio()};
+	Vector3m const focus_point {m_current_position + m_current_rotation.DirectionVector() * m_focus_distance};
+
+	m_current_fov      = 				 Lerp(m_current_fov	    , m_target_fov	   , t_fov);
+	m_current_rotation = SphericalCoord::Lerp(m_current_rotation, m_target_rotation, t_rotation);
+
+	if (m_position_update_mode == EPositionUpdateMode::Linear)
+		m_current_position = Vector3m::Lerp(m_current_position, m_target_position, t_position);
+	else
+		m_current_position = m_target_position = focus_point - m_current_rotation.DirectionVector() * m_focus_distance;
+
+	m_camera_data = CameraData {
+		Matrix4x4::ModelMatrix(m_current_position, m_current_rotation.AsQuaternion()).Inverted(),
+		Matrix4x4::PerspectiveProjection(m_current_fov, ratio, 1_cm, 1_km),
 	};
+
+	// 3 - Post processing
+	if (m_focus_update_mode != EUpdateMode::None)
+	{
+		UpdateFocusDistance();
+
+		if (m_focus_update_mode == EUpdateMode::Once)
+			m_focus_update_mode = EUpdateMode::None;
+	}
 
 	return m_camera_data;
 }
 
-RkVoid CameraController::ScrollCallback(Window& in_window, double const in_x_offset, double const in_y_offset)
+RkVoid CameraController::ScrollCallback(Window& in_window, [[maybe_unused]] double const in_x_offset, double const in_y_offset)
 {
-	RkBool  const shift_pressed {glfwGetKey(in_window.GLFWHandle(), GLFW_MOD_SHIFT) == GLFW_PRESS};
-	RkFloat const speed			{shift_pressed ? 5.0f : 1.0f};
+	GLFWwindow* const handle		{in_window.GLFWHandle()};
+	RkBool      const shift_pressed {glfwGetKey(handle, GLFW_KEY_LEFT_SHIFT ) == GLFW_PRESS ||
+								     glfwGetKey(handle, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS};
+	RkBool      const alt_pressed   {glfwGetKey(handle, GLFW_KEY_LEFT_ALT   ) == GLFW_PRESS ||
+								     glfwGetKey(handle, GLFW_KEY_RIGHT_ALT  ) == GLFW_PRESS};
 
-	Zoom(-in_y_offset * speed);
+	if (alt_pressed) ZoomFov(-in_y_offset * (shift_pressed ? 5.0f : 1.0f));
+	else			 Zoom   ( in_y_offset * (shift_pressed ? 5.0f : 1.0f));
 }
 
 RkVoid CameraController::MouseButtonCallback(Window& in_window, int const in_button, int const in_action, int const in_mods)
 {
-	// Pan camera controls
-	if (in_button == GLFW_MOUSE_BUTTON_MIDDLE)
+	if (in_action == GLFW_PRESS)
 	{
-		if (in_action == GLFW_PRESS)
-		{
-			glfwSetInputMode(in_window.GLFWHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			m_current_movement_mode = EMovementMode::Pan;
+		m_screen_start_position = in_window.GetCursorPosition();
 
-			RkDouble x, y {};
-			glfwGetCursorPos(in_window.GLFWHandle(), &x, &y);
-			m_world_start_position  = m_current_position;
-			m_screen_start_position = Vector2px {
-				Pixels(x),
-				Pixels(y)
-			};
-		}
-		else if (in_action == GLFW_RELEASE)
+		// Pan camera controls
+		if (in_button == GLFW_MOUSE_BUTTON_MIDDLE)
 		{
-			glfwSetInputMode(in_window.GLFWHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			m_current_movement_mode = EMovementMode::None;
+			m_cursor_mode = ECursorMode::PanCamera;
+			UpdateFocusDistance();
 		}
+
+		// Rotations
+		if (in_button == GLFW_MOUSE_BUTTON_RIGHT)
+			m_cursor_mode = in_mods == GLFW_MOD_ALT ?
+				ECursorMode::RotateCameraAroundFocus :
+				ECursorMode::RotateCamera;
 	}
+	else if (in_action == GLFW_RELEASE)
+		m_cursor_mode = ECursorMode::Free;
 }
 
 RkVoid CameraController::CursorPositionCallback(Window&, double const in_x_position, double const in_y_position)
@@ -89,80 +112,140 @@ RkVoid CameraController::CursorPositionCallback(Window&, double const in_x_posit
 		Pixels(in_y_position)
 	};
 
-	if (m_current_movement_mode == EMovementMode::Pan)
-		Pan(m_screen_start_position, cursor_position);
+	if (m_cursor_mode == ECursorMode::PanCamera)
+		Pan   (m_screen_start_position, cursor_position);
+	if (m_cursor_mode == ECursorMode::RotateCamera)
+		Rotate(m_screen_start_position, cursor_position);
+	if (m_cursor_mode == ECursorMode::RotateCameraAroundFocus)
+		RotateAroundFocus(m_screen_start_position, cursor_position);
 
 	m_screen_start_position = cursor_position;
 }
 
-RkVoid CameraController::Zoom(RkFloat const in_offset)
+RkVoid CameraController::Rotate(Vector2px const in_start, Vector2px const in_end) noexcept
 {
-	Vector3m const camera_forward {m_camera_data.view * Constants<Vector4m>::forward};
+	Vector2px  const window_size	    {m_window->GetSize()};
+	Vector2f   const ndc_start_position {VectorCast<RkFloat>(in_start) / VectorCast<RkFloat>(window_size) * 2.0f - 1.0f};
+	Vector2f   const ndc_end_position   {VectorCast<RkFloat>(in_end)   / VectorCast<RkFloat>(window_size) * 2.0f - 1.0f};
+	Quaternion const inv_forward		{m_current_rotation.AsQuaternion().Inverted()};
 
-	m_target_position += camera_forward * in_offset;
+	m_focus_update_mode    = EUpdateMode        ::None;
+	m_position_update_mode = EPositionUpdateMode::Linear;
+	m_target_rotation     -=
+		SphericalCoord(inv_forward * m_camera_data.NDCToWorldDirection(ndc_end_position  )) -
+		SphericalCoord(inv_forward * m_camera_data.NDCToWorldDirection(ndc_start_position));
 }
 
-RkVoid CameraController::Pan(Vector2px const in_start, Vector2px const in_end)
+RkVoid CameraController::RotateAroundFocus(Vector2px const in_start, Vector2px const in_end) noexcept
+{
+	Vector2px  const window_size		{m_window->GetSize()};
+	Vector2f   const ndc_start_position {VectorCast<RkFloat>(in_start) / VectorCast<RkFloat>(window_size) * 2.0f - 1.0f};
+	Vector2f   const ndc_end_position   {VectorCast<RkFloat>(in_end)   / VectorCast<RkFloat>(window_size) * 2.0f - 1.0f};
+	Quaternion const inv_forward        {m_current_rotation.AsQuaternion().Inverted()};
+
+	m_focus_update_mode    = EUpdateMode		::None;
+	m_position_update_mode = EPositionUpdateMode::Spherical;
+	m_target_rotation     +=
+		SphericalCoord(inv_forward * m_camera_data.NDCToWorldDirection(ndc_end_position  )) -
+		SphericalCoord(inv_forward * m_camera_data.NDCToWorldDirection(ndc_start_position));
+}
+
+RkVoid CameraController::Zoom(RkFloat const in_offset) noexcept
+{
+	m_focus_update_mode    = EUpdateMode		::Continuous;
+	m_position_update_mode = EPositionUpdateMode::Linear;
+	m_target_position     += m_camera_data.forward * in_offset;
+}
+
+RkVoid CameraController::ZoomFov(RkFloat const in_offset) noexcept
+{
+	m_focus_update_mode    = EUpdateMode		::None;
+	m_position_update_mode = EPositionUpdateMode::Linear;
+	m_target_fov          += s_fov_scroll_speed * in_offset;
+}
+
+RkVoid CameraController::HandleMovement() noexcept
+{
+	// Key polling
+	GLFWwindow*  window {m_window->GLFWHandle()};
+	RkBool const shift_pressed {
+		glfwGetKey(window, GLFW_KEY_LEFT_SHIFT ) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS
+	};
+	RkBool const up_pressed {
+		glfwGetKey(window, GLFW_KEY_UP   ) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_W    ) == GLFW_PRESS
+	};
+	RkBool const down_pressed {
+		glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_S    ) == GLFW_PRESS
+	};
+	RkBool const left_pressed {
+		glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_A    ) == GLFW_PRESS
+	};
+	RkBool const right_pressed {
+		glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_D    ) == GLFW_PRESS
+	};
+
+	// Velocity computation
+	RkFloat const delta_time {m_clock->LastTickDuration()};
+	Meters  const speed      {shift_pressed ? 30_m : 10_m};
+	Vector3m      direction  {};
+
+	if (up_pressed)    direction += Constants<Vector3m>::forward;
+	if (down_pressed)  direction += Constants<Vector3m>::backward;
+	if (left_pressed)  direction += Constants<Vector3m>::left;
+	if (right_pressed) direction += Constants<Vector3m>::right;
+
+	if (up_pressed || down_pressed || left_pressed || right_pressed)
+	{
+		m_focus_update_mode    = EUpdateMode	    ::Continuous;
+		m_position_update_mode = EPositionUpdateMode::Linear;
+		m_target_position     += m_camera_data.inverted_view * Vector4m(direction * speed * delta_time, 0_m);
+	}
+}
+
+RkVoid CameraController::Pan(Vector2px const in_start, Vector2px const in_end) noexcept
 {
 	// NDC means normalized device coordinates
 	Vector2px const window_size		   {m_window->GetSize()};
 	Vector2f  const ndc_start_position {VectorCast<RkFloat>(in_start) / VectorCast<RkFloat>(window_size) * 2.0f - 1.0f};
 	Vector2f  const ndc_end_position   {VectorCast<RkFloat>(in_end)   / VectorCast<RkFloat>(window_size) * 2.0f - 1.0f};
 
-	Vector4m  const near_start_pos     {VectorCast<Meters>(ndc_start_position), -1.0_m, 1.0_m};
-	Vector4m  const  far_start_pos     {VectorCast<Meters>(ndc_start_position),  1.0_m, 1.0_m};
-	Vector4m  const   near_end_pos     {VectorCast<Meters>(  ndc_end_position), -1.0_m, 1.0_m};
-	Vector4m  const    far_end_pos     {VectorCast<Meters>(  ndc_end_position),  1.0_m, 1.0_m};
-
 	Ray3 const start_ray {
-		.origin    =  (m_camera_data.inverted_view_projection * near_start_pos).Homogenize(),
-		.direction = ((m_camera_data.inverted_view_projection *  far_start_pos).Homogenize() - m_camera_data.near_plane_position).Normalized()
+		.origin    = m_camera_data.NDCToWorldPosition (Vector3f {ndc_start_position, 0.0f}),
+		.direction = m_camera_data.NDCToWorldDirection(ndc_start_position)
 	};
 
 	Ray3 const end_ray {
-		.origin    =  (m_camera_data.inverted_view_projection * near_end_pos).Homogenize(),
-		.direction = ((m_camera_data.inverted_view_projection *  far_end_pos).Homogenize() - m_camera_data.near_plane_position).Normalized()
+		.origin    = m_camera_data.NDCToWorldPosition (Vector3f {ndc_end_position  , 0.0f}),
+		.direction = m_camera_data.NDCToWorldDirection(ndc_end_position)
 	};
 
 	Plane3 const grab_plane {
-		.origin = m_camera_data.near_plane_position + m_camera_data.forward * m_camera_data.near_plane_position.Length(),
-		.normal = m_camera_data.forward
+		.origin = m_camera_data.world_position + m_camera_data.forward * m_focus_distance,
+		.normal = -m_camera_data.forward
 	};
 
 	// Shooting 2 rays though the near plane, to get 2 world space positions
 	std::optional const start_grab_position {grab_plane.RayPlaneIntersection(start_ray)};
 	std::optional const   end_grab_position {grab_plane.RayPlaneIntersection(end_ray  )};
 
-	RUKEN_ASSERT(
-		start_grab_position && end_grab_position,
-		"This ray plane intersection should never fail. Your maths are probably wrong."
-	);
-
-	// Finally, projecting the start and end positions to a plane facing
-	// the camera to get the displacement we need to apply.
-	Vector3m  const normal    {(m_camera_data.near_plane_position - start_grab_position.value()).Normalized()};
-	Vector3m  const tangent   {m_camera_data.forward};
-	Vector3m  const bitangent {grab_plane.normal.Cross(tangent)};
-	Matrix4x4 const plane_matrix {
-		tangent.x(), bitangent.x(), normal.x(), 0.0f,
-		tangent.y(), bitangent.y(), normal.y(), 0.0f,
-		tangent.z(), bitangent.z(), normal.z(), 0.0f,
-		m_camera_data.near_plane_position.x(), m_camera_data.near_plane_position.y(), m_camera_data.near_plane_position.z(), 1.0f
-	};
-/*
-	Matrix4x4 const plane_matrix {
-		tangent.x(), bitangent.x(), normal.x(), m_camera_data.near_plane_position.x(),
-		tangent.y(), bitangent.y(), normal.y(), m_camera_data.near_plane_position.y(),
-		tangent.z(), bitangent.z(), normal.z(), m_camera_data.near_plane_position.z(),
-		0.0f       , 0.0f         , 0.0f      , 1.0f
-    };
-    */
-	Matrix4x4 const inverted_plane_matrix {plane_matrix.Inverted()};
-
-	Vector3m const a((inverted_plane_matrix * Vector4m(  end_grab_position.value(), 1.0_m)).Homogenize());
-	Vector3m const b((inverted_plane_matrix * Vector4m(start_grab_position.value(), 1.0_m)).Homogenize());
-    Vector3m const displacement {(plane_matrix * Vector4m(a - b, 0.0_m))};
+	if (!start_grab_position || !end_grab_position)
+		return;
 
 	// Finally applying the offset
-	m_target_position = m_world_start_position + (start_grab_position.value() - end_grab_position.value());
+	m_focus_update_mode    = EUpdateMode        ::None;
+	m_position_update_mode = EPositionUpdateMode::Linear;
+	m_target_position     += start_grab_position.value() - end_grab_position.value();
+}
+
+RkVoid CameraController::UpdateFocusDistance() noexcept
+{
+	m_focus_distance = s_ground_plane.RayPlaneDistance(Ray3 {
+		.origin    = m_camera_data.world_position,
+		.direction = m_camera_data.forward
+	}).value_or(25.0_m);
 }

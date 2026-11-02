@@ -75,6 +75,13 @@ Vector2px Window::GetSize() const noexcept
 	};
 }
 
+Vector2px Window::GetCursorPosition() const noexcept
+{
+	RkDouble x, y {};
+	glfwGetCursorPos(m_window, &x, &y);
+	return Vector2px { Pixels(x), Pixels(y) };
+}
+
 RkBool Window::ShouldClose() const noexcept
 {
 	return glfwWindowShouldClose(m_window);

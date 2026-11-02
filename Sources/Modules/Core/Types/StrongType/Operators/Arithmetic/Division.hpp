@@ -23,7 +23,6 @@ struct Division
      *
      * \param in_lhs Left-hand side operand
      * \param in_rhs Right-hand side operand
-     *
      * \return Reference to the instance
      */
     template <typename TStrongType>
@@ -38,7 +37,6 @@ struct Division
      *
      * \param in_lhs Left-hand side operand
      * \param in_rhs Right-hand side operand
-     *
      * \return Reference to the instance
      */
     template <typename TStrongType>
@@ -53,7 +51,6 @@ struct Division
      *
      * \param in_lhs Left-hand side operand
      * \param in_rhs Right-hand side operand
-     *
      * \return Value of the new instance
      */
     template <typename TStrongType>
@@ -71,7 +68,6 @@ struct Division
      *
      * \param in_lhs Left-hand side operand
      * \param in_rhs Right-hand side operand
-     *
      * \return Value of the new instance
      */
     template <typename TStrongType>

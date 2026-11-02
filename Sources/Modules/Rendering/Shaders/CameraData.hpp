@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Maths/Matrix/Matrix.hpp"
-#include "Maths/Vector/DistanceVector.hpp"
+#include "Core/Maths/Matrix/Matrix.hpp"
+#include "Core/Maths/Vector/VectorCast.hpp"
+#include "Core/Maths/Vector/ScalarVector.hpp"
+#include "Core/Maths/Vector/DistanceVector.hpp"
 
 #include "Rendering/RenderDevice.hpp"
 #include "Rendering/Resources/GPUBuffer.hpp"
@@ -18,13 +20,15 @@ struct CameraData
 		view					 {in_view},
 		projection				 {in_projection},
 		view_projection 		 {view * projection},
-		inverted_view			 {view		.Inverted()},
-		inverted_projection 	 {projection.Inverted()},
+		inverted_view			 {view		     .Inverted()},
+		inverted_projection 	 {projection     .Inverted()},
 		inverted_view_projection {inverted_projection * inverted_view},
 		world_position			 {Meters(inverted_view.data[12]), Meters(inverted_view.data[13]), Meters(inverted_view.data[14])},
-		near_plane_position      {(inverted_view_projection * Vector4m(0_m, 0_m, -1_m, 1_m)).Homogenize()},
-		far_plane_position       {(inverted_view_projection * Vector4m(0_m, 0_m,  1_m, 1_m)).Homogenize()},
-		forward					 {(far_plane_position - near_plane_position).Normalized()}
+		near_plane_position      {(inverted_view_projection * Vector4m(Constants<Vector3m>::zero   , 1_m)).Homogenized()},
+		far_plane_position       {(inverted_view_projection * Vector4m(Constants<Vector3m>::forward, 1_m)).Homogenized()},
+		forward					 {(inverted_view            * Vector4m(Constants<Vector3m>::forward, 0_m)).xyz()},
+		up						 {(inverted_view            * Vector4m(Constants<Vector3m>::up     , 0_m)).xyz()},
+		right				     {(inverted_view            * Vector4m(Constants<Vector3m>::right  , 0_m)).xyz()}
 	{}
 
 	// This struct is uploaded to the GPU as is.
@@ -41,6 +45,28 @@ struct CameraData
 	alignas(16) Vector3m  near_plane_position;
 	alignas(16) Vector3m  far_plane_position;
 	alignas(16) Vector3m  forward;
+	alignas(16) Vector3m  up;
+	alignas(16) Vector3m  right;
+
+	#pragma region Methods
+
+	Vector3m NDCToWorldDirection(Vector2f const& in_ndc) const noexcept
+	{
+		Vector4m const near_ndc {VectorCast<Meters>(in_ndc), 0_m, 1_m};
+		Vector4m const far_ndc  {VectorCast<Meters>(in_ndc), 1_m, 1_m};
+
+		Vector3m const near_position {(inverted_view_projection * near_ndc).Homogenized()};
+		Vector3m const far_position  {(inverted_view_projection * far_ndc ).Homogenized()};
+
+		return (far_position - near_position).Normalize();
+	}
+
+	Vector3m NDCToWorldPosition(Vector3f const& in_ndc) const noexcept
+	{
+		return (inverted_view_projection * Vector4m {VectorCast<Meters>(in_ndc), 1_m}).Homogenized();
+	}
+
+	#pragma endregion
 };
 
 /**
