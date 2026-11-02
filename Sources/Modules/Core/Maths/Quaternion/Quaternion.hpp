@@ -87,7 +87,7 @@ struct Quaternion
 	Quaternion Normalized() const noexcept;
 
     /// @returns A vector pointing in the direction of the rotation
-    Vector3m ToDirectionVector() const noexcept;
+    Vector3m DirectionVector() const noexcept;
 
 	Vector3rad Euler() const noexcept;
 

@@ -22,10 +22,10 @@ Quaternion::Quaternion(Vector3rad const& in_euler_rotation) noexcept
     RkFloat const sin_y = Sin(half_y_angle);
     RkFloat const sin_z = Sin(half_z_angle);
 
-    w = cos_x * cos_y * cos_z - sin_x * sin_y * sin_z;
-    x = sin_x * cos_y * cos_z + cos_x * sin_y * sin_z;
-    y = cos_x * sin_y * cos_z - sin_x * cos_y * sin_z;
-    z = cos_x * cos_y * sin_z + sin_x * sin_y * cos_z;
+    w = cos_x * cos_y * cos_z + sin_x * sin_y * sin_z;
+    x = sin_x * cos_y * cos_z - cos_x * sin_y * sin_z;
+    y = cos_x * sin_y * cos_z + sin_x * cos_y * sin_z;
+    z = cos_x * cos_y * sin_z - sin_x * sin_y * cos_z;
 }
 
 Quaternion::Quaternion(Vector2rad const& in_euler_rotation) noexcept:
@@ -72,7 +72,7 @@ Quaternion Quaternion::Normalized() const noexcept
     return result;
 }
 
-Vector3m Quaternion::ToDirectionVector() const noexcept
+Vector3m Quaternion::DirectionVector() const noexcept
 {
     return *this * Constants<Vector3m>::forward;
 }

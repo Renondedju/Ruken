@@ -6,6 +6,7 @@
 
 #include "Core/Maths/Vector/Operations/VectorFormatter.hpp"
 #include "Core/Maths/Vector/Operations/VectorNormalization.hpp"
+#include "Core/Maths/Vector/Operations/VectorHomogenize.hpp"
 #include "Core/Maths/Vector/Operations/VectorOperators.hpp"
 #include "Core/Maths/Vector/Operations/VectorLength.hpp"
 #include "Core/Maths/Vector/Operations/VectorMinMax.hpp"
@@ -24,6 +25,7 @@ BEGIN_RUKEN_NAMESPACE
 template <RkSize TSize, EDistanceUnit TDistanceUnit>
 struct RUKEN_EMPTY_BASES DistanceVectorOperations:
 	VectorNormalization<TSize, Distance<TDistanceUnit>>,
+	VectorHomogenize   <TSize, Distance<TDistanceUnit>>,
 	VectorOperators    <TSize, Distance<TDistanceUnit>>,
 	VectorMinMax       <TSize, Distance<TDistanceUnit>>,
 	VectorLength       <TSize, Distance<TDistanceUnit>>,
@@ -230,19 +232,6 @@ struct RUKEN_EMPTY_BASES alignas(16) Vector<4, Distance<TDistanceUnit>> final:
 					 Vector<3, Distance<TDistanceUnit>> const& in_yzw) noexcept:
 		data {in_x, in_yzw.x(), in_yzw.y(), in_yzw.z()}
 	{}
-
-	#pragma endregion
-
-	#pragma region Methods
-
-	Vector<3, Distance<TDistanceUnit>> Homogenize() const noexcept
-	{
-		return Vector<3, Distance<TDistanceUnit>>{
-			data[0] / data[3],
-			data[1] / data[3],
-			data[2] / data[3]
-		};
-	}
 
 	#pragma endregion
 };

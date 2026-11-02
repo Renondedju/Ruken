@@ -60,12 +60,15 @@ struct RUKEN_EMPTY_BASES Vector<2, Pixels> final:
     #pragma region Methods
 
     /**
-	 * \brief Returns the aspect ratio of the vector (width/height)
-	 * \return Aspect ratio
+	 * @brief Returns the aspect ratio of the vector (width/height)
+	 * @return Aspect ratio
 	 */
 	constexpr RkFloat AspectRatio() const noexcept
 	{
-	    return static_cast<RkFloat>(Width()) / static_cast<RkFloat>(Height());
+		RkFloat const width  {Width()};
+		RkFloat const height {Height()};
+
+	    return width / height;
 	}
 
     #pragma endregion

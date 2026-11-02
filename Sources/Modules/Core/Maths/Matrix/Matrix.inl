@@ -2,10 +2,10 @@
 
 #include "Core/Maths/Matrix/Matrix.hpp"
 #include "Core/Debug/Assert.hpp"
+#include "Maths/Matrix/Matrix.hpp"
 
 BEGIN_RUKEN_NAMESPACE
-
-template<RkSize TRows, RkSize TColumns>
+	template<RkSize TRows, RkSize TColumns>
 constexpr Matrix<TRows, TColumns>::Matrix() noexcept:
 	data {}
 {
@@ -17,14 +17,9 @@ constexpr Matrix<TRows, TColumns>::Matrix() noexcept:
 
 template<RkSize TRows, RkSize TColumns>
 template<typename ... TTypes> requires (sizeof...(TTypes) == TRows * TColumns)
-constexpr Matrix<TRows, TColumns>::Matrix(TTypes... in_values) noexcept
-{
-	RkFloat values[] { static_cast<RkFloat>(in_values)... };
-
-	for (RkSize column {0ULL}; column < TColumns; ++column)
-		for (RkSize row {0ULL}; row < TRows; ++row)
-			data[column + row * TColumns] = values[column + row * TColumns];
-}
+constexpr Matrix<TRows, TColumns>::Matrix(TTypes... in_values) noexcept:
+	data { static_cast<RkFloat>(in_values)... }
+{}
 
 #pragma region Static Methods
 
@@ -52,9 +47,9 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ModelMatrix(
 	Quaternion const& in_rotation,
 	Vector3m   const& in_scale) noexcept requires (TRows == 4 && TColumns == 4)
 {
-	return Matrix::ScaleMatrix		(in_scale)    *
+	return Matrix::TranslationMatrix(in_position) *
 	       Matrix::RotationMatrix3D (in_rotation) *
-	       Matrix::TranslationMatrix(in_position);
+	       Matrix::ScaleMatrix		(in_scale)    ;
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -67,7 +62,7 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ModelMatrix(
 }
 
 template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::PerspectiveProjectionMatrix(
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::PerspectiveProjection(
 	Radians const in_fov,
 	RkFloat const in_aspect,
 	Meters  const in_near,
@@ -77,19 +72,20 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::PerspectiveProjection
 	// https://www.kdab.com/projection-matrices-with-vulkan-part-2/
 	// Post view correction is used. This matrix is specific to vulkan.
 	RkFloat const fov_tangent {Tan(in_fov / 2.0F)};
-	Meters  const far         {-in_far};
-	Meters  const near        {-in_near};
+	RkFloat const far         {-in_far};
+	RkFloat const near        {-in_near};
+	RkFloat const f_n         {far - near};
 
 	return Matrix<4, 4> {
-		fov_tangent / in_aspect, 0.0F,  0.0F, 0.0F,
+		(1.0f/in_aspect) / fov_tangent, 0.0F,  0.0F, 0.0F,
 		0.0F, 1.0f / fov_tangent, 0.0F, 0.0F,
-		0.0F, 0.0F, -far / (far - near),          1.0F,
-		0.0F, 0.0F, -(far * near) / (far - near), 0.0F
-	} * Matrix4x4::ClipSpace();
+		0.0F, 0.0F, -far / f_n,          1.0F,
+		0.0F, 0.0F, -(far * near) / f_n, 0.0F
+	} * ClipSpace();
 }
 
 template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::OrthogonalProjectionMatrix(
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::OrthogonalProjection(
 	Meters const in_left,
 	Meters const in_right,
 	Meters const in_bottom,
@@ -115,7 +111,7 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::OrthogonalProjectionM
 		-(bot + top) / bt,
 		in_near      / nf,
 		1.0F
-	} * Matrix4x4::ClipSpace();
+	} * ClipSpace();
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -130,71 +126,39 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ClipSpace() noexcept 
 }
 
 template<RkSize TRows, RkSize TColumns>
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(Quaternion const& in_rotation) noexcept
+	requires (TRows >= 3 && TColumns >= 3)
+{
+	RkFloat const qxx {in_rotation.x * in_rotation.x};
+	RkFloat const qyy {in_rotation.y * in_rotation.y};
+	RkFloat const qzz {in_rotation.z * in_rotation.z};
+	RkFloat const qxz {in_rotation.x * in_rotation.z};
+	RkFloat const qxy {in_rotation.x * in_rotation.y};
+	RkFloat const qyz {in_rotation.y * in_rotation.z};
+	RkFloat const qwx {in_rotation.w * in_rotation.x};
+	RkFloat const qwy {in_rotation.w * in_rotation.y};
+	RkFloat const qwz {in_rotation.w * in_rotation.z};
+
+	return Matrix3x3 {
+		1.0f - 2.0f * (qyy + qzz),        2.0f * (qxy + qwz),         2.0f * (qxz - qwy),
+		       2.0f * (qxy - qwz), 1.0f - 2.0f * (qxx + qzz),         2.0f * (qyz + qwx),
+		       2.0f * (qxz + qwy),        2.0f * (qyz - qwx),  1.0f - 2.0f * (qxx + qyy),
+	};
+}
+
+template<RkSize TRows, RkSize TColumns>
 constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(Vector3rad const& in_euler_angles) noexcept
 	requires (TRows >= 3 && TColumns >= 3)
 {
-	RkFloat const cos_x = Cos(in_euler_angles.x());
-	RkFloat const sin_x = Sin(in_euler_angles.x());
-	RkFloat const cos_y = Cos(in_euler_angles.y());
-	RkFloat const sin_y = Sin(in_euler_angles.y());
-	RkFloat const cos_z = Cos(in_euler_angles.z());
-	RkFloat const sin_z = Sin(in_euler_angles.z());
-
-	// The resulting matrix will implicitly be converted to the requested size if needed
-	return Matrix<3, 3> {
-		cos_z * cos_y - sin_z * sin_x * sin_y, sin_z * cos_y + cos_z * sin_x * sin_y, -cos_x * sin_y,
-		-sin_z * cos_x,						   cos_z * cos_x, sin_x,
-		cos_z * sin_y + sin_z * sin_x * cos_y, sin_z * sin_y - cos_z * sin_x * cos_y, cos_x * cos_y
-	};
+	return RotationMatrix3D(Quaternion {in_euler_angles});
 }
 
 template<RkSize TRows, RkSize TColumns>
 constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(
 	Vector3m const& in_axis,
-	Radians  const in_angle) noexcept requires (TRows >= 3 && TColumns >= 3)
+	Radians  const  in_angle) noexcept requires (TRows >= 3 && TColumns >= 3)
 {
-	RkFloat const cos_angle = Cos(in_angle);
-	RkFloat const sin_angle = Sin(in_angle);
-
-	// The matrix will implicitly be converted to the requested size if needed
-	return Matrix<3, 3> {
-		cos_angle + static_cast<RkFloat>(in_axis.x() * in_axis.x()) * (1 - cos_angle),
-		in_axis.y() * in_axis.x() * (1 - cos_angle) + in_axis.z() * sin_angle,
-		in_axis.z() * in_axis.x() * (1 - cos_angle) - in_axis.y() * sin_angle,
-		in_axis.x() * in_axis.y() * (1 - cos_angle) - in_axis.z() * sin_angle,
-		cos_angle + static_cast<RkFloat>(in_axis.y() * in_axis.y()) * (1 - cos_angle),
-		in_axis.z() * in_axis.y() * (1 - cos_angle) + in_axis.x() * sin_angle,
-		in_axis.x() * in_axis.z() * (1 - cos_angle) + in_axis.y() * sin_angle,
-		in_axis.y() * in_axis.z() * (1 - cos_angle) - in_axis.x() * sin_angle,
-		cos_angle + static_cast<RkFloat>(in_axis.z() * in_axis.z()) * (1 - cos_angle),
-	};
-}
-
-template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::RotationMatrix3D(Quaternion const in_value) noexcept
-	requires (TRows >= 3 && TColumns >= 3)
-{
-	RkFloat const sqr_x (in_value.x * in_value.x);
-	RkFloat const sqr_y (in_value.y * in_value.y);
-	RkFloat const sqr_z (in_value.z * in_value.z);
-
-	// The matrix will implicitly be converted to the requested size if needed
-	/*
-	return Matrix<3, 3> {
-		1 - 2 * (sqr_y + sqr_z), 2 * (in_value.x * in_value.y - in_value.z * in_value.w), 2 * (in_value.x * in_value.z + in_value.y * in_value.w),
-
-		2 * (in_value.x * in_value.y + in_value.z * in_value.w), 1 - 2 * (sqr_x + sqr_z), 2 * (in_value.y * in_value.z - in_value.x * in_value.w),
-
-		2 * (in_value.x * in_value.z - in_value.y * in_value.w), 2 * (in_value.y * in_value.z + in_value.x * in_value.w), 1 - 2 * (sqr_x + sqr_y)
-	};
-	*/
-	return Matrix<3, 3> {
-		1 - 2 * (sqr_y + sqr_z), 2 * (in_value.x * in_value.y + in_value.z * in_value.w), 2 * (in_value.x * in_value.z - in_value.y * in_value.w),
-
-		2 * (in_value.x * in_value.y - in_value.z * in_value.w), 1 - 2 * (sqr_x + sqr_z), 2 * (in_value.y * in_value.z + in_value.x * in_value.w),
-
-		2 * (in_value.x * in_value.z + in_value.y * in_value.w), 2 * (in_value.y * in_value.z - in_value.x * in_value.w), 1 - 2 * (sqr_x + sqr_y)
-	};
+	return RotationMatrix3D(Quaternion {in_axis, in_angle});
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -252,15 +216,15 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::ScaleMatrix(Vector<TS
 }
 
 template<RkSize TRows, RkSize TColumns>
-constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::TranslationMatrix(Vector3m const& in_translation) noexcept
-	requires (TRows == 4 && TColumns == 4)
+constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::TranslationMatrix(Vector<TRows - 1, Meters> const& in_translation) noexcept
+	requires (TRows == TColumns)
 {
-	return Matrix<4, 4> {
-		1.0F, 0.0F, 0.0F, 0.0F,
-		0.0F, 1.0F, 0.0F, 0.0F,
-		0.0F, 0.0F, 1.0F, 0.0F,
-		in_translation.x(), in_translation.y(), in_translation.z(), 1.0F
-	};
+	Matrix translation {};
+
+	for (RkSize dimension {}; dimension < TRows - 1; ++dimension)
+		translation[TRows - 1, dimension] = static_cast<RkFloat>(in_translation.data[dimension]);
+
+	return translation;
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -312,23 +276,37 @@ constexpr Matrix<TRows, TColumns> Matrix<TRows, TColumns>::Inverted() const noex
 	};
 }
 
+template<RkSize TRows, RkSize TColumns>
+constexpr Matrix<TColumns, TRows> Matrix<TRows, TColumns>::Transposed() const noexcept
+{
+	Matrix<TColumns, TRows> new_matrix;
+
+	for (RkSize row {}; row < TRows;    ++row)
+	for (RkSize col {}; col < TColumns; ++col)
+		new_matrix[col, row] = (*this)[row, col];
+
+	return new_matrix;
+}
+
 #pragma endregion
 
 #pragma region Operators
 
-template<RkSize TRows, RkSize TColumns>
-template<RkSize TOtherRows, RkSize TOtherColumns> requires (TColumns == TOtherRows)
+template<RkSize TRows	  , RkSize TColumns>
+template<RkSize TOtherRows, RkSize TOtherColumns>
+	requires (TColumns == TOtherRows)
 constexpr Matrix<TRows, TOtherColumns> Matrix<TRows, TColumns>::operator*
 	(Matrix<TOtherRows, TOtherColumns> const& in_matrix) const noexcept
 {
 	Matrix<TRows, TOtherColumns> new_matrix;
 
-	for (RkSize row			 {0ULL}; row		  < TRows;         ++row)
-	for (RkSize other_column {0ULL}; other_column < TOtherColumns; ++other_column)
+	for (RkSize dst_row	   {}; dst_row	  < TRows;		   ++dst_row)
+	for (RkSize dst_column {}; dst_column < TOtherColumns; ++dst_column)
 	{
-		new_matrix[row, other_column] = 0.0F;
-		for (RkSize column {0ULL}; column < TColumns; ++column)
-			new_matrix[row, other_column] += (*this)[row, column] * in_matrix[column, other_column];
+		new_matrix[dst_row, dst_column] = 0.0F;
+		for (RkSize inner {}; inner < TColumns; inner++) {
+			new_matrix[dst_row, dst_column] += (*this)[dst_row, inner] * in_matrix[inner, dst_column];
+		}
 	}
 
 	return new_matrix;
@@ -336,19 +314,20 @@ constexpr Matrix<TRows, TOtherColumns> Matrix<TRows, TColumns>::operator*
 
 template<RkSize TRows, RkSize TColumns>
 template<RkSize TVectorSize, EDistanceUnit TDistanceUnit> requires (TColumns == TVectorSize)
-constexpr Vector<TVectorSize, Distance<TDistanceUnit>>  Matrix<TRows, TColumns>::operator*
+constexpr Vector<TVectorSize, Distance<TDistanceUnit>> Matrix<TRows, TColumns>::operator*
 	(Vector<TVectorSize, Distance<TDistanceUnit>> const& in_vector) const noexcept
 {
-	Vector<TVectorSize, Distance<TDistanceUnit>> new_vector;
+	Matrix<1, TVectorSize> matrix {};
+	for (RkSize size {}; size < TVectorSize; size++)
+		matrix[0, size] = static_cast<RkFloat>(in_vector[size]);
 
-	for (RkSize row	{0ULL}; row < TRows; ++row)
-	{
-		new_vector[row] = Distance<TDistanceUnit>(0.0F);
-		for (RkSize column {0ULL}; column < TVectorSize; ++column)
-			new_vector[row] += Distance<TDistanceUnit>((*this)[column, row]) * in_vector[column];
-	}
+	// Pre multiplication, row major vectors
+	Matrix<1, TVectorSize>						 result		   {matrix * *this};
+	Vector<TVectorSize, Distance<TDistanceUnit>> result_vector {};
+	for (RkSize size {}; size < TVectorSize; size++)
+		result_vector[size] = Distance<TDistanceUnit>(result[0, size]);
 
-	return new_vector;
+	return result_vector;
 }
 
 template<RkSize TRows, RkSize TColumns>
@@ -360,6 +339,26 @@ constexpr Matrix<TRows, TColumns>& Matrix<TRows, TColumns>::operator*=(Matrix co
 }
 
 template<RkSize TRows, RkSize TColumns>
+constexpr RkBool Matrix<TRows, TColumns>::operator==(Matrix const& in_matrix) const noexcept
+{
+	for (RkSize index {}; index < elements; ++index)
+		if (!RelativelyClose(data[index], in_matrix.data[index]))
+			return false;
+
+	return true;
+}
+
+template<RkSize TRows, RkSize TColumns>
+constexpr RkBool Matrix<TRows, TColumns>::operator!=(Matrix const& in_matrix) const noexcept
+{
+	for (RkSize index {}; index < elements; ++index)
+		if (!RelativelyClose(data[index], in_matrix.data[index]))
+			return true;
+
+	return false;
+}
+
+template<RkSize TRows, RkSize TColumns>
 template<RkSize TNewRows, RkSize TNewColumns>
 constexpr Matrix<TRows, TColumns>::operator Matrix<TNewRows, TNewColumns>() const noexcept
 {
@@ -367,7 +366,7 @@ constexpr Matrix<TRows, TColumns>::operator Matrix<TNewRows, TNewColumns>() cons
 	Matrix<TNewRows, TNewColumns> to_matrix {};
 
 	for (RkSize row {0ULL}; row < std::min(TRows, TNewRows); ++row)
-		std::memcpy( // Copy is done row by row,
+		memcpy( // Copy is done row by row,
 			&to_matrix.data[row * TNewColumns],
 			&          data[row * TColumns   ],
 			sizeof(RkFloat) * std::min(TColumns, TNewColumns));

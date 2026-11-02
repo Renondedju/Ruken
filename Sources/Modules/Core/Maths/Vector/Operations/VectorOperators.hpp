@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Maths/Utility.hpp"
 #include "Meta/Meta.hpp"
 #include "Maths/Vector/Helper/VectorHelper.hpp"
 
@@ -154,6 +155,36 @@ struct VectorOperators
     #undef RUKEN_VECTOR_ASSIGNMENT_OPERATOR_SCALAR_MIXIN
 
     /**
+     * Equality test.
+     * @param in_vector Other vector.
+     * @return True if the 2 vectors are equal.
+     */
+    [[nodiscard]]
+    constexpr RkBool operator==(TVector const& in_vector) const noexcept
+    {
+        for (RkSize index {}; index < TDimensions; ++index)
+            if (static_cast<TVector const*>(this)->data[index] != in_vector.data[index])
+                return false;
+
+        return true;
+    }
+
+    /**
+     * Inequality test.
+     * @param in_vector Other vector.
+     * @return True if the 2 vectors are not equal.
+     */
+    [[nodiscard]]
+    constexpr RkBool operator!=(TVector const& in_vector) const noexcept
+    {
+        for (RkSize index {}; index < TDimensions; ++index)
+            if (static_cast<TVector const*>(this)->data[index] == in_vector.data[index])
+                return false;
+
+        return true;
+    }
+
+    /**
      * \brief Inverts the content of the vector (unary -)
      * \return Inverted vector
      */
@@ -167,24 +198,6 @@ struct VectorOperators
             vector.data[index] = -static_cast<TVector const*>(this)->data[index];
 
         return vector;
-    }
-
-    /**
-     * \brief Right shift ostream operator
-     * \param in_stream Output stream to write to
-     * \param in_vector Vector instance to write
-     * \return Output stream reference
-     */
-    friend std::ostream& operator<<(std::ostream& in_stream, TVector const& in_vector) noexcept
-    {
-        in_stream << '(';
-        for (RkSize index {0ULL}; index < TDimensions; ++index)
-            if (index < TDimensions - 1)
-                in_stream << in_vector.data[index] << ", ";
-            else
-                in_stream << in_vector.data[index];
-
-        return in_stream << ')';
     }
 
     /**

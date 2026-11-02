@@ -4,16 +4,14 @@
 
 BEGIN_RUKEN_NAMESPACE
 
-struct Ray2
+template <RkSize TDimensions>
+struct Ray
 {
-	Vector2m origin;
-	Vector2m direction;
+	Vector<TDimensions, Meters> origin;
+	Vector<TDimensions, Meters> direction;
 };
 
-struct Ray3
-{
-	Vector3m origin;
-	Vector3m direction;
-};
+using Ray2 = Ray<2>;
+using Ray3 = Ray<3>;
 
 END_RUKEN_NAMESPACE

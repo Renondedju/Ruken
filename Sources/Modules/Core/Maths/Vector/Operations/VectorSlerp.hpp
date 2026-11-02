@@ -1,48 +1,40 @@
-
 #pragma once
 
 #include "Maths/Trigonometry.hpp"
-#include "Maths/Vector/Helper/VectorHelper.hpp"
 #include "Maths/Vector/Operations/VectorDot.hpp"
 #include "Maths/Vector/Operations/VectorNormalization.hpp"
 
 BEGIN_RUKEN_NAMESPACE
 
 /**
- * \brief Implements vector Slerp method
+ * @brief Implements vector Slerp method
  *
- * \tparam TDimensions Dimensions or size of the composed vector
- * \tparam TUnderlyingType Underlying type of the composed vector
+ * @tparam TDimensions Dimensions or size of the composed vector
+ * @tparam TUnderlyingType Underlying type of the composed vector
  */
 template <RkSize TDimensions, typename TUnderlyingType>
 struct VectorSlerp
 {
-    using TVector = Vector<TDimensions, TUnderlyingType>;
-    using Helper  = VectorHelper<TDimensions, TUnderlyingType>;
-
     #pragma region Static Methods
 
     /**
-     * \brief Performs a circular interpolation between this vector (source) and in_vector (destination)
+     * @brief Performs a circular interpolation between this vector (source) and in_vector (destination)
      *
-     * \tparam TOtherDimensions Dimensions or size of the right hand side vector
-     * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
-     * \param in_source Source vector
-     * \param in_destination Destination vector
-     * \param in_ratio Translation ratio (not clamped)
-     * \return Circularly interpolated vector
+     * @param in_source Source vector
+     * @param in_destination Destination vector
+     * @param in_ratio Translation ratio (not clamped)
+     * @return Circularly interpolated vector
      */
-    template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]]
-    static constexpr Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Slerp(
-        Vector<TDimensions, TUnderlyingType>           const& in_source,
-        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_destination,
-        RkFloat                                        const  in_ratio) noexcept
+    static constexpr Vector<TDimensions, TUnderlyingType> Slerp(
+        Vector<TDimensions, TUnderlyingType> const& in_source,
+        Vector<TDimensions, TUnderlyingType> const& in_destination,
+        RkFloat                              const  in_ratio) noexcept
     {
-        RkFloat const dot   = VectorDot<TDimensions, TVector>::Dot(in_source, in_destination);
-        Radians const theta = static_cast<Radians>(ArcCos(dot) * in_ratio);
+        RkFloat const dot   = VectorDot<TDimensions, TUnderlyingType>::Dot(in_source, in_destination);
+        Radians const theta = ArcCos(dot) * in_ratio;
 
-        return in_source * Cos(theta) + VectorNormalization<TDimensions, TVector>::Normalized(in_source - in_destination * dot) * Sin(theta);
+        return in_source * Cos(theta) + VectorNormalization<TDimensions, TUnderlyingType>::Normalized(in_source - in_destination * dot) * Sin(theta);
     }
 
     #pragma endregion
@@ -50,19 +42,15 @@ struct VectorSlerp
     #pragma region Methods
 
     /**
-     * \brief Performs a circular interpolation between this vector (source) and in_vector (destination)
-     *
-     * \tparam TOtherDimensions Dimensions or size of the right hand side vector
-     * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
-     * \param in_destination Destination vector
-     * \param in_ratio Translation ratio (not clamped)
-     * \return Circularly interpolated vector
+     * @brief Performs a circular interpolation between this vector (source) and in_vector (destination)
+     * @param in_destination Destination vector
+     * @param in_ratio Translation ratio (not clamped)
+     * @return Circularly interpolated vector
      */
-    template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]]
-    constexpr auto Slerp(Vector<TOtherDimensions, TOtherUnderlyingType> const& in_destination, RkFloat const in_ratio) const noexcept
+    constexpr auto Slerp(Vector<TDimensions, TUnderlyingType> const& in_destination, RkFloat const in_ratio) const noexcept
     {
-        return Slerp(*static_cast<TVector const*>(this), in_destination, in_ratio);
+        return Slerp(*static_cast<Vector<TDimensions, TUnderlyingType> const*>(this), in_destination, in_ratio);
     }
 
     #pragma endregion

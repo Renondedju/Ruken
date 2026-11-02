@@ -51,7 +51,7 @@ struct RUKEN_EMPTY_BASES Vector<2, Angle<TAngleUnit>> final:
 
 	#pragma region Getters/Setters
 
-	Angle<TAngleUnit>&	     operator[](RkSize in_offset)		  noexcept { return data[in_offset]; }
+	Angle<TAngleUnit>&	     operator[](RkSize in_offset)		noexcept { return data[in_offset]; }
 	Angle<TAngleUnit> const& operator[](RkSize in_offset) const noexcept { return data[in_offset]; }
 
 	Angle<TAngleUnit>&	     x()       noexcept { return data[0]; }

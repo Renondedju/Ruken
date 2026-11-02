@@ -107,7 +107,7 @@ struct Matrix
      * @return New perspective projection matrix
      */
     [[nodiscard]]
-    constexpr static Matrix PerspectiveProjectionMatrix(
+    constexpr static Matrix PerspectiveProjection(
             Radians in_fov,
             RkFloat in_aspect,
             Meters in_near,
@@ -128,7 +128,7 @@ struct Matrix
      * @return Orthogonal projection matrix
      */
     [[nodiscard]]
-    constexpr static Matrix OrthogonalProjectionMatrix(
+    constexpr static Matrix OrthogonalProjection(
             Meters in_left  , Meters in_right,
             Meters in_bottom, Meters in_top,
             Meters in_near  , Meters in_far) noexcept
@@ -147,12 +147,12 @@ struct Matrix
         requires (TRows == 4 && TColumns == 4);
 
     /**
-     * @brief Creates a 3D rotation matrix.
-     * @param in_euler_angles Euler angles.
-     * @return Rotation matrix.
+     * @brief Quaternion to rotation matrix.
+     * @param in_rotation Quaternion rotation.
+     * @return 3x3 rotation matrix, converted to the requested size.
      */
     [[nodiscard]]
-    constexpr static Matrix RotationMatrix3D(Vector3rad const& in_euler_angles) noexcept
+    constexpr static Matrix RotationMatrix3D(Quaternion const& in_rotation) noexcept
         requires (TRows >= 3 && TColumns >= 3);
 
     /**
@@ -166,11 +166,12 @@ struct Matrix
         requires (TRows >= 3 && TColumns >= 3);
 
     /**
-     * @brief Creates a 3D rotation matrix.
+     * @brief Euler angles to rotation matrix.
+     * @param in_euler_angles Euler angles
      * @return Rotation matrix.
      */
     [[nodiscard]]
-    constexpr static Matrix RotationMatrix3D(Quaternion in_value) noexcept
+    constexpr static Matrix RotationMatrix3D(Vector3rad const& in_euler_angles) noexcept
         requires (TRows >= 3 && TColumns >= 3);
 
     /**
@@ -216,13 +217,19 @@ struct Matrix
      * @return Translation matrix
      */
     [[nodiscard]]
-    constexpr static Matrix TranslationMatrix(Vector3m const& in_translation) noexcept
-        requires (TRows == 4 && TColumns == 4);
-
+    constexpr static Matrix TranslationMatrix(Vector<TRows - 1, Meters> const& in_translation) noexcept
+        requires (TRows == TColumns);
 
     [[nodiscard]]
     constexpr Matrix Inverted() const noexcept
         requires (TRows == 4 && TColumns == 4);
+
+    /**
+     * @brief Returns the transposed matrix.
+     * @return Transposed matrix
+     */
+    [[nodiscard]]
+    constexpr Matrix<TColumns, TRows> Transposed() const noexcept;
 
     #pragma endregion
 
@@ -251,6 +258,20 @@ struct Matrix
     constexpr Matrix& operator*=(Matrix const& in_matrix) noexcept;
 
     /**
+     * Checks if the 2 matrices are relatively close to each other.
+     * @param in_matrix Other matrix.
+     * @return True if the 2 matrices are relatively equal.
+     */
+    constexpr RkBool operator==(Matrix const& in_matrix) const noexcept;
+
+    /**
+     * Checks if the 2 matrices are not relatively close to each other.
+     * @param in_matrix Other matrix.
+     * @return False if the 2 matrices are relatively equal.
+     */
+    constexpr RkBool operator!=(Matrix const& in_matrix) const noexcept;
+
+    /**
      * @brief Matrix conversion operator.
      * @note This operator is only explicit if one of the new sizes of the matrix is smaller than the original one.
      * @tparam TNewRows New height or number of rows of the matrix.
@@ -273,6 +294,7 @@ struct Matrix
 
 using Matrix4x4 = Matrix<4, 4>;
 using Matrix3x3 = Matrix<3, 3>;
+using Matrix2x2 = Matrix<2, 2>;
 
 END_RUKEN_NAMESPACE
 

@@ -14,27 +14,21 @@ BEGIN_RUKEN_NAMESPACE
 template <RkSize TDimensions, typename TUnderlyingType>
 struct VectorLerp
 {
-    using Helper = VectorHelper<TDimensions, TUnderlyingType>;
-
     #pragma region Static Methods
 
     /**
-     * \brief Performs a linear interpolation between this vector (source) and in_vector (destination)
+     * @brief Performs a linear interpolation between this vector (source) and in_vector (destination)
      *
-     * \tparam TOtherDimensions Dimensions or size of the right hand side vector
-     * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
-     *
-     * \param in_source Source vector
-     * \param in_destination Destination vector
-     * \param in_ratio Translation ratio (not clamped)
-     * \return Interpolated vector
+     * @param in_source Source vector
+     * @param in_destination Destination vector
+     * @param in_ratio Translation ratio (not clamped)
+     * @return Interpolated vector
      */
-    template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]]
-    static constexpr Helper::template LargestVector<TOtherDimensions, TOtherUnderlyingType> Lerp(
-        Vector<TDimensions, TUnderlyingType>           const& in_source,
-        Vector<TOtherDimensions, TOtherUnderlyingType> const& in_destination,
-        RkFloat                                        const  in_ratio) noexcept
+    static constexpr Vector<TDimensions, TUnderlyingType> Lerp(
+        Vector<TDimensions, TUnderlyingType> const& in_source,
+        Vector<TDimensions, TUnderlyingType> const& in_destination,
+        RkFloat                              const  in_ratio) noexcept
     {
         return in_source + (in_destination - in_source) * in_ratio;
     }
@@ -44,18 +38,14 @@ struct VectorLerp
     #pragma region Methods
 
     /**
-     * \brief Performs a linear interpolation between this vector (source) and in_vector (destination)
+     * @brief Performs a linear interpolation between this vector (source) and in_vector (destination)
      *
-     * \tparam TOtherDimensions Dimensions or size of the right hand side vector
-     * \tparam TOtherUnderlyingType Underlying type of the right hand side vector
-     *
-     * \param in_destination Destination vector
-     * \param in_ratio Translation ratio (not clamped)
-     * \return Interpolated vector
+     * @param in_destination Destination vector
+     * @param in_ratio Translation ratio (not clamped)
+     * @return Interpolated vector
      */
-    template<RkSize TOtherDimensions, typename TOtherUnderlyingType>
     [[nodiscard]]
-    constexpr auto Lerp(Vector<TOtherDimensions, TOtherUnderlyingType> const& in_destination, RkFloat const in_ratio) const noexcept
+    constexpr auto Lerp(Vector<TDimensions, TUnderlyingType> const& in_destination, RkFloat const in_ratio) const noexcept
     {
         return Lerp(*static_cast<Vector<TDimensions, TUnderlyingType> const*>(this), in_destination, in_ratio);
     }

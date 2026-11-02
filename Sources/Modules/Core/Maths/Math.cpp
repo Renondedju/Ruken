@@ -21,9 +21,9 @@ RkFloat RUKEN_NAMESPACE::Exp2(RkFloat const in_value) noexcept
     return std::exp2f(in_value);
 }
 
-RkFloat RUKEN_NAMESPACE::Mod(RkFloat const in_value, RkFloat in_modulo) noexcept
+RkFloat RUKEN_NAMESPACE::Mod(RkFloat const in_value, RkFloat const in_modulo) noexcept
 {
-    return std::modf(in_value, &in_modulo);
+    return std::fmodf(in_modulo + std::fmodf(in_value, in_modulo), in_modulo);
 }
 
 RkFloat RUKEN_NAMESPACE::Frac(RkFloat const in_value) noexcept

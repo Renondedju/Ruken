@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Maths/Vector/Helper/VectorHelper.hpp"
