@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Filesystem/FilePath.hpp"
 #include "Core/ServiceProvider.hpp"
 #include "Types/FundamentalTypes.hpp"

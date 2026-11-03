@@ -4,8 +4,8 @@
 #include "Filesystem/Filesystem.hpp"
 #include "Core/Debug/Logging/Logger.hpp"
 
-#include <slang.h>
-#include <slang-com-ptr.h>
+#include <slang/slang.h>
+#include <slang/slang-com-ptr.h>
 
 USING_RUKEN_NAMESPACE
 
@@ -17,6 +17,7 @@ SlangImporter::SlangImporter() noexcept:
 
 		m_target_create_info .format                   = SLANG_SPIRV;
 		m_target_create_info .profile                  = m_global_session->findProfile("spirv_1_5");
+		m_session_create_info.defaultMatrixLayoutMode  = SLANG_MATRIX_LAYOUT_ROW_MAJOR;
 		m_session_create_info.targets                  = &m_target_create_info;
 		m_session_create_info.targetCount              = 1;
 		m_session_create_info.searchPaths              = m_search_paths.data();
