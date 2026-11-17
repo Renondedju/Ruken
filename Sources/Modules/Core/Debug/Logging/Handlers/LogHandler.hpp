@@ -9,7 +9,7 @@ BEGIN_RUKEN_NAMESPACE
 
 /**
  * @brief This is the base class responsible for dispatching the appropriate log messages
- *        (based on the log messages�' severity) to the handler�'s specified destination.
+ *        (based on the log messages severity) to the handler�'s specified destination.
  * @note  Logger objects can add zero or more handler objects to themselves with an "AddHandler" method.
  */
 class LogHandler
@@ -38,9 +38,7 @@ class LogHandler
 
         #pragma region Methods
     
-        /**
-         * \brief Adds the specified record to a thread safe queue.
-         */
+		/// @brief Adds the specified record to a thread safe queue.
         virtual RkVoid Handle(LogRecord&& in_record) noexcept = 0;
 
         #pragma endregion

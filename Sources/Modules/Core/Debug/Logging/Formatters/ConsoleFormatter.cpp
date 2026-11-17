@@ -56,28 +56,29 @@ ConsoleFormatter::ConsoleFormatter() noexcept:
 
 std::string ConsoleFormatter::ComputeLabel(LogRecord const& in_record) const noexcept
 {
-    #ifdef RUKEN_OS_WINDOWS
 
-    switch (in_record.level)
-    {
-        case ELogLevel::Debug:
-            SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_GREY);
-            break;
+#ifdef RUKEN_OS_WINDOWS
 
-        case ELogLevel::Info:
-            SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_WHITE);
-            break;
+        switch (in_record.level)
+        {
+            case ELogLevel::Debug:
+                SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_GREY);
+                break;
 
-        case ELogLevel::Warning:
-            SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_YELLOW);
-            break;
+            case ELogLevel::Info:
+                SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_WHITE);
+                break;
 
-        case ELogLevel::Error:
-            SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_RED);
-            break;
+            case ELogLevel::Warning:
+                SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_YELLOW);
+                break;
+
+            case ELogLevel::Error:
+                SetConsoleTextAttribute(m_handle, RUKEN_FOREGROUND_RED);
+                break;
+        }
     }
-
-    #endif
+#endif
 
     return LogFormatter::ComputeLabel(in_record);
 }

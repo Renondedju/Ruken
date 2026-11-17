@@ -9,8 +9,6 @@
 #include <format>
 #include <string_view>
 #include <forward_list>
-#include <tracy/Tracy.hpp>
-
 
 BEGIN_RUKEN_NAMESPACE
 
